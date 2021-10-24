@@ -1,0 +1,18 @@
+.switch-wrapper {
+    height:2.5rem;
+    ::deep {
+        .rz-switch {        
+            top:-1rem;
+            &:not(.rz-switch-checked) .rz-switch-circle 
+            {
+                background:var(--input-background) !important;
+            }
+            &.rz-switch-checked .rz-switch-circle {
+                background:var(--accent) !important;
+            }
+            .rz-switch-circle:before {
+                background:var(--color) !important;
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+
+
+input {
+    background:var(--input-background) !important;
+    border:var(--input-background) !important;
+    color: var(--color) !important;
+    border-radius: unset !important;
+    &:focus {
+        outline:1px solid var(--accent);
+    }
+}

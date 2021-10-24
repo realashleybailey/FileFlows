@@ -1,0 +1,44 @@
+{
+    "ProductName" : "ViWatcher",
+    "Labels": {
+        "Save":"Save",
+        "Saving":"Saving"
+    },
+    "Pages":{
+        "Home":{
+            "Title":"Home"
+        },
+        "Settings":{
+            "Title":"Settings",
+            "Labels":{
+                "Directories":"Directories",
+                "Tools":"Tools"
+            },
+            "Fields":{
+                "Source":"Source Directory",
+                "Source-Help":"The source directory containing the video files to convert.  This will be recursively searched.",
+                "Destination":"Destination Directory",
+                "Destination-Help": "The destination directory where the encode files will be placed.\nNote: If blank, the files will be saved in the same directory as the source files and the source files will be replaced.",
+                "Container":"Container",
+                "Container-Placeholder":"Select container for converted videos",
+                "Container-Help":"The container converted videos will be created with.",
+                "TestMode":"Test Mode",
+                "TestMode-Help":"When in test mode no actual encoding will be done, only the results of what would happen are shown.",
+                "HandBrakeCli":"HandBrake CLI",
+                "HandBrakeCli-Help":"The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
+                "FFProbeExe":"FFProbe",
+                "FFProbeExe-Help":"The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
+            }
+        },
+        "VideoFiles":{
+            "Title":"Video Files",
+            "Buttons":{
+                "Scan":"Scan",
+                "Scanning":"Scanning",
+                "Ignore":"Ignore",
+                "Process":"Process",
+                "View":"View"
+            }
+        }
+    }
+}

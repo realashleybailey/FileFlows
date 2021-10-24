@@ -1,0 +1,11 @@
+@namespace ViWatcher.Client.Components.Inputs
+@typeparam T
+@inherits Input<T>
+
+<InputWrapper Input="@this">
+    <div>
+        <RadzenDropDown @bind-Value="Value" AllowClear="true" Placeholder="@Placeholder"
+            Data="@Options" TextProperty="Label" ValueProperty="Value">
+        </RadzenDropDown>
+    </div>
+</InputWrapper>

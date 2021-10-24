@@ -1,0 +1,17 @@
+@namespace ViWatcher.Client.Components
+
+@if(Visible)
+{
+    <div class="blocker">
+        <div class="blocker-indicator">
+            <div class="blocker-spinner">
+            </div>
+            @if(Message != "")
+            {
+                <div class="blocker-message">
+                    @Message
+                </div>
+            }
+        </div>
+    </div>
+}

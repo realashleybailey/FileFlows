@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+@namespace ViWatcher.Client.Shared
+
+<RadzenDialog/>
+<RadzenNotification/>
+<RadzenContextMenu/>
+<RadzenTooltip/>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <div class="main">
+        @if(Blocker != null){
+            <CascadingValue Value="Blocker" IsFixed="true">
+                @Body
+            </CascadingValue>
+        }
+
+        <Blocker @ref="Blocker"></Blocker>
+    </div>
+</div>

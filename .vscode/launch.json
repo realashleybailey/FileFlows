@@ -1,0 +1,87 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [        
+        {
+            "name": "Server Build", 
+            "type": "coreclr",            
+            "request": "launch",
+            "preLaunchTask": "Server Build",
+            "program": "${workspaceFolder}/Server/bin/Debug/net6.0/Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Server",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "cwd": "${workspaceFolder}/Server",
+                "ASPNETCORE_URLS": "http://localhost:6868"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Server/Views"
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Server Watch", 
+            "type": "coreclr",            
+            "request": "launch",
+            "preLaunchTask": "Server Watch",
+            "program": "${workspaceFolder}/Server/bin/Debug/net6.0/Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Server",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "cwd": "${workspaceFolder}/Server",
+                "ASPNETCORE_URLS": "http://localhost:6868"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Server/Views"
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Client Build", 
+            "type": "coreclr",            
+            "request": "launch",
+            "preLaunchTask": "Client Build",
+            "program": "${workspaceFolder}/Client/bin/Debug/net5.0/Client.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Client",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "cwd": "${workspaceFolder}/Client",
+                "ASPNETCORE_URLS": "http://localhost:6969"
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Client Watch",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "watch",
+                "--project",
+                "${workspaceFolder}/Client/Client.csproj"
+            ],
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "cwd": "${workspaceFolder}/Client",
+            }
+        },
+    ],     
+    "compounds": [
+      {
+        "name": "Server/Client Watch",
+        "configurations": ["Server Watch", "Client Watch"]
+      },
+      {
+        "name": "Server/Client Debug",
+        "configurations": ["Server Build", "Client Watch"]
+      }
+    ] 
+}

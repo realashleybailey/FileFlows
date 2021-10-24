@@ -1,0 +1,40 @@
+@namespace ViWatcher.Client.Pages
+
+@page "/video-files"
+
+<PageView Title="@lblTitle" Icon="fas fa-cogs">
+    <Head>
+        <RadzenButton class="save-button" BusyText="@lblScan" 
+            IsBusy=@IsScanning Click=@Scan Text="@lblScan" />
+    </Head>
+    <Body>
+        <div class="video-files">
+            <div class="toolbar">
+                <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span class="fas fa-bell-slash"></span> @lblIgnore</button>
+                <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span class="fas fa-eye"></span> @lblView</button>
+                <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span class="fas fa-play"></span> @lblProcess</button>
+            </div>
+
+            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" PageSizeOptions="@pageSizeOptions"
+                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedItems 
+                AllowColumnResize="true" FilterMode="FilterMode.Advanced"  AllowPaging="true" AllowSorting="true" 
+                Data="@Files" TItem="ViWatcher.Shared.Models.VideoFile" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Width="40px" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                            <RadzenCheckBox TriState="false" TValue="bool" Value="@(Files.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
+                                            Change="@(args => SelectedItems = args ? Files.ToList() : null)" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox TriState="false" Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="Path" Title="Path"/>
+                    <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="Extension" Title="Extension"/>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    </Body>
+
+</PageView>

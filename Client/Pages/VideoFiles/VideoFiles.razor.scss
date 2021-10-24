@@ -1,0 +1,31 @@
+.video-files {
+    position:absolute;
+    top:4rem;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+}
+
+.toolbar {
+    height:2rem;
+    font-size:0.7rem;
+    button {
+        text-transform: uppercase;
+        background:transparent;
+        color:var(--color);
+        border:unset;
+        border-radius: 0 !important;
+        &:disabled {
+            color:rgba(var(--color-rgb), 0.4);
+        }
+        &:hover:not(:disabled){
+            color:var(--accent);
+            border-color: var(--accent);
+        }
+    }
+}
+
+::deep .rz-data-grid
+{
+    height:calc(100% - 2rem);
+}

@@ -1,0 +1,8 @@
+@namespace ViWatcher.Client.Components.Inputs
+@inherits Input<string>
+
+<InputWrapper Input="@this">
+    <div>
+        <RadzenTextBox @bind-Value="Value" Placeholder="@Placeholder" />
+    </div>
+</InputWrapper>

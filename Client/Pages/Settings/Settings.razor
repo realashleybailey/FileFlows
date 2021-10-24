@@ -1,0 +1,27 @@
+@namespace ViWatcher.Client.Pages
+@page "/settings"
+
+<PageView Title="@lblTitle" Icon="fas fa-cogs">
+    <Head>
+        <RadzenButton class="save-button" BusyText="@lblSaving" 
+            IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+    </Head>
+    <Body>
+        <div class="settings">
+
+            <RadzenTemplateForm Data="@Model">
+                <Fieldset Title="Pages.Settings.Labels.Directories">
+                    <InputText @bind-Value="@Model.Source" Label="Pages.Settings.Fields.Source" />
+                    <InputText @bind-Value="@Model.Destination" Label="Pages.Settings.Fields.Destination" />
+                    <InputSelect @bind-Value="@Model.Container" Label="Pages.Settings.Fields.Container" Options="Containers" />
+                    <InputSwitch @bind-Value="@Model.TestMode" Label="Pages.Settings.Fields.TestMode" />
+                </Fieldset>
+                <Fieldset Title="Pages.Settings.Labels.Tools">
+                    <InputText @bind-Value="@Model.HandBrakeCli" Label="Pages.Settings.Fields.HandBrakeCli" />
+                    <InputText @bind-Value="@Model.FFProbeExe" Label="Pages.Settings.Fields.FFProbeExe" />
+                </Fieldset>
+            </RadzenTemplateForm>
+        </div>
+    </Body>
+
+</PageView>

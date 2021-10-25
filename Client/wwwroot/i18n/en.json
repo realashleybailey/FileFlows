@@ -24,6 +24,8 @@
                 "Container-Help":"The container converted videos will be created with.",
                 "TestMode":"Test Mode",
                 "TestMode-Help":"When in test mode no actual encoding will be done, only the results of what would happen are shown.",
+                "Extensions":"Extensions",
+                "Extensions-Help":"A list of file extensions to be considered a video file",
                 "HandBrakeCli":"HandBrake CLI",
                 "HandBrakeCli-Help":"The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
                 "FFProbeExe":"FFProbe",

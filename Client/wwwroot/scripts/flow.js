@@ -30,6 +30,8 @@ window.ViFlow = {
         container.addEventListener("mouseup", ViFlow.dragEnd, false);
         container.addEventListener("mouseup", ViFlow.ioMouseUp, false);
         container.addEventListener("mousemove", ViFlow.drag, false);
+        container.addEventListener("mousemove", ViFlow.ioMouseMove, false);
+        
 
 
         let canvas = document.querySelector('canvas');
@@ -94,6 +96,7 @@ window.ViFlow = {
             ViFlow.yOffset = ViFlow.currentY;
 
             ViFlow.setTranslate(ViFlow.currentX, ViFlow.currentY, ViFlow.dragItem);
+            ViFlow.redrawLines();
         }
     },
 
@@ -133,16 +136,37 @@ window.ViFlow = {
     ioSelected: null,
     ioIsInput: null,
     ioContext: null,
+    ioCanvas: null,
+    ioSourceBounds: null,
+    ioCanvasBounds: null,
     ioOutputConnections: new Map(),
     ioDown: function (event, isInput) {
         ViFlow.ioNode = event.target;
         ViFlow.ioSelected = ViFlow.ioNode.parentNode.parentNode;
         ViFlow.ioIsInput = isInput;
+
+        let canvas = document.querySelector('canvas');
+        ViFlow.ioCanvasBounds = canvas.getBoundingClientRect();     
+        var srcBounds = ViFlow.ioNode.getBoundingClientRect();   
+        let srcX = srcBounds.left - ViFlow.ioCanvasBounds.left;
+        let srcY = srcBounds.top - ViFlow.ioCanvasBounds.top;
+        ViFlow.ioSourceBounds = { left: srcX, top: srcY };
+        
         if (ViFlow.selectedOutput != null) {
         }
         else {
             // start drawing line
         }
+    },
+
+    ioMouseMove: function (event) {
+        if (!ViFlow.ioNode)
+            return;
+        
+        let destX = event.clientX - ViFlow.ioCanvasBounds.left;
+        let destY = event.clientY - ViFlow.ioCanvasBounds.top;
+        ViFlow.redrawLines();
+        ViFlow.drawLineToPoint(ViFlow.ioSourceBounds.left, ViFlow.ioSourceBounds.top, destX, destY);        
     },
 
     ioMouseUp: function (event) {
@@ -168,6 +192,7 @@ window.ViFlow = {
         
         ViFlow.ioNode = null;
         ViFlow.ioSelected = null;
+        ViFlow.redrawLines();
     },
 
 
@@ -189,16 +214,16 @@ window.ViFlow = {
         ViFlow.ioContext.clearRect(0, 0, canvas.width, canvas.height);
 
         for (let output of outputs) {
-            console.log('output', output);
             let connections = ViFlow.ioOutputConnections.get(output);
             if(!connections)
                 continue;
-            console.log('################connections',connections);
             for (let input of connections) {
                 ViFlow.drawLine(input, output);
             }
         }
     },
+
+    accentColor: null,
 
     drawLine: function (input, output) {
         
@@ -207,25 +232,33 @@ window.ViFlow = {
         let srcBounds = src.getBoundingClientRect();
         let destBounds = dest.getBoundingClientRect();
 
-        let canvas = document.querySelector('canvas');
-        let canvasBounds = canvas.getBoundingClientRect();
+        if (!ViFlow.ioCanvas)
+            ViFlow.ioCanvas = document.querySelector('canvas');
+        let canvasBounds = ViFlow.ioCanvas.getBoundingClientRect();
 
-        if (!ViFlow.ioContext) 
-            ViFlow.ioContext = canvas.getContext('2d');
-        
-        ViFlow.ioContext.beginPath();
         let srcX = srcBounds.left - canvasBounds.left;
         let srcY = srcBounds.top - canvasBounds.top;
         let destX = destBounds.left - canvasBounds.left;
         let destY = destBounds.top - canvasBounds.top;
+        ViFlow.drawLineToPoint(srcX, srcY, destX, destY);
+    },
+
+    drawLineToPoint: function ( srcX, srcY, destX, destY)
+    {
+        if (!ViFlow.ioContext) {
+            if (!ViFlow.ioCanvas)
+                ViFlow.ioCanvas = document.querySelector('canvas');
+            ViFlow.ioContext = ViFlow.ioCanvas.getContext('2d');
+        }
+        
+        ViFlow.ioContext.beginPath();
+
         ViFlow.ioContext.moveTo(srcX, srcY);
         ViFlow.ioContext.lineTo(destX, destY);
-        console.log('src: ', srcX, srcY);
-        console.log('dest: ', destX,destY );
         ViFlow.ioContext.lineWidth = 5;
-        let color = ViFlow.colorFromCssClass('--accent');
-        console.log('color: ', color);
-        ViFlow.ioContext.strokeStyle = color;
+        if(!ViFlow.accentColor)
+            ViFlow.accentColor = ViFlow.colorFromCssClass('--accent');
+        ViFlow.ioContext.strokeStyle = ViFlow.accentColor;
         ViFlow.ioContext.stroke();
     }
 }

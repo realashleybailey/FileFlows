@@ -15,6 +15,7 @@
                     <InputText @bind-Value="@Model.Destination" Label="Pages.Settings.Fields.Destination" />
                     <InputSelect @bind-Value="@Model.Container" Label="Pages.Settings.Fields.Container" Options="Containers" />
                     <InputSwitch @bind-Value="@Model.TestMode" Label="Pages.Settings.Fields.TestMode" />
+                    <InputArray @bind-Value="@Model.Extensions" Label="Pages.Settings.Fields.Extensions" EnterOnSpace="@true" />
                 </Fieldset>
                 <Fieldset Title="Pages.Settings.Labels.Tools">
                     <InputText @bind-Value="@Model.HandBrakeCli" Label="Pages.Settings.Fields.HandBrakeCli" />

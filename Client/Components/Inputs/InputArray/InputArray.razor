@@ -1,0 +1,15 @@
+@namespace ViWatcher.Client.Components.Inputs
+@inherits Input<string[]>
+
+<InputWrapper Input="@this">
+    <div class="input-array-wrapper">
+        @foreach(var str in Value ?? new string[]{})
+        {
+            <span class="chip">
+                @str
+                <span class="remove fas fa-times" @onclick="() => Remove(str)"></span>
+            </span>
+        }
+        <input type="text" @onkeyup="OnKeyDown" @bind-value="InputText" @bind-value:event="oninput" />
+    </div>
+</InputWrapper>

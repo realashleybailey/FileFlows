@@ -2,7 +2,7 @@
 
 @page "/video-files"
 
-<PageView Title="@lblTitle" Icon="fas fa-cogs">
+<PageView>
     <Head>
         <RadzenButton class="save-button" BusyText="@lblScan" 
             IsBusy=@IsScanning Click=@Scan Text="@lblScan" />
@@ -29,7 +29,7 @@
                             <RadzenCheckBox TriState="false" Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="ShortName" Title="Name" />
                     <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="Path" Title="Path"/>
                     <RadzenDataGridColumn TItem="ViWatcher.Shared.Models.VideoFile" Property="Extension" Title="Extension"/>
                 </Columns>

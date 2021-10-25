@@ -15,7 +15,7 @@ namespace ViWatcher.Client.Pages
 
         private bool IsSaving { get; set; }
 
-        private string lblTitle, lblSave, lblSaving, lblSource, lblDestination;
+        private string lblSave, lblSaving, lblSource, lblDestination;
 
         private ViWatcher.Shared.Models.Settings Model { get; set; } = new ViWatcher.Shared.Models.Settings();
 
@@ -23,7 +23,6 @@ namespace ViWatcher.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            lblTitle = Translater.Instant("Pages.Settings.Title");
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             lblSource = Translater.Instant("Pages.Settings.Fields.Source");

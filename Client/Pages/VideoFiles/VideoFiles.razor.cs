@@ -12,7 +12,7 @@ namespace ViWatcher.Client.Pages
     public partial class VideoFiles:ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
-        private string lblTitle, lblScanning, lblScan, lblIgnore, lblProcess, lblView;
+        private string lblScanning, lblScan, lblIgnore, lblProcess, lblView;
         IEnumerable<int> pageSizeOptions = new int[] { 50, 100, 250, 500 };
 
         private RadzenDataGrid<xVideoFile> _DataGrid;
@@ -30,7 +30,6 @@ namespace ViWatcher.Client.Pages
         private bool IsScanning{ get; set; }
         protected override void OnInitialized()
         {
-            lblTitle = Translater.Instant("Pages.VideoFiles.Title");
             lblScan = Translater.Instant("Pages.VideoFiles.Button.Scan");
             lblScanning = Translater.Instant("Pages.VideoFiles.Button.Scanning");
             lblIgnore = Translater.Instant("Pages.VideoFiles.Button.Ignore");

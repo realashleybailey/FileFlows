@@ -44,8 +44,8 @@ namespace ViWatcher.Server.Controllers
                             continue;
                         var vidfile = new VideoFile
                         {
-                            FullName = file.FullName,
-                            Name = file.Name,
+                            Name = file.FullName,
+                            ShortName = file.Name,
                             Path = file.DirectoryName,
                             Extension = extension
                         };

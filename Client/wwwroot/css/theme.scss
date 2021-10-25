@@ -14,9 +14,18 @@ body {
     --accent:rgb(255, 0, 144);
     --accent-rgb:255, 0, 144;
 
+    --border-color:rgba(var(--color-rgb), 0.1);
+
     --input-background: rgb(49, 49, 49);
 
     --primary: #0366d6;
     --error: #ff0000;
     --modified:rgba(var(--accent-rgb), 0.4);
+
+    
+    // flow colours
+    --flow-logic: var(--orange);
+    --flow-input: var(--accent);
+    --flow-output: var(--indigo);
+    --flow-process: var(--cyan);
 }

@@ -39,6 +39,12 @@
                 "Process":"Process",
                 "View":"View"
             }
+        },
+        "Flows":{
+            "Title":"Flows"
+        },
+        "Flow":{
+            "Title":"Flow"
         }
     }
 }

@@ -1,0 +1,31 @@
+@namespace ViWatcher.Client.Pages
+
+@page "/flow"
+
+<PageView>
+    <Body>                   
+        <div class="flow-container">
+            <div class="flow-elements">
+                <ul id="flow-elements-available">                    
+                 @if(Available != null){
+                        @foreach(var ele in Available){
+                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ViFlow.dragElementStart(event)">@ele.Name</li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="flow-parts" id="flow-parts" ondragover="ViFlow.drop(event, false)" ondrop="ViFlow.drop(event, true)" @onclick="() => Select(null)">                
+                <canvas width="8000" height="4000"></canvas>
+                @if(Parts != null)
+                {
+                    <CascadingValue IsFixed="true" Value="this">
+                    @foreach(var part in Parts){                        
+                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)"></FlowElement>
+                    }
+                    </CascadingValue>
+                }
+
+            </div>
+        </div>
+    </Body>
+</PageView>

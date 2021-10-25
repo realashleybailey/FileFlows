@@ -3,10 +3,10 @@
 <div class="page-view">
     <div class="top-row">
         <span class="title">
-            @if(string.IsNullOrEmpty(Icon) == false){
-                <span class="icon @Icon"></span>
+            @if(string.IsNullOrEmpty(Menu?.Active?.Icon) == false){
+                <span class="icon @Menu.Active.Icon"></span>
             }
-            @Title
+            @Menu?.Active?.Title
         </span>
         <span class="other">
             @Head

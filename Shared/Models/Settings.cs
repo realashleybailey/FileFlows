@@ -1,6 +1,6 @@
 ﻿namespace ViWatcher.Shared.Models
 {
-    public class Settings
+    public class Settings:ViObject
     {
         public string Container { get; set; }
         public string Source{ get; set; }

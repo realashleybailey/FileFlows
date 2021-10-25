@@ -1,15 +1,14 @@
-using Microsoft.AspNetCore.Components;
+namespace ViWatcher.Client.Components
+{
+    using Microsoft.AspNetCore.Components;
+    using ViWatcher.Client.Shared;
 
-namespace ViWatcher.Client.Components{
     public partial class PageView 
     {
-        [Parameter]
-        public string Title{ get; set; }
-        
-        [Parameter]
-        public string Icon{ get; set; }
+        [CascadingParameter]
+        public NavMenu Menu{ get; set; }
 
-        
+
         [Parameter]
         public RenderFragment Head { get; set; }
 

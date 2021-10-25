@@ -9,13 +9,15 @@
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu @ref="Menu" />
     </div>
 
     <div class="main">
-        @if(Blocker != null){
-            <CascadingValue Value="Blocker" IsFixed="true">
-                @Body
+        @if(Blocker != null && Menu != null){
+            <CascadingValue Value="Menu" IsFixed="true">
+                <CascadingValue Value="Blocker" IsFixed="true">
+                    @Body
+                </CascadingValue>
             </CascadingValue>
         }
 

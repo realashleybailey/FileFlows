@@ -45,7 +45,7 @@ namespace ViWatcher.Server.Helpers
             using (var db = GetDb())
             {
                 var dbObjects = db.Fetch<DbObject>("where Type=@0", typeof(T).FullName);
-                return dbObjects.Select(x => JsonConvert.DeserializeObject<T>(x.Data));
+                return dbObjects.Select(x => Convert<T>(x));
             }
         }
 
@@ -54,8 +54,24 @@ namespace ViWatcher.Server.Helpers
             using (var db = GetDb())
             {
                 var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", typeof(T).FullName);                
-                return string.IsNullOrEmpty(dbObject?.Data) ? new T() : JsonConvert.DeserializeObject<T>(dbObject.Data);
+                if(string.IsNullOrEmpty(dbObject?.Data))
+                    return new T();
+                return Convert<T>(dbObject);
             }
+        }
+
+
+        private static T Convert<T>(DbObject dbObject)
+        {            
+            T result = JsonConvert.DeserializeObject<T>(dbObject.Data);
+            if(result is ViWatcher.Shared.Models.ViObject viObj)
+            {
+                viObj.Uid = Guid.Parse(dbObject.Uid);
+                viObj.Name = dbObject.Name;
+                viObj.DateModified = dbObject.DateModified;
+                viObj.DateCreated = dbObject.DateCreated;
+            }
+            return result;
         }
 
         public static void Update(object obj)

@@ -1,11 +1,11 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using ViWatcher.Server;
-using ViWatcher.Shared.Models;
-using ViWatcher.Server.Helpers;
-
 namespace ViWatcher.Server.Controllers
 {
+    using System.Diagnostics;
+    using Microsoft.AspNetCore.Mvc;
+    using ViWatcher.Server;
+    using ViWatcher.Shared.Models;
+    using ViWatcher.Server.Helpers;
+
     [Route("/api/settings")]
     public class SettingsController : Controller
     {

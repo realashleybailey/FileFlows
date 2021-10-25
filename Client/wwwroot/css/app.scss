@@ -70,3 +70,16 @@ a, .btn-link {
         background:var(--accent) !important;
     }
 }
+.draggable {
+    cursor:grab;
+    
+    &:active {
+        cursor: grabbing !important;
+    }
+    &:hover {
+        cursor:grab;
+    }
+}
+.dragging {
+    cursor: grabbing;
+}

@@ -5,6 +5,6 @@ namespace ViWatcher.Shared.Attributes
 
     public class TextAreaAttribute : FormInputAttribute
     {
-        public TextAreaAttribute() : base(FormInputType.TextArea) { }
+        public TextAreaAttribute(int order) : base(FormInputType.TextArea, order) { }
     }
 }

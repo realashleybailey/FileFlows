@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Components 
+namespace ViWatcher.Client.Components.Inputs 
 {
     using Microsoft.AspNetCore.Components;
     using ViWatcher.Shared;

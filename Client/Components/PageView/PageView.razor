@@ -1,19 +1,10 @@
 @namespace ViWatcher.Client.Components
 
-<div class="page-view">
-    <div class="top-row">
-        <span class="title">
-            @if(string.IsNullOrEmpty(Menu?.Active?.Icon) == false){
-                <span class="icon @Menu.Active.Icon"></span>
-            }
-            @Menu?.Active?.Title
-        </span>
-        <span class="other">
-            @Head
-        </span>
-    </div>
-
-    <div class="content">
+<ViContainer Title="@Menu?.Active?.Title" Icon="@Menu?.Active?.Icon">
+    <Head>
+        @Head
+    </Head>
+    <Body>
         @Body
-    </div>
-</div>
+    </Body>
+</ViContainer>

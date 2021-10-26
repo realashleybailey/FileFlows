@@ -1,0 +1,7 @@
+.row {
+    flex-grow:1;
+}
+::deep .monaco-editor-container  {
+    height:calc(100% - 2rem);
+    width:calc(100% - 1rem);
+}

@@ -24,7 +24,7 @@
                 {
                     <CascadingValue IsFixed="true" Value="this">
                     @foreach(var part in Parts){                        
-                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)"></FlowElement>
+                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)" OnEdit="() => Edit(part)"></FlowElement>
                     }
                     </CascadingValue>
                 }
@@ -33,3 +33,5 @@
         </div>
     </Body>
 </PageView>
+
+<FlowPartEditor @ref="Editor"></FlowPartEditor>

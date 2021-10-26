@@ -20,6 +20,9 @@ namespace ViWatcher.Client.Pages
         [CascadingParameter] Blocker Blocker { get; set; }
         private viFlowElement[] Available{ get; set; }
         private List<viFlowPart> Parts { get; set; } = new List<viFlowPart>();
+
+        private FlowPartEditor Editor{ get; set; }
+
         public viFlowPart SelectedPart{ get; set; }
         [Inject]
         private IJSRuntime jsRuntime{ get; set; }
@@ -95,6 +98,18 @@ namespace ViWatcher.Client.Pages
             SelectedPart = part;
         }
 
+        internal async Task DeletePart(viFlowPart part)
+        {
+            if (part != null)
+            {
+                this.Parts.Remove(part);
+                this.StateHasChanged();
+                await WaitForRender();
+                await InitModel(this.Model);
+                await jsRuntime.InvokeVoidAsync("ViFlow.redrawLines");
+            }
+        }
+
         [JSInvokable]
         public void UpdatePosition(string uidString, int xPos, int yPos)
         {
@@ -111,11 +126,8 @@ namespace ViWatcher.Client.Pages
         }
 
         [JSInvokable]
-        public void AddElement(string uidString, int xPos, int yPos)
+        public void AddElement(string uid, int xPos, int yPos)
         {
-            Guid uid;
-            if(Guid.TryParse(uidString, out uid) == false)
-                 return;
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
             if(element == null)
                 return;
@@ -126,12 +138,15 @@ namespace ViWatcher.Client.Pages
         }
 
         [JSInvokable]
-        public void MakeConnection(string uidInput, string uidOutput, int input, int output)
+        public void AddConnection(string uidInput, string uidOutput, int input, int output)
         {
+            Logger.Instance.DLog($"adding connnection 0: {uidInput}, {uidOutput}, {input}, {output}");
             var fpInput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidInput);
             var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
             if(fpInput == null || fpOutput == null)
                 return;
+            Logger.Instance.DLog($"adding connnection 1: {uidInput}, {uidOutput}, {input}, {output}");
+
 
             fpOutput.OutputConnections ??= new List<ViWatcher.Shared.Models.FlowConnection>();
             fpOutput.OutputConnections.Add(new ViWatcher.Shared.Models.FlowConnection
@@ -140,6 +155,19 @@ namespace ViWatcher.Client.Pages
                 Output = output,
                 InputNode = fpInput.Uid
             });
+            // make sure there are no duplicates
+            fpOutput.OutputConnections = fpOutput.OutputConnections.GroupBy(x => x.Input + "," + x.Output + "," + x.InputNode).Select(x => x.First()).ToList();
+        }
+
+        [JSInvokable]
+        public void RemoveConnection(string uidInput, string uidOutput, int input, int output)
+        {
+            var fpInput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidInput);
+            var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
+            if(fpInput == null || fpOutput == null)
+                return;
+
+            fpOutput.OutputConnections = fpOutput.OutputConnections?.Where(x => x.Input != input && x.Output != output && x.InputNode != fpInput.Uid)?.ToList();
         }
         private void AddPart(viFlowElement element, float xPos, float yPos)
         {            
@@ -154,7 +182,6 @@ namespace ViWatcher.Client.Pages
             part.Uid = Guid.NewGuid();
             Parts.Add(part);
         }
-
         
         private async Task Save()
         {
@@ -168,6 +195,15 @@ namespace ViWatcher.Client.Pages
                         Name = "SOme flow",
                     };
                 }
+                // ensure there are no duplicates and no rogue connections
+                Guid[] nodeUids = Parts.Select(x => x.Uid).ToArray();
+                foreach (var p in Parts)
+                {
+                    p.OutputConnections = p.OutputConnections
+                                          ?.Where(x => nodeUids.Contains(x.InputNode))
+                                          ?.GroupBy(x => x.Input + "," + x.Output + "," + x.InputNode).Select(x => x.First())
+                                          ?.ToList();
+                }
                 Model.Parts = this.Parts;
                 var result = await HttpHelper.Put<viFlow>(API_URL, Model);
                 if(result.Success)
@@ -178,6 +214,16 @@ namespace ViWatcher.Client.Pages
                 this.IsSaving = false;
                 this.Blocker.Hide();
             }
+        }
+
+        async Task Edit(viFlowPart part)
+        {
+            var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
+            if(flowElement == null){
+                // cant find it, cant edit
+                return;
+            }
+            await Editor.Open(part, flowElement);
         }
     }
 }

@@ -2,7 +2,8 @@
     "ProductName" : "ViWatcher",
     "Labels": {
         "Save":"Save",
-        "Saving":"Saving"
+        "Saving":"Saving",
+        "Cancel":"Cancel"
     },
     "Pages":{
         "Home":{

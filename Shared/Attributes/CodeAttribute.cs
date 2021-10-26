@@ -5,6 +5,6 @@ namespace ViWatcher.Shared.Attributes
 
     public class CodeAttribute : FormInputAttribute
     {
-        public CodeAttribute() : base(FormInputType.Code) { }
+        public CodeAttribute(int order) : base(FormInputType.Code, order) { }
     }
 }

@@ -1,0 +1,19 @@
+@namespace ViWatcher.Client.Components
+
+<div class="vi-container">
+    <div class="top-row">
+        <span class="title">
+            @if(string.IsNullOrEmpty(Icon) == false){
+                <span class="icon @Icon"></span>
+            }
+            @Title
+        </span>
+        <span class="other">
+            @Head
+        </span>
+    </div>
+
+    <div class="content">
+        @Body
+    </div>
+</div>

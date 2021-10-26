@@ -7,8 +7,11 @@ namespace ViWatcher.Shared.Attributes
     {
         public FormInputType InputType{ get; set; }
 
-        public FormInputAttribute(FormInputType type){
+        public int Order{ get; set; }
+
+        public FormInputAttribute(FormInputType type, int order){
             this.InputType = type;
+            this.Order = order;
         }
     }
 }

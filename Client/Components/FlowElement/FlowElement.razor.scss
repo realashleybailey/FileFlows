@@ -1,6 +1,7 @@
 .flow-part {
     display:flex;
     flex-direction: row;
+    outline:unset !important;
     .icon-wrapper {
         width: 2rem;
         border-right: solid 3px;

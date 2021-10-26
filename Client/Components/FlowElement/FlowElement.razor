@@ -1,7 +1,8 @@
 @namespace ViWatcher.Client.Components
 
 <div id="@Part.Uid" style="position:absolute;left:@(Part.xPos)px;top:@(Part.yPos)px"                             
-    @onclick="() => Select()"  @onclick:stopPropagation
+    @onclick="() => Select()"  @onclick:stopPropagation @ondblclick="() => Edit()" @ondblclick:stopPropagation
+    tabindex="1" @onkeydown="KeyDown" @onkeydown:stopPropagation @onkeydown:preventDefault    
     class="flow-part @Part.Type @(Selected ? "selected" : "") size-@(Math.Max(Part.Inputs, Part.Outputs))">
     @if(Part.Inputs > 0)
     {
@@ -11,7 +12,7 @@
             }
         </div>
     }
-    <div class="icon-wrapper"><span class="icon fas fa-chevron-right"></span></div>
+    <div class="icon-wrapper"><span class="icon @Icon"></span></div>
     <span class="name">@Part.Name</span>
     @if(Part.Outputs > 0)
     {

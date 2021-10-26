@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Pages 
+namespace ViWatcher.Client.Components.Inputs 
 {
     using Models;
     using ViWatcher.Client.Helpers;
@@ -10,14 +10,9 @@ namespace ViWatcher.Client.Pages
     using ViWatcher.Client.Components;
     using BlazorMonaco;
     using Microsoft.JSInterop;
-
-    public partial class CodeEditor : ComponentBase
+    
+    public partial class InputCode : Input<string>
     {
-        [CascadingParameter] Blocker Blocker { get; set; }
-
-        private bool IsSaving { get; set; }
-
-        private string lblSave, lblSaving;
 
         const string API_URL = "/api/code-eval";
 
@@ -25,29 +20,8 @@ namespace ViWatcher.Client.Pages
 
         [Inject]
         private IJSRuntime jsRuntime{ get; set; }
+
         
-        protected override void OnInitialized()
-        {
-            lblSave = Translater.Instant("Labels.Save");
-            lblSaving = Translater.Instant("Labels.Saving");
-        }
-
-        private async Task Save()
-        {
-            this.Blocker.Show(lblSaving);
-            this.IsSaving = true;
-            try
-            {
-                string code = await Editor.GetValue();
-                var resault = await HttpHelper.Post<string>(API_URL + "/validate", code);                
-            }
-            finally
-            {
-                this.IsSaving = false;
-                this.Blocker.Hide();
-            }
-        }
-
         private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
         {
             return new StandaloneEditorConstructionOptions

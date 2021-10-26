@@ -13,6 +13,8 @@ namespace ViWatcher.Shared
         Switch = 2,
         Select = 3,
         TextArea = 4,
-        Code = 5
+        Code = 5,
+        Int = 6,
+        Float = 7
     }
 }

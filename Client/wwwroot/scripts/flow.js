@@ -131,10 +131,15 @@ window.ViFlow = {
 
     ioCanvas: null,
     ioSelectedConnection: null,
+    accentColor: null,
+    lineColor: null,
     getCanvas: function () {
          
         if (ViFlow.ioCanvas)
             return ViFlow.ioCanvas;
+        
+        ViFlow.accentColor = ViFlow.colorFromCssClass('--accent');
+        ViFlow.lineColor = ViFlow.colorFromCssClass('--color-darkest');
         
         let canvas = document.querySelector('canvas');
         // Listen for mouse moves
@@ -144,11 +149,11 @@ window.ViFlow = {
             for (let line of ViFlow.ioLines) {
                 // Check whether point is inside ellipse's stroke
                 if (ctx.isPointInStroke(line.path, event.offsetX, event.offsetY)) {
-                    ctx.strokeStyle = 'green';
+                    ctx.strokeStyle = ViFlow.accentColor;
                     ViFlow.ioSelectedConnection = line;
                 }
                 else {
-                    ctx.strokeStyle = ViFlow.accentColor;
+                    ctx.strokeStyle = ViFlow.lineColor;
                 }
         
                 // Draw ellipse
@@ -157,13 +162,29 @@ window.ViFlow = {
         });
         canvas.addEventListener('keydown', function (event) {
             if (event.code === 'Delete' && ViFlow.ioSelectedConnection) {
+                console.log('deleting');
                 let selected = ViFlow.ioSelectedConnection;
-                console.log('delete connection', selected);
-                let connections = ViFlow.ioOutputConnections.get(selected.output.getAttribute('id'));
+                let outputUid = selected.output.parentNode.parentNode.getAttribute('id');
+                let outputNodeUid = selected.output.getAttribute('id');
+                let outputIndex = parseInt(selected.output.getAttribute('x-output'), 10);
+                let connections = ViFlow.ioOutputConnections.get(outputNodeUid);
                 let index = connections.indexOf(selected.connection);
                 if (index >= 0) {
                     connections.splice(index, 1);
                 }
+                console.log('delete 2',
+                selected.connection.part,
+                outputUid,
+                selected.connection.index,
+                outputIndex);
+
+                ViFlow.csharp.invokeMethodAsync("RemoveConnection",
+                    selected.connection.part,
+                    outputUid,
+                    selected.connection.index,
+                    outputIndex
+                );
+
                 ViFlow.redrawLines();               
             }
         });
@@ -233,17 +254,12 @@ window.ViFlow = {
         if (!ViFlow.ioNode)
             return;
                 
-        console.log('ioMouseUp', event.target);
         let target = event.target;
         let suitable = target?.classList?.contains(ViFlow.ioIsInput ? 'output' : 'input') === true;
         if (suitable) {
-            console.log('suitable drop target!');
             let input = ViFlow.isInput ? ViFlow.ioNode : target;
             let output = ViFlow.isInput ? target : ViFlow.ioNode;
             let outputId = output.getAttribute('id');
-
-            console.log('input', input, 'output', output);
-            ViFlow.drawLine(input, output);
 
             if (input.classList.contains('connected') === false)
                 input.classList.add('connected');
@@ -256,15 +272,22 @@ window.ViFlow = {
                 connections = ViFlow.ioOutputConnections.get(outputId);
             }
             let index = parseInt(input.getAttribute('x-input'), 10);
-            console.log('index', input.getAttribute('x-input'), input);
-            connections.push({ index: index, part: input.parentNode.parentNode.getAttribute('id')});
 
-            ViFlow.csharp.invokeMethodAsync("MakeConnection",
-                input.parentNode.parentNode.getAttribute('id'),
-                output.parentNode.parentNode.getAttribute('id'),
-                parseInt(input.getAttribute("x-input"), 10),
-                parseInt(output.getAttribute("x-output"), 10)
-            );
+            let part = input.parentNode.parentNode.getAttribute('id');
+            let existing = connections.filter(x => x.index == index && x.part == part);
+            if (!existing || existing.length === 0) {
+
+                ViFlow.drawLine(input, output);
+    
+                connections.push({ index: index, part: part });
+
+                ViFlow.csharp.invokeMethodAsync("AddConnection",
+                    input.parentNode.parentNode.getAttribute('id'),
+                    output.parentNode.parentNode.getAttribute('id'),
+                    parseInt(input.getAttribute("x-input"), 10),
+                    parseInt(output.getAttribute("x-output"), 10)
+                );
+            }
         }
         
         ViFlow.ioNode = null;
@@ -276,7 +299,10 @@ window.ViFlow = {
     colorFromCssClass: function (variable) {
         var tmp = document.createElement("div"), color;
         tmp.style.cssText = "position:fixed;left:-100px;top:-100px;width:1px;height:1px";
-        tmp.style.color = "var(" + variable + ")";
+        if (variable.startsWith('--'))
+            tmp.style.color = "var(" + variable + ")";
+        else
+            tmp.style.color = variable;
         document.body.appendChild(tmp);  // required in some browsers
         color = getComputedStyle(tmp).getPropertyValue("color");
         document.body.removeChild(tmp);
@@ -299,15 +325,16 @@ window.ViFlow = {
             for (let input of connections) {
                 let inputEle = document.getElementById(input.part + '-input-' + input.index);
                 if (!inputEle)
-                    console.log('failed to locate: ', input.part + '-input-' + input.index);
+                    console.log('failed to locate: ' + input.part + '-input-' + input.index, input);
                 ViFlow.drawLine(inputEle, output, input);
             }
         }
     },
 
-    accentColor: null,
-
     drawLine: function (input, output, connection) {
+
+        if (!input || !output)
+            return;
         
         let src = output;
         let dest = input;
@@ -345,9 +372,7 @@ window.ViFlow = {
         }
 
         context.lineWidth = 5;
-        if(!ViFlow.accentColor)
-            ViFlow.accentColor = ViFlow.colorFromCssClass('--accent');
-        context.strokeStyle = ViFlow.accentColor;
+        context.strokeStyle = ViFlow.lineColor;
         //context.fill(path);
         context.stroke(path);
         

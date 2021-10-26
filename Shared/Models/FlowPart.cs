@@ -3,9 +3,11 @@ namespace ViWatcher.Shared.Models
     using System;
     using System.Collections.Generic;
 
-    public class FlowPart:ViObject
+    public class FlowPart
     {
-        public Guid FlowElementUid { get; set; }
+        public Guid Uid{ get; set; } 
+        public string Name{ get; set;  }
+        public string FlowElementUid { get; set; }
         public float xPos{ get; set; }
         public float yPos { get; set; }
 
@@ -15,6 +17,8 @@ namespace ViWatcher.Shared.Models
         public List<FlowConnection> OutputConnections { get; set; }
 
         public FlowElementType Type { get; set; }
+
+        public object Model{ get; set; }
     }
 
     public class FlowConnection {

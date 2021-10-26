@@ -1,0 +1,46 @@
+@namespace ViWatcher.Client.Components 
+@using ViWatcher.Shared
+
+@if(Visible && Part != null)
+{
+    <div class="flow-part-editor-wrapper">
+        <div class="flow-part-editor-background"></div>
+        <div class="flow-part-editor">
+
+            <ViContainer Title="@Part.Type.ToString()" Icon="@Icon">
+                <Head>
+                    <RadzenButton class="save-button" BusyText="@lblSaving" 
+                        IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+
+                    <RadzenButton class="cancel-button" Click=@Cancel Text="@lblCancel" />
+                </Head>
+                <Body>
+                    <div class="fields">
+                    @foreach(var field in Element.Fields.OrderBy(x => x.Order)){                        
+                        switch(field.InputType)
+                        {
+                            case FormInputType.Int:
+                            {
+                                <InputNumber Label="@field.Name" /> 
+                            }
+                            break;
+                            case FormInputType.Code:
+                            {
+                                <InputCode Label="@field.Name" /> 
+                            }
+                            break;
+                            default:
+                            {
+                                <span>@field.InputType</span>
+                            }
+                            break;
+                        }
+                    }
+                        <div class="empty"></div>
+                    </div>
+                </Body>
+            </ViContainer>
+        </div>
+
+    </div>
+}

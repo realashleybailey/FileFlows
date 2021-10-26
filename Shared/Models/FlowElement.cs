@@ -1,17 +1,31 @@
 namespace ViWatcher.Shared.Models
 {
-    public class FlowElement:ViObject
+    using System.Collections.Generic;
+
+    public class FlowElement
     {
-        public virtual int Inputs{ get; set; }
-        public virtual int Outputs{ get; set; }
-        public virtual FlowElementType Type { get; set; }
+        public string Uid{ get; set; }
+        public string Name{ get; set; }
 
-        public virtual string Group{ get; set; }
+        public int Inputs{ get; set; }
+        public int Outputs{ get; set; }
+        public FlowElementType Type { get; set; }
 
-        public virtual int MaxInputs { get => -1; }
-        public virtual int MaxOutputs { get => -1; }
-        public virtual int MinInputs { get => -1; }
-        public virtual int MinOutputs { get => -1; }
+        public string Group{ get; set; }
+
+        public int MaxInputs { get => -1; }
+        public int MaxOutputs { get => -1; }
+        public int MinInputs { get => -1; }
+        public int MinOutputs { get => -1; }
+
+        public List<FlowElementField> Fields{ get; set; }
+    }
+
+    public class FlowElementField{
+        public int Order{ get; set; }
+        public string Type{ get; set; }
+        public string Name{ get; set; }
+        public FormInputType InputType{ get; set; }
     }
 
 }

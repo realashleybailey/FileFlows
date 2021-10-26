@@ -8,6 +8,9 @@
         "Home":{
             "Title":"Home"
         },
+        "CodeEditor":{
+            "Title":"Code Editor"
+        },
         "Settings":{
             "Title":"Settings",
             "Labels":{

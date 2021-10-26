@@ -40,11 +40,17 @@
     .icon-wrapper, .input, .output {
         border-color:var(--flow-logic) !important;
     }
+    .connected {
+        background-color:var(--flow-logic) !important;
+    }
 }
 .Input:not(.selected) 
 {
     .icon-wrapper, .input, .output  {
         border-color:var(--flow-input) !important;
+    }
+    .connected {
+        background-color:var(--flow-input) !important;
     }
 }
 .Output:not(.selected) 
@@ -52,17 +58,26 @@
     .icon-wrapper, .input, .output  {
         border-color:var(--flow-output) !important;
     }
+    .connected {
+        background-color:var(--flow-output) !important;
+    }
 }
 .Process:not(.selected) 
 {
     .icon-wrapper, .input, .output  {
         border-color:var(--flow-process) !important;
     }
+    .connected {
+        background-color:var(--flow-process) !important;
+    }
 }
 .selected 
 {
     .icon-wrapper, .input, .output  {
         border-color:var(--accent) !important;
+    }    
+    .connected {
+        background-color:var(--accent) !important;
     }
 }
 

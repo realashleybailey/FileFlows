@@ -1,0 +1,6 @@
+.code-editor {
+    height:calc(100% - 1rem);
+    ::deep .monaco-editor-container  {
+        height:100%;
+    }
+}

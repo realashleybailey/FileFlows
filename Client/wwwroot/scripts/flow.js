@@ -40,6 +40,8 @@ window.ViFlow = {
         canvas.style.width = canvas.width + 'px';
         canvas.style.height = canvas.height + 'px';
 
+        ViFlow.redrawLines();
+
     },
 
     dragStart: function (e) {
@@ -119,9 +121,7 @@ window.ViFlow = {
         event.preventDefault();
         if (dropping !== true)
             return;
-        //console.log('dropped', ViFlow.draggingElementUid);
         let bounds = event.target.getBoundingClientRect();
-//        console.log('target', event.target, event.target.offsetLeft, event.target.offsetTop, bounds);
 
         let xPos = event.clientX - bounds.left - 20;
         let yPos = event.clientY - bounds.top - 20;
@@ -129,6 +129,47 @@ window.ViFlow = {
         ViFlow.csharp.invokeMethodAsync("AddElement", ViFlow.draggingElementUid, xPos, yPos);        
     },
 
+    ioCanvas: null,
+    ioSelectedConnection: null,
+    getCanvas: function () {
+         
+        if (ViFlow.ioCanvas)
+            return ViFlow.ioCanvas;
+        
+        let canvas = document.querySelector('canvas');
+        // Listen for mouse moves
+        canvas.addEventListener('mousedown', function (event) {
+            let ctx = ViFlow.ioContext;
+            ViFlow.ioSelectedConnection = null;
+            for (let line of ViFlow.ioLines) {
+                // Check whether point is inside ellipse's stroke
+                if (ctx.isPointInStroke(line.path, event.offsetX, event.offsetY)) {
+                    ctx.strokeStyle = 'green';
+                    ViFlow.ioSelectedConnection = line;
+                }
+                else {
+                    ctx.strokeStyle = ViFlow.accentColor;
+                }
+        
+                // Draw ellipse
+                ctx.stroke(line.path);
+            }
+        });
+        canvas.addEventListener('keydown', function (event) {
+            if (event.code === 'Delete' && ViFlow.ioSelectedConnection) {
+                let selected = ViFlow.ioSelectedConnection;
+                console.log('delete connection', selected);
+                let connections = ViFlow.ioOutputConnections.get(selected.output.getAttribute('id'));
+                let index = connections.indexOf(selected.connection);
+                if (index >= 0) {
+                    connections.splice(index, 1);
+                }
+                ViFlow.redrawLines();               
+            }
+        });
+        ViFlow.ioCanvas = canvas;
+        return ViFlow.ioCanvas;
+    },
 
 
 
@@ -136,10 +177,29 @@ window.ViFlow = {
     ioSelected: null,
     ioIsInput: null,
     ioContext: null,
-    ioCanvas: null,
     ioSourceBounds: null,
     ioCanvasBounds: null,
     ioOutputConnections: new Map(),
+    ioLines:[],
+    ioOffset: 6,
+    ioInitConnections: function (connections) {
+        for (let k in connections) { // iterating keys so use in
+            for (let con of connections[k]) { // iterating values so use of
+                let id = k + '-output-' + con.output;
+                
+                let list = ViFlow.ioOutputConnections.get(id);
+                if (!list) {
+                    ViFlow.ioOutputConnections.set(id, []);
+                    list = ViFlow.ioOutputConnections.get(id);
+                }
+                list.push({ index: con.input, part: con.inputNode });
+            }
+
+        }
+        
+        // ViFlow.ioOutputConnections.set(output, []);
+        //     ViFlow.ioOutputConnections.get(output).push(input);
+    },
     ioDown: function (event, isInput) {
         ViFlow.ioNode = event.target;
         ViFlow.ioSelected = ViFlow.ioNode.parentNode.parentNode;
@@ -148,8 +208,8 @@ window.ViFlow = {
         let canvas = document.querySelector('canvas');
         ViFlow.ioCanvasBounds = canvas.getBoundingClientRect();     
         var srcBounds = ViFlow.ioNode.getBoundingClientRect();   
-        let srcX = srcBounds.left - ViFlow.ioCanvasBounds.left;
-        let srcY = srcBounds.top - ViFlow.ioCanvasBounds.top;
+        let srcX = (srcBounds.left - ViFlow.ioCanvasBounds.left) + ViFlow.ioOffset;
+        let srcY = (srcBounds.top - ViFlow.ioCanvasBounds.top) + ViFlow.ioOffset;
         ViFlow.ioSourceBounds = { left: srcX, top: srcY };
         
         if (ViFlow.selectedOutput != null) {
@@ -180,14 +240,31 @@ window.ViFlow = {
             console.log('suitable drop target!');
             let input = ViFlow.isInput ? ViFlow.ioNode : target;
             let output = ViFlow.isInput ? target : ViFlow.ioNode;
+            let outputId = output.getAttribute('id');
 
             console.log('input', input, 'output', output);
             ViFlow.drawLine(input, output);
 
-            if (!ViFlow.ioOutputConnections[output])
-                ViFlow.ioOutputConnections.set(output, []);
-            ViFlow.ioOutputConnections.get(output).push(input);
-            console.log('ouptut connections', ViFlow.ioOutputConnections[output]);
+            if (input.classList.contains('connected') === false)
+                input.classList.add('connected');
+            if (output.classList.contains('connected') === false)
+                output.classList.add('connected');
+
+            let connections = ViFlow.ioOutputConnections.get(outputId);
+            if (!connections) {
+                ViFlow.ioOutputConnections.set(outputId, []);
+                connections = ViFlow.ioOutputConnections.get(outputId);
+            }
+            let index = parseInt(input.getAttribute('x-input'), 10);
+            console.log('index', input.getAttribute('x-input'), input);
+            connections.push({ index: index, part: input.parentNode.parentNode.getAttribute('id')});
+
+            ViFlow.csharp.invokeMethodAsync("MakeConnection",
+                input.parentNode.parentNode.getAttribute('id'),
+                output.parentNode.parentNode.getAttribute('id'),
+                parseInt(input.getAttribute("x-input"), 10),
+                parseInt(output.getAttribute("x-output"), 10)
+            );
         }
         
         ViFlow.ioNode = null;
@@ -207,58 +284,93 @@ window.ViFlow = {
     },
 
     redrawLines: function () {
+        ViFlow.ioLines = [];
         let outputs = document.querySelectorAll('.flow-part .output');
-        let canvas = document.querySelector('canvas');
-        if (!ViFlow.ioContext)
-            return;
+        let canvas = ViFlow.getCanvas();
+        if (!ViFlow.ioContext) {
+            ViFlow.ioContext = canvas.getContext('2d');
+        }
         ViFlow.ioContext.clearRect(0, 0, canvas.width, canvas.height);
 
         for (let output of outputs) {
-            let connections = ViFlow.ioOutputConnections.get(output);
+            let connections = ViFlow.ioOutputConnections.get(output.getAttribute('id'));
             if(!connections)
                 continue;
             for (let input of connections) {
-                ViFlow.drawLine(input, output);
+                let inputEle = document.getElementById(input.part + '-input-' + input.index);
+                if (!inputEle)
+                    console.log('failed to locate: ', input.part + '-input-' + input.index);
+                ViFlow.drawLine(inputEle, output, input);
             }
         }
     },
 
     accentColor: null,
 
-    drawLine: function (input, output) {
+    drawLine: function (input, output, connection) {
         
         let src = output;
         let dest = input;
         let srcBounds = src.getBoundingClientRect();
         let destBounds = dest.getBoundingClientRect();
 
-        if (!ViFlow.ioCanvas)
-            ViFlow.ioCanvas = document.querySelector('canvas');
-        let canvasBounds = ViFlow.ioCanvas.getBoundingClientRect();
+        let canvas = ViFlow.getCanvas();
+        let canvasBounds = canvas.getBoundingClientRect();
 
-        let srcX = srcBounds.left - canvasBounds.left;
-        let srcY = srcBounds.top - canvasBounds.top;
-        let destX = destBounds.left - canvasBounds.left;
-        let destY = destBounds.top - canvasBounds.top;
-        ViFlow.drawLineToPoint(srcX, srcY, destX, destY);
+        let srcX = (srcBounds.left - canvasBounds.left) + ViFlow.ioOffset;
+        let srcY = (srcBounds.top - canvasBounds.top) + ViFlow.ioOffset;
+        let destX = (destBounds.left - canvasBounds.left) + ViFlow.ioOffset;
+        let destY = (destBounds.top - canvasBounds.top) + ViFlow.ioOffset;
+        ViFlow.drawLineToPoint(srcX, srcY, destX, destY, output, connection);
     },
 
-    drawLineToPoint: function ( srcX, srcY, destX, destY)
+    drawLineToPoint: function (srcX, srcY, destX, destY, output, connection)
     {
         if (!ViFlow.ioContext) {
-            if (!ViFlow.ioCanvas)
-                ViFlow.ioCanvas = document.querySelector('canvas');
-            ViFlow.ioContext = ViFlow.ioCanvas.getContext('2d');
+            let canvas = ViFlow.getCanvas();
+            ViFlow.ioContext = canvas.getContext('2d');
         }
-        
-        ViFlow.ioContext.beginPath();
 
-        ViFlow.ioContext.moveTo(srcX, srcY);
-        ViFlow.ioContext.lineTo(destX, destY);
-        ViFlow.ioContext.lineWidth = 5;
+        const context = ViFlow.ioContext;
+
+        
+        const path = new Path2D();
+        path.moveTo(srcX, srcY);
+        if (Math.abs(destY - srcY) <= 50) {
+            path.lineTo(destX, destY);
+        } else {
+            path.bezierCurveTo(srcX + 50, srcY + 50,
+                destX - 50, destY - 50,
+                destX, destY);
+        }
+
+        context.lineWidth = 5;
         if(!ViFlow.accentColor)
             ViFlow.accentColor = ViFlow.colorFromCssClass('--accent');
-        ViFlow.ioContext.strokeStyle = ViFlow.accentColor;
-        ViFlow.ioContext.stroke();
+        context.strokeStyle = ViFlow.accentColor;
+        //context.fill(path);
+        context.stroke(path);
+        
+        ViFlow.ioLines.push({ path: path, output: output, connection: connection });
+        
+        //context.beginPath();
+        // context.moveTo(srcX, srcY);
+        // if (Math.abs(destY - srcY) <= 50) {
+        //     context.lineTo(destX, destY);
+        // } else {
+        //     context.bezierCurveTo(srcX + 50, srcY + 50,
+        //         destX - 50, destY - 50,
+        //         destX, destY);
+        // }
+        // context.lineWidth = 5;
+        // if(!ViFlow.accentColor)
+        //     ViFlow.accentColor = ViFlow.colorFromCssClass('--accent');
+        // context.strokeStyle = ViFlow.accentColor;
+        // context.stroke();
+    },
+
+
+    getModel: function() {
+        var parts = document.querySelectorAll(".flow-parts .flow-part");
     }
 }

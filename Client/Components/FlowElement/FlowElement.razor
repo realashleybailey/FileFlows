@@ -7,7 +7,7 @@
     {
         <div class="inputs">
             @for(int i=1;i<=Part.Inputs;i++){
-                <div class="input input-@i" @onclick:preventDefault @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation onmousedown="ViFlow.ioDown(event, true)"></div>
+                <div id="@(Part.Uid)-input-@i" x-input="@i" class="input input-@i" @onclick:preventDefault @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation onmousedown="ViFlow.ioDown(event, true)"></div>
             }
         </div>
     }
@@ -17,7 +17,7 @@
     {
         <div class="outputs">
             @for(int i=1;i<=Part.Outputs;i++){
-                <div class="output output-@i" @onclick:preventDefault @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation onmousedown="ViFlow.ioDown(event, false)"></div>
+                <div id="@(Part.Uid)-output-@i" x-output="@i" class="output output-@i" @onclick:preventDefault @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation onmousedown="ViFlow.ioDown(event, false)"></div>
             }
         </div>
     }

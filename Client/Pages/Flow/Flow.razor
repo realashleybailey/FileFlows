@@ -3,6 +3,10 @@
 @page "/flow"
 
 <PageView>
+    <Head>
+        <RadzenButton class="save-button" BusyText="@lblSaving" 
+            IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+    </Head>
     <Body>                   
         <div class="flow-container">
             <div class="flow-elements">
@@ -15,7 +19,7 @@
                 </ul>
             </div>
             <div class="flow-parts" id="flow-parts" ondragover="ViFlow.drop(event, false)" ondrop="ViFlow.drop(event, true)" @onclick="() => Select(null)">                
-                <canvas width="8000" height="4000"></canvas>
+                <canvas width="8000" height="4000" tabindex="1"></canvas>
                 @if(Parts != null)
                 {
                     <CascadingValue IsFixed="true" Value="this">

@@ -74,10 +74,18 @@ namespace ViWatcher.Server.Helpers
             return result;
         }
 
-        public static void Update(object obj)
+        public static T Update<T>(T obj) where T: new()
+        {
+            DbObject dbObject = Update((object)obj);
+            if(string.IsNullOrEmpty(dbObject.Uid))
+                return new T(); // since we hate nulls
+            return Convert<T>(dbObject);
+        }
+
+        public static DbObject Update(object obj)
         {
             if(obj == null)
-                return;
+                return new DbObject();
             string json = JsonConvert.SerializeObject(obj);
             using (var db = GetDb())
             {
@@ -102,6 +110,7 @@ namespace ViWatcher.Server.Helpers
                     dbObject.Data = json;
                     db.Update(dbObject);
                 }
+                return dbObject;
             }
         }
 

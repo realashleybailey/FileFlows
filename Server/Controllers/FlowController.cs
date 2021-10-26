@@ -27,6 +27,18 @@ namespace ViWatcher.Server.Controllers
             }
             return results;
         }
+
+        [HttpGet("one")]
+        public Flow Get() => DbHelper.Single<Flow>();
+
+        [HttpPut]
+        public Flow Save([FromBody] Flow model)
+        {
+            if(model == null)
+                throw new Exception("No model");
+            var flow = DbHelper.Update<Flow>(model);
+            return flow;
+        }
     }
 
 }

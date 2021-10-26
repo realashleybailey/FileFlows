@@ -21,6 +21,7 @@ namespace ViWatcher.Client.Shared
             MenuItems.Add(new NavMenuItem("Pages.VideoFiles.Title", "fas fa-video", "video-files"));
             MenuItems.Add(new NavMenuItem("Pages.Flows.Title", "fas fa-project-diagram", "flow"));
             MenuItems.Add(new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings"));
+            MenuItems.Add(new NavMenuItem("Pages.CodeEditor.Title", "fas fa-code", "code-editor"));
 
             Active = MenuItems[0];
         }

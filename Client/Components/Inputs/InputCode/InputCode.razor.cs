@@ -30,10 +30,8 @@ namespace ViWatcher.Client.Components.Inputs
                 Minimap = new EditorMinimapOptions { Enabled = false },
                 Theme = "vs-dark",
                 Language = "javascript",
-                Value = "function xyz() {\n" +
-                        "   console.log(\"Hello world!\");\n" +
-                        "}"
-            };
+                Value = this.Value ?? ""
+        };
         }
 
         private void OnEditorInit(MonacoEditorBase e)

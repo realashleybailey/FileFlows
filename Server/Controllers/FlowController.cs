@@ -1,12 +1,14 @@
 namespace ViWatcher.Server.Controllers
 {
     using System;
-    using System.Diagnostics;    
+    using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
     using ViWatcher.Server;
     using ViWatcher.Shared;
     using ViWatcher.Shared.Models;
     using ViWatcher.Server.Helpers;
+    using ViWatcher.Shared.Nodes;
+    using System.ComponentModel;
 
     [Route("/api/flow")]
     public class FlowController : Controller
@@ -19,16 +21,32 @@ namespace ViWatcher.Server.Controllers
             var assmebly = tNode.Assembly;
             return assmebly.GetTypes()
                            .Where(x => x.IsSubclassOf(tNode))
-                           .Select(x => 
+                           .Select(x =>
                            {
                                FlowElement element = new FlowElement();
                                element.Group = x.Namespace.Substring(x.Namespace.LastIndexOf(".") + 1);
                                element.Name = x.Name;
                                element.Uid = x.FullName;
-                               element.Fields = new ();
-                               foreach(var prop in x.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)){
+                               element.Fields = new();
+
+                               // if(x.IsAssignableFrom(typeof(IConfigurableInputNode)) || x.IsAssignableFrom(typeof(IInputNode)))
+                               // {
+                               //    element.Inputs = dValue == null ? 1 : (int)dValue.Value;
+                               // }
+
+                               // if(x.IsAssignableFrom(typeof(IConfigurableOutputNode)) || x.IsAssignableFrom(typeof(IOutputNode)))
+                               // {
+                               //    var dValue = x.GetProperty(nameof(IOutputNode.Outputs)).GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
+                               //    element.Outputs = dValue == null ? 1 : (int)dValue.Value;
+                               // }
+                               var model = new Dictionary<string, object>();
+                               element.Model = model;
+
+                               foreach (var prop in x.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                               {
                                    var attribute = prop.GetCustomAttributes(typeof(ViWatcher.Shared.Attributes.FormInputAttribute), false).FirstOrDefault() as ViWatcher.Shared.Attributes.FormInputAttribute;
-                                   if(attribute != null){
+                                   if (attribute != null)
+                                   {
                                        element.Fields.Add(new FlowElementField
                                        {
                                            Name = prop.Name,
@@ -36,6 +54,19 @@ namespace ViWatcher.Server.Controllers
                                            InputType = attribute.InputType,
                                            Type = prop.PropertyType.FullName
                                        });
+                                       var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
+                                       model.Add(prop.Name, dValue != null ? dValue.Value : prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
+                                   }
+
+                                   if (prop.Name == nameof(element.Inputs))
+                                   {
+                                       var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
+                                       element.Inputs = dValue == null ? 1 : (int)dValue.Value;
+                                   }
+                                   if (prop.Name == nameof(element.Outputs))
+                                   {
+                                       var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
+                                       element.Outputs = dValue == null ? 1 : (int)dValue.Value;
                                    }
                                }
 
@@ -64,7 +95,7 @@ namespace ViWatcher.Server.Controllers
         [HttpPut]
         public Flow Save([FromBody] Flow model)
         {
-            if(model == null)
+            if (model == null)
                 throw new Exception("No model");
             var flow = DbHelper.Update<Flow>(model);
             return flow;

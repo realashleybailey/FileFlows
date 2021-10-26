@@ -13,12 +13,9 @@ namespace ViWatcher.Shared.Models
 
         public string Group{ get; set; }
 
-        public int MaxInputs { get => -1; }
-        public int MaxOutputs { get => -1; }
-        public int MinInputs { get => -1; }
-        public int MinOutputs { get => -1; }
-
         public List<FlowElementField> Fields{ get; set; }
+
+        public object Model{ get; set; }
     }
 
     public class FlowElementField{

@@ -1,10 +1,7 @@
 namespace ViWatcher.Shared.Nodes {
 
     public class Node
-    {
-        public int Inputs{ get; set; }
-        public int Outputs{ get; set; }
-        
+    {        
         public FlowElementType Type { get; set; }
         
         public string Name => base.GetType().FullName.Substring("ViWatcher.Shared.Nodes.".Length);

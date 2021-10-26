@@ -15,6 +15,7 @@ namespace ViWatcher.Shared
         TextArea = 4,
         Code = 5,
         Int = 6,
-        Float = 7
+        Float = 7,
+        StringArray = 8
     }
 }

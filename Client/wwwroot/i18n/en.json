@@ -5,6 +5,17 @@
         "Saving":"Saving",
         "Cancel":"Cancel"
     },
+    "Flow":{
+        "Parts":
+        {
+            "FileExtension":{
+                "Fields":{
+                    "Extensions":"Extensions",
+                    "Extensions-Help":"A list of extensions that if match will output to the first output node, otherwise the second output node will be used."
+                }
+            }
+        }
+    },
     "Pages":{
         "Home":{
             "Title":"Home"

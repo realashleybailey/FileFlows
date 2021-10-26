@@ -17,16 +17,25 @@
                 <Body>
                     <div class="fields">
                     @foreach(var field in Element.Fields.OrderBy(x => x.Order)){                        
+                        string label = "Flow.Parts." + Element.Name + ".Fields." + field.Name;
                         switch(field.InputType)
                         {
                             case FormInputType.Int:
                             {
-                                <InputNumber Label="@field.Name" /> 
+                                var value = GetValue<int>(field.Name);
+                                <InputNumber Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" /> 
+                            }
+                            break;
+                            case FormInputType.StringArray:
+                            {
+                                var value = GetValue<string[]>(field.Name, new string[] {});
+                                <InputArray Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" /> 
                             }
                             break;
                             case FormInputType.Code:
                             {
-                                <InputCode Label="@field.Name" /> 
+                                var value = GetValue<string>(field.Name);
+                                <InputCode Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" /> 
                             }
                             break;
                             default:

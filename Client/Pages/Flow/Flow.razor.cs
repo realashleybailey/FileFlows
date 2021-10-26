@@ -14,6 +14,7 @@ namespace ViWatcher.Client.Pages
     using System.Linq;
     using System;
     using ViWatcher.Shared;
+    using Newtonsoft.Json.Linq;
 
     public partial class Flow:ComponentBase
     {
@@ -47,8 +48,15 @@ namespace ViWatcher.Client.Pages
             {
                 var elementsResult = await HttpHelper.Get<viFlowElement[]>(API_URL + "/elements");
                 if (elementsResult.Success)
+                {
                     Available = elementsResult.Data;
-                    
+                    foreach(var item in Available){
+                        if(item.Model is JObject jObject){
+                            item.Model = jObject.ToObject<Dictionary<string, object>>();
+                        }
+                    }
+                }
+
                 var modelResult = await HttpHelper.Get<viFlow>(API_URL + "/one");
                 await InitModel((modelResult.Success ? modelResult.Data : null) ?? new viFlow() { Parts = new List<viFlowPart>() });
 
@@ -180,6 +188,8 @@ namespace ViWatcher.Client.Pages
             part.Inputs = element.Inputs;
             part.Outputs = element.Outputs;
             part.Uid = Guid.NewGuid();
+            part.Model = element.Model;
+            Logger.Instance.DLog("part.Model: " + part.Model?.GetType()?.Name);
             Parts.Add(part);
         }
         
@@ -221,6 +231,7 @@ namespace ViWatcher.Client.Pages
             var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
             if(flowElement == null){
                 // cant find it, cant edit
+                Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
                 return;
             }
             await Editor.Open(part, flowElement);

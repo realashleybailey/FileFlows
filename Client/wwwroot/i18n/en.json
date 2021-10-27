@@ -3,6 +3,8 @@
     "Labels": {
         "Save":"Save",
         "Saving":"Saving",
+        "Execute":"Execute",
+        "Executing":"Executing",
         "Cancel":"Cancel"
     },
     "Flow":{

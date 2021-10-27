@@ -66,3 +66,13 @@ canvas {
         box-shadow: 0 3px 10px rgba(var(--accent-rgb), 0.1);
     }
 }
+
+.group {
+    padding: .25rem 0;
+    margin: .5rem;
+    text-align: center;
+}
+.flow-element + .group {
+    border-top:1px solid var(--border-color);
+    margin-top:1.25rem;
+}

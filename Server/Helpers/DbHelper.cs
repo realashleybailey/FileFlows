@@ -6,6 +6,7 @@ namespace ViWatcher.Server.Helpers
     using Newtonsoft.Json;
     using ViWatcher.Server.Models;
     using System.Data.SQLite;
+    using Newtonsoft.Json.Converters;
 
     public class DbHelper
     {
@@ -86,7 +87,9 @@ namespace ViWatcher.Server.Helpers
         {
             if(obj == null)
                 return new DbObject();
-            string json = JsonConvert.SerializeObject(obj);
+            // if we use Json.Net it doesnt serialize the expando object properly... why???
+            //string json = JsonConvert.SerializeObject(obj, new ExpandoObjectConverter());
+            string json = System.Text.Json.JsonSerializer.Serialize(obj);
             using (var db = GetDb())
             {
                 var type = obj.GetType();

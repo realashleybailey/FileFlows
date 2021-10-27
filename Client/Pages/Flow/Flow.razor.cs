@@ -15,6 +15,7 @@ namespace ViWatcher.Client.Pages
     using System;
     using ViWatcher.Shared;
     using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json;
 
     public partial class Flow:ComponentBase
     {
@@ -28,16 +29,19 @@ namespace ViWatcher.Client.Pages
         [Inject]
         private IJSRuntime jsRuntime{ get; set; }
         private bool IsSaving { get; set; }
+        private bool IsExecuting { get; set; }
 
         private viFlow Model{ get; set; }
 
         const string API_URL = "/api/flow";
 
-        private string lblSave, lblSaving;
+        private string lblSave, lblSaving, lblExecute, lblExecuting;
         protected override void OnInitialized()
         {
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
+            lblExecute = Translater.Instant("Labels.Execute");
+            lblExecuting = Translater.Instant("Labels.Executing");
             _ = Init();
         }
 
@@ -50,11 +54,11 @@ namespace ViWatcher.Client.Pages
                 if (elementsResult.Success)
                 {
                     Available = elementsResult.Data;
-                    foreach(var item in Available){
-                        if(item.Model is JObject jObject){
-                            item.Model = jObject.ToObject<Dictionary<string, object>>();
-                        }
-                    }
+                    // foreach(var item in Available){
+                    //     if(item.Model is JObject jObject){
+                    //         item.Model = jObject.ToObject<Dictionary<string, object>>();
+                    //     }
+                    // }
                 }
 
                 var modelResult = await HttpHelper.Get<viFlow>(API_URL + "/one");
@@ -226,6 +230,23 @@ namespace ViWatcher.Client.Pages
             }
         }
 
+
+
+        private async Task Execute()
+        {
+            this.Blocker.Show(lblSaving);
+            this.IsSaving = true;
+            try
+            {
+                var result = await HttpHelper.Post<string>(API_URL + "/execute?input=somefile.mp4");                
+            }
+            finally
+            {
+                this.IsSaving = false;
+                this.Blocker.Hide();
+            }
+        }
+
         async Task Edit(viFlowPart part)
         {
             var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
@@ -234,7 +255,16 @@ namespace ViWatcher.Client.Pages
                 Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
                 return;
             }
-            await Editor.Open(part, flowElement);
+            Logger.Instance.DLog("opening editor for: ", part);
+            var newModelTask = Editor.Open(part, flowElement);
+            await newModelTask;
+            if (newModelTask.IsCanceled == false)
+            {
+                Logger.Instance.DLog("model updated:" + JsonConvert.SerializeObject(newModelTask.Result));
+                part.Model = newModelTask.Result;
+            }else{
+                Logger.Instance.DLog("model canceled");
+            }
         }
     }
-}
+};

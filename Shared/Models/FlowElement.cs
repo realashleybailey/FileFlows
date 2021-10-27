@@ -1,6 +1,7 @@
 namespace ViWatcher.Shared.Models
 {
     using System.Collections.Generic;
+    using System.Dynamic;
 
     public class FlowElement
     {
@@ -15,7 +16,7 @@ namespace ViWatcher.Shared.Models
 
         public List<FlowElementField> Fields{ get; set; }
 
-        public object Model{ get; set; }
+        public ExpandoObject Model{ get; set; }
     }
 
     public class FlowElementField{

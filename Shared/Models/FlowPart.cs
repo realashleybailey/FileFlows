@@ -2,6 +2,7 @@ namespace ViWatcher.Shared.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Dynamic;
 
     public class FlowPart
     {
@@ -18,7 +19,7 @@ namespace ViWatcher.Shared.Models
 
         public FlowElementType Type { get; set; }
 
-        public object Model{ get; set; }
+        public ExpandoObject  Model{ get; set; }
     }
 
     public class FlowConnection {

@@ -39,5 +39,13 @@ namespace ViWatcher.Client.Components.Inputs
             Logger.Instance.DLog("editor init done");
             _ = jsRuntime.InvokeVoidAsync("ViCode.initModel");
         }
+
+        private void OnBlur(){
+            _ = Task.Run(async () =>
+            {
+
+                this.Value = await Editor.GetValue();
+            });
+        }
     }
 }

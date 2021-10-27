@@ -1,5 +1,10 @@
 namespace ViWatcher.Shared
 {
+    public enum NodeResult {
+        Failure = 0,
+        Success = 1,
+    }
+
     public enum FlowElementType {
         Input,
         Output,
@@ -18,4 +23,6 @@ namespace ViWatcher.Shared
         Float = 7,
         StringArray = 8
     }
+
+
 }

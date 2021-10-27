@@ -3,6 +3,7 @@ namespace ViWatcher.Client
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
+    using Microsoft.JSInterop;
     using ViWatcher.Client.Helpers;
     using ViWatcher.Shared;
 
@@ -10,6 +11,8 @@ namespace ViWatcher.Client
         
         [Inject]
         public HttpClient Client { get; set; }
+        [Inject]
+        public IJSRuntime jsRuntime { get; set; }
         public bool LanguageLoaded { get; set; } = false;
 
         private async Task LoadLanguage()
@@ -25,6 +28,7 @@ namespace ViWatcher.Client
 
         protected override async Task OnInitializedAsync()
         {
+            Logger.jsRuntime = jsRuntime;
             HttpHelper.Client = Client;
             await Task.Run(async () => 
             {

@@ -4,6 +4,8 @@
 
 <PageView>
     <Head>
+        <RadzenButton class="save-button" BusyText="@lblExecuting" 
+            IsBusy=@IsExecuting Click=@Execute Text="@lblExecute" />
         <RadzenButton class="save-button" BusyText="@lblSaving" 
             IsBusy=@IsSaving Click=@Save Text="@lblSave" />
     </Head>
@@ -12,8 +14,13 @@
             <div class="flow-elements">
                 <ul id="flow-elements-available">                    
                  @if(Available != null){
-                        @foreach(var ele in Available){
-                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ViFlow.dragElementStart(event)">@ele.Name</li>
+                        @foreach(var grp in Available.GroupBy(x => x.Group))
+                        {
+                            <li class="group">@grp.Key</li>
+                            foreach(var ele in grp)
+                            {
+                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ViFlow.dragElementStart(event)">@ele.Name</li>
+                            }
                         }
                     }
                 </ul>

@@ -1,0 +1,21 @@
+@namespace ViWatcher.Client.Components.Dialogs
+
+@if (Visible)
+{
+    <div class="background-overlay"></div>
+
+    <div class="vi-modal">
+        <div class="vi-modal-inner">
+            <div class="vi-modal-title">
+                <span>@Title</span>
+            </div>
+            <div class="vi-modal-body">
+                <span>@Message</span>
+            </div>
+            <div class="vi-modal-footer">
+                <RadzenButton Click=@Yes Text="@lblYes" />
+                <RadzenButton Click=@No Text="@lblNo" />
+            </div>
+        </div>
+    </div>
+}

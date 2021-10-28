@@ -2,10 +2,13 @@ namespace ViWatcher.Client.Pages
 {
     using System.Collections.Generic;
     using System.Dynamic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
+    using Radzen;
     using Radzen.Blazor;
     using ViWatcher.Client.Components;
+    using ViWatcher.Client.Components.Dialogs;
     using ViWatcher.Client.Helpers;
     using ViWatcher.Shared;
     using ViWatcher.Shared.Models;
@@ -14,6 +17,7 @@ namespace ViWatcher.Client.Pages
     {
         [CascadingParameter] Blocker Blocker { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
+        [Inject] NotificationService NotificationService { get; set; }
         protected RadzenDataGrid<Library> DataGrid { get; set; }
 
         private List<Library> Data = new List<Library>();
@@ -70,12 +74,18 @@ namespace ViWatcher.Client.Pages
         private Library EditingItem = null;
         private async Task Add()
         {
-            var newItem = await Edit(new Library());
-            if (newItem.Uid != System.Guid.Empty)
-                this.Data.Add(newItem);
+            await Edit(new Library());
         }
 
-        async Task<Library> Edit(Library library)
+        async Task Edit()
+        {
+            var selected = this.SelectedItems?.FirstOrDefault();
+            if (selected == null)
+                return;
+            await Edit(selected);
+        }
+
+        async Task Edit(Library library)
         {
             this.EditingItem = library;
             List<ElementField> fields = new List<ElementField>();
@@ -97,11 +107,7 @@ namespace ViWatcher.Client.Pages
             Logger.Instance.DLog("About to open eeditor");
             var result = await Editor.Open("Pages.Library", library.Name, fields, library,
               saveCallback: Save);
-            Logger.Instance.DLog("finshed with eeditor");
-
-            string json = System.Text.Json.JsonSerializer.Serialize(result);
-            var updated = System.Text.Json.JsonSerializer.Deserialize<Library>(json);
-            return updated;
+            Logger.Instance.DLog("finshed with eeditor", result);
         }
 
         async Task<bool> Save(ExpandoObject model)
@@ -113,7 +119,18 @@ namespace ViWatcher.Client.Pages
             {
                 var saveResult = await HttpHelper.Post<Library>($"{API_URL}", model);
                 if (saveResult.Success == false)
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.SaveFailed"));
                     return false;
+                }
+
+                int index = this.Data.FindIndex(x => x.Uid == saveResult.Data.Uid);
+                if (index < 0)
+                    this.Data.Add(saveResult.Data);
+                else
+                    this.Data[index] = saveResult.Data;
+                await DataGrid.Reload();
+
                 return true;
             }
             finally
@@ -122,7 +139,37 @@ namespace ViWatcher.Client.Pages
                 this.StateHasChanged();
             }
         }
+        async Task Delete()
+        {
+            var uids = this.SelectedItems?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+            if (uids.Length == 0)
+                return; // nothing to delete
+            if (await Confirm.Show("Labels.Delete",
+                Translater.Instant("Labels.DeleteItems", new { count = uids.Length })) == false)
+                return; // rejected the confirm
 
+            Blocker.Show();
+            this.StateHasChanged();
+
+            try
+            {
+                var deleteResult = await HttpHelper.Delete($"{API_URL}", new DeleteModel { Uids = uids });
+                if (deleteResult.Success == false)
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
+                    return;
+                }
+
+                this.SelectedItems.Clear();
+                this.Data.RemoveAll(x => uids.Contains(x.Uid));
+                await DataGrid.Reload();
+            }
+            finally
+            {
+                Blocker.Hide();
+                this.StateHasChanged();
+            }
+        }
     }
 
 }

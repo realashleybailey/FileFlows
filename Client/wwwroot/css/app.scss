@@ -87,3 +87,13 @@ a, .btn-link {
 .dragging {
     cursor: grabbing;
 }
+
+.background-overlay {
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:2;
+    background:rgba(var(--base-rgb), 0.7);
+}

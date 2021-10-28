@@ -7,9 +7,16 @@
 }
 
 .navbar-brand {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: bold;
     > span {
         color:var(--accent);
+    }
+    svg {
+        margin-right:0.25rem;
+        position: relative;
+        top:-0.1rem;
     }
 }
 

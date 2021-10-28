@@ -74,6 +74,17 @@ namespace ViWatcher.Server.Helpers
             }
         }
 
+        public static T Single<T>(string andWhere, params object[] args) where T : ViObject, new()
+        {
+            using (var db = GetDb())
+            {
+                args = new object[] { typeof(T).FullName }.Union(args).ToArray();
+                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and " + andWhere, args);
+                if (string.IsNullOrEmpty(dbObject?.Data))
+                    return new T();
+                return Convert<T>(dbObject);
+            }
+        }
         private static T Convert<T>(DbObject dbObject) where T : ViObject, new()
         {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
@@ -111,7 +122,7 @@ namespace ViWatcher.Server.Helpers
             {
                 var type = obj.GetType();
                 obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", type.FullName);
+                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid.ToString());
                 if (dbObject == null)
                 {
                     obj.Uid = Guid.NewGuid();
@@ -139,6 +150,17 @@ namespace ViWatcher.Server.Helpers
                     db.Update(dbObject);
                 }
                 return obj;
+            }
+        }
+        public static void Delete<T>(Guid[] uids) where T : ViObject
+        {
+            string typeName = typeof(T).FullName;
+            using (var db = GetDb())
+            {
+                foreach (var uid in uids)
+                {
+                    db.Delete<DbObject>("where Type=@0 and Uid = @1", typeName, uid.ToString());
+                }
             }
         }
 

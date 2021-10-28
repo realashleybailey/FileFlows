@@ -9,7 +9,12 @@
         "Add":"Add",
         "Edit":"Edit",
         "Delete":"Delete",
-        "Deleting":"Deleting"
+        "Deleting":"Deleting",
+        "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?"
+    },
+    "ErrorMessages":{
+        "SaveFailed":"Failed to save",
+        "DeleteFailed":"Failed to delete"
     },
     "Flow":{
         "Parts":

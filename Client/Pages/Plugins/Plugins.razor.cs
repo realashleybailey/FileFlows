@@ -4,6 +4,7 @@ namespace ViWatcher.Client.Pages
     using System.Dynamic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
+    using Radzen;
     using Radzen.Blazor;
     using ViWatcher.Client.Components;
     using ViWatcher.Client.Helpers;
@@ -14,6 +15,7 @@ namespace ViWatcher.Client.Pages
     {
         [CascadingParameter] Blocker Blocker { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
+        [Inject] NotificationService NotificationService { get; set; }
         protected RadzenDataGrid<PluginInfo> DataGrid { get; set; }
 
         private List<PluginInfo> Data = new List<PluginInfo>();
@@ -37,9 +39,7 @@ namespace ViWatcher.Client.Pages
             {
                 var result = await HttpHelper.Get<List<PluginInfo>>(API_URL);
                 if (result.Success)
-                {
                     this.Data = result.Data;
-                }
             }
             finally
             {
@@ -98,7 +98,10 @@ namespace ViWatcher.Client.Pages
             {
                 var pluginResult = await HttpHelper.Post<PluginInfo>($"{API_URL}/{EditingPlugin.Uid}/settings", model);
                 if (pluginResult.Success == false)
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.SaveFailed"));
                     return false;
+                }
                 return true;
             }
             finally
@@ -106,7 +109,6 @@ namespace ViWatcher.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
-            return false;
         }
     }
 

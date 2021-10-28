@@ -1,10 +1,6 @@
 namespace ViWatcher.Server.Controllers
 {
-    using System.ComponentModel;
-    using System.Dynamic;
-    using System.Reflection;
     using Microsoft.AspNetCore.Mvc;
-    using ViWatcher.Plugins.Attributes;
     using ViWatcher.Server.Helpers;
     using ViWatcher.Shared.Models;
 
@@ -20,6 +16,10 @@ namespace ViWatcher.Server.Controllers
         [HttpPost]
         public Library Save([FromBody] Library library)
         {
+            var duplicate = DbHelper.Single<Library>("lower(name) = lower(@1) and uid <> @2", library.Name, library.Uid);
+            if (duplicate != null && duplicate.Uid != Guid.Empty)
+                throw new Exception("Duplicate name.");
+
             return DbHelper.Update(library);
         }
 
@@ -35,6 +35,14 @@ namespace ViWatcher.Server.Controllers
                 DbHelper.Update(library);
             }
             return library;
+        }
+
+        [HttpDelete]
+        public void Delete([FromBody] DeleteModel model)
+        {
+            if (model == null || model.Uids?.Any() != true)
+                return; // nothing to delete
+            DbHelper.Delete<Library>(model.Uids);
         }
     }
 }

@@ -49,3 +49,13 @@
         color: var(--accent);
     }
 }
+
+.rz-notification {
+    top:1rem !important;
+    right:1rem  !important;
+    .rz-growl-message-error .rz-growl-item {
+        background-color: var(--base);
+        border:solid 1px var(--error);
+        color:var(--error);
+    }
+}

@@ -5,7 +5,7 @@ namespace ViWatcher.Client.Helpers
     using System.Threading.Tasks;
     using Newtonsoft.Json;
 
-    public class HttpHelper 
+    public class HttpHelper
     {
         public static HttpClient Client { get; set; }
 
@@ -23,12 +23,17 @@ namespace ViWatcher.Client.Helpers
             return await MakeRequest<T>(HttpMethod.Put, url, data);
         }
 
+        public static async Task<RequestResult<string>> Delete(string url, object data = null)
+        {
+            return await MakeRequest<string>(HttpMethod.Delete, url, data);
+        }
+
         private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null)
-        {            
+        {
             try
             {
 #if (DEBUG)
-                if(url.Contains("i18n") == false)
+                if (url.Contains("i18n") == false)
                     url = "http://localhost:6868" + url;
 #endif
                 Logger.Instance.DLog("About to request: " + url);
@@ -61,6 +66,6 @@ namespace ViWatcher.Client.Helpers
             {
                 throw;
             }
-        }   
+        }
     }
 }

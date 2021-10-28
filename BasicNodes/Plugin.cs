@@ -1,9 +1,9 @@
-namespace ViWatcher.BasicNodes
+namespace FileFlow.BasicNodes
 {
     using System.ComponentModel.DataAnnotations;
-    using ViWatcher.Plugins.Attributes;
+    using FileFlow.Plugins.Attributes;
 
-    public class Plugin : ViWatcher.Plugins.Plugin
+    public class Plugin : FileFlow.Plugins.Plugin
     {
         public override string Name => "Basic Nodes";
 

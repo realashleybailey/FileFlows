@@ -1,10 +1,11 @@
-namespace ViWatcher.Client.Helpers 
+namespace FileFlow.Client.Helpers 
 {
-    using ViWatcher.Plugins;
+    using FileFlow.Plugins;
 
     public class FlowHelper
     {
-        public static string GetFlowPartIcon(FlowElementType type){
+        public static string GetFlowPartIcon(FlowElementType type)
+        {
             return "fas fa-chevron-right";
         }
     }

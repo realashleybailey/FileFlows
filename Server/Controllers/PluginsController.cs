@@ -1,12 +1,12 @@
-namespace ViWatcher.Server.Controllers
+namespace FileFlow.Server.Controllers
 {
     using System.ComponentModel;
     using System.Dynamic;
     using System.Reflection;
     using Microsoft.AspNetCore.Mvc;
-    using ViWatcher.Plugins.Attributes;
-    using ViWatcher.Server.Helpers;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Plugins.Attributes;
+    using FileFlow.Server.Helpers;
+    using FileFlow.Shared.Models;
 
     [Route("/api/plugin")]
     public class PluginController : Controller

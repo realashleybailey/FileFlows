@@ -1,13 +1,13 @@
-namespace ViWatcher.Server.Controllers
+namespace FileFlow.Server.Controllers
 {
     using System;
     using System.Text;
-    using System.Diagnostics;    
+    using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
-    using ViWatcher.Server;
-    using ViWatcher.Shared;
-    using ViWatcher.Shared.Models;
-    using ViWatcher.Server.Helpers;
+    using FileFlow.Server;
+    using FileFlow.Shared;
+    using FileFlow.Shared.Models;
+    using FileFlow.Server.Helpers;
     using Jint.Runtime;
     using Jint.Native.Object;
     using Jint;
@@ -18,12 +18,12 @@ namespace ViWatcher.Server.Controllers
         [HttpPost("validate")]
         public string Validate([FromBody] string code)
         {
-            if(string.IsNullOrEmpty(code))
+            if (string.IsNullOrEmpty(code))
                 return ""; // no code, means will run fine... i think... maybe...  depends what i do
             var sb = new StringBuilder();
-            Action<object> log = (object o)  =>
+            Action<object> log = (object o) =>
             {
-                if(o != null)
+                if (o != null)
                     sb.AppendLine(o.ToString());
             };
             var engine = new Engine()

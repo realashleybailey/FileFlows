@@ -1,8 +1,8 @@
 using System;
 using Microsoft.JSInterop;
-using ViWatcher.Plugins;
+using FileFlow.Plugins;
 
-namespace ViWatcher.Client
+namespace FileFlow.Client
 {
     public class Logger : ILogger
     {
@@ -26,7 +26,7 @@ namespace ViWatcher.Client
 
         private void Log(int level, object[] args)
         {
-            _ = jsRuntime.InvokeVoidAsync("Vi.log", new object[] { level, args });
+            _ = jsRuntime.InvokeVoidAsync("ff.log", new object[] { level, args });
         }
     }
 }

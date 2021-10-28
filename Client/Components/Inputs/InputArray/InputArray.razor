@@ -1,9 +1,9 @@
-@namespace ViWatcher.Client.Components.Inputs
+@namespace FileFlow.Client.Components.Inputs
 @inherits Input<string[]>
 
 <InputWrapper Input="@this">
     <div class="input-array-wrapper">
-        @foreach(var str in Value ?? new string[]{})
+        @foreach (var str in Value ?? new string[] { })
         {
             <span class="chip">
                 @str

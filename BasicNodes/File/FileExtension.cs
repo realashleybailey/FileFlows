@@ -1,8 +1,8 @@
-namespace ViWatcher.BasicNodes.File
+namespace FileFlow.BasicNodes.File
 {
     using System.ComponentModel;
-    using ViWatcher.Plugins;
-    using ViWatcher.Plugins.Attributes;
+    using FileFlow.Plugins;
+    using FileFlow.Plugins.Attributes;
 
     public class FileExtension : Node
     {

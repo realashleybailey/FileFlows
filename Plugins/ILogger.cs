@@ -1,4 +1,4 @@
-namespace ViWatcher.Plugins
+namespace FileFlow.Plugins
 {
     public interface ILogger
     {

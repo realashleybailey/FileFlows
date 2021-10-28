@@ -1,15 +1,15 @@
-namespace ViWatcher.Client.Components
+namespace FileFlow.Client.Components
 {
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Client.Shared;
+    using FileFlow.Client.Shared;
 
-    public partial class ViContainer 
+    public partial class ViContainer
     {
         [Parameter]
-        public string Title{ get; set; }
+        public string Title { get; set; }
 
         [Parameter]
-        public string Icon{ get; set; }
+        public string Icon { get; set; }
 
 
         [Parameter]
@@ -17,6 +17,6 @@ namespace ViWatcher.Client.Components
 
         [Parameter]
         public RenderFragment Body { get; set; }
-        
+
     }
 }

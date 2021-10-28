@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Pages
+namespace FileFlow.Client.Pages
 {
     using System.Collections.Generic;
     using System.Dynamic;
@@ -6,10 +6,10 @@ namespace ViWatcher.Client.Pages
     using Microsoft.AspNetCore.Components;
     using Radzen;
     using Radzen.Blazor;
-    using ViWatcher.Client.Components;
-    using ViWatcher.Client.Helpers;
-    using ViWatcher.Shared;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Client.Components;
+    using FileFlow.Client.Helpers;
+    using FileFlow.Shared;
+    using FileFlow.Shared.Models;
 
     public partial class Plugins : ComponentBase
     {

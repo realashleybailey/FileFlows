@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ViWatcher.Client
+namespace FileFlow.Client
 {
     public class Program
     {

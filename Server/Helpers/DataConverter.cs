@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ViWatcher.Server.Models;
-using ViWatcher.Shared.Models;
+using FileFlow.Server.Models;
+using FileFlow.Shared.Models;
 
-namespace ViWatcher.Server.Helpers
+namespace FileFlow.Server.Helpers
 {
     public class DataConverter : JsonConverter<ViObject>
     {

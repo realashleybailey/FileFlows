@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Components.Inputs 
+namespace FileFlow.Client.Components.Inputs 
 {
     using System.Collections.Generic;
     using Models;
@@ -6,6 +6,6 @@ namespace ViWatcher.Client.Components.Inputs
     public partial class InputSelect<T> : Input<T>
     {
         [Parameter]
-        public IEnumerable<ListOption> Options{ get; set; }
+        public IEnumerable<ListOption> Options { get; set; }
     }
 }

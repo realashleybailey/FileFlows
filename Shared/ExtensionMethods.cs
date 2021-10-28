@@ -1,4 +1,4 @@
-namespace ViWatcher.Shared
+namespace FileFlow.Shared
 {
     using Newtonsoft.Json;
 

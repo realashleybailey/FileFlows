@@ -1,14 +1,15 @@
-namespace ViWatcher.Plugins {
+namespace FileFlow.Plugins
+{
 
     public interface IInputNode
     {
     }
     public interface IOutputNode
     {
-        int Outputs{ get; }
+        int Outputs { get; }
     }
-    public interface IConfigurableOutputNode:IOutputNode
+    public interface IConfigurableOutputNode : IOutputNode
     {
-        int Outputs{ get; set; }
+        int Outputs { get; set; }
     }
 }

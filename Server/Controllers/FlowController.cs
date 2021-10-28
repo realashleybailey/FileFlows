@@ -1,13 +1,13 @@
-namespace ViWatcher.Server.Controllers
+namespace FileFlow.Server.Controllers
 {
     using System;
     using Microsoft.AspNetCore.Mvc;
-    using ViWatcher.Shared.Models;
-    using ViWatcher.Server.Helpers;
+    using FileFlow.Shared.Models;
+    using FileFlow.Server.Helpers;
     using System.ComponentModel;
     using System.Dynamic;
-    using ViWatcher.Plugins;
-    using ViWatcher.Plugins.Attributes;
+    using FileFlow.Plugins;
+    using FileFlow.Plugins.Attributes;
 
     [Route("/api/flow")]
     public class FlowController : Controller
@@ -74,7 +74,7 @@ namespace ViWatcher.Server.Controllers
                     }
                 }
 
-                //(ViWatcher.Shared.Nodes.Node)Activator.CreateInstance(x);
+                //(FileFlow.Shared.Nodes.Node)Activator.CreateInstance(x);
                 elements.Add(element);
             }
             return elements;

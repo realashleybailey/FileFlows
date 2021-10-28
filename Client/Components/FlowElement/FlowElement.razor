@@ -1,24 +1,30 @@
-@namespace ViWatcher.Client.Components
+@namespace FileFlow.Client.Components
 
-<div id="@Part.Uid" style="position:absolute;left:@(Part.xPos)px;top:@(Part.yPos)px"                             
-    @onclick="() => Select()"  @onclick:stopPropagation @ondblclick="() => Edit()" @ondblclick:stopPropagation
-    tabindex="1" @onkeydown="KeyDown" @onkeydown:stopPropagation @onkeydown:preventDefault    
+<div id="@Part.Uid" style="position:absolute;left:@(Part.xPos)px;top:@(Part.yPos)px" @onclick="() => Select()"
+    @onclick:stopPropagation @ondblclick="() => Edit()" @ondblclick:stopPropagation tabindex="1" @onkeydown="KeyDown"
+    @onkeydown:stopPropagation @onkeydown:preventDefault
     class="flow-part @Part.Type @(Selected ? "selected" : "") size-@(Math.Max(Part.Inputs, Part.Outputs))">
-    @if(Part.Inputs > 0)
+    @if (Part.Inputs > 0)
     {
         <div class="inputs">
-            @for(int i=1;i<=Part.Inputs;i++){
-                <div id="@(Part.Uid)-input-@i" x-input="@i" class="input input-@i" @onclick:preventDefault @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation onmousedown="ViFlow.ioDown(event, true)"></div>
+            @for (int i = 1; i <= Part.Inputs; i++)
+            {
+                <div id="@(Part.Uid)-input-@i" x-input="@i" class="input input-@i" @onclick:preventDefault
+            @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation
+            onmousedown="ffFlow.ioDown(event, true)"></div>
             }
         </div>
     }
     <div class="icon-wrapper"><span class="icon @Icon"></span></div>
     <span class="name">@Part.Name</span>
-    @if(Part.Outputs > 0)
+    @if (Part.Outputs > 0)
     {
         <div class="outputs">
-            @for(int i=1;i<=Part.Outputs;i++){
-                <div id="@(Part.Uid)-output-@i" x-output="@i" class="output output-@i" @onclick:preventDefault @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation onmousedown="ViFlow.ioDown(event, false)"></div>
+            @for (int i = 1; i <= Part.Outputs; i++)
+            {
+                <div id="@(Part.Uid)-output-@i" x-output="@i" class="output output-@i" @onclick:preventDefault
+            @onclick:stopPropagation @onmousedown:preventDefault @onmousedown:stopPropagation
+            onmousedown="ffFlow.ioDown(event, false)"></div>
             }
         </div>
     }

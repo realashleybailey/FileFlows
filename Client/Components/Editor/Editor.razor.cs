@@ -1,17 +1,17 @@
-namespace ViWatcher.Client.Components
+namespace FileFlow.Client.Components
 {
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Shared;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Shared;
+    using FileFlow.Shared.Models;
     using Newtonsoft.Json;
-    using viFlowElement = ViWatcher.Shared.Models.FlowElement;
+    using ffElement = FileFlow.Shared.Models.FlowElement;
     using System.Collections;
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Reflection;
-    using ViWatcher.Plugins.Attributes;
+    using FileFlow.Plugins.Attributes;
     using System.Linq;
     using System.ComponentModel;
 
@@ -169,7 +169,7 @@ namespace ViWatcher.Client.Components
                 {
 
                     // we have a list, we want to make it an array
-                    var converted = ViWatcher.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
+                    var converted = FileFlow.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
                     return (T)converted;
                 }
 

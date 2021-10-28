@@ -1,10 +1,10 @@
-namespace ViWatcher.Client 
+namespace FileFlow.Client 
 {
     using System.Net.Http;
     using System.Text;
-    using ViWatcher.Shared;
+    using FileFlow.Shared;
 
-    public static class ExtensionMethods 
+    public static class ExtensionMethods
     {
         public static StringContent AsJson(this object o)
         {

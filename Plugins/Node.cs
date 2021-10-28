@@ -1,17 +1,17 @@
-namespace ViWatcher.Plugins 
+namespace FileFlow.Plugins
 {
 
-    using ViWatcher.Plugins;
+    using FileFlow.Plugins;
     public class Node
-    {        
+    {
         public FlowElementType Type { get; set; }
 
-        public virtual int Inputs{ get; }
-        public virtual int Outputs{ get; }
+        public virtual int Inputs { get; }
+        public virtual int Outputs { get; }
 
-        public string Name => base.GetType().FullName.Substring("ViWatcher.Shared.Nodes.".Length);
+        public string Name => base.GetType().FullName.Substring("FileFlow.Shared.Nodes.".Length);
 
-        public string Group 
+        public string Group
         {
             get
             {
@@ -26,11 +26,11 @@ namespace ViWatcher.Plugins
         /// </summary>
         /// <param name="args">the arguments passed into the node</param>
         /// <returns>the number of the output node to call next, this is 1 based</returns>
-        public virtual int Execute(NodeParameters args) 
-        { 
-            if(Outputs > 0)
+        public virtual int Execute(NodeParameters args)
+        {
+            if (Outputs > 0)
                 return 1;
-            return -1; 
+            return -1;
         }
     }
 }

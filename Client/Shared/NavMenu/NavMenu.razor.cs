@@ -1,7 +1,7 @@
-namespace ViWatcher.Client.Shared
+namespace FileFlow.Client.Shared
 {
     using System.Collections.Generic;
-    using ViWatcher.Shared;
+    using FileFlow.Shared;
 
     public partial class NavMenu
     {

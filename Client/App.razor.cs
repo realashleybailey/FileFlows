@@ -1,11 +1,11 @@
-namespace ViWatcher.Client
+namespace FileFlow.Client
 {
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
-    using ViWatcher.Client.Helpers;
-    using ViWatcher.Shared;
+    using FileFlow.Client.Helpers;
+    using FileFlow.Shared;
 
     public partial class App : ComponentBase
     {

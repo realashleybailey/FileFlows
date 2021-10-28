@@ -1,13 +1,13 @@
-namespace ViWatcher.Client.Pages 
+namespace FileFlow.Client.Pages
 {
     using Models;
-    using ViWatcher.Client.Helpers;
+    using FileFlow.Client.Helpers;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Newtonsoft.Json;
-    using ViWatcher.Shared;
-    using ViWatcher.Client.Components;
+    using FileFlow.Shared;
+    using FileFlow.Client.Components;
     using BlazorMonaco;
     using Microsoft.JSInterop;
 
@@ -21,11 +21,11 @@ namespace ViWatcher.Client.Pages
 
         const string API_URL = "/api/code-eval";
 
-        private MonacoEditor Editor{ get; set; }
+        private MonacoEditor Editor { get; set; }
 
         [Inject]
-        private IJSRuntime jsRuntime{ get; set; }
-        
+        private IJSRuntime jsRuntime { get; set; }
+
         protected override void OnInitialized()
         {
             lblSave = Translater.Instant("Labels.Save");
@@ -39,7 +39,7 @@ namespace ViWatcher.Client.Pages
             try
             {
                 string code = await Editor.GetValue();
-                var resault = await HttpHelper.Post<string>(API_URL + "/validate", code);                
+                var resault = await HttpHelper.Post<string>(API_URL + "/validate", code);
             }
             finally
             {
@@ -65,7 +65,7 @@ namespace ViWatcher.Client.Pages
         private void OnEditorInit(MonacoEditorBase e)
         {
             Logger.Instance.DLog("editor init done");
-            _ = jsRuntime.InvokeVoidAsync("ViCode.initModel");
+            _ = jsRuntime.InvokeVoidAsync("ffCode.initModel");
         }
     }
 }

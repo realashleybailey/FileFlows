@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Components.Inputs 
+namespace FileFlow.Client.Components.Inputs 
 {
     using System.Collections.Generic;
     using Models;
@@ -12,20 +12,22 @@ namespace ViWatcher.Client.Components.Inputs
         [Parameter]
         public bool AllowDuplicates { get; set; }
         [Parameter]
-        public bool EnterOnSpace{ get; set; }
+        public bool EnterOnSpace { get; set; }
         private string InputText = "";
         private string PreviousInputText = "";
         private void OnKeyDown(KeyboardEventArgs e)
         {
-            if(e.ShiftKey == false && e.AltKey == false && e.CtrlKey == false)
+            if (e.ShiftKey == false && e.AltKey == false && e.CtrlKey == false)
             {
                 if (e.Code == "Enter" || (EnterOnSpace && e.Code == "Space"))
                 {
                     if (Add(InputText))
                         this.InputText = "";
                 }
-                else if(e.Code == "Backspace" && PreviousInputText == string.Empty){
-                    if(this.Value?.Any() == true){
+                else if (e.Code == "Backspace" && PreviousInputText == string.Empty)
+                {
+                    if (this.Value?.Any() == true)
+                    {
                         this.Value = this.Value.Take(this.Value.Length - 1).ToArray();
                     }
                 }
@@ -40,12 +42,12 @@ namespace ViWatcher.Client.Components.Inputs
 
         bool Add(string str)
         {
-            if(string.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
                 return false;
             str = str.Trim();
-            if(AllowDuplicates == false)
+            if (AllowDuplicates == false)
             {
-                if(this.Value.Contains(str))
+                if (this.Value.Contains(str))
                     return false;
             }
             this.Value = this.Value.Union(new[] { str }).ToArray();

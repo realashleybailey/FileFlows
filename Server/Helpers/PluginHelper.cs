@@ -1,8 +1,8 @@
 using System.Reflection;
-using ViWatcher.Plugins;
-using ViWatcher.Shared.Models;
+using FileFlow.Plugins;
+using FileFlow.Shared.Models;
 
-namespace ViWatcher.Server.Helpers
+namespace FileFlow.Server.Helpers
 {
     public class PluginHelper
     {

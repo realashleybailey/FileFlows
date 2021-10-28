@@ -1,4 +1,4 @@
-namespace ViWatcher.Shared.Models
+namespace FileFlow.Shared.Models
 {
     using System;
     using System.Collections.Generic;

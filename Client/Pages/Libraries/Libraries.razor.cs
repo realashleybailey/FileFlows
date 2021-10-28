@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Pages
+namespace FileFlow.Client.Pages
 {
     using System.Collections.Generic;
     using System.Dynamic;
@@ -7,11 +7,11 @@ namespace ViWatcher.Client.Pages
     using Microsoft.AspNetCore.Components;
     using Radzen;
     using Radzen.Blazor;
-    using ViWatcher.Client.Components;
-    using ViWatcher.Client.Components.Dialogs;
-    using ViWatcher.Client.Helpers;
-    using ViWatcher.Shared;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Client.Components;
+    using FileFlow.Client.Components.Dialogs;
+    using FileFlow.Client.Helpers;
+    using FileFlow.Shared;
+    using FileFlow.Shared.Models;
 
     public partial class Libraries : ComponentBase
     {
@@ -91,17 +91,17 @@ namespace ViWatcher.Client.Pages
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
-                InputType = ViWatcher.Plugins.FormInputType.Text,
+                InputType = FileFlow.Plugins.FormInputType.Text,
                 Name = nameof(library.Name)
             });
             fields.Add(new ElementField
             {
-                InputType = ViWatcher.Plugins.FormInputType.Text,
+                InputType = FileFlow.Plugins.FormInputType.Text,
                 Name = nameof(library.Path)
             });
             fields.Add(new ElementField
             {
-                InputType = ViWatcher.Plugins.FormInputType.Switch,
+                InputType = FileFlow.Plugins.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });
             Logger.Instance.DLog("About to open eeditor");

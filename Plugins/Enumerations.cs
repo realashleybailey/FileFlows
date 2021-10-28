@@ -1,14 +1,15 @@
-namespace ViWatcher.Plugins
+namespace FileFlow.Plugins
 {
 
-    public enum FlowElementType {
+    public enum FlowElementType
+    {
         Input,
         Output,
         Process,
         Logic
     }
 
-    public enum FormInputType 
+    public enum FormInputType
     {
         Text = 1,
         Switch = 2,

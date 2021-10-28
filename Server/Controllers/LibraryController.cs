@@ -1,8 +1,8 @@
-namespace ViWatcher.Server.Controllers
+namespace FileFlow.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using ViWatcher.Server.Helpers;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Server.Helpers;
+    using FileFlow.Shared.Models;
 
     [Route("/api/library")]
     public class LibraryController : Controller

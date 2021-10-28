@@ -1,8 +1,8 @@
-namespace ViWatcher.BasicNodes.Video
+namespace FileFlow.BasicNodes.Video
 {
     using System.ComponentModel;
-    using ViWatcher.Plugins;
-    using ViWatcher.Plugins.Attributes;
+    using FileFlow.Plugins;
+    using FileFlow.Plugins.Attributes;
 
     public class VideoCodec : Node
     {

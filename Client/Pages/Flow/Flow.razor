@@ -1,39 +1,45 @@
-@namespace ViWatcher.Client.Pages
+@namespace FileFlow.Client.Pages
 
 @page "/flow"
 
 <PageView>
+
     <Head>
-        <RadzenButton class="save-button" BusyText="@lblExecuting" 
-            IsBusy=@IsExecuting Click=@Execute Text="@lblExecute" />
-        <RadzenButton class="save-button" BusyText="@lblSaving" 
-            IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+        <RadzenButton class="save-button" BusyText="@lblExecuting" IsBusy=@IsExecuting Click=@Execute
+            Text="@lblExecute" />
+        <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
     </Head>
-    <Body>                   
+
+    <Body>
         <div class="flow-container">
             <div class="flow-elements">
-                <ul id="flow-elements-available">                    
-                 @if(Available != null){
-                        @foreach(var grp in Available.GroupBy(x => x.Group))
+                <ul id="flow-elements-available">
+                    @if (Available != null)
+                    {
+                        @foreach (var grp in Available.GroupBy(x => x.Group))
                         {
                             <li class="group">@grp.Key</li>
-                            foreach(var ele in grp)
+                            foreach (var ele in grp)
                             {
-                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ViFlow.dragElementStart(event)">@ele.Name</li>
+                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"
+                        ondragstart="ffFlow.dragElementStart(event)">@ele.Name</li>
                             }
                         }
                     }
                 </ul>
             </div>
-            <div class="flow-parts" id="flow-parts" ondragover="ViFlow.drop(event, false)" ondrop="ViFlow.drop(event, true)" @onclick="() => Select(null)">                
+            <div class="flow-parts" id="flow-parts" ondragover="ffFlow.drop(event, false)"
+                ondrop="ffFlow.drop(event, true)" @onclick="() => Select(null)">
                 <canvas width="8000" height="4000" tabindex="1"></canvas>
-                @if(Parts != null)
+                @if (Parts != null)
                 {
                     <CascadingValue IsFixed="true" Value="this">
-                    @foreach(var part in Parts){                        
-                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)" OnEdit="() => Edit(part)"></FlowElement>
+                        @foreach (var part in Parts)
+                    {
+                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)"
+                        OnEdit="() => Edit(part)"></FlowElement>
                     }
-                    </CascadingValue>
+                </CascadingValue>
                 }
 
             </div>

@@ -1,10 +1,10 @@
-namespace ViWatcher.Server.Controllers
+namespace FileFlow.Server.Controllers
 {
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
-    using ViWatcher.Server;
-    using ViWatcher.Shared.Models;
-    using ViWatcher.Server.Helpers;
+    using FileFlow.Server;
+    using FileFlow.Shared.Models;
+    using FileFlow.Server.Helpers;
     using System.Collections.Generic;
     using System.IO;
 
@@ -15,13 +15,13 @@ namespace ViWatcher.Server.Controllers
         public IEnumerable<VideoFile> Scan()
         {
             var settings = DbHelper.Single<Settings>();
-            if(string.IsNullOrEmpty(settings?.Source))
+            if (string.IsNullOrEmpty(settings?.Source))
                 return new VideoFile[] { };
 
             DirectoryInfo dir = new DirectoryInfo(settings.Source);
-            if(dir.Exists == false)
+            if (dir.Exists == false)
                 return new VideoFile[] { };
-            
+
             var extensions = settings.Extensions ?? new[] { "avi", "mp4", "mkv", "divx", "mov", "mpg", "mpeg" };
 
             List<VideoFile> files = new List<VideoFile>();
@@ -31,16 +31,17 @@ namespace ViWatcher.Server.Controllers
             {
                 try
                 {
-                    foreach(var subdir in dir.GetDirectories()){
+                    foreach (var subdir in dir.GetDirectories())
+                    {
                         SearchDirectory(subdir);
                     }
-                    
-                    foreach(var file in dir.GetFiles("*.*"))
+
+                    foreach (var file in dir.GetFiles("*.*"))
                     {
                         string extension = file.Extension?.ToLower() ?? "";
-                        if(extension.StartsWith("."))
+                        if (extension.StartsWith("."))
                             extension = extension.Substring(1);
-                        if(extensions.Contains(extension) == false)
+                        if (extensions.Contains(extension) == false)
                             continue;
                         var vidfile = new VideoFile
                         {

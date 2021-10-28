@@ -1,9 +1,9 @@
-namespace ViWatcher.Shared.Models
+namespace FileFlow.Shared.Models
 {
     using System;
     using System.Collections.Generic;
 
-    public class Flow:ViObject
+    public class Flow : ViObject
     {
         public List<FlowPart> Parts { get; set; }
     }

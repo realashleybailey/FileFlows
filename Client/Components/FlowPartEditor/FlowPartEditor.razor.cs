@@ -1,12 +1,12 @@
-namespace ViWatcher.Client.Components
+namespace FileFlow.Client.Components
 {
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Shared;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Shared;
+    using FileFlow.Shared.Models;
     using Newtonsoft.Json;
-    using viFlowElement = ViWatcher.Shared.Models.FlowElement;
+    using ffElement = FileFlow.Shared.Models.FlowElement;
     using System.Collections;
     using System.Collections.Generic;
     using System.Dynamic;
@@ -17,7 +17,7 @@ namespace ViWatcher.Client.Components
         public bool Visible { get; set; }
 
         private FlowPart Part { get; set; }
-        private viFlowElement Element { get; set; }
+        private ffElement Element { get; set; }
 
         private string Icon { get; set; }
         private bool IsSaving { get; set; }
@@ -35,7 +35,7 @@ namespace ViWatcher.Client.Components
             lblCancel = Translater.Instant("Labels.Cancel");
         }
 
-        internal Task<ExpandoObject> Open(FlowPart part, viFlowElement element)
+        internal Task<ExpandoObject> Open(FlowPart part, ffElement element)
         {
             OpenTask = new TaskCompletionSource<ExpandoObject>();
             Logger.Instance.DLog("Part: ", part);
@@ -45,12 +45,12 @@ namespace ViWatcher.Client.Components
             this.Visible = true;
             this.Model = part.Model ?? element.Model ?? new ExpandoObject();
             Logger.Instance.DLog("model", this.Model);
-             this.StateHasChanged();
+            this.StateHasChanged();
             return OpenTask.Task;
         }
 
         private void Save()
-        {            
+        {
             OpenTask.TrySetResult(this.Model);
             this.Visible = false;
             this.Part = null;
@@ -95,10 +95,11 @@ namespace ViWatcher.Client.Components
             var valueType = value.GetType();
             try
             {
-                if(typeof(T).IsArray && typeof(IEnumerable).IsAssignableFrom(valueType)){
+                if (typeof(T).IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
+                {
 
                     // we have a list, we want to make it an array
-                    var converted = ViWatcher.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
+                    var converted = FileFlow.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
                     return (T)converted;
                 }
 

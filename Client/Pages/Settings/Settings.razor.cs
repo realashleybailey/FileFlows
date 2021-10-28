@@ -1,13 +1,13 @@
-namespace ViWatcher.Client.Pages 
+namespace FileFlow.Client.Pages 
 {
     using Models;
-    using ViWatcher.Client.Helpers;
+    using FileFlow.Client.Helpers;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Newtonsoft.Json;
-    using ViWatcher.Shared;
-    using ViWatcher.Client.Components;
+    using FileFlow.Shared;
+    using FileFlow.Client.Components;
 
     public partial class Settings : ComponentBase
     {
@@ -17,7 +17,7 @@ namespace ViWatcher.Client.Pages
 
         private string lblSave, lblSaving, lblSource, lblDestination;
 
-        private ViWatcher.Shared.Models.Settings Model { get; set; } = new ViWatcher.Shared.Models.Settings();
+        private FileFlow.Shared.Models.Settings Model { get; set; } = new FileFlow.Shared.Models.Settings();
 
         private ListOption[] Containers;
 
@@ -35,8 +35,8 @@ namespace ViWatcher.Client.Pages
 
             Blocker.Show("Loading Settings");
 
-            var response  = await HttpHelper.Get<ViWatcher.Shared.Models.Settings>("/api/settings");
-            if(response.Success)
+            var response = await HttpHelper.Get<FileFlow.Shared.Models.Settings>("/api/settings");
+            if (response.Success)
                 this.Model = response.Data;
 
             Blocker.Hide();

@@ -1,6 +1,6 @@
-namespace ViWatcher.Shared.Models
+namespace FileFlow.Shared.Models
 {
-    public class VideoFile:ViObject
+    public class VideoFile : ViObject
     {
         public string ShortName { get; set; }
         public string Path { get; set; }

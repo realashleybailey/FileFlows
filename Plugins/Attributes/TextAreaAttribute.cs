@@ -1,4 +1,4 @@
-namespace ViWatcher.Plugins.Attributes
+namespace FileFlow.Plugins.Attributes
 {
     using System;
     using System.Collections.Generic;

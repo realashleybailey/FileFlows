@@ -1,26 +1,26 @@
-namespace ViWatcher.Client.Components
+namespace FileFlow.Client.Components
 {
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Shared;
+    using FileFlow.Shared;
 
-    public partial class Fieldset:ComponentBase
+    public partial class Fieldset : ComponentBase
     {
         private string _Title;
         private string _OriginalTitle;
-        [Parameter]    
+        [Parameter]
         public string Title
-        { 
-            get => _Title; 
-            set 
+        {
+            get => _Title;
+            set
             {
-                if(_OriginalTitle == value)
+                if (_OriginalTitle == value)
                     return;
                 _OriginalTitle = value;
                 _Title = Translater.TranslateIfNeeded(value);
-            } 
+            }
         }
 
         [Parameter]
-        public RenderFragment ChildContent{ get; set; }
+        public RenderFragment ChildContent { get; set; }
     }
 }

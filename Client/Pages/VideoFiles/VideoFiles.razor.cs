@@ -1,33 +1,33 @@
-namespace ViWatcher.Client.Pages
+namespace FileFlow.Client.Pages
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Radzen.Blazor;
-    using ViWatcher.Client.Components;
-    using ViWatcher.Client.Helpers;
-    using ViWatcher.Shared;
-    using xVideoFile = ViWatcher.Shared.Models.VideoFile;
+    using FileFlow.Client.Components;
+    using FileFlow.Client.Helpers;
+    using FileFlow.Shared;
+    using xVideoFile = FileFlow.Shared.Models.VideoFile;
 
-    public partial class VideoFiles:ComponentBase
+    public partial class VideoFiles : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
         private string lblScanning, lblScan, lblIgnore, lblProcess, lblView;
         IEnumerable<int> pageSizeOptions = new int[] { 50, 100, 250, 500 };
 
         private RadzenDataGrid<xVideoFile> _DataGrid;
-        protected RadzenDataGrid<xVideoFile> DataGrid 
-        { 
-            get => _DataGrid; 
+        protected RadzenDataGrid<xVideoFile> DataGrid
+        {
+            get => _DataGrid;
             set
             {
-                if(_DataGrid == null && value != null)
+                if (_DataGrid == null && value != null)
                     value.PageSize = 250;
                 _DataGrid = value;
-            } 
+            }
         }
 
-        private bool IsScanning{ get; set; }
+        private bool IsScanning { get; set; }
         protected override void OnInitialized()
         {
             lblScan = Translater.Instant("Pages.VideoFiles.Button.Scan");
@@ -38,7 +38,7 @@ namespace ViWatcher.Client.Pages
         }
 
         private List<xVideoFile> Files = new List<xVideoFile>();
-        
+
         private IList<xVideoFile> SelectedItems;
 
         async Task Scan()
@@ -48,7 +48,7 @@ namespace ViWatcher.Client.Pages
             Files.Clear();
             try
             {
-                var files = await HttpHelper.Get<List<ViWatcher.Shared.Models.VideoFile>>("/api/video-file/scan");
+                var files = await HttpHelper.Get<List<FileFlow.Shared.Models.VideoFile>>("/api/video-file/scan");
                 if (files.Success)
                 {
                     this.Files = files.Data;

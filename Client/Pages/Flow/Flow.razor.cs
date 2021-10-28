@@ -1,37 +1,37 @@
-namespace ViWatcher.Client.Pages
+namespace FileFlow.Client.Pages
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
-    using ViWatcher.Client.Components;
-    using ViWatcher.Client.Helpers;
-    using viFlowPart = ViWatcher.Shared.Models.FlowPart;
-    using viFlowElement = ViWatcher.Shared.Models.FlowElement;
-    using viFlow = ViWatcher.Shared.Models.Flow;
-    using xFlowConnection = ViWatcher.Shared.Models.FlowConnection;
+    using FileFlow.Client.Components;
+    using FileFlow.Client.Helpers;
+    using ffPart = FileFlow.Shared.Models.FlowPart;
+    using ffElement = FileFlow.Shared.Models.FlowElement;
+    using ff = FileFlow.Shared.Models.Flow;
+    using xFlowConnection = FileFlow.Shared.Models.FlowConnection;
     using Microsoft.JSInterop;
     using System.Linq;
     using System;
-    using ViWatcher.Shared;
+    using FileFlow.Shared;
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json;
 
-    public partial class Flow:ComponentBase
+    public partial class Flow : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
-        private viFlowElement[] Available{ get; set; }
-        private List<viFlowPart> Parts { get; set; } = new List<viFlowPart>();
+        private ffElement[] Available { get; set; }
+        private List<ffPart> Parts { get; set; } = new List<ffPart>();
 
-        private FlowPartEditor Editor{ get; set; }
+        private FlowPartEditor Editor { get; set; }
 
-        public viFlowPart SelectedPart{ get; set; }
+        public ffPart SelectedPart { get; set; }
         [Inject]
-        private IJSRuntime jsRuntime{ get; set; }
+        private IJSRuntime jsRuntime { get; set; }
         private bool IsSaving { get; set; }
         private bool IsExecuting { get; set; }
 
-        private viFlow Model{ get; set; }
+        private ff Model { get; set; }
 
         const string API_URL = "/api/flow";
 
@@ -50,7 +50,7 @@ namespace ViWatcher.Client.Pages
             this.Blocker.Show();
             try
             {
-                var elementsResult = await HttpHelper.Get<viFlowElement[]>(API_URL + "/elements");
+                var elementsResult = await HttpHelper.Get<ffElement[]>(API_URL + "/elements");
                 if (elementsResult.Success)
                 {
                     Available = elementsResult.Data;
@@ -61,16 +61,17 @@ namespace ViWatcher.Client.Pages
                     // }
                 }
 
-                var modelResult = await HttpHelper.Get<viFlow>(API_URL + "/one");
-                await InitModel((modelResult.Success ? modelResult.Data : null) ?? new viFlow() { Parts = new List<viFlowPart>() });
+                var modelResult = await HttpHelper.Get<ff>(API_URL + "/one");
+                await InitModel((modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() });
 
                 var dotNetObjRef = DotNetObjectReference.Create(this);
-                await jsRuntime.InvokeVoidAsync("ViFlow.init", new object[] { "flow-parts", dotNetObjRef});
+                await jsRuntime.InvokeVoidAsync("ffFlow.init", new object[] { "flow-parts", dotNetObjRef });
 
                 await WaitForRender();
-                await jsRuntime.InvokeVoidAsync("ViFlow.redrawLines");
+                await jsRuntime.InvokeVoidAsync("ffFlow.redrawLines");
 
-            }finally 
+            }
+            finally
             {
                 this.Blocker.Hide();
             }
@@ -78,10 +79,12 @@ namespace ViWatcher.Client.Pages
 
         private bool _needsRendering = false;
 
-        private async Task WaitForRender(){
+        private async Task WaitForRender()
+        {
             _needsRendering = true;
             StateHasChanged();
-            while(_needsRendering){
+            while (_needsRendering)
+            {
                 await Task.Delay(50);
             }
         }
@@ -91,26 +94,27 @@ namespace ViWatcher.Client.Pages
             _needsRendering = false;
         }
 
-        private async Task InitModel(viFlow model){
+        private async Task InitModel(ff model)
+        {
             this.Model = model;
-            this.Model.Parts ??= new List<viFlowPart>(); // just incase its null
+            this.Model.Parts ??= new List<ffPart>(); // just incase its null
             this.Parts = this.Model.Parts;
 
-            var connections = new Dictionary<string, List<xFlowConnection> >();
-            foreach(var part in this.Parts.Where(x => x.OutputConnections?.Any() == true))
+            var connections = new Dictionary<string, List<xFlowConnection>>();
+            foreach (var part in this.Parts.Where(x => x.OutputConnections?.Any() == true))
             {
                 connections.Add(part.Uid.ToString(), part.OutputConnections);
             }
-            await jsRuntime.InvokeVoidAsync("ViFlow.ioInitConnections", connections);
+            await jsRuntime.InvokeVoidAsync("ffFlow.ioInitConnections", connections);
 
         }
 
-        private void Select(viFlowPart part)
+        private void Select(ffPart part)
         {
             SelectedPart = part;
         }
 
-        internal async Task DeletePart(viFlowPart part)
+        internal async Task DeletePart(ffPart part)
         {
             if (part != null)
             {
@@ -118,7 +122,7 @@ namespace ViWatcher.Client.Pages
                 this.StateHasChanged();
                 await WaitForRender();
                 await InitModel(this.Model);
-                await jsRuntime.InvokeVoidAsync("ViFlow.redrawLines");
+                await jsRuntime.InvokeVoidAsync("ffFlow.redrawLines");
             }
         }
 
@@ -126,10 +130,10 @@ namespace ViWatcher.Client.Pages
         public void UpdatePosition(string uidString, int xPos, int yPos)
         {
             Guid uid;
-            if(Guid.TryParse(uidString, out uid) == false)
-                 return;
+            if (Guid.TryParse(uidString, out uid) == false)
+                return;
             var part = this.Parts.FirstOrDefault(x => x.Uid == uid);
-            if(part == null)
+            if (part == null)
                 return;
 
             Logger.Instance.DLog($"Updating part position {xPos}, {yPos}");
@@ -141,7 +145,7 @@ namespace ViWatcher.Client.Pages
         public void AddElement(string uid, int xPos, int yPos)
         {
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
-            if(element == null)
+            if (element == null)
                 return;
 
             Logger.Instance.DLog($"Addeing element {xPos}, {yPos}");
@@ -155,13 +159,13 @@ namespace ViWatcher.Client.Pages
             Logger.Instance.DLog($"adding connnection 0: {uidInput}, {uidOutput}, {input}, {output}");
             var fpInput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidInput);
             var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
-            if(fpInput == null || fpOutput == null)
+            if (fpInput == null || fpOutput == null)
                 return;
             Logger.Instance.DLog($"adding connnection 1: {uidInput}, {uidOutput}, {input}, {output}");
 
 
-            fpOutput.OutputConnections ??= new List<ViWatcher.Shared.Models.FlowConnection>();
-            fpOutput.OutputConnections.Add(new ViWatcher.Shared.Models.FlowConnection
+            fpOutput.OutputConnections ??= new List<FileFlow.Shared.Models.FlowConnection>();
+            fpOutput.OutputConnections.Add(new FileFlow.Shared.Models.FlowConnection
             {
                 Input = input,
                 Output = output,
@@ -176,14 +180,14 @@ namespace ViWatcher.Client.Pages
         {
             var fpInput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidInput);
             var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
-            if(fpInput == null || fpOutput == null)
+            if (fpInput == null || fpOutput == null)
                 return;
 
             fpOutput.OutputConnections = fpOutput.OutputConnections?.Where(x => x.Input != input && x.Output != output && x.InputNode != fpInput.Uid)?.ToList();
         }
-        private void AddPart(viFlowElement element, float xPos, float yPos)
-        {            
-            var part = new viFlowPart();
+        private void AddPart(ffElement element, float xPos, float yPos)
+        {
+            var part = new ffPart();
             part.Name = element.Name;
             part.FlowElementUid = element.Uid;
             part.Type = element.Type;
@@ -196,15 +200,16 @@ namespace ViWatcher.Client.Pages
             Logger.Instance.DLog("part.Model: " + part.Model?.GetType()?.Name);
             Parts.Add(part);
         }
-        
+
         private async Task Save()
         {
             this.Blocker.Show(lblSaving);
             this.IsSaving = true;
             try
             {
-                if(Model == null){
-                    Model = new viFlow
+                if (Model == null)
+                {
+                    Model = new ff
                     {
                         Name = "SOme flow",
                     };
@@ -219,8 +224,8 @@ namespace ViWatcher.Client.Pages
                                           ?.ToList();
                 }
                 Model.Parts = this.Parts;
-                var result = await HttpHelper.Put<viFlow>(API_URL, Model);
-                if(result.Success)
+                var result = await HttpHelper.Put<ff>(API_URL, Model);
+                if (result.Success)
                     Model = result.Data;
             }
             finally
@@ -238,7 +243,7 @@ namespace ViWatcher.Client.Pages
             this.IsSaving = true;
             try
             {
-                var result = await HttpHelper.Post<string>(API_URL + "/execute?input=somefile.mp4");                
+                var result = await HttpHelper.Post<string>(API_URL + "/execute?input=somefile.mp4");
             }
             finally
             {
@@ -247,10 +252,11 @@ namespace ViWatcher.Client.Pages
             }
         }
 
-        async Task Edit(viFlowPart part)
+        async Task Edit(ffPart part)
         {
             var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
-            if(flowElement == null){
+            if (flowElement == null)
+            {
                 // cant find it, cant edit
                 Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
                 return;
@@ -262,7 +268,9 @@ namespace ViWatcher.Client.Pages
             {
                 Logger.Instance.DLog("model updated:" + JsonConvert.SerializeObject(newModelTask.Result));
                 part.Model = newModelTask.Result;
-            }else{
+            }
+            else
+            {
                 Logger.Instance.DLog("model canceled");
             }
         }

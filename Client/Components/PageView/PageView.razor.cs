@@ -1,12 +1,12 @@
-namespace ViWatcher.Client.Components
+namespace FileFlow.Client.Components
 {
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Client.Shared;
+    using FileFlow.Client.Shared;
 
-    public partial class PageView 
+    public partial class PageView
     {
         [CascadingParameter]
-        public NavMenu Menu{ get; set; }
+        public NavMenu Menu { get; set; }
 
 
         [Parameter]
@@ -14,6 +14,6 @@ namespace ViWatcher.Client.Components
 
         [Parameter]
         public RenderFragment Body { get; set; }
-        
+
     }
 }

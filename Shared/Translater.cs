@@ -1,5 +1,5 @@
 
-namespace ViWatcher.Shared
+namespace FileFlow.Shared
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@ namespace ViWatcher.Shared
     using System.Text.RegularExpressions;
     using Jeffijoe.MessageFormat;
     using Newtonsoft.Json.Linq;
-    using ViWatcher.Plugins;
+    using FileFlow.Plugins;
 
     public class Translater
     {

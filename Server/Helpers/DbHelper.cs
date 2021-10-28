@@ -1,14 +1,14 @@
-namespace ViWatcher.Server.Helpers
+namespace FileFlow.Server.Helpers
 {
     using System;
     using System.Collections.Generic;
     using NPoco;
     using Newtonsoft.Json;
-    using ViWatcher.Server.Models;
+    using FileFlow.Server.Models;
     using System.Data.SQLite;
     using Newtonsoft.Json.Converters;
-    using ViWatcher.Shared;
-    using ViWatcher.Shared.Models;
+    using FileFlow.Shared;
+    using FileFlow.Shared.Models;
 
     public class DbHelper
     {
@@ -16,9 +16,9 @@ namespace ViWatcher.Server.Helpers
         private static IDatabase GetDb()
         {
 
-            if (!File.Exists("Data/viwatcher.sqlite"))
+            if (!File.Exists("Data/FileFlow.sqlite"))
             {
-                SQLiteConnection.CreateFile("Data/viwatcher.sqlite");
+                SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
 
                 string sql = @$"CREATE TABLE {nameof(DbObject)}(
                                Uid             CHAR(36)           NOT NULL          PRIMARY KEY,
@@ -28,7 +28,7 @@ namespace ViWatcher.Server.Helpers
                                DateModified    datetime           default           current_timestamp,
                                Data            TEXT               NOT NULL
                             );";
-                using (var con = new SQLiteConnection("Data Source=Data/viwatcher.sqlite;Version=3;"))
+                using (var con = new SQLiteConnection("Data Source=Data/FileFlow.sqlite;Version=3;"))
                 {
                     con.Open();
                     using (var cmd = new SQLiteCommand(sql, con))
@@ -39,7 +39,7 @@ namespace ViWatcher.Server.Helpers
                 }
             }
 
-            var db = new Database("Data Source=Data/viwatcher.sqlite;Version=3;", null, SQLiteFactory.Instance);
+            var db = new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
             return db;
         }
 

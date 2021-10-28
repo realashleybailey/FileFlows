@@ -1,6 +1,6 @@
-namespace ViWatcher.Shared.Models
+namespace FileFlow.Shared.Models
 {
-    using ViWatcher.Plugins;
+    using FileFlow.Plugins;
     public class ElementField
     {
         public int Order { get; set; }

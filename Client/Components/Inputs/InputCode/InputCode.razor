@@ -1,7 +1,8 @@
-@namespace ViWatcher.Client.Components.Inputs
+@namespace FileFlow.Client.Components.Inputs
 @inherits Input<string>
 @using BlazorMonaco
 
-<div class="row"> 
-    <MonacoEditor @ref="Editor" ConstructionOptions="EditorConstructionOptions" OnDidInit="OnEditorInit" OnDidBlurEditorText="OnBlur" />
+<div class="row">
+    <MonacoEditor @ref="Editor" ConstructionOptions="EditorConstructionOptions" OnDidInit="OnEditorInit"
+        OnDidBlurEditorText="OnBlur" />
 </div>

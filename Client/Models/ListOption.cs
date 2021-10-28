@@ -1,7 +1,8 @@
-namespace ViWatcher.Client.Models 
+namespace FileFlow.Client.Models 
 {
-    public class ListOption {
-        public string Label{ get; set; }
-        public object Value{ get; set; }
+    public class ListOption
+    {
+        public string Label { get; set; }
+        public object Value { get; set; }
     }
 }

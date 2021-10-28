@@ -1,91 +1,89 @@
 {
-    "ProductName" : "ViWatcher",
-    "Labels": {
-        "Save":"Save",
-        "Saving":"Saving",
-        "Execute":"Execute",
-        "Executing":"Executing",
-        "Cancel":"Cancel",
-        "Add":"Add",
-        "Edit":"Edit",
-        "Delete":"Delete",
-        "Deleting":"Deleting",
-        "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?"
-    },
-    "ErrorMessages":{
-        "SaveFailed":"Failed to save",
-        "DeleteFailed":"Failed to delete"
-    },
-    "Flow":{
-        "Parts":
-        {
-            "FileExtension":{
-                "Fields":{
-                    "Extensions":"Extensions",
-                    "Extensions-Help":"A list of extensions that if match will output to the first output node, otherwise the second output node will be used."
-                }
-            }
+  "ProductName": "FileFlow",
+  "Labels": {
+    "Save": "Save",
+    "Saving": "Saving",
+    "Execute": "Execute",
+    "Executing": "Executing",
+    "Cancel": "Cancel",
+    "Add": "Add",
+    "Edit": "Edit",
+    "Delete": "Delete",
+    "Deleting": "Deleting",
+    "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?"
+  },
+  "ErrorMessages": {
+    "SaveFailed": "Failed to save",
+    "DeleteFailed": "Failed to delete"
+  },
+  "Flow": {
+    "Parts": {
+      "FileExtension": {
+        "Fields": {
+          "Extensions": "Extensions",
+          "Extensions-Help": "A list of extensions that if match will output to the first output node, otherwise the second output node will be used."
         }
-    },
-    "Pages":{
-        "Home":{
-            "Title":"Home"
-        },
-        "CodeEditor":{
-            "Title":"Code Editor"
-        },
-        "Libraries":{
-            "Title":"Libraries"
-        },
-        "Plugins":{
-            "Title":"Plugins"
-        },
-        "Settings":{
-            "Title":"Settings",
-            "Labels":{
-                "Directories":"Directories",
-                "Tools":"Tools"
-            },
-            "Fields":{
-                "Source":"Source Directory",
-                "Source-Help":"The source directory containing the video files to convert.  This will be recursively searched.",
-                "Destination":"Destination Directory",
-                "Destination-Help": "The destination directory where the encode files will be placed.\nNote: If blank, the files will be saved in the same directory as the source files and the source files will be replaced.",
-                "Container":"Container",
-                "Container-Placeholder":"Select container for converted videos",
-                "Container-Help":"The container converted videos will be created with.",
-                "TestMode":"Test Mode",
-                "TestMode-Help":"When in test mode no actual encoding will be done, only the results of what would happen are shown.",
-                "Extensions":"Extensions",
-                "Extensions-Help":"A list of file extensions to be considered a video file"
-            }
-        },
-        "VideoFiles":{
-            "Title":"Video Files",
-            "Buttons":{
-                "Scan":"Scan",
-                "Scanning":"Scanning",
-                "Ignore":"Ignore",
-                "Process":"Process",
-                "View":"View"
-            }
-        },
-        "Flows":{
-            "Title":"Flows"
-        },
-        "Flow":{
-            "Title":"Flow"
-        }
-    },
-    "Plugins":{
-        "BasicNodes":{
-            "Fields":
-            {                
-                "HandBrakeCli":"HandBrake CLI",
-                "HandBrakeCli-Help":"The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
-                "FFProbeExe":"FFProbe",
-                "FFProbeExe-Help":"The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
-            }
-        }
+      }
     }
+  },
+  "Pages": {
+    "Home": {
+      "Title": "Home"
+    },
+    "CodeEditor": {
+      "Title": "Code Editor"
+    },
+    "Libraries": {
+      "Title": "Libraries"
+    },
+    "Plugins": {
+      "Title": "Plugins"
+    },
+    "Settings": {
+      "Title": "Settings",
+      "Labels": {
+        "Directories": "Directories",
+        "Tools": "Tools"
+      },
+      "Fields": {
+        "Source": "Source Directory",
+        "Source-Help": "The source directory containing the video files to convert.  This will be recursively searched.",
+        "Destination": "Destination Directory",
+        "Destination-Help": "The destination directory where the encode files will be placed.\nNote: If blank, the files will be saved in the same directory as the source files and the source files will be replaced.",
+        "Container": "Container",
+        "Container-Placeholder": "Select container for converted videos",
+        "Container-Help": "The container converted videos will be created with.",
+        "TestMode": "Test Mode",
+        "TestMode-Help": "When in test mode no actual encoding will be done, only the results of what would happen are shown.",
+        "Extensions": "Extensions",
+        "Extensions-Help": "A list of file extensions to be considered a video file"
+      }
+    },
+    "VideoFiles": {
+      "Title": "Video Files",
+      "Buttons": {
+        "Scan": "Scan",
+        "Scanning": "Scanning",
+        "Ignore": "Ignore",
+        "Process": "Process",
+        "View": "View"
+      }
+    },
+    "Flows": {
+      "Title": "Flows"
+    },
+    "Flow": {
+      "Title": "Flow"
+    }
+  },
+  "Plugins": {
+    "BasicNodes": {
+      "Fields": {
+        "HandBrakeCli": "HandBrake CLI",
+        "HandBrakeCli-Help": "The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
+        "FFProbeExe": "FFProbe",
+        "FFProbeExe-Help": "The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
+      }
+    }
+  }
 }

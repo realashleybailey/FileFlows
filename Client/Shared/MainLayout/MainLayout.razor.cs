@@ -1,7 +1,7 @@
-namespace ViWatcher.Client.Shared
+namespace FileFlow.Client.Shared
 {
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Client.Components;
+    using FileFlow.Client.Components;
     public partial class MainLayout : LayoutComponentBase
     {
         public NavMenu Menu { get; set; }

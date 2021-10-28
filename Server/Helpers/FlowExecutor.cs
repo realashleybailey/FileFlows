@@ -1,9 +1,9 @@
-namespace ViWatcher.Server.Helpers
+namespace FileFlow.Server.Helpers
 {
-    using ViWatcher.Shared.Models;
-    using ViWatcher.Plugins;
+    using FileFlow.Shared.Models;
+    using FileFlow.Plugins;
 
-    public class FlowExecutor 
+    public class FlowExecutor
     {
         public Flow Flow { get; set; }
 

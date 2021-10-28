@@ -1,4 +1,4 @@
-window.Vi = {
+window.ff = {
     log: function (level, parameters) {
 
         if (!parameters || parameters.length == 0)

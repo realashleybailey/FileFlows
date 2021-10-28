@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using ViWatcher.Shared;
+using FileFlow.Shared;
 
-namespace ViWatcher.Client.Components.Dialogs
+namespace FileFlow.Client.Components.Dialogs
 {
     public partial class Confirm : ComponentBase
     {

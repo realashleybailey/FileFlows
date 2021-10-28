@@ -1,25 +1,26 @@
-namespace ViWatcher.Client.Components.Inputs 
+namespace FileFlow.Client.Components.Inputs 
 {
     using Microsoft.AspNetCore.Components;
-    using ViWatcher.Shared;
+    using FileFlow.Shared;
 
-    public interface IInput {
-        string Label{ get; set; }
-        string Help{ get; set; }
-        string Placeholder{ get; set; }
+    public interface IInput
+    {
+        string Label { get; set; }
+        string Help { get; set; }
+        string Placeholder { get; set; }
     }
 
-    public abstract class Input<T>:ComponentBase, IInput
+    public abstract class Input<T> : ComponentBase, IInput
     {
         private string _Label;
         private string _LabelOriginal;
         [Parameter]
         public string Label
-        { 
-            get => _Label; 
-            set 
-            { 
-                if(_LabelOriginal == value)
+        {
+            get => _Label;
+            set
+            {
+                if (_LabelOriginal == value)
                     return;
                 _LabelOriginal = value;
                 if (Translater.NeedsTranslating(_LabelOriginal))
@@ -32,10 +33,10 @@ namespace ViWatcher.Client.Components.Inputs
                 {
                     _Label = value;
                 }
-            } 
+            }
         }
-        
-        public string Help{ get; set; }
+
+        public string Help { get; set; }
         public string Placeholder { get; set; }
 
 
@@ -47,7 +48,7 @@ namespace ViWatcher.Client.Components.Inputs
             get => _Value;
             set
             {
-                if(_Value == null && value == null)
+                if (_Value == null && value == null)
                     return;
                 if (_Value != null && value != null && _Value.Equals(value)) return;
                 _Value = value;
@@ -56,6 +57,6 @@ namespace ViWatcher.Client.Components.Inputs
         }
 
         [Parameter]
-        public EventCallback<T> ValueChanged { get; set; }  
+        public EventCallback<T> ValueChanged { get; set; }
     }
 }

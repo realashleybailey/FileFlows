@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Components.Inputs 
+namespace FileFlow.Client.Components.Inputs 
 {
     using System.Collections.Generic;
     using Models;

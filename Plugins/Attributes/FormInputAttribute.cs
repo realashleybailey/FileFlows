@@ -1,16 +1,17 @@
-namespace ViWatcher.Plugins.Attributes
+namespace FileFlow.Plugins.Attributes
 {
     using System;
     using System.Collections.Generic;
-    using ViWatcher.Plugins;
+    using FileFlow.Plugins;
 
-    public class FormInputAttribute:Attribute
+    public class FormInputAttribute : Attribute
     {
-        public FormInputType InputType{ get; set; }
+        public FormInputType InputType { get; set; }
 
-        public int Order{ get; set; }
+        public int Order { get; set; }
 
-        public FormInputAttribute(FormInputType type, int order){
+        public FormInputAttribute(FormInputType type, int order)
+        {
             this.InputType = type;
             this.Order = order;
         }

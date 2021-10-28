@@ -1,4 +1,4 @@
-namespace ViWatcher.Server
+namespace FileFlow.Server
 {
     public class Logger
     {

@@ -1,4 +1,4 @@
-@namespace ViWatcher.Client.Components.Inputs
+@namespace FileFlow.Client.Components.Inputs
 
 <div class="row">
     <div class="col-md-4 align-items-center d-flex input-label">
@@ -6,7 +6,8 @@
     </div>
     <div class="col-md-8 input-value">
         @ChildContent
-        @if(string.IsNullOrEmpty(Input.Help) == false){
+        @if (string.IsNullOrEmpty(Input.Help) == false)
+        {
             <span class="help-text">@Input.Help</span>
         }
     </div>

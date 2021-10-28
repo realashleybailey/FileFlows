@@ -1,4 +1,4 @@
-namespace ViWatcher.Server.Helpers
+namespace FileFlow.Server.Helpers
 {
     using NPoco;
 

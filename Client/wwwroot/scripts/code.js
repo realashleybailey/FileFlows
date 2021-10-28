@@ -1,4 +1,4 @@
-window.ViCode = {
+window.ffCode = {
 
     initModel: function () {
         

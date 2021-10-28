@@ -1,4 +1,4 @@
-namespace ViWatcher.Server.Models
+namespace FileFlow.Server.Models
 {
     using NPoco;
 

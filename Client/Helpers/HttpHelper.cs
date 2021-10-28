@@ -1,4 +1,4 @@
-namespace ViWatcher.Client.Helpers
+namespace FileFlow.Client.Helpers
 {
     using System;
     using System.Net.Http;

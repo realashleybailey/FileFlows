@@ -2,10 +2,10 @@
 
 @namespace ViWatcher.Client.Shared
 
-<RadzenDialog/>
-<RadzenNotification/>
-<RadzenContextMenu/>
-<RadzenTooltip/>
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
 
 <div class="page">
     <div class="sidebar">
@@ -13,10 +13,13 @@
     </div>
 
     <div class="main">
-        @if(Blocker != null && Menu != null){
+        @if (Blocker != null && Menu != null && Editor != null)
+        {
             <CascadingValue Value="Menu" IsFixed="true">
                 <CascadingValue Value="Blocker" IsFixed="true">
-                    @Body
+                    <CascadingValue Value="Editor" IsFixed="true">
+                        @Body
+                    </CascadingValue>
                 </CascadingValue>
             </CascadingValue>
         }
@@ -24,3 +27,6 @@
         <Blocker @ref="Blocker"></Blocker>
     </div>
 </div>
+
+
+<Editor @ref="Editor"></Editor>

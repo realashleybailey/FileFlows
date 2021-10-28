@@ -2,6 +2,7 @@ namespace ViWatcher.Shared.Models
 {
     using System.Collections.Generic;
     using System.Dynamic;
+    using ViWatcher.Plugins;
 
     public class FlowElement
     {
@@ -14,16 +15,8 @@ namespace ViWatcher.Shared.Models
 
         public string Group{ get; set; }
 
-        public List<FlowElementField> Fields{ get; set; }
+        public List<ElementField> Fields{ get; set; }
 
         public ExpandoObject Model{ get; set; }
     }
-
-    public class FlowElementField{
-        public int Order{ get; set; }
-        public string Type{ get; set; }
-        public string Name{ get; set; }
-        public FormInputType InputType{ get; set; }
-    }
-
 }

@@ -1,7 +1,7 @@
-using ViWatcher.Shared.Models;
+namespace ViWatcher.Plugins 
+{
 
-namespace ViWatcher.Shared.Nodes {
-
+    using ViWatcher.Plugins;
     public class Node
     {        
         public FlowElementType Type { get; set; }

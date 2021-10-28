@@ -1,10 +1,12 @@
 using System;
 using Microsoft.JSInterop;
+using ViWatcher.Plugins;
 
-namespace ViWatcher.Client {
-    public class Logger
+namespace ViWatcher.Client
+{
+    public class Logger : ILogger
     {
-        public static IJSRuntime jsRuntime{ get; set; }
+        public static IJSRuntime jsRuntime { get; set; }
         static Logger _Instance;
         public static Logger Instance
         {
@@ -17,13 +19,14 @@ namespace ViWatcher.Client {
             set { _Instance = value; }
         }
 
-        public void ELog(object message, object parameters = null) => Log(1, message, parameters);
-        public void WLog(object message, object parameters = null) => Log(2, message, parameters);
-        public void DLog(object message, object parameters = null) => Log(3, message, parameters);
-        public void ILog(object message, object parameters = null) => Log(4, message, parameters);
+        public void ELog(params object[] args) => Log(1, args);
+        public void WLog(params object[] args) => Log(2, args);
+        public void DLog(params object[] args) => Log(3, args);
+        public void ILog(params object[] args) => Log(4, args);
 
-        private void Log(int level, object message, object parameters) {
-            _ = jsRuntime.InvokeVoidAsync("Vi.log", new object[] { level, message, parameters });
+        private void Log(int level, object[] args)
+        {
+            _ = jsRuntime.InvokeVoidAsync("Vi.log", new object[] { level, args });
         }
     }
 }

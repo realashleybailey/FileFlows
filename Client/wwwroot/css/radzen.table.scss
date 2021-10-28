@@ -3,6 +3,24 @@
     background: rgba(var(--base), 0.2) !important;
     border-radius: unset !important;
     border:unset !important;
+    
+    .switch-wrapper {
+        height:2.5rem;
+        .rz-switch {        
+            transform:scale(.75);
+            top:-.65rem;
+            &:not(.rz-switch-checked) .rz-switch-circle 
+            {
+                background:var(--input-background) !important;
+            }
+            &.rz-switch-checked .rz-switch-circle {
+                background:var(--accent) !important;
+            }
+            .rz-switch-circle:before {
+                background:var(--color) !important;
+            }
+        }
+    }
 }
 .rz-datatable-emptymessage{
     text-align: center;
@@ -68,5 +86,37 @@
     border-radius:0 !important;
     &.rz-state-active {
         border-color:var(--accent) !important;
+    }
+}
+
+
+.page-table {
+    position:absolute;
+    top:0;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    ::deep .rz-data-grid
+    {
+        height:calc(100% - 2rem);
+    }
+    
+    .table-toolbar {
+        height:2rem;
+        font-size:0.7rem;
+        button {
+            text-transform: uppercase;
+            background:transparent;
+            color:var(--color);
+            border:unset;
+            border-radius: 0 !important;
+            &:disabled {
+                color:rgba(var(--color-rgb), 0.4);
+            }
+            &:hover:not(:disabled){
+                color:var(--accent);
+                border-color: var(--accent);
+            }
+        }
     }
 }

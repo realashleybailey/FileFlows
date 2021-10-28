@@ -1,0 +1,43 @@
+@namespace ViWatcher.Client.Pages
+@using ViWatcher.Shared.Models
+
+@page "/libraries"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <div class="plugins page-table">
+            <div class="table-toolbar">
+                <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
+            </div>
+
+
+            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" AllowColumnResize="true"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="Library"
+                LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Library" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="Library" Property="Path" Title="Path" />
+                    <RadzenDataGridColumn TItem="Library" Property="Enabled" Title="Enabled">
+                        <Template Context="item">
+                            <div class="switch-wrapper">
+                                <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Library" Width="8rem" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                        </HeaderTemplate>
+                        <Template Context="item">
+                            <RadzenButton class="edit-button" Click="() => Edit(item)" Text="@lblEdit" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    </Body>
+
+</PageView>

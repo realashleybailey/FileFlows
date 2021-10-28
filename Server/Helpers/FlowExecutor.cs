@@ -1,20 +1,20 @@
 namespace ViWatcher.Server.Helpers
 {
     using ViWatcher.Shared.Models;
-    using ViWatcher.Shared.Nodes;
+    using ViWatcher.Plugins;
 
     public class FlowExecutor 
     {
         public Flow Flow { get; set; }
 
-        public Task<Shared.Models.NodeParameters> Run(string input)
+        public Task<NodeParameters> Run(string input)
         {
             return Task.Run(() =>
             {
 
-                Shared.Models.NodeParameters args = new Shared.Models.NodeParameters();
+                var args = new NodeParameters();
                 args.FileName = input;
-                args.Result = Shared.NodeResult.Success;
+                args.Result = NodeResult.Success;
                 args.Logger = new Shared.FlowLogger();
                 bool flowCompleted = false;
                 int count = 0;
@@ -58,7 +58,7 @@ namespace ViWatcher.Server.Helpers
                     }
                     catch (Exception ex)
                     {
-                        args.Result = Shared.NodeResult.Failure;
+                        args.Result = NodeResult.Failure;
                         args.Logger.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                     }
                 }

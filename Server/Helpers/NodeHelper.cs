@@ -2,8 +2,9 @@ namespace ViWatcher.Server.Helpers
 {
     using System.Collections;
     using System.Reflection;
-    using ViWatcher.Shared.Models;
-    using ViWatcher.Shared.Nodes;
+    using ViWatcher.Shared.Models;   
+    using ViWatcher.Plugins;
+    
     public class NodeHelper 
     {
         static List<Type> _NodeTypes;

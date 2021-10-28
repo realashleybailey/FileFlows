@@ -6,6 +6,8 @@ namespace ViWatcher.Server.Controllers
     using ViWatcher.Server.Helpers;
     using System.ComponentModel;
     using System.Dynamic;
+    using ViWatcher.Plugins;
+    using ViWatcher.Plugins.Attributes;
 
     [Route("/api/flow")]
     public class FlowController : Controller
@@ -24,7 +26,7 @@ namespace ViWatcher.Server.Controllers
                 element.Name = x.Name;
                 element.Uid = x.FullName;
                 element.Fields = new();
-                var instance = (ViWatcher.Shared.Nodes.Node)Activator.CreateInstance(x);
+                var instance = (Node)Activator.CreateInstance(x);
                 element.Inputs = instance.Inputs;
                 element.Outputs = instance.Outputs;
 
@@ -44,10 +46,10 @@ namespace ViWatcher.Server.Controllers
 
                 foreach (var prop in x.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
                 {
-                    var attribute = prop.GetCustomAttributes(typeof(ViWatcher.Shared.Attributes.FormInputAttribute), false).FirstOrDefault() as ViWatcher.Shared.Attributes.FormInputAttribute;
+                    var attribute = prop.GetCustomAttributes(typeof(FormInputAttribute), false).FirstOrDefault() as FormInputAttribute;
                     if (attribute != null)
                     {
-                        element.Fields.Add(new FlowElementField
+                        element.Fields.Add(new ElementField
                         {
                             Name = prop.Name,
                             Order = attribute.Order,

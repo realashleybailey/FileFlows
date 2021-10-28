@@ -1,0 +1,70 @@
+@namespace ViWatcher.Client.Components
+@using ViWatcher.Shared
+@using ViWatcher.Plugins;
+
+@if (Visible)
+{
+    <div class="editor-wrapper">
+        <div class="editor-background"></div>
+        <div class="editor">
+
+            <ViContainer Title="@Title" Icon="@Icon">
+
+                <Head>
+                    <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+
+                    <RadzenButton class="cancel-button" Click=@Cancel Text="@lblCancel" />
+                </Head>
+
+                <Body>
+                    <div class="fields">
+                        @foreach (var field in Fields.OrderBy(x => x.Order))
+                        {
+                            string label = TypeName + ".Fields." + field.Name;
+                            switch (field.InputType)
+                            {
+                                case FormInputType.Text:
+                                    {
+                                        var value = GetValue<string>(field.Name) ?? "";
+                                        <InputText Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
+                                case FormInputType.Int:
+                                    {
+                                        var value = GetValue<int>(field.Name);
+                                        <InputNumber Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
+                                case FormInputType.Switch:
+                                    {
+                                        var value = GetValue<bool>(field.Name);
+                                        <InputSwitch Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
+                                case FormInputType.StringArray:
+                                    {
+                                        var value = GetValue<string[]>(field.Name, new string[] { });
+                                        <InputArray Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
+                                case FormInputType.Code:
+                                    {
+                                        var value = GetValue<string>(field.Name);
+                                        <InputCode Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        <span>couldnt find type @field.InputType</span>
+                                    }
+                                    break;
+                            }
+                        }
+                        <div class="empty"></div>
+                    </div>
+                </Body>
+            </ViContainer>
+        </div>
+
+    </div>
+}

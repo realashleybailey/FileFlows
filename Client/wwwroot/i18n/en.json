@@ -5,7 +5,11 @@
         "Saving":"Saving",
         "Execute":"Execute",
         "Executing":"Executing",
-        "Cancel":"Cancel"
+        "Cancel":"Cancel",
+        "Add":"Add",
+        "Edit":"Edit",
+        "Delete":"Delete",
+        "Deleting":"Deleting"
     },
     "Flow":{
         "Parts":
@@ -25,6 +29,12 @@
         "CodeEditor":{
             "Title":"Code Editor"
         },
+        "Libraries":{
+            "Title":"Libraries"
+        },
+        "Plugins":{
+            "Title":"Plugins"
+        },
         "Settings":{
             "Title":"Settings",
             "Labels":{
@@ -42,11 +52,7 @@
                 "TestMode":"Test Mode",
                 "TestMode-Help":"When in test mode no actual encoding will be done, only the results of what would happen are shown.",
                 "Extensions":"Extensions",
-                "Extensions-Help":"A list of file extensions to be considered a video file",
-                "HandBrakeCli":"HandBrake CLI",
-                "HandBrakeCli-Help":"The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
-                "FFProbeExe":"FFProbe",
-                "FFProbeExe-Help":"The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
+                "Extensions-Help":"A list of file extensions to be considered a video file"
             }
         },
         "VideoFiles":{
@@ -64,6 +70,17 @@
         },
         "Flow":{
             "Title":"Flow"
+        }
+    },
+    "Plugins":{
+        "BasicNodes":{
+            "Fields":
+            {                
+                "HandBrakeCli":"HandBrake CLI",
+                "HandBrakeCli-Help":"The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
+                "FFProbeExe":"FFProbe",
+                "FFProbeExe-Help":"The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
+            }
         }
     }
 }

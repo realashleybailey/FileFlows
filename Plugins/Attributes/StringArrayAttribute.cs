@@ -1,4 +1,4 @@
-namespace ViWatcher.Shared.Attributes
+namespace ViWatcher.Plugins.Attributes
 {
     public class StringArrayAttribute : FormInputAttribute
     {

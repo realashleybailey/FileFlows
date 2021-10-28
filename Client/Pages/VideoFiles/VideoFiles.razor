@@ -8,8 +8,8 @@
             IsBusy=@IsScanning Click=@Scan Text="@lblScan" />
     </Head>
     <Body>
-        <div class="video-files">
-            <div class="toolbar">
+        <div class="video-files page-table">
+            <div class="table-toolbar">
                 <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span class="fas fa-bell-slash"></span> @lblIgnore</button>
                 <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span class="fas fa-eye"></span> @lblView</button>
                 <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span class="fas fa-play"></span> @lblProcess</button>

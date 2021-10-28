@@ -1,14 +1,12 @@
 namespace ViWatcher.BasicNodes.Functions
 {
     using System.ComponentModel;
-    using ViWatcher.Shared.Attributes;
-    using ViWatcher.Shared.Models;
-    using ViWatcher.Shared.Nodes;
+    using ViWatcher.Plugins;
+    using ViWatcher.Plugins.Attributes;
     using Jint.Runtime;
     using Jint.Native.Object;
     using Jint;
     using System.Text;
-    using ViWatcher.Shared;
 
     public class Function : Node, IConfigurableOutputNode
     {

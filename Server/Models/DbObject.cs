@@ -3,7 +3,7 @@ namespace ViWatcher.Server.Models
     using NPoco;
 
     [PrimaryKey(nameof(Uid), AutoIncrement = false)]
-    public class DbObject
+    internal class DbObject
     {
         public string Uid { get; set; }
         public string Name { get; set; }

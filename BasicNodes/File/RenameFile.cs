@@ -1,8 +1,8 @@
 namespace ViWatcher.BasicNodes.File
 {
     using System.ComponentModel;
-    using ViWatcher.Shared.Attributes;
-    using ViWatcher.Shared.Nodes;
+    using ViWatcher.Plugins;
+    using ViWatcher.Plugins.Attributes;
 
     public class RenameFile : Node
     {

@@ -1,4 +1,4 @@
-namespace ViWatcher.Shared.Nodes {
+namespace ViWatcher.Plugins {
 
     public interface IInputNode
     {

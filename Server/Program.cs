@@ -28,4 +28,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+ViWatcher.Server.Helpers.PluginHelper.ScanForPlugins();
+
 app.Run();

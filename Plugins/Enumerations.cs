@@ -1,9 +1,5 @@
-namespace ViWatcher.Shared
+namespace ViWatcher.Plugins
 {
-    public enum NodeResult {
-        Failure = 0,
-        Success = 1,
-    }
 
     public enum FlowElementType {
         Input,

@@ -1,6 +1,7 @@
 namespace ViWatcher.Client.Helpers 
 {
-    using ViWatcher.Shared;
+    using ViWatcher.Plugins;
+
     public class FlowHelper
     {
         public static string GetFlowPartIcon(FlowElementType type){

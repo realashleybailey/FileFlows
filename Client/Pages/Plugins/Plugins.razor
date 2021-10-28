@@ -1,0 +1,55 @@
+@namespace ViWatcher.Client.Pages
+@using ViWatcher.Shared.Models
+
+@page "/plugins"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <div class="plugins page-table">
+            <div class="table-toolbar">
+                <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span
+                        class="fas fa-bell-slash"></span> dosomething</button>
+            </div>
+
+            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
+                @bind-Value=@SelectedItems AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true"
+                Data="@Data" TItem="PluginInfo" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="PluginInfo" Width="40px" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                            <RadzenCheckBox TriState="false" TValue="bool"
+                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
+                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox TriState="false"
+                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PluginInfo" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="PluginInfo" Property="Version" Title="Version" />
+                    <RadzenDataGridColumn TItem="PluginInfo" Property="Assembly" Title="Assembly" />
+                    <RadzenDataGridColumn TItem="PluginInfo" Property="Enabled" Title="Enabled">
+                        <Template Context="item">
+                            <div class="switch-wrapper">
+                                <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PluginInfo" Width="8rem" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                        </HeaderTemplate>
+                        <Template Context="item">
+                            <RadzenButton class="edit-button" Click="() => Edit(item)" Text="@lblEdit" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    </Body>
+
+</PageView>

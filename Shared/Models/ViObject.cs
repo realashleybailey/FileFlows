@@ -1,6 +1,8 @@
 namespace ViWatcher.Shared.Models
 {
     using System;
+    using System.Text.Json.Serialization;
+
     public class ViObject
     {
         public Guid Uid { get; set; }

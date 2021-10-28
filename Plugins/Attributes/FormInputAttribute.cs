@@ -1,7 +1,8 @@
-namespace ViWatcher.Shared.Attributes
+namespace ViWatcher.Plugins.Attributes
 {
     using System;
     using System.Collections.Generic;
+    using ViWatcher.Plugins;
 
     public class FormInputAttribute:Attribute
     {

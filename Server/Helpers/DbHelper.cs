@@ -7,6 +7,8 @@ namespace ViWatcher.Server.Helpers
     using ViWatcher.Server.Models;
     using System.Data.SQLite;
     using Newtonsoft.Json.Converters;
+    using ViWatcher.Shared;
+    using ViWatcher.Shared.Models;
 
     public class DbHelper
     {
@@ -41,7 +43,7 @@ namespace ViWatcher.Server.Helpers
             return db;
         }
 
-        public static IEnumerable<T> Select<T>()
+        public static IEnumerable<T> Select<T>() where T : ViObject, new()
         {
             using (var db = GetDb())
             {
@@ -50,70 +52,93 @@ namespace ViWatcher.Server.Helpers
             }
         }
 
-        public static T Single<T>() where T : new() 
-        {            
+        public static T Single<T>() where T : ViObject, new()
+        {
             using (var db = GetDb())
             {
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", typeof(T).FullName);                
-                if(string.IsNullOrEmpty(dbObject?.Data))
+                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", typeof(T).FullName);
+                if (string.IsNullOrEmpty(dbObject?.Data))
                     return new T();
                 return Convert<T>(dbObject);
             }
         }
 
-
-        private static T Convert<T>(DbObject dbObject)
-        {            
-            T result = JsonConvert.DeserializeObject<T>(dbObject.Data);
-            if(result is ViWatcher.Shared.Models.ViObject viObj)
+        public static T Single<T>(Guid uid) where T : ViObject, new()
+        {
+            using (var db = GetDb())
             {
-                viObj.Uid = Guid.Parse(dbObject.Uid);
-                viObj.Name = dbObject.Name;
-                viObj.DateModified = dbObject.DateModified;
-                viObj.DateCreated = dbObject.DateCreated;
+                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid.ToString());
+                if (string.IsNullOrEmpty(dbObject?.Data))
+                    return new T();
+                return Convert<T>(dbObject);
             }
+        }
+
+        private static T Convert<T>(DbObject dbObject) where T : ViObject, new()
+        {
+            var serializerOptions = new System.Text.Json.JsonSerializerOptions
+            {
+                Converters = { new BoolConverter() }
+            };
+            // need to case obj to (ViObject) here so the DataConverter is used
+            T result = System.Text.Json.JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
+            result.Uid = Guid.Parse(dbObject.Uid);
+            result.Name = dbObject.Name;
+            result.DateModified = dbObject.DateModified;
+            result.DateCreated = dbObject.DateCreated;
             return result;
         }
 
-        public static T Update<T>(T obj) where T: new()
-        {
-            DbObject dbObject = Update((object)obj);
-            if(string.IsNullOrEmpty(dbObject.Uid))
-                return new T(); // since we hate nulls
-            return Convert<T>(dbObject);
-        }
+        // public static T Update<T>(T obj) where T : ViObject, new()
+        // {
+        //     var updated = Update((ViObject)obj);
+        //     if (updated.Uid == Guid.Empty)
+        //         return new T(); // since we hate nulls
+        //     return Convert<T>(updated);
+        // }
 
-        public static DbObject Update(object obj)
+        public static T Update<T>(T obj) where T : ViObject, new()
         {
-            if(obj == null)
-                return new DbObject();
-            // if we use Json.Net it doesnt serialize the expando object properly... why???
-            //string json = JsonConvert.SerializeObject(obj, new ExpandoObjectConverter());
-            string json = System.Text.Json.JsonSerializer.Serialize(obj);
+            if (obj == null)
+                return new T();
+            var serializerOptions = new System.Text.Json.JsonSerializerOptions
+            {
+                Converters = { new DataConverter(), new BoolConverter() }
+            };
+            // need to case obj to (ViObject) here so the DataConverter is used
+            string json = System.Text.Json.JsonSerializer.Serialize((ViObject)obj, serializerOptions);
             using (var db = GetDb())
             {
                 var type = obj.GetType();
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", type.FullName);     
-                if(dbObject == null){
+                obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
+                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", type.FullName);
+                if (dbObject == null)
+                {
+                    obj.Uid = Guid.NewGuid();
+                    obj.DateCreated = DateTime.Now;
+                    obj.DateModified = obj.DateCreated;
                     // create new 
                     dbObject = new DbObject
                     {
-                        Uid = Guid.NewGuid().ToString(),
-                        DateCreated = DateTime.Now,
-                        DateModified = DateTime.Now,
+                        Uid = obj.Uid.ToString(),
+                        Name = obj.Name,
+                        DateCreated = obj.DateCreated,
+                        DateModified = obj.DateModified,
+
                         Type = type.FullName,
-                        Name = type.Name,
                         Data = json
                     };
                     db.Insert(dbObject);
                 }
                 else
                 {
-                    dbObject.DateModified = DateTime.Now;
+                    obj.DateModified = DateTime.Now;
+                    dbObject.Name = obj.Name;
+                    dbObject.DateModified = obj.DateModified;
                     dbObject.Data = json;
                     db.Update(dbObject);
                 }
-                return dbObject;
+                return obj;
             }
         }
 

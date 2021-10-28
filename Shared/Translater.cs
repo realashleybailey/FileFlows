@@ -7,6 +7,7 @@ namespace ViWatcher.Shared
     using System.Text.RegularExpressions;
     using Jeffijoe.MessageFormat;
     using Newtonsoft.Json.Linq;
+    using ViWatcher.Plugins;
 
     public class Translater
     {
@@ -14,11 +15,13 @@ namespace ViWatcher.Shared
         private static Dictionary<string, string> Language { get; set; } = new Dictionary<string, string>();
         private static Regex rgxNeedsTranslating = new Regex(@"^([\w\d_\-]+\.)+[\w\d_\-]+$");
 
+        public static ILogger Logger { get; set; }
+
         public static string TranslateIfNeeded(string value)
         {
-            if(string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
                 return String.Empty;
-            if(NeedsTranslating(value) == false)
+            if (NeedsTranslating(value) == false)
                 return value;
             return Instant(value);
         }
@@ -90,16 +93,17 @@ namespace ViWatcher.Shared
                     return Language[key];
 
             }
-            if(possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder"))
+            if (possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder"))
                 return "";
 
             string result = possibleKeys?.FirstOrDefault() ?? "";
+            Logger?.WLog("Failed to lookup key: " + result);
             result = result.Substring(result.LastIndexOf(".") + 1);
 
             return result;
         }
 
-        public static string Instant(string key, object parameters = null) 
+        public static string Instant(string key, object parameters = null)
             => Instant(new[] { key }, parameters);
 
         public static string Instant(string[] possibleKeys, object parameters = null)
@@ -107,12 +111,13 @@ namespace ViWatcher.Shared
             try
             {
                 string msg = Lookup(possibleKeys);
-                if(msg == "")
+                if (msg == "")
                     return "";
-                return Formatter.FormatMessage(msg, parameters ?? new {});
+                return Formatter.FormatMessage(msg, parameters ?? new { });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                Logger?.WLog("Failed to translating key: " + possibleKeys[0] + ", " + ex.Message);
                 return possibleKeys[0];
             }
         }

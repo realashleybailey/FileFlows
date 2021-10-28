@@ -1,14 +1,15 @@
-namespace ViWatcher.Client.Shared 
+namespace ViWatcher.Client.Shared
 {
     using System.Collections.Generic;
     using ViWatcher.Shared;
 
-    public partial class NavMenu{
+    public partial class NavMenu
+    {
         private string lblHome, lblVideoFiles, lblSettings;
         private List<NavMenuItem> MenuItems = new List<NavMenuItem>();
         private bool collapseNavMenu = true;
 
-        public NavMenuItem Active{ get; private set; }
+        public NavMenuItem Active { get; private set; }
 
         private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
         protected override void OnInitialized()
@@ -20,6 +21,8 @@ namespace ViWatcher.Client.Shared
             MenuItems.Add(new NavMenuItem("Pages.Home.Title", "fas fa-home", ""));
             MenuItems.Add(new NavMenuItem("Pages.VideoFiles.Title", "fas fa-video", "video-files"));
             MenuItems.Add(new NavMenuItem("Pages.Flows.Title", "fas fa-project-diagram", "flow"));
+            MenuItems.Add(new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"));
+            MenuItems.Add(new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"));
             MenuItems.Add(new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings"));
             MenuItems.Add(new NavMenuItem("Pages.CodeEditor.Title", "fas fa-code", "code-editor"));
 
@@ -37,12 +40,14 @@ namespace ViWatcher.Client.Shared
         }
     }
 
-    public class NavMenuItem {
-        public string Title{ get; set; }
-        public string Icon{ get; set; }
-        public string Url{ get; set; }
+    public class NavMenuItem
+    {
+        public string Title { get; set; }
+        public string Icon { get; set; }
+        public string Url { get; set; }
 
-        public NavMenuItem(string title = "", string icon = "", string url = "") {
+        public NavMenuItem(string title = "", string icon = "", string url = "")
+        {
             this.Title = Translater.TranslateIfNeeded(title);
             this.Icon = icon;
             this.Url = url;

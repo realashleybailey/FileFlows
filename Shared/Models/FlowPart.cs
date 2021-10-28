@@ -3,6 +3,7 @@ namespace ViWatcher.Shared.Models
     using System;
     using System.Collections.Generic;
     using System.Dynamic;
+    using ViWatcher.Plugins;
 
     public class FlowPart
     {

@@ -1,17 +1,12 @@
 using System;
 using System.Linq;
 using System.Text;
+using ViWatcher.Plugins;
 
 namespace ViWatcher.Shared 
 {
-    public interface IFlowLogger {
-        void ILog(params object[] args);
-        void DLog(params object[] args);
-        void WLog(params object[] args);
-        void ELog(params object[] args);
-    }
 
-    public class FlowLogger : IFlowLogger
+    public class FlowLogger : ILogger
     {
         StringBuilder log = new StringBuilder();
         public void DLog(params object[] args)=> Log(LogType.Debug, args);

@@ -19,6 +19,7 @@ namespace FileFlow.Client.Pages
 
     public partial class Flow : ComponentBase
     {
+        [Parameter] public System.Guid Uid { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         private ffElement[] Available { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();

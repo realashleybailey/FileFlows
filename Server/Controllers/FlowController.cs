@@ -13,6 +13,40 @@ namespace FileFlow.Server.Controllers
     public class FlowController : Controller
     {
 
+        [HttpGet]
+        public IEnumerable<Flow> GetAll() => DbHelper.Select<Flow>();
+
+        [HttpPut("state/{uid}")]
+        public Flow SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
+        {
+            var flow = DbHelper.Single<Flow>(uid);
+            if (flow == null)
+                throw new Exception("Flow not found.");
+            if (enable != null)
+            {
+                flow.Enabled = enable.Value;
+                DbHelper.Update(flow);
+            }
+            return flow;
+        }
+
+        [HttpDelete]
+        public void Delete([FromBody] DeleteModel model)
+        {
+            if (model == null || model.Uids?.Any() != true)
+                return; // nothing to delete
+            DbHelper.Delete<Flow>(model.Uids);
+        }
+
+        [HttpGet("{uid}")]
+        public Flow Get(Guid uid) => DbHelper.Single<Flow>(uid);
+
+
+        [HttpGet("one")]
+        public Flow Get() => DbHelper.Single<Flow>();
+
+
+
         [HttpGet("elements")]
         public IEnumerable<FlowElement> GetElements()
         {
@@ -78,9 +112,6 @@ namespace FileFlow.Server.Controllers
             }
             return elements;
         }
-
-        [HttpGet("one")]
-        public Flow Get() => DbHelper.Single<Flow>();
 
         [HttpPut]
         public Flow Save([FromBody] Flow model)

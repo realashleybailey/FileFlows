@@ -68,10 +68,16 @@ namespace FileFlow.Client.Pages
         }
 
         private PluginInfo EditingPlugin = null;
+        private async Task RowDoubleClicked(DataGridRowMouseEventArgs<PluginInfo> item)
+        {
+            this.SelectedItems.Clear();
+            this.SelectedItems.Add(item.Data);
+            await Edit();
+        }
         async Task Edit()
         {
             PluginInfo plugin = this.SelectedItems.FirstOrDefault();
-            if (plugin == null)
+            if (plugin?.HasSettings != true)
                 return;
             Blocker.Show();
             this.StateHasChanged();

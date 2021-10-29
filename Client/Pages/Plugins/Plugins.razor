@@ -17,7 +17,7 @@
                     @lblEdit</button>
             </div>
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
+            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"  RowDoubleClick=@RowDoubleClicked
                 @bind-Value=@SelectedItems AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true"
                 Data="@Data" TItem="PluginInfo" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <Columns>

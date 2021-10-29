@@ -74,7 +74,7 @@ namespace FileFlow.Client.Pages
         private Library EditingItem = null;
         private async Task Add()
         {
-            await Edit(new Library());
+            await Edit(new Library() { Enabled = true });
         }
 
         async Task Edit()
@@ -96,18 +96,21 @@ namespace FileFlow.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Text,
+                InputType = FileFlow.Plugin.FormInputType.Folder,
                 Name = nameof(library.Path)
+            });
+            fields.Add(new ElementField
+            {
+                InputType = FileFlow.Plugin.FormInputType.Text,
+                Name = nameof(library.Filter)
             });
             fields.Add(new ElementField
             {
                 InputType = FileFlow.Plugin.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });
-            Logger.Instance.DLog("About to open eeditor");
             var result = await Editor.Open("Pages.Library", library.Name, fields, library,
               saveCallback: Save);
-            Logger.Instance.DLog("finshed with eeditor", result);
         }
 
         async Task<bool> Save(ExpandoObject model)
@@ -169,6 +172,13 @@ namespace FileFlow.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+        }
+
+        private async Task RowDoubleClicked(DataGridRowMouseEventArgs<Library> item)
+        {
+            this.SelectedItems.Clear();
+            this.SelectedItems.Add(item.Data);
+            await Edit(item.Data);
         }
     }
 

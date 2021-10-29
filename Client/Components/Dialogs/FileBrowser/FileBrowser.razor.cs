@@ -63,7 +63,7 @@ namespace FileFlow.Client.Components.Dialogs
             if (Selected == null)
                 return;
             this.Visible = false;
-            Instance.ShowTask.TrySetResult(Selected.FullName);
+            Instance.ShowTask.TrySetResult(Selected.IsParent ? Selected.Name : Selected.FullName);
             await Task.CompletedTask;
         }
 
@@ -76,9 +76,7 @@ namespace FileFlow.Client.Components.Dialogs
 
         private async Task SetSelected(FileBrowserItem item)
         {
-            if (item.IsParent)
-                return;
-            if (DirectoryMode == false && (item.IsPath || item.IsDrive))
+            if (DirectoryMode == false && (item.IsPath || item.IsDrive || item.IsParent))
                 return;
             if (this.Selected == item)
                 this.Selected = null;
@@ -89,7 +87,6 @@ namespace FileFlow.Client.Components.Dialogs
 
         private async Task DblClick(FileBrowserItem item)
         {
-            Logger.Instance.DLog("dbl click: ", item);
             if (item.IsParent || item.IsPath || item.IsDrive)
                 await LoadPath(item.FullName);
             else

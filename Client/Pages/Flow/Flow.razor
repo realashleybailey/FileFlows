@@ -1,10 +1,11 @@
 @namespace FileFlow.Client.Pages
 
-@page "/flow"
+@page "/flow/{uid:guid}"
 
 <PageView>
 
     <Head>
+        Uid: @Uid
         <RadzenButton class="save-button" BusyText="@lblExecuting" IsBusy=@IsExecuting Click=@Execute
             Text="@lblExecute" />
         <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />

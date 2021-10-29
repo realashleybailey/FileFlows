@@ -110,15 +110,9 @@ namespace FileFlow.Client.Components
 
             if (SaveCallback != null)
             {
-                Logger.Instance.DLog("About to call save callbakc");
                 bool saved = await SaveCallback(this.Model);
-                Logger.Instance.DLog("saved:" + saved);
                 if (saved == false)
                     return;
-            }
-            else
-            {
-                Logger.Instance.DLog("Save callback was null");
             }
             OpenTask.TrySetResult(this.Model);
 

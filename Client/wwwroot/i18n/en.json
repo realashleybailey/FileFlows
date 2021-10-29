@@ -36,14 +36,26 @@
     }
   },
   "Pages": {
+    "Flow": {
+      "Title": "Flow"
+    },
+    "Flows":{
+      "Title":"Flows"
+    },
     "Home": {
       "Title": "Home"
     },
-    "CodeEditor": {
-      "Title": "Code Editor"
-    },
     "Libraries": {
       "Title": "Libraries"
+    },
+    "Library":{
+      "Fields":{
+        "Name":"Name",
+        "Path":"Path",
+        "Enabled":"Enabled",
+        "Filter":"Filter",
+        "Filter-Help":"An optional filter regular expression to run against matching files."
+      }
     },
     "Plugins": {
       "Title": "Plugins"
@@ -77,12 +89,6 @@
         "Process": "Process",
         "View": "View"
       }
-    },
-    "Flows": {
-      "Title": "Flows"
-    },
-    "Flow": {
-      "Title": "Flow"
     }
   },
   "Plugins": {

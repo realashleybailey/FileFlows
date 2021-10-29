@@ -1,6 +1,6 @@
-namespace FileFlow.Client.Helpers 
+namespace FileFlow.Client.Helpers
 {
-    using FileFlow.Plugins;
+    using FileFlow.Plugin;
 
     public class FlowHelper
     {

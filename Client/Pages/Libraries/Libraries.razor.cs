@@ -91,17 +91,17 @@ namespace FileFlow.Client.Pages
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugins.FormInputType.Text,
+                InputType = FileFlow.Plugin.FormInputType.Text,
                 Name = nameof(library.Name)
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugins.FormInputType.Text,
+                InputType = FileFlow.Plugin.FormInputType.Text,
                 Name = nameof(library.Path)
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugins.FormInputType.Switch,
+                InputType = FileFlow.Plugin.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });
             Logger.Instance.DLog("About to open eeditor");

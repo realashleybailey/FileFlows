@@ -3,7 +3,7 @@ namespace FileFlow.Server.Helpers
     using System.Collections;
     using System.Reflection;
     using FileFlow.Shared.Models;
-    using FileFlow.Plugins;
+    using FileFlow.Plugin;
 
     public class NodeHelper
     {
@@ -14,27 +14,27 @@ namespace FileFlow.Server.Helpers
             get
             {
                 if (_NodeTypes == null)
-                    _NodeTypes = GetNodes();
+                    _NodeTypes = GetNodeTypes();
                 return _NodeTypes;
             }
         }
 
-        static List<Type> GetNodes()
+        public static List<Type> GetNodeTypes()
         {
             List<Type> nodes = new List<Type>();
             var tNode = typeof(Node);
-            foreach (var file in new DirectoryInfo("Plugins").GetFiles("*.dll"))
+            var plugins = DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false && x.Enabled);
+            foreach (var plugin in plugins)
             {
-                if (file.Name == "Shared")
-                    continue;
                 try
                 {
-                    var assembly = Assembly.LoadFile(file.FullName);
+                    var assembly = Assembly.LoadFile(new FileInfo(Path.Combine("Plugins", plugin.Assembly)).FullName);
                     var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode));
                     nodes.AddRange(nodeTypes);
                 }
                 catch (Exception) { }
             }
+            _NodeTypes = nodes;
             return nodes;
         }
 

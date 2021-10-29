@@ -1,6 +1,6 @@
 namespace FileFlow.Server
 {
-    public class Logger : FileFlow.Plugins.ILogger
+    public class Logger : FileFlow.Plugin.ILogger
     {
         private enum LogType { Error, Warning, Debug, Info }
         private void Log(LogType type, object[] args)

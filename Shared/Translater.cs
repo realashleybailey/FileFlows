@@ -7,7 +7,7 @@ namespace FileFlow.Shared
     using System.Text.RegularExpressions;
     using Jeffijoe.MessageFormat;
     using Newtonsoft.Json.Linq;
-    using FileFlow.Plugins;
+    using FileFlow.Plugin;
 
     public class Translater
     {

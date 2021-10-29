@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "ASByZv74M4YQWgnt6TVX1xFxYT/hxcmFv3mCzyberRdfFKxvh7hvWdE1s1kllKI2hCO+CoNDDa+bENTrWJdN5Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\john\\src\\ViWatcher\\Plugins\\BasicNodes\\BasicNodes.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\john\\.nuget\\packages\\esprima\\2.0.3\\esprima.2.0.3.nupkg.sha512",
+    "C:\\Users\\john\\.nuget\\packages\\jint\\3.0.0-beta-2035\\jint.3.0.0-beta-2035.nupkg.sha512"
+  ],
+  "logs": []
+}

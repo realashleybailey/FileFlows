@@ -11,6 +11,7 @@ namespace FileFlow.Shared.Models
         public string Assembly { get; set; }
         public string Version { get; set; }
         public bool Deleted { get; set; }
+        public bool HasSettings { get; set; }
         public ExpandoObject Settings { get; set; }
 
         public List<ElementField> Fields { get; set; }

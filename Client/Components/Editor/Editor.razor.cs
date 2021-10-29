@@ -11,7 +11,7 @@ namespace FileFlow.Client.Components
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Reflection;
-    using FileFlow.Plugins.Attributes;
+    using FileFlow.Plugin.Attributes;
     using System.Linq;
     using System.ComponentModel;
 
@@ -147,28 +147,34 @@ namespace FileFlow.Client.Components
         {
             var dict = field?.Parameters as IDictionary<string, object>;
             if (dict?.ContainsKey(parameter) != true)
+            {
                 return default(T);
+            }
             var val = dict[parameter];
             if (val == null)
                 return default(T);
             if (val.GetType() != typeof(T))
-                return default(T);
+            {
+                try
+                {
+                    string json = JsonConvert.SerializeObject(val);
+                    val = JsonConvert.DeserializeObject<T>(json);
+                }
+                catch (Exception) { return default(T); }
+            }
             return (T)val;
         }
 
         private T GetValue<T>(string field, T @default = default(T))
         {
             var dict = (IDictionary<string, object>)Model;
-            Logger.Instance.DLog("Getting value for: " + field);
             if (dict.ContainsKey(field) == false)
             {
-                Logger.Instance.DLog("Not in model");
                 return @default;
             }
             object value = dict[field];
             if (value == null)
             {
-                Logger.Instance.DLog("value is null");
                 return @default;
             }
             if (value is T)
@@ -193,7 +199,6 @@ namespace FileFlow.Client.Components
                 Logger.Instance.DLog("Not of type: " + value.GetType());
                 Logger.Instance.WLog("error: " + ex.Message + "\n" + ex.StackTrace);
                 return @default;
-
             }
         }
     }

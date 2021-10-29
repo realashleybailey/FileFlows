@@ -1,7 +1,7 @@
 namespace FileFlow.Server.Helpers
 {
     using FileFlow.Shared.Models;
-    using FileFlow.Plugins;
+    using FileFlow.Plugin;
 
     public class FlowExecutor
     {

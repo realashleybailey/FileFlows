@@ -7,6 +7,7 @@ namespace FileFlow.Server.Controllers
     using FileFlow.Shared.Models;
     using FileFlow.Server.Helpers;
     using System.Runtime.InteropServices;
+    using System.Text.RegularExpressions;
 
     [Route("/api/file-browser")]
     public class FileBrowserController : Controller
@@ -63,11 +64,14 @@ namespace FileFlow.Server.Controllers
                 }
                 if (includeFiles)
                 {
+                    var rgxFile = new Regex(extensions?.Any() == false ? "*" :
+                                         ".(" + string.Join("|", extensions.Select(x => Regex.Escape(x.ToLower()))) + ")$");
                     foreach (var file in di.GetFiles())
                     {
                         if ((file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                             continue;
-                        items.Add(new FileBrowserItem { FullName = file.FullName, Name = file.Name });
+                        if (rgxFile.IsMatch(file.Name))
+                            items.Add(new FileBrowserItem { FullName = file.FullName, Name = file.Name });
                     }
                 }
             }

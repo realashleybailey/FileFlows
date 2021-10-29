@@ -5,7 +5,7 @@
     "tasks": [
         {
           "label": "Build",
-          "dependsOn": ["BasicNodes", "Client Build", "Server Build"]
+          "dependsOn": ["BasicNodes", "VideoNodes", "Client Build", "Server Build"]
         },
         {
             "label": "BasicNodes",
@@ -17,10 +17,31 @@
                 "/property:GenerateFullPaths=true",
                 // Do not generate summary otherwise it leads to duplicate errors in Problems panel
                 "/consoleloggerparameters:NoSummary",
-                "--output:../Server/Plugins"
+                "--output:../../Server/Plugins"
             ],
             "options": {
-              "cwd": "${workspaceFolder}/BasicNodes"
+              "cwd": "${workspaceFolder}/Plugins/BasicNodes"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "VideoNodes",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                // Ask dotnet build to generate full paths for file names.
+                "/property:GenerateFullPaths=true",
+                // Do not generate summary otherwise it leads to duplicate errors in Problems panel
+                "/consoleloggerparameters:NoSummary",
+                "--output:../../Server/Plugins"
+            ],
+            "options": {
+              "cwd": "${workspaceFolder}/Plugins/VideoNodes"
             },
             "group": "build",
             "presentation": {

@@ -1,6 +1,6 @@
 using System;
 using Microsoft.JSInterop;
-using FileFlow.Plugins;
+using FileFlow.Plugin;
 
 namespace FileFlow.Client
 {

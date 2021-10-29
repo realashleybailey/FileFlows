@@ -11,8 +11,10 @@
     <Body>
         <div class="plugins page-table">
             <div class="table-toolbar">
-                <button disabled="@(SelectedItems?.Any() != true ? "disabled" : null)"><span
-                        class="fas fa-bell-slash"></span> dosomething</button>
+                <button @onclick="@Edit"
+                    disabled="@(SelectedItems?.FirstOrDefault()?.HasSettings == true ? null : "disabled")"><span c
+                        lass="fas fa-edit"></span>
+                    @lblEdit</button>
             </div>
 
             <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
@@ -21,9 +23,6 @@
                 <Columns>
                     <RadzenDataGridColumn TItem="PluginInfo" Width="40px" Sortable="false" Filterable="false">
                         <HeaderTemplate>
-                            <RadzenCheckBox TriState="false" TValue="bool"
-                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
                         </HeaderTemplate>
                         <Template Context="data">
                             <RadzenCheckBox TriState="false"
@@ -38,13 +37,6 @@
                             <div class="switch-wrapper">
                                 <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
                             </div>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="PluginInfo" Width="8rem" Sortable="false" Filterable="false">
-                        <HeaderTemplate>
-                        </HeaderTemplate>
-                        <Template Context="item">
-                            <RadzenButton class="edit-button" Click="() => Edit(item)" Text="@lblEdit" />
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>

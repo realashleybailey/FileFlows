@@ -1,9 +1,9 @@
 namespace FileFlow.BasicNodes
 {
     using System.ComponentModel.DataAnnotations;
-    using FileFlow.Plugins.Attributes;
+    using FileFlow.Plugin.Attributes;
 
-    public class Plugin : FileFlow.Plugins.Plugin
+    public class Plugin : FileFlow.Plugin.Plugin
     {
         public override string Name => "Basic Nodes";
 

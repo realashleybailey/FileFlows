@@ -6,8 +6,8 @@ namespace FileFlow.Server.Controllers
     using FileFlow.Server.Helpers;
     using System.ComponentModel;
     using System.Dynamic;
-    using FileFlow.Plugins;
-    using FileFlow.Plugins.Attributes;
+    using FileFlow.Plugin;
+    using FileFlow.Plugin.Attributes;
 
     [Route("/api/flow")]
     public class FlowController : Controller
@@ -16,11 +16,10 @@ namespace FileFlow.Server.Controllers
         [HttpGet("elements")]
         public IEnumerable<FlowElement> GetElements()
         {
-            var nodeTypes = Helpers.NodeHelper.NodeTypes;
+            var nodeTypes = Helpers.NodeHelper.GetNodeTypes();
             List<FlowElement> elements = new List<FlowElement>();
             foreach (var x in nodeTypes)
             {
-
                 FlowElement element = new FlowElement();
                 element.Group = x.Namespace.Substring(x.Namespace.LastIndexOf(".") + 1);
                 element.Name = x.Name;

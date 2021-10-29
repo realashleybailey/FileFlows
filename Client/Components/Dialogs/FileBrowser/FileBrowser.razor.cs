@@ -92,6 +92,11 @@ namespace FileFlow.Client.Components.Dialogs
             Logger.Instance.DLog("dbl click: ", item);
             if (item.IsParent || item.IsPath || item.IsDrive)
                 await LoadPath(item.FullName);
+            else
+            {
+                this.Selected = item;
+                this.Select();
+            }
         }
 
         private async Task LoadPath(string path)

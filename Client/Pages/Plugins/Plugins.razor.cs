@@ -1,5 +1,6 @@
 namespace FileFlow.Client.Pages
 {
+    using System.Linq;
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Threading.Tasks;
@@ -55,7 +56,9 @@ namespace FileFlow.Client.Pages
             Data.Clear();
             try
             {
-                await HttpHelper.Put<PluginInfo>($"{API_URL}/state/{plugin.Uid}?enable={enabled}");
+                var result = await HttpHelper.Put<PluginInfo>($"{API_URL}/state/{plugin.Uid}?enable={enabled}");
+                if (result.Success)
+                    plugin.Enabled = result.Data.Enabled;
             }
             finally
             {
@@ -65,8 +68,11 @@ namespace FileFlow.Client.Pages
         }
 
         private PluginInfo EditingPlugin = null;
-        async Task Edit(PluginInfo plugin)
+        async Task Edit()
         {
+            PluginInfo plugin = this.SelectedItems.FirstOrDefault();
+            if (plugin == null)
+                return;
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();

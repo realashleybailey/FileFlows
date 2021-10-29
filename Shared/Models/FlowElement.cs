@@ -2,7 +2,7 @@ namespace FileFlow.Shared.Models
 {
     using System.Collections.Generic;
     using System.Dynamic;
-    using FileFlow.Plugins;
+    using FileFlow.Plugin;
 
     public class FlowElement
     {

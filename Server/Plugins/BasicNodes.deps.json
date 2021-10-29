@@ -9,7 +9,7 @@
       "BasicNodes/1.0.0": {
         "dependencies": {
           "Jint": "3.0.0-beta-2035",
-          "Plugins": "1.0.0"
+          "Plugin": "1.0.0"
         },
         "runtime": {
           "BasicNodes.dll": {}
@@ -34,9 +34,9 @@
           }
         }
       },
-      "Plugins/1.0.0": {
+      "Plugin/1.0.0": {
         "runtime": {
-          "Plugins.dll": {}
+          "Plugin.dll": {}
         }
       }
     }
@@ -61,7 +61,7 @@
       "path": "jint/3.0.0-beta-2035",
       "hashPath": "jint.3.0.0-beta-2035.nupkg.sha512"
     },
-    "Plugins/1.0.0": {
+    "Plugin/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "VideoNodes/1.0.0": {
+        "dependencies": {
+          "Plugin": "1.0.0"
+        },
+        "runtime": {
+          "VideoNodes.dll": {}
+        }
+      },
+      "Plugin/1.0.0": {
+        "runtime": {
+          "Plugin.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "VideoNodes/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Plugin/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

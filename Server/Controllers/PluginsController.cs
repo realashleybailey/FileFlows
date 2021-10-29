@@ -4,7 +4,7 @@ namespace FileFlow.Server.Controllers
     using System.Dynamic;
     using System.Reflection;
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Plugins.Attributes;
+    using FileFlow.Plugin.Attributes;
     using FileFlow.Server.Helpers;
     using FileFlow.Shared.Models;
 
@@ -23,6 +23,9 @@ namespace FileFlow.Server.Controllers
             var plugin = DbHelper.Single<PluginInfo>(uid);
             if (plugin == null)
                 throw new Exception("Plugin not found.");
+
+            if (plugin.Name == "Basic Nodes" && enable == false)
+                return plugin; // dont let them disable the basic nodes
             if (enable != null)
             {
                 plugin.Enabled = enable.Value;
@@ -46,42 +49,7 @@ namespace FileFlow.Server.Controllers
             pi.Settings ??= new System.Dynamic.ExpandoObject();
             var dict = (IDictionary<string, object>)pi.Settings;
 
-            pi.Fields = new List<ElementField>();
-            foreach (var prop in plugin.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
-            {
-                var attribute = prop.GetCustomAttributes(typeof(FormInputAttribute), false).FirstOrDefault() as FormInputAttribute;
-                if (attribute != null)
-                {
-                    var ef = new ElementField
-                    {
-                        Name = prop.Name,
-                        Order = attribute.Order,
-                        InputType = attribute.InputType,
-                        Type = prop.PropertyType.FullName,
-                        Parameters = new Dictionary<string, object>()
-                    };
-                    pi.Fields.Add(ef);
-
-                    var parameters = new Dictionary<string, object>();
-
-                    foreach (var attProp in attribute.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                    {
-                        if (new string[] { nameof(FormInputAttribute.Order), nameof(FormInputAttribute.InputType), "TypeId" }.Contains(attProp.Name))
-                            continue;
-
-                        object value = attProp.GetValue(attribute);
-                        Logger.Instance.DLog(attProp.Name, value);
-                        ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
-
-                    }
-
-                    if (dict.ContainsKey(prop.Name) == false)
-                    {
-                        var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                        dict.Add(prop.Name, dValue != null ? dValue.Value : prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
-                    }
-                }
-            }
+            pi.Fields = PluginHelper.GetPluginFields(plugin.GetType(), dict);
             return pi;
         }
 

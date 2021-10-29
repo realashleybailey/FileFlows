@@ -10,7 +10,7 @@ namespace FileFlow.Client.Components.Inputs
 
         const string API_URL = "/api/code-eval";
 
-        private MonacoEditor Editor { get; set; }
+        private MonacoEditor CodeEditor { get; set; }
 
         [Inject]
         private IJSRuntime jsRuntime { get; set; }
@@ -39,7 +39,7 @@ namespace FileFlow.Client.Components.Inputs
             _ = Task.Run(async () =>
             {
 
-                this.Value = await Editor.GetValue();
+                this.Value = await CodeEditor.GetValue();
             });
         }
     }

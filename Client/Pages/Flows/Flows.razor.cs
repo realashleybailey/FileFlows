@@ -88,6 +88,7 @@ namespace FileFlow.Client.Pages
             this.SelectedItems.Clear();
             this.SelectedItems.Add(item.Data);
             Edit();
+            await Task.CompletedTask;
         }
 
         async Task Delete()

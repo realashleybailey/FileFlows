@@ -118,10 +118,17 @@ namespace FileFlow.Client.Components
             foreach (var input in RegisteredInputs)
             {
                 Logger.Instance.DLog("Validating input: " + input.Label);
-                valid &= await input.Validate();
+                bool iValid = await input.Validate();
+                if (iValid == false)
+                {
+                    Logger.Instance.DLog("Invalid input:" + input.Label);
+                    valid = false;
+                }
             }
             if (valid == false)
                 return;
+
+            Logger.Instance.DLog("editor is valid!");
 
             if (SaveCallback != null)
             {
@@ -186,6 +193,19 @@ namespace FileFlow.Client.Components
             {
                 return @default;
             }
+
+            if (value is System.Text.Json.JsonElement je)
+            {
+                if (typeof(T) == typeof(string))
+                    return (T)(object)je.GetString();
+                if (typeof(T) == typeof(int))
+                    return (T)(object)je.GetInt32();
+                if (typeof(T) == typeof(bool))
+                    return (T)(object)je.GetBoolean();
+                if (typeof(T) == typeof(float))
+                    return (T)(object)(float)je.GetInt64();
+            }
+
             if (value is T)
             {
                 return (T)value;
@@ -205,7 +225,7 @@ namespace FileFlow.Client.Components
             }
             catch (Exception ex)
             {
-                Logger.Instance.DLog("Not of type: " + value.GetType());
+                Logger.Instance.DLog("Not of type: " + field + ", " + value.GetType());
                 Logger.Instance.WLog("error: " + ex.Message + "\n" + ex.StackTrace);
                 return @default;
             }

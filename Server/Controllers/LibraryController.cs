@@ -13,10 +13,16 @@ namespace FileFlow.Server.Controllers
             return DbHelper.Select<Library>();
         }
 
+        [HttpGet("{uid}")]
+        public Library Get(Guid uid)
+        {
+            return DbHelper.Single<Library>(uid);
+        }
+
         [HttpPost]
         public Library Save([FromBody] Library library)
         {
-            var duplicate = DbHelper.Single<Library>("lower(name) = lower(@1) and uid <> @2", library.Name, library.Uid);
+            var duplicate = DbHelper.Single<Library>("lower(name) = lower(@1) and uid <> @2", library.Name, library.Uid.ToString());
             if (duplicate != null && duplicate.Uid != Guid.Empty)
                 throw new Exception("Duplicate name.");
 

@@ -11,7 +11,6 @@ namespace FileFlow.Server.Helpers
         {
             return Task.Run(() =>
             {
-
                 var args = new NodeParameters();
                 args.FileName = input;
                 args.Result = NodeResult.Success;

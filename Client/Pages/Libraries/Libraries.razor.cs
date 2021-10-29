@@ -12,6 +12,7 @@ namespace FileFlow.Client.Pages
     using FileFlow.Client.Helpers;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
+    using FileFlow.Client.Models;
 
     public partial class Libraries : ComponentBase
     {
@@ -87,6 +88,19 @@ namespace FileFlow.Client.Pages
 
         async Task Edit(Library library)
         {
+            Blocker.Show();
+            var flowResult = await HttpHelper.Get<FileFlow.Shared.Models.Flow[]>("/api/flow");
+            Blocker.Hide();
+            if (flowResult.Success == false || flowResult.Data?.Any() != true)
+            {
+                NotificationService.Notify(NotificationSeverity.Error,
+                    flowResult.Success || string.IsNullOrEmpty(flowResult.Body) ? Translater.Instant("Pages.Libraries.Error.NoFlows") : Translater.TranslateIfNeeded(flowResult.Body)
+                );
+                return;
+            }
+            var flowOptions = flowResult.Data.Select(x => new ListOption { Value = x.Uid, Label = x.Name });
+
+
             this.EditingItem = library;
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
@@ -112,6 +126,14 @@ namespace FileFlow.Client.Pages
             });
             fields.Add(new ElementField
             {
+                InputType = FileFlow.Plugin.FormInputType.Select,
+                Name = nameof(library.Flow),
+                Parameters = new Dictionary<string, object>{
+                    { "Options", flowOptions }
+                }
+            });
+            fields.Add(new ElementField
+            {
                 InputType = FileFlow.Plugin.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });
@@ -129,7 +151,7 @@ namespace FileFlow.Client.Pages
                 var saveResult = await HttpHelper.Post<Library>($"{API_URL}", model);
                 if (saveResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.SaveFailed"));
+                    NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
                     return false;
                 }
 

@@ -22,7 +22,11 @@ namespace FileFlow.Client.Pages
             set
             {
                 if (_DataGrid == null && value != null)
+                {
+#pragma warning disable BL0005
                     value.PageSize = 250;
+#pragma warning restore BL0005
+                }
                 _DataGrid = value;
             }
         }

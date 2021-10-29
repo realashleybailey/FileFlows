@@ -12,7 +12,12 @@ namespace FileFlow.Shared.Validators
             if (value == null)
                 return false;
             if (value is string str)
-                return string.IsNullOrWhiteSpace(str) == false;
+            {
+                bool valid = string.IsNullOrWhiteSpace(str) == false;
+                Logger.Instance.DLog("Validating required string: '" + str + "' = " + valid);
+                return valid;
+
+            }
 
             if (value is Array array)
                 return array.Length > 0;

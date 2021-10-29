@@ -56,7 +56,8 @@ namespace FileFlow.Client.Helpers
                 {
                     var options = new JsonSerializerOptions
                     {
-                        PropertyNameCaseInsensitive = true
+                        PropertyNameCaseInsensitive = true,
+                        Converters = { new FileFlow.Shared.Json.ValidatorConverter() }
                     };
                     T result = typeof(T) == typeof(string) ? (T)(object)body : System.Text.Json.JsonSerializer.Deserialize<T>(body, options);
                     return new RequestResult<T> { Success = true, Body = body, Data = result };

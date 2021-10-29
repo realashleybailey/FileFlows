@@ -33,6 +33,7 @@ namespace FileFlow.Client
             Instance = this;
             Logger.jsRuntime = jsRuntime;
             Translater.Logger = Logger.Instance;
+            FileFlow.Shared.Logger.Instance = Logger.Instance;
             HttpHelper.Client = Client;
             await Task.Run(async () =>
             {

@@ -18,8 +18,8 @@ namespace FileFlow.Server
         public void WLog(params object[] args) => Log(LogType.Warning, args);
         public void ELog(params object[] args) => Log(LogType.Error, args);
 
-        static Logger _Instance;
-        public static Logger Instance
+        static FileFlow.Plugin.ILogger _Instance;
+        public static FileFlow.Plugin.ILogger Instance
         {
             get
             {

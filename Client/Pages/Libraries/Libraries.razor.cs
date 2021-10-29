@@ -92,12 +92,18 @@ namespace FileFlow.Client.Pages
             fields.Add(new ElementField
             {
                 InputType = FileFlow.Plugin.FormInputType.Text,
-                Name = nameof(library.Name)
+                Name = nameof(library.Name),
+                Validators = new List<FileFlow.Shared.Validators.Validator> {
+                    new FileFlow.Shared.Validators.Required()
+                }
             });
             fields.Add(new ElementField
             {
                 InputType = FileFlow.Plugin.FormInputType.Folder,
-                Name = nameof(library.Path)
+                Name = nameof(library.Path),
+                Validators = new List<FileFlow.Shared.Validators.Validator> {
+                    new FileFlow.Shared.Validators.Required()
+                }
             });
             fields.Add(new ElementField
             {

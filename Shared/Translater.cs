@@ -6,8 +6,9 @@ namespace FileFlow.Shared
     using System.Linq;
     using System.Text.RegularExpressions;
     using Jeffijoe.MessageFormat;
-    using Newtonsoft.Json.Linq;
     using FileFlow.Plugin;
+    using System.Text.Json;
+    using System.Dynamic;
 
     public class Translater
     {
@@ -48,34 +49,27 @@ namespace FileFlow.Shared
         public static Dictionary<string, string> DeserializeAndFlatten(string json)
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            JToken token = JToken.Parse(json);
-            FillDictionaryFromJToken(dict, token, "");
+            var options = new JsonSerializerOptions
+            {
+                Converters = { new LanguageConverter() }
+            };
+            dynamic d = JsonSerializer.Deserialize<ExpandoObject>(json, options);
+            FillDictionaryFromExpando(dict, d, "");
             return dict;
         }
 
-        private static void FillDictionaryFromJToken(Dictionary<string, string> dict, JToken token, string prefix)
+        private static void FillDictionaryFromExpando(Dictionary<string, string> dict, ExpandoObject expando, string prefix)
         {
-            switch (token.Type)
+            var dictExpando = (IDictionary<string, object>)expando;
+            foreach (string key in dictExpando.Keys)
             {
-                case JTokenType.Object:
-                    foreach (JProperty prop in token.Children<JProperty>())
-                    {
-                        FillDictionaryFromJToken(dict, prop.Value, Join(prefix, prop.Name));
-                    }
-                    break;
+                if (dictExpando[key] is ExpandoObject eo)
+                {
+                    FillDictionaryFromExpando(dict, eo, Join(prefix, key));
+                }
+                else if (dictExpando[key] is string str)
+                    dict.Add(Join(prefix, key), str);
 
-                case JTokenType.Array:
-                    int index = 0;
-                    foreach (JToken value in token.Children())
-                    {
-                        FillDictionaryFromJToken(dict, value, Join(prefix, index.ToString()));
-                        index++;
-                    }
-                    break;
-
-                default:
-                    dict.Add(prefix, ((JValue)token).Value.ToString());
-                    break;
             }
         }
         private static string Join(string prefix, string name)

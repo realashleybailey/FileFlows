@@ -5,7 +5,6 @@ namespace FileFlow.Client.Components
     using Microsoft.AspNetCore.Components;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
-    using Newtonsoft.Json;
     using ffElement = FileFlow.Shared.Models.FlowElement;
     using System.Collections;
     using System.Collections.Generic;
@@ -14,6 +13,7 @@ namespace FileFlow.Client.Components
     using FileFlow.Plugin.Attributes;
     using System.Linq;
     using System.ComponentModel;
+    using FileFlow.Client.Components.Inputs;
 
     public partial class Editor : ComponentBase
     {
@@ -36,6 +36,8 @@ namespace FileFlow.Client.Components
 
         public delegate Task<bool> SaveDelegate(ExpandoObject model);
         private SaveDelegate SaveCallback;
+
+        private readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
         protected override void OnInitialized()
         {
@@ -61,7 +63,7 @@ namespace FileFlow.Client.Components
 
         internal Task<ExpandoObject> Open(string title, object obj, object model, SaveDelegate saveCallback = null)
         {
-            Logger.Instance.DLog("opening editor!");
+            this.RegisteredInputs.Clear();
             var expandoModel = ConverToExando(model);
             var dict = (IDictionary<string, object>)expandoModel;
             Logger.Instance.DLog("Part: ", obj);
@@ -89,6 +91,11 @@ namespace FileFlow.Client.Components
             return Open(obj.GetType().Name, title, fields, expandoModel, saveCallback: saveCallback);
         }
 
+        internal void RegisterInput<T>(Input<T> input)
+        {
+            if (this.RegisteredInputs.Contains(input) == false)
+                this.RegisteredInputs.Add(input);
+        }
 
         internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null)
         {
@@ -107,6 +114,14 @@ namespace FileFlow.Client.Components
 
         private async Task Save()
         {
+            bool valid = true;
+            foreach (var input in RegisteredInputs)
+            {
+                Logger.Instance.DLog("Validating input: " + input.Label);
+                valid &= await input.Validate();
+            }
+            if (valid == false)
+                return;
 
             if (SaveCallback != null)
             {
@@ -151,8 +166,8 @@ namespace FileFlow.Client.Components
             {
                 try
                 {
-                    string json = JsonConvert.SerializeObject(val);
-                    val = JsonConvert.DeserializeObject<T>(json);
+                    string json = System.Text.Json.JsonSerializer.Serialize(val);
+                    val = System.Text.Json.JsonSerializer.Deserialize<T>(json);
                 }
                 catch (Exception) { return default(T); }
             }

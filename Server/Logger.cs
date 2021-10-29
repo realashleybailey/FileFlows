@@ -9,7 +9,7 @@ namespace FileFlow.Server
                 x == null ? "null" :
                 x.GetType().IsPrimitive ? x.ToString() :
                 x is string ? x.ToString() :
-                Newtonsoft.Json.JsonConvert.SerializeObject(x)))
+                System.Text.Json.JsonSerializer.Serialize(x)))
             );
         }
 

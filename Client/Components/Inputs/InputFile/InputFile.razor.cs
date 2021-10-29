@@ -16,6 +16,7 @@ namespace FileFlow.Client.Components.Inputs
             string result = await FileBrowser.Show(this.Value, directory: Directory, extensions: Extensions);
             if (string.IsNullOrEmpty(result))
                 return;
+            this.ClearError();
             this.Value = result;
         }
     }

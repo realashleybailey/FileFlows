@@ -1,17 +1,24 @@
-namespace FileFlow.Client.Components.Inputs 
+namespace FileFlow.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
     using FileFlow.Shared;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public interface IInput
     {
         string Label { get; set; }
         string Help { get; set; }
         string Placeholder { get; set; }
+        string ErrorMessage { get; set; }
+
+        Task<bool> Validate();
     }
 
     public abstract class Input<T> : ComponentBase, IInput
     {
+        [CascadingParameter] protected Editor Editor { get; set; }
         private string _Label;
         private string _LabelOriginal;
         [Parameter]
@@ -39,6 +46,9 @@ namespace FileFlow.Client.Components.Inputs
         public string Help { get; set; }
         public string Placeholder { get; set; }
 
+        [Parameter] public List<FileFlow.Shared.Validators.Validator> Validators { get; set; }
+
+        public string ErrorMessage { get; set; } = "";
 
         private T _Value;
 
@@ -51,6 +61,7 @@ namespace FileFlow.Client.Components.Inputs
                 if (_Value == null && value == null)
                     return;
                 if (_Value != null && value != null && _Value.Equals(value)) return;
+                ErrorMessage = ""; // clear the error
                 _Value = value;
                 ValueChanged.InvokeAsync(value);
             }
@@ -58,5 +69,28 @@ namespace FileFlow.Client.Components.Inputs
 
         [Parameter]
         public EventCallback<T> ValueChanged { get; set; }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            Editor.RegisterInput(this);
+        }
+        protected void ClearError() => this.ErrorMessage = "";
+
+        public async Task<bool> Validate()
+        {
+            if (this.Validators?.Any() != true)
+                return true;
+            Logger.Instance.DLog("validating actual input: " + this.Label);
+            foreach (var val in this.Validators)
+            {
+                if (await val.Validate(this.Value) == false)
+                {
+                    ErrorMessage = Translater.Instant($"Validators.{val.Type}", val);
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

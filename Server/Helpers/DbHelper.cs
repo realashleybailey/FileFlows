@@ -3,10 +3,8 @@ namespace FileFlow.Server.Helpers
     using System;
     using System.Collections.Generic;
     using NPoco;
-    using Newtonsoft.Json;
     using FileFlow.Server.Models;
     using System.Data.SQLite;
-    using Newtonsoft.Json.Converters;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
 

@@ -5,7 +5,6 @@ namespace FileFlow.Client.Components
     using Microsoft.AspNetCore.Components;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
-    using Newtonsoft.Json;
     using ffElement = FileFlow.Shared.Models.FlowElement;
     using System.Collections;
     using System.Collections.Generic;

@@ -77,35 +77,7 @@ namespace FileFlow.Server.Controllers
                 var dict = (IDictionary<string, object>)model;
                 element.Model = model;
 
-                foreach (var prop in x.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-                {
-                    var attribute = prop.GetCustomAttributes(typeof(FormInputAttribute), false).FirstOrDefault() as FormInputAttribute;
-                    if (attribute != null)
-                    {
-                        element.Fields.Add(new ElementField
-                        {
-                            Name = prop.Name,
-                            Order = attribute.Order,
-                            InputType = attribute.InputType,
-                            Type = prop.PropertyType.FullName
-                        });
-                        var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                        dict.Add(prop.Name, dValue != null ? dValue.Value : prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
-                    }
-
-                    if (prop.Name == nameof(element.Inputs))
-                    {
-                        var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                        if (dValue != null)
-                            element.Inputs = (int)dValue.Value;
-                    }
-                    if (prop.Name == nameof(element.Outputs))
-                    {
-                        var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                        if (dValue != null)
-                            element.Outputs = (int)dValue.Value;
-                    }
-                }
+                element.Fields = FormHelper.GetFields(x, dict);
 
                 //(FileFlow.Shared.Nodes.Node)Activator.CreateInstance(x);
                 elements.Add(element);

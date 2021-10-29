@@ -1,11 +1,21 @@
 @namespace FileFlow.Client.Components.Inputs
 
-<div class="row">
+@{
+    bool invalid = string.IsNullOrEmpty(Input.ErrorMessage) == false;
+
+}
+
+<div class="row @(invalid ? "error" : "")">
     <div class="col-md-4 align-items-center d-flex input-label">
         <RadzenLabel Text="@Input.Label" />
     </div>
+
     <div class="col-md-8 input-value">
         @ChildContent
+        @if (invalid)
+        {
+            <span class="error-text">@Input.ErrorMessage</span>
+        }
         @if (string.IsNullOrEmpty(Input.Help) == false)
         {
             <span class="help-text">@Input.Help</span>

@@ -49,7 +49,7 @@ namespace FileFlow.Server.Controllers
             pi.Settings ??= new System.Dynamic.ExpandoObject();
             var dict = (IDictionary<string, object>)pi.Settings;
 
-            pi.Fields = PluginHelper.GetPluginFields(plugin.GetType(), dict);
+            pi.Fields = FormHelper.GetFields(plugin.GetType(), dict);
             return pi;
         }
 

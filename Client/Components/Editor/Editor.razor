@@ -17,8 +17,9 @@
                 </Head>
 
                 <Body>
-                    <div class="fields">
-                        @foreach (var field in Fields.OrderBy(x => x.Order))
+                    <CascadingValue IsFixed="true" Value="this">
+                        <div class="fields">
+                            @foreach (var field in Fields.OrderBy(x => x.Order))
                         {
                             string label = TypeName + ".Fields." + field.Name;
                             switch (field.InputType)
@@ -26,46 +27,51 @@
                                 case FormInputType.Text:
                                     {
                                         var value = GetValue<string>(field.Name) ?? "";
-                                        <InputText Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputText Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators />
                                     }
                                     break;
                                 case FormInputType.Int:
                                     {
                                         var value = GetValue<int>(field.Name);
-                                        <InputNumber Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputNumber Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators />
                                     }
                                     break;
                                 case FormInputType.Switch:
                                     {
                                         var value = GetValue<bool>(field.Name);
-                                        <InputSwitch Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputSwitch Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators />
                                     }
                                     break;
                                 case FormInputType.StringArray:
                                     {
                                         var value = GetValue<string[]>(field.Name, new string[] { });
-                                        <InputArray Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputArray Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators />
                                     }
                                     break;
                                 case FormInputType.File:
                                     {
                                         var value = GetValue<string>(field.Name, "");
                                         var extensions = GetParameter<List<string>>(field, "Extensions")?.ToArray();
-                                        <InputFile Label="@label" Value="@value" Extensions=@extensions
-                        ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputFile Label="@label" Value="@value" Extensions=@extensions Validators=@field.Validators
+                            ValueChanged="@(x => UpdateValue(field.Name, x))" />
                                     }
                                     break;
                                 case FormInputType.Folder:
                                     {
                                         var value = GetValue<string>(field.Name, "");
-                                        <InputFile Label="@label" Value="@value" Directory=@true
-                        ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputFile Label="@label" Value="@value" Directory=@true Validators=@field.Validators
+                            ValueChanged="@(x => UpdateValue(field.Name, x))" />
                                     }
                                     break;
                                 case FormInputType.Code:
                                     {
                                         var value = GetValue<string>(field.Name);
-                                        <InputCode Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                        <InputCode Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators />
                                     }
                                     break;
                                 default:
@@ -77,9 +83,10 @@
                         }
                         <div class="empty"></div>
                     </div>
-                </Body>
-            </ViContainer>
-        </div>
-
+                </CascadingValue>
+            </Body>
+        </ViContainer>
     </div>
+
+</div>
 }

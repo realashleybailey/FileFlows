@@ -1,10 +1,9 @@
-using System;
-using System.Linq;
-using System.Text;
-using FileFlow.Plugin;
-
 namespace FileFlow.Shared
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+    using FileFlow.Plugin;
 
     public class FlowLogger : ILogger
     {
@@ -27,7 +26,7 @@ namespace FileFlow.Shared
                 string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :
-                Newtonsoft.Json.JsonConvert.SerializeObject(x)));
+                System.Text.Json.JsonSerializer.Serialize(x)));
             log.AppendLine(message);
             Console.WriteLine(message);
         }

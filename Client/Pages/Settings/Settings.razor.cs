@@ -1,11 +1,9 @@
-namespace FileFlow.Client.Pages 
+namespace FileFlow.Client.Pages
 {
     using Models;
     using FileFlow.Client.Helpers;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using Newtonsoft.Json;
     using FileFlow.Shared;
     using FileFlow.Client.Components;
 

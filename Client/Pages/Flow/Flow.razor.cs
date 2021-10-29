@@ -3,7 +3,6 @@ namespace FileFlow.Client.Pages
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using Microsoft.AspNetCore.Components.Web;
     using FileFlow.Client.Components;
     using FileFlow.Client.Helpers;
     using ffPart = FileFlow.Shared.Models.FlowPart;
@@ -14,8 +13,6 @@ namespace FileFlow.Client.Pages
     using System.Linq;
     using System;
     using FileFlow.Shared;
-    using Newtonsoft.Json.Linq;
-    using Newtonsoft.Json;
 
     public partial class Flow : ComponentBase
     {
@@ -267,7 +264,7 @@ namespace FileFlow.Client.Pages
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {
-                Logger.Instance.DLog("model updated:" + JsonConvert.SerializeObject(newModelTask.Result));
+                Logger.Instance.DLog("model updated:" + System.Text.Json.JsonSerializer.Serialize(newModelTask.Result));
                 part.Model = newModelTask.Result;
             }
             else

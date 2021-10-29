@@ -54,7 +54,7 @@
         "Path":"Path",
         "Enabled":"Enabled",
         "Filter":"Filter",
-        "Filter-Help":"An optional filter regular expression to run against matching files."
+        "Filter-Help":"An optional filter regular expression to run against matching files.\nExample: ^\\.(mp4|mkv|avi|mpg|mov)$"
       }
     },
     "Plugins": {
@@ -100,5 +100,10 @@
         "FFProbeExe-Help": "The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
       }
     }
+  },
+  "Validators":{
+    "Required" :"Required",
+    "Range": "Must be between {Minimum} and {Maximum}",
+    "Pattern":"Is not valid"
   }
 }

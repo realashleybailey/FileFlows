@@ -11,6 +11,8 @@ namespace FileFlow.Shared.Models
         public FormInputType InputType { get; set; }
 
         public Dictionary<string, object> Parameters { get; set; }
+
+        public List<Validators.Validator> Validators { get; set; }
     }
 
 }

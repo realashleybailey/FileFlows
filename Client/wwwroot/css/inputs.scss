@@ -1,11 +1,17 @@
-
-
 input {
     background:var(--input-background) !important;
     border:var(--input-background) !important;
     color: var(--color) !important;
     border-radius: unset !important;
+    border:solid 1px transparent !important;
     &:focus {
         outline:1px solid var(--accent);
+    }
+}
+
+.error 
+{
+    input {
+        border-color:var(--accent) !important;
     }
 }

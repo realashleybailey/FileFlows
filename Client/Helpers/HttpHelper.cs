@@ -2,8 +2,8 @@ namespace FileFlow.Client.Helpers
 {
     using System;
     using System.Net.Http;
+    using System.Text.Json;
     using System.Threading.Tasks;
-    using Newtonsoft.Json;
 
     public class HttpHelper
     {
@@ -54,7 +54,11 @@ namespace FileFlow.Client.Helpers
                 string body = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    T result = typeof(T) == typeof(string) ? (T)(object)body : JsonConvert.DeserializeObject<T>(body);
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    T result = typeof(T) == typeof(string) ? (T)(object)body : System.Text.Json.JsonSerializer.Deserialize<T>(body, options);
                     return new RequestResult<T> { Success = true, Body = body, Data = result };
                 }
                 else

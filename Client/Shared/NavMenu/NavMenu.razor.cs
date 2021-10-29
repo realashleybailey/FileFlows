@@ -1,10 +1,13 @@
 namespace FileFlow.Client.Shared
 {
     using System.Collections.Generic;
+    using System.Linq;
     using FileFlow.Shared;
+    using Microsoft.AspNetCore.Components;
 
     public partial class NavMenu
     {
+        [Inject] private NavigationManager NavigationManager { get; set; }
         private string lblHome, lblVideoFiles, lblSettings;
         private List<NavMenuItem> MenuItems = new List<NavMenuItem>();
         private bool collapseNavMenu = true;
@@ -25,7 +28,8 @@ namespace FileFlow.Client.Shared
             MenuItems.Add(new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"));
             MenuItems.Add(new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings"));
 
-            Active = MenuItems[0];
+            string currentRoute = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
+            Active = MenuItems.Where(x => x.Url == currentRoute).FirstOrDefault() ?? MenuItems[0];
         }
 
         private void ToggleNavMenu()
@@ -36,6 +40,7 @@ namespace FileFlow.Client.Shared
         private void SetActive(NavMenuItem item)
         {
             Active = item;
+            this.StateHasChanged();
         }
     }
 

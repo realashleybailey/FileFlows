@@ -2,9 +2,16 @@
     font-size:0.8rem;
     font-style:italic;
     color: var(--color-darkest);
+    white-space: pre-wrap;
 }
 
 .input-label {
     margin-bottom:auto;
     color:rgba(var(--color-rgb), 0.7);
+}
+
+.error-text {
+    font-size:0.8rem;
+    color: var(--accent);
+    white-space: pre-wrap;
 }

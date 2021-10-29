@@ -1,21 +1,12 @@
 @namespace FileFlow.Client.Components.Dialogs
 
-@if (Visible)
-{
-    <div class="background-overlay"></div>
+<Modal Title="@Title" Visible="Visible">
 
-    <div class="vi-modal">
-        <div class="vi-modal-inner">
-            <div class="vi-modal-title">
-                <span>@Title</span>
-            </div>
-            <div class="vi-modal-body">
-                <span>@Message</span>
-            </div>
-            <div class="vi-modal-footer">
-                <RadzenButton Click=@Yes Text="@lblYes" />
-                <RadzenButton Click=@No Text="@lblNo" />
-            </div>
-        </div>
-    </div>
-}
+    <Body>
+        <span>@Message</span>
+    </Body>
+    <Footer>
+        <RadzenButton Click=@Yes Text="@lblYes" />
+        <RadzenButton Click=@No Text="@lblNo" />
+    </Footer>
+</Modal>

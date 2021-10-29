@@ -1,0 +1,39 @@
+@namespace FileFlow.Client.Components.Dialogs
+
+<Modal Title="@Title" Visible="Visible">
+
+    <Body>
+        <ul class="file-list">
+            @foreach (var item in Items)
+            {
+                <li @onclick="() => SetSelected(item)" @ondblclick="() => DblClick(item)"
+                class="@(item == Selected ? "selected" : "")">
+                    @if (item.IsDrive)
+                    {
+                        <span class="far fa-hdd"></span>
+                        <span class="name">@item.Name</span>
+                    }
+                    else if (item.IsParent)
+                    {
+                        <span class="far fa-folder-open"></span>
+                        <span class="name">..</span>
+                    }
+                    else if (item.IsPath)
+                    {
+                        <span class="far fa-folder"></span>
+                        <span class="name">@item.Name</span>
+                    }
+                    else
+                    {
+                        <span class="far fa-file"></span>
+                        <span class="name">@item.Name</span>
+                    }
+                </li>
+            }
+        </ul>
+    </Body>
+    <Footer>
+        <RadzenButton Click=@Select Text="@lblSelect" Disabled="Selected == null" />
+        <RadzenButton Click=@Cancel Text="@lblCancel" />
+    </Footer>
+</Modal>

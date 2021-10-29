@@ -1,0 +1,9 @@
+@namespace FileFlow.Client.Components.Inputs
+@inherits Input<string>
+
+<InputWrapper Input="@this">
+    <div class="input-file-wrapper">
+        <RadzenTextBox @bind-Value="Value" Placeholder="@Placeholder" />
+        <RadzenButton Click=@Browse Text="..." />
+    </div>
+</InputWrapper>

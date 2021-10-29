@@ -52,13 +52,29 @@ namespace FileFlow.Server.Controllers
                 var attribute = prop.GetCustomAttributes(typeof(FormInputAttribute), false).FirstOrDefault() as FormInputAttribute;
                 if (attribute != null)
                 {
-                    pi.Fields.Add(new ElementField
+                    var ef = new ElementField
                     {
                         Name = prop.Name,
                         Order = attribute.Order,
                         InputType = attribute.InputType,
-                        Type = prop.PropertyType.FullName
-                    });
+                        Type = prop.PropertyType.FullName,
+                        Parameters = new Dictionary<string, object>()
+                    };
+                    pi.Fields.Add(ef);
+
+                    var parameters = new Dictionary<string, object>();
+
+                    foreach (var attProp in attribute.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        if (new string[] { nameof(FormInputAttribute.Order), nameof(FormInputAttribute.InputType), "TypeId" }.Contains(attProp.Name))
+                            continue;
+
+                        object value = attProp.GetValue(attribute);
+                        Logger.Instance.DLog(attProp.Name, value);
+                        ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
+
+                    }
+
                     if (dict.ContainsKey(prop.Name) == false)
                     {
                         var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;

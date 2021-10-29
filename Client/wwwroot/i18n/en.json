@@ -6,11 +6,18 @@
     "Execute": "Execute",
     "Executing": "Executing",
     "Cancel": "Cancel",
+    "Select":"Select",
     "Add": "Add",
     "Edit": "Edit",
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?"
+  },
+  "Dialogs":{
+    "FileBrowser":{
+      "FileTitle":"Select A File",
+      "DirectoryTitle":"Select A Directory"
+    }
   },
   "ErrorMessages": {
     "SaveFailed": "Failed to save",

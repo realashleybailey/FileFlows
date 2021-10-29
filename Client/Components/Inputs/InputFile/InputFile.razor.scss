@@ -1,0 +1,20 @@
+.input-file-wrapper {
+    display:flex;
+    flex-direction: row;
+    width:100%;
+
+    ::deep 
+    {
+        .rz-textbox {
+            flex-grow:1;
+            width:unset;
+        }
+
+        button {
+            width: 3rem;
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+}

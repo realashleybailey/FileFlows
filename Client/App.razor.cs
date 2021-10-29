@@ -9,6 +9,7 @@ namespace FileFlow.Client
 
     public partial class App : ComponentBase
     {
+        private App Instance { get; set; }
 
         [Inject]
         public HttpClient Client { get; set; }
@@ -29,6 +30,7 @@ namespace FileFlow.Client
 
         protected override async Task OnInitializedAsync()
         {
+            Instance = this;
             Logger.jsRuntime = jsRuntime;
             Translater.Logger = Logger.Instance;
             HttpHelper.Client = Client;

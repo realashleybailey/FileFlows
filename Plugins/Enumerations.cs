@@ -18,7 +18,9 @@ namespace FileFlow.Plugins
         Code = 5,
         Int = 6,
         Float = 7,
-        StringArray = 8
+        StringArray = 8,
+        File = 9,
+        Folder = 10
     }
 
 

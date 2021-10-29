@@ -1,0 +1,114 @@
+namespace FileFlow.Client.Components.Dialogs
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using Microsoft.AspNetCore.Components;
+    using FileFlow.Shared;
+    using FileFlow.Client.Helpers;
+    using System.Linq;
+    using FileFlow.Shared.Models;
+
+    public partial class FileBrowser : ComponentBase
+    {
+        private string lblSelect, lblCancel;
+        private string Title;
+
+        private bool DirectoryMode = false;
+        private string[] Extensions = new string[] { };
+        TaskCompletionSource<string> ShowTask;
+
+        private static FileBrowser Instance { get; set; }
+
+        private FileBrowserItem Selected;
+        List<FileBrowserItem> Items = new List<FileBrowserItem>();
+
+        private bool Visible { get; set; }
+
+        private const string API_URL = "/api/file-browser";
+
+        protected override void OnInitialized()
+        {
+            this.lblSelect = Translater.Instant("Labels.Select");
+            this.lblCancel = Translater.Instant("Labels.Cancel");
+            Instance = this;
+        }
+
+        public static Task<string> Show(string start, bool directory = false, string[] extensions = null)
+        {
+            if (Instance == null)
+                return Task.FromResult<string>("");
+
+            return Instance.ShowInstance(start, directory, extensions);
+        }
+
+        private Task<string> ShowInstance(string start, bool directory = false, string[] extensions = null)
+        {
+
+            this.Extensions = extensions ?? new string[] { };
+            this.DirectoryMode = directory;
+
+            this.Title = Translater.TranslateIfNeeded("Dialogs.FileBrowser.FileTitle");
+            _ = this.LoadPath(start);
+            this.Visible = true;
+            this.StateHasChanged();
+
+            Instance.ShowTask = new TaskCompletionSource<string>();
+            return Instance.ShowTask.Task;
+        }
+
+        private async void Select()
+        {
+            if (Selected == null)
+                return;
+            this.Visible = false;
+            Instance.ShowTask.TrySetResult(Selected.FullName);
+            await Task.CompletedTask;
+        }
+
+        private async void Cancel()
+        {
+            this.Visible = false;
+            Instance.ShowTask.TrySetResult("");
+            await Task.CompletedTask;
+        }
+
+        private async Task SetSelected(FileBrowserItem item)
+        {
+            if (item.IsParent)
+                return;
+            if (DirectoryMode == false && (item.IsPath || item.IsDrive))
+                return;
+            if (this.Selected == item)
+                this.Selected = null;
+            else
+                this.Selected = item;
+            await Task.CompletedTask;
+        }
+
+        private async Task DblClick(FileBrowserItem item)
+        {
+            Logger.Instance.DLog("dbl click: ", item);
+            if (item.IsParent || item.IsPath || item.IsDrive)
+                await LoadPath(item.FullName);
+        }
+
+        private async Task LoadPath(string path)
+        {
+            var result = await HttpHelper.Get<List<FileBrowserItem>>($"{API_URL}?includeFiles={DirectoryMode == false}" +
+            $"&start={Uri.EscapeDataString(path)}" +
+            string.Join("", Extensions?.Select(x => "&extensions=" + Uri.EscapeDataString(x))?.ToArray() ?? new string[] { }));
+            if (result.Success)
+            {
+                this.Items = result.Data;
+                var parent = this.Items.Where(x => x.IsParent).FirstOrDefault();
+                if (parent != null)
+                    this.Title = parent.Name;
+                else
+                    this.Title = "Root";
+                this.StateHasChanged();
+            }
+        }
+    }
+}

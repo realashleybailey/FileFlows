@@ -7,12 +7,12 @@ namespace FileFlow.BasicNodes
     {
         public override string Name => "Basic Nodes";
 
-        [Text(1)]
         [Required]
+        [File(1, "exe")]
         public string HandBrakeCli { get; set; }
 
-        [Text(2)]
         [Required]
+        [File(2, "exe")]
         public string FFProbeExe { get; set; }
     }
 }

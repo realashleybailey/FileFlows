@@ -143,6 +143,19 @@ namespace FileFlow.Client.Components
                 dict.Add(field, value);
         }
 
+        private T GetParameter<T>(ElementField field, string parameter)
+        {
+            var dict = field?.Parameters as IDictionary<string, object>;
+            if (dict?.ContainsKey(parameter) != true)
+                return default(T);
+            var val = dict[parameter];
+            if (val == null)
+                return default(T);
+            if (val.GetType() != typeof(T))
+                return default(T);
+            return (T)val;
+        }
+
         private T GetValue<T>(string field, T @default = default(T))
         {
             var dict = (IDictionary<string, object>)Model;

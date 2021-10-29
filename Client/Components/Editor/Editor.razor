@@ -47,6 +47,21 @@
                                         <InputArray Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))" />
                                     }
                                     break;
+                                case FormInputType.File:
+                                    {
+                                        var value = GetValue<string>(field.Name, "");
+                                        var extensions = GetParameter<List<string>>(field, "Extensions")?.ToArray();
+                                        <InputFile Label="@label" Value="@value" Extensions=@extensions
+                        ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
+                                case FormInputType.Folder:
+                                    {
+                                        var value = GetValue<string>(field.Name, "");
+                                        <InputFile Label="@label" Value="@value" Directory=@true
+                        ValueChanged="@(x => UpdateValue(field.Name, x))" />
+                                    }
+                                    break;
                                 case FormInputType.Code:
                                     {
                                         var value = GetValue<string>(field.Name);

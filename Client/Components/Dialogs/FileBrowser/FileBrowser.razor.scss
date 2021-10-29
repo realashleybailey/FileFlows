@@ -1,0 +1,31 @@
+.file-list {
+    margin:0;
+    list-style:none;
+    padding:0;
+    max-height: 80vh;
+    height:30rem;
+    overflow:auto;
+    width:30rem;
+    max-width:80vw;
+
+    li {
+        width:calc(100% - 1rem);
+        padding: 0.25rem 0.5rem;
+        border:solid 1px transparent;
+        cursor:pointer;
+        display: flex;  
+        user-select: none;
+        span:first-child {
+            margin-right:0.5rem;            
+            position: relative;
+            top: 0.3rem;
+        }
+
+        &:hover {
+            border-color:rgba(var(--accent-rgb), 0.7);
+        }
+        &.selected {
+            border-color:var(--accent);
+        }
+    }
+}

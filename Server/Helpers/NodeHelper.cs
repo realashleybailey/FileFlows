@@ -58,7 +58,8 @@ namespace FileFlow.Server.Helpers
                             continue;
 
                         var value = FileFlow.Shared.Converter.ConvertObject(prop.PropertyType, dict[k]);
-                        prop.SetValue(node, value);
+                        if (value != null)
+                            prop.SetValue(node, value);
                     }
                     catch (Exception ex)
                     {

@@ -15,3 +15,10 @@ C:\Users\john\src\ViWatcher\Server\Plugins\VideoNodes.deps.json
 C:\Users\john\src\ViWatcher\Server\Plugins\VideoNodes.dll
 C:\Users\john\src\ViWatcher\Server\Plugins\ref\VideoNodes.dll
 C:\Users\john\src\ViWatcher\Server\Plugins\VideoNodes.pdb
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\VideoNodes.deps.json
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\VideoNodes.dll
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\ref\VideoNodes.dll
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\VideoNodes.pdb
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\Plugin.dll
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\Plugin.pdb
+C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\FFMpegCore.dll

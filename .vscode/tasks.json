@@ -36,6 +36,8 @@
                 "build",
                 // Ask dotnet build to generate full paths for file names.
                 "/property:GenerateFullPaths=true",
+                //"--self-contained=false",
+                //"/p:PublishSingleFile=true",
                 // Do not generate summary otherwise it leads to duplicate errors in Problems panel
                 "/consoleloggerparameters:NoSummary",
                 "--output:../../Server/Plugins"

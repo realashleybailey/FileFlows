@@ -5,5 +5,7 @@ namespace FileFlow.BasicNodes
     public class Plugin : FileFlow.Plugin.IPlugin
     {
         public string Name => "Basic Nodes";
+
+        public void Init() { }
     }
 }

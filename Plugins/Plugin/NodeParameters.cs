@@ -7,6 +7,8 @@ namespace FileFlow.Plugin
         public ILogger Logger { get; set; }
 
         public NodeResult Result { get; set; } = NodeResult.Success;
+
+        public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
     }
 
 

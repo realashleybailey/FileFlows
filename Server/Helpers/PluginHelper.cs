@@ -23,6 +23,7 @@ namespace FileFlow.Server.Helpers
                 Logger.Instance.DLog("Found plugin dll: " + dll.Assembly);
                 installed.Add(dll.Assembly);
                 var plugin = GetPlugin(dll.Assembly);
+                plugin.Init();
                 var existing = dbPluginInfos.FirstOrDefault(x => x.Assembly == dll.Assembly);
                 bool hasSettings = plugin == null ? false : FormHelper.GetFields(plugin.GetType(), new Dictionary<string, object>()).Any();
                 if (existing != null)

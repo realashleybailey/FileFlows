@@ -27,7 +27,8 @@
         @foreach (var item in MenuItems)
         {
             <li class="nav-item">
-                <NavLink class="nav-link" href="@item.Url" Match="NavLinkMatch.All" @onclick="() => SetActive(item)">
+                <NavLink class="nav-link" href="@item.Url"
+                Match="@(item.Url == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)" @onclick="() => SetActive(item)">
                     <span class="@item.Icon" aria-hidden="true"></span> @item.Title
                 </NavLink>
             </li>

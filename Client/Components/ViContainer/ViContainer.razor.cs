@@ -11,6 +11,9 @@ namespace FileFlow.Client.Components
         [Parameter]
         public string Icon { get; set; }
 
+        [Parameter]
+        public bool FullWidth { get; set; }
+
 
         [Parameter]
         public RenderFragment Head { get; set; }

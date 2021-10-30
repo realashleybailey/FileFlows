@@ -105,6 +105,7 @@ a, .btn-link {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index:5;
+    min-width:20rem;
     
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);  
     background: rgba(var(--base-rgb), 0.8);
@@ -118,5 +119,11 @@ a, .btn-link {
     }
     .vi-modal-footer {
         text-align: right;
+    }
+    .vi-modal-footer {
+        button {
+            width:6rem;
+            padding:0;
+        }
     }
 }

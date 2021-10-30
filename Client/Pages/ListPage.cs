@@ -17,7 +17,7 @@ namespace FileFlow.Client.Pages
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] public Editor Editor { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
-        public string lblAdd, lblEdit, lblDelete, lblDeleting;
+        public string lblAdd, lblEdit, lblDelete, lblDeleting, lblRefresh;
 
         public abstract string ApIUrl { get; }
 
@@ -49,8 +49,18 @@ namespace FileFlow.Client.Pages
             lblEdit = Translater.Instant("Labels.Edit");
             lblDelete = Translater.Instant("Labels.Delete");
             lblDeleting = Translater.Instant("Labels.Deleting");
+            lblRefresh = Translater.Instant("Labels.Refresh");
 
             _ = Load();
+        }
+
+        public virtual async Task Refresh() => await Load();
+
+        public virtual string FetchUrl => ApIUrl;
+
+        public async virtual Task PostLoad()
+        {
+            await Task.CompletedTask;
         }
 
         public virtual async Task Load()
@@ -60,11 +70,12 @@ namespace FileFlow.Client.Pages
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Get<List<T>>(ApIUrl);
+                var result = await HttpHelper.Get<List<T>>(FetchUrl);
                 if (result.Success)
                 {
                     this.Data = result.Data;
                 }
+                await PostLoad();
             }
             finally
             {

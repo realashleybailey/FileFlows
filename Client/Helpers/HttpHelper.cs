@@ -18,6 +18,10 @@ namespace FileFlow.Client.Helpers
         {
             return await MakeRequest<T>(HttpMethod.Post, url, data);
         }
+        public static async Task<RequestResult<string>> Put(string url, object data = null)
+        {
+            return await MakeRequest<string>(HttpMethod.Put, url, data);
+        }
         public static async Task<RequestResult<T>> Put<T>(string url, object data = null)
         {
             return await MakeRequest<T>(HttpMethod.Put, url, data);

@@ -74,14 +74,14 @@ namespace FileFlow.Client.Pages
 
         private void Add()
         {
-            NavigationManager.NavigateTo("flow/" + System.Guid.Empty);
+            NavigationManager.NavigateTo("flows/" + System.Guid.Empty);
         }
 
         private void Edit()
         {
             var item = this.SelectedItems?.FirstOrDefault();
             if (item != null)
-                NavigationManager.NavigateTo("flow/" + item.Uid);
+                NavigationManager.NavigateTo("flows/" + item.Uid);
         }
         private async Task RowDoubleClicked(DataGridRowMouseEventArgs<ffFlow> item)
         {

@@ -51,6 +51,7 @@ namespace FileFlow.Shared
             Dictionary<string, string> dict = new Dictionary<string, string>();
             var options = new JsonSerializerOptions
             {
+                AllowTrailingCommas = true,
                 Converters = { new LanguageConverter() }
             };
             dynamic d = JsonSerializer.Deserialize<ExpandoObject>(json, options);

@@ -50,6 +50,18 @@ namespace FileFlow.Server.Helpers
             }
         }
 
+        public static IEnumerable<string> GetNames<T>(string andWhere = "", params object[] args)
+        {
+
+            using (var db = GetDb())
+            {
+                if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
+                    andWhere = " and " + andWhere;
+                args = new object[] { typeof(T).FullName }.Union(args ?? new object[] { }).ToArray();
+                return db.Fetch<string>($"select Name from {nameof(DbObject)} where Type=@0 {andWhere} order by name", args);
+            }
+        }
+
         public static T Single<T>() where T : ViObject, new()
         {
             using (var db = GetDb())
@@ -150,7 +162,7 @@ namespace FileFlow.Server.Helpers
                 return obj;
             }
         }
-        public static void Delete<T>(Guid[] uids) where T : ViObject
+        public static void Delete<T>(params Guid[] uids) where T : ViObject
         {
             string typeName = typeof(T).FullName;
             using (var db = GetDb())

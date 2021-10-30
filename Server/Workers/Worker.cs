@@ -4,18 +4,26 @@ namespace FileFlow.Server.Workers
     {
         public enum ScheduleType
         {
+            Second,
             Minute,
             Hourly,
             Daily
         }
 
-        private int Minute { get; set; }
+        private int Seconds { get; set; }
         private ScheduleType Schedule { get; set; }
 
-        public Worker(ScheduleType schedule, int minute)
+        public Worker(ScheduleType schedule, int interval)
         {
+            if (schedule == ScheduleType.Minute)
+                interval *= 60;
+            if (schedule == ScheduleType.Hourly)
+                interval *= 60 * 60;
+            if (schedule == ScheduleType.Daily)
+                interval *= 60 * 60 * 24;
+
             this.Schedule = schedule;
-            this.Minute = minute;
+            this.Seconds = interval;
         }
 
         static readonly List<Worker> Workers = new List<Worker>();
@@ -25,6 +33,7 @@ namespace FileFlow.Server.Workers
             if (Workers.Any())
                 return; // workers already running
             Workers.Add(new LibraryWorker());
+            Workers.Add(new FlowWorker());
             foreach (var worker in Workers)
                 worker.Start();
         }
@@ -49,7 +58,7 @@ namespace FileFlow.Server.Workers
             {
                 timer = new System.Timers.Timer();
                 timer.Elapsed += TimerElapsed;
-                timer.Interval = Minute * 60_000;
+                timer.Interval = Seconds * 1_000;
                 timer.AutoReset = true;
                 timer.Start();
             }

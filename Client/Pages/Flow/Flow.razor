@@ -1,11 +1,18 @@
 @namespace FileFlow.Client.Pages
 
-@page "/flow/{uid:guid}"
+@page "/flows/{uid:guid}"
 
-<PageView>
+@{
+    bool isNew = Model == null || Model.Uid == System.Guid.Empty;
+}
+
+<PageView FullWidth=@true title="@Title">
 
     <Head>
-        Uid: @Uid
+        @if (isNew == false)
+        {
+            <RadzenButton Click=@Rename Text="@lblRename" />
+        }
         <RadzenButton class="save-button" BusyText="@lblExecuting" IsBusy=@IsExecuting Click=@Execute
             Text="@lblExecute" />
         <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />

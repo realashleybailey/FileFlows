@@ -5,7 +5,11 @@
     overflow: hidden;
     max-height: 100vh;
     position: relative;
+    &:not(.fullwidth){        
+        max-width:1400px;
+    }
 }
+
 .top-row {
     //justify-content: flex-end;
     height: 3.5rem;

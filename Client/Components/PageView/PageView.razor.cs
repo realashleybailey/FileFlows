@@ -15,5 +15,11 @@ namespace FileFlow.Client.Components
         [Parameter]
         public RenderFragment Body { get; set; }
 
+        [Parameter]
+        public bool FullWidth { get; set; }
+
+        [Parameter]
+        public string Title { get; set; }
+
     }
 }

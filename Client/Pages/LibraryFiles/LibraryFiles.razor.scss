@@ -1,0 +1,57 @@
+.status-picker {
+    width:100%;
+    height:5rem;   
+    margin-top:-1rem; 
+    display:flex;
+    flex-direction: row;
+    .status {
+        flex-basis:100%;
+        border:solid 1px var(--accent);
+        position:relative;
+        filter:opacity(0.4);
+        &:hover {
+            filter:unset;
+            cursor:pointer;
+            background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+            box-shadow: inset 0 -3px 0 0 var(--accent) !important;
+        }
+        &.active {
+            filter:unset;
+        }
+        .icon {
+            left: 1rem;
+            top: 0.85rem;
+            font-size: 3rem;
+            position: absolute;
+            width: 3rem;
+            text-align: center;
+        }
+        .count {
+            display:block;
+            font-size:3rem;
+            line-height:3rem;
+            padding:0;
+            margin:0;
+            text-align: left;
+            margin-left: 5.5rem;
+            position: relative;
+            top: 0.25rem;
+        }
+        .name {
+            text-align: left;
+            margin-left: 5.5rem;
+            font-size:0.8rem;
+        }
+    }
+}
+
+.page-table 
+{
+    top:6rem;
+    ::deep tbody td:nth-child(2)
+    {
+        /* Beginning of string */
+        direction: rtl;
+        text-align: left;
+    }
+}

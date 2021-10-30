@@ -1,16 +1,12 @@
 using System.Text.RegularExpressions;
+using FileFlow.Server.Helpers;
 using FileFlow.Shared.Models;
 
 namespace FileFlow.Server.Workers
 {
     public class LibraryWorker : Worker
     {
-        public readonly Dictionary<Guid, List<string>> Queue = new();
-        public readonly List<string> Processed = new List<string>();
-
-        public FlowWorker FlowWorker = new FlowWorker();
-
-        public LibraryWorker() : base(ScheduleType.Minute, 1)
+        public LibraryWorker() : base(ScheduleType.Second, 30)
         {
             Trigger();
         }
@@ -18,13 +14,11 @@ namespace FileFlow.Server.Workers
         public override void Start()
         {
             base.Start();
-            FlowWorker.Start();
         }
 
         public override void Stop()
         {
             base.Stop();
-            FlowWorker.Stop();
         }
 
         protected override void Execute()
@@ -42,6 +36,13 @@ namespace FileFlow.Server.Workers
                     continue;
                 }
 
+                var flow = DbHelper.Single<Flow>(library.Flow);
+                if (flow == null || flow.Uid == Guid.Empty)
+                {
+                    Logger.Instance.WLog($"Library '{library.Name}' flow not found");
+                    continue;
+                }
+
                 var files = GetFiles(new DirectoryInfo(library.Path));
                 Regex regexFilter = null;
                 try
@@ -53,57 +54,39 @@ namespace FileFlow.Server.Workers
                     Logger.Instance.WLog($"Library '{library.Name}' filter '{library.Filter} is invalid: " + ex.Message);
                     continue;
                 }
+                string[] known = DbHelper.GetNames<LibraryFile>().ToArray();
                 foreach (var file in files)
                 {
                     if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false)
                         continue;
-                    if (Processed.Contains(file.FullName))
-                        continue;
-                    List<string> list;
-                    lock (Queue)
+
+                    if (known.Contains(file.FullName))
+                        continue; // already known
+
+                    var libraryFile = new LibraryFile
                     {
-                        if (Queue.ContainsKey(library.Uid) == false)
-                            Queue.Add(library.Uid, new List<string>());
-                        list = Queue[library.Uid];
-                    }
-                    if (list.Contains(file.FullName))
-                        continue;
-                    list.Add(file.FullName);
+                        Name = file.FullName,
+                        RelativePath = file.FullName.Substring(library.Path.Length + 1),
+                        Status = FileStatus.Unprocessed,
+                        Library = new ObjectReference
+                        {
+                            Name = library.Name,
+                            Uid = library.Uid,
+                            Type = library.GetType().FullName
+                        },
+                        Flow = new ObjectReference
+                        {
+                            Name = flow.Name,
+                            Uid = flow.Uid,
+                            Type = flow.GetType().FullName
+                        },
+                        Order = -1
+                    };
+                    DbHelper.Update(libraryFile);
                     Logger.Instance.DLog("Found file to process: " + file);
                 }
             }
             Logger.Instance.DLog("Finished scanning libraries");
-            CheckQueue();
-        }
-
-        private void CheckQueue()
-        {
-            if (FlowWorker.Processing == false && Queue.Any())
-            {
-                var libController = new Controllers.LibraryController();
-
-                while (Queue.Any())
-                {
-                    var item = Queue.First();
-                    var library = libController.Get(item.Key);
-                    if (library == null)
-                    {
-                        Queue.Remove(item.Key);
-                        continue;
-                    }
-                    while (item.Value.Any())
-                    {
-                        if (File.Exists(item.Value.First()) == false)
-                        {
-                            item.Value.RemoveAt(0);
-                            continue;
-                        }
-                        Logger.Instance.DLog("About to request processing of: " + item.Value[0]);
-                        FlowWorker.Process(library, item.Value[0]);
-                        return;
-                    }
-                }
-            }
         }
 
         public List<FileInfo> GetFiles(DirectoryInfo dir)

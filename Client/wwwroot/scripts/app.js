@@ -11,4 +11,4 @@ window.ff = {
         else if (level === 3) parameters.length > 0 ? console.info(message, parameters) : console.info(message);
         else parameters.length > 0 ? console.error(message, parameters) : console.log(message);
     }
-}
+};

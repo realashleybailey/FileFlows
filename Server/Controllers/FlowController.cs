@@ -94,6 +94,34 @@ namespace FileFlow.Server.Controllers
             return flow;
         }
 
+        [HttpPut("{uid}/rename")]
+        public void Rename([FromRoute] Guid uid, [FromQuery] string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+            name = name.Trim();
+            var flow = Get(uid);
+            if (flow == null)
+                throw new Exception("Flow not found");
+            if (flow.Name == name)
+                return; // name already is the requested name
+
+            bool inUse = DbHelper.GetNames<Flow>("Uid <> @1", uid.ToString()).Where(x => x.ToLower() == name.ToLower()).Any();
+            if (inUse)
+                throw new Exception("ErrorMessage.NameInUse");
+
+            flow.Name = name;
+            DbHelper.Update(flow);
+
+            // update any object references
+            var libraryFiles = DbHelper.Select<LibraryFile>();
+            foreach (var lf in libraryFiles.Where(x => x.Flow.Uid == uid))
+            {
+                lf.Flow.Name = flow.Name;
+                DbHelper.Update(lf);
+            }
+        }
+
         [HttpPost("execute")]
         public async Task<string> Execute(string input)
         {

@@ -13,10 +13,14 @@ namespace FileFlow.Client.Pages
     using System.Linq;
     using System;
     using FileFlow.Shared;
+    using FileFlow.Client.Components.Dialogs;
+    using Radzen;
+    using Radzen.Blazor;
 
     public partial class Flow : ComponentBase
     {
         [Parameter] public System.Guid Uid { get; set; }
+        [Inject] public NotificationService NotificationService { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         private ffElement[] Available { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
@@ -31,11 +35,14 @@ namespace FileFlow.Client.Pages
 
         private ff Model { get; set; }
 
+        private string Title { get; set; }
+
         const string API_URL = "/api/flow";
 
-        private string lblSave, lblSaving, lblExecute, lblExecuting;
+        private string lblSave, lblSaving, lblExecute, lblExecuting, lblRename;
         protected override void OnInitialized()
         {
+            lblRename = Translater.Instant("Labels.Rename");
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             lblExecute = Translater.Instant("Labels.Execute");
@@ -87,14 +94,49 @@ namespace FileFlow.Client.Pages
             }
         }
 
+        async Task Rename()
+        {
+            string message = Translater.Instant("Pages.Flow.Labels.Rename");
+            string newName = await Prompt.Show(message, "", Model.Name);
+            if (string.IsNullOrEmpty(newName))
+                return; // was canceled
+
+            Blocker.Show();
+            try
+            {
+                var result = await HttpHelper.Put(API_URL + "/" + Model.Uid + "/rename?name=" + Uri.EscapeDataString(newName));
+
+                if (result.Success == false)
+                {
+                    NotificationService.Notify(NotificationSeverity.Error,
+                        result.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.UnexpectedError")
+                    );
+                    return;
+                }
+                Model.Name = newName;
+                this.SetTitle();
+                this.StateHasChanged();
+            }
+            finally
+            {
+                Blocker.Hide();
+            }
+        }
+
         protected override void OnAfterRender(bool firstRender)
         {
             _needsRendering = false;
         }
 
+        private void SetTitle()
+        {
+            this.Title = Translater.Instant(Model.Uid == Guid.Empty ? "Pages.Flow.Labels.NewFlow" : "Pages.Flow.Labels.EditFlow", Model);
+        }
+
         private async Task InitModel(ff model)
         {
             this.Model = model;
+            this.SetTitle();
             this.Model.Parts ??= new List<ffPart>(); // just incase its null
             this.Parts = this.Model.Parts;
 

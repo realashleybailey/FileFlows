@@ -10,6 +10,38 @@
     </Head>
 
     <Body>
+
+        <div class="status-picker">
+            @foreach (var status in Statuses)
+            {
+                <div class="status @status.Status @(status.Status == SelectedStatus ? "active" : "")"
+                @onclick="() => SetSelected(status)">
+                    @switch (status.Status)
+                    {
+                        case FileStatus.Unprocessed:
+                            <span class=" icon far fa-hourglass"></span>
+                            break;
+                        case FileStatus.Processed:
+                            <span class="icon far fa-check-circle"></span>
+                            break;
+                        case FileStatus.Processing:
+                            <span class="icon fas fa-file-medical-alt"></span>
+                            break;
+                        case FileStatus.FlowNotFound:
+                            <span class="icon fas fa-exclamation"></span>
+                            break;
+                        case FileStatus.ProcessingFailed:
+                            <span class="icon far fa-times-circle"></span>
+                            break;
+
+                    }
+
+                    <span class="count">@status.Count</span>
+                    <span class="name">@status.Name</span>
+                </div>
+            }
+        </div>
+
         <div class="page-table">
             <div class="table-toolbar">
                 <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span
@@ -18,6 +50,7 @@
                 <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
                         class="fas fa-trash"></span>
                     @lblDelete</button>
+                <button @onclick="@Refresh"><span class="fas fa-sync-alt"></span> @lblRefresh</button>
             </div>
             @{
                 bool paging = Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
@@ -40,8 +73,10 @@
                                 Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Name" Title="Name" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="FlowName" Title="Flow" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Library.Name" Title="Library" Width="14rem" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Flow.Name" Title="Flow" Width="14rem" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Status" Title="Status" Width="10rem" />
                 </Columns>
             </RadzenDataGrid>
         </div>

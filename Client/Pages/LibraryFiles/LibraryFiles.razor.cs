@@ -15,16 +15,37 @@ namespace FileFlow.Client.Pages
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
         public override string ApIUrl => "/api/library-file";
-        private string lblIgnore, lblProcess, lblView;
 
-        protected override void OnInitialized()
+        private FileFlow.Shared.Models.FileStatus SelectedStatus = FileFlow.Shared.Models.FileStatus.Unprocessed;
+
+        private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
+
+        private void SetSelected(LibraryStatus status)
         {
-            base.OnInitialized();
-            lblIgnore = Translater.Instant("Pages.LibraryFiles.Button.Ignore");
-            lblProcess = Translater.Instant("Pages.LibraryFiles.Button.Process");
-            lblView = Translater.Instant("Pages.LibraryFiles.Button.View");
+            SelectedStatus = status.Status;
+            _ = this.Refresh();
         }
 
+        public override string FetchUrl => ApIUrl + "?status=" + SelectedStatus;
+
+        public override async Task PostLoad()
+        {
+            var result = await HttpHelper.Get<List<LibraryStatus>>(ApIUrl + "/status");
+            if (result.Success)
+            {
+                var order = new List<FileStatus> { FileStatus.Unprocessed, FileStatus.Processing, FileStatus.Processed, FileStatus.FlowNotFound, FileStatus.ProcessingFailed };
+                foreach (var s in order)
+                {
+                    if (result.Data.Any(x => x.Status == s) == false && s != FileStatus.FlowNotFound)
+                        result.Data.Add(new LibraryStatus { Status = s });
+
+                }
+                foreach (var s in result.Data)
+                    s.Name = Translater.Instant("Enums.FileStatus." + s.Status.ToString());
+                Statuses.Clear();
+                Statuses.AddRange(result.Data.OrderBy(x => { int index = order.IndexOf(x.Status); return index >= 0 ? index : 100; }));
+            }
+        }
 
         public override async Task Edit(LibraryFile item)
         {

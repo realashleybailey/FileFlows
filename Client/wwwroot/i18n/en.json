@@ -10,11 +10,16 @@
     "Select":"Select",
     "Yes":"Yes",
     "No":"No",
+    "Ok":"OK",
     "Add": "Add",
     "Edit": "Edit",
+    "Refresh'":"Refresh",
     "Delete": "Delete",
     "Deleting": "Deleting",
-    "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?"
+    "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
+    "Rename":"Rename",
+    "Confirm":"Confirm",
+    "Prompt":"Prompt"
   },
   "Dialogs":{
     "FileBrowser":{
@@ -22,10 +27,21 @@
       "DirectoryTitle":"Select A Directory"
     }
   },
+  "Enums":{
+    "FileStatus":{
+      "Processed":"Processed",
+      "Processing":"Processing",
+      "Unprocessed":"Unprocessed",
+      "FlowNotFound":"Flow Not Found",
+      "ProcessingFailed":"Processing Failed"
+    }
+  },
   "ErrorMessages": {
+    "UnexpectedError":"An unexpected error occurred",
     "SaveFailed": "Failed to save",
     "DeleteFailed": "Failed to delete",
-    "NotFound":"Item not found"
+    "NotFound":"Item not found",
+    "NameInUse":"Name is already in use"
   },
   "Flow": {
     "Parts": {
@@ -39,7 +55,11 @@
   },
   "Pages": {
     "Flow": {
-      "Title": "Flow"
+      "Title": "Flow",
+      "Labels":{
+        "NewFlow":"Flow: New",
+        "EditFlow":"Flow: {Name}"
+      }
     },
     "Flows":{
       "Title":"Flows"

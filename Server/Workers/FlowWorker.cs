@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using FileFlow.Server.Controllers;
 using FileFlow.Server.Helpers;
+using FileFlow.Shared;
 using FileFlow.Shared.Models;
 
 namespace FileFlow.Server.Workers
@@ -36,8 +37,32 @@ namespace FileFlow.Server.Workers
                     Library = null;
                 }
             }
+
+            var libraryFile = DbHelper.Single<LibraryFile>("name = @1", file.FullName);
+            if (libraryFile.Uid == Guid.Empty)
+            {
+                libraryFile = DbHelper.Update(new LibraryFile
+                {
+                    Name = file.FullName,
+                    FlowName = flow.Name,
+                    DateCreated = file.CreationTime,
+                    DateModified = file.LastWriteTime
+                });
+            }
+            else
+            {
+                // shoudl do check here if its been changed???
+                libraryFile.FlowName = flow.Name;
+                libraryFile.DateCreated = file.CreationTime;
+                libraryFile.DateModified = file.LastWriteTime;
+                DbHelper.Update(libraryFile);
+            }
             Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
             var executor = new FlowExecutor();
+            executor.Logger = new FlowLogger
+            {
+                File = libraryFile
+            };
             executor.Flow = flow;
             executor.Run(file.FullName);
         }

@@ -20,7 +20,8 @@ namespace FileFlow.Plugin
         Float = 7,
         StringArray = 8,
         File = 9,
-        Folder = 10
+        Folder = 10,
+        LogView = 11
     }
 
 

@@ -45,7 +45,7 @@ namespace FileFlow.Server.Helpers
         {
             using (var db = GetDb())
             {
-                var dbObjects = db.Fetch<DbObject>("where Type=@0", typeof(T).FullName);
+                var dbObjects = db.Fetch<DbObject>("where Type=@0 order by name", typeof(T).FullName);
                 return dbObjects.Select(x => Convert<T>(x));
             }
         }
@@ -161,6 +161,5 @@ namespace FileFlow.Server.Helpers
                 }
             }
         }
-
     }
 }

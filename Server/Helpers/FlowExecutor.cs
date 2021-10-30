@@ -2,10 +2,13 @@ namespace FileFlow.Server.Helpers
 {
     using FileFlow.Shared.Models;
     using FileFlow.Plugin;
+    using FileFlow.Server.Workers;
 
     public class FlowExecutor
     {
         public Flow Flow { get; set; }
+
+        public ILogger Logger { get; set; }
 
         public Task<NodeParameters> Run(string input)
         {
@@ -14,7 +17,7 @@ namespace FileFlow.Server.Helpers
                 var args = new NodeParameters();
                 args.FileName = input;
                 args.Result = NodeResult.Success;
-                args.Logger = new Shared.FlowLogger();
+                args.Logger = Logger ?? new FlowLogger();
                 bool flowCompleted = false;
                 int count = 0;
 

@@ -4,98 +4,34 @@ namespace FileFlow.Client.Pages
     using System.Dynamic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Components;
     using Radzen;
     using Radzen.Blazor;
     using FileFlow.Client.Components;
-    using FileFlow.Client.Components.Dialogs;
     using FileFlow.Client.Helpers;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
     using FileFlow.Client.Models;
 
-    public partial class Libraries : ComponentBase
+    public partial class Libraries : ListPage<Library>
     {
-        [CascadingParameter] Blocker Blocker { get; set; }
-        [CascadingParameter] Editor Editor { get; set; }
-        [Inject] NotificationService NotificationService { get; set; }
-        protected RadzenDataGrid<Library> DataGrid { get; set; }
-
-        private List<Library> Data = new List<Library>();
-
-        private IList<Library> SelectedItems;
-        private string lblAdd, lblEdit, lblDelete, lblDeleting;
-
-        const string API_URL = "/api/library";
-        protected override void OnInitialized()
-        {
-            lblAdd = Translater.Instant("Labels.Add");
-            lblEdit = Translater.Instant("Labels.Edit");
-            lblDelete = Translater.Instant("Labels.Delete");
-            lblDeleting = Translater.Instant("Labels.Deleting");
-            _ = Load();
-        }
-
-        async Task Load()
-        {
-            Blocker.Show();
-            this.StateHasChanged();
-            Data.Clear();
-            try
-            {
-                var result = await HttpHelper.Get<List<Library>>(API_URL);
-                if (result.Success)
-                {
-                    this.Data = result.Data;
-                }
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
-        }
-
-        async Task Enable(bool enabled, Library library)
-        {
-            Blocker.Show();
-            this.StateHasChanged();
-            Data.Clear();
-            try
-            {
-                await HttpHelper.Put<Library>($"{API_URL}/state/{library.Uid}?enable={enabled}");
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
-        }
+        public override string ApIUrl => "/api/library";
 
         private Library EditingItem = null;
+
         private async Task Add()
         {
             await Edit(new Library() { Enabled = true });
         }
 
-        async Task Edit()
-        {
-            var selected = this.SelectedItems?.FirstOrDefault();
-            if (selected == null)
-                return;
-            await Edit(selected);
-        }
 
-        async Task Edit(Library library)
+        public override async Task Edit(Library library)
         {
             Blocker.Show();
             var flowResult = await HttpHelper.Get<FileFlow.Shared.Models.Flow[]>("/api/flow");
             Blocker.Hide();
             if (flowResult.Success == false || flowResult.Data?.Any() != true)
             {
-                NotificationService.Notify(NotificationSeverity.Error,
-                    flowResult.Success || string.IsNullOrEmpty(flowResult.Body) ? Translater.Instant("Pages.Libraries.Error.NoFlows") : Translater.TranslateIfNeeded(flowResult.Body)
-                );
+                ShowEditHttpError(flowResult, "Pages.Libraries.Error.NoFlows");
                 return;
             }
             var flowOptions = flowResult.Data.Select(x => new ListOption { Value = x.Uid, Label = x.Name });
@@ -148,7 +84,7 @@ namespace FileFlow.Client.Pages
 
             try
             {
-                var saveResult = await HttpHelper.Post<Library>($"{API_URL}", model);
+                var saveResult = await HttpHelper.Post<Library>($"{ApIUrl}", model);
                 if (saveResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
@@ -170,44 +106,7 @@ namespace FileFlow.Client.Pages
                 this.StateHasChanged();
             }
         }
-        async Task Delete()
-        {
-            var uids = this.SelectedItems?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
-            if (uids.Length == 0)
-                return; // nothing to delete
-            if (await Confirm.Show("Labels.Delete",
-                Translater.Instant("Labels.DeleteItems", new { count = uids.Length })) == false)
-                return; // rejected the confirm
 
-            Blocker.Show();
-            this.StateHasChanged();
-
-            try
-            {
-                var deleteResult = await HttpHelper.Delete($"{API_URL}", new DeleteModel { Uids = uids });
-                if (deleteResult.Success == false)
-                {
-                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
-                    return;
-                }
-
-                this.SelectedItems.Clear();
-                this.Data.RemoveAll(x => uids.Contains(x.Uid));
-                await DataGrid.Reload();
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
-        }
-
-        private async Task RowDoubleClicked(DataGridRowMouseEventArgs<Library> item)
-        {
-            this.SelectedItems.Clear();
-            this.SelectedItems.Add(item.Data);
-            await Edit(item.Data);
-        }
     }
 
 }

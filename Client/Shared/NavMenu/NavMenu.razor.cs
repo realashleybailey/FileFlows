@@ -8,7 +8,6 @@ namespace FileFlow.Client.Shared
     public partial class NavMenu
     {
         [Inject] private NavigationManager NavigationManager { get; set; }
-        private string lblHome, lblVideoFiles, lblSettings;
         private List<NavMenuItem> MenuItems = new List<NavMenuItem>();
         private bool collapseNavMenu = true;
 
@@ -17,12 +16,8 @@ namespace FileFlow.Client.Shared
         private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
         protected override void OnInitialized()
         {
-            this.lblHome = Translater.Instant("Pages.Home.Title");
-            this.lblVideoFiles = Translater.Instant("Pages.VideoFiles.Title");
-            this.lblSettings = Translater.Instant("Pages.Settings.Title");
-
             MenuItems.Add(new NavMenuItem("Pages.Home.Title", "fas fa-home", ""));
-            MenuItems.Add(new NavMenuItem("Pages.VideoFiles.Title", "fas fa-video", "video-files"));
+            MenuItems.Add(new NavMenuItem("Pages.LibraryFiles.Title", "fas fa-copy", "library-files"));
             MenuItems.Add(new NavMenuItem("Pages.Flows.Title", "fas fa-project-diagram", "flows"));
             MenuItems.Add(new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"));
             MenuItems.Add(new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"));

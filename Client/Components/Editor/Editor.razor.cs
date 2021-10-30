@@ -26,7 +26,7 @@ namespace FileFlow.Client.Components
         private string TypeName { get; set; }
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblCancel;
+        private string lblSave, lblSaving, lblCancel, lblClose;
 
         private List<ElementField> Fields { get; set; }
 
@@ -37,6 +37,9 @@ namespace FileFlow.Client.Components
         public delegate Task<bool> SaveDelegate(ExpandoObject model);
         private SaveDelegate SaveCallback;
 
+        private bool ReadOnly { get; set; }
+        public bool Large { get; set; }
+
         private readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
         protected override void OnInitialized()
@@ -44,6 +47,7 @@ namespace FileFlow.Client.Components
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             lblCancel = Translater.Instant("Labels.Cancel");
+            lblClose = Translater.Instant("Labels.Close");
         }
 
         private ExpandoObject ConverToExando(object model)
@@ -61,35 +65,6 @@ namespace FileFlow.Client.Components
             return expando;
         }
 
-        internal Task<ExpandoObject> Open(string title, object obj, object model, SaveDelegate saveCallback = null)
-        {
-            this.RegisteredInputs.Clear();
-            var expandoModel = ConverToExando(model);
-            var dict = (IDictionary<string, object>)expandoModel;
-            Logger.Instance.DLog("Part: ", obj);
-            var fields = new List<ElementField>();
-            foreach (var prop in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
-            {
-                var attribute = prop.GetCustomAttributes(typeof(FormInputAttribute), false).FirstOrDefault() as FormInputAttribute;
-                if (attribute != null)
-                {
-                    fields.Add(new ElementField
-                    {
-                        Name = prop.Name,
-                        Order = attribute.Order,
-                        InputType = attribute.InputType,
-                        Type = prop.PropertyType.FullName
-                    });
-                    if (dict.ContainsKey(prop.Name) == false)
-                    {
-                        var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                        dict.Add(prop.Name, dValue != null ? dValue.Value : prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
-                    }
-                }
-            }
-
-            return Open(obj.GetType().Name, title, fields, expandoModel, saveCallback: saveCallback);
-        }
 
         internal void RegisterInput<T>(Input<T> input)
         {
@@ -97,12 +72,14 @@ namespace FileFlow.Client.Components
                 this.RegisteredInputs.Add(input);
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false)
         {
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
             this.Title = title;
             this.Fields = fields;
+            this.ReadOnly = readOnly;
+            this.Large = large;
             this.Visible = true;
             var expandoModel = ConverToExando(model);
             this.Model = expandoModel;

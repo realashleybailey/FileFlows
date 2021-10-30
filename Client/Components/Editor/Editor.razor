@@ -6,14 +6,21 @@
 {
     <div class="editor-wrapper">
         <div class="background-overlay"></div>
-        <div class="editor">
+        <div class="editor @(Large ? "large" : "")">
 
             <ViContainer Title="@Title" Icon="@Icon">
 
                 <Head>
-                    <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+                    @if (ReadOnly)
+                    {
+                        <RadzenButton class="cancel-button" Click=@Cancel Text="@lblClose" />
+                    }
+                    else
+                    {
+                        <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
 
-                    <RadzenButton class="cancel-button" Click=@Cancel Text="@lblCancel" />
+                        <RadzenButton class="cancel-button" Click=@Cancel Text="@lblCancel" />
+                    }
                 </Head>
 
                 <Body>
@@ -29,6 +36,12 @@
                                         var value = GetValue<string>(field.Name) ?? "";
                                         <InputText Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
                             Validators=@field.Validators />
+                                    }
+                                    break;
+                                case FormInputType.LogView:
+                                    {
+                                        var value = GetValue<string>(field.Name) ?? "";
+                                        <InputLogView Label="@label" Value="@value" />
                                     }
                                     break;
                                 case FormInputType.Int:

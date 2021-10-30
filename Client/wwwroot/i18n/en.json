@@ -6,6 +6,7 @@
     "Execute": "Execute",
     "Executing": "Executing",
     "Cancel": "Cancel",
+    "Close":"Close",
     "Select":"Select",
     "Yes":"Yes",
     "No":"No",
@@ -23,7 +24,8 @@
   },
   "ErrorMessages": {
     "SaveFailed": "Failed to save",
-    "DeleteFailed": "Failed to delete"
+    "DeleteFailed": "Failed to delete",
+    "NotFound":"Item not found"
   },
   "Flow": {
     "Parts": {
@@ -57,6 +59,14 @@
         "Filter-Help":"An optional filter regular expression to run against matching files.\nExample: ^\\.(mp4|mkv|avi|mpg|mov)$"
       }
     },
+    "LibraryFiles": {
+      "Title": "Library Files",
+      "Buttons": {
+        "Ignore": "Ignore",
+        "Process": "Process",
+        "View": "View"
+      }
+    },
     "Plugins": {
       "Title": "Plugins"
     },
@@ -78,16 +88,6 @@
         "TestMode-Help": "When in test mode no actual encoding will be done, only the results of what would happen are shown.",
         "Extensions": "Extensions",
         "Extensions-Help": "A list of file extensions to be considered a video file"
-      }
-    },
-    "VideoFiles": {
-      "Title": "Video Files",
-      "Buttons": {
-        "Scan": "Scan",
-        "Scanning": "Scanning",
-        "Ignore": "Ignore",
-        "Process": "Process",
-        "View": "View"
       }
     }
   },

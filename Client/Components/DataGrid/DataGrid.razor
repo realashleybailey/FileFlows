@@ -1,0 +1,42 @@
+@namespace FileFlow.Client.Components
+
+@typeparam T
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <div class="library-files page-table">
+            <div class="table-toolbar">
+                @Buttons
+            </div>
+            @{
+                bool paging = Page.Data.Count > (Page.DataGrid == null ? 250 : Page.DataGrid.PageSize);
+            }
+
+            <RadzenDataGrid @ref="Page.DataGrid" AllowFiltering="true" PageSizeOptions="@Page.PageSizeOptions"
+                RowDoubleClick=@Page.RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
+                @bind-Value=@Page.SelectedItems AllowColumnResize="true" FilterMode="FilterMode.Advanced"
+                AllowPaging="@paging" AllowSorting="true" Data="@Page.Data" TItem="T"
+                LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="T" Width="40px" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                            <RadzenCheckBox TriState="false" TValue="bool"
+                                Value="@(Page.Data.Any(i => Page.SelectedItems != null && Page.SelectedItems.Contains(i)))"
+                                Change="@(args => Page.SelectedItems = args ? Page.Data.ToList() : null)" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox TriState="false"
+                                Value="@(Page.SelectedItems != null && Page.SelectedItems.Contains(data))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    @Columns
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    </Body>
+
+</PageView>

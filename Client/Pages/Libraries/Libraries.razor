@@ -1,5 +1,6 @@
 @namespace FileFlow.Client.Pages
 @using FileFlow.Shared.Models
+@inherits ListPage<Library>
 
 @page "/libraries"
 
@@ -9,11 +10,10 @@
     </Head>
 
     <Body>
-        <div class="libraries page-table first-column-checkbox">
+        <div class="page-table">
             <div class="table-toolbar">
                 <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
-                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span c
-                        lass="fas fa-edit"></span>
+                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span class="fas fa-edit"></span>
                     @lblEdit</button>
                 <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
                         class="fas fa-trash"></span>

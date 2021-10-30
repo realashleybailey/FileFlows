@@ -1,9 +1,11 @@
-namespace FileFlow.Shared
+namespace FileFlow.Server.Workers
 {
     using System;
     using System.Linq;
     using System.Text;
     using FileFlow.Plugin;
+    using FileFlow.Server.Helpers;
+    using FileFlow.Shared.Models;
 
     public class FlowLogger : ILogger
     {
@@ -11,8 +13,9 @@ namespace FileFlow.Shared
         public void DLog(params object[] args) => Log(LogType.Debug, args);
         public void ELog(params object[] args) => Log(LogType.Error, args);
         public void ILog(params object[] args) => Log(LogType.Info, args);
-
         public void WLog(params object[] args) => Log(LogType.Warning, args);
+
+        public LibraryFile File { get; set; }
         private enum LogType
         {
             Error, Warning, Info, Debug
@@ -29,6 +32,12 @@ namespace FileFlow.Shared
                 System.Text.Json.JsonSerializer.Serialize(x)));
             log.AppendLine(message);
             Console.WriteLine(message);
+
+            if (File != null)
+            {
+                File.Log = log.ToString();
+                DbHelper.Update(File);
+            }
         }
 
         public override string ToString() => log.ToString();

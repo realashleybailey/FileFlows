@@ -1,7 +1,8 @@
 @namespace FileFlow.Client.Pages
-@using ffFlow = FileFlow.Shared.Models.Flow;
+@using FileFlow.Shared.Models
+@inherits ListPage<LibraryFile>
 
-@page "/flows"
+@page "/library-files"
 
 <PageView>
 
@@ -11,21 +12,24 @@
     <Body>
         <div class="page-table">
             <div class="table-toolbar">
-                <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
-                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span c
-                        lass="fas fa-edit"></span>
+                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span
+                        class="fas fa-edit"></span>
                     @lblEdit</button>
                 <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
                         class="fas fa-trash"></span>
                     @lblDelete</button>
             </div>
+            @{
+                bool paging = Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
+            }
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" AllowColumnResize="true" RowDoubleClick=@RowDoubleClicked
-                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedItems
-                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="ffFlow"
+            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" PageSizeOptions="@PageSizeOptions"
+                RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
+                @bind-Value=@SelectedItems AllowColumnResize="true" FilterMode="FilterMode.Advanced"
+                AllowPaging="@paging" AllowSorting="true" Data="@Data" TItem="LibraryFile"
                 LogicalFilterOperator="LogicalFilterOperator.Or">
                 <Columns>
-                    <RadzenDataGridColumn TItem="ffFlow" Width="40px" Sortable="false" Filterable="false">
+                    <RadzenDataGridColumn TItem="LibraryFile" Width="40px" Sortable="false" Filterable="false">
                         <HeaderTemplate>
                             <RadzenCheckBox TriState="false" TValue="bool"
                                 Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
@@ -36,14 +40,8 @@
                                 Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ffFlow" Property="Name" Title="Name" />
-                    <RadzenDataGridColumn TItem="ffFlow" Property="Enabled" Title="Enabled">
-                        <Template Context="item">
-                            <div class="switch-wrapper">
-                                <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
-                            </div>
-                        </Template>
-                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="FlowName" Title="Flow" />
                 </Columns>
             </RadzenDataGrid>
         </div>

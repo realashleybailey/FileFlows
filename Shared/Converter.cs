@@ -16,10 +16,16 @@ namespace FileFlow.Shared
             if (value is JsonElement je)
             {
                 string json = je.GetRawText();
-                return JsonSerializer.Deserialize(json, type);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                return JsonSerializer.Deserialize(json, type, options);
             }
             if (valueType == type)
                 return value;
+
+
             if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
                 return ChangeListToArray(type.GetElementType(), (IEnumerable)value, valueType);
 

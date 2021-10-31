@@ -74,7 +74,7 @@ namespace FileFlow.Server.Controllers
                     continue;
                 try
                 {
-                    string updated = JsonHelper.SimpleObjectMerge(json, System.IO.File.ReadAllText(jf));
+                    string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
                     json = updated;
                 }
                 catch (Exception) { }

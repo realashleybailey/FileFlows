@@ -14,10 +14,10 @@ namespace FileFlow.BasicNodes.Functions
         public override int Outputs => 1;
         public override FlowElementType Type => FlowElementType.Logic;
 
-        [Enum(typeof(LogType), 1)]
+        [Enum(1, LogType.Info, LogType.Debug, LogType.Warning, LogType.Error)]
         public LogType LogType { get; set; }
 
-        [Text(2)]
+        [TextArea(2)]
         public string Message { get; set; }
         public override int Execute(NodeParameters args)
         {

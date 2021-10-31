@@ -1,5 +1,6 @@
 namespace FileFlow.Plugin
 {
+    using System.Collections.Generic;
     public class NodeParameters
     {
         public string FileName { get; set; }

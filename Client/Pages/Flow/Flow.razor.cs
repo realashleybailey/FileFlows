@@ -16,17 +16,17 @@ namespace FileFlow.Client.Pages
     using FileFlow.Client.Components.Dialogs;
     using Radzen;
     using Radzen.Blazor;
+    using FileFlow.Shared.Helpers;
 
     public partial class Flow : ComponentBase
     {
+        [CascadingParameter] public Editor Editor { get; set; }
         [Parameter] public System.Guid Uid { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         private ffElement[] Available { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
-
-        private FlowPartEditor Editor { get; set; }
 
         public ffPart SelectedPart { get; set; }
         [Inject]
@@ -335,7 +335,9 @@ namespace FileFlow.Client.Pages
                 return;
             }
             Logger.Instance.DLog("opening editor for: ", part);
-            var newModelTask = Editor.Open(part, flowElement);
+            Logger.Instance.DLog("flowElement.Fields: ", flowElement.Fields);
+
+            var newModelTask = Editor.Open("Flow.Parts." + part.Name, part.Name, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new System.Dynamic.ExpandoObject());
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {

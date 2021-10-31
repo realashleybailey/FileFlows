@@ -145,16 +145,17 @@ namespace FileFlow.Client.Components
             var val = dict[parameter];
             if (val == null)
                 return default(T);
-            if (val.GetType() != typeof(T))
-            {
-                try
-                {
-                    string json = System.Text.Json.JsonSerializer.Serialize(val);
-                    val = System.Text.Json.JsonSerializer.Deserialize<T>(json);
-                }
-                catch (Exception) { return default(T); }
-            }
-            return (T)val;
+            return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), val);
+            // if (val.GetType() != typeof(T))
+            // {
+            //     try
+            //     {
+            //         string json = System.Text.Json.JsonSerializer.Serialize(val);
+            //         val = System.Text.Json.JsonSerializer.Deserialize<T>(json);
+            //     }
+            //     catch (Exception) { return default(T); }
+            // }
+            // return (T)val;
         }
 
         private T GetValue<T>(string field, T @default = default(T))
@@ -186,25 +187,27 @@ namespace FileFlow.Client.Components
             {
                 return (T)value;
             }
-            var valueType = value.GetType();
-            try
-            {
-                if (typeof(T).IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
-                {
 
-                    // we have a list, we want to make it an array
-                    var converted = FileFlow.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
-                    return (T)converted;
-                }
+            return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), value);
+            // var valueType = value.GetType();
+            // try
+            // {
+            //     if (typeof(T).IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
+            //     {
 
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.DLog("Not of type: " + field + ", " + value.GetType());
-                Logger.Instance.WLog("error: " + ex.Message + "\n" + ex.StackTrace);
-                return @default;
-            }
+            //         // we have a list, we want to make it an array
+            //         var converted = FileFlow.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
+            //         return (T)converted;
+            //     }
+
+            //     return (T)Convert.ChangeType(value, typeof(T));
+            // }
+            // catch (Exception ex)
+            // {
+            //     Logger.Instance.DLog("Not of type: " + field + ", " + value.GetType());
+            //     Logger.Instance.WLog("error: " + ex.Message + "\n" + ex.StackTrace);
+            //     return @default;
+            // }
         }
     }
 }

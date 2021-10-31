@@ -11,8 +11,24 @@ namespace FileFlow.Client.Components.Inputs
 
     public partial class InputSelect : Input<object>
     {
+        private readonly List<ListOption> _Options = new List<ListOption>();
         [Parameter]
-        public IEnumerable<ListOption> Options { get; set; }
+        public IEnumerable<ListOption> Options
+        {
+            get => _Options;
+            set
+            {
+                _Options.Clear();
+                if (value == null)
+                    return;
+                foreach (var lo in value)
+                {
+                    if (Translater.NeedsTranslating(lo.Label))
+                        lo.Label = Translater.Instant(lo.Label);
+                    _Options.Add(lo);
+                }
+            }
+        }
 
 
         private bool _AllowClear = true;

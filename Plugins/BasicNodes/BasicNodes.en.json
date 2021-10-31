@@ -1,0 +1,40 @@
+{
+    "Enums":{
+        "LogType":{
+            "Info":"Information",
+            "Debug":"Debug",
+            "Warning":"Warning",
+            "Error":"Error"
+        }
+    },
+    "Flow":{
+        "Parts":{
+            "Log":{
+                "Fields":{
+                    "LogType":"Type",
+                    "Message":"Message"
+                }
+            },
+            "FileExtension":{
+                "Fields":{
+                    "Extensions":"Extensions",
+                    "Extensions-Help":"A list of case insensitive file extensions that will be matched against.\nOuput 1 equals a match\nOutput 2 equals not a match"
+                }
+            },
+            "MoveFile":{
+                "Fields":{
+                    "Path":"Directory",
+                    "Path-Help":"The destination directory of the file",
+                    "FileName":"File Name",
+                    "FileName-Help":"Optional filename of the moved file, if blank the original filename will be used."
+                }
+            },
+            "RenameFile":{
+                "Fields":{
+                    "FileName":"File Name",
+                    "FileName-Help":"The new filename"
+                }
+            }
+        }
+    }
+}

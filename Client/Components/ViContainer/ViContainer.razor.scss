@@ -26,6 +26,11 @@
     .other {
         white-space:nowrap;
         margin-left:1rem;
+        margin-right: -0.5rem;
+        ::deep button {
+            width:7rem;
+            padding:unset;
+        }
     }
 
     ::deep a, .btn-link {

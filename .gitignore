@@ -2,3 +2,6 @@
 */obj
 *.suo
 *.sqlite
+obj/
+bin/
+Server/Plugins/

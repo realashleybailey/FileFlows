@@ -1,0 +1,8 @@
+@namespace FileFlow.Client.Components.Inputs
+@inherits Input<string>
+
+<InputWrapper Input="@this">
+    <div>
+        <RadzenTextArea @bind-Value="Value" @oninput="@(args => ClearError())" Placeholder="@Placeholder" Rows="8" />
+    </div>
+</InputWrapper>

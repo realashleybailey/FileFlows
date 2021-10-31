@@ -13,7 +13,7 @@ namespace FileFlow.VideoNodes
         public override int Inputs => 1;
         public override FlowElementType Type => FlowElementType.Process;
 
-        [DefaultValue("en")]
+        [DefaultValue("eng")]
         [Text(1)]
         public string Language { get; set; }
 
@@ -35,8 +35,7 @@ namespace FileFlow.VideoNodes
                 if (mediaInfo == null)
                     return -1;
 
-                Language ??= "";
-                Language = Language.ToLower();
+                Language = Language?.ToLower() ?? "";
 
                 // ffmpeg is one based for stream index, so video should be 1, audio should be 2
 
@@ -50,19 +49,22 @@ namespace FileFlow.VideoNodes
                     if (Language != string.Empty)
                     {
                         args.Logger.ILog("Language: " + x.Language, x);
-                        if (x.Language?.ToLower()?.StartsWith(Language) != true)
+                        if (string.IsNullOrEmpty(x.Language))
+                            return 50; // no language specified
+                        if (x.Language?.ToLower() != Language)
                             return 100; // low priority not the desired language
                     }
                     return 0;
                 })
                 .ThenByDescending(x => x.Channels)
                 //.ThenBy(x => x.CodecName.ToLower() == "ac3" ? 0 : 1) // if we do this we can get commentary tracks...
-                .ThenByDescending(x => x.Index)
+                .ThenBy(x => x.Index)
                 .FirstOrDefault();
 
-                bool noAudioAc3 = bestAudio.CodecName.ToLower() != "ac3";
+                bool firstAc3 = bestAudio?.CodecName?.ToLower() == "ac3" && mediaInfo.AudioStreams[0] == bestAudio;
+                args.Logger.ILog("Best Audio: ", (object)bestAudio ?? (object)"null");
 
-                if (noAudioAc3 == false && videoH265 != null)
+                if (firstAc3 == true && videoH265 != null)
                 {
                     args.Logger.DLog("File is h265 with the first audio track being AC3");
                     return 2;
@@ -84,12 +86,15 @@ namespace FileFlow.VideoNodes
                                                 else
                                                     options.WithCustomArgument($"-map 0:v:0 -c:v copy");
 
-                                                if (noAudioAc3)
+                                                if (bestAudio.CodecName.ToLower() != "ac3")
                                                     options.WithCustomArgument($"-map 0:{bestAudio.Index} -c:a ac3");
                                                 else
                                                     options.WithCustomArgument($"-map 0:{bestAudio.Index} -c:a copy");
 
-                                                options.WithCustomArgument($"-map 0:s? -c:s copy");
+                                                if (Language != string.Empty)
+                                                    options.WithCustomArgument($"-map 0:s:m:language:{Language}? -c:s copy");
+                                                else
+                                                    options.WithCustomArgument($"-map 0:s? -c:s copy");
                                             });
 
                 args.Logger.ILog(new string('=', ("FFMpeg.Arguments: " + ffmpeg.Arguments).Length));

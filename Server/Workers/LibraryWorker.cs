@@ -63,6 +63,9 @@ namespace FileFlow.Server.Workers
                     if (known.Contains(file.FullName))
                         continue; // already known
 
+                    if (CanAccess(file) == false)
+                        continue; // this can happen if the file is currently being written to, next scan will retest it
+
                     var libraryFile = new LibraryFile
                     {
                         Name = file.FullName,
@@ -87,6 +90,22 @@ namespace FileFlow.Server.Workers
                 }
             }
             Logger.Instance.DLog("Finished scanning libraries");
+        }
+
+        private bool CanAccess(FileInfo file)
+        {
+            try
+            {
+                using (var fs = File.Open(file.FullName, FileMode.Open, FileAccess.ReadWrite))
+                {
+                }
+
+                return true;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
         }
 
         public List<FileInfo> GetFiles(DirectoryInfo dir)

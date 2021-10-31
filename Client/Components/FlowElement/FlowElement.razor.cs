@@ -30,18 +30,20 @@ namespace FileFlow.Client.Components
         [Parameter]
         public EventCallback<ffPart> OnSelect { get; set; }
 
-        [Parameter]
-        public EventCallback<ffPart> OnEdit { get; set; }
-
         private void Select()
         {
             this.OnSelect.InvokeAsync(this.Part);
         }
 
-        private void Edit()
+        private async Task Edit()
         {
             Logger.Instance.DLog("edit part!");
-            this.OnEdit.InvokeAsync(this.Part);
+            bool updated = await Flow.Edit(this.Part);
+            if (updated)
+            {
+                Logger.Instance.DLog("flow part updated!, recheck number of outputs!");
+                this.StateHasChanged();
+            }
         }
 
         private async Task KeyDown(KeyboardEventArgs e)

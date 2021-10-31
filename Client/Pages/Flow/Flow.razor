@@ -41,11 +41,11 @@
                 {
                     <CascadingValue IsFixed="true" Value="this">
                         @foreach (var part in Parts)
-                    {
-                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)"
-                        OnEdit="() => Edit(part)"></FlowElement>
-                    }
-                </CascadingValue>
+                        {
+                            <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)">
+                            </FlowElement>
+                        }
+                    </CascadingValue>
                 }
 
             </div>

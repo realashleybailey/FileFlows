@@ -17,6 +17,8 @@ namespace FileFlow.Client.Pages
     using Radzen;
     using Radzen.Blazor;
     using FileFlow.Shared.Helpers;
+    using System.Dynamic;
+    using System.ComponentModel;
 
     public partial class Flow : ComponentBase
     {
@@ -259,6 +261,13 @@ namespace FileFlow.Client.Pages
             // we have to clone the model, not use the same instance
             if (element.Model != null)
                 part.Model = FileFlow.Shared.Helpers.ObjectCloner.Clone(element.Model);
+            if (part.Model != null && part.Model is IDictionary<string, object> dict)
+            {
+                if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString() ?? "", out int outputs))
+                {
+                    part.Outputs = outputs;
+                }
+            }
             Logger.Instance.DLog("part.Model: " + part.Model?.GetType()?.Name);
             Parts.Add(part);
             IsDirty = true;
@@ -325,30 +334,34 @@ namespace FileFlow.Client.Pages
             }
         }
 
-        async Task Edit(ffPart part)
+        public async Task<bool> Edit(ffPart part)
         {
             var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
             if (flowElement == null)
             {
                 // cant find it, cant edit
                 Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
-                return;
+                return false;
             }
-            Logger.Instance.DLog("opening editor for: ", part);
-            Logger.Instance.DLog("flowElement.Fields: ", flowElement.Fields);
-
-            var newModelTask = Editor.Open("Flow.Parts." + part.Name, part.Name, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new System.Dynamic.ExpandoObject());
+            var newModelTask = Editor.Open("Flow.Parts." + part.Name, part.Name, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new ExpandoObject());
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {
                 IsDirty = true;
                 Logger.Instance.DLog("model updated:" + System.Text.Json.JsonSerializer.Serialize(newModelTask.Result));
                 part.Model = newModelTask.Result;
+                if (part.Model is IDictionary<string, object> dict)
+                {
+                    if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString(), out int outputs))
+                        part.Outputs = outputs;
+                }
+                return true;
             }
             else
             {
                 Logger.Instance.DLog("model canceled");
+                return false;
             }
         }
     }
-};
+}

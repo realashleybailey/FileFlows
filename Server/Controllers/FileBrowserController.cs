@@ -65,8 +65,9 @@ namespace FileFlow.Server.Controllers
                 }
                 if (includeFiles)
                 {
-                    var rgxFile = new Regex(extensions?.Any() == false ? "*" :
-                                         ".(" + string.Join("|", extensions.Select(x => Regex.Escape(x.ToLower()))) + ")$");
+                    string expression = extensions?.Any() == false ? "" :
+                                         ".(" + string.Join("|", extensions.Select(x => Regex.Escape(x.ToLower()))) + ")$";
+                    var rgxFile = new Regex(expression);
                     foreach (var file in di.GetFiles())
                     {
                         if ((file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)

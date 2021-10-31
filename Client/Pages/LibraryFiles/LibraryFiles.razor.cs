@@ -23,6 +23,7 @@ namespace FileFlow.Client.Pages
         private void SetSelected(LibraryStatus status)
         {
             SelectedStatus = status.Status;
+            this.StateHasChanged();
             _ = this.Refresh();
         }
 

@@ -121,6 +121,9 @@
         "Extensions": "Extensions",
         "Extensions-Help": "A list of file extensions to be considered a video file"
       }
+    },
+    "Tools":{
+      "Title":"Tools"
     }
   },
   "Plugins": {

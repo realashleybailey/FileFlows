@@ -3,7 +3,7 @@
 
 <InputWrapper Input="@this">
     <div>
-        <RadzenNumeric TValue="int" @bind-Value="Value" Placeholder="@Placeholder" Min="0" Max="10000"
+        <RadzenNumeric id=@Uid TValue="int" @bind-Value="Value" Placeholder="@Placeholder" Min="0" Max="10000"
             @oninput="@(args => ClearError())" />
     </div>
 </InputWrapper>

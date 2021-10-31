@@ -24,7 +24,7 @@ namespace FileFlow.Server.Controllers
         {
             var duplicate = DbHelper.Single<Library>("lower(name) = lower(@1) and uid <> @2", library.Name, library.Uid.ToString());
             if (duplicate != null && duplicate.Uid != Guid.Empty)
-                throw new Exception("Duplicate name.");
+                throw new Exception("ErrorMessages.NameInUse");
 
             return DbHelper.Update(library);
         }

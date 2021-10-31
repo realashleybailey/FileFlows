@@ -5,6 +5,7 @@ namespace FileFlow.Client.Components.Inputs
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.JSInterop;
 
     public interface IInput
     {
@@ -14,11 +15,16 @@ namespace FileFlow.Client.Components.Inputs
         string ErrorMessage { get; set; }
 
         Task<bool> Validate();
+
+        bool Focus();
     }
 
     public abstract class Input<T> : ComponentBase, IInput
     {
         [CascadingParameter] protected Editor Editor { get; set; }
+
+        [Inject] protected IJSRuntime jsRuntime { get; set; }
+        protected string Uid = System.Guid.NewGuid().ToString();
         private string _Label;
         private string _LabelOriginal;
         [Parameter]
@@ -90,6 +96,14 @@ namespace FileFlow.Client.Components.Inputs
                     return false;
                 }
             }
+            return true;
+        }
+
+        public virtual bool Focus() => false;
+
+        protected bool FocusUid()
+        {
+            _ = jsRuntime.InvokeVoidAsync("eval", $"document.getElementById('{Uid}').focus()");
             return true;
         }
     }

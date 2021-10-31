@@ -40,7 +40,7 @@ namespace FileFlow.Server.Helpers
             {
                 var tNode = typeof(Node);
                 var assembly = Assembly.LoadFile(new FileInfo(Path.Combine("Plugins", pluginAssembly)).FullName);
-                var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode));
+                var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode) && x.IsAbstract == false);
                 return nodeTypes;
             }
             catch (Exception) { }

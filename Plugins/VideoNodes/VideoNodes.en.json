@@ -2,9 +2,23 @@
     "Flow":{
         "Parts":{
             "VideoCodec":{
+                "Description":"This node will check the codecs in the input file, and trigger when matched",
                 "Fields":{
                     "Codecs":"Codecs",
                     "Codecs-Help":"Enter a list of case insensitive video or audio codecs.\nEg hevc, h265, mpeg4, ac3"
+                }
+            },
+            "VideoH265AC3":{
+                "Description":"This will ensure all videos are encoded in H265 (if not already encoded) and that AC3 audio is the first audio channel\nThe second output of this node is called when was processing is needed.",
+                "Fields":{
+                    "Language":"Language",
+                    "Language-Help":"Optional language to use when encoding the audio.  The track needs to start with this string, so 'en' will match a track called 'eng' or 'english'.\nIf not specified the first audio track will be used.",
+                    "Crf":"Constant Rate Factor",
+                    "Crf-Help":"Refer to ffmpeg for more details, the lower the value the bigger the file.  A good value is around 19-23.  Default is 21.",
+                    "NvidiaEncoding":"NVIDIA Encoding",
+                    "NvidiaEncoding-Help":"If NVIDIA hardware encoding should be used.  If you do not have a supported NVIDIA card the encoding will fail.",
+                    "Threads":"Threads",
+                    "Threads-Help":"Only used if not using NVIDIA.  If set to 0, the threads will use FFMpegs defaults."
                 }
             }
         }

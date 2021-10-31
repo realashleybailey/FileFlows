@@ -3,6 +3,7 @@
 
 <InputWrapper Input="@this">
     <div>
-        <RadzenTextArea @bind-Value="Value" @oninput="@(args => ClearError())" Placeholder="@Placeholder" Rows="8" />
+        <RadzenTextArea id=@Uid @bind-Value="Value" @oninput="@(args => ClearError())" Placeholder="@Placeholder"
+            Rows="8" />
     </div>
 </InputWrapper>

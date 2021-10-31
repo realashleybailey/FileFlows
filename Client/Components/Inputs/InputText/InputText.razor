@@ -3,6 +3,6 @@
 
 <InputWrapper Input="@this">
     <div>
-        <RadzenTextBox @bind-Value="Value" @oninput="@(args => ClearError())" Placeholder="@Placeholder" />
+        <RadzenTextBox id=@Uid @bind-Value="Value" @oninput="@(args => ClearError())" Placeholder="@Placeholder" />
     </div>
 </InputWrapper>

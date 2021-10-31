@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Components.Inputs 
+namespace FileFlow.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
@@ -13,6 +13,8 @@ namespace FileFlow.Client.Components.Inputs
         public bool EnterOnSpace { get; set; }
         private string InputText = "";
         private string PreviousInputText = "";
+        public override bool Focus() => FocusUid();
+
         private void OnKeyDown(KeyboardEventArgs e)
         {
             if (e.ShiftKey == false && e.AltKey == false && e.CtrlKey == false)

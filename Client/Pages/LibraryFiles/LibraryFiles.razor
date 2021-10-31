@@ -62,7 +62,8 @@
                 AllowPaging="@paging" AllowSorting="true" Data="@Data" TItem="LibraryFile"
                 LogicalFilterOperator="LogicalFilterOperator.Or">
                 <Columns>
-                    <RadzenDataGridColumn TItem="LibraryFile" Width="40px" Sortable="false" Filterable="false">
+                    <RadzenDataGridColumn TItem="LibraryFile" Width="40px" Sortable="false" Filterable="false"
+                        Frozen="true">
                         <HeaderTemplate>
                             <RadzenCheckBox TriState="false" TValue="bool"
                                 Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
@@ -73,10 +74,16 @@
                                 Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Library.Name" Title="Library" Width="14rem" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Flow.Name" Title="Flow" Width="14rem" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Status" Title="Status" Width="10rem" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name" Width="20rem"
+                        Frozen="true" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Flow.Name" Title="Flow" Width="12rem" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Library.Name" Title="Library" Width="12rem" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time" Width="6rem"
+                        FormatString="{0:hh\:mm\:ss}" Visible=@(SelectedStatus !=
+                        FileFlow.Shared.Models.FileStatus.Unprocessed)>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="OutputPath" Title="Output" Width="30rem"
+                        Visible=@(SelectedStatus == FileFlow.Shared.Models.FileStatus.Processed) />
                 </Columns>
             </RadzenDataGrid>
         </div>

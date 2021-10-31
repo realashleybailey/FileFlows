@@ -42,12 +42,27 @@ namespace FileFlow.Client.Components
 
         private readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
+        private bool FocusFirst = false;
+
         protected override void OnInitialized()
         {
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             lblCancel = Translater.Instant("Labels.Cancel");
             lblClose = Translater.Instant("Labels.Close");
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (FocusFirst)
+            {
+                foreach (var input in RegisteredInputs)
+                {
+                    if (input.Focus())
+                        break;
+                }
+                FocusFirst = false;
+            }
         }
 
         private ExpandoObject ConverToExando(object model)
@@ -85,6 +100,7 @@ namespace FileFlow.Client.Components
             this.Model = expandoModel;
             OpenTask = new TaskCompletionSource<ExpandoObject>();
             this.StateHasChanged();
+            this.FocusFirst = true;
             return OpenTask.Task;
         }
 

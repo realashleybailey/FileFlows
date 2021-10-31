@@ -5,21 +5,22 @@ namespace FileFlow.VideoNodes
     using FileFlow.Plugin;
     using FileFlow.Plugin.Attributes;
 
-    public class VideoFile : Node
+    public class VideoFile : VideoNode
     {
         public override int Outputs => 1;
         public override FlowElementType Type => FlowElementType.Input;
 
         public override int Execute(NodeParameters args)
         {
-            var ffmpegFilePath = @"C:\utils\ffmpeg\ffmpeg.exe";
+            string ffmpegPath = GetFFMpegPath(args);
+            if (string.IsNullOrEmpty(ffmpegPath))
+                return -1;
 
             try
             {
-                //GlobalFFOptions.Configure(new FFOptions { BinaryFolder = @"C:\utils\ffmpeg" });
-                GlobalFFOptions.Configure(options => options.BinaryFolder = @"C:\utils\ffmpeg");
+                GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegPath);
 
-                var mediaInfo = FFProbe.Analyse(args.FileName);
+                var mediaInfo = FFProbe.Analyse(args.WorkingFile);
                 if (mediaInfo.VideoStreams.Any() == false)
                 {
                     args.Logger.ILog("No video streams detected.");
@@ -36,7 +37,8 @@ namespace FileFlow.VideoNodes
                 {
                     args.Logger.ILog($"Audio stream '{vs.CodecName}' '{vs.CodecTag}' '{vs.Index}' '{vs.Language}");
                 }
-                args.Parameters.Add("MediaInfo", mediaInfo);
+
+                SetMediaInfo(args, mediaInfo);
 
                 return 1;
             }

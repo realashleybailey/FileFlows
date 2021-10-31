@@ -30,6 +30,7 @@ namespace FileFlow.Client.Components.Inputs
             }
         }
 
+        public override bool Focus() => FocusUid();
 
         private bool _AllowClear = true;
         [Parameter]

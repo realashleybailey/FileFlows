@@ -21,6 +21,17 @@
                     "Extensions-Help":"A list of case insensitive file extensions that will be matched against.\nOuput 1 equals a match\nOutput 2 equals not a match"
                 }
             },
+            "FileSize":{
+                "Fields":{
+                    "Comparison":"Comparison",
+                    "Lower":"Lower",
+                    "Lower-Suffix":"MB",
+                    "Lower-Help":"The value it must bet greater than",
+                    "Upper":"Upper",
+                    "Upper-Suffix":"MB",
+                    "Upper-Help":"The value it must be less than. Leave as 0 to not test the upper limit."
+                }
+            },
             "MoveFile":{
                 "Fields":{
                     "Path":"Directory",

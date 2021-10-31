@@ -60,6 +60,8 @@ namespace FileFlow.Server.Workers
                 }
 
                 Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
+                libFile.ProcessingStarted = System.DateTime.Now;
+                DbHelper.Update(libFile);
                 var executor = new FlowExecutor();
                 executor.Logger = new FlowLogger
                 {
@@ -69,6 +71,8 @@ namespace FileFlow.Server.Workers
                 var task = executor.Run(file.FullName);
                 task.Wait();
                 libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
+                libFile.OutputPath = task.Result.OutputFile;
+                libFile.ProcessingEnded = System.DateTime.Now;
                 DbHelper.Update(libFile);
             }
             finally

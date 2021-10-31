@@ -6,7 +6,7 @@ namespace FileFlow.VideoNodes
     using FileFlow.Plugin.Attributes;
     using FFMpegCore;
 
-    public class VideoCodec : Node
+    public class VideoCodec : VideoNode
     {
         public override int Inputs => 1;
         public override int Outputs => 2;
@@ -17,24 +17,9 @@ namespace FileFlow.VideoNodes
 
         public override int Execute(NodeParameters args)
         {
-            if (args.Parameters.ContainsKey("MediaInfo") == false)
-            {
-                args.Logger.WLog("No codec information loaded, use a 'VideoFile' node first");
-                return -1;
-            }
-            var mediaInfo = args.Parameters["MediaInfo"] as IMediaAnalysis;
-            if (mediaInfo == null)
-            {
-                args.Logger.WLog("Invalid MediaInfo found");
-                return -1;
-            }
-
-            Codecs = Codecs?.Select(x => x.ToLower())?.ToArray() ?? new string[] { };
-            if (Codecs.Length == 0)
-            {
-                args.Logger.WLog("No codecs defined");
-                return -1;
-            }
+            var mediaInfo = GetMediaInfo(args);
+            if(mediaInfo == null)
+                return -1;                
 
             var codec = mediaInfo.VideoStreams.FirstOrDefault(x => Codecs.Contains(x.CodecName.ToLower()));
             if (codec != null)

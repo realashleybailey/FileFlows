@@ -7,7 +7,9 @@ namespace FileFlow.Shared.Helpers
 
     public class ObjectCloner
     {
+#pragma warning disable CS8603
         private static readonly MethodInfo CloneMethod = typeof(Object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
+#pragma warning restore CS8603
 
         private static bool IsPrimitive(Type type)
         {
@@ -15,10 +17,12 @@ namespace FileFlow.Shared.Helpers
             return (type.IsValueType & type.IsPrimitive);
         }
 
+#pragma warning disable CS8604
         public static T Clone<T>(T original)
         {
             return (T)Clone((object)original);
         }
+#pragma warning restore CS8604
 
         public static object Clone(object originalObject)
         {

@@ -21,6 +21,7 @@ namespace FileFlow.Client.Shared
             MenuItems.Add(new NavMenuItem("Pages.Flows.Title", "fas fa-project-diagram", "flows"));
             MenuItems.Add(new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"));
             MenuItems.Add(new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"));
+            MenuItems.Add(new NavMenuItem("Pages.Tools.Title", "fas fa-tools", "tools"));
             MenuItems.Add(new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings"));
 
             string currentRoute = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);

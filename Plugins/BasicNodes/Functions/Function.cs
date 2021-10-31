@@ -42,6 +42,7 @@ namespace FileFlow.BasicNodes.Functions
                 options.MaxStatements(100);
             })
             .SetValue("Logger", args.Logger)
+            .SetValue("FileSize", new FileInfo(args.WorkingFile).Length)
             //.SetValue("ILog", log.ILog)
             ;
 

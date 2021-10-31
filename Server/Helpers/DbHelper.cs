@@ -84,6 +84,17 @@ namespace FileFlow.Server.Helpers
             }
         }
 
+        public static T SingleByName<T>(string name) where T : ViObject, new()
+        {
+            using (var db = GetDb())
+            {
+                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and lower(Name)=lower(@1)", typeof(T).FullName, name);
+                if (string.IsNullOrEmpty(dbObject?.Data))
+                    return new T();
+                return Convert<T>(dbObject);
+            }
+        }
+
         public static T Single<T>(string andWhere, params object[] args) where T : ViObject, new()
         {
             using (var db = GetDb())

@@ -38,7 +38,7 @@
     color:var(--color) !important;
 }
 .rz-grid-table td{
-    background:unset !important;
+    background:var(--base) !important;
     color:var(--color) !important;
 }
 .rz-datatable-thead th .rz-column-title, .rz-grid-table thead th .rz-column-title{

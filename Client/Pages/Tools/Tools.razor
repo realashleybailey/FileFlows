@@ -1,0 +1,48 @@
+@namespace FileFlow.Client.Pages
+@using FileFlow.Shared.Models
+@inherits ListPage<Tool>
+
+@page "/tools"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <div class="page-table">
+            <div class="table-toolbar">
+                <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
+                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span
+                        class="fas fa-edit"></span>
+                    @lblEdit</button>
+                <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
+                        class="fas fa-trash"></span>
+                    @lblDelete</button>
+            </div>
+
+
+            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" AllowColumnResize="true"
+                RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
+                @bind-Value=@SelectedItems FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data"
+                TItem="Tool" LogicalFilterOperator="LogicalFilterOperator.Or">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Tool" Width="40px" Sortable="false" Filterable="false">
+                        <HeaderTemplate>
+                            <RadzenCheckBox TriState="false" TValue="bool"
+                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
+                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox TriState="false"
+                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Tool" Property="Name" Title="Name" Width="14rem" />
+                    <RadzenDataGridColumn TItem="Tool" Property="Path" Title="Path" />
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    </Body>
+
+</PageView>

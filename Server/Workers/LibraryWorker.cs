@@ -6,7 +6,7 @@ namespace FileFlow.Server.Workers
 {
     public class LibraryWorker : Worker
     {
-        public LibraryWorker() : base(ScheduleType.Second, 30)
+        public LibraryWorker() : base(ScheduleType.Second, 10)
         {
             Trigger();
         }

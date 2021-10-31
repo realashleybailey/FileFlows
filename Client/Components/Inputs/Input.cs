@@ -77,7 +77,7 @@ namespace FileFlow.Client.Components.Inputs
         }
         protected void ClearError() => this.ErrorMessage = "";
 
-        public async Task<bool> Validate()
+        public virtual async Task<bool> Validate()
         {
             if (this.Validators?.Any() != true)
                 return true;

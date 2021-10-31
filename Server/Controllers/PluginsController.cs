@@ -63,5 +63,23 @@ namespace FileFlow.Server.Controllers
             DbHelper.Update(pi);
             return pi;
         }
+
+        [HttpGet("language/{langCode}.json")]
+        public string LanguageFile([FromQuery] string langCode = "en")
+        {
+            var json = "{}";
+            foreach (var jf in Directory.GetFiles("plugins", "*.json"))
+            {
+                if (jf.Contains(".deps."))
+                    continue;
+                try
+                {
+                    string updated = JsonHelper.SimpleObjectMerge(json, System.IO.File.ReadAllText(jf));
+                    json = updated;
+                }
+                catch (Exception) { }
+            }
+            return json;
+        }
     }
 }

@@ -20,4 +20,13 @@
     -->
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="VideoNodes.en.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+    <Content Include="FFMpegCore.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

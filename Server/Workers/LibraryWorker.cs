@@ -36,7 +36,7 @@ namespace FileFlow.Server.Workers
                     continue;
                 }
 
-                var flow = DbHelper.Single<Flow>(library.Flow);
+                var flow = library.Flow == null ? null : DbHelper.Single<Flow>(library.Flow.Uid);
                 if (flow == null || flow.Uid == Guid.Empty)
                 {
                     Logger.Instance.WLog($"Library '{library.Name}' flow not found");

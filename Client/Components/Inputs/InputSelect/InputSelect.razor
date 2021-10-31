@@ -3,8 +3,21 @@
 
 <InputWrapper Input="@this">
     <div>
-        <RadzenDropDown @bind-Value="Value" AllowClear="true" Placeholder="@Placeholder" Data="@Options"
-            TextProperty="Label" ValueProperty="Value">
-        </RadzenDropDown>
+        <select @onchange="SelectionChanged" class="@(SelectedIndex == -1 ? "select-one" : "")">
+            @if (AllowClear)
+            {
+                <option class="select-one" selected=@(SelectedIndex == -1 ? "selected" : null) value="@(-1)">@lblSelectOne
+                </option>
+            }
+            @{
+                int index = -1;
+            }
+            @foreach (var opt in Options)
+            {
+                ++index;
+                <option selected=@(SelectedIndex == index ? "selected" : null) value="@(index)">@opt.Label</option>
+            }
+        </select>
+
     </div>
 </InputWrapper>

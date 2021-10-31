@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Models 
+namespace FileFlow.Plugin
 {
     public class ListOption
     {

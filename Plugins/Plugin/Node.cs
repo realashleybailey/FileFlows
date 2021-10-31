@@ -4,7 +4,7 @@ namespace FileFlow.Plugin
     using FileFlow.Plugin;
     public class Node
     {
-        public FlowElementType Type { get; set; }
+        public virtual FlowElementType Type { get; }
 
         public virtual int Inputs { get; }
         public virtual int Outputs { get; }

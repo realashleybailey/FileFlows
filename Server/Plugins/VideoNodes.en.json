@@ -1,0 +1,12 @@
+{
+    "Flow":{
+        "Parts":{
+            "VideoCodec":{
+                "Fields":{
+                    "Codecs":"Codecs",
+                    "Codecs-Help":"Enter a list of case insensitive video or audio codecs.\nEg hevc, h265, mpeg4, ac3"
+                }
+            }
+        }
+    }
+}

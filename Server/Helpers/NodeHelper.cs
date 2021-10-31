@@ -26,16 +26,25 @@ namespace FileFlow.Server.Helpers
             var plugins = DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false && x.Enabled);
             foreach (var plugin in plugins)
             {
-                try
-                {
-                    var assembly = Assembly.LoadFile(new FileInfo(Path.Combine("Plugins", plugin.Assembly)).FullName);
-                    var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode));
+                var nodeTypes = GetAssemblyNodeTypes(plugin.Assembly)?.ToList();
+                if (nodeTypes?.Any() == true)
                     nodes.AddRange(nodeTypes);
-                }
-                catch (Exception) { }
             }
             _NodeTypes = nodes;
             return nodes;
+        }
+
+        public static IEnumerable<Type> GetAssemblyNodeTypes(string pluginAssembly)
+        {
+            try
+            {
+                var tNode = typeof(Node);
+                var assembly = Assembly.LoadFile(new FileInfo(Path.Combine("Plugins", pluginAssembly)).FullName);
+                var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode));
+                return nodeTypes;
+            }
+            catch (Exception) { }
+            return new List<Type>();
         }
 
         public static Node LoadNode(FlowPart part)

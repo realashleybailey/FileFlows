@@ -22,3 +22,5 @@ C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\VideoNodes.pdb
 C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\Plugin.dll
 C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\Plugin.pdb
 C:\Users\john\src\ViWatcher\Plugins\VideoNodes\bin\Debug\net6.0\FFMpegCore.dll
+C:\Users\john\src\ViWatcher\Server\Plugins\VideoNodes.en.json
+C:\Users\john\src\ViWatcher\Server\Plugins\FFMpegCore.dll

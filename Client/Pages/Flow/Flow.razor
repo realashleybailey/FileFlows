@@ -9,13 +9,11 @@
 <PageView FullWidth=@true title="@Title">
 
     <Head>
-        @if (isNew == false)
-        {
-            <RadzenButton Click=@Rename Text="@lblRename" />
-        }
+        <RadzenButton Click=@Rename Text="@lblRename" />
         <RadzenButton class="save-button" BusyText="@lblExecuting" IsBusy=@IsExecuting Click=@Execute
             Text="@lblExecute" />
         <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+        <RadzenButton Click=@Close Text="@lblClose" />
     </Head>
 
     <Body>

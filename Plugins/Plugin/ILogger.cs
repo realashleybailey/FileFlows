@@ -7,4 +7,9 @@ namespace FileFlow.Plugin
         void WLog(params object[] args);
         void ELog(params object[] args);
     }
+    public enum LogType
+    {
+        Error, Warning, Info, Debug
+    }
+
 }

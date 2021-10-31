@@ -11,6 +11,7 @@ namespace FileFlow.BasicNodes.Functions
     public class Function : Node, IConfigurableOutputNode
     {
         public override int Inputs => 1;
+        public override FlowElementType Type => FlowElementType.Logic;
 
         [DefaultValue(1)]
         [NumberIntAttribute(1)]

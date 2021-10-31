@@ -39,12 +39,39 @@ namespace FileFlow.Server.Controllers
         }
 
         [HttpGet("{uid}")]
-        public Flow Get(Guid uid) => DbHelper.Single<Flow>(uid);
+        public Flow Get(Guid uid)
+        {
+            if (uid != Guid.Empty)
+                return DbHelper.Single<Flow>(uid);
 
-
-        [HttpGet("one")]
-        public Flow Get() => DbHelper.Single<Flow>();
-
+            // create default flow
+            var flowNames = DbHelper.GetNames<Flow>();
+            Flow flow = new Flow();
+            flow.Parts = new();
+            flow.Name = "New Flow";
+            flow.Enabled = true;
+            int count = 0;
+            while (flowNames.Contains(flow.Name))
+            {
+                flow.Name = "New Flow " + (++count);
+            }
+            // try find basic node
+            var inputFileType = NodeHelper.GetAssemblyNodeTypes("BasicNodes")?.Where(x => x.Name == "InputFile").FirstOrDefault();
+            if (inputFileType != null)
+            {
+                flow.Parts.Add(new FlowPart
+                {
+                    Name = inputFileType.Name,
+                    xPos = 50,
+                    yPos = 200,
+                    Uid = Guid.NewGuid(),
+                    Type = FlowElementType.Input,
+                    Outputs = 1,
+                    FlowElementUid = inputFileType.FullName
+                });
+            }
+            return flow;
+        }
 
 
         [HttpGet("elements")]
@@ -62,6 +89,7 @@ namespace FileFlow.Server.Controllers
                 var instance = (Node)Activator.CreateInstance(x);
                 element.Inputs = instance.Inputs;
                 element.Outputs = instance.Outputs;
+                element.Type = instance.Type;
 
                 // if(x.IsAssignableFrom(typeof(IConfigurableInputNode)) || x.IsAssignableFrom(typeof(IInputNode)))
                 // {
@@ -90,6 +118,16 @@ namespace FileFlow.Server.Controllers
         {
             if (model == null)
                 throw new Exception("No model");
+
+            if (model.Parts?.Any() != true)
+                throw new Exception("Flow.ErrorMessages.NoParts");
+
+            int inputNodes = model.Parts.Where(x => x.Type == FlowElementType.Input).Count();
+            if (inputNodes == 0)
+                throw new Exception("Flow.ErrorMessages.NoInput");
+            else if (inputNodes > 1)
+                throw new Exception("Flow.ErrorMessages.TooManyInputNodes");
+
             var flow = DbHelper.Update<Flow>(model);
             return flow;
         }
@@ -100,20 +138,31 @@ namespace FileFlow.Server.Controllers
             if (string.IsNullOrEmpty(name))
                 return;
             name = name.Trim();
+
+            bool inUse = DbHelper.GetNames<Flow>("Uid <> @1", uid.ToString()).Where(x => x.ToLower() == name.ToLower()).Any();
+            if (inUse)
+                throw new Exception("ErrorMessages.NameInUse");
+
+            if (uid == Guid.Empty)
+                return; // renaming a new flow
+
+
             var flow = Get(uid);
             if (flow == null)
                 throw new Exception("Flow not found");
             if (flow.Name == name)
                 return; // name already is the requested name
 
-            bool inUse = DbHelper.GetNames<Flow>("Uid <> @1", uid.ToString()).Where(x => x.ToLower() == name.ToLower()).Any();
-            if (inUse)
-                throw new Exception("ErrorMessage.NameInUse");
-
             flow.Name = name;
             DbHelper.Update(flow);
 
             // update any object references
+            var libraries = DbHelper.Select<Library>();
+            foreach (var lib in libraries.Where(x => x.Flow.Uid == uid))
+            {
+                lib.Flow.Name = flow.Name;
+                DbHelper.Update(lib);
+            }
             var libraryFiles = DbHelper.Select<LibraryFile>();
             foreach (var lf in libraryFiles.Where(x => x.Flow.Uid == uid))
             {
@@ -122,14 +171,14 @@ namespace FileFlow.Server.Controllers
             }
         }
 
-        [HttpPost("execute")]
-        public async Task<string> Execute(string input)
-        {
-            var executor = new Helpers.FlowExecutor();
-            executor.Flow = Get();
-            var result = await executor.Run(input);
-            return result.Logger.ToString();
-        }
+        // [HttpPost("execute")]
+        // public async Task<string> Execute(string input)
+        // {
+        //     var executor = new Helpers.FlowExecutor();
+        //     executor.Flow = Get();
+        //     var result = await executor.Run(input);
+        //     return result.Logger.ToString();
+        // }
     }
 
 }

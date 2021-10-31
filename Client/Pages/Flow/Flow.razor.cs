@@ -20,6 +20,7 @@ namespace FileFlow.Client.Pages
     public partial class Flow : ComponentBase
     {
         [Parameter] public System.Guid Uid { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         private ffElement[] Available { get; set; }
@@ -39,11 +40,17 @@ namespace FileFlow.Client.Pages
 
         const string API_URL = "/api/flow";
 
-        private string lblSave, lblSaving, lblExecute, lblExecuting, lblRename;
+        private string lblSave, lblSaving, lblClose, lblExecute, lblExecuting, lblRename;
+
+        private bool _needsRendering = false;
+
+        private bool IsDirty = false;
+
         protected override void OnInitialized()
         {
             lblRename = Translater.Instant("Labels.Rename");
             lblSave = Translater.Instant("Labels.Save");
+            lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
             lblExecute = Translater.Instant("Labels.Execute");
             lblExecuting = Translater.Instant("Labels.Executing");
@@ -65,8 +72,7 @@ namespace FileFlow.Client.Pages
                     //     }
                     // }
                 }
-
-                var modelResult = await HttpHelper.Get<ff>(API_URL + "/one");
+                var modelResult = await HttpHelper.Get<ff>(API_URL + "/" + Uid.ToString());
                 await InitModel((modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() });
 
                 var dotNetObjRef = DotNetObjectReference.Create(this);
@@ -82,8 +88,6 @@ namespace FileFlow.Client.Pages
             }
         }
 
-        private bool _needsRendering = false;
-
         private async Task WaitForRender()
         {
             _needsRendering = true;
@@ -92,6 +96,17 @@ namespace FileFlow.Client.Pages
             {
                 await Task.Delay(50);
             }
+        }
+
+        async Task Close()
+        {
+            if (IsDirty)
+            {
+                bool result = await Confirm.Show(lblClose, $"Pages.{nameof(Flow)}.Messages.Close");
+                if (result == false)
+                    return;
+            }
+            NavigationManager.NavigateTo("flows");
         }
 
         async Task Rename()
@@ -109,7 +124,7 @@ namespace FileFlow.Client.Pages
                 if (result.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error,
-                        result.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.UnexpectedError")
+                        Translater.TranslateIfNeeded(result.Body?.EmptyAsNull() ?? "ErrorMessages.UnexpectedError")
                     );
                     return;
                 }
@@ -130,7 +145,7 @@ namespace FileFlow.Client.Pages
 
         private void SetTitle()
         {
-            this.Title = Translater.Instant(Model.Uid == Guid.Empty ? "Pages.Flow.Labels.NewFlow" : "Pages.Flow.Labels.EditFlow", Model);
+            this.Title = Translater.Instant("Pages.Flow.Labels.EditFlow", Model);
         }
 
         private async Task InitModel(ff model)
@@ -158,6 +173,7 @@ namespace FileFlow.Client.Pages
         {
             if (part != null)
             {
+                IsDirty = true;
                 this.Parts.Remove(part);
                 this.StateHasChanged();
                 await WaitForRender();
@@ -176,6 +192,7 @@ namespace FileFlow.Client.Pages
             if (part == null)
                 return;
 
+            IsDirty = true;
             Logger.Instance.DLog($"Updating part position {xPos}, {yPos}");
             part.xPos = xPos;
             part.yPos = yPos;
@@ -187,6 +204,7 @@ namespace FileFlow.Client.Pages
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
             if (element == null)
                 return;
+            IsDirty = true;
 
             Logger.Instance.DLog($"Addeing element {xPos}, {yPos}");
             AddPart(element, xPos, yPos);
@@ -201,6 +219,7 @@ namespace FileFlow.Client.Pages
             var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
             if (fpInput == null || fpOutput == null)
                 return;
+            IsDirty = true;
             Logger.Instance.DLog($"adding connnection 1: {uidInput}, {uidOutput}, {input}, {output}");
 
 
@@ -223,6 +242,7 @@ namespace FileFlow.Client.Pages
             if (fpInput == null || fpOutput == null)
                 return;
 
+            IsDirty = true;
             fpOutput.OutputConnections = fpOutput.OutputConnections?.Where(x => x.Input != input && x.Output != output && x.InputNode != fpInput.Uid)?.ToList();
         }
         private void AddPart(ffElement element, float xPos, float yPos)
@@ -236,9 +256,12 @@ namespace FileFlow.Client.Pages
             part.Inputs = element.Inputs;
             part.Outputs = element.Outputs;
             part.Uid = Guid.NewGuid();
-            part.Model = element.Model;
+            // we have to clone the model, not use the same instance
+            if (element.Model != null)
+                part.Model = FileFlow.Shared.Helpers.ObjectCloner.Clone(element.Model);
             Logger.Instance.DLog("part.Model: " + part.Model?.GetType()?.Name);
             Parts.Add(part);
+            IsDirty = true;
         }
 
         private async Task Save()
@@ -251,7 +274,7 @@ namespace FileFlow.Client.Pages
                 {
                     Model = new ff
                     {
-                        Name = "SOme flow",
+                        Name = "New flow",
                     };
                 }
                 // ensure there are no duplicates and no rogue connections
@@ -266,7 +289,17 @@ namespace FileFlow.Client.Pages
                 Model.Parts = this.Parts;
                 var result = await HttpHelper.Put<ff>(API_URL, Model);
                 if (result.Success)
+                {
                     Model = result.Data;
+                    IsDirty = false;
+                }
+                else
+                {
+                    NotificationService.Notify(NotificationSeverity.Error,
+                        result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant($"ErrorMessages.UnexpectedError") : Translater.TranslateIfNeeded(result.Body),
+                        duration: 60_000
+                    );
+                }
             }
             finally
             {
@@ -306,6 +339,7 @@ namespace FileFlow.Client.Pages
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {
+                IsDirty = true;
                 Logger.Instance.DLog("model updated:" + System.Text.Json.JsonSerializer.Serialize(newModelTask.Result));
                 part.Model = newModelTask.Result;
             }

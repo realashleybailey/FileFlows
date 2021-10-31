@@ -83,7 +83,6 @@ namespace FileFlow.Client.Components
             this.Visible = true;
             var expandoModel = ConverToExando(model);
             this.Model = expandoModel;
-            Logger.Instance.DLog("model", this.Model);
             OpenTask = new TaskCompletionSource<ExpandoObject>();
             this.StateHasChanged();
             return OpenTask.Task;

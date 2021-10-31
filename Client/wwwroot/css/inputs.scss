@@ -6,12 +6,15 @@ input {
     border:solid 1px transparent !important;
     &:focus {
         outline:1px solid var(--accent);
-    }
+    }    
+}
+::placeholder {
+    color:rgba(var(--color-rgb), 0.3) !important;
 }
 
 .error 
 {
-    input {
+    input, select {
         border-color:var(--accent) !important;
     }
 }

@@ -10,7 +10,7 @@ namespace FileFlow.Client.Pages
     using FileFlow.Client.Helpers;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
-    using FileFlow.Client.Models;
+    using FileFlow.Plugin;
 
     public partial class Libraries : ListPage<Library>
     {
@@ -31,10 +31,10 @@ namespace FileFlow.Client.Pages
             Blocker.Hide();
             if (flowResult.Success == false || flowResult.Data?.Any() != true)
             {
-                ShowEditHttpError(flowResult, "Pages.Libraries.Error.NoFlows");
+                ShowEditHttpError(flowResult, "Pages.Libraries.ErrorMessages.NoFlows");
                 return;
             }
-            var flowOptions = flowResult.Data.Select(x => new ListOption { Value = x.Uid, Label = x.Name });
+            var flowOptions = flowResult.Data.Select(x => new ListOption { Value = new ObjectReference { Name = x.Name, Uid = x.Uid }, Label = x.Name });
 
 
             this.EditingItem = library;

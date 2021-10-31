@@ -3,6 +3,7 @@ namespace FileFlow.Shared
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Text.Json;
 
     public class Converter
     {
@@ -12,6 +13,11 @@ namespace FileFlow.Shared
             if (value == null)
                 return Activator.CreateInstance(type);
             Type valueType = value.GetType();
+            if (value is JsonElement je)
+            {
+                string json = je.GetRawText();
+                return JsonSerializer.Deserialize(json, type);
+            }
             if (valueType == type)
                 return value;
             if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))

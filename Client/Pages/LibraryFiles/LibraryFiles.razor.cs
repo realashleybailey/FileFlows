@@ -30,6 +30,15 @@ namespace FileFlow.Client.Pages
 
         public override async Task PostLoad()
         {
+            await RefreshStatus();
+        }
+        protected override async Task PostDelete()
+        {
+            await RefreshStatus();
+        }
+
+        private async Task RefreshStatus()
+        {
             var result = await HttpHelper.Get<List<LibraryStatus>>(ApIUrl + "/status");
             if (result.Success)
             {

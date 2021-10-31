@@ -104,13 +104,10 @@ namespace FileFlow.Client.Pages
 
         public void ShowEditHttpError<U>(RequestResult<U> result, string defaultMessage = "ErrorMessage.NotFound")
         {
-            if (result.Success == false)
-            {
-                NotificationService.Notify(NotificationSeverity.Error,
-                    result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant(defaultMessage) : Translater.TranslateIfNeeded(result.Body)
-                );
-                return;
-            }
+            NotificationService.Notify(NotificationSeverity.Error,
+                result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant(defaultMessage) : Translater.TranslateIfNeeded(result.Body),
+                duration: 60_000
+            );
         }
 
 
@@ -154,12 +151,19 @@ namespace FileFlow.Client.Pages
                 this.SelectedItems.Clear();
                 this.Data.RemoveAll(x => uids.Contains(x.Uid));
                 await DataGrid.Reload();
+
+                await PostDelete();
             }
             finally
             {
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+        }
+
+        protected async virtual Task PostDelete()
+        {
+            await Task.CompletedTask;
         }
     }
 }

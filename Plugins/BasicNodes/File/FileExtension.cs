@@ -11,5 +11,6 @@ namespace FileFlow.BasicNodes.File
 
         [StringArray(1)]
         public string[] Extensions { get; set; }
+        public override FlowElementType Type => FlowElementType.Logic;
     }
 }

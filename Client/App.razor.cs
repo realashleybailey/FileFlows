@@ -20,7 +20,8 @@ namespace FileFlow.Client
         private async Task LoadLanguage()
         {
             string langFile = await LoadLanguageFile("i18n/en.json");
-            Translater.Init(langFile);
+            string pluginLang = await LoadLanguageFile("/api/plugin/language/en.json");
+            Translater.Init(langFile, pluginLang);
         }
 
         private async Task<string> LoadLanguageFile(string url)

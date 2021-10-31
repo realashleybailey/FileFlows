@@ -7,5 +7,6 @@ namespace FileFlow.BasicNodes.File
     public class InputFile : Node
     {
         public override int Outputs => 1;
+        public override FlowElementType Type => FlowElementType.Input;
     }
 }

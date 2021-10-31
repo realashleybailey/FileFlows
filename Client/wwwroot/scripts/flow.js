@@ -19,7 +19,6 @@ window.ffFlow = {
         ffFlow.xOffset = 0;
         ffFlow.yOffset = 0;
         ffFlow.dragItem = null;
-        ffFlow.csharp = null;
         ffFlow.draggingElementUid = null;
         ffFlow.ioCanvas = null;
         ffFlow.ioSelectedConnection = null;

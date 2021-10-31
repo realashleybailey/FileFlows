@@ -18,12 +18,13 @@ namespace FileFlow.Server.Controllers
             if (start == "ROOT")
             {
                 // special case for windows we list the drives
-                return System.IO.DriveInfo.GetDrives().Where(x => x.IsReady).Select(x => new FileBrowserItem
+                var results = System.IO.DriveInfo.GetDrives().Where(x => x.IsReady).Select(x => new FileBrowserItem
                 {
                     IsDrive = true,
                     Name = x.Name,
                     FullName = x.RootDirectory.FullName
                 });
+                return results;
             }
 
             if (string.IsNullOrEmpty(start))

@@ -13,13 +13,14 @@
     "Ok":"OK",
     "Add": "Add",
     "Edit": "Edit",
-    "Refresh'":"Refresh",
+    "Refresh":"Refresh",
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
     "Rename":"Rename",
     "Confirm":"Confirm",
-    "Prompt":"Prompt"
+    "Prompt":"Prompt",
+    "SelectOne":"Select One"
   },
   "Dialogs":{
     "FileBrowser":{
@@ -44,6 +45,11 @@
     "NameInUse":"Name is already in use"
   },
   "Flow": {
+    "ErrorMessages":{
+      "NoParts":"No flow parts specific, you must have some parts to save a flow",
+      "NoInput":"No input node specific, each flow needs one input node",
+      "TooManyInputNodes":"You can only have one input node"
+    },
     "Parts": {
       "FileExtension": {
         "Fields": {
@@ -57,8 +63,10 @@
     "Flow": {
       "Title": "Flow",
       "Labels":{
-        "NewFlow":"Flow: New",
         "EditFlow":"Flow: {Name}"
+      },
+      "Messages":{
+        "Cancel":"Are you sure you want to cancel and discard all changes?"
       }
     },
     "Flows":{
@@ -68,15 +76,19 @@
       "Title": "Home"
     },
     "Libraries": {
-      "Title": "Libraries"
+      "Title": "Libraries",
+      "ErrorMessages":{
+        "NoFlows":"There are no flows configured.\nCreate a flow before adding or updating a library."
+      }
     },
     "Library":{
       "Fields":{
         "Name":"Name",
         "Path":"Path",
         "Enabled":"Enabled",
+        "Flow":"Flow",
         "Filter":"Filter",
-        "Filter-Help":"An optional filter regular expression to run against matching files.\nExample: ^\\.(mp4|mkv|avi|mpg|mov)$"
+        "Filter-Help":"An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$"
       }
     },
     "LibraryFiles": {

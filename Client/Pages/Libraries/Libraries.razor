@@ -37,9 +37,10 @@
                                 Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Library" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="Library" Property="Name" Title="Name" Width="14rem" />
                     <RadzenDataGridColumn TItem="Library" Property="Path" Title="Path" />
-                    <RadzenDataGridColumn TItem="Library" Property="Enabled" Title="Enabled">
+                    <RadzenDataGridColumn TItem="Library" Property="Flow.Name" Title="Flow" Width="14rem" />
+                    <RadzenDataGridColumn TItem="Library" Property="Enabled" Title="Enabled" Width="14rem">
                         <Template Context="item">
                             <div class="switch-wrapper">
                                 <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />

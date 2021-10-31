@@ -68,7 +68,7 @@
                                 case FormInputType.Select:
                                     {
                                         var value = GetValue<object>(field.Name, "");
-                                        var options = GetParameter<List<FileFlow.Client.Models.ListOption>>(field, "Options");
+                                        var options = GetParameter<List<FileFlow.Plugin.ListOption>>(field, "Options");
                                         <InputSelect Label="@label" Value="@value" Options=@options
                             ValueChanged="@(x => UpdateValue(field.Name, x))" />
                                     }

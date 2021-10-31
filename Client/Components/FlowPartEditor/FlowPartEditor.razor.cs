@@ -43,7 +43,6 @@ namespace FileFlow.Client.Components
             this.Icon = Helpers.FlowHelper.GetFlowPartIcon(part.Type);
             this.Visible = true;
             this.Model = part.Model ?? element.Model ?? new ExpandoObject();
-            Logger.Instance.DLog("model", this.Model);
             this.StateHasChanged();
             return OpenTask.Task;
         }
@@ -94,15 +93,7 @@ namespace FileFlow.Client.Components
             var valueType = value.GetType();
             try
             {
-                if (typeof(T).IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
-                {
-
-                    // we have a list, we want to make it an array
-                    var converted = FileFlow.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
-                    return (T)converted;
-                }
-
-                return (T)Convert.ChangeType(value, typeof(T));
+                return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), value);
             }
             catch (Exception ex)
             {

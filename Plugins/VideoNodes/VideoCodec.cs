@@ -4,7 +4,6 @@ namespace FileFlow.VideoNodes
     using System.ComponentModel;
     using FileFlow.Plugin;
     using FileFlow.Plugin.Attributes;
-    using FFMpegCore;
 
     public class VideoCodec : VideoNode
     {
@@ -17,21 +16,21 @@ namespace FileFlow.VideoNodes
 
         public override int Execute(NodeParameters args)
         {
-            var mediaInfo = GetMediaInfo(args);
-            if(mediaInfo == null)
-                return -1;                
+            var videoInfo = GetVideoInfo(args);
+            if (videoInfo == null)
+                return -1;
 
-            var codec = mediaInfo.VideoStreams.FirstOrDefault(x => Codecs.Contains(x.CodecName.ToLower()));
+            var codec = videoInfo.VideoStreams.FirstOrDefault(x => Codecs.Contains(x.Codec.ToLower()));
             if (codec != null)
             {
-                args.Logger.ILog($"Matching video codec found[{codec.Index}]: {codec.CodecName}");
+                args.Logger.ILog($"Matching video codec found[{codec.Index}]: {codec.Codec}");
                 return 1;
             }
 
-            var acodec = mediaInfo.AudioStreams.FirstOrDefault(x => Codecs.Contains(x.CodecName.ToLower()));
+            var acodec = videoInfo.AudioStreams.FirstOrDefault(x => Codecs.Contains(x.Codec.ToLower()));
             if (acodec != null)
             {
-                args.Logger.ILog($"Matching audio codec found[{acodec.Index}]: {acodec.CodecName}, language: {acodec.Language}");
+                args.Logger.ILog($"Matching audio codec found[{acodec.Index}]: {acodec.Codec}, language: {acodec.Language}");
                 return 1;
             }
 

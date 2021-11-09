@@ -9,7 +9,20 @@ namespace FileFlow.Server.Workers
     public class FlowWorker : Worker
     {
 
-        public FlowWorker() : base(ScheduleType.Second, 5) { }
+        public static readonly List<FlowWorker> RegisteredFlowWorkers = new List<FlowWorker>();
+
+        public readonly FlowWorkerStatus Status = new FlowWorkerStatus();
+
+        public FlowLogger CurrentFlowLogger { get; private set; }
+
+        public readonly Guid Uid = Guid.NewGuid();
+        private FlowExecutor Executor;
+
+        public FlowWorker() : base(ScheduleType.Second, 5)
+        {
+            this.Status.Uid = this.Uid;
+            RegisteredFlowWorkers.Add(this);
+        }
 
 
         private static Mutex mutex = new Mutex();
@@ -36,6 +49,13 @@ namespace FileFlow.Server.Workers
             }
         }
 
+        internal async Task Abort()
+        {
+            if (Executor != null)
+            {
+                await Executor.Cancel();
+            }
+        }
 
         protected override void Execute()
         {
@@ -62,14 +82,33 @@ namespace FileFlow.Server.Workers
                 Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
                 libFile.ProcessingStarted = System.DateTime.Now;
                 DbHelper.Update(libFile);
-                var executor = new FlowExecutor();
-                executor.Logger = new FlowLogger
+                this.Status.CurrentFile = libFile.Name;
+                this.Status.TotalParts = flow.Parts.Count;
+                this.Status.CurrentPart = 0;
+                this.Status.CurrentPartPercent = 0;
+                this.Status.CurrentPartName = string.Empty;
+                Executor = new FlowExecutor();
+                CurrentFlowLogger = new FlowLogger
                 {
                     File = libFile
                 };
-                executor.Flow = flow;
-                var task = executor.Run(file.FullName);
-                task.Wait();
+                Executor.Logger = CurrentFlowLogger;
+                Executor.Flow = flow;
+                Executor.OnPartPercentageUpdate += OnPartPercentageUpdate;
+                Executor.OnStepChange += OnStepChange;
+                Task<Plugin.NodeParameters> task = null;
+                try
+                {
+                    task = Executor.Run(file.FullName);
+                    task.Wait();
+                }
+                finally
+                {
+                    Executor.OnPartPercentageUpdate -= OnPartPercentageUpdate;
+                    Executor.OnStepChange -= OnStepChange;
+                    Executor = null;
+                }
+                Logger.Instance.DLog("FlowWorker.Executor.Status: " + task.Result.Result);
                 libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
                 libFile.OutputPath = task.Result.OutputFile;
                 libFile.ProcessingEnded = System.DateTime.Now;
@@ -77,12 +116,29 @@ namespace FileFlow.Server.Workers
             }
             finally
             {
+                this.Status.CurrentFile = string.Empty;
+                this.Status.TotalParts = 0;
+                this.Status.CurrentPart = 0;
+                this.Status.CurrentPartPercent = 0;
+                this.Status.CurrentPartName = string.Empty;
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(1_000);
                     Trigger();
                 });
             }
+        }
+
+
+        private void OnPartPercentageUpdate(float percentage)
+        {
+            this.Status.CurrentPartPercent = percentage;
+        }
+
+        private void OnStepChange(int currentStep, string stepName)
+        {
+            this.Status.CurrentPart = currentStep;
+            this.Status.CurrentPartName = stepName;
         }
     }
 }

@@ -12,22 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="FFMpegCore">
-      <HintPath>FFMpegCore.dll</HintPath>
-    </Reference>
     <PackageReference Include="Instances" Version="1.6.0" />
-    <!--
-    <PackageReference Include="FFMpegCore" Version="4.5.0" />
-    -->
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="VideoNodes.en.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>  
-    <Content Include="FFMpegCore.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

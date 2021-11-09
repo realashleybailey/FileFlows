@@ -92,6 +92,18 @@ namespace FileFlow.Server.Workers
             Logger.Instance.DLog("Finished scanning libraries");
         }
 
+        internal static void ResetProcessing()
+        {
+            var processing = DbHelper.Select<LibraryFile>()
+                                     .Where(x => x.Status == FileStatus.Processing);
+            foreach (var p in processing)
+            {
+                p.Status = FileStatus.Unprocessed;
+                p.Log = "";
+                DbHelper.Update(p);
+            }
+        }
+
         private bool CanAccess(FileInfo file)
         {
             try

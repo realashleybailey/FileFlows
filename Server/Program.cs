@@ -32,6 +32,8 @@ FileFlow.Shared.Logger.Instance = FileFlow.Server.Logger.Instance;
 
 FileFlow.Server.Helpers.PluginHelper.ScanForPlugins();
 
+FileFlow.Server.Workers.LibraryWorker.ResetProcessing();
+
 FileFlow.Server.Workers.Worker.StartWorkers();
 app.Run();
 FileFlow.Server.Workers.Worker.StopWorkers();

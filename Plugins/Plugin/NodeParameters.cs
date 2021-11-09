@@ -16,6 +16,8 @@ namespace FileFlow.Plugin
         public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
 
         public Func<string, string> GetToolPath { get; set; }
+
+        public Action<float> PartPercentageUpdate { get; set; }
     }
 
 

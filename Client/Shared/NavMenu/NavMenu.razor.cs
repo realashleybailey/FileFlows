@@ -16,7 +16,7 @@ namespace FileFlow.Client.Shared
         private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
         protected override void OnInitialized()
         {
-            MenuItems.Add(new NavMenuItem("Pages.Home.Title", "fas fa-home", ""));
+            MenuItems.Add(new NavMenuItem("Pages.Dashboard.Title", "fas fa-home", ""));
             MenuItems.Add(new NavMenuItem("Pages.LibraryFiles.Title", "fas fa-copy", "library-files"));
             MenuItems.Add(new NavMenuItem("Pages.Flows.Title", "fas fa-project-diagram", "flows"));
             MenuItems.Add(new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"));

@@ -9,7 +9,7 @@ namespace FileFlow.Server.Workers
 
     public class FlowLogger : ILogger
     {
-        StringBuilder log = new StringBuilder();
+        List<string> log = new List<string>();
         public void DLog(params object[] args) => Log(LogType.Debug, args);
         public void ELog(params object[] args) => Log(LogType.Error, args);
         public void ILog(params object[] args) => Log(LogType.Info, args);
@@ -30,16 +30,26 @@ namespace FileFlow.Server.Workers
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
-            log.AppendLine(message);
+            log.Add(message);
             Console.WriteLine(message);
 
             if (File != null)
             {
-                File.Log = log.ToString();
+                File.Log = this.ToString();
                 DbHelper.Update(File);
             }
         }
 
-        public override string ToString() => log.ToString();
+        internal string GetPreview()
+        {
+            lock (log)
+            {
+                if (log.Count > 50)
+                    return String.Join(Environment.NewLine, log.Skip(log.Count - 50));
+                return String.Join(Environment.NewLine, log);
+            }
+        }
+
+        public override string ToString() => String.Join(Environment.NewLine, log);
     }
 }

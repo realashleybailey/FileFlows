@@ -14,6 +14,7 @@
     "Add": "Add",
     "Edit": "Edit",
     "Refresh":"Refresh",
+    "Log":"Log",
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
@@ -60,6 +61,18 @@
     }
   },
   "Pages": {
+    "Dashboard":{
+      "Title":"Home",
+      "ErrorMessages":{
+        "LogFailed":"Failed to retrieve log for worker"
+      },
+      "Messages":{
+        "CancelMesssage":"Are you sure you want to cancel the worker for {CurrentFile}?"
+      },
+      "Fields":{
+        "Log":"Log"
+      }
+    },
     "Flow": {
       "Title": "Flow",
       "Labels":{
@@ -71,9 +84,6 @@
     },
     "Flows":{
       "Title":"Flows"
-    },
-    "Home": {
-      "Title": "Home"
     },
     "Libraries": {
       "Title": "Libraries",

@@ -2,16 +2,11 @@ namespace FileFlow.VideoNodes
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
-    using FFMpegCore;
-    using FFMpegCore.Enums;
     using FileFlow.Plugin;
     using FileFlow.Plugin.Attributes;
 
-    public class VideoH265AC3 : VideoNode
+    public class VideoH265AC3 : EncodingNode
     {
-        public override int Outputs => 2;
-        public override int Inputs => 1;
-        public override FlowElementType Type => FlowElementType.Process;
 
         [DefaultValue("eng")]
         [Text(1)]
@@ -27,23 +22,26 @@ namespace FileFlow.VideoNodes
         [NumberInt(4)]
         public int Threads { get; set; }
 
+        private NodeParameters args;
+
         public override int Execute(NodeParameters args)
         {
+            this.args = args;
             try
             {
-                IMediaAnalysis mediaInfo = GetMediaInfo(args);
-                if (mediaInfo == null)
+                VideoInfo videoInfo = GetVideoInfo(args);
+                if (videoInfo == null)
                     return -1;
 
                 Language = Language?.ToLower() ?? "";
 
                 // ffmpeg is one based for stream index, so video should be 1, audio should be 2
 
-                var videoH265 = mediaInfo.VideoStreams.FirstOrDefault(x => Regex.IsMatch(x.CodecName ?? "", @"^(hevc|h(\.)?265)$", RegexOptions.IgnoreCase));
-                var videoTrack = videoH265 ?? mediaInfo.VideoStreams[0];
+                var videoH265 = videoInfo.VideoStreams.FirstOrDefault(x => Regex.IsMatch(x.Codec ?? "", @"^(hevc|h(\.)?265)$", RegexOptions.IgnoreCase));
+                var videoTrack = videoH265 ?? videoInfo.VideoStreams[0];
                 args.Logger.ILog("Video: ", videoTrack);
 
-                var bestAudio = mediaInfo.AudioStreams.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains("commentary") == false)
+                var bestAudio = videoInfo.AudioStreams.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains("commentary") == false)
                 .OrderBy(x =>
                 {
                     if (Language != string.Empty)
@@ -61,7 +59,7 @@ namespace FileFlow.VideoNodes
                 .ThenBy(x => x.Index)
                 .FirstOrDefault();
 
-                bool firstAc3 = bestAudio?.CodecName?.ToLower() == "ac3" && mediaInfo.AudioStreams[0] == bestAudio;
+                bool firstAc3 = bestAudio?.Codec?.ToLower() == "ac3" && videoInfo.AudioStreams[0] == bestAudio;
                 args.Logger.ILog("Best Audio: ", (object)bestAudio ?? (object)"null");
 
                 if (firstAc3 == true && videoH265 != null)
@@ -70,44 +68,36 @@ namespace FileFlow.VideoNodes
                     return 2;
                 }
 
-                string ffmpegPath = GetFFMpegPath(args);
-                if (string.IsNullOrEmpty(ffmpegPath))
+                string ffmpegExe = GetFFMpegExe(args);
+                if (string.IsNullOrEmpty(ffmpegExe))
                     return -1;
 
 
-                GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegPath);
-                var ffmpeg = FFMpegArguments.FromFileInput(args.WorkingFile)
-                                            .OutputToFile(args.OutputFile, true, options =>
-                                            {
-                                                if (NvidiaEncoding == false && Threads > 0)
-                                                    options.WithCustomArgument($"-threads {Math.Min(Threads, 16)}");
-                                                if (videoH265 == null)
-                                                    options.WithCustomArgument($"-map 0:v:0 -c:v {(NvidiaEncoding ? "hevc_nvenc -preset hq" : "libx265")} -crf " + (Crf > 0 ? Crf : 21));
-                                                else
-                                                    options.WithCustomArgument($"-map 0:v:0 -c:v copy");
+                List<string> ffArgs = new List<string>();
 
-                                                if (bestAudio.CodecName.ToLower() != "ac3")
-                                                    options.WithCustomArgument($"-map 0:{bestAudio.Index} -c:a ac3");
-                                                else
-                                                    options.WithCustomArgument($"-map 0:{bestAudio.Index} -c:a copy");
+                if (NvidiaEncoding == false && Threads > 0)
+                    ffArgs.Add($"-threads {Math.Min(Threads, 16)}");
+                if (videoH265 == null)
+                    ffArgs.Add($"-map 0:v:0 -c:v {(NvidiaEncoding ? "hevc_nvenc -preset hq" : "libx265")} -crf " + (Crf > 0 ? Crf : 21));
+                else
+                    ffArgs.Add($"-map 0:v:0 -c:v copy");
 
-                                                if (Language != string.Empty)
-                                                    options.WithCustomArgument($"-map 0:s:m:language:{Language}? -c:s copy");
-                                                else
-                                                    options.WithCustomArgument($"-map 0:s? -c:s copy");
-                                            });
+                TotalTime = videoInfo.VideoStreams[0].Duration;
 
-                args.Logger.ILog(new string('=', ("FFMpeg.Arguments: " + ffmpeg.Arguments).Length));
-                args.Logger.ILog("FFMpeg.Arguments: " + ffmpeg.Arguments);
-                args.Logger.ILog(new string('=', ("FFMpeg.Arguments: " + ffmpeg.Arguments).Length));
+                if (bestAudio.Codec.ToLower() != "ac3")
+                    ffArgs.Add($"-map 0:{bestAudio.Index} -c:a ac3");
+                else
+                    ffArgs.Add($"-map 0:{bestAudio.Index} -c:a copy");
 
+                if (Language != string.Empty)
+                    ffArgs.Add($"-map 0:s:m:language:{Language}? -c:s copy");
+                else
+                    ffArgs.Add($"-map 0:s? -c:s copy");
 
-                //ffmpeg.NotifyOnProgress((time) => args.Logger.ILog($"INFO: Record: Progress: {time}"));
-                ffmpeg.NotifyOnOutput((str, type) =>
-                {
-                    args.Logger.ILog($"INFO: Output: {str}");
-                });
-                ffmpeg.ProcessSynchronously();
+                string ffArgsLine = string.Join(" ", ffArgs);
+
+                Encode(args, ffmpegExe, ffArgsLine);
+
                 if (File.Exists(args.OutputFile))
                     args.WorkingFile = args.OutputFile;
                 return 1;

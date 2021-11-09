@@ -8,10 +8,6 @@ namespace FileFlow.VideoNodes
         public string Name => "Video Nodes";
 
         [Required]
-        [File(1, "exe")]
-        public string HandBrakeCli { get; set; }
-
-        [Required]
         [File(2, "exe")]
         public string FFProbeExe { get; set; }
 

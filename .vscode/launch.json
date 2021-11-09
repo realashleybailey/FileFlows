@@ -77,11 +77,11 @@
     "compounds": [
       {
         "name": "Server/Client Watch",
-        "configurations": ["Server Watch", "Client Watch"]
+        "configurations": ["Client Watch", "Server Watch"]
       },
       {
         "name": "Server/Client Debug",
-        "configurations": ["Server Build", "Client Watch"]
+        "configurations": ["Client Watch", "Server Build"]
       }
     ] 
 }

@@ -32,5 +32,11 @@ namespace FileFlow.Plugin
                 return 1;
             return -1;
         }
+
+        /// <summary>
+        /// Cancels the node
+        /// </summary>
+        /// <returns>cancels the node</returns>
+        public virtual Task Cancel() => Task.CompletedTask;
     }
 }

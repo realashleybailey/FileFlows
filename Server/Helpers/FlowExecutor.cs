@@ -10,6 +10,15 @@ namespace FileFlow.Server.Helpers
 
         public ILogger Logger { get; set; }
 
+        public delegate void PartPercentageUpdate(float percentage);
+        public event PartPercentageUpdate OnPartPercentageUpdate;
+
+        public delegate void StepChange(int currentStep, string stepName);
+
+        public event StepChange OnStepChange;
+
+        public Node CurrentNode;
+
         public Task<NodeParameters> Run(string input)
         {
             return Task.Run(() =>
@@ -17,6 +26,9 @@ namespace FileFlow.Server.Helpers
                 var args = new NodeParameters();
                 args.FileName = input;
                 args.WorkingFile = input;
+
+                args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
+
                 var fiInput = new System.IO.FileInfo(input);
                 args.OutputFile = @"D:\videos\processed\" + fiInput.Name.Replace(fiInput.Extension, ".mkv");
                 args.Result = NodeResult.Success;
@@ -30,19 +42,37 @@ namespace FileFlow.Server.Helpers
                 if (part == null)
                     return args; // no node to execute
 
+                int step = 0;
+                if (OnStepChange != null)
+                    OnStepChange(step, part.Name);
+
                 while (flowCompleted == false && count < 20)
                 {
                     try
                     {
+
                         args.Logger.DLog("Executing part:" + part.Name);
-                        var node = NodeHelper.LoadNode(part);
-                        args.Logger.DLog("node: " + node);
-                        int output = node.Execute(args);
+                        CurrentNode = NodeHelper.LoadNode(part);
+
+                        ++step;
+                        if (OnStepChange != null)
+                            OnStepChange(step, CurrentNode.Name);
+
+                        args.Logger.DLog("node: " + CurrentNode);
+                        int output = CurrentNode.Execute(args);
+                        if (CurrentNode == null)
+                        {
+                            // happens when canceled    
+                            args.Logger.ELog("node was canceled error code:", CurrentNode);
+                            args.Result = NodeResult.Failure;
+                            flowCompleted = true;
+                            break;
+                        }
                         args.Logger.DLog("output: " + output);
                         if (output == -1)
                         {
                             // the execution failed                     
-                            args.Logger.ELog("node returned error code:", node);
+                            args.Logger.ELog("node returned error code:", CurrentNode);
                             args.Result = NodeResult.Failure;
                             flowCompleted = true;
                             break;
@@ -77,6 +107,16 @@ namespace FileFlow.Server.Helpers
 
                 return args;
             });
+        }
+
+        public async Task Cancel()
+        {
+            if (CurrentNode != null)
+            {
+                var cn = CurrentNode;
+                CurrentNode = null;
+                await cn.Cancel();
+            }
         }
     }
 }

@@ -159,7 +159,15 @@ namespace FileFlow.Client.Components
             var val = dict[parameter];
             if (val == null)
                 return default(T);
-            return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), val);
+            try
+            {
+                return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), val);
+            }
+            catch (Exception)
+            {
+                Logger.Instance.ELog("Failed converted: " + parameter, val);
+                return default(T);
+            }
         }
 
         private T GetValue<T>(string field, T @default = default(T))

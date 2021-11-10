@@ -29,6 +29,11 @@ namespace FileFlow.Shared
             if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
                 return ChangeListToArray(type.GetElementType(), (IEnumerable)value, valueType);
 
+
+            // not used yet, so not tested
+            // if (valueType.IsArray && typeof(IEnumerable).IsAssignableFrom(type))
+            //     return ChangeArrayToList(type.GetElementType(), (Array)value);
+
             if (valueType == typeof(Int64) && type == typeof(Int32))
                 return Convert.ToInt32(value);
             return Convert.ChangeType(value, type);
@@ -41,6 +46,7 @@ namespace FileFlow.Shared
         }
         public static object ChangeListToArray(Type arrayType, IEnumerable value, Type valueType)
         {
+            Logger.Instance.DLog("Change list to array");
             List<object> list = new List<object>();
             foreach (var o in value)
                 list.Add(o);
@@ -49,5 +55,14 @@ namespace FileFlow.Shared
                 array.SetValue(list[i], i);
             return array;
         }
+        // public static object ChangeArrayToList(Type listType, Array array)
+        // {
+        //     var genericListType = typeof(List<>).MakeGenericType(listType);
+        //     var genericList = Activator.CreateInstance(genericListType);
+        //     var addMethod = genericList.GetType().GetMethod("Add", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        //     foreach (var o in array)
+        //         addMethod.Invoke(genericList, new object[] { o });
+        //     return genericList;
+        // }
     }
 }

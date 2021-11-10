@@ -6,3 +6,6 @@ obj/
 bin/
 Server/Plugins/
 VideoTests/*
+zpublish/*
+wpublish/*
+dockerbuild.ps1

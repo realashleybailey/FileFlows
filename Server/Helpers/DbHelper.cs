@@ -14,8 +14,11 @@ namespace FileFlow.Server.Helpers
         private static IDatabase GetDb()
         {
 
-            if (!File.Exists("Data/FileFlow.sqlite"))
+            if (File.Exists("Data/FileFlow.sqlite") == false)
             {
+                if (Directory.Exists("Data") == false)
+                    Directory.CreateDirectory("Data");
+
                 SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
 
                 string sql = @$"CREATE TABLE {nameof(DbObject)}(

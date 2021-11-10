@@ -65,7 +65,7 @@ namespace FileFlow.Client.Pages
                 InputType = FileFlow.Plugin.FormInputType.Select,
                 Name = nameof(library.Flow),
                 Parameters = new Dictionary<string, object>{
-                    { "Options", flowOptions }
+                    { "Options", flowOptions.ToList() }
                 }
             });
             fields.Add(new ElementField

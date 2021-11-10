@@ -79,6 +79,9 @@ namespace FileFlow.Server.Helpers
         public static List<PluginInfo> GetPlugins()
         {
             List<PluginInfo> results = new List<PluginInfo>();
+            if (Directory.Exists("Plugins") == false)
+                Directory.CreateDirectory("Plugins");
+
             foreach (var dll in new DirectoryInfo("Plugins").GetFiles("*.dll"))
             {
                 Logger.Instance.DLog("Checking dll: " + dll.Name);

@@ -68,17 +68,21 @@ namespace FileFlow.Server.Controllers
         public string LanguageFile([FromQuery] string langCode = "en")
         {
             var json = "{}";
-            foreach (var jf in Directory.GetFiles("plugins", "*.json"))
+            try
             {
-                if (jf.Contains(".deps."))
-                    continue;
-                try
+                foreach (var jf in Directory.GetFiles("plugins", "*.json"))
                 {
-                    string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
-                    json = updated;
+                    if (jf.Contains(".deps."))
+                        continue;
+                    try
+                    {
+                        string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
+                        json = updated;
+                    }
+                    catch (Exception) { }
                 }
-                catch (Exception) { }
             }
+            catch (Exception) { }
             return json;
         }
     }

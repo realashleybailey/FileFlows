@@ -67,10 +67,18 @@
         "LogFailed":"Failed to retrieve log for worker"
       },
       "Messages":{
-        "CancelMesssage":"Are you sure you want to cancel the worker for {CurrentFile}?"
+        "CancelMesssage":"Are you sure you want to cancel the worker for {CurrentFile}?",
+        "Waiting":"Waiting for a file to process"
       },
       "Fields":{
-        "Log":"Log"
+        "Log":"Log",
+        "CurrentStep":"Step",
+        "File":"File",
+        "Overall":"Overall",
+        "Current":"Current",
+        "ProcessingTime":"Processing Time",
+        "Upcoming":"Upcoming",
+        "RecentlyFinished":"Recently Finished"
       }
     },
     "Flow": {

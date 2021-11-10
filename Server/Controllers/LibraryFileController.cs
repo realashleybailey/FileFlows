@@ -18,6 +18,22 @@ namespace FileFlow.Server.Controllers
                            .Select(x => { x.Log = ""; return x; });
         }
 
+        [HttpGet("upcoming")]
+        public IEnumerable<LibraryFile> Upcoming([FromQuery] FileStatus? status)
+        {
+            return GetAll(FileStatus.Unprocessed).Take(5);
+        }
+
+        [HttpGet("recently-finished")]
+        public IEnumerable<LibraryFile> RecentlyFinished([FromQuery] FileStatus? status)
+        {
+            return DbHelper.Select<LibraryFile>()
+                           .Where(x => x.Status == FileStatus.Processed)
+                           .OrderByDescending(x => x.ProcessingEnded)
+                           .Take(5)
+                           .Select(x => { x.Log = ""; return x; });
+        }
+
         [HttpGet("status")]
         public IEnumerable<LibraryStatus> GetStatus()
         {
@@ -32,6 +48,13 @@ namespace FileFlow.Server.Controllers
         {
             return DbHelper.Single<LibraryFile>(uid);
         }
+
+        [HttpGet("{uid}/log")]
+        public string GetLog(Guid uid)
+        {
+            return DbHelper.Single<LibraryFile>(uid)?.Log ?? "";
+        }
+
         [HttpDelete]
         public void Delete([FromBody] DeleteModel model)
         {

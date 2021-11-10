@@ -18,14 +18,15 @@ namespace FileFlow.VideoNodes
 
         private FFMpegEncoder Encoder;
 
-        protected void Encode(NodeParameters args, string ffmpegExe, string ffmpegParameters)
+        protected bool Encode(NodeParameters args, string ffmpegExe, string ffmpegParameters)
         {
             this.args = args;
             Encoder = new FFMpegEncoder(ffmpegExe, args.Logger);
             Encoder.AtTime += AtTimeEvent;
-            Encoder.Encode(args.WorkingFile, args.OutputFile, ffmpegParameters);
+            bool success = Encoder.Encode(args.WorkingFile, args.OutputFile, ffmpegParameters);
             Encoder.AtTime -= AtTimeEvent;
             Encoder = null;
+            return success;
         }
 
         public override Task Cancel()
@@ -40,7 +41,6 @@ namespace FileFlow.VideoNodes
             if (TotalTime.TotalMilliseconds == 0)
                 return;
             float percent = (float)((time.TotalMilliseconds / TotalTime.TotalMilliseconds) * 100);
-            args.Logger.ILog("At Time: " + time + ", percent: " + percent);
             args.PartPercentageUpdate(percent);
         }
     }

@@ -96,7 +96,8 @@ namespace FileFlow.VideoNodes
 
                 string ffArgsLine = string.Join(" ", ffArgs);
 
-                Encode(args, ffmpegExe, ffArgsLine);
+                if (Encode(args, ffmpegExe, ffArgsLine) == false)
+                    return -1;
 
                 if (File.Exists(args.OutputFile))
                     args.WorkingFile = args.OutputFile;

@@ -87,6 +87,7 @@ namespace FileFlow.Server.Workers
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;
                 this.Status.CurrentPartName = string.Empty;
+                this.Status.StartedAt = DateTime.Now;
                 Executor = new FlowExecutor();
                 CurrentFlowLogger = new FlowLogger
                 {
@@ -121,6 +122,7 @@ namespace FileFlow.Server.Workers
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;
                 this.Status.CurrentPartName = string.Empty;
+                this.Status.StartedAt = new DateTime(1970, 1, 1);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(1_000);

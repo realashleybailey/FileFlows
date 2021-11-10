@@ -155,23 +155,11 @@ namespace FileFlow.Client.Components
         {
             var dict = field?.Parameters as IDictionary<string, object>;
             if (dict?.ContainsKey(parameter) != true)
-            {
                 return default(T);
-            }
             var val = dict[parameter];
             if (val == null)
                 return default(T);
             return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), val);
-            // if (val.GetType() != typeof(T))
-            // {
-            //     try
-            //     {
-            //         string json = System.Text.Json.JsonSerializer.Serialize(val);
-            //         val = System.Text.Json.JsonSerializer.Deserialize<T>(json);
-            //     }
-            //     catch (Exception) { return default(T); }
-            // }
-            // return (T)val;
         }
 
         private T GetValue<T>(string field, T @default = default(T))

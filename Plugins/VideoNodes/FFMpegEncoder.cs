@@ -26,7 +26,7 @@ namespace FileFlow.VideoNodes
             this.Logger = logger;
         }
 
-        public void Encode(string input, string output, string arguments)
+        public bool Encode(string input, string output, string arguments)
         {
             // -y means it will overwrite a file if output already exists
             arguments = $"-i \"{input}\" -y {arguments} \"{output}\"";
@@ -37,6 +37,8 @@ namespace FileFlow.VideoNodes
 
             var task = ExecuteShellCommand(ffMpegExe, arguments, 0);
             task.Wait();
+            Logger.ILog("Exit Code: " + task.Result.ExitCode);
+            return task.Result.ExitCode == 0; // exitcode 0 means it was successful
         }
 
         internal void Cancel()
@@ -151,15 +153,15 @@ namespace FileFlow.VideoNodes
             {
                 outputCloseEvent.SetResult(true);
             }
-            else if (rgxTime.IsMatch(e.Data))
-            {
-                var timeString = rgxTime.Match(e.Data).Value;
-                var ts = TimeSpan.Parse(timeString);
-                if (AtTime != null)
-                    AtTime.Invoke(ts);
-            }
             else
             {
+                if (rgxTime.IsMatch(e.Data))
+                {
+                    var timeString = rgxTime.Match(e.Data).Value;
+                    var ts = TimeSpan.Parse(timeString);
+                    if (AtTime != null)
+                        AtTime.Invoke(ts);
+                }
                 Logger.ILog(e.Data);
                 outputBuilder.AppendLine(e.Data);
             }
@@ -172,23 +174,22 @@ namespace FileFlow.VideoNodes
             {
                 errorCloseEvent.SetResult(true);
             }
-            else if (rgxTime.IsMatch(e.Data))
-            {
-                var timeString = rgxTime.Match(e.Data).Value;
-                var ts = TimeSpan.Parse(timeString);
-                if (AtTime != null)
-                    AtTime.Invoke(ts);
-            }
-            else if (e.Data.StartsWith("frame="))
-            {
-                // for some reason this comes in as the error...
-                Logger.ILog(e.Data);
-                outputBuilder.AppendLine(e.Data);
-            }
-            else
+            else if (e.Data.ToLower().Contains("failed") || e.Data.Contains("No capable devices found") || e.Data.ToLower().Contains("error"))
             {
                 Logger.ELog(e.Data);
                 errorBuilder.AppendLine(e.Data);
+            }
+            else
+            {
+                if (rgxTime.IsMatch(e.Data))
+                {
+                    var timeString = rgxTime.Match(e.Data).Value;
+                    var ts = TimeSpan.Parse(timeString);
+                    if (AtTime != null)
+                        AtTime.Invoke(ts);
+                }
+                Logger.ILog(e.Data);
+                outputBuilder.AppendLine(e.Data);
             }
         }
 

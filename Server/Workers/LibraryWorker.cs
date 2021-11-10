@@ -114,7 +114,7 @@ namespace FileFlow.Server.Workers
 
                 return true;
             }
-            catch (IOException)
+            catch (Exception)
             {
                 return false;
             }

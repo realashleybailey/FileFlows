@@ -19,6 +19,9 @@ namespace FileFlow.Client.Pages
         const string ApIUrl = "/api/worker";
         private bool Refreshing = false;
         public readonly List<FlowWorkerStatus> Workers = new List<FlowWorkerStatus>();
+
+        public readonly List<LibraryFile> Upcoming = new List<LibraryFile>();
+        public readonly List<LibraryFile> Finished = new List<LibraryFile>();
         private bool _needsRendering = false;
 
         [Inject] private IJSRuntime jSRuntime { get; set; }
@@ -28,7 +31,7 @@ namespace FileFlow.Client.Pages
 
         private IJSObjectReference jsFunctions;
 
-        private string lblLog, lblCancel;
+        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished;
         private Timer AutoRefreshTimer;
         protected override async Task OnInitializedAsync()
         {
@@ -39,6 +42,14 @@ namespace FileFlow.Client.Pages
             AutoRefreshTimer.Start();
             lblLog = Translater.Instant("Labels.Log");
             lblCancel = Translater.Instant("Labels.Cancel");
+            lblWaiting = Translater.Instant("Pages.Dashboard.Messages.Waiting");
+            lblCurrentStep = Translater.Instant("Pages.Dashboard.Fields.CurrentStep");
+            lblFile = Translater.Instant("Pages.Dashboard.Fields.File");
+            lblOverall = Translater.Instant("Pages.Dashboard.Fields.Overall");
+            lblCurrent = Translater.Instant("Pages.Dashboard.Fields.Current");
+            lblProcessingTime = Translater.Instant("Pages.Dashboard.Fields.ProcessingTime");
+            lblUpcoming = Translater.Instant("Pages.Dashboard.Fields.Upcoming");
+            lblRecentlyFinished = Translater.Instant("Pages.Dashboard.Fields.RecentlyFinished");
             jsFunctions = await jSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Dashboard.js");
             await this.Refresh();
         }
@@ -47,6 +58,8 @@ namespace FileFlow.Client.Pages
         public void Dispose()
         {
             Logger.Instance.DLog("Disposing the dashboard!");
+            if (jsFunctions != null)
+                _ = jsFunctions.InvokeVoidAsync("DestroyAllCharts", this.Workers);
             if (AutoRefreshTimer != null)
             {
                 AutoRefreshTimer.Stop();
@@ -76,10 +89,31 @@ namespace FileFlow.Client.Pages
                     {
                         this.Workers.AddRange(result.Data);
                     }
-                    this.StateHasChanged();
                     await WaitForRender();
-                    await jsFunctions.InvokeVoidAsync("InitChart", this.Workers);
+                    await jsFunctions.InvokeVoidAsync("InitChart", this.Workers, this.lblOverall, this.lblCurrent);
                 }
+
+                var upcomingResult = await HttpHelper.Get<List<LibraryFile>>("/api/library-file/upcoming");
+                if (upcomingResult.Success)
+                {
+                    this.Upcoming.Clear();
+                    if (upcomingResult.Data.Any())
+                        this.Upcoming.AddRange(upcomingResult.Data);
+
+                    this.StateHasChanged();
+                }
+
+                var finishedResult = await HttpHelper.Get<List<LibraryFile>>("/api/library-file/recently-finished");
+                if (finishedResult.Success)
+                {
+                    this.Finished.Clear();
+                    if (finishedResult.Data.Any())
+                        this.Finished.AddRange(finishedResult.Data);
+
+                    this.StateHasChanged();
+                }
+
+
             }
             catch (Exception)
             {
@@ -106,13 +140,20 @@ namespace FileFlow.Client.Pages
             _needsRendering = false;
         }
 
+        private async Task ShowFileInfo(LibraryFile file)
+        {
+            await Helpers.LibraryFileEditor.Open(Blocker, NotificationService, Editor, file);
+
+        }
+
         private async Task LogClicked(FlowWorkerStatus worker)
         {
             Blocker.Show();
             string log = string.Empty;
+            string url = $"{ApIUrl}/{worker.Uid}/log";
             try
             {
-                var logResult = await HttpHelper.Get<string>($"{ApIUrl}/{worker.Uid}/log");
+                var logResult = await HttpHelper.Get<string>(url);
                 if (logResult.Success == false || string.IsNullOrEmpty(logResult.Data))
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("Pages.Dashboard.ErrorMessages.LogFailed"));
@@ -129,7 +170,11 @@ namespace FileFlow.Client.Pages
             fields.Add(new ElementField
             {
                 InputType = FileFlow.Plugin.FormInputType.LogView,
-                Name = "Log"
+                Name = "Log",
+                Parameters = new Dictionary<string, object> {
+                    { nameof(Components.Inputs.InputLogView.RefreshUrl), url },
+                    { nameof(Components.Inputs.InputLogView.RefreshSeconds), 3 },
+                }
             });
 
             await Editor.Open("Pages.Dashboard", worker.CurrentFile, fields, new { Log = log }, large: true, readOnly: true);

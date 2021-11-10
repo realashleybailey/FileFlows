@@ -12,9 +12,6 @@ namespace FileFlow.Client.Components.Inputs
 
         private MonacoEditor CodeEditor { get; set; }
 
-        [Inject]
-        private IJSRuntime jsRuntime { get; set; }
-
 
         private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
         {

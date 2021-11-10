@@ -1,20 +1,93 @@
 @namespace FileFlow.Client.Pages
+@using FileFlow.Shared.Models
 
 @page "/"
 
-@for (int i = 0; i < Workers.Count; i++)
-{
-    var worker = Workers[i];
-    <div class="worker-wrapper">
-        <div class="chart chart-@i"></div>
-        <div class="worker-info">
-            <span class="current">@worker.CurrentFile</span>
-            <span class="status">@worker.Status</span>
-            <span class="current-step">@worker.CurrentPartName</span>
-            <div class="actions">
-                <RadzenButton Click="() => LogClicked(worker)" Text="@lblLog" />
-                <RadzenButton Click="() => CancelClicked(worker)" Text="@lblCancel" />
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <div class="dashboard-wrapper">
+            <div class="dashboard">
+
+                @for (int i = 0; i < Workers.Count; i++)
+                {
+                    var worker = Workers[i];
+                    var waiting = worker.Status == FileFlow.Shared.Models.ProcessStatus.Waiting;
+                    <div class="worker-wrapper @(waiting ? "waiting" : "")">
+                        <div class="chart-wrapper">
+                            <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>
+                        </div>
+                        <div class="worker-info">
+                            @if (waiting)
+                            {
+                                <span class="waiting-icon"><i class="fas fa-bed"></i></span>
+                                <span class="waiting-message">@lblWaiting</span>
+                            }
+                            else
+                            {
+                                <span class="label-value current">
+                                    <span class="label">@lblFile</span>
+                                    <span class="value">@worker.CurrentFile</span>
+                                </span>
+                                <span class="label-value current-step">
+                                    <span class="label">@lblCurrentStep</span>
+                                    <span class="value">@worker.CurrentPartName</span>
+                                </span>
+                                <span class="label-value processing-time">
+                                    <span class="label">@lblProcessingTime</span>
+                                    <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
+                                </span>
+                                <div class="actions-wrapper">
+                                    <div class="actions">
+                                        <RadzenButton Click="() => LogClicked(worker)" Text="@lblLog" />
+                                        <RadzenButton Click="() => CancelClicked(worker)" Text="@lblCancel" />
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (Upcoming.Any())
+                {
+                    <div class="library-files upcoming @(Finished.Any() ? "" : "full-width")">
+                        <div class="title"><span>@lblUpcoming</span></div>
+                        <div class="table-wrapper">
+                            <RadzenDataGrid Data="@Upcoming" TItem="LibraryFile">
+                                <Columns>
+                                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
+                                    Width="20rem" Frozen="true" />
+                                </Columns>
+                            </RadzenDataGrid>
+                        </div>
+                    </div>
+                }
+
+                @if (Finished.Any())
+                {
+                    <div class="library-files finished @(Upcoming.Any() ? "" : "full-width")">
+                        <div class="title"><span>@lblRecentlyFinished</span></div>
+                        <div class="table-wrapper">
+                            <RadzenDataGrid Data="@Finished" TItem="LibraryFile">
+                                <Columns>
+                                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
+                                    Width="20rem" Frozen="true" />
+                                    <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time"
+                                    Width="6rem" FormatString="{0:hh\:mm\:ss}">
+                                        <Template Context="data">
+                                            <a href="" @onclick="@(() => ShowFileInfo(data))"
+                                            @onclick:preventDefault>@data.ProcessingTime.ToString(@"hh\:mm\:ss")</a>
+                                        </Template>
+                                    </RadzenDataGridColumn>
+                                </Columns>
+                            </RadzenDataGrid>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
-    </div>
-}
+    </Body>
+</PageView>

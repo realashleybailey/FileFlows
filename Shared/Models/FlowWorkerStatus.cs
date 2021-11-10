@@ -14,6 +14,10 @@ namespace FileFlow.Shared.Models
         public string CurrentPartName { get; set; }
 
         public float CurrentPartPercent { get; set; }
+
+        public DateTime StartedAt { get; set; }
+
+        public TimeSpan ProcessingTime => StartedAt > new DateTime(2000, 1, 1) ? DateTime.Now.Subtract(StartedAt) : new TimeSpan();
     }
 
     public enum ProcessStatus

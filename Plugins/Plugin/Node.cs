@@ -9,7 +9,7 @@ namespace FileFlow.Plugin
         public virtual int Inputs { get; }
         public virtual int Outputs { get; }
 
-        public string Name => base.GetType().FullName.Substring("FileFlow.Shared.Nodes.".Length);
+        public string Name => base.GetType().Name;
 
         public string Group
         {

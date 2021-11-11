@@ -23,6 +23,12 @@ namespace FileFlow.Server.Workers
 
         protected override void Execute()
         {
+            var settings = DbHelper.Single<Settings>();
+            if (settings?.WorkerScanner != true)
+            {
+                Logger.Instance.DLog("Scanner worker not enabled");
+                return;
+            }
             Logger.Instance.DLog("################### Library worker triggered");
             var libController = new Controllers.LibraryController();
             var libaries = libController.GetAll();
@@ -99,7 +105,6 @@ namespace FileFlow.Server.Workers
             foreach (var p in processing)
             {
                 p.Status = FileStatus.Unprocessed;
-                p.Log = "";
                 DbHelper.Update(p);
             }
         }

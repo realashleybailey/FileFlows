@@ -7,59 +7,89 @@ namespace FileFlow.Server.Helpers
     using System.Data.SQLite;
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
+    using System.Data.Common;
 
     public class DbHelper
     {
+        static bool InitDone;
+
+        static string CreateDBSript =
+            @$"CREATE TABLE {nameof(DbObject)}(
+                Uid             CHAR(36)           NOT NULL          PRIMARY KEY,
+                Name            VARCHAR(255)       NOT NULL,
+                Type            VARCHAR(255)       NOT NULL,
+                DateCreated     datetime           default           current_timestamp,
+                DateModified    datetime           default           current_timestamp,
+                Data            TEXT               NOT NULL
+            );";
 
         private static IDatabase GetDb()
         {
-            bool addFFmpeg = false;
-            if (File.Exists("Data/FileFlow.sqlite") == false)
+            if (Globals.IsDevelopment || true)
             {
-                if (Directory.Exists("Data") == false)
-                    Directory.CreateDirectory("Data");
-
-                SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
-
-                string sql = @$"CREATE TABLE {nameof(DbObject)}(
-                               Uid             CHAR(36)           NOT NULL          PRIMARY KEY,
-                               Name            VARCHAR(255)       NOT NULL,
-                               Type            VARCHAR(255)       NOT NULL,
-                               DateCreated     datetime           default           current_timestamp,
-                               DateModified    datetime           default           current_timestamp,
-                               Data            TEXT               NOT NULL
-                            );";
-                using (var con = new SQLiteConnection("Data Source=Data/FileFlow.sqlite;Version=3;"))
+                if (File.Exists("Data/FileFlow.sqlite") == false)
                 {
-                    con.Open();
-                    using (var cmd = new SQLiteCommand(sql, con))
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
-                    con.Close();
-                }
-                addFFmpeg = true;
-            }
+                    if (Directory.Exists("Data") == false)
+                        Directory.CreateDirectory("Data");
 
-            var db = new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
-            if (addFFmpeg)
+                    SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
+
+                    using (var con = new SQLiteConnection("Data Source=Data/FileFlow.sqlite;Version=3;"))
+                    {
+                        con.Open();
+                        using (var cmd = new SQLiteCommand(CreateDBSript, con))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        con.Close();
+                    }
+                }
+
+                return new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
+            }
+            else if (InitDone == false)
             {
+                var db = new Database("Server=localhost;Uid=root;Pwd=;", null, MySqlConnector.MySqlConnectorFactory.Instance);
+
+                bool exists = db.ExecuteScalar<int>("select schema_name from information_schema.schemata where schema_name = 'FileFlow'") > 0;
+                if (exists)
+                {
+                    InitDone = true;
+                    db.Dispose();
+                    return new Database("Server=localhost;Uid=root;Pwd=password;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+                }
+
+                db.Execute("create database FileFlow");
+                // dispose of original one
+                db.Dispose();
+
+                // create new one pointing ot the database
+                db = new Database("Server=localhost;Uid=root;Pwd=password;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+
+                db.Execute(CreateDBSript);
+
                 AddOrUpdateObject(db, new Tool
                 {
                     Name = "FFMpeg",
-                    Path = "/bin/ffmpeg",
+                    Path = "/usr/local/bin/ffmpeg",
                     DateCreated = DateTime.Now,
                     DateModified = DateTime.Now
                 });
                 AddOrUpdateObject(db, new Settings
                 {
                     Name = "Settings",
-                    TempPath = "/media/temp",
+                    TempPath = "/temp",
                     DateCreated = DateTime.Now,
                     DateModified = DateTime.Now
                 });
+                InitDone = true;
+                return db;
             }
-            return db;
+            else
+            {
+                return new Database("Server=localhost;Uid=root;Pwd=password;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+
+            }
         }
 
         public static IEnumerable<T> Select<T>() where T : ViObject, new()

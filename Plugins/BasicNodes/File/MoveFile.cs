@@ -39,9 +39,22 @@ namespace FileFlow.BasicNodes.File
 
             long fileSize = new FileInfo(args.WorkingFile).Length;
 
+            bool moved = false;
             Task task = Task.Run(() =>
             {
-                System.IO.File.Move(args.WorkingFile, dest, true);
+                try
+                {
+                    if (System.IO.File.Exists(dest))
+                        System.IO.File.Delete(dest);
+                    System.IO.File.Move(args.WorkingFile, dest, true);
+
+                    args.SetWorkingFile(dest);
+                    moved = true;
+                }
+                catch (Exception ex)
+                {
+                    args.Logger.ELog("Failed to move file: " + ex.Message);
+                }
             });
 
             while (task.IsCompleted == false)
@@ -50,6 +63,10 @@ namespace FileFlow.BasicNodes.File
                 args.PartPercentageUpdate(currentSize / fileSize * 100);
                 System.Threading.Thread.Sleep(50);
             }
+
+            if (moved == false)
+                return -1;
+
             args.PartPercentageUpdate(100);
 
             return 0;

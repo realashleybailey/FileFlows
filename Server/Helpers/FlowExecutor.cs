@@ -19,7 +19,7 @@ namespace FileFlow.Server.Helpers
 
         public Node CurrentNode;
 
-        public Task<NodeParameters> Run(string input, string relativePath, string tempPath)
+        public Task<NodeParameters> Run(string input, string relativePath, string tempPath, string logFile)
         {
             return Task.Run(() =>
             {
@@ -31,7 +31,10 @@ namespace FileFlow.Server.Helpers
 
                 var fiInput = new System.IO.FileInfo(input);
                 args.Result = NodeResult.Success;
-                args.Logger = Logger ?? new FlowLogger();
+                args.Logger = Logger ?? new FlowLogger()
+                {
+                    LogFile = logFile
+                };
                 args.GetToolPath = (string name) => new Controllers.ToolController().GetByName(name)?.Path ?? "";
                 bool flowCompleted = false;
                 int count = 0;

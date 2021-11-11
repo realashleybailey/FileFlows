@@ -76,6 +76,7 @@
         "File":"File",
         "Overall":"Overall",
         "Current":"Current",
+        "Uid":"UID",
         "ProcessingTime":"Processing Time",
         "Upcoming":"Upcoming",
         "RecentlyFinished":"Recently Finished",
@@ -124,11 +125,20 @@
     "Settings": {
       "Title": "Settings",
       "Labels": {
-        "Directories": "Directories"
+        "Directories": "Directories",
+        "Workers": "Workers"
       },
       "Fields": {
         "TempPath": "Temp Directory",
-        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here."
+        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",        
+        "LoggingPath":"Logging Directory",
+        "LoggingPath-Help":"This is where log files will be created.",
+        "Workers":"Workers",
+        "Workers-Helper":"The number of workers that can run simultaneously",
+        "WorkerScanner":"Library Scanner",
+        "WorkerScanner-Helper":"If the library scanner is enabled.  When this is disabled the libraries will not be scanned for files.",
+        "WorkerFlowExecutor":"Flow Executor",
+        "WorkerFlowExecutor-Helper":"If the flow executor is enabled or not.  When this is disabled no flows will be run."
       }
     },
     "Tools":{

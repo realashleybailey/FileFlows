@@ -18,6 +18,8 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseMiddleware<FileFlow.Server.ExceptionMiddleware>();
 app.UseRouting();
 
+FileFlow.Server.Globals.IsDevelopment = app.Environment.IsDevelopment();
+
 if (app.Environment.IsDevelopment())
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 

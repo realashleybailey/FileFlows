@@ -6,6 +6,7 @@ namespace FileFlow.Shared.Models
     {
         public Guid Uid { get; set; }
         public string CurrentFile { get; set; }
+        public Guid CurrentUid { get; set; }
         public string WorkingFile { get; set; }
 
         public ProcessStatus Status => string.IsNullOrEmpty(CurrentFile) ? ProcessStatus.Waiting : ProcessStatus.Processing;

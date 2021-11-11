@@ -15,35 +15,53 @@ namespace FileFlow.Client.Helpers
         static string ApIUrl => "/api/library-file";
         public static async Task Open(Blocker blocker, NotificationService notificationService, Editor editor, LibraryFile item)
         {
+            LibraryFileModel model = null;
+            string logUrl = ApIUrl + "/" + item.Uid + "/log";
             blocker.Show();
-            var result = await HttpHelper.Get<LibraryFile>(ApIUrl + "/" + item.Uid);
-            blocker.Hide();
-            if (result.Success == false)
+            try
             {
-                notificationService.Notify(NotificationSeverity.Error,
-                    result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant("ErrorMessage.NotFound") : Translater.TranslateIfNeeded(result.Body),
-                    duration: 60_000
-                );
-                return;
-            }
+                var result = await HttpHelper.Get<LibraryFileModel>(ApIUrl + "/" + item.Uid);
+                if (result.Success == false)
+                {
+                    notificationService.Notify(NotificationSeverity.Error,
+                        result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant("ErrorMessage.NotFound") : Translater.TranslateIfNeeded(result.Body),
+                        duration: 60_000
+                    );
+                    return;
+                }
 
-            item = result.Data;
+                model = result.Data;
+                var logResult = await HttpHelper.Get<string>(logUrl);
+                model.Log = (logResult.Success ? logResult.Data : string.Empty) ?? string.Empty;
+
+            }
+            finally
+            {
+
+                blocker.Hide();
+            }
 
             List<ElementField> fields = new List<ElementField>();
 
-            bool processing = item.Status == FileStatus.Processing;
+            bool processing = model.Status == FileStatus.Processing;
             Logger.Instance.DLog("Item is processing: " + processing);
             fields.Add(new ElementField
             {
                 InputType = FileFlow.Plugin.FormInputType.LogView,
-                Name = nameof(item.Log),
+                Name = "Log",
                 Parameters = processing ? new Dictionary<string, object> {
-                    { nameof(Components.Inputs.InputLogView.RefreshUrl), ApIUrl + "/" + item.Uid + "/log" },
+                    { nameof(Components.Inputs.InputLogView.RefreshUrl), logUrl },
                     { nameof(Components.Inputs.InputLogView.RefreshSeconds), 5 },
                 } : null
             });
 
-            await editor.Open("Pages.LibraryFile", item.Name, fields, item, large: true, readOnly: true);
+            await editor.Open("Pages.LibraryFile", model.Name, fields, model, large: true, readOnly: true);
         }
+    }
+
+
+    public class LibraryFileModel : LibraryFile
+    {
+        public string Log { get; set; }
     }
 }

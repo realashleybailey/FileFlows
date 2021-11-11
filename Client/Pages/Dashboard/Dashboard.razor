@@ -32,6 +32,14 @@
                                     <span class="label">@lblFile</span>
                                     <span class="value">@worker.CurrentFile</span>
                                 </span>
+                                <span class="label-value working-file">
+                                    <span class="label">@lblWorkingFile</span>
+                                    <span class="value">@worker.WorkingFile</span>
+                                </span>
+                                <span class="label-value uid">
+                                    <span class="label">@lblUid</span>
+                                    <span class="value">@worker.CurrentUid</span>
+                                </span>
                                 <span class="label-value current-step">
                                     <span class="label">@lblCurrentStep</span>
                                     <span class="value">@worker.CurrentPartName</span>
@@ -39,10 +47,6 @@
                                 <span class="label-value processing-time">
                                     <span class="label">@lblProcessingTime</span>
                                     <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
-                                </span>
-                                <span class="label-value working-file">
-                                    <span class="label">@lblWorkingFile</span>
-                                    <span class="value">@worker.WorkingFile</span>
                                 </span>
                                 <div class="actions-wrapper">
                                     <div class="actions">

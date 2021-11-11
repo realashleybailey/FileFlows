@@ -4,8 +4,6 @@ namespace FileFlow.Shared.Models
 
     public class LibraryFile : ViObject
     {
-        public string Log { get; set; }
-
         public string RelativePath { get; set; }
 
         public string OutputPath { get; set; }

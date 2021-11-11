@@ -14,8 +14,7 @@ namespace FileFlow.Server.Controllers
             return DbHelper.Select<LibraryFile>()
                            .Where(x => status == null || x.Status == status.Value)
                            .OrderBy(x => x.Order != -1 ? x.Order : int.MaxValue)
-                           .ThenBy(x => x.DateCreated)
-                           .Select(x => { x.Log = ""; return x; });
+                           .ThenBy(x => x.DateCreated);
         }
 
         [HttpGet("upcoming")]
@@ -30,8 +29,7 @@ namespace FileFlow.Server.Controllers
             return DbHelper.Select<LibraryFile>()
                            .Where(x => x.Status == FileStatus.Processed)
                            .OrderByDescending(x => x.ProcessingEnded)
-                           .Take(5)
-                           .Select(x => { x.Log = ""; return x; });
+                           .Take(5);
         }
 
         [HttpGet("status")]
@@ -52,7 +50,23 @@ namespace FileFlow.Server.Controllers
         [HttpGet("{uid}/log")]
         public string GetLog(Guid uid)
         {
-            return DbHelper.Single<LibraryFile>(uid)?.Log ?? "";
+            var logFile = DbHelper.Single<Settings>()?.GetLogFile(uid);
+            if (string.IsNullOrEmpty(logFile))
+                return string.Empty;
+            if (System.IO.File.Exists(logFile) == false)
+                return string.Empty;
+
+
+            try
+            {
+                Stream stream = System.IO.File.Open(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using StreamReader streamReader = new StreamReader(stream);
+                return streamReader.ReadToEnd();
+            }
+            catch (System.Exception ex)
+            {
+                return "Error opening log: " + ex.Message;
+            }
         }
 
         [HttpDelete]

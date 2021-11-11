@@ -59,11 +59,18 @@ namespace FileFlow.Server.Workers
 
         protected override void Execute()
         {
+            var settings = DbHelper.Single<Settings>();
+            if (settings?.WorkerFlowExecutor != true)
+            {
+                Logger.Instance.DLog("Flow executor not enabled");
+                return;
+            }
+
             var libFile = GetLibraryFile();
             if (libFile == null)
                 return; // nothing to process
 
-            string tempPath = DbHelper.Single<Settings>()?.TempPath;
+            string tempPath = settings.TempPath;
             if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
             {
                 Logger.Instance.ELog("Temp Path not set, cannot process");
@@ -91,6 +98,7 @@ namespace FileFlow.Server.Workers
                 libFile.ProcessingStarted = System.DateTime.Now;
                 DbHelper.Update(libFile);
                 this.Status.CurrentFile = libFile.Name;
+                this.Status.CurrentUid = libFile.Uid;
                 this.Status.TotalParts = flow.Parts.Count;
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;
@@ -100,7 +108,8 @@ namespace FileFlow.Server.Workers
                 Executor = new FlowExecutor();
                 CurrentFlowLogger = new FlowLogger
                 {
-                    File = libFile
+                    File = libFile,
+                    LogFile = System.IO.Path.Combine(settings.LoggingPath, libFile.Uid.ToString() + ".log")
                 };
                 Executor.Logger = CurrentFlowLogger;
                 Executor.Flow = flow;
@@ -109,7 +118,7 @@ namespace FileFlow.Server.Workers
                 Task<Plugin.NodeParameters> task = null;
                 try
                 {
-                    task = Executor.Run(file.FullName, libFile.RelativePath, tempPath);
+                    task = Executor.Run(file.FullName, libFile.RelativePath, tempPath, settings.GetLogFile(libFile.Uid));
                     task.Wait();
                 }
                 finally
@@ -127,6 +136,7 @@ namespace FileFlow.Server.Workers
             finally
             {
                 this.Status.CurrentFile = string.Empty;
+                this.Status.CurrentUid = Guid.Empty;
                 this.Status.TotalParts = 0;
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;

@@ -9,6 +9,7 @@ namespace FileFlow.Server.Workers
 
     public class FlowLogger : ILogger
     {
+        public string LogFile { get; set; }
         List<string> log = new List<string>();
         public void DLog(params object[] args) => Log(LogType.Debug, args);
         public void ELog(params object[] args) => Log(LogType.Error, args);
@@ -32,12 +33,8 @@ namespace FileFlow.Server.Workers
                 System.Text.Json.JsonSerializer.Serialize(x)));
             log.Add(message);
             Console.WriteLine(message);
-
-            if (File != null)
-            {
-                File.Log = this.ToString();
-                DbHelper.Update(File);
-            }
+            if (string.IsNullOrEmpty(LogFile) == false)
+                System.IO.File.AppendAllText(LogFile, message + Environment.NewLine);
         }
 
         internal string GetPreview()

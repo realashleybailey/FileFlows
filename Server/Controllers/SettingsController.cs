@@ -21,12 +21,6 @@ namespace FileFlow.Server.Controllers
         {
             if (model == null)
                 return;
-            model.Extensions = model.Extensions?.Where(x => x != null)?.Select(x =>
-            {
-                if (x.StartsWith("."))
-                    return x.Substring(1).ToLower();
-                return x.ToLower();
-            })?.ToArray() ?? new string[] { };
             DbHelper.Update(model);
         }
     }

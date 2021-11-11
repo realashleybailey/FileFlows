@@ -9,6 +9,14 @@
     },
     "Flow":{
         "Parts":{
+            "CopyFile":{
+                "Fields":{
+                    "DestinationPath":"Destination Path",
+                    "DestinationPath-Help":"The path where the file will be copied too",
+                    "CopyFolder":"Copy Folder",
+                    "CopyFolder-Help" :"If the relative library folder structure should be copied too"
+                }
+            },
             "Log":{
                 "Fields":{
                     "LogType":"Type",
@@ -34,10 +42,10 @@
             },
             "MoveFile":{
                 "Fields":{
-                    "Path":"Directory",
-                    "Path-Help":"The destination directory of the file",
-                    "FileName":"File Name",
-                    "FileName-Help":"Optional filename of the moved file, if blank the original filename will be used."
+                    "DestinationPath":"Destination Path",
+                    "DestinationPath-Help":"The path where the file will be moved too",
+                    "MoveFolder":"Copy Folder",
+                    "MoveFolder-Help" :"If the relative library folder structure should be copied too"
                 }
             },
             "RenameFile":{

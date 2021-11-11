@@ -78,7 +78,8 @@
         "Current":"Current",
         "ProcessingTime":"Processing Time",
         "Upcoming":"Upcoming",
-        "RecentlyFinished":"Recently Finished"
+        "RecentlyFinished":"Recently Finished",
+        "WorkingFile":"Working File"
       }
     },
     "Flow": {
@@ -123,21 +124,11 @@
     "Settings": {
       "Title": "Settings",
       "Labels": {
-        "Directories": "Directories",
-        "Tools": "Tools"
+        "Directories": "Directories"
       },
       "Fields": {
-        "Source": "Source Directory",
-        "Source-Help": "The source directory containing the video files to convert.  This will be recursively searched.",
-        "Destination": "Destination Directory",
-        "Destination-Help": "The destination directory where the encode files will be placed.\nNote: If blank, the files will be saved in the same directory as the source files and the source files will be replaced.",
-        "Container": "Container",
-        "Container-Placeholder": "Select container for converted videos",
-        "Container-Help": "The container converted videos will be created with.",
-        "TestMode": "Test Mode",
-        "TestMode-Help": "When in test mode no actual encoding will be done, only the results of what would happen are shown.",
-        "Extensions": "Extensions",
-        "Extensions-Help": "A list of file extensions to be considered a video file"
+        "TempPath": "Temp Directory",
+        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here."
       }
     },
     "Tools":{

@@ -1,12 +1,9 @@
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using FileFlow.Plugin;
-using FileFlow.Plugin.Attributes;
-using FileFlow.Shared.Models;
-
 namespace FileFlow.Server.Helpers
 {
+    using System.Reflection;
+    using FileFlow.Plugin;
+    using FileFlow.Shared.Models;
+
     public class PluginHelper
     {
 
@@ -43,6 +40,7 @@ namespace FileFlow.Server.Helpers
                     dll.DateCreated = DateTime.Now;
                     dll.DateModified = DateTime.Now;
                     dll.HasSettings = hasSettings;
+                    dll.Enabled = true;
                     dll.Uid = Guid.NewGuid();
                     DbHelper.Update(dll);
                 }

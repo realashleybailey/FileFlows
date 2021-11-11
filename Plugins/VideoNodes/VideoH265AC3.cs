@@ -99,8 +99,6 @@ namespace FileFlow.VideoNodes
                 if (Encode(args, ffmpegExe, ffArgsLine) == false)
                     return -1;
 
-                if (File.Exists(args.OutputFile))
-                    args.WorkingFile = args.OutputFile;
                 return 1;
             }
             catch (Exception ex)

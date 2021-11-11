@@ -13,7 +13,7 @@ namespace FileFlow.Server.Helpers
 
         private static IDatabase GetDb()
         {
-
+            bool addFFmpeg = false;
             if (File.Exists("Data/FileFlow.sqlite") == false)
             {
                 if (Directory.Exists("Data") == false)
@@ -38,9 +38,27 @@ namespace FileFlow.Server.Helpers
                     }
                     con.Close();
                 }
+                addFFmpeg = true;
             }
 
             var db = new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
+            if (addFFmpeg)
+            {
+                AddOrUpdateObject(db, new Tool
+                {
+                    Name = "FFMpeg",
+                    Path = "/bin/ffmpeg",
+                    DateCreated = DateTime.Now,
+                    DateModified = DateTime.Now
+                });
+                AddOrUpdateObject(db, new Settings
+                {
+                    Name = "Settings",
+                    TempPath = "/media/temp",
+                    DateCreated = DateTime.Now,
+                    DateModified = DateTime.Now
+                });
+            }
             return db;
         }
 
@@ -136,46 +154,53 @@ namespace FileFlow.Server.Helpers
         {
             if (obj == null)
                 return new T();
+            using (var db = GetDb())
+            {
+                return AddOrUpdateObject(db, obj);
+            }
+        }
+
+        private static T AddOrUpdateObject<T>(IDatabase db, T obj) where T : ViObject
+        {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
             {
                 Converters = { new DataConverter(), new BoolConverter() }
             };
             // need to case obj to (ViObject) here so the DataConverter is used
             string json = System.Text.Json.JsonSerializer.Serialize((ViObject)obj, serializerOptions);
-            using (var db = GetDb())
-            {
-                var type = obj.GetType();
-                obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid.ToString());
-                if (dbObject == null)
-                {
-                    obj.Uid = Guid.NewGuid();
-                    obj.DateCreated = DateTime.Now;
-                    obj.DateModified = obj.DateCreated;
-                    // create new 
-                    dbObject = new DbObject
-                    {
-                        Uid = obj.Uid.ToString(),
-                        Name = obj.Name,
-                        DateCreated = obj.DateCreated,
-                        DateModified = obj.DateModified,
 
-                        Type = type.FullName,
-                        Data = json
-                    };
-                    db.Insert(dbObject);
-                }
-                else
+            var type = obj.GetType();
+            obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
+            var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid.ToString());
+            if (dbObject == null)
+            {
+                obj.Uid = Guid.NewGuid();
+                obj.DateCreated = DateTime.Now;
+                obj.DateModified = obj.DateCreated;
+                // create new 
+                dbObject = new DbObject
                 {
-                    obj.DateModified = DateTime.Now;
-                    dbObject.Name = obj.Name;
-                    dbObject.DateModified = obj.DateModified;
-                    dbObject.Data = json;
-                    db.Update(dbObject);
-                }
-                return obj;
+                    Uid = obj.Uid.ToString(),
+                    Name = obj.Name,
+                    DateCreated = obj.DateCreated,
+                    DateModified = obj.DateModified,
+
+                    Type = type.FullName,
+                    Data = json
+                };
+                db.Insert(dbObject);
             }
+            else
+            {
+                obj.DateModified = DateTime.Now;
+                dbObject.Name = obj.Name;
+                dbObject.DateModified = obj.DateModified;
+                dbObject.Data = json;
+                db.Update(dbObject);
+            }
+            return obj;
         }
+
         public static void Delete<T>(params Guid[] uids) where T : ViObject
         {
             string typeName = typeof(T).FullName;

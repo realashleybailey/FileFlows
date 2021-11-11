@@ -13,24 +13,23 @@ namespace FileFlow.Server.Helpers
         public delegate void PartPercentageUpdate(float percentage);
         public event PartPercentageUpdate OnPartPercentageUpdate;
 
-        public delegate void StepChange(int currentStep, string stepName);
+        public delegate void StepChange(int currentStep, string stepName, string workingFile);
 
         public event StepChange OnStepChange;
 
         public Node CurrentNode;
 
-        public Task<NodeParameters> Run(string input)
+        public Task<NodeParameters> Run(string input, string relativePath, string tempPath)
         {
             return Task.Run(() =>
             {
-                var args = new NodeParameters();
-                args.FileName = input;
-                args.WorkingFile = input;
+                var args = new NodeParameters(input);
+                args.TempPath = tempPath;
+                args.RelativeFile = relativePath;
 
                 args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
 
                 var fiInput = new System.IO.FileInfo(input);
-                args.OutputFile = @"D:\videos\processed\" + fiInput.Name.Replace(fiInput.Extension, ".mkv");
                 args.Result = NodeResult.Success;
                 args.Logger = Logger ?? new FlowLogger();
                 args.GetToolPath = (string name) => new Controllers.ToolController().GetByName(name)?.Path ?? "";
@@ -44,7 +43,7 @@ namespace FileFlow.Server.Helpers
 
                 int step = 0;
                 if (OnStepChange != null)
-                    OnStepChange(step, part.Name);
+                    OnStepChange(step, part.Name, args.WorkingFile);
 
                 while (flowCompleted == false && count < 20)
                 {
@@ -56,7 +55,7 @@ namespace FileFlow.Server.Helpers
 
                         ++step;
                         if (OnStepChange != null)
-                            OnStepChange(step, CurrentNode.Name);
+                            OnStepChange(step, CurrentNode.Name, args.WorkingFile);
 
                         args.Logger.DLog("node: " + CurrentNode);
                         int output = CurrentNode.Execute(args);
@@ -83,6 +82,7 @@ namespace FileFlow.Server.Helpers
                             args.Logger.DLog("flow completed");
                             // flow has completed
                             flowCompleted = true;
+                            args.Result = NodeResult.Success;
                             break;
                         }
                         // we need the connection details

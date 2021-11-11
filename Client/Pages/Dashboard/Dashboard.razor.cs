@@ -31,7 +31,7 @@ namespace FileFlow.Client.Pages
 
         private IJSObjectReference jsFunctions;
 
-        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished;
+        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished, lblWorkingFile;
         private Timer AutoRefreshTimer;
         protected override async Task OnInitializedAsync()
         {
@@ -49,6 +49,7 @@ namespace FileFlow.Client.Pages
             lblCurrent = Translater.Instant("Pages.Dashboard.Fields.Current");
             lblProcessingTime = Translater.Instant("Pages.Dashboard.Fields.ProcessingTime");
             lblUpcoming = Translater.Instant("Pages.Dashboard.Fields.Upcoming");
+            lblWorkingFile =Translater.Instant("Pages.Dashboard.Fields.WorkingFile");
             lblRecentlyFinished = Translater.Instant("Pages.Dashboard.Fields.RecentlyFinished");
             jsFunctions = await jSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Dashboard.js");
             await this.Refresh();

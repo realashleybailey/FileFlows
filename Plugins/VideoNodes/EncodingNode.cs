@@ -23,7 +23,13 @@ namespace FileFlow.VideoNodes
             this.args = args;
             Encoder = new FFMpegEncoder(ffmpegExe, args.Logger);
             Encoder.AtTime += AtTimeEvent;
-            bool success = Encoder.Encode(args.WorkingFile, args.OutputFile, ffmpegParameters);
+
+            string output = Path.Combine(args.TempPath, Guid.NewGuid().ToString() + ".mkv");
+            args.Logger.DLog("New Temp file: " + output);
+
+            bool success = Encoder.Encode(args.WorkingFile, output, ffmpegParameters);
+            if (success)
+                args.SetWorkingFile(output);
             Encoder.AtTime -= AtTimeEvent;
             Encoder = null;
             return success;

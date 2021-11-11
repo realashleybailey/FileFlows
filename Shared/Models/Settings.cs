@@ -1,17 +1,13 @@
 ﻿namespace FileFlow.Shared.Models
 {
+    using System.ComponentModel.DataAnnotations;
+    using FileFlow.Plugin.Attributes;
+
     public class Settings : ViObject
     {
-        public string Container { get; set; }
-        public string Source { get; set; }
-        public string Destination { get; set; }
-
-        public bool TestMode { get; set; }
-
-        public string[] Extensions { get; set; }
-
-        public string HandBrakeCli { get; set; }
-        public string FFProbeExe { get; set; }
+        [Folder(1)]
+        [Required]
+        public string TempPath { get; set; }
     }
 
 }

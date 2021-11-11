@@ -40,6 +40,10 @@
                                     <span class="label">@lblProcessingTime</span>
                                     <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
                                 </span>
+                                <span class="label-value working-file">
+                                    <span class="label">@lblWorkingFile</span>
+                                    <span class="value">@worker.WorkingFile</span>
+                                </span>
                                 <div class="actions-wrapper">
                                     <div class="actions">
                                         <RadzenButton Click="() => LogClicked(worker)" Text="@lblLog" />

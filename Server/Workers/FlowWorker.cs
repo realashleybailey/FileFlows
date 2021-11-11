@@ -63,6 +63,14 @@ namespace FileFlow.Server.Workers
             if (libFile == null)
                 return; // nothing to process
 
+            string tempPath = DbHelper.Single<Settings>()?.TempPath;
+            if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
+            {
+                Logger.Instance.ELog("Temp Path not set, cannot process");
+                return;
+            }
+
+
             try
             {
                 FileInfo file = new FileInfo(libFile.Name);
@@ -88,6 +96,7 @@ namespace FileFlow.Server.Workers
                 this.Status.CurrentPartPercent = 0;
                 this.Status.CurrentPartName = string.Empty;
                 this.Status.StartedAt = DateTime.Now;
+                this.Status.WorkingFile = libFile.Name;
                 Executor = new FlowExecutor();
                 CurrentFlowLogger = new FlowLogger
                 {
@@ -100,7 +109,7 @@ namespace FileFlow.Server.Workers
                 Task<Plugin.NodeParameters> task = null;
                 try
                 {
-                    task = Executor.Run(file.FullName);
+                    task = Executor.Run(file.FullName, libFile.RelativePath, tempPath);
                     task.Wait();
                 }
                 finally
@@ -111,7 +120,7 @@ namespace FileFlow.Server.Workers
                 }
                 Logger.Instance.DLog("FlowWorker.Executor.Status: " + task.Result.Result);
                 libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
-                libFile.OutputPath = task.Result.OutputFile;
+                libFile.OutputPath = task.Result.WorkingFile;
                 libFile.ProcessingEnded = System.DateTime.Now;
                 DbHelper.Update(libFile);
             }
@@ -122,6 +131,7 @@ namespace FileFlow.Server.Workers
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;
                 this.Status.CurrentPartName = string.Empty;
+                this.Status.WorkingFile = string.Empty;
                 this.Status.StartedAt = new DateTime(1970, 1, 1);
                 _ = Task.Run(async () =>
                 {
@@ -137,10 +147,11 @@ namespace FileFlow.Server.Workers
             this.Status.CurrentPartPercent = percentage;
         }
 
-        private void OnStepChange(int currentStep, string stepName)
+        private void OnStepChange(int currentStep, string stepName, string workingFile)
         {
             this.Status.CurrentPart = currentStep;
             this.Status.CurrentPartName = stepName;
+            this.Status.WorkingFile = workingFile;
         }
     }
 }

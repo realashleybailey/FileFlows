@@ -82,7 +82,7 @@ namespace FileFlow.BasicNodes.File
 
             args.PartPercentageUpdate(100);
 
-            return 0;
+            return base.Execute(args);
         }
     }
 }

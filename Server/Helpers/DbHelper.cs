@@ -233,13 +233,14 @@ namespace FileFlow.Server.Helpers
 
         public static void Delete<T>(params Guid[] uids) where T : ViObject
         {
+            if (uids?.Any() != true)
+                return; // nothing to delete
+
             string typeName = typeof(T).FullName;
+            string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
             using (var db = GetDb())
             {
-                foreach (var uid in uids)
-                {
-                    db.Delete<DbObject>("where Type=@0 and Uid = @1", typeName, uid.ToString());
-                }
+                db.Delete<DbObject>($"where Type=@0 and Uid in ({strUids})", typeName);
             }
         }
     }

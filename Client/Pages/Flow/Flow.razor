@@ -28,7 +28,7 @@
                             foreach (var ele in grp)
                             {
                                 <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"
-                        ondragstart="ffFlow.dragElementStart(event)">@ele.Name</li>
+                        ondragstart="ffFlow.dragElementStart(event)">@Helpers.FlowHelper.FormatLabel(ele.Name)</li>
                             }
                         }
                     }
@@ -41,11 +41,11 @@
                 {
                     <CascadingValue IsFixed="true" Value="this">
                         @foreach (var part in Parts)
-                        {
-                            <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)">
-                            </FlowElement>
-                        }
-                    </CascadingValue>
+                    {
+                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)">
+                        </FlowElement>
+                    }
+                </CascadingValue>
                 }
 
             </div>

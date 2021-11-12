@@ -5,7 +5,7 @@ namespace FileFlow.VideoNodes
     using FileFlow.Plugin;
     using FileFlow.Plugin.Attributes;
 
-    public class VideoH265AC3 : EncodingNode
+    public class Video_H265_AC3 : EncodingNode
     {
 
         [DefaultValue("eng")]

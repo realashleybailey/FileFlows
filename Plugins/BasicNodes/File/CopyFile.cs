@@ -93,7 +93,7 @@ namespace FileFlow.BasicNodes.File
             {
                 args.SetWorkingFile(dest);
 
-                return 0;
+                return base.Execute(args);
             }
         }
     }

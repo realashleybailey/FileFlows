@@ -1,5 +1,6 @@
 namespace FileFlow.Client.Components
 {
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
@@ -29,6 +30,13 @@ namespace FileFlow.Client.Components
 
         [Parameter]
         public EventCallback<ffPart> OnSelect { get; set; }
+
+        public string Label { get; set; }
+
+        protected override void OnInitialized()
+        {
+            this.Label = Helpers.FlowHelper.FormatLabel(Part.Name);
+        }
 
         private void Select()
         {

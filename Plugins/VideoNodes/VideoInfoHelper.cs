@@ -11,7 +11,8 @@ namespace FileFlow.VideoNodes
         private ILogger Logger;
 
         Regex rgxTitle = new Regex(@"(?<=((^[\s]+title[\s]+:[\s])))(.*?)$", RegexOptions.Multiline);
-        Regex rgxDuration = new Regex(@"(?<=((^[\s]+DURATION[\s]+:[\s])))([\d]+:?)+\.[\d]+[1-9]", RegexOptions.Multiline);
+        Regex rgxDuration = new Regex(@"(?<=((^[\s]+DURATION(\-[\w]+)?[\s]+:[\s])))([\d]+:?)+\.[\d]+[1-9]", RegexOptions.Multiline);
+        Regex rgxDuration2 = new Regex(@"(?<=((^[\s]+Duration+:[\s])))([\d]+:?)+\.[\d]+[1-9]", RegexOptions.Multiline);
 
         public VideoInfoHelper(string ffMpegExe, ILogger logger)
         {
@@ -55,6 +56,8 @@ namespace FileFlow.VideoNodes
                         Logger.ELog("Failed reading ffmpeg info: " + error);
                         return vi;
                     }
+
+                    Logger.ILog("Video Information:" + Environment.NewLine + output);
 
                     var rgxStreams = new Regex(@"Stream\s#[\d]+:[\d]+(.*?)(?=(Stream\s#[\d]|$))", RegexOptions.Singleline);
                     var streamMatches = rgxStreams.Matches(output);
@@ -101,23 +104,27 @@ namespace FileFlow.VideoNodes
             return vi;
         }
 
-
         VideoStream ParseVideoStream(string info)
         {
             // Stream #0:0(eng): Video: h264 (High), yuv420p(tv, bt709/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 23.98 fps, 23.98 tbr, 1k tbn (default)
             string line = info.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries).First();
             VideoStream vs = new VideoStream();
-            vs.Codec = line.Substring(line.IndexOf("Video: ") + "Video: ".Length).Trim().Split(' ').First().ToLower();
-            //Logger.ILog("codec: " + vs.Codec);
+            vs.Codec = line.Substring(line.IndexOf("Video: ") + "Video: ".Length).Replace(",", "").Trim().Split(' ').First().ToLower();
             var dimensions = Regex.Match(line, @"([\d]{3,})x([\d]{3,})");
-            //Logger.ILog("dimensions: " + dimensions.Value);
-            vs.Width = int.Parse(dimensions.Groups[1].Value);
-            vs.Height = int.Parse(dimensions.Groups[2].Value);
-            vs.TypeIndex = int.Parse(Regex.Match(line, @"#([\d]+):([\d]+)").Groups[2].Value);
-            vs.FramesPerSecond = float.Parse(Regex.Match(line, @"([\d]+(\.[\d]+)?)\sfps").Groups[1].Value);
+            if (int.TryParse(dimensions.Groups[1].Value, out int width))
+                vs.Width = width;
+            if (int.TryParse(dimensions.Groups[2].Value, out int height))
+                vs.Height = height;
+            if (int.TryParse(Regex.Match(line, @"#([\d]+):([\d]+)").Groups[2].Value, out int typeIndex))
+                vs.TypeIndex = typeIndex;
 
-            if (rgxDuration.IsMatch(info))
-                vs.Duration = TimeSpan.Parse(rgxDuration.Match(info).Value);
+            if (Regex.IsMatch(line, @"([\d]+(\.[\d]+)?)\sfps") && float.TryParse(Regex.Match(line, @"([\d]+(\.[\d]+)?)\sfps").Groups[1].Value, out float fps))
+                vs.FramesPerSecond = fps;
+
+            if (rgxDuration.IsMatch(info) && TimeSpan.TryParse(rgxDuration.Match(info).Value, out TimeSpan duration))
+                vs.Duration = duration;
+            else if (rgxDuration2.IsMatch(info) && TimeSpan.TryParse(rgxDuration2.Match(info).Value, out TimeSpan duration2))
+                vs.Duration = duration2;
 
             return vs;
         }

@@ -21,5 +21,8 @@ namespace FileFlow.Client.Components
         [Parameter]
         public string Title { get; set; }
 
+        [Parameter]
+        public bool Flex { get; set; }
+
     }
 }

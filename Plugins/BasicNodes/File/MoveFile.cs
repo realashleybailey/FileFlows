@@ -17,6 +17,9 @@ namespace FileFlow.BasicNodes.File
         [Boolean(2)]
         public bool MoveFolder { get; set; }
 
+        [Boolean(3)]
+        public bool DeleteOriginal { get; set; }
+
         public override int Execute(NodeParameters args)
         {
             string dest = DestinationPath;
@@ -48,7 +51,12 @@ namespace FileFlow.BasicNodes.File
                         System.IO.File.Delete(dest);
                     System.IO.File.Move(args.WorkingFile, dest, true);
 
+                    if (DeleteOriginal && args.WorkingFile != args.FileName)
+                    {
+                        System.IO.File.Delete(args.FileName);
+                    }
                     args.SetWorkingFile(dest);
+
                     moved = true;
                 }
                 catch (Exception ex)
@@ -59,7 +67,12 @@ namespace FileFlow.BasicNodes.File
 
             while (task.IsCompleted == false)
             {
-                long currentSize = new FileInfo(dest).Length;
+
+                long currentSize = 0;
+                var destFileInfo = new FileInfo(dest);
+                if (destFileInfo.Exists)
+                    currentSize = destFileInfo.Length;
+
                 args.PartPercentageUpdate(currentSize / fileSize * 100);
                 System.Threading.Thread.Sleep(50);
             }

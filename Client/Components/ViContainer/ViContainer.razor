@@ -1,6 +1,6 @@
 @namespace FileFlow.Client.Components
 
-<div class="vi-container @(FullWidth ? "fullwidth" : "")">
+<div class="vi-container @(FullWidth ? "fullwidth" : "") @(Flex ? "flex" : "")">
     <div class="top-row">
         <span class="title">
             @if (string.IsNullOrEmpty(Icon) == false)

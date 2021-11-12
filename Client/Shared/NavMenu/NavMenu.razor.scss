@@ -1,5 +1,9 @@
 .navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: transparent;
+    .fas {
+        font-size:1.3rem;
+        padding-top:0.2rem;
+    }
 }
 
 .top-row {
@@ -62,5 +66,10 @@
     .collapse {
         /* Never collapse the sidebar for wide screens */
         display: block;
+    }
+}
+@media (max-width: 640.99px) {
+    .nav-item.flows {
+        display:none;
     }
 }

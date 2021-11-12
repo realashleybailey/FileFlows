@@ -1,15 +1,25 @@
+
 .editor {
     position:fixed;
     right:0;
     top:0;
     bottom:0;
     max-width: 100%;
-    width:700px;
-    border-left:solid 1px var(--border-color);
     background:var(--base-darker);
     z-index:3;
-    &.large {
-        width:70vw;
+    left:0;
+}
+
+
+@media screen and (min-width: 850px) 
+{
+    .editor {
+        left:unset;
+        width:700px;
+        border-left:solid 1px var(--border-color);
+        &.large {
+            width:70vw;
+        }
     }
 }
 

@@ -8,6 +8,11 @@
     &:not(.fullwidth){        
         max-width:1400px;
     }
+
+    &.flex .content {
+        display:flex;
+        flex-direction: column;
+    }
 }
 
 .top-row {
@@ -54,34 +59,4 @@
     flex-grow:1;
     overflow: auto;
     position:relative;
-}
-
-@media (max-width: 640.98px) {
-    .top-row
-    {
-        &:not(.auth) {
-            display: none;
-        }
-
-        &.auth {
-            justify-content: space-between;
-        }
-
-        a, .btn-link {
-            margin-left: 0;
-        }
-    }
-}
-@media (min-width: 641px) {
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    > div {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
 }

@@ -18,7 +18,7 @@
         FileFlow
     </a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
+        <span class="fas fa-bars"></span>
     </button>
 </div>
 
@@ -26,7 +26,7 @@
     <ul class="nav flex-column">
         @foreach (var item in MenuItems)
         {
-            <li class="nav-item">
+            <li class="nav-item @(item.Url.Replace("/", ""))">
                 <NavLink class="nav-link" href="@item.Url"
                 Match="@(item.Url == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)" @onclick="() => SetActive(item)">
                     <span class="@item.Icon" aria-hidden="true"></span> @item.Title

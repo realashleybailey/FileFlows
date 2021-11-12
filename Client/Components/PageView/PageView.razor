@@ -3,7 +3,7 @@
 @{
     string title = string.IsNullOrEmpty(Title) == false ? Title : Menu?.Active?.Title;
 }
-<ViContainer Title="@title" Icon="@Menu?.Active?.Icon" FullWidth=@FullWidth>
+<ViContainer Title="@title" Icon="@Menu?.Active?.Icon" FullWidth=@FullWidth Flex="Flex">
 
     <Head>
         @Head

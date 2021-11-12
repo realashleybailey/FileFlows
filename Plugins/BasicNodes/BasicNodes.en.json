@@ -45,7 +45,9 @@
                     "DestinationPath":"Destination Path",
                     "DestinationPath-Help":"The path where the file will be moved too",
                     "MoveFolder":"Copy Folder",
-                    "MoveFolder-Help" :"If the relative library folder structure should be copied too"
+                    "MoveFolder-Help" :"If the relative library folder structure should be copied too",
+                    "DeleteOriginal":"Delete Original",
+                    "DeleteOriginal-Help":"If the original file should be deleted, this will only happen if the working file is different to the original file"
                 }
             },
             "RenameFile":{

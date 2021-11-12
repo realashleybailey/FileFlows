@@ -9,13 +9,18 @@ namespace FileFlow.Client
 
     public partial class App : ComponentBase
     {
-        private App Instance { get; set; }
+        public static App Instance { get; private set; }
 
         [Inject]
         public HttpClient Client { get; set; }
         [Inject]
         public IJSRuntime jsRuntime { get; set; }
         public bool LanguageLoaded { get; set; } = false;
+
+        public int DisplayWidth { get; private set; }
+        public int DisplayHeight { get; private set; }
+
+        public bool IsMobile => DisplayWidth > 0 && DisplayWidth <= 768;
 
         private async Task LoadLanguage()
         {
@@ -36,6 +41,9 @@ namespace FileFlow.Client
             Translater.Logger = Logger.Instance;
             FileFlow.Shared.Logger.Instance = Logger.Instance;
             HttpHelper.Client = Client;
+            var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
+            DisplayWidth = dimensions.width;
+            DisplayHeight = dimensions.height;
             await Task.Run(async () =>
             {
                 await LoadLanguage();
@@ -43,5 +51,7 @@ namespace FileFlow.Client
                 this.StateHasChanged();
             });
         }
+
+        record Dimensions(int width, int height);
     }
 }

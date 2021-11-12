@@ -6,6 +6,12 @@ html {
     overflow: hidden;
 }
 
+@media screen and (max-width: 768px) {
+    html, body, #app, .page{
+        height:100%;
+    }
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size:16px;

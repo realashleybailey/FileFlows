@@ -21,5 +21,8 @@ namespace FileFlow.Client.Components
         [Parameter]
         public RenderFragment Body { get; set; }
 
+        [Parameter]
+        public bool Flex { get; set; }
+
     }
 }

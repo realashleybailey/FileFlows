@@ -1,7 +1,7 @@
 .status-picker {
     width:100%;
-    height:5rem;   
     margin-top:-1rem; 
+    margin-bottom:1rem;
     display:flex;
     flex-direction: row;
     .status {
@@ -9,6 +9,11 @@
         border:solid 1px var(--accent);
         position:relative;
         filter:opacity(0.4);
+        padding:0.5rem;
+        text-align: center;
+        .icon {
+            margin-right:1rem;
+        }
         &:hover {
             filter:unset;
             cursor:pointer;
@@ -18,40 +23,74 @@
         &.active {
             filter:unset;
         }
-        .icon {
-            left: 1rem;
-            top: 0.85rem;
-            font-size: 3rem;
-            position: absolute;
-            width: 3rem;
-            text-align: center;
-        }
-        .count {
-            display:block;
-            font-size:3rem;
-            line-height:3rem;
-            padding:0;
-            margin:0;
-            text-align: left;
-            margin-left: 5.5rem;
-            position: relative;
-            top: 0.25rem;
-        }
         .name {
-            text-align: left;
-            margin-left: 5.5rem;
-            font-size:0.8rem;
+            display:none;
         }
     }
 }
 
+
+@media screen and (min-width: 769px) 
+{   
+    .status-picker {
+        height:5rem;   
+        .status {
+            padding:unset;
+            text-align: unset;
+            .icon {
+                left: 1rem;
+                top: 0.85rem;
+                font-size: 3rem;
+                position: absolute;
+                width: 3rem;
+                text-align: center;
+                margin-right:unset;
+            }
+            .count {
+                display:block;
+                font-size:3rem;
+                line-height:3rem;
+                padding:0;
+                margin:0;
+                text-align: left;
+                margin-left: 5.5rem;
+                position: relative;
+                top: 0.25rem;
+            }
+            .name {
+                text-align: left;
+                margin-left: 5.5rem;
+                font-size:0.8rem;
+                display: unset;
+            }
+        }
+    }
+
+}
+
 .page-table 
 {
-    top:6rem;
+    position:relative !important;
+    flex-grow:1;
+    display:flex;
+    flex-direction: column;
+    left: unset;
+    right: unset;
+    bottom: unset;
+    top: unset;
+    
     ::deep tbody td:nth-child(2)
     {
         /* Beginning of string */
         direction: rtl;
         text-align: left;
     }
+    ::deep .rz-data-grid {
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+    }
+
 }

@@ -4,7 +4,7 @@
 
 @page "/library-files"
 
-<PageView>
+<PageView Flex="@true">
 
     <Head>
     </Head>
@@ -54,6 +54,8 @@
             </div>
             @{
                 bool paging = Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
+                bool mobile = App.Instance.IsMobile;
+                string lfNameWidth = mobile ? "60vw" : "20rem";
             }
 
             <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" PageSizeOptions="@PageSizeOptions"
@@ -74,16 +76,18 @@
                                 Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name" Width="20rem"
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name" Width="@lfNameWidth"
                         Frozen="true" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Flow.Name" Title="Flow" Width="12rem" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Library.Name" Title="Library" Width="12rem" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Flow.Name" Title="Flow" Width="12rem"
+                        Visible="!mobile" />
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="Library.Name" Title="Library" Width="12rem"
+                        Visible="!mobile" />
                     <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time" Width="6rem"
                         FormatString="{0:hh\:mm\:ss}" Visible=@(SelectedStatus !=
                         FileFlow.Shared.Models.FileStatus.Unprocessed)>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="LibraryFile" Property="OutputPath" Title="Output" Width="30rem"
-                        Visible=@(SelectedStatus == FileFlow.Shared.Models.FileStatus.Processed) />
+                        Visible=@(SelectedStatus == FileFlow.Shared.Models.FileStatus.Processed && !mobile) />
                 </Columns>
             </RadzenDataGrid>
         </div>

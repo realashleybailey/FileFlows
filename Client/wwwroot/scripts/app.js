@@ -10,5 +10,9 @@ window.ff = {
         else if (level === 2) parameters.length > 0 ? console.warn(message, parameters) : console.warn(message);
         else if (level === 3) parameters.length > 0 ? console.info(message, parameters) : console.info(message);
         else parameters.length > 0 ? console.error(message, parameters) : console.log(message);
+    },
+    deviceDimensions: function () {
+
+        return { width: screen.width, height: screen.height };
     }
 };

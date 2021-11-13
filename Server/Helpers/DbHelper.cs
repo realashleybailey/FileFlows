@@ -8,25 +8,34 @@ namespace FileFlow.Server.Helpers
     using FileFlow.Shared;
     using FileFlow.Shared.Models;
     using System.Data.Common;
+    using System.Diagnostics;
 
     public class DbHelper
     {
-        static bool InitDone;
-
         static string CreateDBSript =
             @$"CREATE TABLE {nameof(DbObject)}(
-                Uid             CHAR(36)           NOT NULL          PRIMARY KEY,
+                Uid             VARCHAR(36)           NOT NULL          PRIMARY KEY,
                 Name            VARCHAR(255)       NOT NULL,
                 Type            VARCHAR(255)       NOT NULL,
-                DateCreated     datetime           default           current_timestamp,
-                DateModified    datetime           default           current_timestamp,
+                DateCreated     datetime           default           now(),
+                DateModified    datetime           default           now(),
                 Data            TEXT               NOT NULL
             );";
 
+
+        private static bool InitDone = false;
         private static IDatabase GetDb()
         {
-            if (Globals.IsDevelopment || true)
+            if (Globals.IsDevelopment)
             {
+                if (InitDone == false)
+                {
+                    CreateDatabase();
+                    InitDone = true;
+                }
+
+                return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+
                 if (File.Exists("Data/FileFlow.sqlite") == false)
                 {
                     if (Directory.Exists("Data") == false)
@@ -47,48 +56,9 @@ namespace FileFlow.Server.Helpers
 
                 return new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
             }
-            else if (InitDone == false)
-            {
-                var db = new Database("Server=localhost;Uid=root;Pwd=;", null, MySqlConnector.MySqlConnectorFactory.Instance);
-
-                bool exists = db.ExecuteScalar<int>("select schema_name from information_schema.schemata where schema_name = 'FileFlow'") > 0;
-                if (exists)
-                {
-                    InitDone = true;
-                    db.Dispose();
-                    return new Database("Server=localhost;Uid=root;Pwd=password;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
-                }
-
-                db.Execute("create database FileFlow");
-                // dispose of original one
-                db.Dispose();
-
-                // create new one pointing ot the database
-                db = new Database("Server=localhost;Uid=root;Pwd=password;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
-
-                db.Execute(CreateDBSript);
-
-                AddOrUpdateObject(db, new Tool
-                {
-                    Name = "FFMpeg",
-                    Path = "/usr/local/bin/ffmpeg",
-                    DateCreated = DateTime.Now,
-                    DateModified = DateTime.Now
-                });
-                AddOrUpdateObject(db, new Settings
-                {
-                    Name = "Settings",
-                    TempPath = "/temp",
-                    DateCreated = DateTime.Now,
-                    DateModified = DateTime.Now
-                });
-                InitDone = true;
-                return db;
-            }
             else
             {
-                return new Database("Server=localhost;Uid=root;Pwd=password;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
-
+                return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
             }
         }
 
@@ -96,7 +66,7 @@ namespace FileFlow.Server.Helpers
         {
             using (var db = GetDb())
             {
-                var dbObjects = db.Fetch<DbObject>("where Type=@0 order by name", typeof(T).FullName);
+                var dbObjects = db.Fetch<DbObject>("where Type=@0 order by Name", typeof(T).FullName);
                 return dbObjects.Select(x => Convert<T>(x));
             }
         }
@@ -242,6 +212,78 @@ namespace FileFlow.Server.Helpers
             {
                 db.Delete<DbObject>($"where Type=@0 and Uid in ({strUids})", typeName);
             }
+        }
+
+        public static bool StartMySqlServer()
+        {
+            Logger.Instance.ILog("Starting mysql service");
+            using (var p = Process.Start(new ProcessStartInfo
+            {
+                //FileName = "etc/init.d/mysql",
+                //Arguments = "start",
+                FileName = "service",
+                Arguments = "mysql start",
+                WorkingDirectory = "/"
+            }))
+            {
+                p.WaitForExit();
+                bool started = p.ExitCode == 0;
+                if (started == false)
+                    return false;
+            }
+            using (var p = Process.Start(new ProcessStartInfo
+            {
+                FileName = "mysql",
+                Arguments = "-uroot -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';\"",
+                WorkingDirectory = "/"
+            }))
+            {
+                p.WaitForExit();
+                bool started = p.ExitCode == 0;
+                if (started == false)
+                    return false;
+            }
+
+            return CreateDatabase();
+        }
+
+        private static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
+        {
+            //System.Threading.Thread.Sleep(3000); // just give mysql a little chance to get itself ready
+
+            var db = new Database(connectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
+
+            bool exists = String.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = 'FileFlow'")) == false;
+            if (exists)
+            {
+                db.Dispose();
+                return true;
+            }
+
+            db.Execute("create database FileFlow");
+            // dispose of original one
+            db.Dispose();
+
+            // create new one pointing ot the database
+            db = new Database(connectionString + "Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+
+            db.Execute(CreateDBSript);
+
+            AddOrUpdateObject(db, new Tool
+            {
+                Name = "FFMpeg",
+                Path = "/usr/local/bin/ffmpeg",
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now
+            });
+            AddOrUpdateObject(db, new Settings
+            {
+                Name = "Settings",
+                TempPath = "/temp",
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now
+            });
+            return true;
         }
     }
 }

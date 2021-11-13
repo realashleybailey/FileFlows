@@ -12,7 +12,7 @@ namespace FileFlow.VideoNodes
 
         Regex rgxTitle = new Regex(@"(?<=((^[\s]+title[\s]+:[\s])))(.*?)$", RegexOptions.Multiline);
         Regex rgxDuration = new Regex(@"(?<=((^[\s]+DURATION(\-[\w]+)?[\s]+:[\s])))([\d]+:?)+\.[\d]+[1-9]", RegexOptions.Multiline);
-        Regex rgxDuration2 = new Regex(@"(?<=((^[\s]+Duration+:[\s])))([\d]+:?)+\.[\d]+[1-9]", RegexOptions.Multiline);
+        Regex rgxDuration2 = new Regex(@"(?<=((^[\s]+Duration:[\s])))([\d]+:?)+\.[\d]+[1-9]", RegexOptions.Multiline);
 
         public VideoInfoHelper(string ffMpegExe, ILogger logger)
         {

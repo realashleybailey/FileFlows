@@ -20,7 +20,7 @@ app.UseRouting();
 
 FileFlow.Server.Globals.IsDevelopment = app.Environment.IsDevelopment();
 
-if (app.Environment.IsDevelopment())
+if (FileFlow.Server.Globals.IsDevelopment)
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.MapControllerRoute(
@@ -35,6 +35,9 @@ app.MapControllerRoute(
 );
 
 FileFlow.Shared.Logger.Instance = FileFlow.Server.Logger.Instance;
+
+if (FileFlow.Server.Globals.IsDevelopment == false)
+    FileFlow.Server.Helpers.DbHelper.StartMySqlServer();
 
 FileFlow.Server.Helpers.PluginHelper.ScanForPlugins();
 

@@ -77,6 +77,7 @@
         "Overall":"Overall",
         "Current":"Current",
         "Uid":"UID",
+        "Library":"Library",
         "ProcessingTime":"Processing Time",
         "Upcoming":"Upcoming",
         "RecentlyFinished":"Recently Finished",

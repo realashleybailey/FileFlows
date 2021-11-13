@@ -6,6 +6,10 @@ namespace FileFlow.Shared.Models
     {
         public Guid Uid { get; set; }
         public string CurrentFile { get; set; }
+        public string RelativeFile { get; set; }
+
+        public ObjectReference Library { get; set; }
+
         public Guid CurrentUid { get; set; }
         public string WorkingFile { get; set; }
 

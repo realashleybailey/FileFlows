@@ -99,6 +99,8 @@ namespace FileFlow.Server.Workers
                 DbHelper.Update(libFile);
                 this.Status.CurrentFile = libFile.Name;
                 this.Status.CurrentUid = libFile.Uid;
+                this.Status.RelativeFile = libFile.RelativePath;
+                this.Status.Library = libFile.Library;
                 this.Status.TotalParts = flow.Parts.Count;
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;
@@ -137,6 +139,8 @@ namespace FileFlow.Server.Workers
             {
                 this.Status.CurrentFile = string.Empty;
                 this.Status.CurrentUid = Guid.Empty;
+                this.Status.RelativeFile = string.Empty;
+                this.Status.Library = new ObjectReference { Name = string.Empty, Uid = Guid.Empty };
                 this.Status.TotalParts = 0;
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;

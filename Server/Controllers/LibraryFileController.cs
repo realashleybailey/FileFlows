@@ -20,7 +20,7 @@ namespace FileFlow.Server.Controllers
         [HttpGet("upcoming")]
         public IEnumerable<LibraryFile> Upcoming([FromQuery] FileStatus? status)
         {
-            return GetAll(FileStatus.Unprocessed).Take(5);
+            return GetAll(FileStatus.Unprocessed).Take(10);
         }
 
         [HttpGet("recently-finished")]
@@ -29,7 +29,7 @@ namespace FileFlow.Server.Controllers
             return DbHelper.Select<LibraryFile>()
                            .Where(x => x.Status == FileStatus.Processed)
                            .OrderByDescending(x => x.ProcessingEnded)
-                           .Take(5);
+                           .Take(10);
         }
 
         [HttpGet("status")]

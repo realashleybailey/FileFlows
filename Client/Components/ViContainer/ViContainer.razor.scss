@@ -15,12 +15,25 @@
     }
 }
 
+
+@media screen and (min-width: 850px) {  
+    .top-row {        
+        height: 3.5rem;
+        display: flex !important;
+        align-items: center;
+        padding:1.5rem;
+    }
+}
+
 .top-row {
-    //justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    padding:1.5rem;
+    display:none;
+
+    &.show-title {
+        height: 3.5rem;
+        display: flex !important;
+        align-items: center;
+        padding:1.5rem;
+    }
 
     .title {
         flex-grow:1;

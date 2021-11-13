@@ -14,7 +14,11 @@
 .waiting-icon {
     font-size:2rem;
 }
-@media screen and (min-width: 769px) {  
+.worker-wrapper {
+    display:flex;
+    flex-direction: column;
+}
+@media screen and (min-width: 850px) {  
     .dashboard {
         > div {
             margin:unset;
@@ -33,19 +37,35 @@
     .waiting-icon {
         font-size:8rem;
     }
+    .worker-wrapper {
+        flex-direction: row;
+    }
+    
+    .actions-wrapper {
+        margin-top:0;
+        flex-grow:1;
+        display:flex;
+        flex-direction: column;
+        justify-content: end;
+        .actions {            
+            text-align: right;
+        }
+    }
+    .chart-wrapper {
+        width:17rem !important;
+        min-width:17rem !important;
+    }
 }
 
 .worker-wrapper {
-    display:flex;
-    flex-direction: row;
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base), 0.2);
     max-width: 100%;
     .chart-wrapper {
         position:relative;
         top:-1rem;
-        width:17rem;
-        min-width:17rem;
+        width:100%;
+        min-width:100%;
     }
     &.waiting {
         .chart-wrapper {
@@ -90,12 +110,9 @@
             }
         }
         .actions-wrapper {
-            flex-grow:1;
-            display:flex;
-            flex-direction: column;
-            justify-content: end;
+            margin-top:1rem;
             .actions {
-                text-align: right;
+                text-align: center;
                 ::deep button {
                     min-width:7rem;
                     padding:0;
@@ -121,4 +138,10 @@
     .table-wrapping {
         flex-grow:1;
     }
+    &:last-child{
+        margin-bottom:2rem;
+    }
+}
+.spacer {
+    height:2rem;
 }

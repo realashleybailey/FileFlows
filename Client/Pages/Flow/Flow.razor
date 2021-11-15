@@ -10,8 +10,6 @@
 
     <Head>
         <RadzenButton Click=@Rename Text="@lblRename" />
-        <RadzenButton class="save-button" BusyText="@lblExecuting" IsBusy=@IsExecuting Click=@Execute
-            Text="@lblExecute" />
         <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
         <RadzenButton Click=@Close Text="@lblClose" />
     </Head>
@@ -24,7 +22,7 @@
                     {
                         @foreach (var grp in Available.GroupBy(x => x.Group))
                         {
-                            <li class="group">@grp.Key</li>
+                            <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
                             foreach (var ele in grp)
                             {
                                 <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"

@@ -3,7 +3,11 @@
 
 @page "/"
 
-<PageView>
+@{
+    string title = Workers?.FirstOrDefault()?.RelativeFile;
+}
+
+<PageView Title=@title>
 
     <Head>
     </Head>

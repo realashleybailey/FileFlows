@@ -9,6 +9,7 @@ namespace FileFlow.BasicNodes.File
         public override int Inputs => 1;
         public override int Outputs => 2;
         public override FlowElementType Type => FlowElementType.Logic;
+        public override string Icon => "fas fa-balance-scale-right";
 
 
         [NumberInt(1)]

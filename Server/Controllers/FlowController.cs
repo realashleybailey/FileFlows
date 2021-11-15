@@ -31,7 +31,7 @@ namespace FileFlow.Server.Controllers
         }
 
         [HttpDelete]
-        public void Delete([FromBody] DeleteModel model)
+        public void Delete([FromBody] ReferenceModel model)
         {
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete
@@ -42,35 +42,53 @@ namespace FileFlow.Server.Controllers
         public Flow Get(Guid uid)
         {
             if (uid != Guid.Empty)
-                return DbHelper.Single<Flow>(uid);
+            {
+                var flow = DbHelper.Single<Flow>(uid);
+                if (flow == null)
+                    return flow;
 
-            // create default flow
-            var flowNames = DbHelper.GetNames<Flow>();
-            Flow flow = new Flow();
-            flow.Parts = new();
-            flow.Name = "New Flow";
-            flow.Enabled = true;
-            int count = 0;
-            while (flowNames.Contains(flow.Name))
-            {
-                flow.Name = "New Flow " + (++count);
-            }
-            // try find basic node
-            var inputFileType = NodeHelper.GetAssemblyNodeTypes("BasicNodes")?.Where(x => x.Name == "InputFile").FirstOrDefault();
-            if (inputFileType != null)
-            {
-                flow.Parts.Add(new FlowPart
+
+                var elements = GetElements();
+
+                foreach (var p in flow.Parts)
                 {
-                    Name = inputFileType.Name,
-                    xPos = 50,
-                    yPos = 200,
-                    Uid = Guid.NewGuid(),
-                    Type = FlowElementType.Input,
-                    Outputs = 1,
-                    FlowElementUid = inputFileType.FullName
-                });
+                    string icon = elements.Where(x => x.Uid == p.FlowElementUid).Select(x => x.Icon).FirstOrDefault();
+                    if (string.IsNullOrEmpty(icon) == false)
+                        p.Icon = icon;
+                }
+                return flow;
             }
-            return flow;
+            else
+            {
+
+                // create default flow
+                var flowNames = DbHelper.GetNames<Flow>();
+                Flow flow = new Flow();
+                flow.Parts = new();
+                flow.Name = "New Flow";
+                flow.Enabled = true;
+                int count = 0;
+                while (flowNames.Contains(flow.Name))
+                {
+                    flow.Name = "New Flow " + (++count);
+                }
+                // try find basic node
+                var inputFileType = NodeHelper.GetAssemblyNodeTypes("BasicNodes")?.Where(x => x.Name == "InputFile").FirstOrDefault();
+                if (inputFileType != null)
+                {
+                    flow.Parts.Add(new FlowPart
+                    {
+                        Name = inputFileType.Name,
+                        xPos = 50,
+                        yPos = 200,
+                        Uid = Guid.NewGuid(),
+                        Type = FlowElementType.Input,
+                        Outputs = 1,
+                        FlowElementUid = inputFileType.FullName
+                    });
+                }
+                return flow;
+            }
         }
 
 
@@ -90,24 +108,14 @@ namespace FileFlow.Server.Controllers
                 element.Inputs = instance.Inputs;
                 element.Outputs = instance.Outputs;
                 element.Type = instance.Type;
+                element.Icon = instance.Icon;
 
-                // if(x.IsAssignableFrom(typeof(IConfigurableInputNode)) || x.IsAssignableFrom(typeof(IInputNode)))
-                // {
-                //    element.Inputs = dValue == null ? 1 : (int)dValue.Value;
-                // }
-
-                // if(x.IsAssignableFrom(typeof(IConfigurableOutputNode)) || x.IsAssignableFrom(typeof(IOutputNode)))
-                // {
-                //    var dValue = x.GetProperty(nameof(IOutputNode.Outputs)).GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                //    element.Outputs = dValue == null ? 1 : (int)dValue.Value;
-                // }
                 var model = new ExpandoObject(); ;
                 var dict = (IDictionary<string, object>)model;
                 element.Model = model;
 
                 element.Fields = FormHelper.GetFields(x, dict);
 
-                //(FileFlow.Shared.Nodes.Node)Activator.CreateInstance(x);
                 elements.Add(element);
             }
             return elements;

@@ -12,6 +12,7 @@ namespace FileFlow.BasicNodes.Functions
     {
         public override int Inputs => 1;
         public override FlowElementType Type => FlowElementType.Logic;
+        public override string Icon => "fas fa-code";
 
         [DefaultValue(1)]
         [NumberIntAttribute(1)]

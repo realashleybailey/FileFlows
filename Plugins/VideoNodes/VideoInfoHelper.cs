@@ -66,7 +66,7 @@ namespace FileFlow.VideoNodes
                     {
                         if (sm.Value.Contains(" Video: "))
                         {
-                            var vs = ParseVideoStream(sm.Value);
+                            var vs = ParseVideoStream(sm.Value, output);
                             if (vs != null)
                             {
                                 vs.Index = streamIndex;
@@ -104,7 +104,7 @@ namespace FileFlow.VideoNodes
             return vi;
         }
 
-        VideoStream ParseVideoStream(string info)
+        VideoStream ParseVideoStream(string info, string fullOutput)
         {
             // Stream #0:0(eng): Video: h264 (High), yuv420p(tv, bt709/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 23.98 fps, 23.98 tbr, 1k tbn (default)
             string line = info.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries).First();
@@ -123,11 +123,12 @@ namespace FileFlow.VideoNodes
 
             if (rgxDuration.IsMatch(info) && TimeSpan.TryParse(rgxDuration.Match(info).Value, out TimeSpan duration))
                 vs.Duration = duration;
-            else if (rgxDuration2.IsMatch(info) && TimeSpan.TryParse(rgxDuration2.Match(info).Value, out TimeSpan duration2))
+            else if (rgxDuration2.IsMatch(fullOutput) && TimeSpan.TryParse(rgxDuration2.Match(fullOutput).Value, out TimeSpan duration2))
                 vs.Duration = duration2;
 
             return vs;
         }
+
         AudioStream ParseAudioStream(string info)
         {
             // Stream #0:1(eng): Audio: dts (DTS), 48000 Hz, stereo, fltp, 1536 kb/s (default)

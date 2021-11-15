@@ -12,6 +12,8 @@ namespace FileFlow.Server.Helpers
 
     public class DbHelper
     {
+        public static bool UseMySql = false;
+
         static string CreateDBSript =
             @$"CREATE TABLE {nameof(DbObject)}(
                 Uid             VARCHAR(36)           NOT NULL          PRIMARY KEY,
@@ -23,43 +25,35 @@ namespace FileFlow.Server.Helpers
             );";
 
 
-        private static bool InitDone = false;
         private static IDatabase GetDb()
         {
-            if (Globals.IsDevelopment)
-            {
-                if (InitDone == false)
-                {
-                    CreateDatabase();
-                    InitDone = true;
-                }
-
+            if (UseMySql)
                 return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+            return UseSqlLite();
+        }
 
-                if (File.Exists("Data/FileFlow.sqlite") == false)
+        private static Database UseSqlLite()
+        {
+
+            if (File.Exists("Data/FileFlow.sqlite") == false)
+            {
+                if (Directory.Exists("Data") == false)
+                    Directory.CreateDirectory("Data");
+
+                SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
+
+                using (var con = new SQLiteConnection("Data Source=Data/FileFlow.sqlite;Version=3;"))
                 {
-                    if (Directory.Exists("Data") == false)
-                        Directory.CreateDirectory("Data");
-
-                    SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
-
-                    using (var con = new SQLiteConnection("Data Source=Data/FileFlow.sqlite;Version=3;"))
+                    con.Open();
+                    using (var cmd = new SQLiteCommand(CreateDBSript, con))
                     {
-                        con.Open();
-                        using (var cmd = new SQLiteCommand(CreateDBSript, con))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-                        con.Close();
+                        cmd.ExecuteNonQuery();
                     }
+                    con.Close();
                 }
+            }
 
-                return new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
-            }
-            else
-            {
-                return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
-            }
+            return new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
         }
 
         public static IEnumerable<T> Select<T>() where T : ViObject, new()
@@ -216,6 +210,8 @@ namespace FileFlow.Server.Helpers
 
         public static bool StartMySqlServer()
         {
+            if (UseMySql == false)
+                return true;
             Logger.Instance.ILog("Starting mysql service");
             using (var p = Process.Start(new ProcessStartInfo
             {
@@ -243,14 +239,13 @@ namespace FileFlow.Server.Helpers
                 if (started == false)
                     return false;
             }
-
-            return CreateDatabase();
+            return true;
         }
 
-        private static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
+        public static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
-            //System.Threading.Thread.Sleep(3000); // just give mysql a little chance to get itself ready
-
+            if (UseMySql == false)
+                return true;
             var db = new Database(connectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
 
             bool exists = String.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = 'FileFlow'")) == false;

@@ -14,6 +14,24 @@ namespace FileFlow.Client.Pages
 
     public abstract class ListPage<T> : ComponentBase where T : ViObject
     {
+        private string _FilterText = string.Empty;
+        public string FilterText
+        {
+            get => _FilterText;
+            set
+            {
+                if (_FilterText == value)
+                    return;
+                _FilterText = value ?? string.Empty;
+                UpdateFilter();
+            }
+        }
+
+        protected void UpdateFilter()
+        {
+            //this.DataGrid.LoadData.InvokeAsync();
+            LoadData();
+        }
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] public Editor Editor { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
@@ -21,7 +39,19 @@ namespace FileFlow.Client.Pages
 
         public abstract string ApIUrl { get; }
 
-        public List<T> Data = new List<T>();
+
+        public List<T> _Data = new List<T>();
+        public List<T> Data
+        {
+            get => _Data;
+            set
+            {
+                _Data = value ?? new List<T>();
+                LoadData();
+            }
+        }
+
+        public IEnumerable<T> DisplayData;
         private RadzenDataGrid<T> _DataGrid;
         public IEnumerable<int> PageSizeOptions = new int[] { 50, 100, 250, 500 };
         public RadzenDataGrid<T> DataGrid
@@ -58,6 +88,14 @@ namespace FileFlow.Client.Pages
 
         public virtual string FetchUrl => ApIUrl;
 
+        public virtual void SelectAll()
+        {
+            if (this.SelectedItems?.Any() == true)
+                this.SelectedItems = new List<T>();
+            else
+                this.SelectedItems = this.DisplayData?.ToList() ?? new List<T>();
+        }
+
         public async virtual Task PostLoad()
         {
             await Task.CompletedTask;
@@ -83,6 +121,18 @@ namespace FileFlow.Client.Pages
                 this.StateHasChanged();
             }
         }
+
+        protected virtual void LoadData()//LoadDataArgs args)
+        {
+            if (string.IsNullOrEmpty(FilterText))
+            {
+                DisplayData = Data;
+                return;
+            }
+            string ft = FilterText.Trim().ToLower();
+            DisplayData = Data.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains(ft));
+        }
+
         public async Task RowDoubleClicked(DataGridRowMouseEventArgs<T> item)
         {
             this.SelectedItems.Clear();
@@ -141,7 +191,7 @@ namespace FileFlow.Client.Pages
 
             try
             {
-                var deleteResult = await HttpHelper.Delete($"{ApIUrl}", new DeleteModel { Uids = uids });
+                var deleteResult = await HttpHelper.Delete($"{ApIUrl}", new ReferenceModel { Uids = uids });
                 if (deleteResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));

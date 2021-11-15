@@ -13,6 +13,7 @@ namespace FileFlow.BasicNodes.Functions
         public override int Inputs => 1;
         public override int Outputs => 1;
         public override FlowElementType Type => FlowElementType.Logic;
+        public override string Icon => "far fa-file-alt";
 
         [Enum(1, LogType.Info, LogType.Debug, LogType.Warning, LogType.Error)]
         public LogType LogType { get; set; }

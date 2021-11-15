@@ -3,6 +3,8 @@ namespace FileFlow.VideoNodes
     using FileFlow.Plugin;
     public abstract class VideoNode : Node
     {
+        public override string Icon => "fas fa-video";
+
         protected string GetFFMpegExe(NodeParameters args)
         {
             string ffmpeg = args.GetToolPath("FFMpeg");

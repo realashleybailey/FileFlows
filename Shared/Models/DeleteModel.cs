@@ -1,6 +1,6 @@
 namespace FileFlow.Shared.Models
 {
-    public class DeleteModel
+    public class ReferenceModel
     {
         public System.Guid[] Uids { get; set; }
     }

@@ -10,6 +10,8 @@ namespace FileFlow.BasicNodes.File
         public override int Inputs => 1;
         public override int Outputs => 1;
         public override FlowElementType Type => FlowElementType.Process;
+        public override string Icon => "far fa-trash-alt";
+
         public override int Execute(NodeParameters args)
         {
             string path = args.FileName.Substring(0, args.FileName.Length - args.RelativeFile.Length);

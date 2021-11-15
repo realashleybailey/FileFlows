@@ -13,6 +13,8 @@ namespace FileFlow.Shared.Models
         public float xPos { get; set; }
         public float yPos { get; set; }
 
+        public string Icon { get; set; }
+
         public int Inputs { get; set; }
         public int Outputs { get; set; }
 

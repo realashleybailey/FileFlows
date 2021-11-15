@@ -11,6 +11,10 @@ namespace FileFlow.Plugin
 
         public string Name => base.GetType().Name;
 
+        /// <summary>
+        /// Gets the fontawesome icon to use in the flow 
+        /// </summary>
+        public virtual string Icon { get; }
         public string Group
         {
             get

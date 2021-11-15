@@ -9,6 +9,8 @@ namespace FileFlow.Shared.Models
         public string Uid { get; set; }
         public string Name { get; set; }
 
+        public string Icon { get; set; }
+
         public int Inputs { get; set; }
         public int Outputs { get; set; }
         public FlowElementType Type { get; set; }

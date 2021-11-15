@@ -13,7 +13,7 @@ namespace FileFlow.Server.Controllers
             // clear the log, its too big to send with this data
             return DbHelper.Select<LibraryFile>()
                            .Where(x => status == null || x.Status == status.Value)
-                           .OrderBy(x => x.Order != -1 ? x.Order : int.MaxValue)
+                           .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                            .ThenBy(x => x.DateCreated);
         }
 
@@ -69,8 +69,43 @@ namespace FileFlow.Server.Controllers
             }
         }
 
+        [HttpPost("move-to-top")]
+        public void MoveToTop([FromBody] ReferenceModel model)
+        {
+            if (model == null || model.Uids?.Any() != true)
+                return; // nothing to delete
+
+            var list = model.Uids.ToList();
+
+            var libFiles = DbHelper.Select<LibraryFile>()
+                                   .Where(x => x.Status == FileStatus.Unprocessed)
+                                   .OrderBy(x =>
+                                    {
+                                        int index = list.IndexOf(x.Uid);
+                                        if (index >= 0)
+                                        {
+                                            x.Order = index + 1;
+                                            return index;
+                                        }
+                                        else if (x.Order > 0)
+                                        {
+                                            x.Order = list.Count + x.Order - 1;
+                                            return x.Order;
+                                        }
+                                        return int.MaxValue;
+                                    })
+                                    .Where(x => x.Order > 0)
+                                    .ToList();
+            int order = 0;
+            foreach (var libFile in libFiles)
+            {
+                libFile.Order = ++order;
+                DbHelper.Update(libFile);
+            }
+        }
+
         [HttpDelete]
-        public void Delete([FromBody] DeleteModel model)
+        public void Delete([FromBody] ReferenceModel model)
         {
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete

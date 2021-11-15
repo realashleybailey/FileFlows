@@ -38,6 +38,9 @@ FileFlow.Shared.Logger.Instance = FileFlow.Server.Logger.Instance;
 
 if (FileFlow.Server.Globals.IsDevelopment == false)
     FileFlow.Server.Helpers.DbHelper.StartMySqlServer();
+FileFlow.Server.Helpers.DbHelper.CreateDatabase();
+
+
 
 FileFlow.Server.Helpers.PluginHelper.ScanForPlugins();
 

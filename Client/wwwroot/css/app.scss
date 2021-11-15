@@ -81,6 +81,7 @@ a, .btn-link {
         background:var(--accent) !important;
     }
 }
+::-webkit-scrollbar-corner {background-color: var(--base) !important;}
 .draggable {
     cursor:grab;
     

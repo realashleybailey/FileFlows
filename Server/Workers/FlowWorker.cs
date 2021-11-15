@@ -33,7 +33,7 @@ namespace FileFlow.Server.Workers
             {
                 var file = DbHelper.Select<LibraryFile>()
                                    .Where(x => x.Status == FileStatus.Unprocessed)
-                                   .OrderBy(x => x.Order != -1 ? x.Order : int.MaxValue)
+                                   .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                                    .ThenBy(x => x.DateCreated)
                                    .FirstOrDefault();
                 if (file != null)

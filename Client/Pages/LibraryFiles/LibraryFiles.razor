@@ -42,7 +42,7 @@
             }
         </div>
 
-        <div class="page-table">
+        <div class="page-table has-filter">
             <div class="table-toolbar">
                 <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span
                         class="fas fa-edit"></span>
@@ -51,25 +51,36 @@
                         class="fas fa-trash"></span>
                     @lblDelete</button>
                 <button @onclick="@Refresh"><span class="fas fa-sync-alt"></span> @lblRefresh</button>
+                @if(SelectedStatus == FileStatus.Unprocessed)
+                {
+                    <button @onclick="@MoveToTop"><span class="far fa-caret-square-up"></span> @lblMoveToTop</button>
+                }
+
+
+                <div class="filter">
+                    <input type="text" @bind-value="FilterText" @bind-value:event="oninput" autocomplete="off" />
+                    <i class="fas fa-search"></i>
+                </div>
             </div>
             @{
-                bool paging = Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
+                bool paging = Data != null && Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
                 bool mobile = App.Instance.IsMobile;
-                string lfNameWidth = mobile ? "60vw" : "20rem";
+                //string lfNameWidth = mobile ? "60vw" : "20rem";
+                string lfNameWidth = "20rem";
+                bool sorting = SelectedStatus != FileStatus.Unprocessed;
             }
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" PageSizeOptions="@PageSizeOptions"
+            <RadzenDataGrid @ref="DataGrid" Data="@DisplayData" PageSizeOptions="@PageSizeOptions"
                 RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
-                @bind-Value=@SelectedItems AllowColumnResize="true" FilterMode="FilterMode.Advanced"
-                AllowPaging="@paging" AllowSorting="true" Data="@Data" TItem="LibraryFile"
-                LogicalFilterOperator="LogicalFilterOperator.Or">
+                @bind-Value=@SelectedItems AllowColumnResize="true" AllowPaging="@paging" AllowSorting="@sorting"
+                TItem="LibraryFile">
                 <Columns>
                     <RadzenDataGridColumn TItem="LibraryFile" Width="40px" Sortable="false" Filterable="false"
                         Frozen="true">
                         <HeaderTemplate>
                             <RadzenCheckBox TriState="false" TValue="bool"
                                 Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
+                                Change="@(args => SelectAll())" />
                         </HeaderTemplate>
                         <Template Context="data">
                             <RadzenCheckBox TriState="false"

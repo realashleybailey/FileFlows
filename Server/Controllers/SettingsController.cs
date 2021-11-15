@@ -13,15 +13,18 @@ namespace FileFlow.Server.Controllers
         [HttpGet]
         public Settings Get()
         {
-            return DbHelper.Single<Settings>();
+            return DbHelper.Single<Settings>() ?? new Settings();
         }
 
         [HttpPut]
-        public void Save([FromBody] Settings model)
+        public Settings Save([FromBody] Settings model)
         {
             if (model == null)
-                return;
-            DbHelper.Update(model);
+                return Get();
+            var settings = Get() ?? model;
+            model.Uid = settings.Uid;
+            model.DateCreated = settings.DateCreated;
+            return DbHelper.Update(model);
         }
     }
 

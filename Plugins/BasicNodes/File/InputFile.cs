@@ -8,5 +8,6 @@ namespace FileFlow.BasicNodes.File
     {
         public override int Outputs => 1;
         public override FlowElementType Type => FlowElementType.Input;
+        public override string Icon => "far fa-file";
     }
 }

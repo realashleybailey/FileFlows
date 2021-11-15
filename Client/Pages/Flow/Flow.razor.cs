@@ -15,10 +15,8 @@ namespace FileFlow.Client.Pages
     using FileFlow.Shared;
     using FileFlow.Client.Components.Dialogs;
     using Radzen;
-    using Radzen.Blazor;
     using FileFlow.Shared.Helpers;
     using System.Dynamic;
-    using System.ComponentModel;
 
     public partial class Flow : ComponentBase
     {
@@ -42,7 +40,7 @@ namespace FileFlow.Client.Pages
 
         const string API_URL = "/api/flow";
 
-        private string lblSave, lblSaving, lblClose, lblExecute, lblExecuting, lblRename;
+        private string lblSave, lblSaving, lblClose, lblRename;
 
         private bool _needsRendering = false;
 
@@ -54,8 +52,6 @@ namespace FileFlow.Client.Pages
             lblSave = Translater.Instant("Labels.Save");
             lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
-            lblExecute = Translater.Instant("Labels.Execute");
-            lblExecuting = Translater.Instant("Labels.Executing");
             _ = Init();
         }
 
@@ -258,6 +254,7 @@ namespace FileFlow.Client.Pages
             part.Inputs = element.Inputs;
             part.Outputs = element.Outputs;
             part.Uid = Guid.NewGuid();
+            part.Icon = element.Icon;
             // we have to clone the model, not use the same instance
             if (element.Model != null)
                 part.Model = FileFlow.Shared.Helpers.ObjectCloner.Clone(element.Model);
@@ -317,22 +314,6 @@ namespace FileFlow.Client.Pages
             }
         }
 
-
-
-        private async Task Execute()
-        {
-            this.Blocker.Show(lblSaving);
-            this.IsSaving = true;
-            try
-            {
-                var result = await HttpHelper.Post<string>(API_URL + "/execute?input=somefile.mp4");
-            }
-            finally
-            {
-                this.IsSaving = false;
-                this.Blocker.Hide();
-            }
-        }
 
         public async Task<bool> Edit(ffPart part)
         {

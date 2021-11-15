@@ -105,7 +105,7 @@ namespace FileFlow.Client.Pages
 
             try
             {
-                var deleteResult = await HttpHelper.Delete($"{API_URL}", new DeleteModel { Uids = uids });
+                var deleteResult = await HttpHelper.Delete($"{API_URL}", new ReferenceModel { Uids = uids });
                 if (deleteResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));

@@ -63,7 +63,7 @@ namespace FileFlow.Server.Workers
                 string[] known = DbHelper.GetNames<LibraryFile>().ToArray();
                 foreach (var file in files)
                 {
-                    if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false)
+                    if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
                         continue;
 
                     if (known.Contains(file.FullName))

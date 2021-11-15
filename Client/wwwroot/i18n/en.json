@@ -117,7 +117,8 @@
       "Buttons": {
         "Ignore": "Ignore",
         "Process": "Process",
-        "View": "View"
+        "View": "View",
+        "MoveToTop":"Move To Top"
       }
     },
     "Plugins": {

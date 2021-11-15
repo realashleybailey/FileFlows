@@ -65,7 +65,9 @@
             }
         }
     }
-
+    .page-table  ::deep .rz-data-grid {
+        top:1.75rem !important;
+    }
 }
 
 .page-table 
@@ -79,15 +81,15 @@
     bottom: unset;
     top: unset;
     
-    ::deep tbody td:nth-child(2)
-    {
-        /* Beginning of string */
-        direction: rtl;
-        text-align: left;
-    }
+    // ::deep tbody td:nth-child(2)
+    // {
+    //     /* Beginning of string */
+    //     direction: rtl;
+    //     text-align: left;
+    // }
     ::deep .rz-data-grid {
         position:absolute;
-        top:1.75rem;
+        top:4rem;
         left:0;
         right:0;
         bottom:0;

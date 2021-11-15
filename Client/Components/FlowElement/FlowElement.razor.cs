@@ -2,6 +2,7 @@ namespace FileFlow.Client.Components
 {
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using FileFlow.Shared;
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
     using ffPart = FileFlow.Shared.Models.FlowPart;
@@ -16,7 +17,7 @@ namespace FileFlow.Client.Components
             set
             {
                 _Part = value;
-                Icon = value == null ? "" : Helpers.FlowHelper.GetFlowPartIcon(value.Type);
+                Icon = value == null ? "" : value?.Icon?.EmptyAsNull() ?? Helpers.FlowHelper.GetFlowPartIcon(value.Type);
             }
         }
 

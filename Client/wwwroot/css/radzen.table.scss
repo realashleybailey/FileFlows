@@ -131,3 +131,38 @@
         right: 5px;
     }
 }
+
+.page-table .filter {
+    width:100%;
+    background:var(--input-background);
+    outline: var(--accent);
+    display:flex;
+    flex-direction: row;
+    input {
+        flex-grow:1;
+        outline:none !important;
+    }
+    i {
+        margin-right:0.5rem;
+        padding-top:0.6rem;
+    }
+}
+
+
+
+@media screen and (min-width: 769px) 
+{
+    .page-table .filter {
+        width:unset;
+        position:absolute;
+        right:0;
+        top:0;
+        input {
+            width:15rem;
+            height:1.4rem;
+        }
+        i {
+            padding-top:0.4rem;
+        }
+    }
+}

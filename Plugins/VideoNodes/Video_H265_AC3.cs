@@ -21,6 +21,7 @@ namespace FileFlow.VideoNodes
         [DefaultValue(0)]
         [NumberInt(4)]
         public int Threads { get; set; }
+        public override string Icon => "far fa-file-video";
 
         private NodeParameters args;
 

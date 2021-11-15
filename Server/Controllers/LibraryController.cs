@@ -44,7 +44,7 @@ namespace FileFlow.Server.Controllers
         }
 
         [HttpDelete]
-        public void Delete([FromBody] DeleteModel model)
+        public void Delete([FromBody] ReferenceModel model)
         {
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete

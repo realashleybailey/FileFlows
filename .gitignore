@@ -9,3 +9,4 @@ VideoTests/*
 zpublish/*
 wpublish/*
 dockerbuild.ps1
+/.vs/FileFlow

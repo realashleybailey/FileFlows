@@ -18,6 +18,8 @@ namespace FileFlow.Client.Pages
 
         private FileFlow.Shared.Models.FileStatus SelectedStatus = FileFlow.Shared.Models.FileStatus.Unprocessed;
 
+        private string lblMoveToTop = "";
+
         private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
         private void SetSelected(LibraryStatus status)
@@ -36,6 +38,12 @@ namespace FileFlow.Client.Pages
         protected override async Task PostDelete()
         {
             await RefreshStatus();
+        }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            lblMoveToTop = Translater.Instant("Pages.LibraryFiles.Buttons.MoveToTop");
         }
 
         private async Task RefreshStatus()
@@ -60,6 +68,25 @@ namespace FileFlow.Client.Pages
         public override async Task Edit(LibraryFile item)
         {
             await Helpers.LibraryFileEditor.Open(Blocker, NotificationService, Editor, item);
+        }
+
+        public async Task MoveToTop()
+        {
+            var uids = this.SelectedItems?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+            if (uids.Length == 0)
+                return; // nothing to delete
+
+            Blocker.Show();
+            try
+            {
+                await HttpHelper.Post(ApIUrl + "/move-to-top", new ReferenceModel { Uids = uids });
+                this.SelectedItems.Clear();
+            }
+            finally
+            {
+                Blocker.Hide();
+            }
+            Refresh();
         }
     }
 }

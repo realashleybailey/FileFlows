@@ -9,6 +9,7 @@ namespace FileFlow.BasicNodes.File
         public override int Inputs => 1;
         public override int Outputs => 1;
         public override FlowElementType Type => FlowElementType.Process;
+        public override string Icon => "far fa-copy";
 
         [Folder(1)]
         public string DestinationPath { get; set; }

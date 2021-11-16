@@ -63,23 +63,35 @@ namespace FileFlow.VideoNodes
                 bool firstAc3 = bestAudio?.Codec?.ToLower() == "ac3" && videoInfo.AudioStreams[0] == bestAudio;
                 args.Logger.ILog("Best Audio: ", (object)bestAudio ?? (object)"null");
 
+
+                string crop = args.GetParameter<string>(DetectBlackBars.CROP_KEY) ?? "";
+                if (crop != string.Empty)
+                    crop = " -vf crop=" + crop;
+
                 if (firstAc3 == true && videoH265 != null)
                 {
-                    args.Logger.DLog("File is h265 with the first audio track being AC3");
-                    return 2;
+                    if (crop == string.Empty)
+                    {
+                        args.Logger.DLog("File is hevc with the first audio track being AC3");
+                        return 2;
+                    }
+                    else
+                    {
+                        args.Logger.ILog("Video is hevc and ac3 but needs to be cropped");
+                    }
                 }
 
                 string ffmpegExe = GetFFMpegExe(args);
                 if (string.IsNullOrEmpty(ffmpegExe))
                     return -1;
 
-
                 List<string> ffArgs = new List<string>();
 
                 if (NvidiaEncoding == false && Threads > 0)
                     ffArgs.Add($"-threads {Math.Min(Threads, 16)}");
-                if (videoH265 == null)
-                    ffArgs.Add($"-map 0:v:0 -c:v {(NvidiaEncoding ? "hevc_nvenc -preset hq" : "libx265")} -crf " + (Crf > 0 ? Crf : 21));
+
+                if (videoH265 == null || crop != string.Empty)
+                    ffArgs.Add($"-map 0:v:0 -c:v {(NvidiaEncoding ? "hevc_nvenc -preset hq" : "libx265")} -crf " + (Crf > 0 ? Crf : 21) + crop);
                 else
                     ffArgs.Add($"-map 0:v:0 -c:v copy");
 

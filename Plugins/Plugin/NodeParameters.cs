@@ -60,6 +60,17 @@ namespace FileFlow.Plugin
             }
             this.WorkingFile = filename;
         }
+
+        public T GetParameter<T>(string name)
+        {
+            if (Parameters.ContainsKey(name) == false)
+            {
+                if (typeof(T) == typeof(string))
+                    return (T)(object)string.Empty;
+                return default(T);
+            }
+            return (T)Parameters[name];
+        }
     }
 
 

@@ -37,6 +37,30 @@ namespace FileFlow.VideoNodes
             }
             return fileInfo.DirectoryName;
         }
+        protected string GetFFPlayExe(NodeParameters args)
+        {
+            string ffmpeg = args.GetToolPath("FFMpeg");
+            if (string.IsNullOrEmpty(ffmpeg))
+            {
+                args.Logger.ELog("FFMpeg tool not found.");
+                return "";
+            }
+
+            var fileInfo = new FileInfo(ffmpeg);
+            if (fileInfo.Exists == false)
+            {
+                args.Logger.ELog("FFMpeg tool configured by ffmpeg file does not exist.");
+                return "";
+            }
+
+            var ffplay = Path.Combine(fileInfo.DirectoryName, "ffplay" + fileInfo.Extension);
+            if (File.Exists(ffplay) == false)
+            {
+                args.Logger.ELog("FFMpeg tool configured by ffplay file does not exist.");
+                return "";
+            }
+            return ffplay;
+        }
 
         private const string VIDEO_INFO = "VideoInfo";
         protected void SetVideoInfo(NodeParameters args, VideoInfo info)

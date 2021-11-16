@@ -40,6 +40,10 @@ if (FileFlow.Server.Globals.IsDevelopment == false)
     FileFlow.Server.Helpers.DbHelper.StartMySqlServer();
 FileFlow.Server.Helpers.DbHelper.CreateDatabase();
 
+System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+FileFlow.Server.Globals.Version = fvi.FileVersion;
+
 
 
 FileFlow.Server.Helpers.PluginHelper.ScanForPlugins();

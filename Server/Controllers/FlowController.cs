@@ -118,7 +118,7 @@ namespace FileFlow.Server.Controllers
 
                 elements.Add(element);
             }
-            return elements;
+            return elements.OrderBy(x => x.Group).ThenBy(x => x.Type).ThenBy(x => x.Name);
         }
 
         [HttpPut]

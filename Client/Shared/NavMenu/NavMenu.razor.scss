@@ -66,6 +66,9 @@
         
     }
 }
+.version-info { 
+    display:none;
+}
 @media (min-width: 850px) {
     .navbar-toggler {
         display: none;
@@ -77,6 +80,14 @@
     }
     .navbar-brand {
         display:unset;
+    }
+    .version-info {
+        display: unset;
+        position: absolute;
+        bottom: 1rem;
+        width: 100%;
+        text-align: center;
+        color: rgba(var(--color-rgb), 0.4);
     }
 }
 @media (max-width: 849.99px) {

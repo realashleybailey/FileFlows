@@ -13,9 +13,13 @@ namespace FileFlow.Client.Shared
 
         public NavMenuItem Active { get; private set; }
 
+        private string lblVersion;
+
         private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
         protected override void OnInitialized()
         {
+            lblVersion = Translater.Instant("Labels.VersionNumber", new { version = Globals.Version });
+
             MenuItems.Add(new NavMenuItem("Pages.Dashboard.Title", "fas fa-home", ""));
             MenuItems.Add(new NavMenuItem("Pages.LibraryFiles.Title", "fas fa-copy", "library-files"));
             MenuItems.Add(new NavMenuItem("Pages.Flows.Title", "fas fa-project-diagram", "flows"));

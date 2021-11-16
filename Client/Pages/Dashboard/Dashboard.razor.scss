@@ -48,7 +48,7 @@
         flex-direction: column;
         justify-content: end;
         .actions {            
-            text-align: right;
+            text-align: right !important;
         }
     }
     .chart-wrapper {

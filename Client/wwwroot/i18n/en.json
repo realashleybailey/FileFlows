@@ -1,6 +1,7 @@
 {
   "ProductName": "FileFlow",
   "Labels": {
+    "VersionNumber":"Version: {version}",
     "Save": "Save",
     "Saving": "Saving",
     "Execute": "Execute",

@@ -62,11 +62,8 @@ namespace FileFlow.VideoNodes
                         int[] parts = match.Value.Split(':').Select(x => int.Parse(x)).ToArray();
                         x = Math.Min(x, parts[2]);
                         y = Math.Min(y, parts[3]);
-                        if (width == 0)
-                        {
-                            width = parts[0];
-                            height = parts[1];
-                        }
+                        width = Math.Max(width, parts[0]);
+                        height = Math.Max(height, parts[1]);
                     }
 
                     if (x == int.MaxValue)
@@ -74,7 +71,7 @@ namespace FileFlow.VideoNodes
                     if (y == int.MaxValue)
                         y = 0;
 
-                    if (x + y == 0)
+                    if (x + y < 28) // to small to bother croping
                         return string.Empty;
                     return $"{width}:{height}:{x}:{y}";
                 }

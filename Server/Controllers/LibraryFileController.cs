@@ -11,10 +11,17 @@ namespace FileFlow.Server.Controllers
         public IEnumerable<LibraryFile> GetAll([FromQuery] FileStatus? status)
         {
             // clear the log, its too big to send with this data
-            return DbHelper.Select<LibraryFile>()
-                           .Where(x => status == null || x.Status == status.Value)
-                           .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
-                           .ThenBy(x => x.DateCreated);
+            var results = DbHelper.Select<LibraryFile>()
+                                   .Where(x => status == null || x.Status == status.Value);
+
+            if (status == FileStatus.Unprocessed)
+                return results.OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
+                              .ThenBy(x => x.DateCreated);
+
+            if (status == FileStatus.Processing)
+                return results;
+
+            return results.OrderByDescending(x => x.ProcessingEnded);
         }
 
         [HttpGet("upcoming")]

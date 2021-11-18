@@ -324,7 +324,8 @@ namespace FileFlow.Client.Pages
                 Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
                 return false;
             }
-            var newModelTask = Editor.Open("Flow.Parts." + part.Name, part.Name, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new ExpandoObject());
+            string title = Helpers.FlowHelper.FormatLabel(part.Name);
+            var newModelTask = Editor.Open("Flow.Parts." + part.Name, title, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new ExpandoObject());
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {

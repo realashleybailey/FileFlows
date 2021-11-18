@@ -40,6 +40,8 @@ namespace FileFlow.Client.Components
         private bool ReadOnly { get; set; }
         public bool Large { get; set; }
 
+        public string EditorDescription { get; set; }
+
         private readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
         private bool FocusFirst = false;
@@ -96,6 +98,9 @@ namespace FileFlow.Client.Components
             this.ReadOnly = readOnly;
             this.Large = large;
             this.Visible = true;
+            Logger.Instance.DLog("getting description for: " + typeName);
+            this.EditorDescription = Translater.Instant(typeName + ".Description");
+            Logger.Instance.DLog("getting description for: " + typeName, this.EditorDescription);
             var expandoModel = ConverToExando(model);
             this.Model = expandoModel;
             OpenTask = new TaskCompletionSource<ExpandoObject>();

@@ -88,7 +88,7 @@ namespace FileFlow.Shared
                     return Language[key];
 
             }
-            if (possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder"))
+            if (possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder") || possibleKeys[0].EndsWith(".Description"))
                 return "";
 
             string result = possibleKeys?.FirstOrDefault() ?? "";

@@ -26,6 +26,10 @@
                 <Body>
                     <CascadingValue IsFixed="true" Value="this">
                         <div class="fields">
+                            @if(string.IsNullOrEmpty(EditorDescription) == false){
+                                <div class="description">@EditorDescription</div>
+                            }
+
                             @foreach (var field in Fields.OrderBy(x => x.Order))
                         {
                             string label = TypeName + ".Fields." + field.Name;

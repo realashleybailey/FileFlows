@@ -1,4 +1,4 @@
-namespace FileFlow.Shared.Models
+namespace FileFlows.Shared.Models
 {
     using System;
     using System.Collections.Generic;

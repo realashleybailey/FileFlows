@@ -1,4 +1,4 @@
-namespace FileFlow.Server
+namespace FileFlows.Server
 {
     using System.Net;
     public class ExceptionMiddleware

@@ -1,4 +1,4 @@
-namespace FileFlow.Server.Models
+namespace FileFlows.Server.Models
 {
     using NPoco;
 

@@ -19,7 +19,7 @@ The Video plugin lets you process video files to ensure they are in the format y
 This application is designed (for now, later alternative builds will be published) to be run as a docker application and primarily for unRAID.
 
 1. Select "Apps" to go to the "Community Applications" of unRAID (if not installed refer to the unRAID forum/site for installation instructions)
-2. Search "FileFlow".  This won't be found in the Community Applications and click "Click Here To Get More Results From DockerHub"
+2. Search "FileFlows".  This won't be found in the Community Applications and click "Click Here To Get More Results From DockerHub"
    1. If that option does not appear go to Unraid \ Settings \ Community Applications.   And then set "Enable developer mode" to "Yes".
 3. Select "Install" 
    ![image](https://user-images.githubusercontent.com/958400/142372817-4582c5bb-6108-42d7-8ada-f0015652c429.png)
@@ -45,7 +45,7 @@ This application is designed (for now, later alternative builds will be publishe
 11. Add Path
     1.  Name:  Logs
     2.  Container Path: /app/Logs
-    3.  Host Path: /mnt/user/appdata/fileflow/logs
+    3.  Host Path: /mnt/user/appdata/fileflows/logs
 12. Add Path
     1.  Name: Media
     2.  Container Path: /media
@@ -54,7 +54,7 @@ This application is designed (for now, later alternative builds will be publishe
 
 
 # Setup
-Once the installed you need to configure FileFlow.
+Once the installed you need to configure FileFlows.
 1. First you need to configure a Flow to be used in a library.  
    1. A Flow needs one input node (Input File or Video File or another Input Node)
    2. A node can have 0 or more outputs.
@@ -72,7 +72,7 @@ Once the installed you need to configure FileFlow.
       5. This flow is designed to monitor a "Downloads" folder" and will move any video files into a "Converted" folder once done, which will be picked up another docker afterwards. e.g.
          1. Sonarr finds files.  
          2. Sabnzbd downloads files to "completed" folder"
-         3. FileFlow processes files moves to "converted"
+         3. FileFlows processes files moves to "converted"
          4. Sonarr watches the "converted" folder for the resulting downloaded files and then continues.
 2. Add a library for files to be monitored, and select which Flow this library should use
 3. Under settings enable the "Library Scanner" and "Flow Executor"

@@ -1,12 +1,12 @@
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
     using System;
     using System.Collections.Generic;
     using NPoco;
-    using FileFlow.Server.Models;
+    using FileFlows.Server.Models;
     using System.Data.SQLite;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
     using System.Data.Common;
     using System.Diagnostics;
 
@@ -28,21 +28,21 @@ namespace FileFlow.Server.Helpers
         private static IDatabase GetDb()
         {
             if (UseMySql)
-                return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+                return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlows", null, MySqlConnector.MySqlConnectorFactory.Instance);
             return UseSqlLite();
         }
 
         private static Database UseSqlLite()
         {
 
-            if (File.Exists("Data/FileFlow.sqlite") == false)
+            if (File.Exists("Data/FileFlows.sqlite") == false)
             {
                 if (Directory.Exists("Data") == false)
                     Directory.CreateDirectory("Data");
 
-                SQLiteConnection.CreateFile("Data/FileFlow.sqlite");
+                SQLiteConnection.CreateFile("Data/FileFlows.sqlite");
 
-                using (var con = new SQLiteConnection("Data Source=Data/FileFlow.sqlite;Version=3;"))
+                using (var con = new SQLiteConnection("Data Source=Data/FileFlows.sqlite;Version=3;"))
                 {
                     con.Open();
                     using (var cmd = new SQLiteCommand(CreateDBSript, con))
@@ -53,7 +53,7 @@ namespace FileFlow.Server.Helpers
                 }
             }
 
-            return new Database("Data Source=Data/FileFlow.sqlite;Version=3;", null, SQLiteFactory.Instance);
+            return new Database("Data Source=Data/FileFlows.sqlite;Version=3;", null, SQLiteFactory.Instance);
         }
 
         public static IEnumerable<T> Select<T>() where T : ViObject, new()
@@ -242,25 +242,41 @@ namespace FileFlow.Server.Helpers
             return true;
         }
 
+        public static void UpgradeDatabase()
+        {
+            using (var db = GetDb())
+            {
+                var objects = db.Fetch<DbObject>();
+                foreach (var obj in objects)
+                {
+                    if (obj.Type.StartsWith("FileFlow."))
+                    {
+                        obj.Type = obj.Type.Replace("FileFlow.", "FileFlows.");
+                        db.Update(obj);
+                    }
+                }
+            }
+        }
+
         public static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
             if (UseMySql == false)
                 return true;
             var db = new Database(connectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
 
-            bool exists = String.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = 'FileFlow'")) == false;
+            bool exists = String.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = 'FileFlows'")) == false;
             if (exists)
             {
                 db.Dispose();
                 return true;
             }
 
-            db.Execute("create database FileFlow");
+            db.Execute("create database FileFlows");
             // dispose of original one
             db.Dispose();
 
             // create new one pointing ot the database
-            db = new Database(connectionString + "Database=FileFlow", null, MySqlConnector.MySqlConnectorFactory.Instance);
+            db = new Database(connectionString + "Database=FileFlows", null, MySqlConnector.MySqlConnectorFactory.Instance);
 
             db.Execute(CreateDBSript);
 

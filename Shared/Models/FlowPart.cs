@@ -1,9 +1,9 @@
-namespace FileFlow.Shared.Models
+namespace FileFlows.Shared.Models
 {
     using System;
     using System.Collections.Generic;
     using System.Dynamic;
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
 
     public class FlowPart
     {

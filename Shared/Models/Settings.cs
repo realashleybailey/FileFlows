@@ -1,7 +1,7 @@
-﻿namespace FileFlow.Shared.Models
+﻿namespace FileFlows.Shared.Models
 {
     using System.ComponentModel.DataAnnotations;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin.Attributes;
 
     public class Settings : ViObject
     {

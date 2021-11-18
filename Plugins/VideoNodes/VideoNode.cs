@@ -1,6 +1,6 @@
-namespace FileFlow.VideoNodes
+namespace FileFlows.VideoNodes
 {
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
     public abstract class VideoNode : Node
     {
         public override string Icon => "fas fa-video";

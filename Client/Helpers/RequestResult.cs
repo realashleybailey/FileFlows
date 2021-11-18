@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Helpers
+namespace FileFlows.Client.Helpers
 {
     public class RequestResult<T>
     {

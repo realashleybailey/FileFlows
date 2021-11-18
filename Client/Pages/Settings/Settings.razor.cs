@@ -1,12 +1,12 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
-    using FileFlow.Client.Helpers;
+    using FileFlows.Client.Helpers;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Shared;
-    using FileFlow.Client.Components;
+    using FileFlows.Shared;
+    using FileFlows.Client.Components;
 
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
     public partial class Settings : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
@@ -15,7 +15,7 @@ namespace FileFlow.Client.Pages
 
         private string lblSave, lblSaving;
 
-        private FileFlow.Shared.Models.Settings Model { get; set; } = new FileFlow.Shared.Models.Settings();
+        private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
 
         protected override async Task OnInitializedAsync()
         {
@@ -23,7 +23,7 @@ namespace FileFlow.Client.Pages
             lblSaving = Translater.Instant("Labels.Saving");
             Blocker.Show("Loading Settings");
 
-            var response = await HttpHelper.Get<FileFlow.Shared.Models.Settings>("/api/settings");
+            var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
             if (response.Success)
                 this.Model = response.Data;
 

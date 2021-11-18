@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs
 {
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;

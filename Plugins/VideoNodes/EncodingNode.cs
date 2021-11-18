@@ -1,10 +1,10 @@
-namespace FileFlow.VideoNodes
+namespace FileFlows.VideoNodes
 {
     using System.ComponentModel;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using FileFlow.Plugin;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin;
+    using FileFlows.Plugin.Attributes;
 
     public abstract class EncodingNode : VideoNode
     {

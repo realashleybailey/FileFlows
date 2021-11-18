@@ -1,6 +1,6 @@
-@namespace FileFlow.Client.Components
-@using FileFlow.Shared
-@using FileFlow.Plugin;
+@namespace FileFlows.Client.Components
+@using FileFlows.Shared
+@using FileFlows.Plugin;
 
 @if (Visible)
 {
@@ -82,7 +82,7 @@
                                 case FormInputType.Select:
                                     {
                                         var value = GetValue<object>(field.Name, "");
-                                        var options = GetParameter<List<FileFlow.Plugin.ListOption>>(field, "Options");
+                                        var options = GetParameter<List<FileFlows.Plugin.ListOption>>(field, "Options");
                                         <InputSelect Label="@label" Value="@value" Options=@options
                             ValueChanged="@(x => UpdateValue(field.Name, x))" />
                                     }

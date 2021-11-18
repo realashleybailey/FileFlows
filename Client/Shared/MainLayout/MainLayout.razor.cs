@@ -1,7 +1,7 @@
-namespace FileFlow.Client.Shared
+namespace FileFlows.Client.Shared
 {
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Client.Components;
+    using FileFlows.Client.Components;
     public partial class MainLayout : LayoutComponentBase
     {
         public NavMenu Menu { get; set; }

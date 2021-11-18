@@ -1,12 +1,12 @@
 
-namespace FileFlow.Shared
+namespace FileFlows.Shared
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Jeffijoe.MessageFormat;
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
     using System.Text.Json;
     using System.Dynamic;
 

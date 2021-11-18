@@ -1,13 +1,13 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using System;
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Shared.Models;
-    using FileFlow.Server.Helpers;
+    using FileFlows.Shared.Models;
+    using FileFlows.Server.Helpers;
     using System.ComponentModel;
     using System.Dynamic;
-    using FileFlow.Plugin;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin;
+    using FileFlows.Plugin.Attributes;
 
     [Route("/api/flow")]
     public class FlowController : Controller

@@ -1,9 +1,9 @@
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
     using System.Collections;
     using System.Reflection;
-    using FileFlow.Shared.Models;
-    using FileFlow.Plugin;
+    using FileFlows.Shared.Models;
+    using FileFlows.Plugin;
 
     public class NodeHelper
     {
@@ -66,7 +66,7 @@ namespace FileFlow.Server.Helpers
                         if (dict[k] == null)
                             continue;
 
-                        var value = FileFlow.Shared.Converter.ConvertObject(prop.PropertyType, dict[k]);
+                        var value = FileFlows.Shared.Converter.ConvertObject(prop.PropertyType, dict[k]);
                         if (value != null)
                             prop.SetValue(node, value);
                     }

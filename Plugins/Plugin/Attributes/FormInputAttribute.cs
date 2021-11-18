@@ -1,8 +1,8 @@
-namespace FileFlow.Plugin.Attributes
+namespace FileFlows.Plugin.Attributes
 {
     using System;
     using System.Collections.Generic;
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
 
     public class FormInputAttribute : Attribute
     {

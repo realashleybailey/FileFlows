@@ -1,8 +1,8 @@
-namespace FileFlow.BasicNodes.File
+namespace FileFlows.BasicNodes.File
 {
     using System.ComponentModel;
-    using FileFlow.Plugin;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin;
+    using FileFlows.Plugin.Attributes;
 
     public class FileSize : Node
     {

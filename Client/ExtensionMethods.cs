@@ -1,8 +1,8 @@
-namespace FileFlow.Client 
+namespace FileFlows.Client
 {
     using System.Net.Http;
     using System.Text;
-    using FileFlow.Shared;
+    using FileFlows.Shared;
 
     public static class ExtensionMethods
     {

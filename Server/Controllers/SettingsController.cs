@@ -1,10 +1,10 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Server;
-    using FileFlow.Shared.Models;
-    using FileFlow.Server.Helpers;
+    using FileFlows.Server;
+    using FileFlows.Shared.Models;
+    using FileFlows.Server.Helpers;
 
     [Route("/api/settings")]
     public class SettingsController : Controller

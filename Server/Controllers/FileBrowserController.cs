@@ -1,11 +1,11 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using System.IO;
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Server;
-    using FileFlow.Shared.Models;
-    using FileFlow.Server.Helpers;
+    using FileFlows.Server;
+    using FileFlows.Shared.Models;
+    using FileFlows.Server.Helpers;
     using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
 

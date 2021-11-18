@@ -1,7 +1,7 @@
-namespace FileFlow.Client.Components
+namespace FileFlows.Client.Components
 {
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Shared;
+    using FileFlows.Shared;
 
     public partial class Fieldset : ComponentBase
     {

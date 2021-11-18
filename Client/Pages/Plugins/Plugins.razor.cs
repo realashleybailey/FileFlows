@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System.Linq;
     using System.Collections.Generic;
@@ -7,10 +7,10 @@ namespace FileFlow.Client.Pages
     using Microsoft.AspNetCore.Components;
     using Radzen;
     using Radzen.Blazor;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
 
     public partial class Plugins : ComponentBase
     {

@@ -1,15 +1,15 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Timers;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Components.Dialogs;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Components.Dialogs;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
     using Radzen;
@@ -172,7 +172,7 @@ namespace FileFlow.Client.Pages
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.LogView,
+                InputType = FileFlows.Plugin.FormInputType.LogView,
                 Name = "Log",
                 Parameters = new Dictionary<string, object> {
                     { nameof(Components.Inputs.InputLogView.RefreshUrl), url },

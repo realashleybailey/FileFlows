@@ -1,6 +1,6 @@
-namespace FileFlow.Client.Components
+namespace FileFlows.Client.Components
 {
-    using FileFlow.Shared.Models;
+    using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
     public partial class DataGrid<T> where T : ViObject
     {

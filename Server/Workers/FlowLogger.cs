@@ -1,11 +1,11 @@
-namespace FileFlow.Server.Workers
+namespace FileFlows.Server.Workers
 {
     using System;
     using System.Linq;
     using System.Text;
-    using FileFlow.Plugin;
-    using FileFlow.Server.Helpers;
-    using FileFlow.Shared.Models;
+    using FileFlows.Plugin;
+    using FileFlows.Server.Helpers;
+    using FileFlows.Shared.Models;
 
     public class FlowLogger : ILogger
     {

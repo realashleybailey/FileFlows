@@ -1,4 +1,4 @@
-namespace FileFlow.Shared.Validators
+namespace FileFlows.Shared.Validators
 {
     using System.Threading.Tasks;
 

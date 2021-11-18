@@ -1,8 +1,8 @@
-namespace FileFlow.Client.Shared
+namespace FileFlows.Client.Shared
 {
     using System.Collections.Generic;
     using System.Linq;
-    using FileFlow.Shared;
+    using FileFlows.Shared;
     using Microsoft.AspNetCore.Components;
 
     public partial class NavMenu

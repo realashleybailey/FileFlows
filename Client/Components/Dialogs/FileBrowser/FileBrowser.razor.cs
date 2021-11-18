@@ -1,14 +1,14 @@
-namespace FileFlow.Client.Components.Dialogs
+namespace FileFlows.Client.Components.Dialogs
 {
     using System;
     using System.IO;
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Shared;
-    using FileFlow.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Client.Helpers;
     using System.Linq;
-    using FileFlow.Shared.Models;
+    using FileFlows.Shared.Models;
 
     public partial class FileBrowser : ComponentBase
     {

@@ -1,11 +1,11 @@
-namespace FileFlow.Shared.Json
+namespace FileFlows.Shared.Json
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.Json;
     using System.Text.Json.Serialization;
-    using FileFlow.Shared.Validators;
+    using FileFlows.Shared.Validators;
 
     public class ValidatorConverter : JsonConverter<Validators.Validator>
     {

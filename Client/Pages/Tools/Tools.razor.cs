@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System.Collections.Generic;
     using System.Dynamic;
@@ -6,11 +6,11 @@ namespace FileFlow.Client.Pages
     using System.Threading.Tasks;
     using Radzen;
     using Radzen.Blazor;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
-    using FileFlow.Plugin;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
+    using FileFlows.Plugin;
 
     public partial class Tools : ListPage<Tool>
     {
@@ -30,18 +30,18 @@ namespace FileFlow.Client.Pages
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Text,
+                InputType = FileFlows.Plugin.FormInputType.Text,
                 Name = nameof(Tool.Name),
-                Validators = new List<FileFlow.Shared.Validators.Validator> {
-                    new FileFlow.Shared.Validators.Required()
+                Validators = new List<FileFlows.Shared.Validators.Validator> {
+                    new FileFlows.Shared.Validators.Required()
                 }
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.File,
+                InputType = FileFlows.Plugin.FormInputType.File,
                 Name = nameof(Tool.Path),
-                Validators = new List<FileFlow.Shared.Validators.Validator> {
-                    new FileFlow.Shared.Validators.Required()
+                Validators = new List<FileFlows.Shared.Validators.Validator> {
+                    new FileFlows.Shared.Validators.Required()
                 }
             });
             var result = await Editor.Open("Pages.Tool", Tool.Name, fields, Tool,

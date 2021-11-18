@@ -1,4 +1,4 @@
-namespace FileFlow.Plugin.Attributes
+namespace FileFlows.Plugin.Attributes
 {
     using System;
     using System.Collections.Generic;

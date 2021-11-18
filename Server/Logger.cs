@@ -1,6 +1,6 @@
-namespace FileFlow.Server
+namespace FileFlows.Server
 {
-    public class Logger : FileFlow.Plugin.ILogger
+    public class Logger : FileFlows.Plugin.ILogger
     {
         private enum LogType { Error, Warning, Debug, Info }
         private void Log(LogType type, object[] args)
@@ -18,8 +18,8 @@ namespace FileFlow.Server
         public void WLog(params object[] args) => Log(LogType.Warning, args);
         public void ELog(params object[] args) => Log(LogType.Error, args);
 
-        static FileFlow.Plugin.ILogger _Instance;
-        public static FileFlow.Plugin.ILogger Instance
+        static FileFlows.Plugin.ILogger _Instance;
+        public static FileFlows.Plugin.ILogger Instance
         {
             get
             {

@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
     public partial class InputTextArea : Input<string>

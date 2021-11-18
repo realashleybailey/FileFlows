@@ -15,12 +15,12 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = provider
 });
 
-app.UseMiddleware<FileFlow.Server.ExceptionMiddleware>();
+app.UseMiddleware<FileFlows.Server.ExceptionMiddleware>();
 app.UseRouting();
 
-FileFlow.Server.Globals.IsDevelopment = app.Environment.IsDevelopment();
+FileFlows.Server.Globals.IsDevelopment = app.Environment.IsDevelopment();
 
-if (FileFlow.Server.Globals.IsDevelopment)
+if (FileFlows.Server.Globals.IsDevelopment)
     app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.MapControllerRoute(
@@ -34,25 +34,26 @@ app.MapControllerRoute(
     defaults: new { controller = "Home", action = "Spa" }
 );
 
-FileFlow.Shared.Logger.Instance = FileFlow.Server.Logger.Instance;
+FileFlows.Shared.Logger.Instance = FileFlows.Server.Logger.Instance;
 
-if (FileFlow.Server.Globals.IsDevelopment == false)
-    FileFlow.Server.Helpers.DbHelper.StartMySqlServer();
-FileFlow.Server.Helpers.DbHelper.CreateDatabase();
+if (FileFlows.Server.Globals.IsDevelopment == false)
+    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
+FileFlows.Server.Helpers.DbHelper.CreateDatabase();
+FileFlows.Server.Helpers.DbHelper.UpgradeDatabase();
 
 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-FileFlow.Server.Globals.Version = fvi.FileVersion;
+FileFlows.Server.Globals.Version = fvi.FileVersion;
 
 
 
-FileFlow.Server.Helpers.PluginHelper.ScanForPlugins();
+FileFlows.Server.Helpers.PluginHelper.ScanForPlugins();
 
-FileFlow.Server.Workers.LibraryWorker.ResetProcessing();
+FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
 
-FileFlow.Server.Workers.Worker.StartWorkers();
+FileFlows.Server.Workers.Worker.StartWorkers();
 
 // this will run the asp.net app and wait until it is killed
 app.Run();
 
-FileFlow.Server.Workers.Worker.StopWorkers();
+FileFlows.Server.Workers.Worker.StopWorkers();

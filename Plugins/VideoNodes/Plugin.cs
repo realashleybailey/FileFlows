@@ -1,9 +1,9 @@
-namespace FileFlow.VideoNodes
+namespace FileFlows.VideoNodes
 {
     using System.ComponentModel.DataAnnotations;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin.Attributes;
 
-    public class Plugin : FileFlow.Plugin.IPlugin
+    public class Plugin : FileFlows.Plugin.IPlugin
     {
         public string Name => "Video Nodes";
 

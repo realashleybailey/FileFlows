@@ -1,4 +1,4 @@
-namespace FileFlow.Server
+namespace FileFlows.Server
 {
     public class Globals
     {

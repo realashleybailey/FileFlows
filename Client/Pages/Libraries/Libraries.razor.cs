@@ -1,4 +1,4 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System.Collections.Generic;
     using System.Dynamic;
@@ -6,11 +6,11 @@ namespace FileFlow.Client.Pages
     using System.Threading.Tasks;
     using Radzen;
     using Radzen.Blazor;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
-    using FileFlow.Plugin;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
+    using FileFlows.Plugin;
 
     public partial class Libraries : ListPage<Library>
     {
@@ -27,7 +27,7 @@ namespace FileFlow.Client.Pages
         public override async Task Edit(Library library)
         {
             Blocker.Show();
-            var flowResult = await HttpHelper.Get<FileFlow.Shared.Models.Flow[]>("/api/flow");
+            var flowResult = await HttpHelper.Get<FileFlows.Shared.Models.Flow[]>("/api/flow");
             Blocker.Hide();
             if (flowResult.Success == false || flowResult.Data?.Any() != true)
             {
@@ -41,28 +41,28 @@ namespace FileFlow.Client.Pages
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Text,
+                InputType = FileFlows.Plugin.FormInputType.Text,
                 Name = nameof(library.Name),
-                Validators = new List<FileFlow.Shared.Validators.Validator> {
-                    new FileFlow.Shared.Validators.Required()
+                Validators = new List<FileFlows.Shared.Validators.Validator> {
+                    new FileFlows.Shared.Validators.Required()
                 }
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Folder,
+                InputType = FileFlows.Plugin.FormInputType.Folder,
                 Name = nameof(library.Path),
-                Validators = new List<FileFlow.Shared.Validators.Validator> {
-                    new FileFlow.Shared.Validators.Required()
+                Validators = new List<FileFlows.Shared.Validators.Validator> {
+                    new FileFlows.Shared.Validators.Required()
                 }
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Text,
+                InputType = FileFlows.Plugin.FormInputType.Text,
                 Name = nameof(library.Filter)
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Select,
+                InputType = FileFlows.Plugin.FormInputType.Select,
                 Name = nameof(library.Flow),
                 Parameters = new Dictionary<string, object>{
                     { "Options", flowOptions.ToList() }
@@ -70,7 +70,7 @@ namespace FileFlow.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.Switch,
+                InputType = FileFlows.Plugin.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });
             var result = await Editor.Open("Pages.Library", library.Name, fields, library,

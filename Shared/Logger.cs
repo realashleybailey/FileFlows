@@ -1,6 +1,6 @@
-namespace FileFlow.Shared
+namespace FileFlows.Shared
 {
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
     public class Logger
     {
         public static ILogger Instance { get; set; }

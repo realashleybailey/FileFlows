@@ -1,8 +1,8 @@
 using System;
 using Microsoft.JSInterop;
-using FileFlow.Plugin;
+using FileFlows.Plugin;
 
-namespace FileFlow.Client
+namespace FileFlows.Client
 {
     public class Logger : ILogger
     {

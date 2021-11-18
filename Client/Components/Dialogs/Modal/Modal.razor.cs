@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using FileFlow.Shared;
+using FileFlows.Shared;
 
-namespace FileFlow.Client.Components.Dialogs
+namespace FileFlows.Client.Components.Dialogs
 {
     public partial class Modal : ComponentBase
     {

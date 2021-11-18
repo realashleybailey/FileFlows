@@ -1,7 +1,7 @@
-namespace FileFlow.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Shared;
+    using FileFlows.Shared;
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using System.Linq;
@@ -52,7 +52,7 @@ namespace FileFlow.Client.Components.Inputs
         public string Help { get; set; }
         public string Placeholder { get; set; }
 
-        [Parameter] public List<FileFlow.Shared.Validators.Validator> Validators { get; set; }
+        [Parameter] public List<FileFlows.Shared.Validators.Validator> Validators { get; set; }
 
         public string ErrorMessage { get; set; } = "";
 

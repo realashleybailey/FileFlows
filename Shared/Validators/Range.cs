@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace FileFlow.Shared.Validators
+namespace FileFlows.Shared.Validators
 {
     public class Range : Validator
     {

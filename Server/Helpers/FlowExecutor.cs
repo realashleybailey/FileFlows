@@ -1,8 +1,8 @@
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
-    using FileFlow.Shared.Models;
-    using FileFlow.Plugin;
-    using FileFlow.Server.Workers;
+    using FileFlows.Shared.Models;
+    using FileFlows.Plugin;
+    using FileFlows.Server.Workers;
 
     public class FlowExecutor
     {

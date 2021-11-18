@@ -1,13 +1,13 @@
-namespace FileFlow.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs
 {
     using System.Collections.Generic;
     using Microsoft.AspNetCore.Components;
     using System.Linq;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
     using System.Text.Json;
     using System.Threading.Tasks;
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
 
     public partial class InputSelect : Input<object>
     {

@@ -1,4 +1,4 @@
-namespace FileFlow.Server.Workers
+namespace FileFlows.Server.Workers
 {
     public abstract class Worker
     {

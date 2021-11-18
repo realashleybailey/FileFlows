@@ -1,19 +1,19 @@
-namespace FileFlow.Client.Components
+namespace FileFlows.Client.Components
 {
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
-    using ffElement = FileFlow.Shared.Models.FlowElement;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
+    using ffElement = FileFlows.Shared.Models.FlowElement;
     using System.Collections;
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Reflection;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin.Attributes;
     using System.Linq;
     using System.ComponentModel;
-    using FileFlow.Client.Components.Inputs;
+    using FileFlows.Client.Components.Inputs;
 
     public partial class Editor : ComponentBase
     {
@@ -166,7 +166,7 @@ namespace FileFlow.Client.Components
                 return default(T);
             try
             {
-                return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), val);
+                return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), val);
             }
             catch (Exception)
             {
@@ -205,7 +205,7 @@ namespace FileFlow.Client.Components
                 return (T)value;
             }
 
-            return (T)FileFlow.Shared.Converter.ConvertObject(typeof(T), value);
+            return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), value);
             // var valueType = value.GetType();
             // try
             // {
@@ -213,7 +213,7 @@ namespace FileFlow.Client.Components
             //     {
 
             //         // we have a list, we want to make it an array
-            //         var converted = FileFlow.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
+            //         var converted = FileFlows.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
             //         return (T)converted;
             //     }
 

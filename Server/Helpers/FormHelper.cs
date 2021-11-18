@@ -1,10 +1,10 @@
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
     using System.Reflection;
-    using FileFlow.Plugin.Attributes;
-    using FileFlow.Shared.Models;
+    using FileFlows.Plugin.Attributes;
+    using FileFlows.Shared.Models;
 
     class FormHelper
     {

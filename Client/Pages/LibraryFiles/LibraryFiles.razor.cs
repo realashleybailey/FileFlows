@@ -1,22 +1,22 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Radzen.Blazor;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
     using Radzen;
     using System.Linq;
-    using FileFlow.Client.Components.Dialogs;
+    using FileFlows.Client.Components.Dialogs;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
         public override string ApIUrl => "/api/library-file";
 
-        private FileFlow.Shared.Models.FileStatus SelectedStatus = FileFlow.Shared.Models.FileStatus.Unprocessed;
+        private FileFlows.Shared.Models.FileStatus SelectedStatus = FileFlows.Shared.Models.FileStatus.Unprocessed;
 
         private string lblMoveToTop = "";
 

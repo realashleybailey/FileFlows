@@ -1,5 +1,5 @@
-@namespace FileFlow.Client.Pages
-@using FileFlow.Shared.Models
+@namespace FileFlows.Client.Pages
+@using FileFlows.Shared.Models
 
 @page "/"
 
@@ -19,7 +19,7 @@
                 @for (int i = 0; i < Workers.Count; i++)
                 {
                     var worker = Workers[i];
-                    var waiting = worker.Status == FileFlow.Shared.Models.ProcessStatus.Waiting;
+                    var waiting = worker.Status == FileFlows.Shared.Models.ProcessStatus.Waiting;
                     <div class="worker-wrapper @(waiting ? "waiting" : "")">
                         <div class="chart-wrapper">
                             <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>

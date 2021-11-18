@@ -1,7 +1,7 @@
-namespace FileFlow.Plugin
+namespace FileFlows.Plugin
 {
 
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
     public class Node
     {
         public virtual FlowElementType Type { get; }

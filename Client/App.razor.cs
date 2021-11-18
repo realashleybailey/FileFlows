@@ -1,11 +1,11 @@
-namespace FileFlow.Client
+namespace FileFlows.Client
 {
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
 
     public partial class App : ComponentBase
     {
@@ -39,7 +39,7 @@ namespace FileFlow.Client
             Instance = this;
             Logger.jsRuntime = jsRuntime;
             Translater.Logger = Logger.Instance;
-            FileFlow.Shared.Logger.Instance = Logger.Instance;
+            FileFlows.Shared.Logger.Instance = Logger.Instance;
             HttpHelper.Client = Client;
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;

@@ -1,8 +1,8 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Server.Helpers;
-    using FileFlow.Shared.Models;
+    using FileFlows.Server.Helpers;
+    using FileFlows.Shared.Models;
 
     [Route("/api/library")]
     public class LibraryController : Controller

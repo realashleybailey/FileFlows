@@ -1,4 +1,4 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
 

@@ -1,21 +1,21 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Helpers;
-    using ffPart = FileFlow.Shared.Models.FlowPart;
-    using ffElement = FileFlow.Shared.Models.FlowElement;
-    using ff = FileFlow.Shared.Models.Flow;
-    using xFlowConnection = FileFlow.Shared.Models.FlowConnection;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Helpers;
+    using ffPart = FileFlows.Shared.Models.FlowPart;
+    using ffElement = FileFlows.Shared.Models.FlowElement;
+    using ff = FileFlows.Shared.Models.Flow;
+    using xFlowConnection = FileFlows.Shared.Models.FlowConnection;
     using Microsoft.JSInterop;
     using System.Linq;
     using System;
-    using FileFlow.Shared;
-    using FileFlow.Client.Components.Dialogs;
+    using FileFlows.Shared;
+    using FileFlows.Client.Components.Dialogs;
     using Radzen;
-    using FileFlow.Shared.Helpers;
+    using FileFlows.Shared.Helpers;
     using System.Dynamic;
 
     public partial class Flow : ComponentBase
@@ -221,8 +221,8 @@ namespace FileFlow.Client.Pages
             Logger.Instance.DLog($"adding connnection 1: {uidInput}, {uidOutput}, {input}, {output}");
 
 
-            fpOutput.OutputConnections ??= new List<FileFlow.Shared.Models.FlowConnection>();
-            fpOutput.OutputConnections.Add(new FileFlow.Shared.Models.FlowConnection
+            fpOutput.OutputConnections ??= new List<FileFlows.Shared.Models.FlowConnection>();
+            fpOutput.OutputConnections.Add(new FileFlows.Shared.Models.FlowConnection
             {
                 Input = input,
                 Output = output,
@@ -257,7 +257,7 @@ namespace FileFlow.Client.Pages
             part.Icon = element.Icon;
             // we have to clone the model, not use the same instance
             if (element.Model != null)
-                part.Model = FileFlow.Shared.Helpers.ObjectCloner.Clone(element.Model);
+                part.Model = FileFlows.Shared.Helpers.ObjectCloner.Clone(element.Model);
             if (part.Model != null && part.Model is IDictionary<string, object> dict)
             {
                 if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString() ?? "", out int outputs))

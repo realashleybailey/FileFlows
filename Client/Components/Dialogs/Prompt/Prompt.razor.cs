@@ -1,9 +1,9 @@
-namespace FileFlow.Client.Components.Dialogs
+namespace FileFlows.Client.Components.Dialogs
 {
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
-    using FileFlow.Shared;
+    using FileFlows.Shared;
     using Microsoft.JSInterop;
 
     public partial class Prompt : ComponentBase

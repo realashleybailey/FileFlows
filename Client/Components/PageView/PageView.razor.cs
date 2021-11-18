@@ -1,7 +1,7 @@
-namespace FileFlow.Client.Components
+namespace FileFlows.Client.Components
 {
     using Microsoft.AspNetCore.Components;
-    using FileFlow.Client.Shared;
+    using FileFlows.Client.Shared;
 
     public partial class PageView
     {

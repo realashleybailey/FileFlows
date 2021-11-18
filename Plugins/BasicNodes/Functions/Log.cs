@@ -1,8 +1,8 @@
-namespace FileFlow.BasicNodes.Functions
+namespace FileFlows.BasicNodes.Functions
 {
     using System.ComponentModel;
-    using FileFlow.Plugin;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin;
+    using FileFlows.Plugin.Attributes;
     using Jint.Runtime;
     using Jint.Native.Object;
     using Jint;

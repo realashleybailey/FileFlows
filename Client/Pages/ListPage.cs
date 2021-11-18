@@ -1,13 +1,13 @@
-namespace FileFlow.Client.Pages
+namespace FileFlows.Client.Pages
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using FileFlow.Client.Components;
-    using FileFlow.Client.Components.Dialogs;
-    using FileFlow.Client.Helpers;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Client.Components;
+    using FileFlows.Client.Components.Dialogs;
+    using FileFlows.Client.Helpers;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
     using Radzen;
     using Radzen.Blazor;

@@ -1,9 +1,9 @@
-namespace FileFlow.BasicNodes.File
+namespace FileFlows.BasicNodes.File
 {
     using System.ComponentModel;
     using System.Threading.Tasks;
-    using FileFlow.Plugin;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin;
+    using FileFlows.Plugin.Attributes;
 
     public class DeleteSourceDirectory : Node
     {

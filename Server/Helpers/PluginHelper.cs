@@ -1,8 +1,8 @@
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
     using System.Reflection;
-    using FileFlow.Plugin;
-    using FileFlow.Shared.Models;
+    using FileFlows.Plugin;
+    using FileFlows.Shared.Models;
 
     public class PluginHelper
     {

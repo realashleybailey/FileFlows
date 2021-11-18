@@ -1,7 +1,7 @@
-namespace FileFlow.Client.Helpers
+namespace FileFlows.Client.Helpers
 {
     using System.Text.RegularExpressions;
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
 
     public class FlowHelper
     {

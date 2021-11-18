@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace FileFlow.Shared.Validators
+namespace FileFlows.Shared.Validators
 {
     public abstract class Validator
     {

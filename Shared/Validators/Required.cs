@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace FileFlow.Shared.Validators
+namespace FileFlows.Shared.Validators
 {
     public class Required : Validator
     {

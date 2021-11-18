@@ -1,7 +1,7 @@
-namespace FileFlow.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs
 {
     using System.Threading.Tasks;
-    using FileFlow.Client.Components.Dialogs;
+    using FileFlows.Client.Components.Dialogs;
     using Microsoft.AspNetCore.Components;
 
     public partial class InputFile : Input<string>

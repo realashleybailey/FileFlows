@@ -1,12 +1,12 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using System.ComponentModel;
     using System.Dynamic;
     using System.Reflection;
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Plugin.Attributes;
-    using FileFlow.Server.Helpers;
-    using FileFlow.Shared.Models;
+    using FileFlows.Plugin.Attributes;
+    using FileFlows.Server.Helpers;
+    using FileFlows.Shared.Models;
 
     [Route("/api/plugin")]
     public class PluginController : Controller

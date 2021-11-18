@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
-using FileFlow.Server.Helpers;
-using FileFlow.Shared.Models;
+using FileFlows.Server.Helpers;
+using FileFlows.Shared.Models;
 
-namespace FileFlow.Server.Workers
+namespace FileFlows.Server.Workers
 {
     public class LibraryWorker : Worker
     {

@@ -1,8 +1,8 @@
-namespace FileFlow.Server.Controllers
+namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using FileFlow.Shared.Models;
-    using FileFlow.Server.Workers;
+    using FileFlows.Shared.Models;
+    using FileFlows.Server.Workers;
 
     [Route("/api/worker")]
     public class WorkerController : Controller

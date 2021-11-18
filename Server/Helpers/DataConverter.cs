@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FileFlow.Server.Models;
-using FileFlow.Shared.Models;
+using FileFlows.Server.Models;
+using FileFlows.Shared.Models;
 
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
     public class DataConverter : JsonConverter<ViObject>
     {

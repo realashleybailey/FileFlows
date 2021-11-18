@@ -1,5 +1,5 @@
-@namespace FileFlow.Client.Pages
-@using FileFlow.Shared.Models
+@namespace FileFlows.Client.Pages
+@using FileFlows.Shared.Models
 @inherits ListPage<LibraryFile>
 
 @page "/library-files"
@@ -51,7 +51,7 @@
                         class="fas fa-trash"></span>
                     @lblDelete</button>
                 <button @onclick="@Refresh"><span class="fas fa-sync-alt"></span> @lblRefresh</button>
-                @if(SelectedStatus == FileStatus.Unprocessed)
+                @if (SelectedStatus == FileStatus.Unprocessed)
                 {
                     <button @onclick="@MoveToTop"><span class="far fa-caret-square-up"></span> @lblMoveToTop</button>
                 }
@@ -95,10 +95,10 @@
                         Visible="!mobile" />
                     <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time" Width="6rem"
                         FormatString="{0:hh\:mm\:ss}" Visible=@(SelectedStatus !=
-                        FileFlow.Shared.Models.FileStatus.Unprocessed)>
+                        FileFlows.Shared.Models.FileStatus.Unprocessed)>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="LibraryFile" Property="OutputPath" Title="Output" Width="30rem"
-                        Visible=@(SelectedStatus == FileFlow.Shared.Models.FileStatus.Processed && !mobile) />
+                        Visible=@(SelectedStatus == FileFlows.Shared.Models.FileStatus.Processed && !mobile) />
                 </Columns>
             </RadzenDataGrid>
         </div>

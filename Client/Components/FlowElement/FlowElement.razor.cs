@@ -1,11 +1,11 @@
-namespace FileFlow.Client.Components
+namespace FileFlows.Client.Components
 {
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using FileFlow.Shared;
+    using FileFlows.Shared;
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
-    using ffPart = FileFlow.Shared.Models.FlowPart;
+    using ffPart = FileFlows.Shared.Models.FlowPart;
 
     public partial class FlowElement : ComponentBase
     {

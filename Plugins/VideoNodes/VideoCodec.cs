@@ -1,9 +1,9 @@
-namespace FileFlow.VideoNodes
+namespace FileFlows.VideoNodes
 {
     using System.Linq;
     using System.ComponentModel;
-    using FileFlow.Plugin;
-    using FileFlow.Plugin.Attributes;
+    using FileFlows.Plugin;
+    using FileFlows.Plugin.Attributes;
 
     public class VideoCodec : VideoNode
     {

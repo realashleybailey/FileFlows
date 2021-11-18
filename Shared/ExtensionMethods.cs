@@ -1,4 +1,4 @@
-namespace FileFlow.Shared
+namespace FileFlows.Shared
 {
     public static class ExtensionMethods
     {

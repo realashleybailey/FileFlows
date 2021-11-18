@@ -1,13 +1,13 @@
-namespace FileFlow.Client.Helpers
+namespace FileFlows.Client.Helpers
 {
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Text.Json;
     using System.Threading.Tasks;
-    using FileFlow.Client.Components;
-    using FileFlow.Shared;
-    using FileFlow.Shared.Models;
+    using FileFlows.Client.Components;
+    using FileFlows.Shared;
+    using FileFlows.Shared.Models;
     using Radzen;
 
     public class LibraryFileEditor
@@ -47,7 +47,7 @@ namespace FileFlow.Client.Helpers
             Logger.Instance.DLog("Item is processing: " + processing);
             fields.Add(new ElementField
             {
-                InputType = FileFlow.Plugin.FormInputType.LogView,
+                InputType = FileFlows.Plugin.FormInputType.LogView,
                 Name = "Log",
                 Parameters = processing ? new Dictionary<string, object> {
                     { nameof(Components.Inputs.InputLogView.RefreshUrl), logUrl },

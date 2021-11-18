@@ -1,9 +1,9 @@
-namespace FileFlow.Shared.Helpers
+namespace FileFlows.Shared.Helpers
 {
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using FileFlow.Shared.Helpers.ArrayExtensions;
+    using FileFlows.Shared.Helpers.ArrayExtensions;
 
     public class ObjectCloner
     {

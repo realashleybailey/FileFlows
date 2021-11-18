@@ -1,4 +1,4 @@
-namespace FileFlow.Server.Helpers
+namespace FileFlows.Server.Helpers
 {
     using NPoco;
 

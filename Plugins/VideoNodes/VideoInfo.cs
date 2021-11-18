@@ -1,4 +1,4 @@
-namespace FileFlow.VideoNodes
+namespace FileFlows.VideoNodes
 {
     public class VideoInfo
     {

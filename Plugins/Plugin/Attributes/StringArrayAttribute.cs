@@ -1,4 +1,4 @@
-namespace FileFlow.Plugin.Attributes
+namespace FileFlows.Plugin.Attributes
 {
     public class StringArrayAttribute : FormInputAttribute
     {

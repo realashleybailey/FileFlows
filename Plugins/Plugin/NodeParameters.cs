@@ -1,4 +1,4 @@
-namespace FileFlow.Plugin
+namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
     public class NodeParameters

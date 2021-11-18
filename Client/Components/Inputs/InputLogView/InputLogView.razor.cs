@@ -1,9 +1,9 @@
-namespace FileFlow.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs
 {
     using System;
     using System.Threading.Tasks;
     using System.Timers;
-    using FileFlow.Client.Helpers;
+    using FileFlows.Client.Helpers;
     using Microsoft.AspNetCore.Components;
     public partial class InputLogView : Input<string>, IDisposable
     {

@@ -1,9 +1,9 @@
-namespace FileFlow.VideoNodes
+namespace FileFlows.VideoNodes
 {
     using System.Diagnostics;
     using System.IO;
     using System.Text.RegularExpressions;
-    using FileFlow.Plugin;
+    using FileFlows.Plugin;
 
     public class VideoInfoHelper
     {

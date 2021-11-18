@@ -242,22 +242,6 @@ namespace FileFlows.Server.Helpers
             return true;
         }
 
-        public static void UpgradeDatabase()
-        {
-            using (var db = GetDb())
-            {
-                var objects = db.Fetch<DbObject>();
-                foreach (var obj in objects)
-                {
-                    if (obj.Type.StartsWith("FileFlow."))
-                    {
-                        obj.Type = obj.Type.Replace("FileFlow.", "FileFlows.");
-                        db.Update(obj);
-                    }
-                }
-            }
-        }
-
         public static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
             if (UseMySql == false)

@@ -39,7 +39,6 @@ FileFlows.Shared.Logger.Instance = FileFlows.Server.Logger.Instance;
 if (FileFlows.Server.Globals.IsDevelopment == false)
     FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
 FileFlows.Server.Helpers.DbHelper.CreateDatabase();
-FileFlows.Server.Helpers.DbHelper.UpgradeDatabase();
 
 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);

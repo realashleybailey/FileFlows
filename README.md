@@ -26,7 +26,7 @@ This application is designed (for now, later alternative builds will be publishe
    ![image](https://user-images.githubusercontent.com/958400/142372817-4582c5bb-6108-42d7-8ada-f0015652c429.png)
 4. Ensure "Advanced View" is on
    ![image](https://user-images.githubusercontent.com/958400/142372935-124e75b3-3e4b-4c27-827b-1c104aaefc17.png)
-5. For icon URL: https://raw.githubusercontent.com/revenz/FileFlows/master/icon.png
+5. For icon URL: https://raw.githubusercontent.com/revenz/FileFlows/master/icon.png?raw=true
 6. WebUI: http://[IP]:[PORT:8585]
 7. Extra Parameters: --runtime=nvidia
    1. Only if using an NVIDIA GPU

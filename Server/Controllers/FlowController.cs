@@ -52,6 +52,8 @@ namespace FileFlows.Server.Controllers
 
                 foreach (var p in flow.Parts)
                 {
+                    if (p.FlowElementUid.EndsWith("." + p.Name))
+                        p.Name = string.Empty;
                     string icon = elements.Where(x => x.Uid == p.FlowElementUid).Select(x => x.Icon).FirstOrDefault();
                     if (string.IsNullOrEmpty(icon) == false)
                         p.Icon = icon;

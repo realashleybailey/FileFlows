@@ -1,1 +1,1 @@
-input{width:100%}
+input{width:100%}::deep .rz-spinner{width:100%;border-color:var(--input-background) !important;border-radius:0 !important}::deep .rz-spinner-button{border:solid 1px transparent !important;background-color:transparent !important;width:1rem !important}::deep .rz-spinner-button:hover{border-color:var(--accent) !important;background-image:unset !important;box-shadow:unset !important}

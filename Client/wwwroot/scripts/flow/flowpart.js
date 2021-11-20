@@ -12,6 +12,7 @@ window.ffFlowPart = {
     },
 
     addFlowPart: function (part) {
+        console.log('adding flowpart', part);
         let div = document.createElement('div');
         ffFlowPart.flowPartElements.push(div);
         div.setAttribute('id', part.uid);
@@ -92,11 +93,8 @@ window.ffFlowPart = {
 
         let divName = document.createElement('div');
         divName.classList.add('name');
-        divName.innerText = part.name;
         div.appendChild(divName);
-        console.log('test1');
         ffFlowPart.updateOutputNodes(part.uid, part, div);
-        console.log('test2');
 
         let divDraggable = document.createElement('div');
         divDraggable.classList.add('draggable');
@@ -105,6 +103,25 @@ window.ffFlowPart = {
 
         let flowParts = document.getElementById('flow-parts');
         flowParts.appendChild(div);
+
+        ffFlowPart.setPartName(part);
+    },
+
+    setPartName: function (part) {
+        try {
+            let divName = document.getElementById(part.uid);
+            divName = divName.querySelector('.name');
+            if (!divName)
+                return;
+            let name = part.name;
+            if (!name) {
+                name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1).replace(/_/g, ' ');
+                name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
+            }
+            divName.innerHTML = name;
+        } catch (err) {
+            console.error(err);
+        }
     },
 
     deleteFlowPart: function (uid) {
@@ -132,10 +149,17 @@ window.ffFlowPart = {
             return;
 
         console.log('editing', part);
+
         ffFlow.csharp.invokeMethodAsync("Edit", part).then(result => {
-            if (!result)
+            if (!result || !result.model)
                 return; // editor was canceled
+            if (result.model.Name) {
+                part.name = result.model.Name;
+                delete result.model.Name;
+            }
             part.model = result.model;
+
+            ffFlowPart.setPartName(part);
 
             if (result.outputs >= 0) {
                 part.outputs = result.outputs;

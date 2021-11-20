@@ -98,14 +98,15 @@ namespace FileFlows.Client.Components
             this.ReadOnly = readOnly;
             this.Large = large;
             this.Visible = true;
+            this.RegisteredInputs.Clear();
             Logger.Instance.DLog("getting description for: " + typeName);
             this.EditorDescription = Translater.Instant(typeName + ".Description");
             Logger.Instance.DLog("getting description for: " + typeName, this.EditorDescription);
             var expandoModel = ConverToExando(model);
             this.Model = expandoModel;
             OpenTask = new TaskCompletionSource<ExpandoObject>();
-            this.StateHasChanged();
             this.FocusFirst = true;
+            this.StateHasChanged();
             return OpenTask.Task;
         }
 
@@ -123,7 +124,10 @@ namespace FileFlows.Client.Components
                 }
             }
             if (valid == false)
+            {
+                Logger.Instance.DLog("not valid!");
                 return;
+            }
 
             Logger.Instance.DLog("editor is valid!");
 

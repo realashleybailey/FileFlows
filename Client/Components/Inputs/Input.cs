@@ -50,7 +50,15 @@ namespace FileFlows.Client.Components.Inputs
         }
 
         public string Help { get; set; }
-        public string Placeholder { get; set; }
+        public string _Placeholder;
+
+        [Parameter]
+        public string Placeholder
+        {
+            get => _Placeholder;
+            set { _Placeholder = value ?? ""; }
+        }
+
 
         [Parameter] public List<FileFlows.Shared.Validators.Validator> Validators { get; set; }
 

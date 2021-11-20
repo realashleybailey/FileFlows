@@ -18,7 +18,7 @@ namespace FileFlows.BasicNodes.Functions
         [NumberIntAttribute(1)]
         public new int Outputs { get; set; }
 
-        [DefaultValue("// VideoFile object contains info about the video file\n\n// return true to continue processing this flow\n// return false to stop it\nreturn true;")]
+        [DefaultValue("// VideoFile object contains info about the video file\n\n// return 0 to complete the flow.\n// return -1 to signal an error in the flow\n// return 1+ to indicate which output to process next\n\n return 0;")]
         [Code(2)]
         public string Code { get; set; }
 

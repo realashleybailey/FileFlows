@@ -6,3 +6,10 @@
     <MonacoEditor @ref="CodeEditor" ConstructionOptions="EditorConstructionOptions" OnDidInit="OnEditorInit"
         OnDidBlurEditorText="OnBlur" />
 </div>
+
+@if (string.IsNullOrEmpty(Help) == false)
+{
+    <div class="row help">
+        <span class="help-text">@Help</span>
+    </div>
+}

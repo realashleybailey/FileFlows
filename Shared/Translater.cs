@@ -86,10 +86,12 @@ namespace FileFlows.Shared
                     continue;
                 if (Language.ContainsKey(key))
                     return Language[key];
-
             }
             if (possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder") || possibleKeys[0].EndsWith(".Description"))
                 return "";
+
+            if (possibleKeys[0].EndsWith(".Name") && Language.ContainsKey("Labels.Name"))
+                return Language["Labels.Name"];
 
             string result = possibleKeys?.FirstOrDefault() ?? "";
             Logger?.WLog("Failed to lookup key: " + result);

@@ -149,13 +149,36 @@ class ffFlowLines {
         const context = this.ioContext;
 
         const path = new Path2D();
+        if (ffFlow.Vertical) {
+            srcX += 2;
+            destX += 2;
+        }
         path.moveTo(srcX, srcY);
-        if (Math.abs(destY - srcY) <= 50) {
-            path.lineTo(destX, destY);
+
+        if (ffFlow.Vertical) {
+            if (srcY < destY - 20) {
+                // draw stepped line
+                let mid = destY + (srcY - destY) / 2;
+                path.lineTo(srcX, mid);
+                path.lineTo(destX, mid);
+                path.lineTo(destX, destY);
+            }
+            else {
+                path.lineTo(srcX, srcY + 20);
+                let midX = (destX - srcX) / 2
+                path.lineTo(srcX + midX, srcY + 20);
+                path.lineTo(srcX + midX, destY - 20);
+                path.lineTo(destX, destY - 20);
+                path.lineTo(destX, destY);
+            }
         } else {
-            path.bezierCurveTo(srcX + 50, srcY + 50,
-                destX - 50, destY - 50,
-                destX, destY);
+            if (Math.abs(destY - srcY) <= 50) {
+                path.lineTo(destX, destY);
+            } else {
+                path.bezierCurveTo(srcX + 50, srcY + 50,
+                    destX - 50, destY - 50,
+                    destX, destY);
+            }
         }
 
         context.lineWidth = 5;

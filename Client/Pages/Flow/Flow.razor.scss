@@ -93,7 +93,10 @@ canvas {
     }   
     .name {
         flex-grow:1;
-        margin:auto;
+        margin:auto 0.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .draggable {

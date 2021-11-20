@@ -64,11 +64,6 @@ namespace FileFlows.Client.Pages
                 if (elementsResult.Success)
                 {
                     Available = elementsResult.Data;
-                    // foreach(var item in Available){
-                    //     if(item.Model is JObject jObject){
-                    //         item.Model = jObject.ToObject<Dictionary<string, object>>();
-                    //     }
-                    // }
                 }
                 var modelResult = await HttpHelper.Get<ff>(API_URL + "/" + Uid.ToString());
                 await InitModel((modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() });
@@ -165,16 +160,9 @@ namespace FileFlows.Client.Pages
         [JSInvokable]
         public object AddElement(string uid)
         {
-            Logger.Instance.DLog("looking up element: " + uid);
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
             return new { element, uid = Guid.NewGuid() };
         }
-
-        private void Select(ffPart part)
-        {
-            SelectedPart = part;
-        }
-
         private async Task Save()
         {
             this.Blocker.Show(lblSaving);
@@ -234,20 +222,38 @@ namespace FileFlows.Client.Pages
                 Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
                 return null;
             }
-            string title = Helpers.FlowHelper.FormatLabel(part.Name);
-            var newModelTask = Editor.Open("Flow.Parts." + part.Name, title, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new ExpandoObject());
+
+            string typeName = part.FlowElementUid.Substring(part.FlowElementUid.LastIndexOf(".") + 1);
+
+            var fields = ObjectCloner.Clone(flowElement.Fields);
+            // add the name to the fields, so a node can be renamed
+            fields.Insert(0, new FileFlows.Shared.Models.ElementField
+            {
+                Name = "Name",
+                Placeholder = FlowHelper.FormatLabel(typeName),
+                InputType = Plugin.FormInputType.Text
+            });
+
+            var model = part.Model ?? new ExpandoObject();
+            // add the name to the model, since this is actually bound on the part not model, but we need this 
+            // so the user can update the name
+            if (model is IDictionary<string, object> dict)
+                dict["Name"] = part.Name ?? string.Empty;
+
+            string title = Helpers.FlowHelper.FormatLabel(typeName);
+            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model);
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {
                 IsDirty = true;
                 Logger.Instance.DLog("model updated:" + System.Text.Json.JsonSerializer.Serialize(newModelTask.Result));
-                var model = newModelTask.Result;
+                var newModel = newModelTask.Result;
                 int outputs = -1;
-                if (part.Model is IDictionary<string, object> dict)
+                if (part.Model is IDictionary<string, object> dictNew)
                 {
-                    if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString(), out outputs)) { }
+                    if (dictNew?.ContainsKey("Outputs") == true && int.TryParse(dictNew["Outputs"]?.ToString(), out outputs)) { }
                 }
-                return new { outputs, model };
+                return new { outputs, model = newModel };
             }
             else
             {

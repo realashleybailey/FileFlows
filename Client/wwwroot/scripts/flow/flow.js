@@ -98,7 +98,6 @@ window.ffFlow = {
 
         ffFlow.csharp.invokeMethodAsync("AddElement", ffFlow.Mouse.draggingElementUid).then(result => {
             console.log('adding element', result);
-
             let element = result.element;
             if (!element) {
                 console.warn('element was null');
@@ -111,8 +110,8 @@ window.ffFlow = {
                 type: element.type,
                 xPos: xPos - 30,
                 yPos: yPos,
-                inputs: element.inputs,
-                outputs: element.outputs,
+                inputs: element.model.Inputs ? element.model.Inputs : element.inputs,
+                outputs: element.model.Outputs ? element.model.Outputs : element.outputs,
                 uid: result.uid,
                 icon: element.icon,
                 model: element.model

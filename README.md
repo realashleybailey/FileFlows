@@ -13,7 +13,7 @@ The Video plugin lets you process video files to ensure they are in the format y
 ![image](https://user-images.githubusercontent.com/958400/142393794-38b58e23-2b05-45b1-8eb1-2f4ad6574422.png)
 
 
-![image](https://user-images.githubusercontent.com/958400/142393881-9a1ebac1-2b8d-4157-9371-7a9a10dee877.png)
+![image](https://user-images.githubusercontent.com/958400/142720537-df9341ea-c11d-432e-bd1c-07ae4ef3b43d.png)
 
 
 # Unraid Installation

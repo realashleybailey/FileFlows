@@ -9,7 +9,7 @@ namespace FileFlows.Shared
             return System.Text.Json.JsonSerializer.Serialize(o);
         }
 
-        public static string EmptyAsNull(this string str)
+        public static string? EmptyAsNull(this string str)
         {
             return str == string.Empty ? null : str;
         }

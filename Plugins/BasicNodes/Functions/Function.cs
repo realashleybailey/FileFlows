@@ -8,7 +8,7 @@ namespace FileFlows.BasicNodes.Functions
     using Jint;
     using System.Text;
 
-    public class Function : Node, IConfigurableOutputNode
+    public class Function : Node
     {
         public override int Inputs => 1;
         public override FlowElementType Type => FlowElementType.Logic;

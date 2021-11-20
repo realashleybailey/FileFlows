@@ -11,8 +11,14 @@ namespace FileFlows.BasicNodes.File
         public override FlowElementType Type => FlowElementType.Process;
         public override string Icon => "far fa-copy";
 
+        private string _DestinationPath = string.Empty;
+        
         [Folder(1)]
-        public string DestinationPath { get; set; }
+        public string DestinationPath 
+        { 
+            get => _DestinationPath;
+            set { _DestinationPath = value ?? ""; }
+        }
 
         [Boolean(2)]
         public bool CopyFolder { get; set; }

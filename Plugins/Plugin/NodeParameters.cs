@@ -19,22 +19,24 @@ namespace FileFlows.Plugin
         /// </summary>
         public string WorkingFile { get; private set; }
 
-        public ILogger Logger { get; set; }
+        public ILogger? Logger { get; set; }
 
         public NodeResult Result { get; set; } = NodeResult.Success;
 
         public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
 
-        public Func<string, string> GetToolPath { get; set; }
+        public Func<string, string>? GetToolPath { get; set; }
 
         public string TempPath { get; set; }
 
-        public Action<float> PartPercentageUpdate { get; set; }
+        public Action<float>? PartPercentageUpdate { get; set; }
 
         public NodeParameters(string filename)
         {
             this.FileName = filename;
             this.WorkingFile = filename;
+            this.RelativeFile = string.Empty;
+            this.TempPath = string.Empty;
         }
 
         public void SetWorkingFile(string filename)
@@ -67,7 +69,7 @@ namespace FileFlows.Plugin
             {
                 if (typeof(T) == typeof(string))
                     return (T)(object)string.Empty;
-                return default(T);
+                return default(T)!;
             }
             return (T)Parameters[name];
         }

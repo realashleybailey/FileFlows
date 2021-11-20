@@ -70,7 +70,7 @@ namespace FileFlows.Server.Controllers
             var json = "{}";
             try
             {
-                foreach (var jf in Directory.GetFiles("plugins", "*.json"))
+                foreach (var jf in Directory.GetFiles("Plugins", "*.json"))
                 {
                     if (jf.Contains(".deps."))
                         continue;
@@ -79,10 +79,16 @@ namespace FileFlows.Server.Controllers
                         string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
                         json = updated;
                     }
-                    catch (Exception) { }
+                    catch (Exception ex)
+                    {
+                        Logger.Instance.ELog("Error loading plugin json[0]:" + ex.Message + Environment.NewLine + ex.StackTrace);
+                    }
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
+            }
             return json;
         }
     }

@@ -26,26 +26,14 @@
                             foreach (var ele in grp)
                             {
                                 <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"
-                        ondragstart="ffFlow.dragElementStart(event)">@Helpers.FlowHelper.FormatLabel(ele.Name)</li>
+                        ondragstart="ffFlow.Mouse.dragElementStart(event)">@Helpers.FlowHelper.FormatLabel(ele.Name)</li>
                             }
                         }
                     }
                 </ul>
             </div>
-            <div class="flow-parts" id="flow-parts" ondragover="ffFlow.drop(event, false)"
-                ondrop="ffFlow.drop(event, true)" @onclick="() => Select(null)">
+            <div class="flow-parts" id="flow-parts">
                 <canvas width="8000" height="4000" tabindex="1"></canvas>
-                @if (Parts != null)
-                {
-                    <CascadingValue IsFixed="true" Value="this">
-                        @foreach (var part in Parts)
-                    {
-                        <FlowElement Part="part" Selected="@(part == SelectedPart)" OnSelect="() => Select(part)">
-                        </FlowElement>
-                    }
-                </CascadingValue>
-                }
-
             </div>
         </div>
     </Body>

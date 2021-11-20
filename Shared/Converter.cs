@@ -11,7 +11,7 @@ namespace FileFlows.Shared
         public static object ConvertObject(Type type, object value)
         {
             if (value == null)
-                return Activator.CreateInstance(type);
+                return Activator.CreateInstance(type)!;
             Type valueType = value.GetType();
             if (value is JsonElement je)
             {
@@ -20,14 +20,14 @@ namespace FileFlows.Shared
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                return JsonSerializer.Deserialize(json, type, options);
+                return JsonSerializer.Deserialize(json, type, options)!;
             }
             if (valueType == type)
                 return value;
 
 
             if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
-                return ChangeListToArray(type.GetElementType(), (IEnumerable)value, valueType);
+                return ChangeListToArray(type.GetElementType()!, (IEnumerable)value, valueType);
 
 
             // not used yet, so not tested
@@ -42,7 +42,7 @@ namespace FileFlows.Shared
         public static object ChangeListToArray<T>(IEnumerable value, Type valueType)
         {
             var arrayType = typeof(T).GetElementType();
-            return ChangeListToArray(arrayType, value, valueType);
+            return ChangeListToArray(arrayType!, value, valueType);
         }
         public static object ChangeListToArray(Type arrayType, IEnumerable value, Type valueType)
         {

@@ -178,15 +178,6 @@ namespace FileFlows.Server.Controllers
                 DbHelper.Update(lf);
             }
         }
-
-        // [HttpPost("execute")]
-        // public async Task<string> Execute(string input)
-        // {
-        //     var executor = new Helpers.FlowExecutor();
-        //     executor.Flow = Get();
-        //     var result = await executor.Run(input);
-        //     return result.Logger.ToString();
-        // }
     }
 
 }

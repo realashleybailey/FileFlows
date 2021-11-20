@@ -74,7 +74,7 @@ namespace FileFlows.Client.Pages
                 await InitModel((modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() });
 
                 var dotNetObjRef = DotNetObjectReference.Create(this);
-                await jsRuntime.InvokeVoidAsync("ffFlow.init", new object[] { "flow-parts", dotNetObjRef });
+                await jsRuntime.InvokeVoidAsync("ffFlow.init", new object[] { "flow-parts", dotNetObjRef, this.Parts });
 
                 await WaitForRender();
                 await jsRuntime.InvokeVoidAsync("ffFlow.redrawLines");
@@ -162,112 +162,17 @@ namespace FileFlows.Client.Pages
 
         }
 
+        [JSInvokable]
+        public object AddElement(string uid)
+        {
+            Logger.Instance.DLog("looking up element: " + uid);
+            var element = this.Available.FirstOrDefault(x => x.Uid == uid);
+            return new { element, uid = Guid.NewGuid() };
+        }
+
         private void Select(ffPart part)
         {
             SelectedPart = part;
-        }
-
-        internal async Task DeletePart(ffPart part)
-        {
-            if (part != null)
-            {
-                IsDirty = true;
-                this.Parts.Remove(part);
-                this.StateHasChanged();
-                await WaitForRender();
-                await InitModel(this.Model);
-                await jsRuntime.InvokeVoidAsync("ffFlow.redrawLines");
-            }
-        }
-
-        [JSInvokable]
-        public void UpdatePosition(string uidString, int xPos, int yPos)
-        {
-            Guid uid;
-            if (Guid.TryParse(uidString, out uid) == false)
-                return;
-            var part = this.Parts.FirstOrDefault(x => x.Uid == uid);
-            if (part == null)
-                return;
-
-            IsDirty = true;
-            Logger.Instance.DLog($"Updating part position {xPos}, {yPos}");
-            part.xPos = xPos;
-            part.yPos = yPos;
-        }
-
-        [JSInvokable]
-        public void AddElement(string uid, int xPos, int yPos)
-        {
-            var element = this.Available.FirstOrDefault(x => x.Uid == uid);
-            if (element == null)
-                return;
-            IsDirty = true;
-
-            Logger.Instance.DLog($"Addeing element {xPos}, {yPos}");
-            AddPart(element, xPos, yPos);
-            this.StateHasChanged();
-        }
-
-        [JSInvokable]
-        public void AddConnection(string uidInput, string uidOutput, int input, int output)
-        {
-            Logger.Instance.DLog($"adding connnection 0: {uidInput}, {uidOutput}, {input}, {output}");
-            var fpInput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidInput);
-            var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
-            if (fpInput == null || fpOutput == null)
-                return;
-            IsDirty = true;
-            Logger.Instance.DLog($"adding connnection 1: {uidInput}, {uidOutput}, {input}, {output}");
-
-
-            fpOutput.OutputConnections ??= new List<FileFlows.Shared.Models.FlowConnection>();
-            fpOutput.OutputConnections.Add(new FileFlows.Shared.Models.FlowConnection
-            {
-                Input = input,
-                Output = output,
-                InputNode = fpInput.Uid
-            });
-            // make sure there are no duplicates
-            fpOutput.OutputConnections = fpOutput.OutputConnections.GroupBy(x => x.Input + "," + x.Output + "," + x.InputNode).Select(x => x.First()).ToList();
-        }
-
-        [JSInvokable]
-        public void RemoveConnection(string uidInput, string uidOutput, int input, int output)
-        {
-            var fpInput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidInput);
-            var fpOutput = this.Parts.FirstOrDefault(x => x.Uid.ToString() == uidOutput);
-            if (fpInput == null || fpOutput == null)
-                return;
-
-            IsDirty = true;
-            fpOutput.OutputConnections = fpOutput.OutputConnections?.Where(x => x.Input != input && x.Output != output && x.InputNode != fpInput.Uid)?.ToList();
-        }
-        private void AddPart(ffElement element, float xPos, float yPos)
-        {
-            var part = new ffPart();
-            part.Name = element.Name;
-            part.FlowElementUid = element.Uid;
-            part.Type = element.Type;
-            part.xPos = xPos;
-            part.yPos = yPos;
-            part.Inputs = element.Inputs;
-            part.Outputs = element.Outputs;
-            part.Uid = Guid.NewGuid();
-            part.Icon = element.Icon;
-            // we have to clone the model, not use the same instance
-            if (element.Model != null)
-                part.Model = FileFlows.Shared.Helpers.ObjectCloner.Clone(element.Model);
-            if (part.Model != null && part.Model is IDictionary<string, object> dict)
-            {
-                if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString() ?? "", out int outputs))
-                {
-                    part.Outputs = outputs;
-                }
-            }
-            Logger.Instance.DLog("part.Model: " + part.Model?.GetType()?.Name);
-            Parts.Add(part);
-            IsDirty = true;
         }
 
         private async Task Save()
@@ -276,6 +181,10 @@ namespace FileFlows.Client.Pages
             this.IsSaving = true;
             try
             {
+
+                var parts = await jsRuntime.InvokeAsync<List<FileFlows.Shared.Models.FlowPart>>("ffFlow.getModel");
+                Logger.Instance.DLog("Parts", parts);
+
                 if (Model == null)
                 {
                     Model = new ff
@@ -284,15 +193,15 @@ namespace FileFlows.Client.Pages
                     };
                 }
                 // ensure there are no duplicates and no rogue connections
-                Guid[] nodeUids = Parts.Select(x => x.Uid).ToArray();
-                foreach (var p in Parts)
+                Guid[] nodeUids = parts.Select(x => x.Uid).ToArray();
+                foreach (var p in parts)
                 {
                     p.OutputConnections = p.OutputConnections
                                           ?.Where(x => nodeUids.Contains(x.InputNode))
                                           ?.GroupBy(x => x.Input + "," + x.Output + "," + x.InputNode).Select(x => x.First())
                                           ?.ToList();
                 }
-                Model.Parts = this.Parts;
+                Model.Parts = parts;
                 var result = await HttpHelper.Put<ff>(API_URL, Model);
                 if (result.Success)
                 {
@@ -315,14 +224,15 @@ namespace FileFlows.Client.Pages
         }
 
 
-        public async Task<bool> Edit(ffPart part)
+        [JSInvokable]
+        public async Task<object> Edit(ffPart part)
         {
             var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
             if (flowElement == null)
             {
                 // cant find it, cant edit
                 Logger.Instance.DLog("Failed to locate flow element: " + part.FlowElementUid);
-                return false;
+                return null;
             }
             string title = Helpers.FlowHelper.FormatLabel(part.Name);
             var newModelTask = Editor.Open("Flow.Parts." + part.Name, title, ObjectCloner.Clone(flowElement.Fields), part.Model ?? new ExpandoObject());
@@ -331,18 +241,18 @@ namespace FileFlows.Client.Pages
             {
                 IsDirty = true;
                 Logger.Instance.DLog("model updated:" + System.Text.Json.JsonSerializer.Serialize(newModelTask.Result));
-                part.Model = newModelTask.Result;
+                var model = newModelTask.Result;
+                int outputs = -1;
                 if (part.Model is IDictionary<string, object> dict)
                 {
-                    if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString(), out int outputs))
-                        part.Outputs = outputs;
+                    if (dict?.ContainsKey("Outputs") == true && int.TryParse(dict["Outputs"]?.ToString(), out outputs)) { }
                 }
-                return true;
+                return new { outputs, model };
             }
             else
             {
                 Logger.Instance.DLog("model canceled");
-                return false;
+                return null;
             }
         }
     }

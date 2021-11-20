@@ -76,8 +76,11 @@
             },
             "Function":{
                 "Description":"A custom of code that can be executed and can return the output to goto.\nreturn -1 for error and flow to stop\nreturn 0 for flow to complete\nreturn 1 or more for the desired output to be called",
-                "Outputs":"Outputs",
-                "Outputs-Help":"The number of outputs this node can have."
+                "Fields":{
+                    "Outputs":"Outputs",
+                    "Outputs-Help":"The number of outputs this node can have.",
+                    "Code":"Code"
+                }
             }
         }
     }

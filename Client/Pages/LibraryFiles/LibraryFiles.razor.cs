@@ -86,7 +86,7 @@ namespace FileFlows.Client.Pages
             {
                 Blocker.Hide();
             }
-            Refresh();
+            await Refresh();
         }
     }
 }

@@ -14,12 +14,13 @@ namespace FileFlows.Plugin
         /// <summary>
         /// Gets the fontawesome icon to use in the flow 
         /// </summary>
-        public virtual string Icon { get; }
+        public virtual string Icon => string.Empty;
         public string Group
         {
             get
             {
                 var type = base.GetType();
+                if (type == null || type.FullName == null) return string.Empty;
                 string group = type.FullName.Substring(0, type.FullName.LastIndexOf("."));
                 return group.Substring(group.LastIndexOf(".") + 1);
             }

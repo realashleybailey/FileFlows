@@ -50,8 +50,12 @@ window.ffFlow = {
 
 
         let canvas = document.querySelector('canvas');
-        canvas.height = window.screen.availHeight;
-        canvas.width = window.screen.availWidth;
+
+        let width = ffFlow.Vertical ? (document.body.clientWidth * 1.5) : window.screen.availWidth
+        let height = ffFlow.Vertical ? (document.body.clientHeight * 2) : window.screen.availHeight;
+
+        canvas.height = height;
+        canvas.width = width;
         canvas.style.width = canvas.width + 'px';
         canvas.style.height = canvas.height + 'px';
 
@@ -105,7 +109,7 @@ window.ffFlow = {
             }
 
             let part = {
-                name: element.name,
+                name: '', // new part, dont set a name
                 flowElementUid: element.uid,
                 type: element.type,
                 xPos: xPos - 30,

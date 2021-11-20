@@ -14,8 +14,9 @@
     font-size: 1.5rem;
     font-style: italic;
     font-weight: bold;
-    color:var(--accent);
+    color:var(--accent) !important;
     display:none;
+    cursor:pointer;
     svg {
         margin-right:0.25rem;
         position: relative;
@@ -28,7 +29,6 @@
         margin-right:0.25rem;
         font-size:1.8rem;
         color:var(--accent);
-
     }
 }
 

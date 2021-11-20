@@ -7,9 +7,11 @@
 }
 
 <PageView FullWidth=@true title="@Title">
+    <HeadLeft>
+        <input class="flow-name" type="text" @bind-value="@Name" autocomplete="off" placeholder="@lblName" />
+    </HeadLeft>
 
     <Head>
-        <RadzenButton Click=@Rename Text="@lblRename" />
         <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
         <RadzenButton Click=@Close Text="@lblClose" />
     </Head>

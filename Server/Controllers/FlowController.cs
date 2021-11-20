@@ -81,12 +81,13 @@ namespace FileFlows.Server.Controllers
                     flow.Parts.Add(new FlowPart
                     {
                         Name = inputFileType.Name,
-                        xPos = 50,
-                        yPos = 200,
+                        xPos = 450,
+                        yPos = 50,
                         Uid = Guid.NewGuid(),
                         Type = FlowElementType.Input,
                         Outputs = 1,
-                        FlowElementUid = inputFileType.FullName
+                        FlowElementUid = inputFileType.FullName,
+                        Icon = "far fa-file"
                     });
                 }
                 return flow;
@@ -129,6 +130,14 @@ namespace FileFlows.Server.Controllers
             if (model == null)
                 throw new Exception("No model");
 
+
+            if (string.IsNullOrWhiteSpace(model.Name))
+                throw new Exception("ErrorMessages.NameRequired");
+            model.Name = model.Name.Trim();
+            bool inUse = DbHelper.GetNames<Flow>("Uid <> @1", model.Uid.ToString()).Where(x => x.ToLower() == model.Name.ToLower()).Any();
+            if (inUse)
+                throw new Exception("ErrorMessages.NameInUse");
+
             if (model.Parts?.Any() != true)
                 throw new Exception("Flow.ErrorMessages.NoParts");
 
@@ -145,13 +154,6 @@ namespace FileFlows.Server.Controllers
         [HttpPut("{uid}/rename")]
         public void Rename([FromRoute] Guid uid, [FromQuery] string name)
         {
-            if (string.IsNullOrEmpty(name))
-                return;
-            name = name.Trim();
-
-            bool inUse = DbHelper.GetNames<Flow>("Uid <> @1", uid.ToString()).Where(x => x.ToLower() == name.ToLower()).Any();
-            if (inUse)
-                throw new Exception("ErrorMessages.NameInUse");
 
             if (uid == Guid.Empty)
                 return; // renaming a new flow

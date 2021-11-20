@@ -14,5 +14,8 @@ window.ff = {
     deviceDimensions: function () {
 
         return { width: screen.width, height: screen.height };
+    },
+    gotoHomePage: function () {
+        window.open('https://github.com/revenz/fileflows', '_blank');
     }
 };

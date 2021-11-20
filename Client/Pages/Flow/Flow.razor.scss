@@ -9,6 +9,16 @@
     background:rgba(var(--color-rgb), 0.03);
 }
 
+.flow-name {
+    flex-grow:1;
+    margin-left:0.5rem;
+    background:transparent !important;
+    border-bottom:solid 1px var(--accent) !important;
+    &:focus {
+        outline:unset !important;
+    }
+}
+
 canvas {
     position:absolute;
     top:0;

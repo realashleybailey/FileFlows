@@ -40,6 +40,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        display: flex;
     }
     .other {
         white-space:nowrap;
@@ -63,6 +64,7 @@
 
     .icon {
         margin-right:0.5rem;
+        margin-top: .25rem;
         color:var(--accent);
     }
 }

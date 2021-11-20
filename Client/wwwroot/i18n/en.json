@@ -20,7 +20,6 @@
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
-    "Rename":"Rename",
     "Confirm":"Confirm",
     "Prompt":"Prompt",
     "SelectOne":"Select One"
@@ -45,7 +44,8 @@
     "SaveFailed": "Failed to save",
     "DeleteFailed": "Failed to delete",
     "NotFound":"Item not found",
-    "NameInUse":"Name is already in use"
+    "NameInUse":"Name is already in use",
+    "NameRequired":"Name is required"
   },
   "Flow": {
     "ErrorMessages":{

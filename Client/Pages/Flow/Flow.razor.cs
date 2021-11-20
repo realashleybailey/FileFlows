@@ -38,9 +38,11 @@ namespace FileFlows.Client.Pages
 
         private string Title { get; set; }
 
+        private string Name { get; set; }
+
         const string API_URL = "/api/flow";
 
-        private string lblSave, lblSaving, lblClose, lblRename;
+        private string lblName, lblSave, lblSaving, lblClose;
 
         private bool _needsRendering = false;
 
@@ -48,7 +50,7 @@ namespace FileFlows.Client.Pages
 
         protected override void OnInitialized()
         {
-            lblRename = Translater.Instant("Labels.Rename");
+            lblName = Translater.Instant("Labels.Name");
             lblSave = Translater.Instant("Labels.Save");
             lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
@@ -102,34 +104,6 @@ namespace FileFlows.Client.Pages
             NavigationManager.NavigateTo("flows");
         }
 
-        async Task Rename()
-        {
-            string message = Translater.Instant("Pages.Flow.Labels.Rename");
-            string newName = await Prompt.Show(message, "", Model.Name);
-            if (string.IsNullOrEmpty(newName))
-                return; // was canceled
-
-            Blocker.Show();
-            try
-            {
-                var result = await HttpHelper.Put(API_URL + "/" + Model.Uid + "/rename?name=" + Uri.EscapeDataString(newName));
-
-                if (result.Success == false)
-                {
-                    NotificationService.Notify(NotificationSeverity.Error,
-                        Translater.TranslateIfNeeded(result.Body?.EmptyAsNull() ?? "ErrorMessages.UnexpectedError")
-                    );
-                    return;
-                }
-                Model.Name = newName;
-                this.SetTitle();
-                this.StateHasChanged();
-            }
-            finally
-            {
-                Blocker.Hide();
-            }
-        }
 
         protected override void OnAfterRender(bool firstRender)
         {
@@ -138,7 +112,7 @@ namespace FileFlows.Client.Pages
 
         private void SetTitle()
         {
-            this.Title = Translater.Instant("Pages.Flow.Labels.EditFlow", Model);
+            this.Title = Translater.Instant("Pages.Flow.Title", Model) + ":";
         }
 
         private async Task InitModel(ff model)
@@ -147,6 +121,8 @@ namespace FileFlows.Client.Pages
             this.SetTitle();
             this.Model.Parts ??= new List<ffPart>(); // just incase its null
             this.Parts = this.Model.Parts;
+
+            this.Name = model.Name ?? "";
 
             var connections = new Dictionary<string, List<xFlowConnection>>();
             foreach (var part in this.Parts.Where(x => x.OutputConnections?.Any() == true))
@@ -173,13 +149,8 @@ namespace FileFlows.Client.Pages
                 var parts = await jsRuntime.InvokeAsync<List<FileFlows.Shared.Models.FlowPart>>("ffFlow.getModel");
                 Logger.Instance.DLog("Parts", parts);
 
-                if (Model == null)
-                {
-                    Model = new ff
-                    {
-                        Name = "New flow",
-                    };
-                }
+                Model ??= new ff();
+                Model.Name = this.Name;
                 // ensure there are no duplicates and no rogue connections
                 Guid[] nodeUids = parts.Select(x => x.Uid).ToArray();
                 foreach (var p in parts)

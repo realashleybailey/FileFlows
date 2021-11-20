@@ -20,6 +20,8 @@ namespace FileFlows.Client.Components
 
         [Parameter]
         public RenderFragment Head { get; set; }
+        [Parameter]
+        public RenderFragment HeadLeft { get; set; }
 
         [Parameter]
         public RenderFragment Body { get; set; }

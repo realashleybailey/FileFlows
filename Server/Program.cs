@@ -44,9 +44,10 @@ System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAss
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
 FileFlows.Server.Globals.Version = fvi.FileVersion;
 
+FileFlows.Shared.Helpers.HttpHelper.Client = new HttpClient();
 
-
-FileFlows.Server.Helpers.PluginHelper.ScanForPlugins();
+using var pl = new FileFlows.Server.Helpers.PluginHelper();
+pl.ScanForPlugins();
 
 FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
 

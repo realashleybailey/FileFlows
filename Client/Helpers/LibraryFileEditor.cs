@@ -1,12 +1,10 @@
 namespace FileFlows.Client.Helpers
 {
-    using System;
     using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Text.Json;
     using System.Threading.Tasks;
     using FileFlows.Client.Components;
     using FileFlows.Shared;
+    using FileFlows.Shared.Helpers;
     using FileFlows.Shared.Models;
     using Radzen;
 

@@ -75,18 +75,20 @@ namespace FileFlows.Server.Controllers
                     flow.Name = "New Flow " + (++count);
                 }
                 // try find basic node
-                var inputFileType = NodeHelper.GetAssemblyNodeTypes("BasicNodes")?.Where(x => x.Name == "InputFile").FirstOrDefault();
-                if (inputFileType != null)
+                var context = new System.Runtime.Loader.AssemblyLoadContext("FlowController.Get", true);
+                using var pluginLoader = new PluginHelper();
+                var info = pluginLoader.GetInputFileInfo();
+                if (string.IsNullOrEmpty(info.name) == false)
                 {
                     flow.Parts.Add(new FlowPart
                     {
-                        Name = inputFileType.Name,
+                        Name = info.name,
                         xPos = 450,
                         yPos = 50,
                         Uid = Guid.NewGuid(),
                         Type = FlowElementType.Input,
                         Outputs = 1,
-                        FlowElementUid = inputFileType.FullName,
+                        FlowElementUid = info.fullName,
                         Icon = "far fa-file"
                     });
                 }
@@ -98,30 +100,9 @@ namespace FileFlows.Server.Controllers
         [HttpGet("elements")]
         public IEnumerable<FlowElement> GetElements()
         {
-            var nodeTypes = Helpers.NodeHelper.GetNodeTypes();
-            List<FlowElement> elements = new List<FlowElement>();
-            foreach (var x in nodeTypes)
-            {
-                FlowElement element = new FlowElement();
-                element.Group = x.Namespace.Substring(x.Namespace.LastIndexOf(".") + 1);
-                element.Name = x.Name;
-                element.Uid = x.FullName;
-                element.Fields = new();
-                var instance = (Node)Activator.CreateInstance(x);
-                element.Inputs = instance.Inputs;
-                element.Outputs = instance.Outputs;
-                element.Type = instance.Type;
-                element.Icon = instance.Icon;
-
-                var model = new ExpandoObject(); ;
-                var dict = (IDictionary<string, object>)model;
-                element.Model = model;
-
-                element.Fields = FormHelper.GetFields(x, dict);
-
-                elements.Add(element);
-            }
-            return elements.OrderBy(x => x.Group).ThenBy(x => x.Type).ThenBy(x => x.Name);
+            var context = new System.Runtime.Loader.AssemblyLoadContext("FlowController.GetElements", true);
+            using var pluginLoader = new PluginHelper();
+            return pluginLoader.GetElements();
         }
 
         [HttpPut]

@@ -1,9 +1,11 @@
-namespace FileFlows.Client.Helpers
+namespace FileFlows.Shared.Helpers
 {
     using System;
     using System.Net.Http;
+    using System.Text;
     using System.Text.Json;
     using System.Threading.Tasks;
+    using FileFlows.Shared.Models;
 
     public class HttpHelper
     {
@@ -41,7 +43,7 @@ namespace FileFlows.Client.Helpers
             try
             {
 #if (DEBUG)
-                if (url.Contains("i18n") == false)
+                if (url.Contains("i18n") == false && url.StartsWith("http") == false)
                     url = "http://localhost:6868" + url;
 #endif
                 Logger.Instance.DLog("About to request: " + url);
@@ -49,7 +51,7 @@ namespace FileFlows.Client.Helpers
                 {
                     Method = method,
                     RequestUri = new Uri(url, UriKind.RelativeOrAbsolute),
-                    Content = data != null ? data.AsJson() : null
+                    Content = data != null ? AsJson(data) : null
                 };
 
                 if (method == HttpMethod.Post && data == null)
@@ -59,6 +61,15 @@ namespace FileFlows.Client.Helpers
                 }
 
                 var response = await Client.SendAsync(request);
+
+                if (typeof(T) == typeof(byte[]))
+                {
+                    var bytes = await response.Content.ReadAsByteArrayAsync();
+                    if (response.IsSuccessStatusCode)
+                        return new RequestResult<T> { Success = true, Data = (T)(object)bytes };
+                    return new RequestResult<T> { Success = false };
+                }
+
                 string body = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
@@ -79,6 +90,12 @@ namespace FileFlows.Client.Helpers
             {
                 throw;
             }
+        }
+
+        private static StringContent AsJson(object o)
+        {
+            string json = o.ToJson();
+            return new StringContent(json, Encoding.UTF8, "application/json");
         }
     }
 }

@@ -1,12 +1,11 @@
 namespace FileFlows.Client.Components.Dialogs
 {
     using System;
-    using System.IO;
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Microsoft.AspNetCore.Components;
     using FileFlows.Shared;
-    using FileFlows.Client.Helpers;
+    using FileFlows.Shared.Helpers;
     using System.Linq;
     using FileFlows.Shared.Models;
 
@@ -48,6 +47,9 @@ namespace FileFlows.Client.Components.Dialogs
 
             this.Extensions = extensions ?? new string[] { };
             this.DirectoryMode = directory;
+
+            if (string.IsNullOrEmpty(start) || (System.IO.Directory.Exists(start) == false && System.IO.File.Exists(start) == false))
+                start = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             this.Title = Translater.TranslateIfNeeded("Dialogs.FileBrowser.FileTitle");
             _ = this.LoadPath(start);

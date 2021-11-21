@@ -5,7 +5,7 @@ namespace FileFlows.Client.Pages
     using System.Threading.Tasks;
     using FileFlows.Client.Components;
     using FileFlows.Client.Components.Dialogs;
-    using FileFlows.Client.Helpers;
+    using FileFlows.Shared.Helpers;
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;

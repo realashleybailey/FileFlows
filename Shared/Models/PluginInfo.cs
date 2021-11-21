@@ -16,4 +16,22 @@ namespace FileFlows.Shared.Models
 
         public List<ElementField> Fields { get; set; }
     }
+
+    public class PluginInfoModel : PluginInfo
+    {
+        public string LatestVersion { get; set; }
+
+        public bool UpdateAvailable
+        {
+            get
+            {
+                System.Version latest, current;
+                if (string.IsNullOrEmpty(LatestVersion) || System.Version.TryParse(LatestVersion, out latest) == false)
+                    return false;
+                if (string.IsNullOrEmpty(Version) || System.Version.TryParse(Version, out current) == false)
+                    return false;
+                return current < latest;
+            }
+        }
+    }
 }

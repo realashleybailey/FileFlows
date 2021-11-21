@@ -1,4 +1,4 @@
-namespace FileFlows.Client.Helpers
+namespace FileFlows.Shared.Models
 {
     public class RequestResult<T>
     {

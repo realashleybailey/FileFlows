@@ -7,14 +7,38 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Plugin.Attributes;
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
+    using FileFlows.Shared.Helpers;
 
     [Route("/api/plugin")]
     public class PluginController : Controller
     {
         [HttpGet]
-        public IEnumerable<PluginInfo> GetAll()
+        public async Task<IEnumerable<PluginInfoModel>> GetAll()
         {
-            return DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false);
+            var plugins = DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false);
+            List<PluginInfoModel> pims = new List<PluginInfoModel>();
+            var packages = await GetPluginPackages();
+            foreach (var plugin in plugins)
+            {
+                var pim = new PluginInfoModel
+                {
+                    Uid = plugin.Uid,
+                    Name = plugin.Name,
+                    DateCreated = plugin.DateCreated,
+                    DateModified = plugin.DateModified,
+                    Enabled = plugin.Enabled,
+                    Assembly = plugin.Assembly,
+                    Version = plugin.Version,
+                    Deleted = plugin.Deleted,
+                    HasSettings = plugin.HasSettings,
+                    Settings = plugin.Settings,
+                    Fields = plugin.Fields
+                };
+                var package = packages.FirstOrDefault(x => x.Name.ToLower().Replace(" ", "") == x.Name.ToLower().Replace(" ", ""));
+                pim.LatestVersion = package?.Version ?? "";
+                pims.Add(pim);
+            }
+            return pims;
         }
 
         [HttpPut("state/{uid}")]
@@ -41,16 +65,8 @@ namespace FileFlows.Server.Controllers
             if (pi == null)
                 return new PluginInfo();
 
-            var plugin = PluginHelper.GetPlugin(pi.Assembly);
-            if (plugin == null)
-                return pi;
-            // get the fields for the plugin.
-
-            pi.Settings ??= new System.Dynamic.ExpandoObject();
-            var dict = (IDictionary<string, object>)pi.Settings;
-
-            pi.Fields = FormHelper.GetFields(plugin.GetType(), dict);
-            return pi;
+            using var pluginLoader = new PluginHelper();
+            return pluginLoader.LoadPluginInfo(pi);
         }
 
         [HttpPost("{uid}/settings")]
@@ -90,6 +106,53 @@ namespace FileFlows.Server.Controllers
                 Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
             }
             return json;
+        }
+
+        [HttpGet("plugin-packages")]
+        public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages()
+        {
+            // should expose user configurable repositories
+            var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>("https://github.com/revenz/FileFlowsPlugins/blob/master/plugins.json?raw=true&rand=" + System.DateTime.Now.ToFileTime());
+            if (plugins.Success == false || plugins.Data == null)
+                return new PluginPackageInfo[] { };
+            return plugins.Data;
+        }
+
+
+        [HttpPost("update/{uid}")]
+        public async Task<bool> Update([FromRoute] Guid uid)
+        {
+            var plugin = Get(uid);
+            if (plugin == null)
+                return false;
+            var plugins = await GetPluginPackages();
+            var ppi = plugins.FirstOrDefault(x => x.Name.Replace(" ", "").ToLower() == plugin.Name.Replace(" ", "").ToLower());
+            if (ppi == null)
+                return false;
+
+            if (Version.Parse(ppi.Version) <= Version.Parse(plugin.Version))
+            {
+                // no new version, cannot update
+                return false;
+            }
+
+            var zipResult = await HttpHelper.Get<byte[]>(ppi.Package);
+            if (zipResult.Success == false)
+                return false;
+
+            // save the zip and unzip it
+            string zipFile = System.IO.Path.Combine("Plugins", plugin.Name + ".zip");
+            System.IO.File.WriteAllBytes(zipFile, zipResult.Data);
+
+            System.IO.Compression.ZipFile.ExtractToDirectory(zipFile, $"Plugins/{(plugin.Name.Replace(" ", ""))}/{ppi.Version}", true);
+
+            System.IO.File.Delete(zipFile);
+
+            plugin.Version = ppi.Version;
+            plugin.Fields = null;
+            DbHelper.Update(plugin);
+
+            return true;
         }
     }
 }

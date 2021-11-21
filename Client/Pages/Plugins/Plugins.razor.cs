@@ -8,7 +8,7 @@ namespace FileFlows.Client.Pages
     using Radzen;
     using Radzen.Blazor;
     using FileFlows.Client.Components;
-    using FileFlows.Client.Helpers;
+    using FileFlows.Shared.Helpers;
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
 
@@ -17,17 +17,19 @@ namespace FileFlows.Client.Pages
         [CascadingParameter] Blocker Blocker { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
         [Inject] NotificationService NotificationService { get; set; }
-        protected RadzenDataGrid<PluginInfo> DataGrid { get; set; }
+        protected RadzenDataGrid<PluginInfoModel> DataGrid { get; set; }
 
-        private List<PluginInfo> Data = new List<PluginInfo>();
+        private List<PluginInfoModel> Data = new List<PluginInfoModel>();
 
-        private IList<PluginInfo> SelectedItems;
-        private string lblEdit;
+        private IList<PluginInfoModel> SelectedItems;
+        private string lblAdd, lblEdit, lblUpdate;
 
         const string API_URL = "/api/plugin";
         protected override void OnInitialized()
         {
+            lblAdd = Translater.Instant("Labels.Add");
             lblEdit = Translater.Instant("Labels.Edit");
+            lblUpdate = Translater.Instant("Labels.Update");
             _ = Load();
         }
 
@@ -38,7 +40,7 @@ namespace FileFlows.Client.Pages
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Get<List<PluginInfo>>(API_URL);
+                var result = await HttpHelper.Get<List<PluginInfoModel>>(API_URL);
                 if (result.Success)
                     this.Data = result.Data;
             }
@@ -47,6 +49,25 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+        }
+
+        async Task Add()
+        {
+            Blocker.Show();
+            this.StateHasChanged();
+            Data.Clear();
+            try
+            {
+                var result = await HttpHelper.Get<List<PluginPackageInfo>>(API_URL + "/plugin-packages");
+                if (result.Success)
+                    Logger.Instance.DLog("plugins", result.Data);
+            }
+            finally
+            {
+                Blocker.Hide();
+                this.StateHasChanged();
+            }
+
         }
 
         async Task Enable(bool enabled, PluginInfo plugin)
@@ -67,8 +88,28 @@ namespace FileFlows.Client.Pages
             }
         }
 
+        async Task Update()
+        {
+            var plugin = SelectedItems.FirstOrDefault();
+            if (plugin == null)
+                return;
+            Blocker.Show();
+            this.StateHasChanged();
+            Data.Clear();
+            try
+            {
+                var result = await HttpHelper.Post($"{API_URL}/update/{plugin.Uid}");
+                await this.Load();
+            }
+            finally
+            {
+                Blocker.Hide();
+                this.StateHasChanged();
+            }
+        }
+
         private PluginInfo EditingPlugin = null;
-        private async Task RowDoubleClicked(DataGridRowMouseEventArgs<PluginInfo> item)
+        private async Task RowDoubleClicked(DataGridRowMouseEventArgs<PluginInfoModel> item)
         {
             this.SelectedItems.Clear();
             this.SelectedItems.Add(item.Data);

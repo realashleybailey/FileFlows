@@ -11,18 +11,23 @@
     <Body>
         <div class="plugins page-table">
             <div class="table-toolbar">
+                <button @onclick="@Add"><span class="fas fa-plus"></span>@lblAdd</button>
                 <button @onclick="@Edit"
-                    disabled="@(SelectedItems?.FirstOrDefault()?.HasSettings == true ? null : "disabled")"><span c
-                        lass="fas fa-edit"></span>
+                    disabled="@(SelectedItems?.FirstOrDefault()?.HasSettings == true ? null : "disabled")"><span
+                        class="fas fa-edit"></span>
                     @lblEdit</button>
+                <button @onclick="@Update"
+                    disabled="@(SelectedItems?.Count == 1 && SelectedItems[0].UpdateAvailable ? null : "disabled")"><span
+                        class="fas fa-cloud-download-alt"></span>
+                    @lblUpdate</button>
             </div>
 
             <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
                 RowDoubleClick=@RowDoubleClicked @bind-Value=@SelectedItems AllowColumnResize="true"
-                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="PluginInfo"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="PluginInfoModel"
                 LogicalFilterOperator="LogicalFilterOperator.Or">
                 <Columns>
-                    <RadzenDataGridColumn TItem="PluginInfo" Width="40px" Sortable="false" Filterable="false">
+                    <RadzenDataGridColumn TItem="PluginInfoModel" Width="40px" Sortable="false" Filterable="false">
                         <HeaderTemplate>
                         </HeaderTemplate>
                         <Template Context="data">
@@ -30,10 +35,11 @@
                                 Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="PluginInfo" Property="Name" Title="Name" />
-                    <RadzenDataGridColumn TItem="PluginInfo" Property="Version" Title="Version" />
-                    <RadzenDataGridColumn TItem="PluginInfo" Property="Assembly" Title="Assembly" />
-                    <RadzenDataGridColumn TItem="PluginInfo" Property="Enabled" Title="Enabled">
+                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Name" Title="Name" />
+                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Version" Title="Version" />
+                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="LatestVersion" Title="Latest Version" />
+                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Assembly" Title="Assembly" />
+                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Enabled" Title="Enabled">
                         <Template Context="item">
                             <div class="switch-wrapper">
                                 <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />

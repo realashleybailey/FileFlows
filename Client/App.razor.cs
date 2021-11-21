@@ -4,8 +4,8 @@ namespace FileFlows.Client
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
-    using FileFlows.Client.Helpers;
     using FileFlows.Shared;
+    using FileFlows.Shared.Helpers;
 
     public partial class App : ComponentBase
     {

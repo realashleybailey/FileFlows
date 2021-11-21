@@ -20,7 +20,7 @@
                 "--output:../../Server/Plugins"
             ],
             "options": {
-              "cwd": "${workspaceFolder}/Plugins/BasicNodes"
+              "cwd": "${workspaceFolder}/../FileFlowsPlugins/BasicNodes"
             },
             "group": "build",
             "presentation": {
@@ -43,7 +43,7 @@
                 "--output:../../Server/Plugins"
             ],
             "options": {
-              "cwd": "${workspaceFolder}/Plugins/VideoNodes"
+              "cwd": "${workspaceFolder}/../FileFlowsPlugins/VideoNodes"
             },
             "group": "build",
             "presentation": {

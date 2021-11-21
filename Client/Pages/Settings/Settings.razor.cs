@@ -1,12 +1,11 @@
 namespace FileFlows.Client.Pages
 {
-    using FileFlows.Client.Helpers;
+    using FileFlows.Shared.Helpers;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using FileFlows.Shared;
     using FileFlows.Client.Components;
 
-    using FileFlows.Plugin;
     public partial class Settings : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }

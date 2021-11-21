@@ -3,7 +3,7 @@ namespace FileFlows.Client.Components.Inputs
     using System;
     using System.Threading.Tasks;
     using System.Timers;
-    using FileFlows.Client.Helpers;
+    using FileFlows.Shared.Helpers;
     using Microsoft.AspNetCore.Components;
     public partial class InputLogView : Input<string>, IDisposable
     {

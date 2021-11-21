@@ -10,3 +10,5 @@ zpublish/*
 wpublish/*
 dockerbuild.ps1
 /.vs/FileFlows
+dockerbuild-public.ps1
+docker.xml

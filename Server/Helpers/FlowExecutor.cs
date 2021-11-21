@@ -17,7 +17,7 @@ namespace FileFlows.Server.Helpers
 
         public event StepChange OnStepChange;
 
-        public Node CurrentNode;
+        public Node? CurrentNode;
 
         public Task<NodeParameters> Run(string input, string relativePath, string tempPath, string logFile)
         {
@@ -52,53 +52,62 @@ namespace FileFlows.Server.Helpers
                 {
                     try
                     {
+                        using var pluginLoader = new PluginHelper();
 
-                        args.Logger.DLog("Executing part:" + part.Name);
-                        CurrentNode = NodeHelper.LoadNode(part);
+                        try
+                        {
+                            args.Logger.DLog("Executing part:" + part.Name);
+                            CurrentNode = pluginLoader.LoadNode(part);
+                            //CurrentNode = NodeHelper.LoadNode(context, part);
 
-                        ++step;
-                        if (OnStepChange != null)
-                            OnStepChange(step, CurrentNode.Name, args.WorkingFile);
+                            ++step;
+                            if (OnStepChange != null)
+                                OnStepChange(step, CurrentNode.Name, args.WorkingFile);
 
-                        args.Logger.DLog("node: " + CurrentNode);
-                        int output = CurrentNode.Execute(args);
-                        if (CurrentNode == null)
-                        {
-                            // happens when canceled    
-                            args.Logger.ELog("node was canceled error code:", CurrentNode);
-                            args.Result = NodeResult.Failure;
-                            flowCompleted = true;
-                            break;
+                            args.Logger.DLog("node: " + CurrentNode.Name);
+                            int output = CurrentNode.Execute(args);
+                            if (CurrentNode == null)
+                            {
+                                // happens when canceled    
+                                args.Logger.ELog("node was canceled error code:", CurrentNode.Name);
+                                args.Result = NodeResult.Failure;
+                                flowCompleted = true;
+                                break;
+                            }
+                            args.Logger.DLog("output: " + output);
+                            if (output == -1)
+                            {
+                                // the execution failed                     
+                                args.Logger.ELog("node returned error code:", CurrentNode.Name);
+                                args.Result = NodeResult.Failure;
+                                flowCompleted = true;
+                                break;
+                            }
+                            var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
+                            if (outputNode == null)
+                            {
+                                args.Logger.DLog("flow completed");
+                                // flow has completed
+                                flowCompleted = true;
+                                args.Result = NodeResult.Success;
+                                break;
+                            }
+                            // we need the connection details
+                            // need recurision here, since a node could have multiple output connections from the same output
+                            // and we need to clone the input parameters at this point, since we may alter them differently on each path
+                            // for now we're just doing one
+                            part = outputNode == null ? null : Flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
+                            if (part == null)
+                            {
+                                // couldnt find the connection, maybe bad data, but flow has now finished
+                                args.Logger.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
+                                flowCompleted = true;
+                                break;
+                            }
                         }
-                        args.Logger.DLog("output: " + output);
-                        if (output == -1)
+                        finally
                         {
-                            // the execution failed                     
-                            args.Logger.ELog("node returned error code:", CurrentNode);
-                            args.Result = NodeResult.Failure;
-                            flowCompleted = true;
-                            break;
-                        }
-                        var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
-                        if (outputNode == null)
-                        {
-                            args.Logger.DLog("flow completed");
-                            // flow has completed
-                            flowCompleted = true;
-                            args.Result = NodeResult.Success;
-                            break;
-                        }
-                        // we need the connection details
-                        // need recurision here, since a node could have multiple output connections from the same output
-                        // and we need to clone the input parameters at this point, since we may alter them differently on each path
-                        // for now we're just doing one
-                        part = outputNode == null ? null : Flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
-                        if (part == null)
-                        {
-                            // couldnt find the connection, maybe bad data, but flow has now finished
-                            args.Logger.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
-                            flowCompleted = true;
-                            break;
+                            CurrentNode = null;
                         }
                     }
                     catch (Exception ex)

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicNodes", "Plugins\BasicNodes\BasicNodes.csproj", "{DD3DA466-582A-4BE7-920D-B2E8540CD3A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin", "Plugins\Plugin\Plugin.csproj", "{88511D93-4BE7-429C-B657-511C65FF13FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin", "Plugin\Plugin.csproj", "{88511D93-4BE7-429C-B657-511C65FF13FA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VideoNodes", "Plugins\VideoNodes\VideoNodes.csproj", "{B8A27FA1-4E30-445F-9FF0-2AA81DECF7FB}"
 EndProject

@@ -2,6 +2,13 @@ $revision = (git rev-list --count --first-parent HEAD) -join "`n"
 $version = "0.0.1.$revision"
 $copyright = "Copyright 2021 - John Andrews"
 
+# remove old plugins directories
+Remove-Item .\Server\Plugins\* -Recurse -ErrorAction SilentlyContinue 
+
+Push-Location ..\FileFlowsPlugins
+.\buildplugins.ps1
+Pop-Location
+
 if (Test-Path .\zpublish) {
     Remove-Item .\zpublish -Recurse -Force
 }
@@ -17,7 +24,8 @@ dotnet.exe publish Server\Server.csproj --runtime linux-x64 --configuration Rele
 
 dotnet.exe publish Client\Client.csproj --configuration Release --output zpublish /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 
-Copy-Item -Path Server\Plugins\*.* -Destination zpublish\Plugins
+Remove-Item .\zpublish\Plugins -Recurse -ErrorAction SilentlyContinue 
+Copy-Item -Path Server\Plugins -Filter "*.*" -Recurse -Destination zpublish -Container
 
 
 if (Test-Path .\wpublish) {
@@ -28,4 +36,5 @@ dotnet.exe publish Server\Server.csproj --runtime win-x64 --configuration Releas
 
 dotnet.exe publish Client\Client.csproj --configuration Release --output wpublish /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 
-Copy-Item -Path Server\Plugins\*.* -Destination wpublish\Plugins
+Remove-Item .\wpublish\Plugins -Recurse -ErrorAction SilentlyContinue 
+Copy-Item -Path Server\Plugins -Filter "*.*" -Recurse -Destination wpublish -Container

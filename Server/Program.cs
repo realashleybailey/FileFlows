@@ -44,6 +44,10 @@ System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAss
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
 FileFlows.Server.Globals.Version = fvi.FileVersion;
 
+Console.WriteLine(new string('=', 50));
+Console.WriteLine("Starting File Flows " + fvi.FileVersion);
+Console.WriteLine(new string('=', 50));
+
 FileFlows.Shared.Helpers.HttpHelper.Client = new HttpClient();
 
 using var pl = new FileFlows.Server.Helpers.PluginHelper();

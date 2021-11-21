@@ -19,10 +19,11 @@ namespace FileFlows.Server.Helpers
                 Uid             VARCHAR(36)           NOT NULL          PRIMARY KEY,
                 Name            VARCHAR(255)       NOT NULL,
                 Type            VARCHAR(255)       NOT NULL,
-                DateCreated     datetime           default           now(),
-                DateModified    datetime           default           now(),
+                DateCreated     datetime           default           current_timestamp,
+                DateModified    datetime           default           current_timestamp,
                 Data            TEXT               NOT NULL
             );";
+        // for mysql change "current_timestamp" to "now()"
 
 
         private static IDatabase GetDb()
@@ -34,25 +35,6 @@ namespace FileFlows.Server.Helpers
 
         private static Database UseSqlLite()
         {
-
-            if (File.Exists("Data/FileFlows.sqlite") == false)
-            {
-                if (Directory.Exists("Data") == false)
-                    Directory.CreateDirectory("Data");
-
-                SQLiteConnection.CreateFile("Data/FileFlows.sqlite");
-
-                using (var con = new SQLiteConnection("Data Source=Data/FileFlows.sqlite;Version=3;"))
-                {
-                    con.Open();
-                    using (var cmd = new SQLiteCommand(CreateDBSript, con))
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
-                    con.Close();
-                }
-            }
-
             return new Database("Data Source=Data/FileFlows.sqlite;Version=3;", null, SQLiteFactory.Instance);
         }
 
@@ -245,7 +227,43 @@ namespace FileFlows.Server.Helpers
         public static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
             if (UseMySql == false)
-                return true;
+                return CreateSqliteDatabase();
+            else
+                return CreateMySqlDatabase(connectionString);
+        }
+
+        private static bool CreateSqliteDatabase()
+        {
+            if (Directory.Exists("Data") == false)
+                Directory.CreateDirectory("Data");
+
+            string dbFile = "Data/FileFlows.sqlite";
+
+            if (System.IO.File.Exists(dbFile) == false)
+                SQLiteConnection.CreateFile(dbFile);
+
+            using (var con = new SQLiteConnection($"Data Source={dbFile};Version=3;"))
+            {
+                con.Open();
+                using (var cmd = new SQLiteCommand($"SELECT name FROM sqlite_master WHERE type='table' AND name='{nameof(DbObject)}'", con))
+                {
+                    if (cmd.ExecuteScalar() != null)
+                        return true;// tables exist, all good                    
+                }
+                using (var cmd = new SQLiteCommand(CreateDBSript, con))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+
+            using var db = UseSqlLite();
+            AddInitialData(db);
+            return true;
+        }
+
+        private static bool CreateMySqlDatabase(string connectionString)
+        {
             var db = new Database(connectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
 
             bool exists = String.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = 'FileFlows'")) == false;
@@ -264,6 +282,14 @@ namespace FileFlows.Server.Helpers
 
             db.Execute(CreateDBSript);
 
+            AddInitialData(db);
+
+            return true;
+        }
+
+        private static void AddInitialData(Database db)
+        {
+
             AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",
@@ -275,10 +301,10 @@ namespace FileFlows.Server.Helpers
             {
                 Name = "Settings",
                 TempPath = "/temp",
+                LoggingPath = "/app/Logs",
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now
             });
-            return true;
         }
     }
 }

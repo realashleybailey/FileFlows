@@ -86,18 +86,23 @@ namespace FileFlows.Server.Controllers
             var json = "{}";
             try
             {
-                foreach (var jf in Directory.GetFiles("Plugins", "*.json"))
+                using var pluginHelper = new PluginHelper();
+                var pluginDirs = pluginHelper.GetPluginDirectories();
+                foreach (var dir in pluginDirs)
                 {
-                    if (jf.Contains(".deps."))
-                        continue;
-                    try
+                    foreach (var jf in Directory.GetFiles(dir, "*.json"))
                     {
-                        string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
-                        json = updated;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Instance.ELog("Error loading plugin json[0]:" + ex.Message + Environment.NewLine + ex.StackTrace);
+                        if (jf.Contains(".deps."))
+                            continue;
+                        try
+                        {
+                            string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
+                            json = updated;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Instance.ELog("Error loading plugin json[0]:" + ex.Message + Environment.NewLine + ex.StackTrace);
+                        }
                     }
                 }
             }

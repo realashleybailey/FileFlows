@@ -11,10 +11,10 @@ namespace FileFlows.Server.Helpers
     /// </summary>
     public class PluginHelper : IDisposable
     {
-        HostAssemblyLoadContext Context;
+        //HostAssemblyLoadContext Context;
         public PluginHelper()
         {
-            Context = new HostAssemblyLoadContext(GetPluginDirectory());
+            //  Context = new HostAssemblyLoadContext(GetPluginDirectory());
         }
         private static string GetPluginDirectory() => new DirectoryInfo("Plugins").FullName;
 
@@ -34,6 +34,7 @@ namespace FileFlows.Server.Helpers
                 try
                 {
                     var plugin = GetPlugin(dll.Assembly);
+                    //plugin.GetType().GetMethod("Init", BindingFlags.Public | BindingFlags.Instance).Invoke(plugin, new object[] { });
                     plugin.Init();
                     var existing = dbPluginInfos.FirstOrDefault(x => x.Assembly == dll.Assembly);
                     bool hasSettings = plugin == null ? false : FormHelper.GetFields(plugin.GetType(), new Dictionary<string, object>()).Any();
@@ -74,7 +75,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        private List<string> GetPluginDirectories()
+        public List<string> GetPluginDirectories()
         {
 
             string pluginsDir = GetPluginDirectory();
@@ -137,15 +138,16 @@ namespace FileFlows.Server.Helpers
                 foreach (var dll in new DirectoryInfo(pluginDir).GetFiles("*.dll"))
                 {
 
-                    Logger.Instance.DLog("Checking dll: " + dll.Name);
+                    Logger.Instance.DLog("Checking dll: " + dll.FullName);
                     try
                     {
-                        var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+                        //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+                        var assembly = Assembly.LoadFile(dll.FullName);
                         var types = assembly.GetTypes();
                         var pluginType = types.Where(x => x.IsAbstract == false && typeof(IPlugin).IsAssignableFrom(x)).FirstOrDefault();
                         if (pluginType == null)
                         {
-                            Logger.Instance.DLog("Plugin type not found in dll: " + dll.Name);
+                            Logger.Instance.DLog("Plugin type not found in dll: " + dll.FullName);
                             foreach (var type in types)
                             {
                                 Logger.Instance.DLog("type: " + type.Name + ", " + type.BaseType?.Name);
@@ -158,6 +160,7 @@ namespace FileFlows.Server.Helpers
                         info.Assembly = dll.Name;
                         var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(dll.FullName);
                         info.Version = fvi.FileVersion.ToString();
+                        //info.Name = plugin.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetValue(plugin) as string ?? "";
                         info.Name = plugin.Name;
                         results.Add(info);
                     }
@@ -232,14 +235,14 @@ namespace FileFlows.Server.Helpers
                     return null;
 
                 string filename = new FileInfo(dir + "/" + assemblyName).FullName;
-                var dll = Context.LoadFromAssemblyPath(filename);
-                //var dll = Assembly.LoadFile(filename);
+
+                // var dll = Context.LoadFromAssemblyPath(filename);
+                var dll = Assembly.LoadFile(filename);
                 var pluginType = dll.GetTypes().Where(x => x.IsAbstract == false && typeof(IPlugin).IsAssignableFrom(x)).FirstOrDefault();
                 if (pluginType == null)
                     throw new Exception("Plugin type not found in dll");
 
-                var plugin = (IPlugin)Activator.CreateInstance(pluginType);
-                return plugin;
+                return (IPlugin)Activator.CreateInstance(pluginType);
             }
             catch (Exception ex)
             {
@@ -250,11 +253,11 @@ namespace FileFlows.Server.Helpers
 
         public void Dispose()
         {
-            if (Context != null)
-            {
-                Context.Unload();
-                Context = null;
-            }
+            // if (Context != null)
+            // {
+            //     Context.Unload();
+            //     Context = null;
+            // }
         }
 
         private Type? GetNodeType(string fullName)
@@ -264,7 +267,8 @@ namespace FileFlows.Server.Helpers
             {
                 foreach (var dll in new DirectoryInfo(dir).GetFiles("*.dll"))
                 {
-                    var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+                    //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+                    var assembly = Assembly.LoadFile(dll.FullName);
                     var types = assembly.GetTypes();
                     var pluginType = types.Where(x => x.IsAbstract == false && x.FullName == fullName).FirstOrDefault();
                     if (pluginType != null)
@@ -298,8 +302,8 @@ namespace FileFlows.Server.Helpers
                     return new List<Type>();
 
                 string dll = new FileInfo(Path.Combine(dir, pluginAssembly)).FullName;
-                var assembly = Context.LoadFromAssemblyPath(dll);
-                //var assembly = Assembly.LoadFile(dll);
+                //var assembly = Context.LoadFromAssemblyPath(dll);
+                var assembly = Assembly.LoadFile(dll);
                 var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode) && x.IsAbstract == false);
                 return nodeTypes;
             }

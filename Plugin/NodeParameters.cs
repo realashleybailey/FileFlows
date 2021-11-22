@@ -76,6 +76,60 @@ namespace FileFlows.Plugin
             }
             return (T)Parameters[name];
         }
+
+        public void SetParameter(string name, object value)
+        {
+            if (Parameters.ContainsKey(name) == false)
+                Parameters[name] = value;
+            else
+                Parameters.Add(name, value);
+        }
+
+        public bool MoveFile(string destination)
+        {
+            bool moved = false;
+            long fileSize = new FileInfo(WorkingFile).Length;
+            Task task = Task.Run(() =>
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(destination);
+                    if (fileInfo.Exists)
+                        fileInfo.Delete();
+                    else if (fileInfo.Directory.Exists == false)
+                        fileInfo.Directory.Create();
+                    Logger?.ILog($"Moving file: \"{WorkingFile}\" to \"{destination}\"");
+                    System.IO.File.Move(WorkingFile, destination, true);
+
+                    SetWorkingFile(destination);
+
+                    moved = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger?.ELog("Failed to move file: " + ex.Message);
+                }
+            });
+
+            while (task.IsCompleted == false)
+            {
+                long currentSize = 0;
+                var destFileInfo = new FileInfo(destination);
+                if (destFileInfo.Exists)
+                    currentSize = destFileInfo.Length;
+
+                if (PartPercentageUpdate != null)
+                    PartPercentageUpdate(currentSize / fileSize * 100);
+                System.Threading.Thread.Sleep(50);
+            }
+
+            if (moved == false)
+                return false;
+
+            if (PartPercentageUpdate != null)
+                PartPercentageUpdate(100);
+            return true;
+        }
     }
 
 

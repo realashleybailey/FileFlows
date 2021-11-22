@@ -151,10 +151,6 @@ namespace FileFlows.Server.Helpers
                         if (pluginType == null)
                         {
                             Logger.Instance.DLog("Plugin type not found in dll: " + dll.FullName);
-                            foreach (var type in types)
-                            {
-                                Logger.Instance.DLog("type: " + type.Name + ", " + type.BaseType?.Name);
-                            }
                             continue;
                         }
 
@@ -240,7 +236,7 @@ namespace FileFlows.Server.Helpers
                 string filename = new FileInfo(dir + "/" + assemblyName).FullName;
 
                 // var dll = Context.LoadFromAssemblyPath(filename);
-                var dll = Assembly.LoadFile(filename);
+                var dll = Assembly.LoadFrom(filename);
                 var pluginType = dll.GetTypes().Where(x => x.IsAbstract == false && typeof(IPlugin).IsAssignableFrom(x)).FirstOrDefault();
                 if (pluginType == null)
                     throw new Exception("Plugin type not found in dll");
@@ -271,7 +267,7 @@ namespace FileFlows.Server.Helpers
                 foreach (var dll in new DirectoryInfo(dir).GetFiles("*.dll"))
                 {
                     //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
-                    var assembly = Assembly.LoadFile(dll.FullName);
+                    var assembly = Assembly.LoadFrom(dll.FullName);
                     var types = assembly.GetTypes();
                     var pluginType = types.Where(x => x.IsAbstract == false && x.FullName == fullName).FirstOrDefault();
                     if (pluginType != null)
@@ -306,7 +302,7 @@ namespace FileFlows.Server.Helpers
 
                 string dll = new FileInfo(Path.Combine(dir, pluginAssembly)).FullName;
                 //var assembly = Context.LoadFromAssemblyPath(dll);
-                var assembly = Assembly.LoadFile(dll);
+                var assembly = Assembly.LoadFrom(dll);
                 var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode) && x.IsAbstract == false);
                 return nodeTypes;
             }

@@ -39,26 +39,29 @@ namespace FileFlows.Plugin
             this.TempPath = string.Empty;
         }
 
-        public void SetWorkingFile(string filename)
+        public void SetWorkingFile(string filename, bool dontDelete = false)
         {
             if (this.WorkingFile == filename)
                 return;
             if (this.WorkingFile != this.FileName)
             {
                 string fileToDelete = this.WorkingFile;
-                // delete the old working file
-                _ = Task.Run(async () =>
+                if (dontDelete == false)
                 {
-                    await Task.Delay(2_000); // wait 2 seconds for the file to be released if used
-                    try
+                    // delete the old working file
+                    _ = Task.Run(async () =>
                     {
-                        System.IO.File.Delete(fileToDelete);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger?.WLog("Failed to delete temporary file: " + ex.Message + Environment.NewLine + ex.StackTrace);
-                    }
-                });
+                        await Task.Delay(2_000); // wait 2 seconds for the file to be released if used
+                        try
+                        {
+                            System.IO.File.Delete(fileToDelete);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger?.WLog("Failed to delete temporary file: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                        }
+                    });
+                }
             }
             this.WorkingFile = filename;
         }

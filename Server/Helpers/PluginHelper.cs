@@ -141,9 +141,12 @@ namespace FileFlows.Server.Helpers
                     Logger.Instance.DLog("Checking dll: " + dll.FullName);
                     try
                     {
+                        var test = new Plugin.Node();
                         //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
-                        var assembly = Assembly.LoadFile(dll.FullName);
+                        var assembly = Assembly.LoadFrom(dll.FullName);
+                        Console.WriteLine("Getting types");
                         var types = assembly.GetTypes();
+                        Console.WriteLine("Got types");
                         var pluginType = types.Where(x => x.IsAbstract == false && typeof(IPlugin).IsAssignableFrom(x)).FirstOrDefault();
                         if (pluginType == null)
                         {

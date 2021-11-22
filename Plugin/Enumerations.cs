@@ -21,7 +21,8 @@ namespace FileFlows.Plugin
         StringArray = 8,
         File = 9,
         Folder = 10,
-        LogView = 11
+        LogView = 11,
+        RegularExpression = 12
     }
 
 

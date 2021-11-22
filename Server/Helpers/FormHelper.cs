@@ -51,7 +51,7 @@ namespace FileFlows.Server.Helpers
                         ef.Validators.Add(new Shared.Validators.Required());
                     if (prop.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() is RangeAttribute range)
                         ef.Validators.Add(new Shared.Validators.Range { Minimum = (int)range.Minimum, Maximum = (int)range.Maximum });
-                    if (prop.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() is RegularExpressionAttribute exp)
+                    if (prop.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RegularExpressionAttribute), false).FirstOrDefault() is System.ComponentModel.DataAnnotations.RegularExpressionAttribute exp)
                         ef.Validators.Add(new Shared.Validators.Pattern { Expression = exp.Pattern });
                 }
             }

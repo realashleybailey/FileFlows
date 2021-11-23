@@ -25,6 +25,7 @@ namespace FileFlows.Server.Helpers
                         Parameters = new Dictionary<string, object>(),
                         Validators = new List<Shared.Validators.Validator>()
                     };
+
                     fields.Add(ef);
 
                     var parameters = new Dictionary<string, object>();

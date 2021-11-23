@@ -27,6 +27,11 @@ namespace FileFlows.Client.Components.Inputs
         protected string Uid = System.Guid.NewGuid().ToString();
         private string _Label;
         private string _LabelOriginal;
+
+        public string Suffix { get; set; }
+        public string Prefix { get; set; }
+
+
         [Parameter]
         public string Label
         {
@@ -40,6 +45,8 @@ namespace FileFlows.Client.Components.Inputs
                 {
                     _Label = Translater.Instant(_LabelOriginal);
                     Help = Translater.Instant(_LabelOriginal + "-Help");
+                    Suffix = Translater.Instant(_LabelOriginal + "-Suffix");
+                    Prefix = Translater.Instant(_LabelOriginal + "-Prefix");
                     Placeholder = Translater.Instant(_LabelOriginal + "-Placeholder").EmptyAsNull() ?? _Label;
                 }
                 else

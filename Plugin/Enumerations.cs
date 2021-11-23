@@ -22,7 +22,8 @@ namespace FileFlows.Plugin
         File = 9,
         Folder = 10,
         LogView = 11,
-        RegularExpression = 12
+        RegularExpression = 12,
+        TextVariable = 13
     }
 
 

@@ -186,6 +186,20 @@ namespace FileFlows.Client.Pages
         [JSInvokable]
         public async Task<object> Edit(ffPart part)
         {
+            // get flow variables that we can pass onto the form
+            Blocker.Show();
+            List<string> variables = new List<string>();
+            try
+            {
+                var parts = await jsRuntime.InvokeAsync<List<FileFlows.Shared.Models.FlowPart>>("ffFlow.getModel");
+                Logger.Instance.DLog("Parts: ", parts);
+                var variablesResult = await HttpHelper.Post<List<string>>(API_URL +"/" + part.Uid + "/variables", parts);
+                if(variablesResult.Success)
+                    variables = variablesResult.Data;
+            }
+            finally { Blocker.Hide(); }
+
+
             var flowElement = this.Available.FirstOrDefault(x => x.Uid == part.FlowElementUid);
             if (flowElement == null)
             {
@@ -205,6 +219,12 @@ namespace FileFlows.Client.Pages
                 InputType = Plugin.FormInputType.Text
             });
 
+            foreach(var field in fields)
+            {
+                if(field.InputType == Plugin.FormInputType.TextVariable)
+                    field.Variables = variables;
+            }
+
             var model = part.Model ?? new ExpandoObject();
             // add the name to the model, since this is actually bound on the part not model, but we need this 
             // so the user can update the name
@@ -212,7 +232,7 @@ namespace FileFlows.Client.Pages
                 dict["Name"] = part.Name ?? string.Empty;
 
             string title = Helpers.FlowHelper.FormatLabel(typeName);
-            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model);
+            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large:fields.Count > 1);
             await newModelTask;
             if (newModelTask.IsCanceled == false)
             {

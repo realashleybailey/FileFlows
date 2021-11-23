@@ -24,6 +24,7 @@ namespace FileFlows.Plugin
         public NodeResult Result { get; set; } = NodeResult.Success;
 
         public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Variables { get; set; } = new Dictionary<string, object>();
 
         public Func<string, string>? GetToolPath { get; set; }
 
@@ -37,6 +38,18 @@ namespace FileFlows.Plugin
             this.WorkingFile = filename;
             this.RelativeFile = string.Empty;
             this.TempPath = string.Empty;
+            InitFile(filename);
+        }
+
+        private void InitFile(string filename)
+        {
+            var fi = new FileInfo(filename);
+            UpdateVariables(new Dictionary<string, object> {
+                { "ext", fi.Extension },
+                { "FileName", fi.Name },
+                { "Directory", fi.Directory?.Name ?? "" }
+            });
+
         }
 
         public void SetWorkingFile(string filename, bool dontDelete = false)
@@ -64,6 +77,7 @@ namespace FileFlows.Plugin
                 }
             }
             this.WorkingFile = filename;
+            InitFile(filename);
         }
 
         public T GetParameter<T>(string name)
@@ -129,6 +143,19 @@ namespace FileFlows.Plugin
             if (PartPercentageUpdate != null)
                 PartPercentageUpdate(100);
             return true;
+        }
+
+        public void UpdateVariables(Dictionary<string, object> updates)
+        {
+            if (updates == null)
+                return;
+            foreach (var key in updates.Keys)
+            {
+                if (Variables.ContainsKey(key))
+                    Variables[key] = updates[key];
+                else
+                    Variables.Add(key, updates[key]);
+            }
         }
     }
 

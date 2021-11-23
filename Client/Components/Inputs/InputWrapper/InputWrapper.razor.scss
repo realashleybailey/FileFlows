@@ -15,3 +15,18 @@
     color: var(--accent);
     white-space: pre-wrap;
 }
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.input-label {
+    width: 14rem;
+    margin: 0.4rem auto auto;
+}
+.input-value {
+    flex-grow: 1;
+    position: relative;
+    margin: 1px; /* one pixel margin for outline of selected inputs */
+}

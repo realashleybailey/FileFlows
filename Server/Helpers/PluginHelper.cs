@@ -172,6 +172,17 @@ namespace FileFlows.Server.Helpers
             return results;
         }
 
+        internal List<string> GetPartVariables(string flowElementUid)
+        {
+            var nt = GetNodeType(flowElementUid);
+            if (nt == null)
+                return new List<string>();
+            var node = Activator.CreateInstance(nt) as Node;
+            if(node?.Variables == null || node.Variables.Count == 0)
+                return new List<string>();
+            return node.Variables.Keys.ToList();
+        }
+
         /// <summary>
         /// Gets the info for the default InputFile node
         /// </summary>
@@ -266,12 +277,16 @@ namespace FileFlows.Server.Helpers
             {
                 foreach (var dll in new DirectoryInfo(dir).GetFiles("*.dll"))
                 {
-                    //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
-                    var assembly = Assembly.LoadFrom(dll.FullName);
-                    var types = assembly.GetTypes();
-                    var pluginType = types.Where(x => x.IsAbstract == false && x.FullName == fullName).FirstOrDefault();
-                    if (pluginType != null)
-                        return pluginType;
+                    try
+                    {
+                        //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+                        var assembly = Assembly.LoadFrom(dll.FullName);
+                        var types = assembly.GetTypes();
+                        var pluginType = types.Where(x => x.IsAbstract == false && x.FullName == fullName).FirstOrDefault();
+                        if (pluginType != null)
+                            return pluginType;
+                    }
+                    catch (Exception) { }
                 }
             }
             return null;

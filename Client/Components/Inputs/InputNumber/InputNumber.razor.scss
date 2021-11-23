@@ -1,7 +1,19 @@
 input {
     width:100%;
 }
+.input-number-wrapper{
+    width:100%;
+    display:flex;
+    flex-direction: row;
+}
+.radzen-numeric{
+    flex-grow:1;
+}
+.suffix {
+    padding:0.25rem 1rem 0;    
+    background:rgba(var(--input-background-rgb), 0.5);
 
+}
 ::deep {
     .rz-spinner{
         width:100%;

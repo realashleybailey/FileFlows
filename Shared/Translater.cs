@@ -87,7 +87,7 @@ namespace FileFlows.Shared
                 if (Language.ContainsKey(key))
                     return Language[key];
             }
-            if (possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder") || possibleKeys[0].EndsWith(".Description"))
+            if (possibleKeys[0].EndsWith("-Help") || possibleKeys[0].EndsWith("-Placeholder") || possibleKeys[0].EndsWith("-Suffix") || possibleKeys[0].EndsWith("-Prefix") || possibleKeys[0].EndsWith(".Description"))
                 return "";
 
             if (possibleKeys[0].EndsWith(".Name") && Language.ContainsKey("Labels.Name"))

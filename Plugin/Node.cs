@@ -11,6 +11,12 @@ namespace FileFlows.Plugin
 
         public string Name => base.GetType().Name;
 
+
+        /// <summary>
+        /// Get variables that can be used in other nodes such as a renamer node using variables to create a filename using variables from a previous node
+        /// </summary>
+        public virtual Dictionary<string, object> Variables => new Dictionary<string, object>();
+
         /// <summary>
         /// Gets the fontawesome icon to use in the flow 
         /// </summary>

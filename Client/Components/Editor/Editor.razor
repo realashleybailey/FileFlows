@@ -42,6 +42,13 @@
                             Validators=@field.Validators Placeholder="@field.Placeholder" />
                                     }
                                     break;
+                                case FormInputType.TextVariable:
+                                    {
+                                        var value = GetValue<string>(field.Name) ?? "";
+                                        <InputTextVariables Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" />
+                                    }
+                                    break;
                                 case FormInputType.TextArea:
                                     {
                                         var value = GetValue<string>(field.Name) ?? "";

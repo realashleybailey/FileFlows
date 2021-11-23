@@ -2,5 +2,13 @@
   {
     "outputFile": "Shared/NavMenu/NavMenu.razor.css",
     "inputFile": "Shared/NavMenu/NavMenu.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputTextVariables/InputTextVariables.razor.css",
+    "inputFile": "Components/Inputs/InputTextVariables/InputTextVariables.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputWrapper/InputWrapper.razor.css",
+    "inputFile": "Components/Inputs/InputWrapper/InputWrapper.razor.scss"
   }
 ]

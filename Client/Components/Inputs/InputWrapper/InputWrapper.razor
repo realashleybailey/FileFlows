@@ -6,11 +6,11 @@
 }
 
 <div class="row @(invalid ? "error" : "")">
-    <div class="col-md-4 align-items-center d-flex input-label">
+    <div class="input-label">
         <RadzenLabel Text="@Input.Label" />
     </div>
 
-    <div class="col-md-8 input-value">
+    <div class="input-value">
         @ChildContent
         @if (invalid)
         {

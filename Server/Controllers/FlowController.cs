@@ -163,6 +163,62 @@ namespace FileFlows.Server.Controllers
                 DbHelper.Update(lf);
             }
         }
+
+        [HttpPost("{uid}/variables")]
+        public List<string> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid)
+        {
+            var variables = new List<string>();
+            variables.Add("ext");
+            variables.Add("FileName");
+            variables.Add("FolderName");
+            // get the connected nodes to this part
+            var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();
+            if (part == null)
+                return variables;
+
+            List<FlowPart> checkedParts = new List<FlowPart>();
+
+            var parentParts = FindParts(part);
+            if (parentParts.Any() == false)
+                return variables;
+
+            PluginHelper pluginHelper = new PluginHelper(); 
+            foreach(var p in parentParts)
+            {
+                var partVariables = pluginHelper.GetPartVariables(p.FlowElementUid);
+                variables.AddRange(partVariables);
+            }
+
+            return variables;
+
+            List<FlowPart> FindParts(FlowPart part)
+            {
+                List<FlowPart> results = new List<FlowPart>();
+                if (checkedParts.Contains(part))
+                    return results;
+
+
+                foreach (var p in flowParts)
+                {
+                    if (checkedParts.Contains(p) || p == part)
+                        continue;
+
+                    if (p.OutputConnections?.Any() != true) {
+                        checkedParts.Add(p);
+                        continue;
+                    }
+
+                    if (p.OutputConnections.Any(x => x.InputNode == part.Uid)) 
+                    {
+                        results.Add(p);
+
+                        results.AddRange(FindParts(p));
+                        checkedParts.Add(p);
+                    }
+                }
+                return results;
+            }
+        }
     }
 
 }

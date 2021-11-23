@@ -17,5 +17,21 @@ window.ff = {
     },
     gotoHomePage: function () {
         window.open('https://github.com/revenz/fileflows', '_blank');
+    },
+    disableMovementKeys: function (element) {
+        if (typeof (element) === 'string')
+            element = document.getElementById(element);
+        if (!element)
+            return;
+        const blocked = ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Enter', 'PageUp', 'PageDown', 'Home', 'End'];
+        element.addEventListener('keydown', e => {
+            if (e.target.getAttribute('data-disable-movement') != 1)
+                return;
+
+            if (blocked.indexOf(e.code) >= 0) {
+                e.preventDefault();
+                return false;
+            }
+        })
     }
 };

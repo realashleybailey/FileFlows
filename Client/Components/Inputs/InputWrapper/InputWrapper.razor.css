@@ -24,6 +24,7 @@
 
 .input-label {
   width: 14rem;
+  min-width: 14rem;
   margin: 0.4rem auto auto;
 }
 

@@ -172,15 +172,15 @@ namespace FileFlows.Server.Helpers
             return results;
         }
 
-        internal List<string> GetPartVariables(string flowElementUid)
+        internal Dictionary<string, object> GetPartVariables(string flowElementUid)
         {
             var nt = GetNodeType(flowElementUid);
             if (nt == null)
-                return new List<string>();
+                return new Dictionary<string, object>();
             var node = Activator.CreateInstance(nt) as Node;
             if(node?.Variables == null || node.Variables.Count == 0)
-                return new List<string>();
-            return node.Variables.Keys.ToList();
+                return new Dictionary<string, object>();
+            return node.Variables;
         }
 
         /// <summary>

@@ -1,13 +1,15 @@
 @namespace FileFlows.Client.Components.Inputs
 
 @{
-    bool invalid = string.IsNullOrEmpty(Input.ErrorMessage) == false;
+    bool invalid = string.IsNullOrEmpty(Input?.ErrorMessage) == false;
 
 }
-
 <div class="row @(invalid ? "error" : "")">
     <div class="input-label">
-        <RadzenLabel Text="@Input.Label" />
+        @if (string.IsNullOrEmpty(Input?.Label) == false)
+        {
+            <RadzenLabel Text="@Input.Label" />
+        }
     </div>
 
     <div class="input-value">
@@ -16,7 +18,7 @@
         {
             <span class="error-text">@Input.ErrorMessage</span>
         }
-        @if (string.IsNullOrEmpty(Input.Help) == false)
+        @if (string.IsNullOrEmpty(Input?.Help) == false)
         {
             <span class="help-text">@Input.Help</span>
         }

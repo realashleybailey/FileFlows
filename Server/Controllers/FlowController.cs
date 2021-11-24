@@ -165,12 +165,12 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPost("{uid}/variables")]
-        public List<string> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid)
+        public Dictionary<string, object> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid)
         {
-            var variables = new List<string>();
-            variables.Add("ext");
-            variables.Add("FileName");
-            variables.Add("FolderName");
+            var variables = new Dictionary<string, object>();
+            variables.Add("ext", ".mkv");
+            variables.Add("FileName", "Filename");
+            variables.Add("FolderName", "Foldername");
             // get the connected nodes to this part
             var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();
             if (part == null)
@@ -186,7 +186,11 @@ namespace FileFlows.Server.Controllers
             foreach(var p in parentParts)
             {
                 var partVariables = pluginHelper.GetPartVariables(p.FlowElementUid);
-                variables.AddRange(partVariables);
+                foreach (var pv in partVariables)
+                {
+                    if (variables.ContainsKey(pv.Key) == false)
+                        variables.Add(pv.Key, pv.Value);
+                }
             }
 
             return variables;

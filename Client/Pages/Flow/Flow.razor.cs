@@ -188,12 +188,12 @@ namespace FileFlows.Client.Pages
         {
             // get flow variables that we can pass onto the form
             Blocker.Show();
-            List<string> variables = new List<string>();
+            Dictionary<string, object> variables = new Dictionary<string, object>();
             try
             {
                 var parts = await jsRuntime.InvokeAsync<List<FileFlows.Shared.Models.FlowPart>>("ffFlow.getModel");
                 Logger.Instance.DLog("Parts: ", parts);
-                var variablesResult = await HttpHelper.Post<List<string>>(API_URL +"/" + part.Uid + "/variables", parts);
+                var variablesResult = await HttpHelper.Post<Dictionary<string, object>>(API_URL +"/" + part.Uid + "/variables", parts);
                 if(variablesResult.Success)
                     variables = variablesResult.Data;
             }

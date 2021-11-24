@@ -1,16 +1,24 @@
 @namespace FileFlows.Client.Components.Inputs
 @inherits Input<string>
 
-<InputWrapper Input="@this">
-    <div>
-        <input id="@Uid" @ref="eleInput" type="text" @bind-value="Value" @bind-value:event="oninput" autocomplete="off" @onkeydown="OnKeyDown" data-disable-movement="@(VariablesShown ? "1" : null)" />
+<div class="input-text-variables">
+    <InputWrapper Input="@this">
+        <div>
+            <input id="@Uid" @ref="eleInput" type="text" @bind-value="Value" @bind-value:event="oninput" autocomplete="off" @onkeydown="OnKeyDown" data-disable-movement="@(VariablesShown ? "1" : null)" />
 
-        <div class="input-variables dropdown-menu @(VariablesShown && VariablesFiltered.Any() ? "show": "")">
-            @for(int i=0;i<VariablesFiltered.Count;i++)
-            {
-                var item = VariablesFiltered[i];
-                <a class="dropdown-item @(i == SelectedIndex ? "selected": "")" @onclick="() => InsertVariable(item)">@item</a>
-            }
+            <div class="input-variables dropdown-menu @(VariablesShown && VariablesFiltered.Any() ? "show": "")">
+                @for(int i=0;i<VariablesFiltered.Count;i++)
+                {
+                    var item = VariablesFiltered[i];
+                    <a class="dropdown-item @(i == SelectedIndex ? "selected": "")" @onclick="() => InsertVariable(item)">@item</a>
+                }
+            </div>
         </div>
-    </div>
-</InputWrapper>
+    </InputWrapper>
+
+    <InputWrapper>
+        <div class="preview">
+            <input @bind-value="@Preview" readonly="readonly" disabled="disabled" />
+        </div>
+    </InputWrapper>
+</div>

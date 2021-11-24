@@ -10,17 +10,27 @@ namespace FileFlows.Client.Components.Inputs
 
     public partial class InputTextVariables : Input<string>
     {
-        private List<String> _Variables = new List<string>();
+        private Dictionary<string, object> _Variables = new Dictionary<string, object>();
 
         [Parameter]
-        public List<string> Variables
+        public Dictionary<string, object> Variables
         {
             get => _Variables;
-            set { _Variables = value ?? new List<string>(); }
+            set { _Variables = value ?? new Dictionary<string, object>(); }
         }
         public List<string> VariablesFiltered { get; set; } = new List<string>();
 
         private ElementReference eleInput;
+
+        public new string Value
+        {
+            get => base.Value;
+            set
+            {
+                base.Value = value;
+                UpdatePreview();
+            }
+        }
 
         /// <summary>
         /// The index in the string the variable will be inserted at
@@ -35,14 +45,15 @@ namespace FileFlows.Client.Components.Inputs
 
         private string FilterText = string.Empty;
 
-        public override bool Focus() => FocusUid();
+        private string Preview = string.Empty;
 
+        public override bool Focus() => FocusUid();
+            
         protected override void OnInitialized()
         {
-            base.OnInitialized();
-
-            Variables.Sort();
-        }
+            base.OnInitialized();       
+            UpdatePreview();
+        }   
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -55,7 +66,7 @@ namespace FileFlows.Client.Components.Inputs
         {
             if (args.Key == "{")
             {
-                this.VariablesFiltered = Variables;
+                this.VariablesFiltered = Variables.Keys.OrderBy(x => x).ToList();
                 VariablesShown = true;
                 SelectedIndex = 0;
                 FilterText = string.Empty;
@@ -65,13 +76,14 @@ namespace FileFlows.Client.Components.Inputs
                 ValueEnd = this.Value.Length > VariablesIndex ? this.Value.Substring(VariablesIndex) : string.Empty;
                 Logger.Instance.DLog("ValueStart: " + ValueStart);
                 Logger.Instance.DLog("ValueEnd: " + ValueEnd);
-                return;
             }
-
-            if (VariablesShown)
+            else if(args.Key == "}")
+            {
+                VariablesShown = false;
+            }
+            else if (VariablesShown)
             {
                 await VariablesKeyDown(args);
-                return;
             }
         }
 
@@ -110,7 +122,7 @@ namespace FileFlows.Client.Components.Inputs
                 // need to update the filter
                 if (FilterText.Length > 0)
                     FilterText = FilterText.Substring(0, FilterText.Length - 1);
-                this.VariablesFiltered = Variables.Where(x => x.ToLower().StartsWith(FilterText)).ToList();
+                this.VariablesFiltered = Variables.Where(x => x.Key.ToLower().StartsWith(FilterText)).Select(x => x.Key).OrderBy(x => x).ToList();
                 this.SelectedIndex = 0;
 
             }
@@ -118,7 +130,7 @@ namespace FileFlows.Client.Components.Inputs
             {
                 Logger.Instance.DLog("key: " + args.Key);
                 FilterText += args.Key.ToLower();
-                this.VariablesFiltered = Variables.Where(x => x.ToLower().StartsWith(FilterText)).ToList();
+                this.VariablesFiltered = Variables.Where(x => x.Key.ToLower().StartsWith(FilterText)).Select(x => x.Key).OrderBy(x => x).ToList();
                 this.SelectedIndex = 0;
             }
         }
@@ -135,6 +147,12 @@ namespace FileFlows.Client.Components.Inputs
             this.Value = newValue;
             await Task.Delay(50);
             await this.SetCaretPosition(newCaretPos);
+        }
+
+        private void UpdatePreview()
+        {
+            string preview = Plugin.VariablesHelper.ReplaceVariables(this.Value, Variables, false);
+            this.Preview = preview;             
         }
 
         private async Task<int> GetCaretPosition()

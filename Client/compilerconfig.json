@@ -14,5 +14,13 @@
   {
     "outputFile": "Pages/Flow/Flow.razor.css",
     "inputFile": "Pages/Flow/Flow.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/app.css",
+    "inputFile": "wwwroot/css/app.scss"
+  },
+  {
+    "outputFile": "Pages/Settings/Settings.razor.css",
+    "inputFile": "Pages/Settings/Settings.razor.scss"
   }
 ]

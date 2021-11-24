@@ -27,3 +27,16 @@ input {
         }
     }
 }
+
+.preview > input {
+    background: transparent !important;
+    opacity: 0.3;
+    font-style: italic;
+    font-size: 0.8rem;
+    margin: auto 0;
+    padding: 0;
+}
+
+.input-text-variables ::deep .row + .row {
+    margin-top: 0;
+}

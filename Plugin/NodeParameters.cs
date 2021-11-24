@@ -157,6 +157,57 @@ namespace FileFlows.Plugin
                     Variables.Add(key, updates[key]);
             }
         }
+
+        /// <summary>
+        /// Replaces variables in a given string
+        /// </summary>
+        /// <param name="input">the input string</param>
+        /// <param name="variables">the variables used to replace</param>
+        /// <param name="stripMissing">if missing variables shouild be removed</param>
+        /// <returns>the string with the variables replaced</returns>
+        public string ReplaceVariables(string input, bool stripMissing = false) => VariablesHelper.ReplaceVariables(input, Variables, stripMissing);
+
+
+        /// <summary>
+        /// Gets a safe filename with any reserved characters removed or replaced
+        /// </summary>
+        /// <param name="fullFileName">the full filename of the file to make safe</param>
+        /// <returns>the safe filename</returns>
+        public FileInfo GetSafeName(string fullFileName)
+        {
+            var dest = new FileInfo(fullFileName);
+
+            string destName = dest.Name;
+            string destDir = dest?.DirectoryName ?? "";
+
+            // replace these here to avoid double spaces in name
+            if (Path.GetInvalidFileNameChars().Contains(':'))
+            {
+                destName = destName.Replace(" : ", " - ");
+                destName = destName.Replace(": ", " - ");
+                destDir = destDir.Replace(" : ", " - ");
+                destDir = destDir.Replace(": ", " - ");
+            }
+
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                if (c == ':')
+                {
+                    destName = destName.Replace(c.ToString(), " - ");
+                    if(c != Path.DirectorySeparatorChar && c != Path.PathSeparator)
+                        destDir = destDir.Replace(c.ToString(), " - ");
+                }
+                else
+                {
+                    destName = destName.Replace(c.ToString(), "");
+                    if (c != Path.DirectorySeparatorChar && c != Path.PathSeparator)
+                        destDir = destDir.Replace(c.ToString(), "");
+                }
+            }
+            // put the drive letter back if it was replaced iwth a ' - '
+            destDir = System.Text.RegularExpressions.Regex.Replace(destDir, @"^([a-z]) \- ", "$1:", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            return new FileInfo(Path.Combine(destDir, destName));
+        }
     }
 
 

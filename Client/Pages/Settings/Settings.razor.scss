@@ -1,5 +1,8 @@
 .settings {
     ::deep {
+        .content {
+            margin:auto 1rem;
+        }
 
         .row + .row {
             margin-top:1rem;

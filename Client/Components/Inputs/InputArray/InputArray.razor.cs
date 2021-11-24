@@ -3,6 +3,7 @@ namespace FileFlows.Client.Components.Inputs
     using Microsoft.AspNetCore.Components;
     using Microsoft.AspNetCore.Components.Web;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public partial class InputArray : Input<string[]>
     {
@@ -14,6 +15,13 @@ namespace FileFlows.Client.Components.Inputs
         private string InputText = "";
         private string PreviousInputText = "";
         public override bool Focus() => FocusUid();
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            if (Value == null)
+                Value = new string[] { };
+        }
 
         private void OnKeyDown(KeyboardEventArgs e)
         {
@@ -52,6 +60,15 @@ namespace FileFlows.Client.Components.Inputs
             }
             this.Value = this.Value.Union(new[] { str }).ToArray();
             return true;
+        }
+
+        void OnBlur()
+        {
+            if (string.IsNullOrEmpty(InputText) == false)
+            {
+                if (Add(InputText))
+                    InputText = string.Empty;
+            }
         }
     }
 }

@@ -10,5 +10,9 @@
   {
     "outputFile": "Components/Inputs/InputWrapper/InputWrapper.razor.css",
     "inputFile": "Components/Inputs/InputWrapper/InputWrapper.razor.scss"
+  },
+  {
+    "outputFile": "Pages/Flow/Flow.razor.css",
+    "inputFile": "Pages/Flow/Flow.razor.scss"
   }
 ]

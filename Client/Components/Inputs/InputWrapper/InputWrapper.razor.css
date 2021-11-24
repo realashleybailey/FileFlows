@@ -14,6 +14,7 @@
   font-size: 0.8rem;
   color: var(--accent);
   white-space: pre-wrap;
+  display: block;
 }
 
 .row {

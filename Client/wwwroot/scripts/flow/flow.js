@@ -133,7 +133,10 @@ window.ffFlow = {
         let connections = this.FlowLines.ioOutputConnections;
         console.log('getting model, connections', connections);
 
+
+        let connectionUids = [];
         for (let [outputPart, con] of connections) {
+            connectionUids.push(outputPart);
             let partId = outputPart.substring(0, outputPart.indexOf('-output'));
             let output = parseInt(outputPart.substring(outputPart.lastIndexOf('-') + 1), 10);
             let part = this.parts.filter(x => x.uid === partId)[0];
@@ -141,12 +144,17 @@ window.ffFlow = {
                 console.warn('unable to find part: ', partId);
                 continue;
             }
-            console.log('connection output node', partId, con);
             for (let inputCon of con) {
                 let input = inputCon.index;
                 let toPart = inputCon.part;
                 if (!part.outputConnections)
                     part.outputConnections = [];
+
+                if (ffFlow.SingleOutputConnection) {
+                    console.log('removing output connections on output: ' + output);
+                    // remove any duplciates from the output
+                    part.outputConnections = part.outputConnections.filter(x => x.output != output);
+                }
 
                 part.outputConnections.push(
                     {
@@ -154,6 +162,19 @@ window.ffFlow = {
                         output: output,
                         inputNode: toPart
                     });
+            }
+        }
+        // remove any no longer existing connections
+        for (let part of this.parts) {
+            if (!part.outputConnections)
+                continue;
+            for (let i = part.outputConnections.length - 1; i >= 0;i--) {
+                let po = part.outputConnections[i];
+                let outUid = part.uid + '-output-' + po.output;
+                if (connectionUids.indexOf(outUid) < 0) {
+                    // need to remove it
+                    part.outputConnections.splice(i, 1);
+                }
             }
         }
 

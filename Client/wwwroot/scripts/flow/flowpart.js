@@ -66,6 +66,8 @@ window.ffFlowPart = {
             div.appendChild(divInputs);
             for (let i = 1; i <= part.inputs; i++) {
                 let divInput = document.createElement('div');
+                let divInputInner = document.createElement('div');
+                divInput.appendChild(divInputInner);
                 divInput.setAttribute('id', part.uid + '-input-' + i);
                 divInput.setAttribute('x-input', i);
                 divInput.classList.add('input');
@@ -206,6 +208,8 @@ window.ffFlowPart = {
             }
             for (let i = 1; i <= part.outputs; i++) {
                 let divOutput = document.createElement('div');
+                let divOutputInner = document.createElement('div');
+                divOutput.appendChild(divOutputInner);
                 divOutput.setAttribute('id', part.uid + '-output-' + i);
                 divOutput.setAttribute('x-output', i);
                 divOutput.classList.add('output');

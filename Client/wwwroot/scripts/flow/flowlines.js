@@ -7,14 +7,17 @@ class ffFlowLines {
     ioCanvasBounds = null;
     ioOutputConnections = new Map();
     ioLines = [];
-
+    FlowContainer = null;
     ioCanvas = null;
     ioSelectedConnection = null;
     accentColor = null;
     lineColor = null;
-    ioOffset = 6;
+    ioOffset = 14.5;
 
     reset() {
+
+        if (this.FlowContainer != null && this.FlowContainer.classList.contains('drawing-line') === true)
+            this.FlowContainer.classList.remove('drawing-line');
         this.ioNode = null;
         this.ioSelected = null;
         this.ioIsInput = null;
@@ -28,7 +31,12 @@ class ffFlowLines {
     }
 
     ioDown(event, isInput) {
-        this.ioNode = event.target;
+        this.ioNode = event.target.parentNode;
+        if (!this.FlowContainer)
+            this.FlowContainer = document.getElementById('flow-parts');
+
+        if (this.FlowContainer != null && this.FlowContainer.classList.contains('drawing-line') === false)
+            this.FlowContainer.classList.add('drawing-line');
         this.ioSelected = this.ioNode.parentNode.parentNode;
         this.ioIsInput = isInput;
 
@@ -60,10 +68,11 @@ class ffFlowLines {
         if (!this.ioNode)
             return;
 
-        let target = event.target;
+        let target = event.target.parentNode;
         let suitable = target?.classList?.contains(this.ioIsInput ? 'output' : 'input') === true;
         if (suitable) {
             let input = this.isInput ? this.ioNode : target;
+            console.log('input', input);
             let output = this.isInput ? target : this.ioNode;
             let outputId = output.getAttribute('id');
 
@@ -83,17 +92,22 @@ class ffFlowLines {
             let existing = connections.filter(x => x.index == index && x.part == part);
             if (!existing || existing.length === 0) {
 
-
                 if (ffFlow.SingleOutputConnection) {
                     connections = [{ index: index, part: part }];
+                    console.log('setting conncection: ', connections);
                     this.ioOutputConnections.set(outputId, connections);
+                    console.log('ioOutputConnections: ', this.ioOutputConnections);
                 }
                 else
                     connections.push({ index: index, part: part });
 
+                console.log('drawing new line', input, output);
                 this.drawLine(input, output);
             }
         }
+
+        if (this.FlowContainer != null && this.FlowContainer.classList.contains('drawing-line') === true)
+            this.FlowContainer.classList.remove('drawing-line');
 
         this.ioNode = null;
         this.ioSelected = null;
@@ -103,6 +117,8 @@ class ffFlowLines {
     redrawLines() {
         this.ioLines = [];
         let outputs = document.querySelectorAll('.flow-part .output');
+        for (let o of document.querySelectorAll('.flow-part .output, .flow-part .input'))
+            o.classList.remove('connected');
         let canvas = this.getCanvas();
         if (!this.ioContext) {
             this.ioContext = canvas.getContext('2d');
@@ -128,6 +144,10 @@ class ffFlowLines {
 
         let src = output;
         let dest = input;
+        if (output.classList.contains('connected') == false)
+            output.classList.add('connected');
+        if (input.classList.contains('connected') == false)
+            input.classList.add('connected');
         let srcBounds = src.getBoundingClientRect();
         let destBounds = dest.getBoundingClientRect();
 
@@ -232,8 +252,9 @@ class ffFlowLines {
             }
         });
         canvas.addEventListener('keydown', function (event) {
-            if (event.code === 'Delete')
+            if (event.code === 'Delete') {
                 self.deleteConnection();
+            }
         });
         this.ioCanvas = canvas;
         return this.ioCanvas;
@@ -245,10 +266,17 @@ class ffFlowLines {
 
         let selected = this.ioSelectedConnection;
         let outputNodeUid = selected.output.getAttribute('id');
-        let connections = this.ioOutputConnections.get(outputNodeUid);
-        let index = connections.indexOf(selected.connection);
-        if (index >= 0) {
-            connections.splice(index, 1);
+
+        if (ffFlow.SingleOutputConnection) {
+            this.ioOutputConnections.delete(outputNodeUid);
+        } else {
+            let connections = this.ioOutputConnections.get(outputNodeUid);
+            console.log('outputNodeUid', outputNodeUid);
+            console.log('connections', connections);
+            let index = connections.indexOf(selected.connection);
+            if (index >= 0) {
+                connections.splice(index, 1);
+            }
         }
 
         this.redrawLines();

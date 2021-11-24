@@ -45,6 +45,7 @@ namespace FileFlows.Client.Components
         private readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
         private bool FocusFirst = false;
+        private bool _needsRendering = false;
 
         protected override void OnInitialized()
         {
@@ -109,6 +110,17 @@ namespace FileFlows.Client.Components
             this.StateHasChanged();
             return OpenTask.Task;
         }
+
+        private async Task WaitForRender()
+        {
+            _needsRendering = true;
+            StateHasChanged();
+            while (_needsRendering)
+            {
+                await Task.Delay(50);
+            }
+        }
+
 
         private async Task Save()
         {

@@ -157,7 +157,7 @@ namespace FileFlows.Client.Pages
                 {
                     p.OutputConnections = p.OutputConnections
                                           ?.Where(x => nodeUids.Contains(x.InputNode))
-                                          ?.GroupBy(x => x.Input + "," + x.Output + "," + x.InputNode).Select(x => x.First())
+                                          ?.GroupBy(x => x.Output).Select(x => x.First())
                                           ?.ToList();
                 }
                 Model.Parts = parts;

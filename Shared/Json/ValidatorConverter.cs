@@ -15,14 +15,11 @@ namespace FileFlows.Shared.Json
         }
         public override Validator? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            Logger.Instance.DLog("Using validator converter");
-
             using (var jsonDocument = JsonDocument.ParseValue(ref reader))
             {
                 if (jsonDocument.RootElement.TryGetProperty("type", out JsonElement typeValue))
                 {
                     string typeName = typeValue.GetString();
-                    Logger.Instance.DLog("type: " + typeName);
                     var vts = ValidatorTypes;
                     if (vts.ContainsKey(typeName) == false)
                         return new DefaultValidator();

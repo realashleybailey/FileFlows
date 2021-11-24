@@ -6,6 +6,7 @@ namespace FileFlows.Client.Components.Inputs
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.JSInterop;
+    using System;
 
     public interface IInput
     {
@@ -15,6 +16,8 @@ namespace FileFlows.Client.Components.Inputs
         string ErrorMessage { get; set; }
 
         Task<bool> Validate();
+
+        EventHandler<bool> ValidStateChanged { get; set; }
 
         bool Focus();
     }
@@ -27,8 +30,9 @@ namespace FileFlows.Client.Components.Inputs
         protected string Uid = System.Guid.NewGuid().ToString();
         private string _Label;
         private string _LabelOriginal;
+        public EventHandler<bool> ValidStateChanged { get; set; }
 
-        public string Suffix { get; set; }
+public string Suffix { get; set; }
         public string Prefix { get; set; }
 
 
@@ -69,7 +73,16 @@ namespace FileFlows.Client.Components.Inputs
 
         [Parameter] public List<FileFlows.Shared.Validators.Validator> Validators { get; set; }
 
-        public string ErrorMessage { get; set; } = "";
+
+        private string _ErrorMessage = string.Empty;
+        public string ErrorMessage
+        {
+            get => _ErrorMessage;
+            set
+            {
+                _ErrorMessage = value;
+            }
+        }
 
         private T _Value;
 
@@ -82,7 +95,10 @@ namespace FileFlows.Client.Components.Inputs
                 if (_Value == null && value == null)
                     return;
                 if (_Value != null && value != null && _Value.Equals(value)) return;
-                ErrorMessage = ""; // clear the error
+
+                bool areEqual = System.Text.Json.JsonSerializer.Serialize(_Value) == System.Text.Json.JsonSerializer.Serialize(value);
+                if (areEqual == false) // for lists/arrays if they havent really changed, empty to empty, dont clear validation
+                    ErrorMessage = ""; // clear the error
                 _Value = value;
                 ValueChanged.InvokeAsync(value);
             }
@@ -102,15 +118,21 @@ namespace FileFlows.Client.Components.Inputs
         {
             if (this.Validators?.Any() != true)
                 return true;
+            bool isValid = string.IsNullOrEmpty(ErrorMessage);
             Logger.Instance.DLog("validating actual input: " + this.Label);
             foreach (var val in this.Validators)
             {
                 if (await val.Validate(this.Value) == false)
                 {
                     ErrorMessage = Translater.Instant($"Validators.{val.Type}", val);
+                    this.StateHasChanged();
+                    if (isValid)
+                        ValidStateChanged?.Invoke(this, false);
                     return false;
                 }
             }
+            if(isValid == false)
+                ValidStateChanged?.Invoke(this, true);
             return true;
         }
 

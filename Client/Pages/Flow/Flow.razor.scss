@@ -88,144 +88,172 @@ canvas {
 }
 
 ::deep .flow-part {
-    display:flex;
+    display: flex;
     flex-direction: row;
-    outline:unset !important;
+    outline: unset !important;
+
     .icon-wrapper {
         width: 2rem;
         border-right: solid 3px;
         margin: 0;
         padding-left: 0.25rem;
-        display:flex;
+        display: flex;
+
         .icon {
-            margin:auto;
+            margin: auto;
         }
-    }   
+    }
+
     .name {
-        flex-grow:1;
-        margin:auto 0.5rem;
+        flex-grow: 1;
+        margin: auto 0.5rem;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .draggable {
-        position:absolute;
-        top:0;
-        bottom:0;
-        left:0;
-        right:0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
+
     * {
         user-select: none;
     }
 
     &.vertical {
-        height:4rem;
-        &.size-1,&.size-2,&.size-3 {
-            width:12rem;
+        height: 4rem;
+
+        &.size-1, &.size-2, &.size-3 {
+            width: 12rem;
         }
+
         @for $i from 4 through 20 {
             &.size-#{$i} {
-                width:calc(12rem + #{$i}rem);
+                width: calc(12rem + #{$i}rem);
             }
-        } 
-
-    }
-    &:not(.vertical)
-    {
-        &.size-1 {
-            height:2.5rem;
         }
+    }
+
+    &:not(.vertical) {
+        &.size-1 {
+            height: 2.5rem;
+        }
+
         @for $i from 2 through 20 {
             &.size-#{$i} {
-                height:calc(#{$i} * 2rem);
+                height: calc(#{$i} * 2rem);
             }
-        }    
+        }
     }
 
-    &.Logic:not(.selected)  {
-        .icon-wrapper, .input, .output {
-            border-color:var(--flow-logic) !important;
+    &.Logic:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-logic) !important;
         }
-        .connected {
-            background-color:var(--flow-logic) !important;
-        }
-    }
-    &.Input:not(.selected) 
-    {
-        .icon-wrapper, .input, .output  {
-            border-color:var(--flow-input) !important;
-        }
-        .connected {
-            background-color:var(--flow-input) !important;
+
+        .connected > div {
+            background-color: var(--flow-logic) !important;
         }
     }
-    &.Output:not(.selected) 
-    { 
-        .icon-wrapper, .input, .output  {
-            border-color:var(--flow-output) !important;
+
+    &.Input:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-input) !important;
         }
-        .connected {
-            background-color:var(--flow-output) !important;
-        }
-    }
-    &.Process:not(.selected) 
-    {
-        .icon-wrapper, .input, .output  {
-            border-color:var(--flow-process) !important;
-        }
-        .connected {
-            background-color:var(--flow-process) !important;
+
+        .connected > div {
+            background-color: var(--flow-input) !important;
         }
     }
-    &.selected 
-    {
-        .icon-wrapper, .input, .output  {
-            border-color:var(--accent) !important;
-        }    
-        .connected {
-            background-color:var(--accent) !important;
+
+    &.Output:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-output) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-output) !important;
+        }
+    }
+
+    &.Process:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-process) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-process) !important;
+        }
+    }
+
+    &.selected {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--accent) !important;
+        }
+
+        .connected > div {
+            background-color: var(--accent) !important;
         }
     }
 
     .inputs {
-        left:-0.65rem;
+        left: -0.65rem;
     }
-    .outputs{    
-        right:-0.65rem;
+
+    .outputs {
+        right: -0.65rem;
     }
 
 
     .inputs, .outputs {
-        position:absolute;
-        width:1rem;
-        top:0;
-        bottom:0;
-        display:flex;
+        position: absolute;
+        width: 1rem;
+        top: 0;
+        bottom: 0;
+        display: flex;
         flex-direction: column;
+
         .input, .output {
-            margin:auto;
-            width:1rem;
-            height:1rem;
-            border-radius:0.25rem;
-            background-color:var(--base);
-            border:solid 2px;
+            margin: auto;
+
+            > div {
+                width: 1rem;
+                height: 1rem;
+                margin: 0.5rem;
+                border-radius: 0.25rem;
+                background-color: var(--base);
+                border: solid 2px;
+            }
         }
     }
+
     &.vertical {
-        .inputs, .outputs 
-        {
-            top:-0.65rem;
-            bottom:unset;
-            left:2rem;
-            right:0;
+        .inputs, .outputs {
+            top: -1rem;
+            bottom: unset;
+            left: 2rem;
+            right: 0;
             flex-direction: row;
-            width:unset;
+            width: unset;
         }
+
         .outputs {
-            top:unset;
-            bottom:-0.65rem;
+            top: unset;
+            bottom: -1rem;
         }
+    }
+}
+
+::deep {
+    .output > div:hover {
+        cursor: crosshair;
+    }
+
+    .drawing-line .input > div:hover {
+        cursor: crosshair;
     }
 }

@@ -113,7 +113,7 @@
                                     {
                                         var value = GetValue<string>(field.Name);
                                         <InputCode Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" />
+                            Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" />
                                     }
                                     break;
                                 default:

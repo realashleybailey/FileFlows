@@ -4,6 +4,7 @@ namespace FileFlows.Client.Components.Inputs
     using Microsoft.AspNetCore.Components;
     using BlazorMonaco;
     using Microsoft.JSInterop;
+    using System.Collections.Generic;
 
     public partial class InputCode : Input<string>
     {
@@ -11,6 +12,15 @@ namespace FileFlows.Client.Components.Inputs
         const string API_URL = "/api/code-eval";
 
         private MonacoEditor CodeEditor { get; set; }
+
+        private Dictionary<string, object> _Variables = new Dictionary<string, object>();
+
+        [Parameter]
+        public Dictionary<string, object> Variables
+        {
+            get => _Variables;
+            set { _Variables = value ?? new Dictionary<string, object>(); }
+        }
 
 
         private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
@@ -28,7 +38,7 @@ namespace FileFlows.Client.Components.Inputs
         private void OnEditorInit(MonacoEditorBase e)
         {
             Logger.Instance.DLog("editor init done");
-            _ = jsRuntime.InvokeVoidAsync("ffCode.initModel");
+            _ = jsRuntime.InvokeVoidAsync("ffCode.initModel", Variables);
         }
 
         private void OnBlur()

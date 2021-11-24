@@ -22,3 +22,7 @@
     color: var(--color-darkest);
     white-space: pre-wrap;
 }
+
+::deep .monaco-highlighted-label span:not(.highlight) {
+    color: white !important;
+}

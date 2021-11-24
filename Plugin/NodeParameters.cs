@@ -47,7 +47,8 @@ namespace FileFlows.Plugin
             UpdateVariables(new Dictionary<string, object> {
                 { "ext", fi.Extension },
                 { "FileName", fi.Name },
-                { "Directory", fi.Directory?.Name ?? "" }
+                { "FolderName", fi.Directory?.Name ?? "" },
+                { "FileSize", fi.Exists ? fi.Length : 0 }
             });
 
         }

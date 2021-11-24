@@ -22,5 +22,9 @@
   {
     "outputFile": "Pages/Settings/Settings.razor.css",
     "inputFile": "Pages/Settings/Settings.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputCode/InputCode.razor.css",
+    "inputFile": "Components/Inputs/InputCode/InputCode.razor.scss"
   }
 ]

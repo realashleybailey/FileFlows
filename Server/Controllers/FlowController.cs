@@ -171,6 +171,7 @@ namespace FileFlows.Server.Controllers
             variables.Add("ext", ".mkv");
             variables.Add("FileName", "Filename");
             variables.Add("FolderName", "Foldername");
+            variables.Add("FileSize", 1000);
             // get the connected nodes to this part
             var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();
             if (part == null)

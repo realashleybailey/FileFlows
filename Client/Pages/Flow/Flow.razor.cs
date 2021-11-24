@@ -221,8 +221,7 @@ namespace FileFlows.Client.Pages
 
             foreach(var field in fields)
             {
-                if(field.InputType == Plugin.FormInputType.TextVariable)
-                    field.Variables = variables;
+                field.Variables = variables;
             }
 
             var model = part.Model ?? new ExpandoObject();

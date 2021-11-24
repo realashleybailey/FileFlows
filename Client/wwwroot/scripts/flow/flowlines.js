@@ -132,7 +132,7 @@ class ffFlowLines {
             for (let input of connections) {
                 let inputEle = document.getElementById(input.part + '-input-' + input.index);
                 if (!inputEle)
-                    console.log('failed to locate: ' + input.part + '-input-' + input.index, input);
+                    continue;
                 this.drawLine(inputEle, output, input);
             }
         }

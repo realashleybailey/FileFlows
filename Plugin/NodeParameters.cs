@@ -44,11 +44,17 @@ namespace FileFlows.Plugin
         private void InitFile(string filename)
         {
             var fi = new FileInfo(filename);
+            var fiOriginal = new FileInfo(FileName);
             UpdateVariables(new Dictionary<string, object> {
-                { "ext", fi.Extension },
-                { "FileName", fi.Name },
+                { "ext", fi.Extension ?? "" },
+                { "FileName", fi.Name ?? "" },
                 { "FolderName", fi.Directory?.Name ?? "" },
-                { "FileSize", fi.Exists ? fi.Length : 0 }
+                { "FileSize", fi.Exists ? fi.Length : 0 },
+                { "FullPath", fi.DirectoryName ?? "" },
+                { "originalExt", fiOriginal.Extension ?? "" },
+                { "originalFileName", fiOriginal.Name ?? "" },
+                { "originalFolderName", fiOriginal.Directory?.Name ?? "" },
+                { "originalFullPath", fiOriginal.DirectoryName ?? "" },
             });
 
         }

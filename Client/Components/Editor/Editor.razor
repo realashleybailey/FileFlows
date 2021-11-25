@@ -99,14 +99,14 @@
                                         var value = GetValue<string>(field.Name, "");
                                         var extensions = GetParameter<List<string>>(field, "Extensions")?.ToArray();
                                         <InputFile Label="@label" Value="@value" Extensions=@extensions Validators=@field.Validators
-                            ValueChanged="@(x => UpdateValue(field.Name, x))" Placeholder="@field.Placeholder" />
+                            ValueChanged="@(x => UpdateValue(field.Name, x))" Variables=@field.Variables Placeholder="@field.Placeholder" />
                                     }
                                     break;
                                 case FormInputType.Folder:
                                     {
                                         var value = GetValue<string>(field.Name, "");
                                         <InputFile Label="@label" Value="@value" Directory=@true Validators=@field.Validators
-                            ValueChanged="@(x => UpdateValue(field.Name, x))" Placeholder="@field.Placeholder" />
+                            ValueChanged="@(x => UpdateValue(field.Name, x))" Variables=@field.Variables  Placeholder="@field.Placeholder" />
                                     }
                                     break;
                                 case FormInputType.Code:

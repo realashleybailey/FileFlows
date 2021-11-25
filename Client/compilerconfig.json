@@ -26,5 +26,13 @@
   {
     "outputFile": "Components/Inputs/InputCode/InputCode.razor.css",
     "inputFile": "Components/Inputs/InputCode/InputCode.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/VariableInput/VariableInput.razor.css",
+    "inputFile": "Components/Common/VariableInput/VariableInput.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputFile/InputFile.razor.css",
+    "inputFile": "Components/Inputs/InputFile/InputFile.razor.scss"
   }
 ]

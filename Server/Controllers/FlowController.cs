@@ -169,9 +169,15 @@ namespace FileFlows.Server.Controllers
         {
             var variables = new Dictionary<string, object>();
             variables.Add("ext", ".mkv");
-            variables.Add("FileName", "Filename");
+            variables.Add("FileName", "Filename.mkv");
             variables.Add("FolderName", "Foldername");
             variables.Add("FileSize", 1000);
+            bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+            variables.Add("FullPath", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
+            variables.Add("orignalExt", ".mkv");
+            variables.Add("originalFileName", "OriginalFile.mkv");
+            variables.Add("originalFullPath", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
+
             // get the connected nodes to this part
             var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();
             if (part == null)

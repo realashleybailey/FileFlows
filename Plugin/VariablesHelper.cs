@@ -13,6 +13,9 @@
         /// <returns>the string with the variables replaced</returns>
         public static string ReplaceVariables(string input, Dictionary<string, object> variables, bool stripMissing = false)
         {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
             if (variables?.Any() == true)
             {
                 foreach (string variable in variables.Keys)

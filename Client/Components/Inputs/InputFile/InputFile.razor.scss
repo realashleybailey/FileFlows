@@ -1,13 +1,11 @@
 .input-file-wrapper {
-    display:flex;
+    display: flex;
     flex-direction: row;
-    width:100%;
+    width: 100%;
 
-    ::deep 
-    {
-        .rz-textbox {
-            flex-grow:1;
-            width:unset;
+    ::deep {
+        > div {
+            flex-grow: 1;
         }
 
         button {
@@ -16,5 +14,5 @@
             padding: 0;
         }
     }
-
+    
 }

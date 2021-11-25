@@ -3,7 +3,7 @@
 
 <InputWrapper Input="@this">
     <div class="input-file-wrapper">
-        <RadzenTextBox id=@Uid @bind-Value="Value" Placeholder="@Placeholder" @oninput="@(args => ClearError())" />
+        <VariableInput Uid="@Uid" Variables=@Variables @bind-Value="Value" Placeholder="@Placeholder" />
         <RadzenButton Click=@Browse Text="..." />
     </div>
 </InputWrapper>

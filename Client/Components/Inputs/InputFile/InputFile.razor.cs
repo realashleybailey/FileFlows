@@ -1,5 +1,6 @@
 namespace FileFlows.Client.Components.Inputs
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using FileFlows.Client.Components.Dialogs;
     using Microsoft.AspNetCore.Components;
@@ -11,6 +12,16 @@ namespace FileFlows.Client.Components.Inputs
 
         [Parameter]
         public bool Directory { get; set; }
+
+        private Dictionary<string, object> _Variables = new Dictionary<string, object>();
+
+        [Parameter]
+        public Dictionary<string, object> Variables
+        {
+            get => _Variables;
+            set { _Variables = value ?? new Dictionary<string, object>(); }
+        }
+
         public override bool Focus() => FocusUid();
         async Task Browse()
         {

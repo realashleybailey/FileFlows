@@ -12,7 +12,15 @@ provider.Mappings[".br"] = "text/plain";
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    ContentTypeProvider = provider
+    ContentTypeProvider = provider,
+    OnPrepareResponse = x =>
+    {
+        if (x?.File?.PhysicalPath?.ToLower()?.Contains("_framework") == true)
+            return;
+        if (x?.File?.PhysicalPath?.ToLower()?.Contains("_content") == true)
+            return;
+        x?.Context?.Response?.Headers?.Append("Cache-Control", "no-cache");
+    }
 });
 
 app.UseMiddleware<FileFlows.Server.ExceptionMiddleware>();

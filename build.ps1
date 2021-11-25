@@ -43,3 +43,7 @@ Remove-Item .\zpublish\Plugins -Recurse -ErrorAction SilentlyContinue
 Copy-Item -Path Server\Plugins -Filter "*.*" -Recurse -Destination zpublish -Container
 Remove-Item .\wpublish\Plugins -Recurse -ErrorAction SilentlyContinue 
 Copy-Item -Path Server\Plugins -Filter "*.*" -Recurse -Destination wpublish -Container
+
+
+#(Get-Content zpublish\wwwroot\index.html) -replace '#VERSION#', $version | Out-File zpublish\wwwroot\index.html
+#(Get-Content wpublish\wwwroot\index.html) -replace '#VERSION#', $version | Out-File wpublish\wwwroot\index.html

@@ -4,6 +4,7 @@ namespace FileFlows.Server.Controllers
 
     public class HomeController : Controller
     {
+        [ResponseCache(NoStore = true, Duration = 0)]
         public IActionResult Spa() => File("~/index.html", "text/html");
     }
 }

@@ -168,15 +168,18 @@ namespace FileFlows.Server.Controllers
         public Dictionary<string, object> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid)
         {
             var variables = new Dictionary<string, object>();
-            variables.Add("ext", ".mkv");
-            variables.Add("FileName", "Filename.mkv");
-            variables.Add("FolderName", "Foldername");
-            variables.Add("FileSize", 1000);
             bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
-            variables.Add("FullPath", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
-            variables.Add("orignalExt", ".mkv");
-            variables.Add("originalFileName", "OriginalFile.mkv");
-            variables.Add("originalFullPath", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
+            variables.Add("ext", ".mkv");
+
+            variables.Add("fileName", "Filename");
+            variables.Add("fileSize", 1000);
+            variables.Add("fileOrigExt", ".mkv");
+            variables.Add("fileOrigFileName", "OriginalFile");
+
+            variables.Add("folderName", "FolderName");
+            variables.Add("folderFullName", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
+            variables.Add("folderOrigName", "FolderOriginalName");
+            variables.Add("folderOrigFullName", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
 
             // get the connected nodes to this part
             var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();

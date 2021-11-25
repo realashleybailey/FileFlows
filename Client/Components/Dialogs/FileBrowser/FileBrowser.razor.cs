@@ -44,12 +44,8 @@ namespace FileFlows.Client.Components.Dialogs
 
         private Task<string> ShowInstance(string start, bool directory = false, string[] extensions = null)
         {
-
             this.Extensions = extensions ?? new string[] { };
             this.DirectoryMode = directory;
-
-            if (string.IsNullOrEmpty(start) || (System.IO.Directory.Exists(start) == false && System.IO.File.Exists(start) == false))
-                start = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             this.Title = Translater.TranslateIfNeeded("Dialogs.FileBrowser.FileTitle");
             _ = this.LoadPath(start);

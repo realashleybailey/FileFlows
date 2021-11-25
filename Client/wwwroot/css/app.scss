@@ -14,11 +14,15 @@ html {
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size:16px;
+    font-size: 16px;
     color: var(--color) !important;
-    background:var(--base) !important;
+    background: var(--base) !important;
 }
 
+* {
+    scrollbar-color: rgba(var(--accent-rgb), 0.5) var(--base);
+    scrollbar-width: thin;
+}
 a, .btn-link {
     color: var(--accent) !important;
 }

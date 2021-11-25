@@ -51,7 +51,7 @@ window.ffFlowPart = {
         div.addEventListener("keydown", function (event) {
             event.stopImmediatePropagation();
             event.preventDefault();
-            if (event.code === 'Delete') {
+            if (event.code === 'Delete' || event.code === 'Backspace') {
                 ffFlowPart.deleteFlowPart(part.uid);
             }
             else if (event.code === 'Enter') {

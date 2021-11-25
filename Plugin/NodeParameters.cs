@@ -47,14 +47,14 @@ namespace FileFlows.Plugin
             var fiOriginal = new FileInfo(FileName);
             UpdateVariables(new Dictionary<string, object> {
                 { "ext", fi.Extension ?? "" },
-                { "FileName", fi.Name ?? "" },
-                { "FolderName", fi.Directory?.Name ?? "" },
-                { "FileSize", fi.Exists ? fi.Length : 0 },
-                { "FullPath", fi.DirectoryName ?? "" },
-                { "originalExt", fiOriginal.Extension ?? "" },
-                { "originalFileName", fiOriginal.Name ?? "" },
-                { "originalFolderName", fiOriginal.Directory?.Name ?? "" },
-                { "originalFullPath", fiOriginal.DirectoryName ?? "" },
+                { "fileName", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
+                { "fileSize", fi.Exists ? fi.Length : 0 },
+                { "fileOrigExt", fiOriginal.Extension ?? "" },
+                { "fileOrigFileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
+                { "folderName", fi.Directory?.Name ?? "" },
+                { "folderFullName", fi.DirectoryName ?? "" },
+                { "folderOrigName", fiOriginal.Directory?.Name ?? "" },
+                { "folderOrigFullName", fiOriginal.DirectoryName ?? "" },
             });
 
         }

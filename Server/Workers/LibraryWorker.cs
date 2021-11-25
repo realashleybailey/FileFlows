@@ -60,13 +60,21 @@ namespace FileFlows.Server.Workers
                     Logger.Instance.WLog($"Library '{library.Name}' filter '{library.Filter} is invalid: " + ex.Message);
                     continue;
                 }
-                string[] known = DbHelper.GetNames<LibraryFile>().ToArray();
+                List<string> known = new ();
+                foreach(var libFile in DbHelper.Select<LibraryFile>())
+                {
+                    if(string.IsNullOrEmpty(libFile.Name) == false && known.Contains(libFile.Name.ToLower()) == false)
+                        known.Add(libFile.Name.ToLower());
+                    // need to also exclude the final output of a library file
+                    if(string.IsNullOrEmpty(libFile.OutputPath) == false && known.Contains(libFile.OutputPath.ToLower()) == false)
+                        known.Add(libFile.OutputPath.ToLower());
+                }
                 foreach (var file in files)
                 {
                     if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
                         continue;
 
-                    if (known.Contains(file.FullName))
+                    if (known.Contains(file.FullName.ToLower()))
                         continue; // already known
 
                     if (CanAccess(file) == false)

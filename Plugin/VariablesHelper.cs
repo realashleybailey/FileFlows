@@ -33,8 +33,11 @@
 
         private static string ReplaceVariable(string input, string variable, string value)
         {
-            string result = Regex.Replace(input, @"{" + Regex.Escape(variable) + @"}", value, RegexOptions.IgnoreCase);
-            result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @"!}", value.ToUpper(), RegexOptions.IgnoreCase);
+            string result = input;
+            if(Regex.IsMatch(result, @"{" + Regex.Escape(variable) + @"}"))
+                result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @"}", value, RegexOptions.IgnoreCase);
+            if (Regex.IsMatch(result, @"{" + Regex.Escape(variable) + @"!}"))
+                result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @"!}", value.ToUpper(), RegexOptions.IgnoreCase);
             return result;
         }
 

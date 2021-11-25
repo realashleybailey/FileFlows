@@ -28,11 +28,11 @@ namespace FileFlows.Server.Controllers
             }
 
             if (string.IsNullOrEmpty(start))
-                start = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                start = GetStartDirectory();
             else if (System.IO.File.Exists(start))
                 start = new FileInfo(start).DirectoryName!;
             else if (Directory.Exists(start) == false)
-                start = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                start = GetStartDirectory();
 
             var items = new List<FileBrowserItem>();
             var di = new DirectoryInfo(start!);
@@ -47,7 +47,7 @@ namespace FileFlows.Server.Controllers
                         Name = di.FullName
                     });
                 }
-                else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     items.Add(new FileBrowserItem
                     {
@@ -78,6 +78,13 @@ namespace FileFlows.Server.Controllers
                 }
             }
             return items;
+        }
+
+        private string GetStartDirectory()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false && Directory.Exists("/media"))
+                return "/media";
+            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         }
     }
 

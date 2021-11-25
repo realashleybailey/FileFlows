@@ -69,7 +69,7 @@ namespace FileFlows.Server.Helpers
                             if (CurrentNode == null)
                             {
                                 // happens when canceled    
-                                args.Logger.ELog("node was canceled error code:", CurrentNode.Name);
+                                args.Logger.ELog("node was canceled error code:", CurrentNode?.Name);
                                 args.Result = NodeResult.Failure;
                                 flowCompleted = true;
                                 break;
@@ -78,10 +78,10 @@ namespace FileFlows.Server.Helpers
                             if (output == -1)
                             {
                                 // the execution failed                     
-                                args.Logger.ELog("node returned error code:", CurrentNode.Name);
+                                args.Logger.ELog("node returned error code:", CurrentNode?.Name);
                                 args.Result = NodeResult.Failure;
                                 flowCompleted = true;
-                                break;
+                                //break;
                             }
                             var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
                             if (outputNode == null)

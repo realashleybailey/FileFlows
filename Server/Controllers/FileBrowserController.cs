@@ -30,12 +30,12 @@ namespace FileFlows.Server.Controllers
             if (string.IsNullOrEmpty(start))
                 start = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             else if (System.IO.File.Exists(start))
-                start = new FileInfo(start).DirectoryName;
+                start = new FileInfo(start).DirectoryName!;
             else if (Directory.Exists(start) == false)
                 start = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             var items = new List<FileBrowserItem>();
-            var di = new DirectoryInfo(start);
+            var di = new DirectoryInfo(start!);
             if (di.Exists)
             {
                 if (di.Parent?.Exists == true)
@@ -56,7 +56,7 @@ namespace FileFlows.Server.Controllers
                         Name = di.FullName
                     });
                 }
-                foreach (var dir in di.GetDirectories())
+                foreach (var dir in di.GetDirectories().OrderBy(x => x.Name?.ToLower() ?? string.Empty))
                 {
                     if ((dir.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                         continue;
@@ -66,9 +66,9 @@ namespace FileFlows.Server.Controllers
                 if (includeFiles)
                 {
                     string expression = extensions?.Any() == false ? "" :
-                                         ".(" + string.Join("|", extensions.Select(x => Regex.Escape(x.ToLower()))) + ")$";
+                                         ".(" + string.Join("|", extensions!.Select(x => Regex.Escape(x.ToLower()))) + ")$";
                     var rgxFile = new Regex(expression);
-                    foreach (var file in di.GetFiles())
+                    foreach (var file in di.GetFiles().OrderBy(x => x.Name?.ToLower() ?? string.Empty))
                     {
                         if ((file.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                             continue;

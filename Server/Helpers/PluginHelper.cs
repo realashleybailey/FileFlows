@@ -189,7 +189,11 @@ namespace FileFlows.Server.Helpers
         /// <returns>the info for the default InputFile node</returns>
         internal (string name, string fullName) GetInputFileInfo()
         {
-            var inputFileType = GetAssemblyNodeTypes("BasicNodes")?.Where(x => x.Name == "InputFile").FirstOrDefault();
+            string dir = GetPluginDirectory("BasicNodes");
+            if(string.IsNullOrEmpty(dir))
+                return (string.Empty, string.Empty);
+            string assembglyFile = Path.Combine(dir, "BasicNodes.dll");
+            var inputFileType = GetAssemblyNodeTypes(assembglyFile)?.Where(x => x.Name == "InputFile").FirstOrDefault();
             if (inputFileType == null)
                 return (string.Empty, string.Empty);
             return new(inputFileType.Name, inputFileType.FullName);
@@ -311,11 +315,15 @@ namespace FileFlows.Server.Helpers
             try
             {
                 var tNode = typeof(Node);
-                string dir = GetPluginDirectory(pluginAssembly);
-                if (string.IsNullOrEmpty(dir))
-                    return new List<Type>();
+                string dll = pluginAssembly;
+                if (File.Exists(dll) == false)
+                {
+                    string dir = GetPluginDirectory(pluginAssembly);
+                    if (string.IsNullOrEmpty(dir))
+                        return new List<Type>();
 
-                string dll = new FileInfo(Path.Combine(dir, pluginAssembly)).FullName;
+                    dll = new FileInfo(Path.Combine(dir, pluginAssembly)).FullName;
+                }
                 //var assembly = Context.LoadFromAssemblyPath(dll);
                 var assembly = Assembly.LoadFrom(dll);
                 var nodeTypes = assembly.GetTypes().Where(x => x.IsSubclassOf(tNode) && x.IsAbstract == false);

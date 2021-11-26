@@ -75,7 +75,6 @@ namespace FileFlows.Server.Controllers
                     flow.Name = "New Flow " + (++count);
                 }
                 // try find basic node
-                var context = new System.Runtime.Loader.AssemblyLoadContext("FlowController.Get", true);
                 using var pluginLoader = new PluginHelper();
                 var info = pluginLoader.GetInputFileInfo();
                 if (string.IsNullOrEmpty(info.name) == false)

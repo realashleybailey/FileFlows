@@ -11,6 +11,9 @@
         <div class="settings">
 
             <RadzenTemplateForm Data="@Model">
+                <Fieldset Title="Pages.Settings.Labels.General">
+                    <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
+                </Fieldset>
                 <Fieldset Title="Pages.Settings.Labels.Directories">
                     <InputFile @bind-Value="@Model.TempPath" Directory="true" Label="Pages.Settings.Fields.TempPath" />
                     <InputFile @bind-Value="@Model.LoggingPath" Directory="true"

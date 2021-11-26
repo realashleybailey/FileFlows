@@ -33,5 +33,25 @@ window.ff = {
                 return false;
             }
         })
+    },
+    loadJS: function (url, callback) {
+        if (!url)
+            return;
+        let tag = document.createElement('script');
+        tag.src = url;
+        tag.onload = () => {
+            if (callback)
+                callback();
+        };
+        document.body.appendChild(tag);
+    },
+    enableTelemetry: function() {
+        ff.loadJS('https://www.googletagmanager.com/gtag/js?id=G-QSCG4CDWTH', () => {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'G-QSCG4CDWTH');
+        });
     }
 };

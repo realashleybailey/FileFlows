@@ -26,6 +26,13 @@ namespace FileFlows.Server.Controllers
             model.DateCreated = settings.DateCreated;
             return DbHelper.Update(model);
         }
+
+        [HttpGet("telemetry")]
+        public bool Telemetry()
+        {
+            var settings = Get();
+            return settings?.DisableTelemetry != true;
+        }
     }
 
 }

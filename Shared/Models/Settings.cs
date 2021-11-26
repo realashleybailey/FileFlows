@@ -18,6 +18,8 @@
         [Boolean(4)]
         public bool WorkerFlowExecutor { get; set; }
 
+        public bool DisableTelemetry { get; set; }
+
         public string GetLogFile(System.Guid uid)
         {
             if (string.IsNullOrEmpty(LoggingPath))

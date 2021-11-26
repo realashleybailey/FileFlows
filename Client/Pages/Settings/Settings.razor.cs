@@ -9,7 +9,9 @@ namespace FileFlows.Client.Pages
     public partial class Settings : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
 
+        private bool CurrentTelemetry;
         private bool IsSaving { get; set; }
 
         private string lblSave, lblSaving;
@@ -24,7 +26,10 @@ namespace FileFlows.Client.Pages
 
             var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
             if (response.Success)
+            {
                 this.Model = response.Data;
+                CurrentTelemetry = this.Model.DisableTelemetry;
+            }
 
             Blocker.Hide();
         }
@@ -41,6 +46,11 @@ namespace FileFlows.Client.Pages
             {
                 this.IsSaving = false;
                 this.Blocker.Hide();
+            }
+
+            if(CurrentTelemetry != Model.DisableTelemetry)
+            {
+                NavigationManager.NavigateTo("/settings", true);
             }
         }
     }

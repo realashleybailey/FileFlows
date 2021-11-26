@@ -131,20 +131,23 @@
     "Settings": {
       "Title": "Settings",
       "Labels": {
+        "General": "General",
         "Directories": "Directories",
         "Workers": "Workers"
       },
       "Fields": {
+        "Telemetry": "Telemetry",
+        "Telemetry-Help": "Telemetry is useful to help know what devices we need to support, what Flow parts are the most used and where we should focus on the development.",
         "TempPath": "Temp Directory",
-        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",        
-        "LoggingPath":"Logging Directory",
-        "LoggingPath-Help":"This is where log files will be created.",
-        "Workers":"Workers",
-        "Workers-Helper":"The number of workers that can run simultaneously",
-        "WorkerScanner":"Library Scanner",
-        "WorkerScanner-Helper":"If the library scanner is enabled.  When this is disabled the libraries will not be scanned for files.",
-        "WorkerFlowExecutor":"Flow Executor",
-        "WorkerFlowExecutor-Helper":"If the flow executor is enabled or not.  When this is disabled no flows will be run."
+        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",
+        "LoggingPath": "Logging Directory",
+        "LoggingPath-Help": "This is where log files will be created.",
+        "Workers": "Workers",
+        "Workers-Helper": "The number of workers that can run simultaneously",
+        "WorkerScanner": "Library Scanner",
+        "WorkerScanner-Helper": "If the library scanner is enabled.  When this is disabled the libraries will not be scanned for files.",
+        "WorkerFlowExecutor": "Flow Executor",
+        "WorkerFlowExecutor-Helper": "If the flow executor is enabled or not.  When this is disabled no flows will be run."
       }
     },
     "Tools":{

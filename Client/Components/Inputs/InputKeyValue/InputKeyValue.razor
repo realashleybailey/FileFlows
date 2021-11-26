@@ -1,0 +1,44 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<List<KeyValuePair<string, string>>>
+
+<InputWrapper Input="@this">
+    <div class="input-keyvalue-wrapper" @onblur="OnBlur">
+        <table>
+            <thead>
+                <tr>
+                    <th>@lblKey</th>
+                    <th>@lblValue</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var kv in Data)
+                {
+                    <tr class="@(kv.Key == DuplicateKey ? "invalid" : "")">
+                        <td>
+                            <input type="text" @bind-value="kv.Key" @onblur="OnBlur" />
+                        </td>
+                        <td>
+                            <input type="text" @bind-value="kv.Value" @onblur="OnBlur" />
+                        </td>
+                        <td>
+                            <i class="fas fa-trash" @onclick="() => Remove(kv)"></i>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <input id="@Uid" type="text" @bind-value="NewKey" />
+                    </td>
+                    <td>
+                        <input type="text" @bind-value="NewValue" @onblur="Add" />
+                    </td>
+                    <td>                        
+                        <i class="fas fa-plus" @onclick="Add"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+    </div>
+</InputWrapper>

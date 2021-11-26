@@ -116,6 +116,13 @@
                             Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" />
                                     }
                                     break;
+                                case FormInputType.KeyValue:
+                                    {
+                                        var value = GetValue<List<KeyValuePair<string, string>>>(field.Name);
+                                        <InputKeyValue Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
+                            Validators=@field.Validators Placeholder="@field.Placeholder" />
+                                    }
+                                    break;
                                 default:
                                     {
                                         <span>couldnt find type @field.InputType</span>

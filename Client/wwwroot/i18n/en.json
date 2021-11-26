@@ -46,7 +46,8 @@
     "DeleteFailed": "Failed to delete",
     "NotFound":"Item not found",
     "NameInUse":"Name is already in use",
-    "NameRequired":"Name is required"
+    "NameRequired": "Name is required",
+    "DuplicatesFound": "Duplicates found"
   },
   "Flow": {
     "ErrorMessages":{

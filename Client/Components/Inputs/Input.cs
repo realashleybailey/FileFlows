@@ -32,8 +32,10 @@ namespace FileFlows.Client.Components.Inputs
         private string _LabelOriginal;
         public EventHandler<bool> ValidStateChanged { get; set; }
 
-public string Suffix { get; set; }
+        public string Suffix { get; set; }
         public string Prefix { get; set; }
+
+        protected string LabelOriginal => _LabelOriginal;
 
 
         [Parameter]

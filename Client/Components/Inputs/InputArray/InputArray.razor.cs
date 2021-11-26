@@ -50,7 +50,7 @@ namespace FileFlows.Client.Components.Inputs
 
         bool Add(string str)
         {
-            if (string.IsNullOrEmpty(str))
+            if (string.IsNullOrWhiteSpace(str))
                 return false;
             str = str.Trim();
             if (AllowDuplicates == false)

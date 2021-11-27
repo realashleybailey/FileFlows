@@ -118,7 +118,11 @@ window.ffFlowPart = {
             let name = part.name;
             if (!name) {
                 name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1).replace(/_/g, ' ');
-                name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
+                try {
+                    name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
+                } catch (err) {
+                    // safari doesnt like lookbehinds, cos its so far behind all the other browers
+                }
             }
             divName.innerHTML = name;
         } catch (err) {

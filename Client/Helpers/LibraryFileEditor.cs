@@ -11,6 +11,28 @@ namespace FileFlows.Client.Helpers
     public class LibraryFileEditor
     {
         static string ApIUrl => "/api/library-file";
+
+        private static async Task<RequestResult<LibraryFileModel>> GetLibraryFile(string url)
+        {
+#if (DEMO)
+            var file = new LibraryFileModel
+            {
+                Name = "Demo Library File.mkv"
+            };
+            return new RequestResult<LibraryFileModel> { Success = true, Data = file };
+#else
+            return await HttpHelper.Get<LibraryFileModel>(url);
+#endif
+        }
+        private static async Task<RequestResult<string>> GetLibraryFileLog(string url)
+        {
+#if (DEMO)
+            return new RequestResult<string> { Success = true, Data = "This is a sample log file." };
+#else
+            return await HttpHelper.Get<string>(url);
+#endif
+        }
+
         public static async Task Open(Blocker blocker, NotificationService notificationService, Editor editor, LibraryFile item)
         {
             LibraryFileModel model = null;
@@ -18,7 +40,7 @@ namespace FileFlows.Client.Helpers
             blocker.Show();
             try
             {
-                var result = await HttpHelper.Get<LibraryFileModel>(ApIUrl + "/" + item.Uid);
+                var result = await GetLibraryFile(ApIUrl + "/" + item.Uid);
                 if (result.Success == false)
                 {
                     notificationService.Notify(NotificationSeverity.Error,
@@ -29,7 +51,7 @@ namespace FileFlows.Client.Helpers
                 }
 
                 model = result.Data;
-                var logResult = await HttpHelper.Get<string>(logUrl);
+                var logResult = await GetLibraryFileLog(logUrl);
                 model.Log = (logResult.Success ? logResult.Data : string.Empty) ?? string.Empty;
 
             }

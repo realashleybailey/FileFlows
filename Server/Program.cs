@@ -61,17 +61,11 @@ FileFlows.Shared.Helpers.HttpHelper.Client = new HttpClient();
 using var pl = new FileFlows.Server.Helpers.PluginHelper();
 pl.ScanForPlugins();
 
-if (FileFlows.Server.Globals.Demo == false)
-{
-    FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
-    FileFlows.Server.Workers.Worker.StartWorkers();
-}
+FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
+FileFlows.Server.Workers.Worker.StartWorkers();
+
 
 // this will run the asp.net app and wait until it is killed
 app.Run();
 
-
-if (FileFlows.Server.Globals.Demo == false)
-{
-    FileFlows.Server.Workers.Worker.StopWorkers();
-}
+FileFlows.Server.Workers.Worker.StopWorkers();

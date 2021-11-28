@@ -35,6 +35,7 @@ namespace FileFlows.Client.Pages
 
         async Task Load()
         {
+#if(!DEMO)
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();
@@ -49,10 +50,12 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#endif
         }
 
         async Task Add()
         {
+#if (!DEMO)
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();
@@ -67,11 +70,12 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
-
+#endif
         }
 
         async Task Enable(bool enabled, PluginInfo plugin)
         {
+#if (!DEMO)
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();
@@ -86,10 +90,12 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#endif
         }
 
         async Task Update()
         {
+#if (!DEMO)
             var plugin = SelectedItems.FirstOrDefault();
             if (plugin == null)
                 return;
@@ -106,6 +112,7 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#endif
         }
 
         private PluginInfo EditingPlugin = null;
@@ -117,6 +124,7 @@ namespace FileFlows.Client.Pages
         }
         async Task Edit()
         {
+#if (!DEMO)
             PluginInfo plugin = this.SelectedItems.FirstOrDefault();
             if (plugin?.HasSettings != true)
                 return;
@@ -140,10 +148,12 @@ namespace FileFlows.Client.Pages
             this.EditingPlugin = plugin;
             var result = await Editor.Open("Plugins." + plugin.Assembly.Replace(".dll", ""), plugin.Name, plugin.Fields, plugin.Settings,
                 saveCallback: SaveSettings);
+#endif
         }
 
         async Task<bool> SaveSettings(ExpandoObject model)
         {
+#if (!DEMO)
             Blocker.Show();
             this.StateHasChanged();
 
@@ -162,6 +172,9 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#else
+            return true;
+#endif
         }
     }
 

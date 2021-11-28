@@ -1,0 +1,181 @@
+{
+  "Enums": {
+    "LogType": {
+      "Info": "Information",
+      "Debug": "Debug",
+      "Warning": "Warning",
+      "Error": "Error"
+    }
+  },
+  "Flow": {
+    "Parts": {
+      "InputFile": {
+        "Description": "An input node for a library file.  This is required and is the starting point of a flow.  Any input node can be used, just one is required."
+      },
+      "CopyFile": {
+        "Description": "Copies a file to the destination path",
+        "Fields": {
+          "DestinationPath": "Destination Path",
+          "DestinationPath-Help": "The path where the file will be copied too",
+          "CopyFolder": "Copy Folder",
+          "CopyFolder-Help": "If the relative library folder structure should be copied too"
+        }
+      },
+      "DeleteSourceDirectory": {
+        "Description": "Deletes the source directory of the original library file",
+        "Fields": {
+          "IfEmpty": "If Empty",
+          "IfEmpty-Help": "Only delete the source directory if the it is empty",
+          "IncludePatterns": "Include Patterns",
+          "IncludePatterns-Help": "Optional, if set only files matching these patterns will be counted to see if the folder is empty.   Any of these patterns can match."
+        }
+      },
+      "FileExtension": {
+        "Description": "Checks if the file has one of the configured extensions.\n\nOutput 1: Matches\nOutput 2: Does not match",
+        "Fields": {
+          "Extensions": "Extensions",
+          "Extensions-Help": "A list of case insensitive file extensions that will be matched against.\nOuput 1 Matches\nOutput 2: Does not match"
+        }
+      },
+      "FileSize": {
+        "Description": "Checks if the file size matches the configured parameters. The values are in megabytes.\n\nOutput 1: Matches\nOutput 2: Does not match",
+        "Fields": {
+          "Comparison": "Comparison",
+          "Lower": "Lower",
+          "Lower-Suffix": "MB",
+          "Lower-Help": "The value it must be greater than this number of megabytes",
+          "Upper": "Upper",
+          "Upper-Suffix": "MB",
+          "Upper-Help": "The value it must be less than than this number of megabytes. Leave as 0 to not test the upper limit."
+        }
+      },
+      "Function": {
+        "Fields": {
+          "Outputs": "Outputs",
+          "Outputs-Help": "The number of outputs this node can have.",
+          "Code": "Code",
+          "Code-Help": "return -1 for error and flow to stop\nreturn 0 for flow to complete\nreturn 1 or more for the desired output to be called"
+        }
+      },
+      "Log": {
+        "Description": "Logs a message to the flow log",
+        "Fields": {
+          "LogType": "Type",
+          "Message": "Message"
+        }
+      },
+      "MoveFile": {
+        "Description": "Moves a file to the destination path",
+        "Fields": {
+          "DestinationPath": "Destination Path",
+          "DestinationPath-Help": "The path where the file will be moved too",
+          "MoveFolder": "Copy Folder",
+          "MoveFolder-Help": "If the relative library folder structure should be copied too",
+          "DeleteOriginal": "Delete Original",
+          "DeleteOriginal-Help": "If the original file should be deleted, this will only happen if the working file is different to the original file"
+        }
+      },
+      "PatternMatch": {
+        "Description": "Tests the working file and original file against a regular expression.\n\nOutput 1: Matches expression\nOutput 2: Does not match",
+        "Fields": {
+          "Pattern": "Pattern",
+          "Pattern-Help": "A regular expression, using the C# specifciation for regular expressions."
+        }
+      },
+      "PatternReplacer": {
+        "Description": "Lets you make replacements in the filename.  Can use regular expressions for replacements, or simple string raplacements.\n\nOutput 1: Replacement done\nOutput 2: No replacement done",
+        "Fields": {
+          "Replacements": "Replacements",
+          "ReplacementsKey": "Pattern",
+          "ReplacementsValue": "Value",
+          "UseWorkingFileName": "Use Working Filename",
+          "UseWorkingFileName-Help": "If current working filename should be used, or if false, the original filename of the incoming file will be used."
+        }
+      },
+      "Renamer": {
+        "Description": "Renames the working file.\nVariables can be used by entering the key \u0027{\u0027 inside the Pattern field.",
+        "Fields": {
+          "Pattern": "Pattern",
+          "DestinationPath": "Destination Path",
+          "DestinationPath-Help": "If the file should be moved to a different directory.",
+          "LogOnly": "Log Only",
+          "LogOnly-Help": "Turn on if you just want to test this node without it actually renaming the file",
+          "CsvFile": "CSV File",
+          "CsvFile-Help": "Will append to this file the original name and the renamed file.  Useful when using \u0027\u0027Log Only\u0027\u0027 to test the renamer before changing files."
+        }
+      },
+      "MovieLookup": {
+        "Description": "Looks performs a search on TheMovieDB.org.\nStores the Metadata inside the parameter \u0027MovieInfo\u0027.\n\nOutputs 1: Movie found\nOutputs 2: Movie not found",
+        "Fields": {
+          "UseFolderName": "Use Folder Name",
+          "UseFolderName-Help": "If the folder name should be used instead of the filename."
+        }
+      },
+      "MovieRenamer": {
+        "Description": "Renames the working file using the metadata stored in \u0027MovieInfo\u0027.\nNote: MovieLookup should be executed in the flow before this node to work.\n\nOutput 1: File was renamed\nOutput 2: File failed to be renamed",
+        "Fields": {
+          "Pattern": "Pattern",
+          "Pattern-Help": "The pattern to use to rename the folder.  \u0027{Title}\u0027, \u0027{Year}\u0027, \u0027{Extension}\u0027.",
+          "DestinationPath": "Destination Path",
+          "DestinationPath-Help": "If the file should be moved to a different directory.",
+          "LogOnly": "Log Only",
+          "LogOnly-Help": "Turn on if you just want to test this node without it actually renaming the file"
+        }
+      },
+      "VideoFile": {
+        "Description": "An input video file that has had its VideoInformation read and can be processed"
+      },
+      "DetectBlackBars": {
+        "Description": "Processes a video file and scans for black bars in the video.\n\nIf found a parameter \u0022VideoCrop\u0022 will be added.\n\nOutput 1: Black bars detected\nOutput 2: Not detected"
+      },
+      "VideoCodec": {
+        "Description": "This node will check the codecs in the input file, and trigger when matched.\n\nOutput 1: Matches\nOutput 2: Does not match",
+        "Fields": {
+          "Codecs": "Codecs",
+          "Codecs-Help": "Enter a list of case insensitive video or audio codecs.\nEg hevc, h265, mpeg4, ac3"
+        }
+      },
+      "VideoEncode": {
+        "Description": "A generic video encoding node, this lets you customize how to encode a video file using ffmpeg.\n\nOutput 1: Video was processed\nOutput 2: No processing required",
+        "Fields": {
+          "Extension": "Extension",
+          "Extension-Help": "The file extension to use on the newly created file",
+          "VideoCodec": "Video Codec",
+          "VideoCodec-Help": "The video codec the video should be in, for example hevc, h264",
+          "VideoCodecParameters": "Video Codec Parameters",
+          "VideoCodecParameters-Help": "The parameters to use to encode the video, eg. \u0022hevc_nvenc -preset hq -crf 23\u0022 to encode into hevc using the HQ preset a constant rate factor of 23 and using NVIDIA hardware acceleration.",
+          "AudioCodec": "Audio Codec",
+          "AudioCodec-Help": "The audio codec to encode the video with",
+          "Language": "Language",
+          "Language-Help": "Optional ISO 639-2 language code to use.  Will attempt to find an audio track with this language code if not the best audio track will be used.\nhttps://en.wikipedia.org/wiki/List_of_ISO_639-2_codes"
+        }
+      },
+      "Video_H265_AC3": {
+        "Description": "This will ensure all videos are encoded in H265 (if not already encoded) and that AC3 audio is the first audio channel\n\nOutput 1: Video was processed\nOutput 2: No processing required",
+        "Fields": {
+          "Language": "Language",
+          "Language-Help": "Optional ISO 639-2 language code to use.  Will attempt to find an audio track with this language code if not the best audio track will be used.\nhttps://en.wikipedia.org/wiki/List_of_ISO_639-2_codes",
+          "Crf": "Constant Rate Factor",
+          "Crf-Help": "Refer to ffmpeg for more details, the lower the value the bigger the file.  A good value is around 19-23.  Default is 21.",
+          "NvidiaEncoding": "NVIDIA Encoding",
+          "NvidiaEncoding-Help": "If NVIDIA hardware encoding should be used.  If you do not have a supported NVIDIA card the encoding will fail.",
+          "Threads": "Threads",
+          "Threads-Help": "Only used if not using NVIDIA.  If set to 0, the threads will use FFMpegs defaults.",
+          "NormalizeAudio": "Normalize Audio",
+          "NormalizeAudio-Help": "If the audio track should have its volume level normalized",
+          "ForceRencode": "Force Rencode",
+          "ForceRencode-Help": "If the video should always be reencoded regardless if it already is in H265/AC3"
+        }
+      },
+      "FFMPEG": {
+        "Description": "The node lets you run any FFMPEG command you like.  Giving you full control over what it can do.\n\nFor more information refer to the FFMPEG documentation",
+        "Fields": {
+          "Extension": "Extension",
+          "Extension-Help": "The file extension to use on the newly created file",
+          "CommandLine": "Command Line",
+          "CommandLine-Help": "The command line to run with FFMPEG.\n\u0027{WorkingFile}\u0027: the working file of the flow\n\u0027{Output}\u0027: The output file that will be passed as the last parameter to FFMPEG including the extension defined above."
+        }
+      }
+    }
+  }
+}

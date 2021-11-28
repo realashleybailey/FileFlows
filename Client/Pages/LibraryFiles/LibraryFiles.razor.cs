@@ -7,6 +7,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
     using System.Linq;
+    using System;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
@@ -25,6 +26,35 @@ namespace FileFlows.Client.Pages
             _ = this.Refresh();
         }
 
+
+#if (DEMO)
+        public override async Task Load()
+        {
+            this.Data = Enumerable.Range(1, SelectedStatus == FileStatus.Processing ? 1 : 10).Select(x => new LibraryFile
+            {
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now,
+                Flow = new ObjectReference
+                {
+                    Name = "Flow",
+                    Uid = Guid.NewGuid()
+                },
+                Library = new ObjectReference
+                {
+                    Name = "Library",
+                    Uid = Guid.NewGuid(),
+                },
+                Name = "File_" + x + ".ext",
+                RelativePath = "File_" + x + ".ext",
+                Uid = Guid.NewGuid(),
+                Status = SelectedStatus,
+                OutputPath = SelectedStatus == FileStatus.Processed ? "output/File_" + x + ".ext" : string.Empty
+            }).ToList();
+
+            await PostLoad();
+        }
+#endif
+
         public override string FetchUrl => ApIUrl + "?status=" + SelectedStatus;
 
         public override async Task PostLoad()
@@ -42,9 +72,25 @@ namespace FileFlows.Client.Pages
             lblMoveToTop = Translater.Instant("Pages.LibraryFiles.Buttons.MoveToTop");
         }
 
+        private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
+        {
+#if (DEMO)
+
+            var results = new List<LibraryStatus>
+            {
+                new LibraryStatus { Status = FileStatus.Unprocessed, Count = 10 },
+                new LibraryStatus { Status = FileStatus.Processing, Count = 1 },
+                new LibraryStatus { Status = FileStatus.Processed, Count = 10 },
+                new LibraryStatus { Status = FileStatus.ProcessingFailed, Count = 10 }
+            };
+            return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
+#endif
+            return await HttpHelper.Get<List<LibraryStatus>>(ApIUrl + "/status");
+        }
+
         private async Task RefreshStatus()
         {
-            var result = await HttpHelper.Get<List<LibraryStatus>>(ApIUrl + "/status");
+            var result = await GetStatus();
             if (result.Success)
             {
                 var order = new List<FileStatus> { FileStatus.Unprocessed, FileStatus.Processing, FileStatus.Processed, FileStatus.FlowNotFound, FileStatus.ProcessingFailed };
@@ -68,6 +114,10 @@ namespace FileFlows.Client.Pages
 
         public async Task MoveToTop()
         {
+#if (DEMO)
+            return;
+#else
+
             var uids = this.SelectedItems?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
             if (uids.Length == 0)
                 return; // nothing to delete
@@ -83,6 +133,7 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
             }
             await Refresh();
+#endif
         }
     }
 }

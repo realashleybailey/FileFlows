@@ -163,6 +163,9 @@ namespace FileFlows.Client.Pages
 
         public async Task Enable(bool enabled, T item)
         {
+#if (DEMO)
+            return;
+#else
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();
@@ -175,6 +178,7 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#endif
         }
 
         public async Task Delete()
@@ -191,12 +195,14 @@ namespace FileFlows.Client.Pages
 
             try
             {
+#if (!DEMO)
                 var deleteResult = await HttpHelper.Delete($"{ApIUrl}", new ReferenceModel { Uids = uids });
                 if (deleteResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
                     return;
                 }
+#endif
 
                 this.SelectedItems.Clear();
                 this.Data.RemoveAll(x => uids.Contains(x.Uid));

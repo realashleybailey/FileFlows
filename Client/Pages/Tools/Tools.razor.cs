@@ -17,12 +17,15 @@ namespace FileFlows.Client.Pages
 
         private async Task Add()
         {
+#if (!DEMO)
             await Edit(new Tool());
+#endif
         }
 
 
         public override async Task Edit(Tool Tool)
         {
+#if (!DEMO)
             this.EditingItem = Tool;
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
@@ -43,10 +46,14 @@ namespace FileFlows.Client.Pages
             });
             var result = await Editor.Open("Pages.Tool", Tool.Name, fields, Tool,
               saveCallback: Save);
+#endif
         }
 
         async Task<bool> Save(ExpandoObject model)
         {
+#if (DEMO)
+            return true;
+#else
             Blocker.Show();
             this.StateHasChanged();
 
@@ -73,8 +80,8 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#endif
         }
 
     }
-
 }

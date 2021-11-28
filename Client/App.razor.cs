@@ -25,7 +25,11 @@ namespace FileFlows.Client
         private async Task LoadLanguage()
         {
             string langFile = await LoadLanguageFile("i18n/en.json?version=" + Globals.Version);
-            string pluginLang = await LoadLanguageFile("/api/plugin/language/en.json?ts=" + System.DateTime.Now.ToFileTime);
+#if (DEMO)
+            string pluginLang = await LoadLanguageFile("i18n/en.plugins.json?ts=" + System.DateTime.Now.ToFileTime());
+#else
+            string pluginLang = await LoadLanguageFile("/api/plugin/language/en.json?ts=" + System.DateTime.Now.ToFileTime());
+#endif
             Translater.Init(langFile, pluginLang);
         }
 

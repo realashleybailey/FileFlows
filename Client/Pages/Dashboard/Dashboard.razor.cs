@@ -77,6 +77,22 @@ namespace FileFlows.Client.Pages
             _ = Refresh();
         }
 
+        private async Task<RequestResult<List<LibraryFile>>> GetLibraryFiles(string url, bool completed)
+        {
+#if (DEMO)
+            var data = Enumerable.Range(1, 10).Select(x => new LibraryFile
+            {
+                Name = completed ? $"Completed File {x}.mkv" : $"Unprocessed {x}.mkv",
+                RelativePath = completed ? $"Completed File {x}.mkv" : $"Unprocessed {x}.mkv",
+                ProcessingStarted = DateTime.Now.AddMinutes(-5),
+                ProcessingEnded = DateTime.Now
+            }).ToList();
+            return new RequestResult<List<LibraryFile>> { Success = true, Data = data };
+#else
+            return HttpHelper.Get<List<LibraryFile>>(url);
+#endif
+        }
+
         async Task Refresh()
         {
             if (Refreshing)
@@ -84,7 +100,7 @@ namespace FileFlows.Client.Pages
             Refreshing = true;
             try
             {
-                var result = await HttpHelper.Get<List<FlowWorkerStatus>>(ApIUrl);
+                var result = await GetData();
                 if (result.Success)
                 {
                     this.Workers.Clear();
@@ -96,7 +112,7 @@ namespace FileFlows.Client.Pages
                     await jsFunctions.InvokeVoidAsync("InitChart", this.Workers, this.lblOverall, this.lblCurrent);
                 }
 
-                var upcomingResult = await HttpHelper.Get<List<LibraryFile>>("/api/library-file/upcoming");
+                var upcomingResult = await GetLibraryFiles("/api/library-file/upcoming", false);
                 if (upcomingResult.Success)
                 {
                     this.Upcoming.Clear();
@@ -106,7 +122,7 @@ namespace FileFlows.Client.Pages
                     this.StateHasChanged();
                 }
 
-                var finishedResult = await HttpHelper.Get<List<LibraryFile>>("/api/library-file/recently-finished");
+                var finishedResult = await GetLibraryFiles("/api/library-file/recently-finished", true);
                 if (finishedResult.Success)
                 {
                     this.Finished.Clear();
@@ -125,6 +141,40 @@ namespace FileFlows.Client.Pages
             {
                 Refreshing = false;
             }
+        }
+
+        async Task<RequestResult<List<FlowWorkerStatus>>> GetData()
+        {
+#if (DEMO)
+            return new RequestResult<List<FlowWorkerStatus>>
+            {
+                Success = true,
+                Data = new List<FlowWorkerStatus>
+                {
+                    new FlowWorkerStatus
+                    {
+                        CurrentFile = "DemoFile.mkv",
+                        CurrentPart = 1,
+                        CurrentPartName = "Curren Flow Part",
+                        CurrentPartPercent = 50,
+                        CurrentUid = Guid.NewGuid(),
+                        Library = new ObjectReference
+                        {
+                            Name = "Demo Library",
+                            Uid = Guid.NewGuid()
+                        },
+                        RelativeFile = "DemoFile.mkv",
+                        StartedAt = DateTime.Now.AddMinutes(-1),
+                        TotalParts = 5,
+                        WorkingFile = "tempfile.mkv",
+                        Uid = Guid.NewGuid()
+                    }
+                }
+            };
+#else
+            return await HttpHelper.Get<List<FlowWorkerStatus>>(ApIUrl);
+#endif
+            
         }
 
 
@@ -156,7 +206,7 @@ namespace FileFlows.Client.Pages
             string url = $"{ApIUrl}/{worker.Uid}/log";
             try
             {
-                var logResult = await HttpHelper.Get<string>(url);
+                var logResult = await GetLog(url);
                 if (logResult.Success == false || string.IsNullOrEmpty(logResult.Data))
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("Pages.Dashboard.ErrorMessages.LogFailed"));
@@ -183,12 +233,39 @@ namespace FileFlows.Client.Pages
             await Editor.Open("Pages.Dashboard", worker.CurrentFile, fields, new { Log = log }, large: true, readOnly: true);
         }
 
+        private async Task<RequestResult<string>> GetLog(string url)
+        {
+#if (DEMO)
+            return new RequestResult<string>
+            {
+                Success = true,
+                Data = @"2021-11-27 11:46:15.0658 - Debug -> Executing part:
+2021-11-27 11:46:15.1414 - Debug -> node: VideoFile
+2021-11-27 11:46:15.8442 - Info -> Video Information:
+ffmpeg version 4.1.8 Copyright (c) 2000-2021 the FFmpeg developers
+  built with gcc 9 (Ubuntu 9.3.0-17ubuntu1~20.04)
+  configuration: --disable-debug --disable-doc --disable-ffplay --enable-shared --enable-avresample --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-gpl --enable-libass --enable-fontconfig --enable-libfreetype --enable-libvidstab --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxcb --enable-libx265 --enable-libxvid --enable-libx264 --enable-nonfree --enable-openssl --enable-libfdk_aac --enable-postproc --enable-small --enable-version3 --enable-libbluray --enable-libzmq --extra-libs=-ldl --prefix=/opt/ffmpeg --enable-libopenjpeg --enable-libkvazaar --enable-libaom --extra-libs=-lpthread --enable-libsrt --enable-nvenc --enable-cuda --enable-cuvid --enable-libnpp --extra-cflags='-I/opt/ffmpeg/include -I/opt/ffmpeg/include/ffnvcodec -I/usr/local/cuda/include/' --extra-ldflags='-L/opt/ffmpeg/lib -L/usr/local/cuda/lib64 -L/usr/local/cuda/lib32/'
+  libavutil      56. 22.100 / 56. 22.100
+  libavcodec     58. 35.100 / 58. 35.100
+  libavformat    58. 20.100 / 58. 20.100
+  libavdevice    58.  5.100 / 58.  5.100
+  libavfilter     7. 40.101 /  7. 40.101
+  libavresample   4.  0.  0 /  4.  0.  0
+  libswscale      5.  3.100 /  5.  3.100
+  libswresample   3.  3.100 /  3.  3.100
+  libpostproc    55.  3.100 / 55.  3.100"
+            };
+#endif
+            return await HttpHelper.Get<string>(url);
+        }
+
         private async Task CancelClicked(FlowWorkerStatus worker)
         {
             if (await Confirm.Show("Labels.Cancel",
                 Translater.Instant("Pages.Dashboard.Messages.CancelMesssage", worker)) == false)
                 return; // rejected the confirm
 
+#if (!DEMO)
             Blocker.Show();
             try
             {
@@ -200,6 +277,7 @@ namespace FileFlows.Client.Pages
             {
                 Blocker.Hide();
             }
+#endif
         }
     }
 }

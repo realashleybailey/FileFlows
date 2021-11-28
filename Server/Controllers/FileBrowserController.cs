@@ -15,8 +15,6 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public IEnumerable<FileBrowserItem> GetItems([FromQuery] string start, [FromQuery] bool includeFiles, [FromQuery] string[] extensions)
         {
-            if (FileFlows.Server.Globals.Demo)
-                return DemoItems(start, includeFiles, extensions);
             if (start == "ROOT")
             {
                 // special case for windows we list the drives
@@ -81,24 +79,6 @@ namespace FileFlows.Server.Controllers
             }
             return items;
         }
-
-        private IEnumerable<FileBrowserItem> DemoItems(string start, bool includeFiles, string[] extensions)
-        {
-            List<FileBrowserItem> items = new List<FileBrowserItem>();
-            items.AddRange(Enumerable.Range(1, 5).Select(x => new FileBrowserItem { IsPath = true, Name = "Demo Folder " + x, FullName = "DemoFolder" + x }));
-
-            if (includeFiles)
-            {
-                var random = new Random(DateTime.Now.Millisecond);
-                items.AddRange(Enumerable.Range(1, 5).Select(x =>
-                   {
-                       string extension = "." + (extensions?.Any() != true ? "mkv" : extensions[random.Next(0, extensions.Length)]);
-                       return new FileBrowserItem { IsPath = true, Name = "DemoFile" + x + extension, FullName = "DemoFile" + x + extension };
-                   }));
-            }
-            return items;
-        }
-
         private string GetStartDirectory()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false && Directory.Exists("/media"))

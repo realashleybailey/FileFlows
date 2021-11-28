@@ -16,24 +16,28 @@ namespace FileFlows.Client.Pages
         private string lblSave, lblSaving;
 
         private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
-
         protected override async Task OnInitializedAsync()
         {
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             Blocker.Show("Loading Settings");
 
+#if (!DEMO)
             var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
             if (response.Success)
             {
                 this.Model = response.Data;
             }
-
+#endif
             Blocker.Hide();
         }
 
+
         private async Task Save()
         {
+#if (DEMO)
+            return;
+#else
             this.Blocker.Show(lblSaving);
             this.IsSaving = true;
             try
@@ -45,6 +49,7 @@ namespace FileFlows.Client.Pages
                 this.IsSaving = false;
                 this.Blocker.Hide();
             }
+#endif
         }
     }
 }

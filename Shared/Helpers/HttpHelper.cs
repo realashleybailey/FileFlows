@@ -15,7 +15,7 @@ namespace FileFlows.Shared.Helpers
         {
             return await MakeRequest<T>(HttpMethod.Get, url);
         }
-
+#if (!DEMO)
         public static async Task<RequestResult<string>> Post(string url, object data = null)
         {
             return await MakeRequest<string>(HttpMethod.Post, url, data);
@@ -37,6 +37,7 @@ namespace FileFlows.Shared.Helpers
         {
             return await MakeRequest<string>(HttpMethod.Delete, url, data);
         }
+#endif
 
         private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null)
         {

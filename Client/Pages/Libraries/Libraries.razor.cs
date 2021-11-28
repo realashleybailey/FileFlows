@@ -10,6 +10,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
     using FileFlows.Plugin;
+    using System;
 
     public partial class Libraries : ListPage<Library>
     {
@@ -21,12 +22,38 @@ namespace FileFlows.Client.Pages
         {
             await Edit(new Library() { Enabled = true });
         }
+#if (DEMO)
+        public override async Task Load()
+        {
+            this.Data = Enumerable.Range(1, 5).Select(x => new Library
+            {
+                Enabled = true,
+                Flow = new ObjectReference
+                {
+                    Name = "Flow",
+                    Uid = Guid.NewGuid()
+                },
+                Path = "/media/library" + x,                
+                Name = "Demo Library " + x,
+                Uid = Guid.NewGuid(),
+                Filter = "\\.(mkv|mp4|avi|mov|divx)$"
+            }).ToList();
+        }
+#endif
 
+        private async Task<RequestResult<FileFlows.Shared.Models.Flow[]>> GetFlows()
+        {
+#if (DEMO)
+            var results = Enumerable.Range(1, 5).Select(x => new FileFlows.Shared.Models.Flow { Name = "Flow " + x, Uid = System.Guid.NewGuid() }).ToArray();
+            return new RequestResult<FileFlows.Shared.Models.Flow[]> { Success = true, Data = results };
+#endif
+            return await HttpHelper.Get<FileFlows.Shared.Models.Flow[]>("/api/flow");
+        }
 
         public override async Task Edit(Library library)
         {
             Blocker.Show();
-            var flowResult = await HttpHelper.Get<FileFlows.Shared.Models.Flow[]>("/api/flow");
+            var flowResult = await GetFlows();
             Blocker.Hide();
             if (flowResult.Success == false || flowResult.Data?.Any() != true)
             {
@@ -78,6 +105,9 @@ namespace FileFlows.Client.Pages
 
         async Task<bool> Save(ExpandoObject model)
         {
+#if (DEMO)
+            return true;
+#else
             Blocker.Show();
             this.StateHasChanged();
 
@@ -104,6 +134,7 @@ namespace FileFlows.Client.Pages
                 Blocker.Hide();
                 this.StateHasChanged();
             }
+#endif
         }
 
     }

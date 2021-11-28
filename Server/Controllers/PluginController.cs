@@ -15,8 +15,6 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public async Task<IEnumerable<PluginInfoModel>> GetAll()
         {
-            if (Globals.Demo) 
-                return Enumerable.Range(0, 5).Select(x => new PluginInfoModel { Name = "Demo Plugin " + x, Uid = Guid.NewGuid(), Enabled = true, Assembly = "DemoPlugin" + x + ".dll", Version = "1.0.0." + x });
             var plugins = DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false);
             List<PluginInfoModel> pims = new List<PluginInfoModel>();
             var packages = await GetPluginPackages();
@@ -46,9 +44,6 @@ namespace FileFlows.Server.Controllers
         [HttpPut("state/{uid}")]
         public PluginInfo SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
         {
-            if (Globals.Demo)
-                return new PluginInfo { Name = "Demo Plugin", Uid = uid, Enabled = enable == true };
-
             var plugin = DbHelper.Single<PluginInfo>(uid);
             if (plugin == null)
                 throw new Exception("Plugin not found.");
@@ -66,8 +61,6 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{uid}")]
         public PluginInfo Get([FromRoute] Guid uid)
         {
-            if (Globals.Demo)
-                return new PluginInfo { Uid = uid, Name = "Demo Plugin" };
 
             var pi = DbHelper.Single<PluginInfo>(uid);
             if (pi == null)
@@ -80,8 +73,6 @@ namespace FileFlows.Server.Controllers
         [HttpPost("{uid}/settings")]
         public PluginInfo SaveSettings([FromRoute] Guid uid, [FromBody] ExpandoObject settings)
         {
-            if (Globals.Demo) return new PluginInfo { Uid = uid };
-
             var pi = DbHelper.Single<PluginInfo>(uid);
             if (pi == null)
                 return new PluginInfo();
@@ -126,9 +117,6 @@ namespace FileFlows.Server.Controllers
         [HttpGet("plugin-packages")]
         public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages()
         {
-            if(Globals.Demo)
-                return new List<PluginPackageInfo>();
-
             // should expose user configurable repositories
             var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>("https://github.com/revenz/FileFlowsPlugins/blob/master/plugins.json?raw=true&rand=" + System.DateTime.Now.ToFileTime());
             if (plugins.Success == false || plugins.Data == null)
@@ -140,8 +128,6 @@ namespace FileFlows.Server.Controllers
         [HttpPost("update/{uid}")]
         public async Task<bool> Update([FromRoute] Guid uid)
         {
-            if (Globals.Demo) return true;
-
             var plugin = Get(uid);
             if (plugin == null)
                 return false;

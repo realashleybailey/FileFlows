@@ -96,9 +96,7 @@ namespace FileFlows.Client.Components.Dialogs
 
         private async Task LoadPath(string path)
         {
-            var result = await HttpHelper.Get<List<FileBrowserItem>>($"{API_URL}?includeFiles={DirectoryMode == false}" +
-            $"&start={Uri.EscapeDataString(path)}" +
-            string.Join("", Extensions?.Select(x => "&extensions=" + Uri.EscapeDataString(x))?.ToArray() ?? new string[] { }));
+            var result = await GetPathData(path);
             if (result.Success)
             {
                 this.Items = result.Data;
@@ -109,6 +107,29 @@ namespace FileFlows.Client.Components.Dialogs
                     this.Title = "Root";
                 this.StateHasChanged();
             }
+        }
+
+        private async Task<RequestResult<List<FileBrowserItem>>> GetPathData(string path)
+        {
+#if (DEMO)
+            List<FileBrowserItem> items = new List<FileBrowserItem>();
+            items.AddRange(Enumerable.Range(1, 5).Select(x => new FileBrowserItem { IsPath = true, Name = "Demo Folder " + x, FullName = "DemoFolder" + x }));
+
+            if (DirectoryMode == false)
+            {
+                var random = new Random(DateTime.Now.Millisecond);
+                items.AddRange(Enumerable.Range(1, 5).Select(x =>
+                {
+                    string extension = "." + (Extensions?.Any() != true ? "mkv" : Extensions[random.Next(0, Extensions.Length)]);
+                    return new FileBrowserItem { IsPath = true, Name = "DemoFile" + x + extension, FullName = "DemoFile" + x + extension };
+                }));
+            }
+            return new RequestResult<List<FileBrowserItem>> { Success = true, Data = items };
+#else
+            return await HttpHelper.Get<List<FileBrowserItem>>($"{API_URL}?includeFiles={DirectoryMode == false}" +
+            $"&start={Uri.EscapeDataString(path)}" +
+            string.Join("", Extensions?.Select(x => "&extensions=" + Uri.EscapeDataString(x))?.ToArray() ?? new string[] { }));
+#endif
         }
     }
 }

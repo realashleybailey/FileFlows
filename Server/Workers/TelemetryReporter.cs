@@ -13,9 +13,6 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            if (Globals.Demo)
-                return;
-
             var settings = DbHelper.Single<Settings>();
             if (settings?.DisableTelemetry == true)
                 return; // they have turned it off, dont report anything
@@ -37,7 +34,7 @@ namespace FileFlows.Server.Workers
 #if(DEBUG)
             var task = HttpHelper.Put("https://localhost:7197/api/telemetry", data);
 #else
-            var task = HttpHelper.Put("https://fileflows/api/telemetry", data);
+            var task = HttpHelper.Put("http://fileflows.com/api/telemetry", data);
 #endif
             task.Wait();
 

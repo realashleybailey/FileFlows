@@ -19,6 +19,7 @@ namespace FileFlows.Server.Workers
 
             TelemetryData data = new TelemetryData();
             data.ClientUid = settings.Uid;
+            data.Version = Globals.Version;
             var libFiles = DbHelper.Select<LibraryFile>();
             data.FilesFailed = libFiles.Where(x => x.Status == FileStatus.ProcessingFailed).Count();
             data.FilesProcessed = libFiles.Where(x => x.Status == FileStatus.Processed).Count();
@@ -57,6 +58,8 @@ namespace FileFlows.Server.Workers
         public class TelemetryData
         {
             public Guid ClientUid { get; set; }
+
+            public string Version { get; set; }
 
             public List<TelemetryNode> Nodes { get; set; }
 

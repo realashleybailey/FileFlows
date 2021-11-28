@@ -44,13 +44,13 @@ app.MapControllerRoute(
 
 FileFlows.Shared.Logger.Instance = FileFlows.Server.Logger.Instance;
 
-if (FileFlows.Server.Globals.IsDevelopment == false)
-    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
+//if (FileFlows.Server.Globals.IsDevelopment == false)
+//    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
 FileFlows.Server.Helpers.DbHelper.CreateDatabase();
 
 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-FileFlows.Server.Globals.Version = fvi.FileVersion;
+FileFlows.Server.Globals.Version = fvi?.FileVersion ?? String.Empty;
 
 Console.WriteLine(new string('=', 50));
 Console.WriteLine("Starting File Flows " + fvi.FileVersion);
@@ -61,11 +61,17 @@ FileFlows.Shared.Helpers.HttpHelper.Client = new HttpClient();
 using var pl = new FileFlows.Server.Helpers.PluginHelper();
 pl.ScanForPlugins();
 
-FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
-
-FileFlows.Server.Workers.Worker.StartWorkers();
+if (FileFlows.Server.Globals.Demo == false)
+{
+    FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
+    FileFlows.Server.Workers.Worker.StartWorkers();
+}
 
 // this will run the asp.net app and wait until it is killed
 app.Run();
 
-FileFlows.Server.Workers.Worker.StopWorkers();
+
+if (FileFlows.Server.Globals.Demo == false)
+{
+    FileFlows.Server.Workers.Worker.StopWorkers();
+}

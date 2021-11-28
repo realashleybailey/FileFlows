@@ -49,7 +49,6 @@ namespace FileFlows.Server.Helpers
 
         public static IEnumerable<string> GetNames<T>(string andWhere = "", params object[] args)
         {
-
             using (var db = GetDb())
             {
                 if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
@@ -289,7 +288,6 @@ namespace FileFlows.Server.Helpers
 
         private static void AddInitialData(Database db)
         {
-
             AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",

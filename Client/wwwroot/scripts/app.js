@@ -44,14 +44,5 @@ window.ff = {
                 callback();
         };
         document.body.appendChild(tag);
-    },
-    enableTelemetry: function() {
-        ff.loadJS('https://www.googletagmanager.com/gtag/js?id=G-QSCG4CDWTH', () => {
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-
-            gtag('config', 'G-QSCG4CDWTH');
-        });
     }
 };

@@ -18,6 +18,9 @@ namespace FileFlows.Server.Controllers
         [HttpPost("validate")]
         public string Validate([FromBody] string code)
         {
+            if (Globals.Demo == false)
+                return "DEMO";
+
             if (string.IsNullOrEmpty(code))
                 return ""; // no code, means will run fine... i think... maybe...  depends what i do
             var sb = new StringBuilder();

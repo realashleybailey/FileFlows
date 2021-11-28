@@ -1,5 +1,6 @@
 ﻿namespace FileFlows.Shared.Models
 {
+    using System;
     using System.ComponentModel.DataAnnotations;
     using FileFlows.Plugin.Attributes;
 

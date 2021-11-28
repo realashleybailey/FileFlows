@@ -20,7 +20,7 @@ namespace FileFlows.Server.Workers
             if (schedule == ScheduleType.Hourly)
                 interval *= 60 * 60;
             if (schedule == ScheduleType.Daily)
-                interval *= 60 * 60 * 24;
+                interval = 60 * 60 * 24;
 
             this.Schedule = schedule;
             this.Seconds = interval;
@@ -34,6 +34,7 @@ namespace FileFlows.Server.Workers
                 return; // workers already running
             Workers.Add(new LibraryWorker());
             Workers.Add(new FlowWorker());
+            Workers.Add(new TelemetryReporter());
             foreach (var worker in Workers)
                 worker.Start();
         }

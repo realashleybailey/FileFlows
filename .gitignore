@@ -12,3 +12,6 @@ dockerbuild.ps1
 /.vs/FileFlows
 dockerbuild-public.ps1
 docker.xml
+*.user
+/xdemopublish
+/Server/Properties/PublishProfiles/Default Settings.pubxml

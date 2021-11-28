@@ -11,7 +11,6 @@ namespace FileFlows.Client.Pages
         [CascadingParameter] Blocker Blocker { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
 
-        private bool CurrentTelemetry;
         private bool IsSaving { get; set; }
 
         private string lblSave, lblSaving;
@@ -28,7 +27,6 @@ namespace FileFlows.Client.Pages
             if (response.Success)
             {
                 this.Model = response.Data;
-                CurrentTelemetry = this.Model.DisableTelemetry;
             }
 
             Blocker.Hide();
@@ -46,11 +44,6 @@ namespace FileFlows.Client.Pages
             {
                 this.IsSaving = false;
                 this.Blocker.Hide();
-            }
-
-            if(CurrentTelemetry != Model.DisableTelemetry)
-            {
-                NavigationManager.NavigateTo("/settings", true);
             }
         }
     }

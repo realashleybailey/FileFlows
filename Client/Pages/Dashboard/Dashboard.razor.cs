@@ -89,7 +89,7 @@ namespace FileFlows.Client.Pages
             }).ToList();
             return new RequestResult<List<LibraryFile>> { Success = true, Data = data };
 #else
-            return HttpHelper.Get<List<LibraryFile>>(url);
+            return await HttpHelper.Get<List<LibraryFile>>(url);
 #endif
         }
 

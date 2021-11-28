@@ -69,6 +69,7 @@ namespace FileFlows.Server.Workers
                     if(string.IsNullOrEmpty(libFile.OutputPath) == false && known.Contains(libFile.OutputPath.ToLower()) == false)
                         known.Add(libFile.OutputPath.ToLower());
                 }
+                var tasks = new List<Task<LibraryFile>>();
                 foreach (var file in files)
                 {
                     if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
@@ -77,33 +78,45 @@ namespace FileFlows.Server.Workers
                     if (known.Contains(file.FullName.ToLower()))
                         continue; // already known
 
-                    if (CanAccess(file) == false)
-                        continue; // this can happen if the file is currently being written to, next scan will retest it
-
-                    var libraryFile = new LibraryFile
+                    tasks.Add(GetLibraryFile(library, flow, file));
+                }
+                Task.WaitAll(tasks.ToArray());
+                foreach(var task in tasks)
+                {
+                    if(task.Result != null)
                     {
-                        Name = file.FullName,
-                        RelativePath = file.FullName.Substring(library.Path.Length + 1),
-                        Status = FileStatus.Unprocessed,
-                        Library = new ObjectReference
-                        {
-                            Name = library.Name,
-                            Uid = library.Uid,
-                            Type = library.GetType().FullName
-                        },
-                        Flow = new ObjectReference
-                        {
-                            Name = flow.Name,
-                            Uid = flow.Uid,
-                            Type = flow.GetType().FullName
-                        },
-                        Order = -1
-                    };
-                    DbHelper.Update(libraryFile);
-                    Logger.Instance.DLog("Found file to process: " + file);
+                        DbHelper.Update(task.Result);
+                        Logger.Instance.DLog("Found file to process: " + task.Result.Name);
+                    }
                 }
             }
             Logger.Instance.DLog("Finished scanning libraries");
+        }
+
+        private async Task<LibraryFile?> GetLibraryFile(Library library, Flow flow, FileInfo file)
+        {
+            if (await CanAccess(file) == false)
+                return null; // this can happen if the file is currently being written to, next scan will retest it
+
+            return new LibraryFile
+            {
+                Name = file.FullName,
+                RelativePath = file.FullName.Substring(library.Path.Length + 1),
+                Status = FileStatus.Unprocessed,
+                Library = new ObjectReference
+                {
+                    Name = library.Name,
+                    Uid = library.Uid,
+                    Type = library.GetType()?.FullName ?? string.Empty
+                },
+                Flow = new ObjectReference
+                {
+                    Name = flow.Name,
+                    Uid = flow.Uid,
+                    Type = flow.GetType()?.FullName ?? string.Empty
+                },
+                Order = -1
+            };
         }
 
         internal static void ResetProcessing()
@@ -117,10 +130,21 @@ namespace FileFlows.Server.Workers
             }
         }
 
-        private bool CanAccess(FileInfo file)
+        private async Task<bool> CanAccess(FileInfo file)
         {
             try
             {
+                if (file.LastAccessTime < DateTime.Now.AddSeconds(-10))
+                {
+                    // check if the file size changes
+                    long fs = file.Length;
+                    await Task.Delay(5_000);
+                    if (fs != file.Length)
+                    {
+                        Logger.Instance.ILog("File size has changed, skipping for now: " + file.FullName);
+                        return false; // file size has changed, could still be being written too
+                    }
+                }
                 using (var fs = File.Open(file.FullName, FileMode.Open, FileAccess.ReadWrite))
                 {
                 }

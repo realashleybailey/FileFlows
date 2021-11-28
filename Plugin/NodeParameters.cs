@@ -1,6 +1,8 @@
 namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
+    using System.Runtime.InteropServices;
+
     public class NodeParameters
     {
         /// <summary>
@@ -117,8 +119,9 @@ namespace FileFlows.Plugin
                     var fileInfo = new FileInfo(destination);
                     if (fileInfo.Exists)
                         fileInfo.Delete();
-                    else if (fileInfo.Directory.Exists == false)
-                        fileInfo.Directory.Create();
+                    else
+                        CreateDirectoryIfNotExists(fileInfo?.DirectoryName);
+
                     Logger?.ILog($"Moving file: \"{WorkingFile}\" to \"{destination}\"");
                     System.IO.File.Move(WorkingFile, destination, true);
 
@@ -214,6 +217,44 @@ namespace FileFlows.Plugin
             // put the drive letter back if it was replaced iwth a ' - '
             destDir = System.Text.RegularExpressions.Regex.Replace(destDir, @"^([a-z]) \- ", "$1:", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             return new FileInfo(Path.Combine(destDir, destName));
+        }
+
+        public bool CreateDirectoryIfNotExists(string directory)
+        {
+            if (string.IsNullOrEmpty(directory))
+                return false;
+            var di = new DirectoryInfo(directory);
+            if (di.Exists)
+                return true;
+
+            di.Create();
+            if (Chmod(directory))
+                Logger?.ILog("Succesfully set permissions on directory");
+            else
+                Logger?.ILog("Faield to set permissions on directory");
+            return di.Exists;
+        }
+
+        public bool Chmod(string filePath, string permissions = "700", bool recursive = true) 
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return true; // its windows, lets just pretend we did this
+
+            string cmd = $"chmod{(recursive ? " -R" : "")} {permissions} \"{filePath}\"";
+
+            try
+            {
+                using (var p = System.Diagnostics.Process.Start("/bin/bash", $"-c \"{cmd}\""))
+                {
+                    p.WaitForExit();
+                    return p.ExitCode == 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger?.ELog("Failed settings permissions: " + ex.Message);
+                return false;
+            }
         }
     }
 

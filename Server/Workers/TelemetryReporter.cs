@@ -23,13 +23,21 @@ namespace FileFlows.Server.Workers
             data.FilesFailed = libFiles.Where(x => x.Status == FileStatus.ProcessingFailed).Count();
             data.FilesProcessed = libFiles.Where(x => x.Status == FileStatus.Processed).Count();
             var flows = DbHelper.Select<Flow>();
-            data.Nodes = flows.SelectMany(x => x.Parts)
-                              .GroupBy(x => x.Name)
-                              .Select(x => new TelemetryNode
-                              {
-                                  Name = x.Key,
-                                  Count = x.Count()
-                              }).ToList();
+            var dictNodes = new Dictionary<string, int>();
+            foreach(var fp in flows?.SelectMany(x => x.Parts)?.ToArray() ?? new FlowPart[] { })
+            {
+                if (fp == null)
+                    continue;
+                if (dictNodes.ContainsKey(fp.FlowElementUid))
+                    dictNodes[fp.FlowElementUid] = dictNodes[fp.FlowElementUid] + 1;
+                else
+                    dictNodes.Add(fp.FlowElementUid, 1);
+            }
+            data.Nodes = dictNodes.Select(x => new TelemetryNode
+            {
+                Name = x.Key,
+                Count = x.Value
+            }).ToList();
 
 #if(DEBUG)
             var task = HttpHelper.Post("https://localhost:7197/api/telemetry", data);

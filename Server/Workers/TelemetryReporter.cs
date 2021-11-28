@@ -32,11 +32,15 @@ namespace FileFlows.Server.Workers
                               }).ToList();
 
 #if(DEBUG)
-            var task = HttpHelper.Put("https://localhost:7197/api/telemetry", data);
+            var task = HttpHelper.Post("https://localhost:7197/api/telemetry", data);
 #else
-            var task = HttpHelper.Put("http://fileflows.com/api/telemetry", data);
+            var task = HttpHelper.Post("http://fileflows.com/api/telemetry", data);
+            
 #endif
             task.Wait();
+            Logger.Instance.DLog("Telemetry report result: " + task.Result.Success);
+            if (task.Result.Success == false)
+                Logger.Instance.ELog("Telemetry error: " + task.Result.Data);
 
         }
 

@@ -16,7 +16,7 @@ window.ff = {
         return { width: screen.width, height: screen.height };
     },
     gotoHomePage: function () {
-        window.open('https://github.com/revenz/fileflows', '_blank');
+        window.open('http://fileflows.com', '_blank');
     },
     disableMovementKeys: function (element) {
         if (typeof (element) === 'string')

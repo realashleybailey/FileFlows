@@ -15,9 +15,6 @@ window.ff = {
 
         return { width: screen.width, height: screen.height };
     },
-    gotoHomePage: function () {
-        window.open('http://fileflows.com', '_blank');
-    },
     disableMovementKeys: function (element) {
         if (typeof (element) === 'string')
             element = document.getElementById(element);

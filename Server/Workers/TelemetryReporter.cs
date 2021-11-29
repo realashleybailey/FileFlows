@@ -6,7 +6,7 @@ namespace FileFlows.Server.Workers
 {
     public class TelemetryReporter: Worker
     {
-        public TelemetryReporter() : base(ScheduleType.Daily, 0)
+        public TelemetryReporter() : base(ScheduleType.Hourly, 1)
         {
             Trigger();
         }
@@ -47,10 +47,6 @@ namespace FileFlows.Server.Workers
             
 #endif
             task.Wait();
-            Logger.Instance.DLog("Telemetry report result: " + task.Result.Success);
-            if (task.Result.Success == false)
-                Logger.Instance.ELog("Telemetry error: " + task.Result.Data);
-
         }
 
 

@@ -15,12 +15,15 @@ namespace FileFlows.Server.Workers
 
         public Worker(ScheduleType schedule, int interval)
         {
+            if (interval < 1)
+                interval = 1;
+
             if (schedule == ScheduleType.Minute)
                 interval *= 60;
             if (schedule == ScheduleType.Hourly)
                 interval *= 60 * 60;
             if (schedule == ScheduleType.Daily)
-                interval = 60 * 60 * 24;
+                interval *= 60 * 60 * 24;
 
             this.Schedule = schedule;
             this.Seconds = interval;
@@ -86,13 +89,7 @@ namespace FileFlows.Server.Workers
             Executing = true;
             try
             {
-                string prefix = " Starting " + this.GetType().Name + " ";
-                if (prefix.Length % 2 == 1)
-                    prefix += "#";
-                prefix = new string('#', (50 - prefix.Length) / 2) + prefix + new string('#', (50 - prefix.Length) / 2);
-                Logger.Instance.ILog(prefix);
                 Execute();
-                Logger.Instance.ILog(new string('#', 50));
             }
             catch (Exception ex)
             {

@@ -8,6 +8,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using System.Linq;
     using System;
+    using Microsoft.AspNetCore.Components.Web;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
@@ -134,6 +135,14 @@ namespace FileFlows.Client.Pages
             }
             await Refresh();
 #endif
+        }
+
+        private void FilterKeyDown(KeyboardEventArgs e)
+        {
+            if(e.Key == "Enter")
+            {
+                UpdateFilter();
+            }
         }
     }
 }

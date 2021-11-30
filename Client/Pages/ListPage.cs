@@ -14,19 +14,7 @@ namespace FileFlows.Client.Pages
 
     public abstract class ListPage<T> : ComponentBase where T : ViObject
     {
-        private string _FilterText = string.Empty;
-        public string FilterText
-        {
-            get => _FilterText;
-            set
-            {
-                if (_FilterText == value)
-                    return;
-                _FilterText = value ?? string.Empty;
-                UpdateFilter();
-            }
-        }
-
+        public string FilterText { get; set; }
         protected void UpdateFilter()
         {
             //this.DataGrid.LoadData.InvokeAsync();

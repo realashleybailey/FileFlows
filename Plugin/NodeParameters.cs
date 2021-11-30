@@ -231,23 +231,39 @@ namespace FileFlows.Plugin
             if (Chmod(directory))
                 Logger?.ILog("Succesfully set permissions on directory");
             else
-                Logger?.ILog("Faield to set permissions on directory");
+                Logger?.ILog("Failed to set permissions on directory");
             return di.Exists;
         }
 
-        public bool Chmod(string filePath, string permissions = "700", bool recursive = true) 
+        public bool Chmod(string filePath, string permissions = "777", bool recursive = true) 
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
-            string cmd = $"chmod{(recursive ? " -R" : "")} {permissions} \"{filePath}\"";
+            string cmd = $"chmod{(recursive ? " -R" : "")} {permissions} {filePath.Replace(" ", "\\ ")}";
 
             try
             {
-                using (var p = System.Diagnostics.Process.Start("/bin/bash", $"-c \"{cmd}\""))
+                using (var process = new System.Diagnostics.Process())
                 {
-                    p.WaitForExit();
-                    return p.ExitCode == 0;
+                    process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
+
+                    process.Start();
+                    string output = process.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                        return true;
+                    Logger?.ELog("Failed setting permissions:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
+                    if(string.IsNullOrWhiteSpace(error) == false)
+                        Logger?.ELog("Error output:" + output);
+                    return false;
                 }
             }
             catch (Exception ex)

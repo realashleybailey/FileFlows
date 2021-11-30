@@ -81,7 +81,7 @@ namespace FileFlows.Server.Helpers
                                 args.Logger.ELog("node returned error code:", CurrentNode?.Name);
                                 args.Result = NodeResult.Failure;
                                 flowCompleted = true;
-                                //break;
+                                break;
                             }
                             var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
                             if (outputNode == null)

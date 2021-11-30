@@ -16,6 +16,7 @@
 
         private FileFlows.Shared.Models.ShrinkageData Data;
         private Timer AutoRefreshTimer;
+        private bool HasData = false;
 
         private string lblOriginalSize, lblFinalSize, lblSavings, lblShrinkageTitle;
 
@@ -65,6 +66,7 @@
             else if (Data == null)
                 Data = new FileFlows.Shared.Models.ShrinkageData();
 #endif
+            HasData = Data.FinalSize > 0 && Data.OriginalSize > 0;
 
             await Dashboard.jsFunctions.InvokeVoidAsync("InitPieChart", this.Uid, 
                 new [] { Data.FinalSize, Data.OriginalSize - Data.FinalSize }, 

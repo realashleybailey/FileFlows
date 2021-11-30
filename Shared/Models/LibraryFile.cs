@@ -12,6 +12,9 @@ namespace FileFlows.Shared.Models
 
         public ObjectReference Library { get; set; }
 
+        public long OriginalSize { get; set; }
+        public long FinalSize { get; set; }
+
         public DateTime ProcessingStarted { get; set; }
         public DateTime ProcessingEnded { get; set; }
 

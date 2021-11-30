@@ -1,29 +1,31 @@
 {
   "ProductName": "FileFlows",
   "Labels": {
-    "VersionNumber":"Version: {version}",
+    "VersionNumber": "Version: {version}",
     "Save": "Save",
     "Saving": "Saving",
     "Execute": "Execute",
     "Executing": "Executing",
     "Cancel": "Cancel",
-    "Close":"Close",
-    "Select":"Select",
-    "Yes":"Yes",
-    "No":"No",
-    "Ok":"OK",
+    "Close": "Close",
+    "Select": "Select",
+    "Yes": "Yes",
+    "No": "No",
+    "Ok": "OK",
     "Add": "Add",
     "Edit": "Edit",
-    "Update":"Update",
-    "Refresh":"Refresh",
-    "Name":"Name",
-    "Log":"Log",
+    "Update": "Update",
+    "Refresh": "Refresh",
+    "Name": "Name",
+    "Log": "Log",
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
-    "Confirm":"Confirm",
-    "Prompt":"Prompt",
-    "SelectOne":"Select One"
+    "Confirm": "Confirm",
+    "Prompt": "Prompt",
+    "SelectOne": "Select One",
+    "Increase": "Increase",
+    "Decrease": "Decrease"
   },
   "Dialogs":{
     "FileBrowser":{
@@ -66,7 +68,13 @@
   },
   "Pages": {
     "Dashboard":{
-      "Title":"Home",
+      "Title": "Home",
+      "Labels": {
+        "ShrinkageTitle": "Storage Saved",
+        "FinalSize": "Final Size",
+        "OriginalSize": "Original Size",
+        "Savings": "Savings"
+      },
       "ErrorMessages":{
         "LogFailed":"Failed to retrieve log for worker"
       },

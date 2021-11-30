@@ -1,1 +1,87 @@
-.status-picker{width:100%;margin-top:-1rem;margin-bottom:1rem;display:flex;flex-direction:row}.status-picker .status{flex-basis:100%;border:solid 1px var(--accent);position:relative;filter:opacity(0.4);padding:.5rem;text-align:center}.status-picker .status .icon{margin-right:1rem}.status-picker .status:hover{filter:unset;cursor:pointer;background-image:linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;box-shadow:inset 0 -3px 0 0 var(--accent) !important}.status-picker .status.active{filter:unset}.status-picker .status .name{display:none}@media screen and (min-width: 769px){.status-picker{height:5rem}.status-picker .status{padding:unset;text-align:unset}.status-picker .status .icon{left:1rem;top:.85rem;font-size:3rem;position:absolute;width:3rem;text-align:center;margin-right:unset}.status-picker .status .count{display:block;font-size:3rem;line-height:3rem;padding:0;margin:0;text-align:left;margin-left:5.5rem;position:relative;top:.25rem}.status-picker .status .name{text-align:left;margin-left:5.5rem;font-size:.8rem;display:unset}.page-table ::deep .rz-data-grid{top:1.75rem !important}}.page-table{position:relative !important;flex-grow:1;display:flex;flex-direction:column;left:unset;right:unset;bottom:unset;top:unset}.page-table ::deep .rz-data-grid{position:absolute;top:4rem;left:0;right:0;bottom:0}
+﻿.status-picker {
+  width: 100%;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: row;
+}
+.status-picker .status {
+  flex-basis: 100%;
+  border: solid 1px var(--accent);
+  position: relative;
+  filter: opacity(0.4);
+  padding: 0.5rem;
+  text-align: center;
+}
+.status-picker .status .icon {
+  margin-right: 1rem;
+}
+.status-picker .status:hover {
+  filter: unset;
+  cursor: pointer;
+  background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+  box-shadow: inset 0 -3px 0 0 var(--accent) !important;
+}
+.status-picker .status.active {
+  filter: unset;
+}
+.status-picker .status .name {
+  display: none;
+}
+
+@media screen and (min-width: 769px) {
+  .status-picker {
+    height: 5rem;
+  }
+  .status-picker .status {
+    padding: unset;
+    text-align: unset;
+  }
+  .status-picker .status .icon {
+    left: 1rem;
+    top: 0.85rem;
+    font-size: 3rem;
+    position: absolute;
+    width: 3rem;
+    text-align: center;
+    margin-right: unset;
+  }
+  .status-picker .status .count {
+    display: block;
+    font-size: 3rem;
+    line-height: 3rem;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    margin-left: 5.5rem;
+    position: relative;
+    top: 0.25rem;
+  }
+  .status-picker .status .name {
+    text-align: left;
+    margin-left: 5.5rem;
+    font-size: 0.8rem;
+    display: unset;
+  }
+
+  .page-table ::deep .rz-data-grid {
+    top: 1.75rem !important;
+  }
+}
+.page-table {
+  position: relative !important;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  left: unset;
+  right: unset;
+  bottom: unset;
+  top: unset;
+}
+.page-table ::deep .rz-data-grid {
+  position: absolute;
+  top: 4rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

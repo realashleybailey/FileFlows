@@ -117,6 +117,7 @@ namespace FileFlows.Server.Workers
                 Executor.Flow = flow;
                 Executor.OnPartPercentageUpdate += OnPartPercentageUpdate;
                 Executor.OnStepChange += OnStepChange;
+                libFile.OriginalSize = file.Length;
                 Task<Plugin.NodeParameters> task = null;
                 try
                 {
@@ -132,6 +133,7 @@ namespace FileFlows.Server.Workers
                 Logger.Instance.DLog("FlowWorker.Executor.Status: " + task.Result.Result);
                 libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
                 libFile.OutputPath = task.Result.WorkingFile;
+                libFile.FinalSize = new FileInfo(libFile.OutputPath).Length;                
                 libFile.ProcessingEnded = System.DateTime.Now;
                 DbHelper.Update(libFile);
             }

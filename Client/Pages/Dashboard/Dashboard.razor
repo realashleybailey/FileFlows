@@ -13,99 +13,123 @@
     </Head>
 
     <Body>
-        <div class="dashboard-wrapper">
-            <div class="dashboard">
+        <CascadingValue Value="this" IsFixed="true">
+            <div class="dashboard-wrapper">
+                <div class="dashboard">
 
-                @for (int i = 0; i < Workers.Count; i++)
-                {
-                    var worker = Workers[i];
-                    var waiting = worker.Status == FileFlows.Shared.Models.ProcessStatus.Waiting;
-                    <div class="worker-wrapper @(waiting ? "waiting" : "")">
-                        <div class="chart-wrapper">
-                            <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>
-                        </div>
-                        <div class="worker-info">
-                            @if (waiting)
-                            {
-                                <span class="waiting-icon"><i class="fas fa-bed"></i></span>
-                                <span class="waiting-message">@lblWaiting</span>
-                            }
-                            else
-                            {
-                                <span class="label-value current">
-                                    <span class="label">@lblFile</span>
-                                    <span class="value">@worker.RelativeFile</span>
-                                </span>
-                                <span class="label-value working-file">
-                                    <span class="label">@lblWorkingFile</span>
-                                    <span class="value">@worker.WorkingFile</span>
-                                </span>
-                                <span class="label-value library">
-                                    <span class="label">@lblLibrary</span>
-                                    <span class="value">@worker.Library.Name</span>
-                                </span>
-                                <span class="label-value uid">
-                                    <span class="label">@lblUid</span>
-                                    <span class="value">@worker.CurrentUid</span>
-                                </span>
-                                <span class="label-value current-step">
-                                    <span class="label">@lblCurrentStep</span>
-                                    <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
-                                </span>
-                                <span class="label-value processing-time">
-                                    <span class="label">@lblProcessingTime</span>
-                                    <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
-                                </span>
-                                <div class="actions-wrapper">
-                                    <div class="actions">
-                                        <RadzenButton Click="() => LogClicked(worker)" Text="@lblLog" />
-                                        <RadzenButton Click="() => CancelClicked(worker)" Text="@lblCancel" />
+                    @for (int i = 0; i < Workers.Count; i++)
+                    {
+                        var worker = Workers[i];
+                        var waiting = worker.Status == FileFlows.Shared.Models.ProcessStatus.Waiting;
+                        <div class="worker-wrapper @(waiting ? "waiting" : "")">
+                            <div class="chart-wrapper">
+                                <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>
+                            </div>
+                            <div class="worker-info">
+                                @if (waiting)
+                                {
+                                    <span class="waiting-icon"><i class="fas fa-bed"></i></span>
+                                    <span class="waiting-message">@lblWaiting</span>
+                                }
+                                else
+                                {
+                                    <span class="label-value current">
+                                        <span class="label">@lblFile</span>
+                                        <span class="value">@worker.RelativeFile</span>
+                                    </span>
+                                    <span class="label-value working-file">
+                                        <span class="label">@lblWorkingFile</span>
+                                        <span class="value">@worker.WorkingFile</span>
+                                    </span>
+                                    <span class="label-value library">
+                                        <span class="label">@lblLibrary</span>
+                                        <span class="value">@worker.Library.Name</span>
+                                    </span>
+                                    <span class="label-value uid">
+                                        <span class="label">@lblUid</span>
+                                        <span class="value">@worker.CurrentUid</span>
+                                    </span>
+                                    <span class="label-value current-step">
+                                        <span class="label">@lblCurrentStep</span>
+                                        <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
+                                    </span>
+                                    <span class="label-value processing-time">
+                                        <span class="label">@lblProcessingTime</span>
+                                        <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
+                                    </span>
+                                    <div class="actions-wrapper">
+                                        <div class="actions">
+                                            <RadzenButton Click="() => LogClicked(worker)" Text="@lblLog" />
+                                            <RadzenButton Click="() => CancelClicked(worker)" Text="@lblCancel" />
+                                        </div>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
+                    }
+                    
+                    <div class="shrinkage-chart">
+                        <FileFlows.Client.Components.Dashboard.Shrinkage></FileFlows.Client.Components.Dashboard.Shrinkage>
                     </div>
-                }
 
-                @if (Upcoming.Any())
-                {
-                    <div class="library-files upcoming @(Finished.Any() ? "" : "full-width")">
-                        <div class="title"><span>@lblUpcoming</span></div>
-                        <div class="table-wrapper">
-                            <RadzenDataGrid Data="@Upcoming" TItem="LibraryFile">
-                                <Columns>
-                                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
-                                    Width="20rem" Frozen="true" />
-                                </Columns>
-                            </RadzenDataGrid>
+                    @if (Upcoming.Any())
+                    {
+                        <div class="library-files upcoming @(Finished.Any() ? "" : "full-width")">
+                            <div class="title"><span>@lblUpcoming</span></div>
+                            <div class="table-wrapper">
+                                <RadzenDataGrid Data="@Upcoming" TItem="LibraryFile">
+                                    <Columns>
+                                        <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
+                                        Width="20rem" Frozen="true" />
+                                    </Columns>
+                                </RadzenDataGrid>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
 
-                @if (Finished.Any())
-                {
-                    <div class="library-files finished @(Upcoming.Any() ? "" : "full-width")">
-                        <div class="title"><span>@lblRecentlyFinished</span></div>
-                        <div class="table-wrapper">
-                            <RadzenDataGrid Data="@Finished" TItem="LibraryFile">
-                                <Columns>
-                                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
-                                    Width="20rem" Frozen="true" />
-                                    <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time"
-                                    Width="6rem" FormatString="{0:hh\:mm\:ss}">
-                                        <Template Context="data">
-                                            <a href="" @onclick="@(() => ShowFileInfo(data))"
-                                            @onclick:preventDefault>@data.ProcessingTime.ToString(@"hh\:mm\:ss")</a>
-                                        </Template>
-                                    </RadzenDataGridColumn>
-                                </Columns>
-                            </RadzenDataGrid>
+                    @if (Finished.Any())
+                    {
+                        <div class="library-files finished @(Upcoming.Any() ? "" : "full-width")">
+                            <div class="title"><span>@lblRecentlyFinished</span></div>
+                            <div class="table-wrapper">
+                                <RadzenDataGrid Data="@Finished" TItem="LibraryFile">
+                                    <Columns>
+                                        <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
+                                        Width="20rem" Frozen="true" />
+                                        <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time"
+                                        Width="6rem" FormatString="{0:hh\:mm\:ss}">
+                                            <Template Context="data">
+                                                <a href="" @onclick="@(() => ShowFileInfo(data))"
+                                                @onclick:preventDefault>@data.ProcessingTime.ToString(@"hh\:mm\:ss")</a>
+                                            </Template>
+                                        </RadzenDataGridColumn>                                    
+                                        <RadzenDataGridColumn TItem="LibraryFile" Property="FinalSize" Title="Size" Width="6rem">
+                                            <Template Context="data">
+                                                @{
+                                                    long fs = data.FinalSize;
+                                                    long os = data.OriginalSize;
+                                                    int width = (int)((((double)fs) / os) * 100);
+                                                    bool bigger = width > 100;
+                                                    if (width > 100)
+                                                        width = 100;
+                                                    string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
+                                                }
+                                                @if(fs > 0){
+                                                    <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
+                                                        <div class="amount" style="width:calc(@(width)% - 2px)"></div>
+                                                    </div>
+                                                }
+                                            </Template>
+                                        </RadzenDataGridColumn>
+                                    </Columns>
+                                </RadzenDataGrid>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
 
-                <div class="spacer"></div>
+                    <div class="spacer"></div>
+                </div>
             </div>
-        </div>
+        </CascadingValue>
     </Body>
 </PageView>

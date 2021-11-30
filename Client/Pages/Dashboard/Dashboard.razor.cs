@@ -24,12 +24,12 @@ namespace FileFlows.Client.Pages
         public readonly List<LibraryFile> Finished = new List<LibraryFile>();
         private bool _needsRendering = false;
 
-        [Inject] private IJSRuntime jSRuntime { get; set; }
+        [Inject] public IJSRuntime jSRuntime { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
 
-        private IJSObjectReference jsFunctions;
+        public IJSObjectReference jsFunctions;
 
         private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished, lblWorkingFile, lblUid, lblLibrary;
         private Timer AutoRefreshTimer;

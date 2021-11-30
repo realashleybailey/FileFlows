@@ -97,6 +97,25 @@
                         FormatString="{0:hh\:mm\:ss}" Visible=@(SelectedStatus !=
                         FileFlows.Shared.Models.FileStatus.Unprocessed)>
                     </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="LibraryFile" Property="FinalSize" Title="Size" Width="6rem"
+                        Visible=@(SelectedStatus == FileFlows.Shared.Models.FileStatus.Processed && !mobile)>
+                        <Template Context="data">
+                            @{
+                                long fs = data.FinalSize;
+                                long os = data.OriginalSize;
+                                int width = (int)((((double)fs) / os) * 100);
+                                bool bigger = width > 100;
+                                if (width > 100)
+                                    width = 100;
+                                string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
+                            }
+                            @if(fs > 0){
+                                <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
+                                    <div class="amount" style="width:calc(@(width)% - 2px)"></div>
+                                </div>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="LibraryFile" Property="OutputPath" Title="Output" Width="30rem"
                         Visible=@(SelectedStatus == FileFlows.Shared.Models.FileStatus.Processed && !mobile) />
                 </Columns>

@@ -38,5 +38,17 @@
   {
     "outputFile": "Components/Inputs/InputKeyValue/InputKeyValue.razor.css",
     "inputFile": "Components/Inputs/InputKeyValue/InputKeyValue.razor.scss"
+  },
+  {
+    "outputFile": "Pages/LibraryFiles/LibraryFiles.razor.css",
+    "inputFile": "Pages/LibraryFiles/LibraryFiles.razor.scss"
+  },
+  {
+    "outputFile": "Pages/Dashboard/Dashboard.razor.css",
+    "inputFile": "Pages/Dashboard/Dashboard.razor.scss"
+  },
+  {
+    "outputFile": "Components/Dashboard/Shrinkage/Shrinkage.razor.css",
+    "inputFile": "Components/Dashboard/Shrinkage/Shrinkage.razor.scss"
   }
 ]

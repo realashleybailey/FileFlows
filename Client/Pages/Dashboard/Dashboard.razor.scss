@@ -18,20 +18,38 @@
     display:flex;
     flex-direction: column;
 }
-@media screen and (min-width: 850px) {  
+@media screen and (min-width: 850px) {
     .dashboard {
         > div {
-            margin:unset;
+            margin: unset;
         }
-        display:grid;
-        grid-gap: 2rem;
-        grid-template-columns: repeat(2, calc(50% - 1rem));
 
-        .worker-wrapper{
-            grid-column: 1 / 3;
+        display: grid;
+        grid-gap: 2rem;
+        grid-template-columns: repeat(6, calc(16.5% - 2rem));
+
+        .worker-wrapper {
+            grid-column: 1 / 5;
         }
+
+        .shrinkage-chart {
+            grid-column: 5 / 7;
+
+            ::deep > div > div {
+                margin: auto;
+            }
+        }
+
         .library-files.full-width {
-            grid-column: 1 / 3;
+            grid-column: 1 / 7;
+        }
+
+        .library-files:not(.full-width).upcoming {
+            grid-column: 1 / 4;
+        }
+
+        .library-files:not(.full-width).finished {
+            grid-column: 4 / 7;
         }
     }
     .waiting-icon {

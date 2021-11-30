@@ -29,7 +29,7 @@ namespace FileFlows.Server.Helpers
 
                 args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
 
-                var fiInput = new System.IO.FileInfo(input);
+                var fiInput = new FileInfo(input);
                 args.Result = NodeResult.Success;
                 args.Logger = Logger ?? new FlowLogger()
                 {

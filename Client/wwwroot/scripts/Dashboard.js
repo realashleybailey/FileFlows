@@ -4,7 +4,7 @@ export function InitChart(data, lblOverall, lblCurrent) {
         let worker = data[i];
         let workerWaiting = worker.status === 0;
         if (workerWaiting) {
-            DestroyChart(i);
+            DestroyChart('chart-' + i);
             continue;
         }
         let overall = worker.totalParts == 0 ? 100 : (worker.currentPart / worker.totalParts) * 100;
@@ -78,9 +78,54 @@ export function InitChart(data, lblOverall, lblCurrent) {
     }
 }
 
-export function DestroyChart(index) {
+var PieCharts = {};
+
+export function InitPieChart(elementId, series, labels) {
+    if (PieCharts[elementId]) {
+        PieCharts[elementId].updateSeries(series);
+        return;
+    }
+    var options = {
+        series: series,
+        colors: ['var(--accent)', 'var(--input-background)'],
+        chart: {
+            width: 280,
+            type: 'pie',
+            foreColor: 'var(--color)',
+        },
+        labels: labels,
+        legend: {
+            show: false
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            show: false,
+            colors: ['black']
+        },
+        yaxis: {
+            labels: {
+                formatter: function (val) {
+                    let sizes = ["B", "KB", "MB", "GB", "TB"];
+                    let order = 0;
+                    while (val >= 1024 && order < sizes.length - 1) {
+                        order++;
+                        val = val / 1024;
+                    }
+                    return val.toFixed(2) + " " + sizes[order];
+                }
+            },
+        },
+    };
+    DestroyChart(elementId);
+    PieCharts[elementId] = new ApexCharts(document.getElementById(elementId), options);
+    PieCharts[elementId].render();
+}
+
+export function DestroyChart(id) {
     try {
-        ApexCharts.exec('chart-' + index, 'destroy');
+        ApexCharts.exec(id, 'destroy');
     } catch (err) {
     }
 

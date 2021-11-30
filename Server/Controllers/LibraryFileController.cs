@@ -3,6 +3,7 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
+    using Shared.Models;
 
     [Route("/api/library-file")]
     public class LibraryFileController : Controller
@@ -117,6 +118,26 @@ namespace FileFlows.Server.Controllers
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete
             DbHelper.Delete<LibraryFile>(model.Uids);
+        }
+
+        [HttpGet("shrinkage")]
+        public ShrinkageData Shrinkage()
+        {
+            double original = 0;
+            double final = 0;
+            var files = DbHelper.Select<LibraryFile>();
+            foreach(var file in files)
+            {
+                if (file.Status != FileStatus.Processed || file.OriginalSize == 0 || file.FinalSize == 0)
+                    continue;
+                original += file.OriginalSize;
+                final += file.FinalSize;
+            }
+            return new ShrinkageData
+            {
+                FinalSize = final,
+                OriginalSize = original
+            };
         }
     }
 }

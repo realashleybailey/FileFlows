@@ -1,6 +1,6 @@
 .navbar-toggler {
     background-color: transparent;
-    .fas {
+    .fas, .far {
         font-size:1.3rem;
         padding-top:0.2rem;
     }
@@ -32,7 +32,7 @@
     }
 }
 
-.fas {
+.fas, .far {
     width: 2rem;
     font-size: 1.1rem;
     vertical-align: text-top;

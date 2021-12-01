@@ -63,14 +63,14 @@
                 </div>
             </div>
             @{
-                bool paging = Data != null && Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
+                bool paging = false; // Data != null && Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
                 bool mobile = App.Instance.IsMobile;
                 //string lfNameWidth = mobile ? "60vw" : "20rem";
                 string lfNameWidth = "20rem";
                 bool sorting = SelectedStatus != FileStatus.Unprocessed;
             }
 
-            <RadzenDataGrid @ref="DataGrid" Data="@DisplayData" PageSizeOptions="@PageSizeOptions"
+            <RadzenDataGrid @ref="DataGrid" PageSizeOptions="@PageSizeOptions" Data="@Data" 
                 RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
                 @bind-Value=@SelectedItems AllowColumnResize="true" AllowPaging="@paging" AllowSorting="@sorting"
                 TItem="LibraryFile">

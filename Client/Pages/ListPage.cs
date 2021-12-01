@@ -26,6 +26,8 @@ namespace FileFlows.Client.Pages
         public string lblAdd, lblEdit, lblDelete, lblDeleting, lblRefresh;
 
         public abstract string ApIUrl { get; }
+        private bool _needsRendering = false;
+
 
 
         public List<T> _Data = new List<T>();
@@ -88,15 +90,29 @@ namespace FileFlows.Client.Pages
         {
             await Task.CompletedTask;
         }
+        private async Task WaitForRender()
+        {
+            _needsRendering = true;
+            StateHasChanged();
+            while (_needsRendering)
+            {
+                await Task.Delay(50);
+            }
+        }
+        protected override void OnAfterRender(bool firstRender)
+        {
+            _needsRendering = false;
+        }
+
 
         public virtual async Task Load()
         {
             Blocker.Show();
-            this.StateHasChanged();
+            await this.WaitForRender();
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Get<List<T>>(FetchUrl);
+                var result = await FetchData();
                 if (result.Success)
                 {
                     this.Data = result.Data;
@@ -106,8 +122,13 @@ namespace FileFlows.Client.Pages
             finally
             {
                 Blocker.Hide();
-                this.StateHasChanged();
+                await this.WaitForRender();
             }
+        }
+
+        protected virtual Task<RequestResult<List<T>>> FetchData()
+        {
+            return HttpHelper.Get<List<T>>(FetchUrl);
         }
 
         protected virtual void LoadData()//LoadDataArgs args)

@@ -9,6 +9,7 @@ namespace FileFlows.Client.Pages
     using System.Linq;
     using System;
     using Microsoft.AspNetCore.Components.Web;
+    using Radzen;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
@@ -20,12 +21,34 @@ namespace FileFlows.Client.Pages
 
         private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
+        private int Count;
+
         private void SetSelected(LibraryStatus status)
         {
             SelectedStatus = status.Status;
-            this.StateHasChanged();
             _ = this.Refresh();
         }
+
+        private async void LoadPagedData(LoadDataArgs args)
+        {
+            this.Blocker.Show();
+            this.StateHasChanged();
+            try
+            {
+                var result = await HttpHelper.Get<List<LibraryFile>>($"{FetchUrl}?skip={args.Skip}&top={args.Top}");
+                if (result.Success)
+                    this.Data = result.Data;
+            }
+            finally
+            {
+                this.Blocker.Hide();
+                this.StateHasChanged();
+            }
+        }
+        //protected virtual Task<RequestResult<List<LibraryFile>>> FetchData()
+        //{
+        //    return HttpHelper.Get<List<LibraryFile>>($"{FetchUrl}?skip=0&top=250");
+        //}
 
 
 #if (DEMO)
@@ -105,6 +128,8 @@ namespace FileFlows.Client.Pages
                     s.Name = Translater.Instant("Enums.FileStatus." + s.Status.ToString());
                 Statuses.Clear();
                 Statuses.AddRange(result.Data.OrderBy(x => { int index = order.IndexOf(x.Status); return index >= 0 ? index : 100; }));
+
+                this.Count = Statuses.Where(x => x.Status == SelectedStatus).Select(x => x.Count).FirstOrDefault();
             }
         }
 

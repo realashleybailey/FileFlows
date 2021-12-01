@@ -62,6 +62,7 @@ namespace FileFlows.Server.Workers
             {
                 timer = new System.Timers.Timer();
                 timer.Elapsed += TimerElapsed;
+                timer.SynchronizingObject = null;
                 timer.Interval = Seconds * 1_000;
                 timer.AutoReset = true;
                 timer.Start();
@@ -86,24 +87,26 @@ namespace FileFlows.Server.Workers
             if (Executing)
                 return; // dont let run twice
 
-            Executing = true;
-            try
+            _ = Task.Run(() =>
             {
-                Execute();
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.ELog($"Error in worker '{this.GetType().Name}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-            finally
-            {
-                Executing = false;
-            }
+                Executing = true;
+                try
+                {
+                    Execute();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.ELog($"Error in worker '{this.GetType().Name}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                }
+                finally
+                {
+                    Executing = false;
+                }
+            });
         }
 
         protected virtual void Execute()
         {
-
         }
     }
 }

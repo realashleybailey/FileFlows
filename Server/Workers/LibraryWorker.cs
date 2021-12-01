@@ -32,6 +32,8 @@ namespace FileFlows.Server.Workers
             Logger.Instance.DLog("################### Library worker triggered");
             var libController = new Controllers.LibraryController();
             var libaries = libController.GetAll();
+            var libraryFiles = DbHelper.Select<LibraryFile>();
+            var flows = DbHelper.Select<Flow>().ToDictionary(x => x.Uid, x => x);
             foreach (var library in libaries)
             {
                 if (library.Enabled == false)
@@ -42,12 +44,12 @@ namespace FileFlows.Server.Workers
                     continue;
                 }
 
-                var flow = library.Flow == null ? null : DbHelper.Single<Flow>(library.Flow.Uid);
-                if (flow == null || flow.Uid == Guid.Empty)
+                if (library.Flow == null || flows.ContainsKey(library.Flow.Uid) == false)
                 {
                     Logger.Instance.WLog($"Library '{library.Name}' flow not found");
                     continue;
                 }
+                var flow = flows[library.Flow.Uid];
 
                 var files = GetFiles(new DirectoryInfo(library.Path));
                 Regex regexFilter = null;
@@ -61,7 +63,7 @@ namespace FileFlows.Server.Workers
                     continue;
                 }
                 List<string> known = new ();
-                foreach(var libFile in DbHelper.Select<LibraryFile>())
+                foreach(var libFile in libraryFiles)
                 {
                     if(string.IsNullOrEmpty(libFile.Name) == false && known.Contains(libFile.Name.ToLower()) == false)
                         known.Add(libFile.Name.ToLower());
@@ -81,14 +83,7 @@ namespace FileFlows.Server.Workers
                     tasks.Add(GetLibraryFile(library, flow, file));
                 }
                 Task.WaitAll(tasks.ToArray());
-                foreach(var task in tasks)
-                {
-                    if(task.Result != null)
-                    {
-                        DbHelper.Update(task.Result);
-                        Logger.Instance.DLog("Found file to process: " + task.Result.Name);
-                    }
-                }
+                DbHelper.AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray());
             }
             Logger.Instance.DLog("Finished scanning libraries");
         }

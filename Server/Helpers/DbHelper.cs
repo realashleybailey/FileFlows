@@ -9,6 +9,7 @@ namespace FileFlows.Server.Helpers
     using FileFlows.Shared.Models;
     using System.Data.Common;
     using System.Diagnostics;
+    using System.Text;
 
     public class DbHelper
     {
@@ -89,6 +90,61 @@ namespace FileFlows.Server.Helpers
                     return new T();
                 return Convert<T>(dbObject);
             }
+        }
+
+        private static string SqlEscape(string input)
+        {
+            if (input == null)
+                return string.Empty;
+            return "'" + input.Replace("'", "''") + "'";
+        }
+
+        /// <summary>
+        /// This will batch insert many objects into thee datbase
+        /// </summary>
+        /// <param name="items">Items to insert</param>
+        internal static void AddMany(ViObject[] items)
+        {
+            if (items?.Any() != true)
+                return;
+            int max = 500;
+            int count = items.Length;
+
+            var serializerOptions = new System.Text.Json.JsonSerializerOptions
+            {
+                Converters = { new DataConverter(), new BoolConverter() }
+            };
+            for (int i = 0; i < count; i += max)
+            {
+                StringBuilder sql = new StringBuilder();
+                for (int j = i; j < i + max && j < count; j++)
+                {
+                    var obj = items[j];
+                    // need to case obj to (ViObject) here so the DataConverter is used
+                    string json = System.Text.Json.JsonSerializer.Serialize((ViObject)obj, serializerOptions);
+
+                    var type = obj.GetType();
+                    obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
+                    obj.Uid = Guid.NewGuid();
+                    obj.DateCreated = DateTime.Now;
+                    obj.DateModified = obj.DateCreated;
+
+                    sql.AppendLine($"insert into {nameof(DbObject)} (Uid, Name, Type, Data) values (" +
+                                   SqlEscape(obj.Uid.ToString()) + "," +
+                                   SqlEscape(obj.Name) + "," +
+                                   SqlEscape(type?.FullName ?? String.Empty) + "," +
+                                   SqlEscape(json) +
+                                   ");");
+                }
+                if(sql.Length > 0)
+                {
+                    using (var db = GetDb())
+                    {
+                        db.Execute(sql.ToString());
+                    }
+                }                    
+            }
+
         }
 
         public static T Single<T>(string andWhere, params object[] args) where T : ViObject, new()

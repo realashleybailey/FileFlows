@@ -37,12 +37,12 @@ namespace FileFlows.Server.Workers
                 System.IO.File.AppendAllText(LogFile, message + Environment.NewLine);
         }
 
-        internal string GetPreview()
+        internal string GetPreview(int lineCount = 50)
         {
             lock (log)
             {
-                if (log.Count > 50)
-                    return String.Join(Environment.NewLine, log.Skip(log.Count - 50));
+                if(lineCount > 0 && log.Count < lineCount)
+                    return String.Join(Environment.NewLine, log.Skip(log.Count - lineCount));
                 return String.Join(Environment.NewLine, log);
             }
         }

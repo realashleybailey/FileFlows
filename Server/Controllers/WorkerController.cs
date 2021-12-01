@@ -22,12 +22,12 @@ namespace FileFlows.Server.Controllers
         //}
 
         [HttpGet("{uid}/log")]
-        public string Log(Guid uid)
+        public string Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
         {
             var worker = FlowWorker.RegisteredFlowWorkers.FirstOrDefault(x => x.Status.Uid == uid);
             if (worker == null || worker.CurrentFlowLogger == null)
                 return string.Empty;
-            return worker.CurrentFlowLogger.GetPreview();
+            return worker.CurrentFlowLogger.GetPreview(lineCount);
         }
 
         [HttpDelete("{uid}")]

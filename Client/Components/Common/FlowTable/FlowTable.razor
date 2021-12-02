@@ -1,34 +1,64 @@
 ﻿@namespace FileFlows.Client.Components.Common
 @typeparam TItem
 
-<CascadingValue Value="this">
-    @ChildContent
-</CascadingValue>
-
 <div class="flowtable">
-    <div class="flowtable-header">
-        <div class="flowtable-row flowtable-header-row">
-            @foreach(var col in ActualColumns)
+
+    <CascadingValue Value="this">
+        @Columns
+
+        <div class="flowtable-toolbar">
+        
+            <div class="flowtable-toolbar-buttons">
+                @ToolBar
+            </div>
+            <div class="flowtable-toolbar-filter">
+                <input type="text" @bind-value="FilterText" @bind-value:event="oninput" autocomplete="off" />
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+    </CascadingValue>
+
+    <div class="flowtable-data">
+
+        <div class="flowtable-header">
+            <div class="flowtable-row flowtable-header-row">
+                @if(Selection != SelectionMode.None)
+                {
+                    <span style="width:2rem;min-width:2rem;max-width:2rem">
+                        <input type="checkbox" @onchange="(e) => SelectAll(e)" checked="@(DisplayData.Any(i => SelectedItems != null && SelectedItems.Contains(i.Key)))"  />                        
+                    </span>
+                }
+                @foreach(var col in ColumnList)
+                {
+                    <span class="@col.ClassName @(col.Hidden ? "hidden" : "")" style="@col.Style">
+                        @col.Header
+                    </span>
+                }
+            </div>
+        </div>
+        <div class="flowtable-body">
+            @if (Data != null)
             {
-                <span class="@col.ClassName" style="@col.Style">
-                    @col.Header
-                </span>
+                <Virtualize Items="@DisplayData" Context="item" ItemSize="25"  OverscanCount="4">
+                    @{
+                        bool selected = Selection != SelectionMode.None && SelectedItems?.Contains(item.Key) == true;
+                    }
+                    <div class="flowtable-row @(selected ? "selected" : "")" @ondblclick="() => OnDoubleClick(item.Key)" @onclick="() => OnClick(item.Key)">
+                        @if(Selection!= SelectionMode.None)
+                        {
+                            <span style="width:2rem;min-width:2rem;max-width:2rem">
+                                <input type="checkbox" @onchange="(e) => CheckItem(e, item.Key)" checked="@(SelectedItems?.Contains(item.Key) == true)"  />                        
+                            </span>
+                        }
+                        @foreach (var col in ColumnList)
+                        {
+                            <span class="@col.ClassName @(col.Hidden ? "hidden": "")" style="@col.Style">
+                                @col.Cell(item.Key)
+                            </span>
+                        }
+                    </div>                        
+                </Virtualize>
             }
         </div>
-    </div>
-    <div class="flowtable-body">
-        @if (Data != null)
-        {
-            <Virtualize Items="@Data" Context="item" ItemSize="25"  OverscanCount="4">
-                <div class="flowtable-row">
-                    @foreach (var col in ActualColumns)
-                    {
-                        <span class="@col.ClassName" style="@col.Style">
-                            @col.Cell(item)
-                        </span>
-                    }
-                </div>                        
-            </Virtualize>
-        }
     </div>
 </div>

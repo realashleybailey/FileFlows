@@ -42,43 +42,19 @@
             }
         </div>
 
-        <div class="page-table has-filter">
-            <div class="table-toolbar">
-                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span
-                        class="fas fa-edit"></span>
-                    @lblEdit</button>
-                <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
-                        class="fas fa-trash"></span>
-                    @lblDelete</button>
-                <button @onclick="@Refresh"><span class="fas fa-sync-alt"></span> @lblRefresh</button>
+        <FlowTable @ref="Table" Data="@DisplayData" TItem="LibraryFile" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>                    
+                <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="LibraryFile" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+                
                 @if (SelectedStatus == FileStatus.Unprocessed)
                 {
-                    <button @onclick="@MoveToTop"><span class="far fa-caret-square-up"></span> @lblMoveToTop</button>
+                    <FlowTableButton TItem="LibraryFile" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
                 }
+            </ToolBar>
 
-
-                <div class="filter">
-                    <input type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" autocomplete="off" />
-                    <i class="fas fa-search"></i>
-                </div>
-            </div>
-            @{
-                bool paging = false; // Data != null && Data.Count > (DataGrid == null ? 250 : DataGrid.PageSize);
-                bool mobile = App.Instance.IsMobile;
-                //string lfNameWidth = mobile ? "60vw" : "20rem";
-                string lfNameWidth = "20rem";
-                bool sorting = SelectedStatus != FileStatus.Unprocessed;            
-            }
-
-            <FlowTable Data="@DisplayData" TItem="LibraryFile">
-                <FlowTableColumn TItem="LibraryFile" Width="2rem">
-                    <Header>
-                        <input type="checkbox" @onchange="(e) => SelectAll(e)" checked="@(DisplayData.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"  />                        
-                    </Header>
-                    <Cell Context="item">
-                        <input type="checkbox" @onchange="(e) => CheckItem(e, item)" checked="@(SelectedItems?.Contains(item) == true)"  />
-                    </Cell>
-                </FlowTableColumn>
+            <Columns>
                 <FlowTableColumn TItem="LibraryFile">
                     <Header>
                         Name
@@ -103,85 +79,38 @@
                         <span>@item.Library.Name</span>
                     </Cell>
                 </FlowTableColumn>
-            </FlowTable>
+                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed)">
+                    <Header>
+                        Time
+                    </Header>
+                    <Cell Context="item">
+                        <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
+                    <Header>
+                        Size
+                    </Header>
+                    <Cell Context="item">
+                        @{
+                            long fs = item.FinalSize;
+                            long os = item.OriginalSize;
+                            int width = (int)((((double)fs) / os) * 100);
+                            bool bigger = width > 100;
+                            if (width > 100)
+                                width = 100;
+                            string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
+                        }
+                        @if(fs > 0){
+                            <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
+                                <div class="amount" style="width:calc(@(width)% - 2px)"></div>
+                            </div>
+                        }
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
 
-            @*<div class="fake-table">
-                <div class="fake-table-header row">
-                    <span style="width:2rem">
-                        <RadzenCheckBox TriState="false" TValue="bool"
-                            Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                            Change="@(args => SelectAll())" />
-                    </span>
-                    <span class="fillspace">Name</span>
-                    <span style="width:10rem">Flow</span>
-                    <span style="width:10rem">Library</span>
-                </div>
-                <div class="fake-table-body">
-                    <Virtualize Items="@Data" Context="item"  ItemSize="25"  OverscanCount="4">
-                        <div class="fake-row row">
-                            <span style="width:2rem">
-                                <RadzenCheckBox TriState="false"
-                                    Value="@(SelectedItems != null && SelectedItems.Contains(item))" />
-                            </span>
-                            <span class="fillspace">@item.RelativePath</span>
-                            <span style="width:10rem">@item.Flow.Name</span>
-                            <span style="width:10rem">@item.Library.Name</span>
-                        </div>                        
-                    </Virtualize>
-                </div>
-            </div>*@
-@*
-            <RadzenDataGrid @ref="DataGrid" PageSizeOptions="@PageSizeOptions" Data="@Data" 
-                RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
-                @bind-Value=@SelectedItems AllowColumnResize="true" AllowPaging="@paging" AllowSorting="@sorting"
-                TItem="LibraryFile">
-                <Columns>
-                    <RadzenDataGridColumn TItem="LibraryFile" Width="40px" Sortable="false" Filterable="false"
-                        Frozen="true">
-                        <HeaderTemplate>
-                            <RadzenCheckBox TriState="false" TValue="bool"
-                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                                Change="@(args => SelectAll())" />
-                        </HeaderTemplate>
-                        <Template Context="data">
-                            <RadzenCheckBox TriState="false"
-                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name" Width="@lfNameWidth"
-                        Frozen="true" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Flow.Name" Title="Flow" Width="12rem"
-                        Visible="!mobile" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="Library.Name" Title="Library" Width="12rem"
-                        Visible="!mobile" />
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time" Width="6rem"
-                        FormatString="{0:hh\:mm\:ss}" Visible=@(SelectedStatus !=
-                        FileFlows.Shared.Models.FileStatus.Unprocessed)>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="FinalSize" Title="Size" Width="6rem"
-                        Visible=@(SelectedStatus == FileFlows.Shared.Models.FileStatus.Processed && !mobile)>
-                        <Template Context="data">
-                            @{
-                                long fs = data.FinalSize;
-                                long os = data.OriginalSize;
-                                int width = (int)((((double)fs) / os) * 100);
-                                bool bigger = width > 100;
-                                if (width > 100)
-                                    width = 100;
-                                string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
-                            }
-                            @if(fs > 0){
-                                <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
-                                    <div class="amount" style="width:calc(@(width)% - 2px)"></div>
-                                </div>
-                            }
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="LibraryFile" Property="OutputPath" Title="Output" Width="30rem"
-                        Visible=@(SelectedStatus == FileFlows.Shared.Models.FileStatus.Processed && !mobile) />
-                </Columns>
-            </RadzenDataGrid>*@
-        </div>
     </Body>
 
 </PageView>

@@ -1,0 +1,3 @@
+﻿button:disabled {
+  color: rgba(var(--color-rgb), 0.4) !important;
+}

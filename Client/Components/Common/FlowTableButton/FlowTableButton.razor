@@ -1,0 +1,11 @@
+﻿@namespace FileFlows.Client.Components.Common
+@typeparam TItem
+
+
+<button @onclick="@OnClick" disabled="@(Enabled == false)">
+    @if (string.IsNullOrEmpty(Icon) == false)
+    {
+        <span class="icon @Icon"></span>
+    }
+    @Label
+</button>

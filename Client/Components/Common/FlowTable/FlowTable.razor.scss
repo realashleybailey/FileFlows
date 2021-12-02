@@ -1,14 +1,73 @@
-﻿.fillspace {
+﻿$borderColor: var(--input-background);
+
+.fillspace {
     flex-grow: 1;
 }
 
-.flowtable-row {
-    border: solid 1px var(--input-background);
+.flowtable-toolbar {
     display: flex;
     flex-direction: row;
 
+    .flowtable-toolbar-buttons {
+        flex-grow: 1;
+    }
+
+    .flowtable-toolbar-filter {
+        width: 16rem;
+        position:relative;
+
+        input {
+            width: 100%;
+            line-height: 1rem;
+            padding-right:1.75rem;
+        }
+        i{
+            position:absolute;
+            right:8px;
+            top:7px;
+            font-size:0.8rem;
+        }
+    }
+
+    ::deep button {
+        text-transform: uppercase;
+        background: transparent;
+        color: rgba(var(--color-rgb), 0.8);
+        border: unset;
+        border-radius: 0 !important;
+        font-size: 0.8rem;
+
+        &:hover {
+            color: var(--color-rgb);
+        }
+
+        .icon {
+            margin-right: 0.25rem;
+        }
+    }
+}
+
+.flowtable {
+    position: relative !important;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    left: unset;
+    right: unset;
+    bottom: unset;
+    top: unset;
+}
+
+.flowtable-row {
+    border: solid 1px $borderColor;
+    display: flex;
+    flex-direction: row;
+    user-select: none;
+
     &:not(.flowtable-header-row) {
         border-top: none;
+        border-right: none;
+        border-left: none;
     }
 
     > span {
@@ -17,6 +76,10 @@
         white-space: nowrap;
         height: 2.2rem;
         line-height: 2.2rem;
+    }
+
+    &.selected {
+        background: rgba(var(--accent-rgb), 0.3);
     }
 }
 .flowtable-header-row {
@@ -29,9 +92,24 @@
     height: calc(100% - 2rem);
     overflow-y: scroll;
     overflow-x: hidden;
+    border-left: solid 1px $borderColor;
+    border-bottom: solid 1px $borderColor;
 }
 
-::deep .rz-chkbox {
-    position:relative;
-    left:0.25rem;
+.flowtable-data {
+    position: absolute;
+    top: 1.75rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.flowtable-body::-webkit-scrollbar-track {
+    border-right: solid 1px $borderColor;
+    border-left: solid 1px $borderColor;
+}
+
+.hidden {
+    display:none;
+    width:unset !important;
 }

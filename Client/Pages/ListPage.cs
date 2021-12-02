@@ -14,12 +14,7 @@ namespace FileFlows.Client.Pages
 
     public abstract class ListPage<T> : ComponentBase where T : ViObject
     {
-        public string FilterText { get; set; }
-        protected virtual void UpdateFilter()
-        {
-            //this.DataGrid.LoadData.InvokeAsync();
-            LoadData();
-        }
+
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] public Editor Editor { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
@@ -41,28 +36,6 @@ namespace FileFlows.Client.Pages
             }
         }
 
-        public List<T> DisplayData;
-        private RadzenDataGrid<T> _DataGrid;
-        public IEnumerable<int> PageSizeOptions = new int[] { 50, 100, 250, 500 };
-        public RadzenDataGrid<T> DataGrid
-        {
-            get => _DataGrid;
-            set
-            {
-                if (_DataGrid == null && value != null)
-                {
-#pragma warning disable BL0005
-                    value.PageSize = 250;
-#pragma warning restore BL0005
-                }
-                _DataGrid = value;
-            }
-        }
-
-
-        public IList<T> SelectedItems;
-
-
         protected override void OnInitialized()
         {
             lblAdd = Translater.Instant("Labels.Add");
@@ -77,14 +50,6 @@ namespace FileFlows.Client.Pages
         public virtual async Task Refresh() => await Load();
 
         public virtual string FetchUrl => ApIUrl;
-
-        public virtual void SelectAll()
-        {
-            if (this.SelectedItems?.Any() == true)
-                this.SelectedItems = new List<T>();
-            else
-                this.SelectedItems = this.DisplayData?.ToList() ?? new List<T>();
-        }
 
         public async virtual Task PostLoad()
         {
@@ -142,13 +107,10 @@ namespace FileFlows.Client.Pages
             DisplayData = Data.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains(ft)).ToList();
         }
 
-        public async Task RowDoubleClicked(DataGridRowMouseEventArgs<T> item)
+        private async Task OnDoubleClick(T item)
         {
-            this.SelectedItems.Clear();
-            this.SelectedItems.Add(item.Data);
-            await Edit(item.Data);
+            await Edit(item);
         }
-
 
 
         public async Task Edit()

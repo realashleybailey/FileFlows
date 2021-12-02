@@ -11,6 +11,7 @@ namespace FileFlows.Client.Pages
     using Microsoft.AspNetCore.Components.Web;
     using Radzen;
     using Microsoft.AspNetCore.Components;
+    using FileFlows.Client.Components.Common;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
@@ -25,6 +26,8 @@ namespace FileFlows.Client.Pages
         private int Count;
 
         private List<LibraryFile> FilteredData = new List<LibraryFile>();
+
+        private FlowTable<LibraryFile> Table { get; set; }
 
         private void SetSelected(LibraryStatus status)
         {
@@ -147,15 +150,15 @@ namespace FileFlows.Client.Pages
             return;
 #else
 
-            var uids = this.SelectedItems?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+            var selected = Table.GetSelected();
+            var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
             if (uids.Length == 0)
                 return; // nothing to delete
 
             Blocker.Show();
             try
             {
-                await HttpHelper.Post(ApIUrl + "/move-to-top", new ReferenceModel { Uids = uids });
-                this.SelectedItems.Clear();
+                await HttpHelper.Post(ApIUrl + "/move-to-top", new ReferenceModel { Uids = uids });                
             }
             finally
             {
@@ -163,38 +166,6 @@ namespace FileFlows.Client.Pages
             }
             await Refresh();
 #endif
-        }
-
-        private void FilterKeyDown(KeyboardEventArgs e)
-        {
-            if(e.Key == "Enter")
-            {
-                UpdateFilter();
-            }
-        }
-
-        public virtual void SelectAll(ChangeEventArgs e)
-        {
-            bool @checked = e.Value as bool? == true;
-            if (@checked == false)
-                this.SelectedItems = new List<LibraryFile>();
-            else
-                this.SelectedItems = this.DisplayData?.ToList() ?? new List<LibraryFile>();
-        }
-
-        private void CheckItem(ChangeEventArgs e, LibraryFile item)
-        {
-            bool @checked = e.Value as bool? == true;
-            this.SelectedItems ??= new List<LibraryFile>();
-            if (@checked)
-            {
-                if(this.SelectedItems.Contains(item) == false)
-                    this.SelectedItems.Add(item);
-            }
-            else if (this.SelectedItems.Contains(item))
-            {
-                this.SelectedItems.Remove(item);
-            }
         }
     }
 }

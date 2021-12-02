@@ -12,6 +12,9 @@
         [Parameter]
         public RenderFragment<TItem> Cell { get; set; }
 
+        [Parameter]
+        public bool Hidden { get; set; }
+
         string _Width = string.Empty;
         string className = "fillspace";
         string style = string.Empty;
@@ -43,5 +46,6 @@
         {
             this.Table.AddColumn(this);
         }
+
     }
 }

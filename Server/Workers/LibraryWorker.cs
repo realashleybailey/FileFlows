@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
+using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
-using Server.Helpers;
 
 namespace FileFlows.Server.Workers
 {
@@ -24,7 +24,7 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            var settings = CacheStore.GetSettings();
+            var settings = new SettingsController().Get().Result;
             if (settings?.WorkerScanner != true)
             {
                 Logger.Instance.DLog("Scanner worker not enabled");
@@ -32,9 +32,9 @@ namespace FileFlows.Server.Workers
             }
             Logger.Instance.DLog("################### Library worker triggered");
             var libController = new Controllers.LibraryController();
-            var libaries = libController.GetAll();
-            List<LibraryFile> libraryFiles = null;
-            Dictionary<Guid, Flow> flows = null;
+            var libaries = libController.GetAll().Result;
+            List<LibraryFile> libraryFiles = new LibraryFileController().GetAll(null).Result?.ToList() ?? new ();
+            Dictionary<Guid, Flow> flows = new FlowController().GetData().Result;
             foreach (var library in libaries)
             {
                 if (library.ScanInterval < 10)
@@ -50,9 +50,6 @@ namespace FileFlows.Server.Workers
                     Logger.Instance.WLog($"Library '{library.Name}' path not found: {library.Path}");
                     continue;
                 }
-
-                if(flows == null)
-                    flows = DbHelper.Select<Flow>().ToDictionary(x => x.Uid, x => x);
 
                 if (library.Flow == null || flows.ContainsKey(library.Flow.Uid) == false)
                 {
@@ -73,9 +70,6 @@ namespace FileFlows.Server.Workers
                     continue;
                 }
                 List<string> known = new ();
-
-                if(libraryFiles == null)
-                    libraryFiles = CacheStore.GetLibraryFiles();
 
                 foreach (var libFile in libraryFiles)
                 {
@@ -132,12 +126,12 @@ namespace FileFlows.Server.Workers
 
         internal static void ResetProcessing()
         {
-            var processing = DbHelper.Select<LibraryFile>()
-                                     .Where(x => x.Status == FileStatus.Processing);
+            var controller = new LibraryFileController();
+            var processing = controller.GetAll(FileStatus.Processing).Result;
             foreach (var p in processing)
             {
                 p.Status = FileStatus.Unprocessed;
-                DbHelper.Update(p);
+                controller.Update(p).Wait();
             }
         }
 

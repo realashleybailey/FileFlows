@@ -3,6 +3,7 @@ namespace FileFlows.Server.Helpers
     using System.Dynamic;
     using System.Reflection;
     using FileFlows.Plugin;
+    using FileFlows.Server.Controllers;
     using FileFlows.Shared.Models;
 
     /// <summary>
@@ -23,7 +24,8 @@ namespace FileFlows.Server.Helpers
         {
             var dllPluginInfo = GetPlugins();
 
-            var dbPluginInfos = DbHelper.Select<PluginInfo>();
+            var controller = new PluginController();
+            var dbPluginInfos = controller.GetAll().Result;
 
             List<string> installed = new List<string>();
 
@@ -46,7 +48,7 @@ namespace FileFlows.Server.Helpers
                         existing.DateModified = DateTime.Now;
                         existing.HasSettings = hasSettings;
                         existing.Deleted = false;
-                        DbHelper.Update(existing);
+                        controller.Update(existing).Wait();
                     }
                     else
                     {
@@ -57,7 +59,7 @@ namespace FileFlows.Server.Helpers
                         dll.HasSettings = hasSettings;
                         dll.Enabled = true;
                         dll.Uid = Guid.NewGuid();
-                        DbHelper.Update(dll);
+                        controller.Update(dll).Wait();
                     }
                 }
                 catch (Exception ex)
@@ -71,7 +73,7 @@ namespace FileFlows.Server.Helpers
                 Logger.Instance.DLog("Missing plugin dll: " + dll.Assembly);
                 dll.Deleted = true;
                 dll.DateModified = DateTime.Now;
-                DbHelper.Update(dll);
+                controller.Update(dll).Wait();
             }
         }
 
@@ -300,7 +302,7 @@ namespace FileFlows.Server.Helpers
         {
             List<Type> nodes = new List<Type>();
             var tNode = typeof(Node);
-            var plugins = DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false && x.Enabled);
+            var plugins= new PluginController().GetAll().Result.Where(x => x.Deleted == false && x.Enabled);
             foreach (var plugin in plugins)
             {
                 var nodeTypes = GetAssemblyNodeTypes(plugin.Assembly)?.ToList();

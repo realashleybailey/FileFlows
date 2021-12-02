@@ -1,4 +1,5 @@
-﻿using FileFlows.Server.Helpers;
+﻿using FileFlows.Server.Controllers;
+using FileFlows.Server.Helpers;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 
@@ -13,17 +14,16 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            var settings = DbHelper.Single<Settings>();
-            if (settings?.DisableTelemetry == true)
+            if (Settings?.DisableTelemetry == true)
                 return; // they have turned it off, dont report anything
 
             TelemetryData data = new TelemetryData();
-            data.ClientUid = settings.Uid;
+            data.ClientUid = Settings.Uid;
             data.Version = Globals.Version;
-            var libFiles = DbHelper.Select<LibraryFile>();
+            var libFiles = new LibraryFileController().GetAll(null).Result;
             data.FilesFailed = libFiles.Where(x => x.Status == FileStatus.ProcessingFailed).Count();
             data.FilesProcessed = libFiles.Where(x => x.Status == FileStatus.Processed).Count();
-            var flows = DbHelper.Select<Flow>();
+            var flows = new FlowController().GetAll().Result;
             var dictNodes = new Dictionary<string, int>();
             foreach(var fp in flows?.SelectMany(x => x.Parts)?.ToArray() ?? new FlowPart[] { })
             {

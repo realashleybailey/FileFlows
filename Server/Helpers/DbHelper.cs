@@ -27,7 +27,7 @@ namespace FileFlows.Server.Helpers
         // for mysql change "current_timestamp" to "now()"
 
 
-        private static IDatabase GetDb()
+        internal static IDatabase GetDb()
         {
             if (UseMySql)
                 return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlows", null, MySqlConnector.MySqlConnectorFactory.Instance);
@@ -39,53 +39,53 @@ namespace FileFlows.Server.Helpers
             return new Database("Data Source=Data/FileFlows.sqlite;Version=3;", null, SQLiteFactory.Instance);
         }
 
-        public static IEnumerable<T> Select<T>() where T : ViObject, new()
+        public static async Task<IEnumerable<T>> Select<T>() where T : ViObject, new()
         {
             using (var db = GetDb())
             {
-                var dbObjects = db.Fetch<DbObject>("where Type=@0 order by Name", typeof(T).FullName);
+                var dbObjects = await db.FetchAsync<DbObject>("where Type=@0 order by Name", typeof(T).FullName);
                 return dbObjects.Select(x => Convert<T>(x));
             }
         }
 
-        public static IEnumerable<string> GetNames<T>(string andWhere = "", params object[] args)
+        public static async Task<IEnumerable<string>> GetNames<T>(string andWhere = "", params object[] args)
         {
             using (var db = GetDb())
             {
                 if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
                     andWhere = " and " + andWhere;
                 args = new object[] { typeof(T).FullName }.Union(args ?? new object[] { }).ToArray();
-                return db.Fetch<string>($"select Name from {nameof(DbObject)} where Type=@0 {andWhere} order by name", args);
+                return await db.FetchAsync<string>($"select Name from {nameof(DbObject)} where Type=@0 {andWhere} order by name", args);
             }
         }
 
-        public static T Single<T>() where T : ViObject, new()
+        public static async Task<T> Single<T>() where T : ViObject, new()
         {
             using (var db = GetDb())
             {
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0", typeof(T).FullName);
+                var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0", typeof(T).FullName);
                 if (string.IsNullOrEmpty(dbObject?.Data))
                     return new T();
                 return Convert<T>(dbObject);
             }
         }
 
-        public static T Single<T>(Guid uid) where T : ViObject, new()
+        public static async Task<T> Single<T>(Guid uid) where T : ViObject, new()
         {
             using (var db = GetDb())
             {
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid.ToString());
+                var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid.ToString());
                 if (string.IsNullOrEmpty(dbObject?.Data))
                     return new T();
                 return Convert<T>(dbObject);
             }
         }
 
-        public static T SingleByName<T>(string name) where T : ViObject, new()
+        public static async Task<T> SingleByName<T>(string name) where T : ViObject, new()
         {
             using (var db = GetDb())
             {
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and lower(Name)=lower(@1)", typeof(T).FullName, name);
+                var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and lower(Name)=lower(@1)", typeof(T).FullName, name);
                 if (string.IsNullOrEmpty(dbObject?.Data))
                     return new T();
                 return Convert<T>(dbObject);
@@ -99,11 +99,11 @@ namespace FileFlows.Server.Helpers
             return "'" + input.Replace("'", "''") + "'";
         }
 
-        internal static void UpdateLastModified(Guid uid)
+        internal static async Task UpdateLastModified(Guid uid)
         {
             using (var db = GetDb())
             {
-                db.Execute($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
+                await db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
             }
         }
 
@@ -111,7 +111,7 @@ namespace FileFlows.Server.Helpers
         /// This will batch insert many objects into thee datbase
         /// </summary>
         /// <param name="items">Items to insert</param>
-        internal static void AddMany(ViObject[] items)
+        internal static async Task AddMany(ViObject[] items)
         {
             if (items?.Any() != true)
                 return;
@@ -148,19 +148,19 @@ namespace FileFlows.Server.Helpers
                 {
                     using (var db = GetDb())
                     {
-                        db.Execute(sql.ToString());
+                        await db.ExecuteAsync(sql.ToString());
                     }
                 }                    
             }
 
         }
 
-        public static T Single<T>(string andWhere, params object[] args) where T : ViObject, new()
+        public static async Task<T> Single<T>(string andWhere, params object[] args) where T : ViObject, new()
         {
             using (var db = GetDb())
             {
                 args = new object[] { typeof(T).FullName }.Union(args).ToArray();
-                var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and " + andWhere, args);
+                var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and " + andWhere, args);
                 if (string.IsNullOrEmpty(dbObject?.Data))
                     return new T();
                 return Convert<T>(dbObject);
@@ -189,17 +189,17 @@ namespace FileFlows.Server.Helpers
         //     return Convert<T>(updated);
         // }
 
-        public static T Update<T>(T obj) where T : ViObject, new()
+        public static async Task<T> Update<T>(T obj) where T : ViObject, new()
         {
             if (obj == null)
                 return new T();
             using (var db = GetDb())
             {
-                return AddOrUpdateObject(db, obj);
+                return await AddOrUpdateObject(db, obj);
             }
         }
 
-        private static T AddOrUpdateObject<T>(IDatabase db, T obj) where T : ViObject
+        private static async Task<T> AddOrUpdateObject<T>(IDatabase db, T obj) where T : ViObject
         {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
             {
@@ -227,7 +227,7 @@ namespace FileFlows.Server.Helpers
                     Type = type.FullName,
                     Data = json
                 };
-                db.Insert(dbObject);
+                await db.InsertAsync(dbObject);
             }
             else
             {
@@ -235,12 +235,12 @@ namespace FileFlows.Server.Helpers
                 dbObject.Name = obj.Name;
                 dbObject.DateModified = obj.DateModified;
                 dbObject.Data = json;
-                db.Update(dbObject);
+                await db.UpdateAsync(dbObject);
             }
             return obj;
         }
 
-        public static void Delete<T>(params Guid[] uids) where T : ViObject
+        public static async Task Delete<T>(params Guid[] uids) where T : ViObject
         {
             if (uids?.Any() != true)
                 return; // nothing to delete
@@ -249,7 +249,7 @@ namespace FileFlows.Server.Helpers
             string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
             using (var db = GetDb())
             {
-                db.Delete<DbObject>($"where Type=@0 and Uid in ({strUids})", typeName);
+                await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type=@0 and Uid in ({strUids})", typeName);
             }
         }
 
@@ -287,15 +287,15 @@ namespace FileFlows.Server.Helpers
             return true;
         }
 
-        public static bool CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
+        public static async Task<bool> CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
             if (UseMySql == false)
-                return CreateSqliteDatabase();
+                return await CreateSqliteDatabase();
             else
-                return CreateMySqlDatabase(connectionString);
+                return await CreateMySqlDatabase(connectionString);
         }
 
-        private static bool CreateSqliteDatabase()
+        private static async Task<bool> CreateSqliteDatabase()
         {
             if (Directory.Exists("Data") == false)
                 Directory.CreateDirectory("Data");
@@ -321,11 +321,11 @@ namespace FileFlows.Server.Helpers
             }
 
             using var db = UseSqlLite();
-            AddInitialData(db);
+            await AddInitialData(db);
             return true;
         }
 
-        private static bool CreateMySqlDatabase(string connectionString)
+        private static async Task<bool> CreateMySqlDatabase(string connectionString)
         {
             var db = new Database(connectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
 
@@ -345,21 +345,21 @@ namespace FileFlows.Server.Helpers
 
             db.Execute(CreateDBSript);
 
-            AddInitialData(db);
+            await AddInitialData(db);
 
             return true;
         }
 
-        private static void AddInitialData(Database db)
+        private static async Task AddInitialData(Database db)
         {
-            AddOrUpdateObject(db, new Tool
+            await AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",
                 Path = "/usr/local/bin/ffmpeg",
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now
             });
-            AddOrUpdateObject(db, new Settings
+            await AddOrUpdateObject(db, new Settings
             {
                 Name = "Settings",
                 TempPath = "/temp",

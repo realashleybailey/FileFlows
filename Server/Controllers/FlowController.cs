@@ -10,42 +10,42 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Plugin.Attributes;
 
     [Route("/api/flow")]
-    public class FlowController : Controller
+    public class FlowController : ControllerStore<Flow>
     {
 
         [HttpGet]
-        public IEnumerable<Flow> GetAll() => DbHelper.Select<Flow>();
+        public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
 
 
         [HttpPut("state/{uid}")]
-        public Flow SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
+        public async Task<Flow> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
         {
-            var flow = DbHelper.Single<Flow>(uid);
+            var flow = await GetByUid(uid);
             if (flow == null)
                 throw new Exception("Flow not found.");
             if (enable != null)
             {
                 flow.Enabled = enable.Value;
-                DbHelper.Update(flow);
+                await DbManager.Update(flow);
             }
             return flow;
         }
 
         [HttpDelete]
-        public void Delete([FromBody] ReferenceModel model)
+        public async Task Delete([FromBody] ReferenceModel model)
         {
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete
-            DbHelper.Delete<Flow>(model.Uids);
+            await DeleteAll(model);
         }
 
         [HttpGet("{uid}")]
-        public Flow Get(Guid uid)
+        public async Task<Flow> Get(Guid uid)
         {
             if (uid != Guid.Empty)
             {
 
-                var flow = DbHelper.Single<Flow>(uid);
+                var flow = await GetByUid(uid);
                 if (flow == null)
                     return flow;
 
@@ -64,7 +64,7 @@ namespace FileFlows.Server.Controllers
             else
             {
                 // create default flow
-                IEnumerable<string> flowNames = DbHelper.GetNames<Flow>();
+                IEnumerable<string> flowNames = await GetNames();
                 Flow flow = new Flow();
                 flow.Parts = new();
                 flow.Name = "New Flow";
@@ -104,7 +104,7 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPut]
-        public Flow Save([FromBody] Flow model)
+        public async Task<Flow> Save([FromBody] Flow model)
         {
             if (model == null)
                 throw new Exception("No model");
@@ -113,7 +113,7 @@ namespace FileFlows.Server.Controllers
             if (string.IsNullOrWhiteSpace(model.Name))
                 throw new Exception("ErrorMessages.NameRequired");
             model.Name = model.Name.Trim();
-            bool inUse = DbHelper.GetNames<Flow>("Uid <> @1", model.Uid.ToString()).Where(x => x.ToLower() == model.Name.ToLower()).Any();
+            bool inUse = await NameInUse(model.Uid, model.Name);
             if (inUse)
                 throw new Exception("ErrorMessages.NameInUse");
 
@@ -126,40 +126,29 @@ namespace FileFlows.Server.Controllers
             else if (inputNodes > 1)
                 throw new Exception("Flow.ErrorMessages.TooManyInputNodes");
 
-            var flow = DbHelper.Update<Flow>(model);
-            return flow;
+            return await Update(model);
         }
 
         [HttpPut("{uid}/rename")]
-        public void Rename([FromRoute] Guid uid, [FromQuery] string name)
+        public async Task Rename([FromRoute] Guid uid, [FromQuery] string name)
         {
 
             if (uid == Guid.Empty)
                 return; // renaming a new flow
 
 
-            var flow = Get(uid);
+            var flow = await Get(uid);
             if (flow == null)
                 throw new Exception("Flow not found");
             if (flow.Name == name)
                 return; // name already is the requested name
 
             flow.Name = name;
-            DbHelper.Update(flow);
+            await base.Update(flow);
 
             // update any object references
-            var libraries = DbHelper.Select<Library>();
-            foreach (var lib in libraries.Where(x => x.Flow.Uid == uid))
-            {
-                lib.Flow.Name = flow.Name;
-                DbHelper.Update(lib);
-            }
-            var libraryFiles = DbHelper.Select<LibraryFile>();
-            foreach (var lf in libraryFiles.Where(x => x.Flow.Uid == uid))
-            {
-                lf.Flow.Name = flow.Name;
-                DbHelper.Update(lf);
-            }
+            await new LibraryFileController().UpdateFlowName(flow.Uid, flow.Name);
+            var libraries = new LibraryController().UpdateFlowName(flow.Uid, flow.Name);
         }
 
         [HttpPost("{uid}/variables")]

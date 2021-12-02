@@ -5,44 +5,42 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
 
     [Route("/api/library")]
-    public class LibraryController : Controller
+    public class LibraryController : ControllerStore<Library>
     {
         [HttpGet]
-        public IEnumerable<Library> GetAll() => DbHelper.Select<Library>();
+        public async Task<IEnumerable<Library>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
 
         [HttpGet("{uid}")]
-        public Library Get(Guid uid) => DbHelper.Single<Library>(uid);
+        public Task<Library> Get(Guid uid) => GetByUid(uid);
 
         [HttpPost]
-        public Library Save([FromBody] Library library)
-        {
-            var duplicate = DbHelper.Single<Library>("lower(name) = lower(@1) and uid <> @2", library.Name, library.Uid.ToString());
-            if (duplicate != null && duplicate.Uid != Guid.Empty)
-                throw new Exception("ErrorMessages.NameInUse");
-
-            return DbHelper.Update(library);
-        }
+        public Task<Library> Save([FromBody] Library library) => base.Update(library, checkDuplicateName: true);
 
         [HttpPut("state/{uid}")]
-        public Library SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
+        public async Task<Library> SetState([FromRoute] Guid uid, [FromQuery] bool enable)
         {
-            var library = DbHelper.Single<Library>(uid);
+            var library = await GetByUid(uid);
             if (library == null)
                 throw new Exception("Library not found.");
-            if (enable != null)
+            if (library.Enabled != enable)
             {
-                library.Enabled = enable.Value;
-                DbHelper.Update(library);
+                library.Enabled = enable;
+                return await Update(library);
             }
             return library;
         }
 
         [HttpDelete]
-        public void Delete([FromBody] ReferenceModel model)
+        public Task Delete([FromBody] ReferenceModel model) => DeleteAll(model);
+
+        internal async Task UpdateFlowName(Guid uid, string name)
         {
-            if (model == null || model.Uids?.Any() != true)
-                return; // nothing to delete
-            DbHelper.Delete<Library>(model.Uids);
+            var libraries = await GetDataList();
+            foreach (var lib in libraries.Where(x => x.Flow?.Uid == uid))
+            {
+                lib.Flow.Name = name;
+                await Update(lib);
+            }
         }
     }
 }

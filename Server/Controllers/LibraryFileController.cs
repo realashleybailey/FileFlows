@@ -3,21 +3,15 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
-    using global::Server.Helpers;
 
     [Route("/api/library-file")]
-    public class LibraryFileController : Controller
+    public class LibraryFileController : ControllerStore<LibraryFile>
     {
+
         [HttpGet]
         public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
         {
-            DateTime start = DateTime.Now;
-            var libraryFiles = CacheStore.GetLibraryFiles();
-            TimeSpan timeTaken = DateTime.Now - start;
-            if (status != null)
-                libraryFiles = libraryFiles.Where(x => x.Status == status.Value).ToList();
-
-            HttpContext.Response.Headers.Add("x-time-taken", new Microsoft.Extensions.Primitives.StringValues(timeTaken.ToString()));
+            var libraryFiles = await base.GetDataList();
 
             if (status == FileStatus.Unprocessed)
                 return libraryFiles.OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
@@ -48,7 +42,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("recently-finished")]
         public async Task<IEnumerable<LibraryFile>> RecentlyFinished([FromQuery] FileStatus? status)
         {
-            var libraryFiles = CacheStore.GetLibraryFiles();
+            var libraryFiles = await GetDataList();
             return libraryFiles
                            .Where(x => x.Status == FileStatus.Processed)
                            .OrderByDescending(x => x.ProcessingEnded)
@@ -58,7 +52,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("status")]
         public async Task<IEnumerable<LibraryStatus>> GetStatus()
         {
-            var libraryFiles = CacheStore.GetLibraryFiles();
+            var libraryFiles = await GetDataList();
             return libraryFiles.GroupBy(x => x.Status)
                                .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 
@@ -66,15 +60,15 @@ namespace FileFlows.Server.Controllers
 
 
         [HttpGet("{uid}")]
-        public LibraryFile Get(Guid uid)
+        public async Task<LibraryFile> Get(Guid uid)
         {
-            return DbHelper.Single<LibraryFile>(uid);
+            return await GetByUid(uid);
         }
 
         [HttpGet("{uid}/log")]
-        public string GetLog(Guid uid)
+        public async Task<string> GetLog(Guid uid)
         {
-            var logFile = DbHelper.Single<Settings>()?.GetLogFile(uid);
+            var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
             if (string.IsNullOrEmpty(logFile))
                 return string.Empty;
             if (System.IO.File.Exists(logFile) == false)
@@ -102,8 +96,7 @@ namespace FileFlows.Server.Controllers
             var list = model.Uids.ToList();
 
             // clear the list to make sure its upt to date
-            CacheStore.ClearLibraryFiles();
-            var libraryFiles = CacheStore.GetLibraryFiles();
+            var libraryFiles = await GetDataList();
 
             var libFiles = libraryFiles
                                    .Where(x => x.Status == FileStatus.Unprocessed)
@@ -128,17 +121,16 @@ namespace FileFlows.Server.Controllers
             foreach (var libFile in libFiles)
             {
                 libFile.Order = ++order;
-                DbHelper.Update(libFile);
+                await DbHelper.Update(libFile);
             }
         }
 
         [HttpDelete]
-        public void Delete([FromBody] ReferenceModel model)
+        public async Task Delete([FromBody] ReferenceModel model)
         {
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete
-            DbHelper.Delete<LibraryFile>(model.Uids);
-            CacheStore.ClearLibraryFiles();
+            await DeleteAll(model);
         }
 
         [HttpGet("shrinkage")]
@@ -147,7 +139,7 @@ namespace FileFlows.Server.Controllers
             double original = 0;
             double final = 0;
 
-            var files = CacheStore.GetLibraryFiles();
+            var files = await GetDataList();
             foreach(var file in files)
             {
                 if (file.Status != FileStatus.Processed || file.OriginalSize == 0 || file.FinalSize == 0)
@@ -160,6 +152,16 @@ namespace FileFlows.Server.Controllers
                 FinalSize = final,
                 OriginalSize = original
             };
+        }
+
+        internal async Task UpdateFlowName(Guid uid, string name)
+        {
+            var libraryFiles = await GetDataList();
+            foreach (var lf in libraryFiles.Where(x => x.Flow?.Uid == uid))
+            {
+                lf.Flow.Name = name;
+                await Update(lf);
+            }
         }
     }
 }

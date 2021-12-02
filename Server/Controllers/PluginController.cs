@@ -10,12 +10,12 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Helpers;
 
     [Route("/api/plugin")]
-    public class PluginController : Controller
+    public class PluginController : ControllerStore<PluginInfo>
     {
         [HttpGet]
         public async Task<IEnumerable<PluginInfoModel>> GetAll()
         {
-            var plugins = DbHelper.Select<PluginInfo>().Where(x => x.Deleted == false);
+            var plugins = (await GetDataList()).Where(x => x.Deleted == false);
             List<PluginInfoModel> pims = new List<PluginInfoModel>();
             var packages = await GetPluginPackages();
             foreach (var plugin in plugins)
@@ -42,27 +42,25 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPut("state/{uid}")]
-        public PluginInfo SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
+        public async Task<PluginInfo> SetState([FromRoute] Guid uid, [FromQuery] bool enable)
         {
-            var plugin = DbHelper.Single<PluginInfo>(uid);
+            var plugin = await GetByUid(uid);;
             if (plugin == null)
                 throw new Exception("Plugin not found.");
 
             if (plugin.Name == "Basic Nodes" && enable == false)
                 return plugin; // dont let them disable the basic nodes
-            if (enable != null)
-            {
-                plugin.Enabled = enable.Value;
-                DbHelper.Update(plugin);
-            }
-            return plugin;
+            if (enable == plugin.Enabled)
+                return plugin;
+                        
+            plugin.Enabled = enable;
+            return await Update(plugin);
         }
 
         [HttpGet("{uid}")]
-        public PluginInfo Get([FromRoute] Guid uid)
+        public async Task<PluginInfo> Get([FromRoute] Guid uid)
         {
-
-            var pi = DbHelper.Single<PluginInfo>(uid);
+            var pi = await GetByUid(uid);
             if (pi == null)
                 return new PluginInfo();
 
@@ -71,14 +69,13 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPost("{uid}/settings")]
-        public PluginInfo SaveSettings([FromRoute] Guid uid, [FromBody] ExpandoObject settings)
+        public async Task<PluginInfo> SaveSettings([FromRoute] Guid uid, [FromBody] ExpandoObject settings)
         {
-            var pi = DbHelper.Single<PluginInfo>(uid);
+            var pi = await GetByUid(uid);
             if (pi == null)
                 return new PluginInfo();
             pi.Settings = settings;
-            DbHelper.Update(pi);
-            return pi;
+            return await Update(pi);
         }
 
         [HttpGet("language/{langCode}.json")]
@@ -128,7 +125,7 @@ namespace FileFlows.Server.Controllers
         [HttpPost("update/{uid}")]
         public async Task<bool> Update([FromRoute] Guid uid)
         {
-            var plugin = Get(uid);
+            var plugin = await Get(uid);
             if (plugin == null)
                 return false;
             var plugins = await GetPluginPackages();
@@ -156,8 +153,7 @@ namespace FileFlows.Server.Controllers
 
             plugin.Version = ppi.Version;
             plugin.Fields = null;
-            DbHelper.Update(plugin);
-
+            await Update(plugin);
             return true;
         }
     }

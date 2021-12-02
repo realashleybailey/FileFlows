@@ -26,20 +26,20 @@ namespace FileFlows.Server.Workers
 
 
         private static Mutex mutex = new Mutex();
-        protected static LibraryFile GetLibraryFile()
+        protected static LibraryFile? GetLibraryFile()
         {
             mutex.WaitOne();
             try
             {
-                var file = DbHelper.Select<LibraryFile>()
-                                   .Where(x => x.Status == FileStatus.Unprocessed)
+                var controller = new LibraryFileController();
+                var file = controller.GetAll(FileStatus.Unprocessed).Result
                                    .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                                    .ThenBy(x => x.DateCreated)
                                    .FirstOrDefault();
                 if (file != null)
                 {
                     file.Status = FileStatus.Processing;
-                    DbHelper.Update(file);
+                    controller.Update(file).Wait();
                 }
                 return file;
             }
@@ -59,7 +59,7 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            var settings = DbHelper.Single<Settings>();
+            var settings = new SettingsController().Get().Result;
             if (settings?.WorkerFlowExecutor != true)
             {
                 Logger.Instance.DLog("Flow executor not enabled");
@@ -80,23 +80,25 @@ namespace FileFlows.Server.Workers
 
             try
             {
+                var controller = new LibraryFileController();
+                var flowController = new FlowController();
                 FileInfo file = new FileInfo(libFile.Name);
                 if (file.Exists == false)
                 {
-                    DbHelper.Delete<LibraryFile>(libFile.Uid);
+                    controller.DeleteAll(libFile.Uid).Wait();
                     return;
                 }
-                var flow = DbHelper.Single<Flow>(libFile.Flow.Uid);
+                var flow = flowController.Get(libFile.Flow.Uid).Result;
                 if (flow == null || flow.Uid == Guid.Empty)
                 {
                     libFile.Status = FileStatus.FlowNotFound;
-                    DbHelper.Update(libFile);
+                    controller.Update(libFile).Wait();
                     return;
                 }
 
                 Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
                 libFile.ProcessingStarted = System.DateTime.Now;
-                DbHelper.Update(libFile);
+                controller.Update(libFile).Wait();
                 this.Status.CurrentFile = libFile.Name;
                 this.Status.CurrentUid = libFile.Uid;
                 this.Status.RelativeFile = libFile.RelativePath;
@@ -135,7 +137,7 @@ namespace FileFlows.Server.Workers
                 libFile.OutputPath = task.Result.WorkingFile;
                 libFile.FinalSize = new FileInfo(libFile.OutputPath).Length;                
                 libFile.ProcessingEnded = System.DateTime.Now;
-                DbHelper.Update(libFile);
+                controller.Update(libFile).Wait();
             }
             finally
             {

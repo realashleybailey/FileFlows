@@ -35,7 +35,7 @@ namespace FileFlows.Server.Helpers
                 {
                     LogFile = logFile
                 };
-                args.GetToolPath = (string name) => new Controllers.ToolController().GetByName(name)?.Path ?? "";
+                args.GetToolPath = (string name) => new Controllers.ToolController().GetByName(name)?.Result?.Path ?? "";
                 bool flowCompleted = false;
                 int count = 0;
 

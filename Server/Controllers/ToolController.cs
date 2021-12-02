@@ -5,42 +5,26 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
 
     [Route("/api/tool")]
-    public class ToolController : Controller
+    public class ToolController : ControllerStore<Tool>
     {
         [HttpGet]
-        public IEnumerable<Tool> GetAll()
-        {
-            return DbHelper.Select<Tool>();
-        }
+        public async Task<IEnumerable<Tool>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
 
         [HttpGet("{uid}")]
-        public Tool Get(Guid uid)
-        {
-            return DbHelper.Single<Tool>(uid);
-        }
+        public Task<Tool> Get(Guid uid) => GetByUid(uid);
 
         [HttpGet("{uid}")]
-        public Tool GetByName(string name)
+        public async Task<Tool?> GetByName(string name)
         {
-            return DbHelper.SingleByName<Tool>(name);
+            var list = await GetData();
+            name = name.ToLower().Trim();
+            return list.Values.FirstOrDefault(x => x.Name.ToLower() == name);
         }
 
         [HttpPost]
-        public Tool Save([FromBody] Tool tool)
-        {
-            var duplicate = DbHelper.Single<Tool>("lower(name) = lower(@1) and uid <> @2", tool.Name, tool.Uid.ToString());
-            if (duplicate != null && duplicate.Uid != Guid.Empty)
-                throw new Exception("ErrorMessages.NameInUse");
-
-            return DbHelper.Update(tool);
-        }
+        public Task<Tool> Save([FromBody] Tool tool) => Update(tool, checkDuplicateName: true);
 
         [HttpDelete]
-        public void Delete([FromBody] ReferenceModel model)
-        {
-            if (model == null || model.Uids?.Any() != true)
-                return; // nothing to delete
-            DbHelper.Delete<Tool>(model.Uids);
-        }
+        public Task Delete([FromBody] ReferenceModel model) => DeleteAll(model);
     }
 }

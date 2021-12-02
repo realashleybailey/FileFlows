@@ -1,3 +1,5 @@
+using FileFlows.Server.Controllers;
+
 namespace FileFlows.Server.Workers
 {
     public abstract class Worker
@@ -30,6 +32,7 @@ namespace FileFlows.Server.Workers
         }
 
         static readonly List<Worker> Workers = new List<Worker>();
+        protected Shared.Models.Settings Settings;
 
         public static void StartWorkers()
         {
@@ -92,6 +95,7 @@ namespace FileFlows.Server.Workers
                 Executing = true;
                 try
                 {
+                    Settings = new SettingsController().Get().Result;
                     Execute();
                 }
                 catch (Exception ex)

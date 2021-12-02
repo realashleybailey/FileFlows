@@ -3,26 +3,41 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
-    using global::Server.Helpers;
 
     [Route("/api/settings")]
     public class SettingsController : Controller
     {
+        private static Settings Instance = new ();
+        private static Mutex _mutex = new Mutex();
 
         [HttpGet]
-        public Settings Get() => CacheStore.GetSettings();
+        public async Task<Settings> Get()
+        {
+            if (Instance != null)
+                return Instance;
+            _mutex.WaitOne();
+            try
+            {
+                if (Instance == null)
+                    Instance = await DbManager.Single<Settings>();
+                return Instance;
+            }
+            finally
+            {
+                _mutex.ReleaseMutex();
+            }
+        }
 
         [HttpPut]
-        public Settings Save([FromBody] Settings model)
+        public async Task<Settings> Save([FromBody] Settings model)
         {
             if (model == null)
-                return Get();
-            var settings = Get() ?? model;
+                return await Get();
+            var settings = await Get() ?? model;
             model.Uid = settings.Uid;
             model.DateCreated = settings.DateCreated;
-            var result = DbHelper.Update(model);
-            CacheStore.SetSettings(result);
-            return result;
+            Instance = model;
+            return await DbManager.Update(model);
         }
     }
 

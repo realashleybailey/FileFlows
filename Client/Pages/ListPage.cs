@@ -15,7 +15,7 @@ namespace FileFlows.Client.Pages
     public abstract class ListPage<T> : ComponentBase where T : ViObject
     {
         public string FilterText { get; set; }
-        protected void UpdateFilter()
+        protected virtual void UpdateFilter()
         {
             //this.DataGrid.LoadData.InvokeAsync();
             LoadData();
@@ -41,7 +41,7 @@ namespace FileFlows.Client.Pages
             }
         }
 
-        public IEnumerable<T> DisplayData;
+        public List<T> DisplayData;
         private RadzenDataGrid<T> _DataGrid;
         public IEnumerable<int> PageSizeOptions = new int[] { 50, 100, 250, 500 };
         public RadzenDataGrid<T> DataGrid
@@ -139,7 +139,7 @@ namespace FileFlows.Client.Pages
                 return;
             }
             string ft = FilterText.Trim().ToLower();
-            DisplayData = Data.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains(ft));
+            DisplayData = Data.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains(ft)).ToList();
         }
 
         public async Task RowDoubleClicked(DataGridRowMouseEventArgs<T> item)

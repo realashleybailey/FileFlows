@@ -67,9 +67,70 @@
                 bool mobile = App.Instance.IsMobile;
                 //string lfNameWidth = mobile ? "60vw" : "20rem";
                 string lfNameWidth = "20rem";
-                bool sorting = SelectedStatus != FileStatus.Unprocessed;
+                bool sorting = SelectedStatus != FileStatus.Unprocessed;            
             }
 
+            <FlowTable Data="@DisplayData" TItem="LibraryFile">
+                <FlowTableColumn TItem="LibraryFile" Width="2rem">
+                    <Header>
+                        <input type="checkbox" @onchange="(e) => SelectAll(e)" checked="@(DisplayData.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"  />                        
+                    </Header>
+                    <Cell Context="item">
+                        <input type="checkbox" @onchange="(e) => CheckItem(e, item)" checked="@(SelectedItems?.Contains(item) == true)"  />
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="LibraryFile">
+                    <Header>
+                        Name
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="LibraryFile" Width="10rem">
+                    <Header>
+                        Flow
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Flow.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="LibraryFile" Width="10rem">
+                    <Header>
+                        Library
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Library.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+            </FlowTable>
+
+            @*<div class="fake-table">
+                <div class="fake-table-header row">
+                    <span style="width:2rem">
+                        <RadzenCheckBox TriState="false" TValue="bool"
+                            Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
+                            Change="@(args => SelectAll())" />
+                    </span>
+                    <span class="fillspace">Name</span>
+                    <span style="width:10rem">Flow</span>
+                    <span style="width:10rem">Library</span>
+                </div>
+                <div class="fake-table-body">
+                    <Virtualize Items="@Data" Context="item"  ItemSize="25"  OverscanCount="4">
+                        <div class="fake-row row">
+                            <span style="width:2rem">
+                                <RadzenCheckBox TriState="false"
+                                    Value="@(SelectedItems != null && SelectedItems.Contains(item))" />
+                            </span>
+                            <span class="fillspace">@item.RelativePath</span>
+                            <span style="width:10rem">@item.Flow.Name</span>
+                            <span style="width:10rem">@item.Library.Name</span>
+                        </div>                        
+                    </Virtualize>
+                </div>
+            </div>*@
+@*
             <RadzenDataGrid @ref="DataGrid" PageSizeOptions="@PageSizeOptions" Data="@Data" 
                 RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
                 @bind-Value=@SelectedItems AllowColumnResize="true" AllowPaging="@paging" AllowSorting="@sorting"
@@ -119,7 +180,7 @@
                     <RadzenDataGridColumn TItem="LibraryFile" Property="OutputPath" Title="Output" Width="30rem"
                         Visible=@(SelectedStatus == FileFlows.Shared.Models.FileStatus.Processed && !mobile) />
                 </Columns>
-            </RadzenDataGrid>
+            </RadzenDataGrid>*@
         </div>
     </Body>
 

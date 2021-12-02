@@ -96,3 +96,27 @@
     }
 
 }
+
+table {
+    overflow-y: scroll;
+    position: absolute;
+    top: 1.75rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height:calc(100% - 6rem);
+}
+
+::deep td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+::deep .flowtable {
+    position: absolute;
+    top: 1.75rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

@@ -1,0 +1,34 @@
+﻿@namespace FileFlows.Client.Components.Common
+@typeparam TItem
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+<div class="flowtable">
+    <div class="flowtable-header">
+        <div class="flowtable-row flowtable-header-row">
+            @foreach(var col in ActualColumns)
+            {
+                <span class="@col.ClassName" style="@col.Style">
+                    @col.Header
+                </span>
+            }
+        </div>
+    </div>
+    <div class="flowtable-body">
+        @if (Data != null)
+        {
+            <Virtualize Items="@Data" Context="item" ItemSize="25"  OverscanCount="4">
+                <div class="flowtable-row">
+                    @foreach (var col in ActualColumns)
+                    {
+                        <span class="@col.ClassName" style="@col.Style">
+                            @col.Cell(item)
+                        </span>
+                    }
+                </div>                        
+            </Virtualize>
+        }
+    </div>
+</div>

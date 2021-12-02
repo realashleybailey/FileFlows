@@ -10,6 +10,7 @@ namespace FileFlows.Client.Pages
     using System;
     using Microsoft.AspNetCore.Components.Web;
     using Radzen;
+    using Microsoft.AspNetCore.Components;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
@@ -22,6 +23,8 @@ namespace FileFlows.Client.Pages
         private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
         private int Count;
+
+        private List<LibraryFile> FilteredData = new List<LibraryFile>();
 
         private void SetSelected(LibraryStatus status)
         {
@@ -167,6 +170,30 @@ namespace FileFlows.Client.Pages
             if(e.Key == "Enter")
             {
                 UpdateFilter();
+            }
+        }
+
+        public virtual void SelectAll(ChangeEventArgs e)
+        {
+            bool @checked = e.Value as bool? == true;
+            if (@checked == false)
+                this.SelectedItems = new List<LibraryFile>();
+            else
+                this.SelectedItems = this.DisplayData?.ToList() ?? new List<LibraryFile>();
+        }
+
+        private void CheckItem(ChangeEventArgs e, LibraryFile item)
+        {
+            bool @checked = e.Value as bool? == true;
+            this.SelectedItems ??= new List<LibraryFile>();
+            if (@checked)
+            {
+                if(this.SelectedItems.Contains(item) == false)
+                    this.SelectedItems.Add(item);
+            }
+            else if (this.SelectedItems.Contains(item))
+            {
+                this.SelectedItems.Remove(item);
             }
         }
     }

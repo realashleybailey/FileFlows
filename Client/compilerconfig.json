@@ -50,5 +50,13 @@
   {
     "outputFile": "Components/Dashboard/Shrinkage/Shrinkage.razor.css",
     "inputFile": "Components/Dashboard/Shrinkage/Shrinkage.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/FlowTable/FlowTable.razor.css",
+    "inputFile": "Components/Common/FlowTable/FlowTable.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/inputs.css",
+    "inputFile": "wwwroot/css/inputs.scss"
   }
 ]

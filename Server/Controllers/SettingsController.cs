@@ -1,17 +1,16 @@
 namespace FileFlows.Server.Controllers
 {
-    using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
-    using FileFlows.Server;
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
+    using global::Server.Helpers;
 
     [Route("/api/settings")]
     public class SettingsController : Controller
     {
 
         [HttpGet]
-        public Settings Get() => DbHelper.Single<Settings>() ?? new Settings();
+        public Settings Get() => CacheStore.GetSettings();
 
         [HttpPut]
         public Settings Save([FromBody] Settings model)
@@ -21,7 +20,9 @@ namespace FileFlows.Server.Controllers
             var settings = Get() ?? model;
             model.Uid = settings.Uid;
             model.DateCreated = settings.DateCreated;
-            return DbHelper.Update(model);
+            var result = DbHelper.Update(model);
+            CacheStore.SetSettings(result);
+            return result;
         }
     }
 

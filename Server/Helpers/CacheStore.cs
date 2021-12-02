@@ -24,17 +24,22 @@ namespace Server.Helpers
         public static Settings GetSettings()
         {
             return GetOrCreate(KEY_SETTINGS,
-                () => DbHelper.Single<Settings>()
+                () => DbHelper.Single<Settings>() ?? new Settings()
             );
         }
 
         public static void ClearLibraryFiles() => _cache.Remove(KEY_LIBRARY_FILES);
         public static void ClearSettings() => _cache.Remove(KEY_SETTINGS);
 
-        public static TItem GetOrCreate<TItem>(object key, Func<TItem> createItem, int slidingExpiration = 5, int absExpiration = 30)
+        public static void SetSettings(Settings settings)
+        {
+            GetOrCreate(KEY_SETTINGS, () => settings, 60, 120, true);
+        }
+
+        public static TItem GetOrCreate<TItem>(object key, Func<TItem> createItem, int slidingExpiration = 5, int absExpiration = 30, bool force = false)
         {
             TItem cacheEntry;
-            if (!_cache.TryGetValue(key, out cacheEntry))// Look for cache key.
+            if (force || _cache.TryGetValue(key, out cacheEntry) == false)// Look for cache key.
             {
                 // Key not in cache, so get data.
                 cacheEntry = createItem();

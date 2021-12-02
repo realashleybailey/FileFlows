@@ -10,46 +10,51 @@
     </Head>
 
     <Body>
-        <div class="page-table">
-            <div class="table-toolbar">
-                <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
-                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span class="fas fa-edit"></span>
-                    @lblEdit</button>
-                <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
-                        class="fas fa-trash"></span>
-                    @lblDelete</button>
-            </div>
+        
+        <FlowTable @ref="Table" Data="@Data" TItem="Library" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="Library" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="Library" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="Library" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />                
+            </ToolBar>
 
+            <Columns>
+                <FlowTableColumn TItem="Library" Width="14rem">
+                    <Header>
+                        Name
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Library">
+                    <Header>
+                        Path
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Path</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Library" Width="14rem">
+                    <Header>
+                        Flow
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Flow.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Library" Width="10rem">
+                    <Header>
+                        Enabled
+                    </Header>
+                    <Cell Context="item">
+                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" AllowColumnResize="true" RowDoubleClick=@RowDoubleClicked
-                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedItems
-                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="Library"
-                LogicalFilterOperator="LogicalFilterOperator.Or">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Library" Width="40px" Sortable="false" Filterable="false">
-                        <HeaderTemplate>
-                            <RadzenCheckBox TriState="false" TValue="bool"
-                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
-                        </HeaderTemplate>
-                        <Template Context="data">
-                            <RadzenCheckBox TriState="false"
-                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Library" Property="Name" Title="Name" Width="14rem" />
-                    <RadzenDataGridColumn TItem="Library" Property="Path" Title="Path" />
-                    <RadzenDataGridColumn TItem="Library" Property="Flow.Name" Title="Flow" Width="14rem" />
-                    <RadzenDataGridColumn TItem="Library" Property="Enabled" Title="Enabled" Width="14rem">
-                        <Template Context="item">
-                            <div class="switch-wrapper">
-                                <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
-                            </div>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </div>
     </Body>
 
 </PageView>

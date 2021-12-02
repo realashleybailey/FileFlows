@@ -1,1 +1,5 @@
-.switch-wrapper{height:2.5rem}.switch-wrapper ::deep .rz-switch{top:-1rem}.switch-wrapper ::deep .rz-switch:not(.rz-switch-checked) .rz-switch-circle{background:var(--input-background) !important}.switch-wrapper ::deep .rz-switch.rz-switch-checked .rz-switch-circle{background:var(--accent) !important}.switch-wrapper ::deep .rz-switch .rz-switch-circle:before{background:var(--color) !important}
+﻿div {
+  padding: 0;
+  margin: 0;
+  height: 1.6rem;
+}

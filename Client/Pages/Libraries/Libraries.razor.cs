@@ -14,7 +14,7 @@ namespace FileFlows.Client.Pages
 
     public partial class Libraries : ListPage<Library>
     {
-        public override string ApIUrl => "/api/library";
+        public override string ApiUrl => "/api/library";
 
         private Library EditingItem = null;
 
@@ -50,7 +50,7 @@ namespace FileFlows.Client.Pages
             return await HttpHelper.Get<FileFlows.Shared.Models.Flow[]>("/api/flow");
         }
 
-        public override async Task Edit(Library library)
+        public override async Task<bool> Edit(Library library)
         {
             Blocker.Show();
             var flowResult = await GetFlows();
@@ -58,7 +58,7 @@ namespace FileFlows.Client.Pages
             if (flowResult.Success == false || flowResult.Data?.Any() != true)
             {
                 ShowEditHttpError(flowResult, "Pages.Libraries.ErrorMessages.NoFlows");
-                return;
+                return false;
             }
             var flowOptions = flowResult.Data.Select(x => new ListOption { Value = new ObjectReference { Name = x.Name, Uid = x.Uid }, Label = x.Name });
 
@@ -101,6 +101,7 @@ namespace FileFlows.Client.Pages
             });
             var result = await Editor.Open("Pages.Library", library.Name, fields, library,
               saveCallback: Save);
+            return false;
         }
 
         async Task<bool> Save(ExpandoObject model)
@@ -113,7 +114,7 @@ namespace FileFlows.Client.Pages
 
             try
             {
-                var saveResult = await HttpHelper.Post<Library>($"{ApIUrl}", model);
+                var saveResult = await HttpHelper.Post<Library>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
@@ -125,7 +126,8 @@ namespace FileFlows.Client.Pages
                     this.Data.Add(saveResult.Data);
                 else
                     this.Data[index] = saveResult.Data;
-                await DataGrid.Reload();
+
+                await this.Load(saveResult.Data.Uid);
 
                 return true;
             }

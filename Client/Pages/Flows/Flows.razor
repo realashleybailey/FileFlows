@@ -1,5 +1,6 @@
 @namespace FileFlows.Client.Pages
 @using ffFlow = FileFlows.Shared.Models.Flow;
+@inherits ListPage<ffFlow>
 
 @page "/flows"
 
@@ -9,44 +10,35 @@
     </Head>
 
     <Body>
-        <div class="page-table">
-            <div class="table-toolbar">
-                <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
-                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span c
-                        lass="fas fa-edit"></span>
-                    @lblEdit</button>
-                <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
-                        class="fas fa-trash"></span>
-                    @lblDelete</button>
-            </div>
+        <FlowTable @ref="Table" Data="@Data" TItem="ffFlow" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="ffFlow" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="ffFlow" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="ffFlow" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />                
+            </ToolBar>
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" AllowColumnResize="true" RowDoubleClick=@RowDoubleClicked
-                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedItems
-                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="ffFlow"
-                LogicalFilterOperator="LogicalFilterOperator.Or">
-                <Columns>
-                    <RadzenDataGridColumn TItem="ffFlow" Width="40px" Sortable="false" Filterable="false">
-                        <HeaderTemplate>
-                            <RadzenCheckBox TriState="false" TValue="bool"
-                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
-                        </HeaderTemplate>
-                        <Template Context="data">
-                            <RadzenCheckBox TriState="false"
-                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ffFlow" Property="Name" Title="Name" />
-                    <RadzenDataGridColumn TItem="ffFlow" Property="Enabled" Title="Enabled">
-                        <Template Context="item">
-                            <div class="switch-wrapper">
-                                <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
-                            </div>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </div>
+            <Columns>
+
+                <FlowTableColumn TItem="ffFlow">
+                    <Header>
+                        Name
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="ffFlow" Width="12rem">
+                    <Header>
+                        Enabled
+                    </Header>
+                    <Cell Context="item">
+                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
+
     </Body>
 
 </PageView>

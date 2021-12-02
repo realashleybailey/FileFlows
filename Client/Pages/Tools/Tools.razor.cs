@@ -11,7 +11,7 @@ namespace FileFlows.Client.Pages
 
     public partial class Tools : ListPage<Tool>
     {
-        public override string ApIUrl => "/api/tool";
+        public override string ApiUrl => "/api/tool";
 
         private Tool EditingItem = null;
 
@@ -23,7 +23,7 @@ namespace FileFlows.Client.Pages
         }
 
 
-        public override async Task Edit(Tool Tool)
+        public override async Task<bool> Edit(Tool Tool)
         {
 #if (!DEMO)
             this.EditingItem = Tool;
@@ -47,6 +47,7 @@ namespace FileFlows.Client.Pages
             var result = await Editor.Open("Pages.Tool", Tool.Name, fields, Tool,
               saveCallback: Save);
 #endif
+            return false;
         }
 
         async Task<bool> Save(ExpandoObject model)
@@ -59,7 +60,7 @@ namespace FileFlows.Client.Pages
 
             try
             {
-                var saveResult = await HttpHelper.Post<Tool>($"{ApIUrl}", model);
+                var saveResult = await HttpHelper.Post<Tool>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
@@ -71,7 +72,7 @@ namespace FileFlows.Client.Pages
                     this.Data.Add(saveResult.Data);
                 else
                     this.Data[index] = saveResult.Data;
-                await DataGrid.Reload();
+                await this.Load(saveResult.Data.Uid);
 
                 return true;
             }

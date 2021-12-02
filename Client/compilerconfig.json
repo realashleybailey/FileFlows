@@ -62,5 +62,17 @@
   {
     "outputFile": "Components/Common/FlowTableButton/FlowTableButton.razor.css",
     "inputFile": "Components/Common/FlowTableButton/FlowTableButton.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/FlowSwitch/FlowSwitch.razor.css",
+    "inputFile": "Components/Common/FlowSwitch/FlowSwitch.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputSwitch/InputSwitch.razor.css",
+    "inputFile": "Components/Inputs/InputSwitch/InputSwitch.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputNumber/InputNumber.razor.css",
+    "inputFile": "Components/Inputs/InputNumber/InputNumber.razor.scss"
   }
 ]

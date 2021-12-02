@@ -15,7 +15,7 @@ namespace FileFlows.Client.Pages
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
-        public override string ApIUrl => "/api/library-file";
+        public override string ApiUrl => "/api/library-file";
 
         private FileFlows.Shared.Models.FileStatus SelectedStatus = FileFlows.Shared.Models.FileStatus.Unprocessed;
 
@@ -24,10 +24,6 @@ namespace FileFlows.Client.Pages
         private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
         private int Count;
-
-        private List<LibraryFile> FilteredData = new List<LibraryFile>();
-
-        private FlowTable<LibraryFile> Table { get; set; }
 
         private void SetSelected(LibraryStatus status)
         {
@@ -85,7 +81,7 @@ namespace FileFlows.Client.Pages
         }
 #endif
 
-        public override string FetchUrl => ApIUrl + "?status=" + SelectedStatus;
+        public override string FetchUrl => ApiUrl + "?status=" + SelectedStatus;
 
         public override async Task PostLoad()
         {
@@ -115,7 +111,7 @@ namespace FileFlows.Client.Pages
             };
             return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
 #endif
-            return await HttpHelper.Get<List<LibraryStatus>>(ApIUrl + "/status");
+            return await HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
         }
 
         private async Task RefreshStatus()
@@ -139,9 +135,10 @@ namespace FileFlows.Client.Pages
             }
         }
 
-        public override async Task Edit(LibraryFile item)
+        public override async Task<bool> Edit(LibraryFile item)
         {
             await Helpers.LibraryFileEditor.Open(Blocker, NotificationService, Editor, item);
+            return false;
         }
 
         public async Task MoveToTop()
@@ -158,7 +155,7 @@ namespace FileFlows.Client.Pages
             Blocker.Show();
             try
             {
-                await HttpHelper.Post(ApIUrl + "/move-to-top", new ReferenceModel { Uids = uids });                
+                await HttpHelper.Post(ApiUrl + "/move-to-top", new ReferenceModel { Uids = uids });                
             }
             finally
             {

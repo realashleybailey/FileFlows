@@ -48,6 +48,7 @@
   right: unset;
   bottom: unset;
   top: unset;
+  height: 100%;
 }
 
 .flowtable-row {

@@ -1,12 +1,13 @@
 input {
-    width:100%;
+    width: 100%;
+    height: 2.1875rem;
 }
 .input-number-wrapper{
     width:100%;
     display:flex;
     flex-direction: row;
 }
-.radzen-numeric{
+.flow-numeric{
     flex-grow:1;
 }
 .suffix {

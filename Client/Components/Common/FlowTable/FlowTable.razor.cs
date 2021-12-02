@@ -1,5 +1,6 @@
 ﻿namespace FileFlows.Client.Components.Common
 {
+    using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
     using System;
     using System.Collections.Generic;
@@ -58,7 +59,7 @@
         public delegate void SelectionChangedEvent(List<TItem> items);
         public event SelectionChangedEvent SelectionChanged;
 
-        public IEnumerable<TItem> GetSelected() => this.SelectedItems;
+        public IEnumerable<TItem> GetSelected() => new List<TItem>(this.SelectedItems); // clone the list, dont give them the actual one
 
         internal void AddColumn(FlowTableColumn<TItem> col)
         {
@@ -74,14 +75,29 @@
 
         public virtual void SelectAll(ChangeEventArgs e)
         {
+            Logger.Instance.DLog("SelectAll");
             bool @checked = e.Value as bool? == true;
             this.SelectedItems.Clear();
             if (@checked && this.DisplayData?.Any() == true)
                 this.SelectedItems.AddRange(this.DisplayData.Keys);
             this.NotifySelectionChanged();
         }
+
+        internal void SetSelectedIndex(int index)
+        {
+            if (index < 0 || index > this.Data.Count - 1)
+                return;
+            var item = this.Data[index];
+            if (SelectedItems.Contains(item) == false)
+            {
+                this.SelectedItems.Add(item);
+                this.NotifySelectionChanged();
+            }
+        }
+
         private void CheckItem(ChangeEventArgs e, TItem item)
         {
+            Logger.Instance.DLog("CheckItem", e);
             bool @checked = e.Value as bool? == true;
             if (@checked)
             {
@@ -98,9 +114,10 @@
             }
         }
 
-        private void FilterData()
+        private void FilterData(bool clearSelected = true)
         {
-            if (this.SelectedItems.Any())
+            Logger.Instance.DLog("FilterData", clearSelected);
+            if (clearSelected && this.SelectedItems.Any())
             {
                 this.SelectedItems.Clear();
                 this.NotifySelectionChanged();
@@ -124,15 +141,17 @@
 
         private async Task OnClick(TItem item)
         {
-            if (this.SelectedItems.Contains(item))
-                this.SelectedItems.Remove(item);
-            else
+            Logger.Instance.DLog("OnClick", item);
+            if (this.SelectedItems.Contains(item) == false)
+            {
                 this.SelectedItems.Add(item);
-            this.NotifySelectionChanged();
+                this.NotifySelectionChanged();
+            }
         }
 
         private async Task OnDoubleClick(TItem item)
         {
+            Logger.Instance.DLog("OnClick", item);
             this.SelectedItems.Clear();
             this.SelectedItems.Add(item);
             this.NotifySelectionChanged();
@@ -141,8 +160,9 @@
 
         private void NotifySelectionChanged()
         {
+            Logger.Instance.DLog("NotifySelectionChanged");
             if (SelectionChanged != null)
-                SelectionChanged(this.SelectedItems);
+                SelectionChanged(new (SelectedItems)); // we want a clone of the list, not one they can modify 
         }
 
     }

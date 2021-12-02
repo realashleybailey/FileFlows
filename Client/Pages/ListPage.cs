@@ -11,16 +11,18 @@ namespace FileFlows.Client.Pages
     using Microsoft.AspNetCore.Components;
     using Radzen;
     using Radzen.Blazor;
+    using FileFlows.Client.Components.Common;
+    using System;
 
     public abstract class ListPage<T> : ComponentBase where T : ViObject
     {
-
+        protected FlowTable<T> Table { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] public Editor Editor { get; set; }
         [Inject] public NotificationService NotificationService { get; set; }
         public string lblAdd, lblEdit, lblDelete, lblDeleting, lblRefresh;
 
-        public abstract string ApIUrl { get; }
+        public abstract string ApiUrl { get; }
         private bool _needsRendering = false;
 
 
@@ -32,7 +34,6 @@ namespace FileFlows.Client.Pages
             set
             {
                 _Data = value ?? new List<T>();
-                LoadData();
             }
         }
 
@@ -49,7 +50,7 @@ namespace FileFlows.Client.Pages
 
         public virtual async Task Refresh() => await Load();
 
-        public virtual string FetchUrl => ApIUrl;
+        public virtual string FetchUrl => ApiUrl;
 
         public async virtual Task PostLoad()
         {
@@ -70,17 +71,28 @@ namespace FileFlows.Client.Pages
         }
 
 
-        public virtual async Task Load()
+        public virtual async Task Load(Guid? selectedUid = null)
         {
             Blocker.Show();
             await this.WaitForRender();
-            Data.Clear();
             try
             {
                 var result = await FetchData();
                 if (result.Success)
                 {
                     this.Data = result.Data;
+                    if (Table != null)
+                    {
+                        Table.Data = this.Data;
+                        if (selectedUid != null && selectedUid.Value != Guid.Empty)
+                        {
+                            int index = result.Data.FindIndex(x => x.Uid == selectedUid);
+                            if (index >= 0)
+                            {
+                                this.Table.SetSelectedIndex(index);
+                            }
+                        }
+                    }
                 }
                 await PostLoad();
             }
@@ -96,18 +108,8 @@ namespace FileFlows.Client.Pages
             return HttpHelper.Get<List<T>>(FetchUrl);
         }
 
-        protected virtual void LoadData()//LoadDataArgs args)
-        {
-            if (string.IsNullOrEmpty(FilterText))
-            {
-                DisplayData = Data;
-                return;
-            }
-            string ft = FilterText.Trim().ToLower();
-            DisplayData = Data.Where(x => System.Text.Json.JsonSerializer.Serialize(x).ToLower().Contains(ft)).ToList();
-        }
 
-        private async Task OnDoubleClick(T item)
+        protected async Task OnDoubleClick(T item)
         {
             await Edit(item);
         }
@@ -115,13 +117,15 @@ namespace FileFlows.Client.Pages
 
         public async Task Edit()
         {
-            var selected = this.SelectedItems?.FirstOrDefault();
+            var selected = Table.GetSelected()?.FirstOrDefault();
             if (selected == null)
                 return;
-            await Edit(selected);
+            var changed = await Edit(selected);
+            if (changed)
+                await this.Load(selected.Uid);
         }
 
-        public abstract Task Edit(T item);
+        public abstract Task<bool> Edit(T item);
 
         public void ShowEditHttpError<U>(RequestResult<U> result, string defaultMessage = "ErrorMessage.NotFound")
         {
@@ -142,7 +146,7 @@ namespace FileFlows.Client.Pages
             Data.Clear();
             try
             {
-                await HttpHelper.Put<T>($"{ApIUrl}/state/{item.Uid}?enable={enabled}");
+                await HttpHelper.Put<T>($"{ApiUrl}/state/{item.Uid}?enable={enabled}");
             }
             finally
             {
@@ -154,7 +158,7 @@ namespace FileFlows.Client.Pages
 
         public async Task Delete()
         {
-            var uids = this.SelectedItems?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+            var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
             if (uids.Length == 0)
                 return; // nothing to delete
             if (await Confirm.Show("Labels.Delete",
@@ -167,7 +171,7 @@ namespace FileFlows.Client.Pages
             try
             {
 #if (!DEMO)
-                var deleteResult = await HttpHelper.Delete($"{ApIUrl}", new ReferenceModel { Uids = uids });
+                var deleteResult = await HttpHelper.Delete($"{ApiUrl}", new ReferenceModel { Uids = uids });
                 if (deleteResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
@@ -175,9 +179,7 @@ namespace FileFlows.Client.Pages
                 }
 #endif
 
-                this.SelectedItems.Clear();
-                this.Data.RemoveAll(x => uids.Contains(x.Uid));
-                await DataGrid.Reload();
+                this.Data = this.Data.Where(x => uids.Contains(x.Uid) == false).ToList();
 
                 await PostDelete();
             }

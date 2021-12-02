@@ -1,5 +1,6 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
+@inherits ListPage<PluginInfoModel>
 
 @page "/plugins"
 
@@ -9,46 +10,59 @@
     </Head>
 
     <Body>
-        <div class="plugins page-table">
-            <div class="table-toolbar">
-                <button @onclick="@Add"><span class="fas fa-plus"></span>@lblAdd</button>
-                <button @onclick="@Edit"
-                    disabled="@(SelectedItems?.FirstOrDefault()?.HasSettings == true ? null : "disabled")"><span
-                        class="fas fa-edit"></span>
-                    @lblEdit</button>
-                <button @onclick="@Update"
-                    disabled="@(SelectedItems?.Count == 1 && SelectedItems[0].UpdateAvailable ? null : "disabled")"><span
-                        class="fas fa-cloud-download-alt"></span>
-                    @lblUpdate</button>
-            </div>
+        
+        <FlowTable @ref="Table" Data="@Data" TItem="PluginInfoModel" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="PluginInfoModel" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="PluginInfoModel" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />                
+            </ToolBar>
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single"
-                RowDoubleClick=@RowDoubleClicked @bind-Value=@SelectedItems AllowColumnResize="true"
-                FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data" TItem="PluginInfoModel"
-                LogicalFilterOperator="LogicalFilterOperator.Or">
-                <Columns>
-                    <RadzenDataGridColumn TItem="PluginInfoModel" Width="40px" Sortable="false" Filterable="false">
-                        <HeaderTemplate>
-                        </HeaderTemplate>
-                        <Template Context="data">
-                            <RadzenCheckBox TriState="false"
-                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Name" Title="Name" />
-                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Version" Title="Version" />
-                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="LatestVersion" Title="Latest Version" />
-                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Assembly" Title="Assembly" />
-                    <RadzenDataGridColumn TItem="PluginInfoModel" Property="Enabled" Title="Enabled">
-                        <Template Context="item">
-                            <div class="switch-wrapper">
-                                <RadzenSwitch @bind-Value="@item.Enabled" Change="@(args => Enable(args, item))" />
-                            </div>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </div>
+            <Columns>
+
+                <FlowTableColumn TItem="PluginInfoModel">
+                    <Header>
+                        Name
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="PluginInfoModel" Width="10rem">
+                    <Header>
+                        Version
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Version</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="PluginInfoModel" Width="10rem">
+                    <Header>
+                        Latest Version
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.LatestVersion</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="PluginInfoModel" Width="12rem">
+                    <Header>
+                        Assembly
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Assembly</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="PluginInfoModel" Width="10rem">
+                    <Header>
+                        Enabled
+                    </Header>
+                    <Cell Context="item">
+                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
     </Body>
 
 </PageView>

@@ -10,39 +10,34 @@
     </Head>
 
     <Body>
-        <div class="page-table">
-            <div class="table-toolbar">
-                <button @onclick="@Add"><span class="fas fa-plus"></span> @lblAdd</button>
-                <button @onclick="@Edit" disabled="@(SelectedItems?.Count == 1 ? null : "disabled")"><span
-                        class="fas fa-edit"></span>
-                    @lblEdit</button>
-                <button @onclick="@Delete" disabled="@(SelectedItems?.Any() == true ? null : "disabled")"><span
-                        class="fas fa-trash"></span>
-                    @lblDelete</button>
-            </div>
+        <FlowTable @ref="Table" Data="@Data" TItem="Tool" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="Tool" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="Tool" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="Tool" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />                
+            </ToolBar>
 
+            <Columns>
+                <FlowTableColumn TItem="Tool" Width="14rem">
+                    <Header>
+                        Name
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Tool">
+                    <Header>
+                        Path
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Path</span>
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
 
-            <RadzenDataGrid @ref="DataGrid" AllowFiltering="true" AllowColumnResize="true"
-                RowDoubleClick=@RowDoubleClicked SelectionMode="DataGridSelectionMode.Multiple"
-                @bind-Value=@SelectedItems FilterMode="FilterMode.Advanced" AllowSorting="true" Data="@Data"
-                TItem="Tool" LogicalFilterOperator="LogicalFilterOperator.Or">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Tool" Width="40px" Sortable="false" Filterable="false">
-                        <HeaderTemplate>
-                            <RadzenCheckBox TriState="false" TValue="bool"
-                                Value="@(Data.Any(i => SelectedItems != null && SelectedItems.Contains(i)))"
-                                Change="@(args => SelectedItems = args ? Data.ToList() : null)" />
-                        </HeaderTemplate>
-                        <Template Context="data">
-                            <RadzenCheckBox TriState="false"
-                                Value="@(SelectedItems != null && SelectedItems.Contains(data))" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Tool" Property="Name" Title="Name" Width="14rem" />
-                    <RadzenDataGridColumn TItem="Tool" Property="Path" Title="Path" />
-                </Columns>
-            </RadzenDataGrid>
-        </div>
     </Body>
 
 </PageView>

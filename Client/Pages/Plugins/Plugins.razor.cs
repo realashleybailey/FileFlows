@@ -12,46 +12,15 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
 
-    public partial class Plugins : ComponentBase
+    public partial class Plugins : ListPage<PluginInfoModel>
     {
-        [CascadingParameter] Blocker Blocker { get; set; }
-        [CascadingParameter] Editor Editor { get; set; }
-        [Inject] NotificationService NotificationService { get; set; }
-        protected RadzenDataGrid<PluginInfoModel> DataGrid { get; set; }
+        public override string ApiUrl => "/api/plugin";
 
-        private List<PluginInfoModel> Data = new List<PluginInfoModel>();
-
-        private IList<PluginInfoModel> SelectedItems;
-        private string lblAdd, lblEdit, lblUpdate;
-
-        const string API_URL = "/api/plugin";
         protected override void OnInitialized()
         {
-            lblAdd = Translater.Instant("Labels.Add");
-            lblEdit = Translater.Instant("Labels.Edit");
-            lblUpdate = Translater.Instant("Labels.Update");
             _ = Load();
         }
 
-        async Task Load()
-        {
-#if(!DEMO)
-            Blocker.Show();
-            this.StateHasChanged();
-            Data.Clear();
-            try
-            {
-                var result = await HttpHelper.Get<List<PluginInfoModel>>(API_URL);
-                if (result.Success)
-                    this.Data = result.Data;
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
-#endif
-        }
 
         async Task Add()
         {
@@ -61,7 +30,7 @@ namespace FileFlows.Client.Pages
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Get<List<PluginPackageInfo>>(API_URL + "/plugin-packages");
+                var result = await HttpHelper.Get<List<PluginPackageInfo>>(ApiUrl + "/plugin-packages");
                 if (result.Success)
                     Logger.Instance.DLog("plugins", result.Data);
             }
@@ -81,7 +50,7 @@ namespace FileFlows.Client.Pages
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Put<PluginInfo>($"{API_URL}/state/{plugin.Uid}?enable={enabled}");
+                var result = await HttpHelper.Put<PluginInfo>($"{ApiUrl}/state/{plugin.Uid}?enable={enabled}");
                 if (result.Success)
                     plugin.Enabled = result.Data.Enabled;
             }
@@ -96,7 +65,7 @@ namespace FileFlows.Client.Pages
         async Task Update()
         {
 #if (!DEMO)
-            var plugin = SelectedItems.FirstOrDefault();
+            var plugin = Table.GetSelected()?.FirstOrDefault();
             if (plugin == null)
                 return;
             Blocker.Show();
@@ -104,7 +73,7 @@ namespace FileFlows.Client.Pages
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Post($"{API_URL}/update/{plugin.Uid}");
+                var result = await HttpHelper.Post($"{ApiUrl}/update/{plugin.Uid}");
                 await this.Load();
             }
             finally
@@ -116,40 +85,6 @@ namespace FileFlows.Client.Pages
         }
 
         private PluginInfo EditingPlugin = null;
-        private async Task RowDoubleClicked(DataGridRowMouseEventArgs<PluginInfoModel> item)
-        {
-            this.SelectedItems.Clear();
-            this.SelectedItems.Add(item.Data);
-            await Edit();
-        }
-        async Task Edit()
-        {
-#if (!DEMO)
-            PluginInfo plugin = this.SelectedItems.FirstOrDefault();
-            if (plugin?.HasSettings != true)
-                return;
-            Blocker.Show();
-            this.StateHasChanged();
-            Data.Clear();
-
-            try
-            {
-                var pluginResult = await HttpHelper.Get<PluginInfo>($"{API_URL}/{plugin.Uid}");
-                if (pluginResult.Success == false)
-                    return;
-                plugin.Settings = pluginResult.Data.Settings;
-                plugin.Fields = pluginResult.Data.Fields;
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
-            this.EditingPlugin = plugin;
-            var result = await Editor.Open("Plugins." + plugin.Assembly.Replace(".dll", ""), plugin.Name, plugin.Fields, plugin.Settings,
-                saveCallback: SaveSettings);
-#endif
-        }
 
         async Task<bool> SaveSettings(ExpandoObject model)
         {
@@ -159,7 +94,7 @@ namespace FileFlows.Client.Pages
 
             try
             {
-                var pluginResult = await HttpHelper.Post<PluginInfo>($"{API_URL}/{EditingPlugin.Uid}/settings", model);
+                var pluginResult = await HttpHelper.Post<PluginInfo>($"{ApiUrl}/{EditingPlugin.Uid}/settings", model);
                 if (pluginResult.Success == false)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.SaveFailed"));
@@ -174,6 +109,35 @@ namespace FileFlows.Client.Pages
             }
 #else
             return true;
+#endif
+        }
+
+        public override async Task<bool> Edit(PluginInfoModel plugin)
+        {
+#if (!DEMO)
+            if (plugin?.HasSettings != true)
+                return false;
+            Blocker.Show();
+            this.StateHasChanged();
+            Data.Clear();
+
+            try
+            {
+                var pluginResult = await HttpHelper.Get<PluginInfo>($"{ApiUrl}/{plugin.Uid}");
+                if (pluginResult.Success == false)
+                    return false;
+                plugin.Settings = pluginResult.Data.Settings;
+                plugin.Fields = pluginResult.Data.Fields;
+            }
+            finally
+            {
+                Blocker.Hide();
+                this.StateHasChanged();
+            }
+            this.EditingPlugin = plugin;
+            var result = await Editor.Open("Plugins." + plugin.Assembly.Replace(".dll", ""), plugin.Name, plugin.Fields, plugin.Settings,
+                saveCallback: SaveSettings);
+            return false; // we dont need to reload the list
 #endif
         }
     }

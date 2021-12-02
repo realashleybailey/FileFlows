@@ -3,9 +3,8 @@
 
 <InputWrapper Input="@this">
     <div class="input-number-wrapper">
-        <div class="radzen-numeric">
-            <RadzenNumeric id=@Uid TValue="int" @bind-Value="Value" Placeholder="@Placeholder" Min="0" Max="10000"
-                @oninput="@(args => ClearError())" />
+        <div class="flow-numeric">
+            <input id=@Uid type="number" value="@Value" @onchange="ChangeValue" placeholder="@Placeholder" min="@Min" max="@Max" />
         </div>
         @if (string.IsNullOrEmpty(Suffix) == false)
         {

@@ -96,6 +96,11 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
+                InputType = FileFlows.Plugin.FormInputType.Int,
+                Name = nameof(library.ScanInterval)
+            });
+            fields.Add(new ElementField
+            {
                 InputType = FileFlows.Plugin.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });

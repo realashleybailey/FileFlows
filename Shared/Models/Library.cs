@@ -8,5 +8,10 @@ namespace FileFlows.Shared.Models
         public string Path { get; set; }
         public string Filter { get; set; }
         public ObjectReference Flow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of seconds to scan files
+        /// </summary>
+        public int ScanInterval { get; set; }
     }
 }

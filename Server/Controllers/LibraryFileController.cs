@@ -12,7 +12,7 @@ namespace FileFlows.Server.Controllers
         public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
         {
             DateTime start = DateTime.Now;
-            var libraryFiles = await CacheStore.GetLibraryFiles();
+            var libraryFiles = CacheStore.GetLibraryFiles();
             TimeSpan timeTaken = DateTime.Now - start;
             if (status != null)
                 libraryFiles = libraryFiles.Where(x => x.Status == status.Value).ToList();
@@ -48,7 +48,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("recently-finished")]
         public async Task<IEnumerable<LibraryFile>> RecentlyFinished([FromQuery] FileStatus? status)
         {
-            var libraryFiles = await CacheStore.GetLibraryFiles();
+            var libraryFiles = CacheStore.GetLibraryFiles();
             return libraryFiles
                            .Where(x => x.Status == FileStatus.Processed)
                            .OrderByDescending(x => x.ProcessingEnded)
@@ -58,7 +58,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("status")]
         public async Task<IEnumerable<LibraryStatus>> GetStatus()
         {
-            var libraryFiles = await CacheStore.GetLibraryFiles();
+            var libraryFiles = CacheStore.GetLibraryFiles();
             return libraryFiles.GroupBy(x => x.Status)
                                .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 
@@ -103,7 +103,7 @@ namespace FileFlows.Server.Controllers
 
             // clear the list to make sure its upt to date
             CacheStore.ClearLibraryFiles();
-            var libraryFiles = await CacheStore.GetLibraryFiles();
+            var libraryFiles = CacheStore.GetLibraryFiles();
 
             var libFiles = libraryFiles
                                    .Where(x => x.Status == FileStatus.Unprocessed)
@@ -147,7 +147,7 @@ namespace FileFlows.Server.Controllers
             double original = 0;
             double final = 0;
 
-            var files = await CacheStore.GetLibraryFiles();
+            var files = CacheStore.GetLibraryFiles();
             foreach(var file in files)
             {
                 if (file.Status != FileStatus.Processed || file.OriginalSize == 0 || file.FinalSize == 0)

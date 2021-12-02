@@ -75,7 +75,6 @@
 
         public virtual void SelectAll(ChangeEventArgs e)
         {
-            Logger.Instance.DLog("SelectAll");
             bool @checked = e.Value as bool? == true;
             this.SelectedItems.Clear();
             if (@checked && this.DisplayData?.Any() == true)
@@ -116,7 +115,6 @@
 
         private void FilterData(bool clearSelected = true)
         {
-            Logger.Instance.DLog("FilterData", clearSelected);
             if (clearSelected && this.SelectedItems.Any())
             {
                 this.SelectedItems.Clear();

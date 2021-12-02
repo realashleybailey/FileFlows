@@ -122,7 +122,10 @@
         "Enabled":"Enabled",
         "Flow":"Flow",
         "Filter":"Filter",
-        "Filter-Help":"An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$"
+        "Filter-Help": "An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
+        "ScanInterval": "Scan Interval",
+        "ScanInterval-Suffix": "Seconds",
+        "ScanInterval-Help": "The shortest possible time in seconds between scans.  It is not guaranteed to scan at this interval each time, as another scan might be in progress."
       }
     },
     "LibraryFiles": {

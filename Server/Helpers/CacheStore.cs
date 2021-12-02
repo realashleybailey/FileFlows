@@ -11,38 +11,43 @@ namespace Server.Helpers
         private static ConcurrentDictionary<object, SemaphoreSlim> _locks = new ConcurrentDictionary<object, SemaphoreSlim>();
 
         private const string KEY_LIBRARY_FILES = "Library Files";
+        private const string KEY_SETTINGS = "Settings";
 
-        public static Task<List<LibraryFile>> GetLibraryFiles()
+        public static List<LibraryFile> GetLibraryFiles()
         {
             return GetOrCreate(KEY_LIBRARY_FILES,
-                () => Task.FromResult(DbHelper.Select<LibraryFile>().ToList())
+                () => DbHelper.Select<LibraryFile>().ToList(),
+                absExpiration: 10
             );
         }
 
-        public static void ClearLibraryFiles() => _cache.Remove("KEY_LIBRARY_FILES");
-
-        public static async Task<T> GetOrCreate<T>(object key, Func<Task<T>> createItem)
+        public static Settings GetSettings()
         {
-            T cacheEntry;
+            return GetOrCreate(KEY_SETTINGS,
+                () => DbHelper.Single<Settings>()
+            );
+        }
 
+        public static void ClearLibraryFiles() => _cache.Remove(KEY_LIBRARY_FILES);
+        public static void ClearSettings() => _cache.Remove(KEY_SETTINGS);
+
+        public static TItem GetOrCreate<TItem>(object key, Func<TItem> createItem, int slidingExpiration = 5, int absExpiration = 30)
+        {
+            TItem cacheEntry;
             if (!_cache.TryGetValue(key, out cacheEntry))// Look for cache key.
             {
-                SemaphoreSlim mylock = _locks.GetOrAdd(key, k => new SemaphoreSlim(1, 1));
+                // Key not in cache, so get data.
+                cacheEntry = createItem();
 
-                await mylock.WaitAsync();
-                try
-                {
-                    if (!_cache.TryGetValue(key, out cacheEntry))
-                    {
-                        // Key not in cache, so get data.
-                        cacheEntry = await createItem();
-                        _cache.Set(key, cacheEntry);
-                    }
-                }
-                finally
-                {
-                    mylock.Release();
-                }
+                var cacheEntryOptions = new MemoryCacheEntryOptions().SetSize(1);
+                cacheEntryOptions.SetPriority(CacheItemPriority.High);
+                if(slidingExpiration > 0) 
+                    cacheEntryOptions.SetSlidingExpiration(TimeSpan.FromSeconds(slidingExpiration));
+                if(absExpiration > 0)
+                    cacheEntryOptions.SetAbsoluteExpiration(TimeSpan.FromSeconds(absExpiration));
+
+                // Save data in cache.
+                _cache.Set(key, cacheEntry, cacheEntryOptions);
             }
             return cacheEntry;
         }

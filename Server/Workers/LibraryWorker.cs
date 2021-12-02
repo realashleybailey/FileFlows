@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
+using Server.Helpers;
 
 namespace FileFlows.Server.Workers
 {
@@ -23,7 +24,7 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            var settings = DbHelper.Single<Settings>();
+            var settings = CacheStore.GetSettings();
             if (settings?.WorkerScanner != true)
             {
                 Logger.Instance.DLog("Scanner worker not enabled");
@@ -32,17 +33,26 @@ namespace FileFlows.Server.Workers
             Logger.Instance.DLog("################### Library worker triggered");
             var libController = new Controllers.LibraryController();
             var libaries = libController.GetAll();
-            var libraryFiles = DbHelper.Select<LibraryFile>();
-            var flows = DbHelper.Select<Flow>().ToDictionary(x => x.Uid, x => x);
+            List<LibraryFile> libraryFiles = null;
+            Dictionary<Guid, Flow> flows = null;
             foreach (var library in libaries)
             {
+                if (library.ScanInterval < 10)
+                    library.ScanInterval = 60;
+
                 if (library.Enabled == false)
                     continue;
+                if (library.DateModified > DateTime.Now.AddSeconds(-library.ScanInterval))
+                    continue;
+
                 if (string.IsNullOrEmpty(library.Path) || Directory.Exists(library.Path) == false)
                 {
                     Logger.Instance.WLog($"Library '{library.Name}' path not found: {library.Path}");
                     continue;
                 }
+
+                if(flows == null)
+                    flows = DbHelper.Select<Flow>().ToDictionary(x => x.Uid, x => x);
 
                 if (library.Flow == null || flows.ContainsKey(library.Flow.Uid) == false)
                 {
@@ -63,7 +73,11 @@ namespace FileFlows.Server.Workers
                     continue;
                 }
                 List<string> known = new ();
-                foreach(var libFile in libraryFiles)
+
+                if(libraryFiles == null)
+                    libraryFiles = CacheStore.GetLibraryFiles();
+
+                foreach (var libFile in libraryFiles)
                 {
                     if(string.IsNullOrEmpty(libFile.Name) == false && known.Contains(libFile.Name.ToLower()) == false)
                         known.Add(libFile.Name.ToLower());
@@ -84,6 +98,8 @@ namespace FileFlows.Server.Workers
                 }
                 Task.WaitAll(tasks.ToArray());
                 DbHelper.AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray());
+
+                DbHelper.UpdateLastModified(library.Uid);
             }
             Logger.Instance.DLog("Finished scanning libraries");
         }

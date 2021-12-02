@@ -118,9 +118,9 @@ export function InitPieChart(elementId, series, labels) {
             },
         },
     };
-    DestroyChart(elementId);
-    PieCharts[elementId] = new ApexCharts(document.getElementById(elementId), options);
     try {
+        DestroyChart(elementId);
+        PieCharts[elementId] = new ApexCharts(document.getElementById(elementId), options);
         PieCharts[elementId].render();
     } catch (err) { } // cant throw if being destroyed when navigating away
 }

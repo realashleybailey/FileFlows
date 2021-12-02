@@ -99,6 +99,14 @@ namespace FileFlows.Server.Helpers
             return "'" + input.Replace("'", "''") + "'";
         }
 
+        internal static void UpdateLastModified(Guid uid)
+        {
+            using (var db = GetDb())
+            {
+                db.Execute($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
+            }
+        }
+
         /// <summary>
         /// This will batch insert many objects into thee datbase
         /// </summary>

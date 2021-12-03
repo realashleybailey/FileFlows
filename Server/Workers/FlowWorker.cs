@@ -62,7 +62,7 @@ namespace FileFlows.Server.Workers
             var settings = new SettingsController().Get().Result;
             if (settings?.WorkerFlowExecutor != true)
             {
-                Logger.Instance.DLog("Flow executor not enabled");
+                //Logger.Instance.DLog("Flow executor not enabled");
                 return;
             }
 

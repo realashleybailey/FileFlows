@@ -7,7 +7,7 @@ namespace FileFlows.Server.Controllers
     [Route("/api/settings")]
     public class SettingsController : Controller
     {
-        private static Settings Instance = new ();
+        private static Settings Instance;
         private static Mutex _mutex = new Mutex();
 
         [HttpGet]

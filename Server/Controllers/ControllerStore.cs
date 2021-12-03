@@ -23,6 +23,8 @@
             return (await GetData()).Any(x => uid != x.Key && x.Value.Name.ToLower() == name);
         }
 
+        protected void ClearData() => Data = null;
+
         internal async Task<Dictionary<Guid, T>> GetData()
         {
             if (Data == null)
@@ -44,7 +46,7 @@
             return Data;
         }
 
-        protected async Task<List<T>> GetDataList() => (await GetData()).Values.ToList();
+        internal async Task<List<T>> GetDataList() => (await GetData()).Values.ToList();
 
         protected async Task<T> GetByUid(Guid uid)
         {
@@ -101,6 +103,15 @@
                 _mutex.ReleaseMutex();
             }
             return updated;
+        }
+        
+        internal async Task UpdateDateModified(Guid uid)
+        {
+            var item = await GetByUid(uid);
+            if (item == null)
+                return;
+            item.DateModified = DateTime.Now;
+            await DbManager.UpdateDateModified(item.Uid, item.DateModified);
         }
     }
 }

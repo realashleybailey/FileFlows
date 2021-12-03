@@ -27,13 +27,13 @@ namespace FileFlows.Server.Workers
             var settings = new SettingsController().Get().Result;
             if (settings?.WorkerScanner != true)
             {
-                Logger.Instance.DLog("Scanner worker not enabled");
+                //Logger.Instance.DLog("Scanner worker not enabled");
                 return;
             }
-            Logger.Instance.DLog("################### Library worker triggered");
             var libController = new Controllers.LibraryController();
             var libaries = libController.GetAll().Result;
-            List<LibraryFile> libraryFiles = new LibraryFileController().GetAll(null).Result?.ToList() ?? new ();
+            var libFileController = new LibraryFileController();
+            List<LibraryFile> libraryFiles = libFileController.GetAll(null).Result?.ToList() ?? new ();
             Dictionary<Guid, Flow> flows = new FlowController().GetData().Result;
             foreach (var library in libaries)
             {
@@ -42,7 +42,8 @@ namespace FileFlows.Server.Workers
 
                 if (library.Enabled == false)
                     continue;
-                if (library.DateModified > DateTime.Now.AddSeconds(-library.ScanInterval))
+                if(library.DateModified != library.DateCreated // library was just created, do a scan
+                    && library.DateModified > DateTime.Now.AddSeconds(-library.ScanInterval))
                     continue;
 
                 if (string.IsNullOrEmpty(library.Path) || Directory.Exists(library.Path) == false)
@@ -91,16 +92,18 @@ namespace FileFlows.Server.Workers
                     tasks.Add(GetLibraryFile(library, flow, file));
                 }
                 Task.WaitAll(tasks.ToArray());
-                DbHelper.AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray());
 
-                DbHelper.UpdateLastModified(library.Uid);
+
+                libFileController.AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
+
+                libController.UpdateDateModified(library.Uid).Wait();
             }
             Logger.Instance.DLog("Finished scanning libraries");
         }
 
         private async Task<LibraryFile?> GetLibraryFile(Library library, Flow flow, FileInfo file)
         {
-            if (await CanAccess(file) == false)
+            if (await CanAccess(file, library.FileSizeDetectionInterval) == false)
                 return null; // this can happen if the file is currently being written to, next scan will retest it
 
             return new LibraryFile
@@ -126,16 +129,17 @@ namespace FileFlows.Server.Workers
 
         internal static void ResetProcessing()
         {
-            var controller = new LibraryFileController();
-            var processing = controller.GetAll(FileStatus.Processing).Result;
+            // special case can use dbhelper directly
+            // this is called at the start up of FileFlows
+            var processing = DbHelper.Select<LibraryFile>().Result.Where(x => x.Status == FileStatus.Processing);
             foreach (var p in processing)
             {
                 p.Status = FileStatus.Unprocessed;
-                controller.Update(p).Wait();
+                DbHelper.Update(p).Wait();
             }
         }
 
-        private async Task<bool> CanAccess(FileInfo file)
+        private async Task<bool> CanAccess(FileInfo file, int fileSizeDetectionInterval)
         {
             try
             {
@@ -143,7 +147,9 @@ namespace FileFlows.Server.Workers
                 {
                     // check if the file size changes
                     long fs = file.Length;
-                    await Task.Delay(5_000);
+                    if(fileSizeDetectionInterval > 0)
+                        await Task.Delay(Math.Min(300, fileSizeDetectionInterval) * 1000);
+
                     if (fs != file.Length)
                     {
                         Logger.Instance.ILog("File size has changed, skipping for now: " + file.FullName);

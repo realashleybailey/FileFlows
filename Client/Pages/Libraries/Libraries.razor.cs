@@ -20,7 +20,7 @@ namespace FileFlows.Client.Pages
 
         private async Task Add()
         {
-            await Edit(new Library() { Enabled = true });
+            await Edit(new Library() { Enabled = true, ScanInterval = 60 });
         }
 #if (DEMO)
         public override async Task Load()
@@ -97,14 +97,29 @@ namespace FileFlows.Client.Pages
             fields.Add(new ElementField
             {
                 InputType = FileFlows.Plugin.FormInputType.Int,
+                Parameters = new Dictionary<string, object>
+                {
+                    { "Min", 10 },
+                    { "Max", 24 * 60 * 60 }
+                },
                 Name = nameof(library.ScanInterval)
+            });
+            fields.Add(new ElementField
+            {
+                InputType = FileFlows.Plugin.FormInputType.Int,
+                Parameters = new Dictionary<string, object>
+                {
+                    { "Min", 0 },
+                    { "Max", 300 }
+                },
+                Name = nameof(library.FileSizeDetectionInterval)
             });
             fields.Add(new ElementField
             {
                 InputType = FileFlows.Plugin.FormInputType.Switch,
                 Name = nameof(library.Enabled)
             });
-            var result = await Editor.Open("Pages.Library", library.Name, fields, library,
+            var result = await Editor.Open("Pages.Library", "Pages.Library.Title", fields, library,
               saveCallback: Save);
             return false;
         }

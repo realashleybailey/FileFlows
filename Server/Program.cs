@@ -46,7 +46,7 @@ FileFlows.Shared.Logger.Instance = FileFlows.Server.Logger.Instance;
 
 //if (FileFlows.Server.Globals.IsDevelopment == false)
 //    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
-FileFlows.Server.Helpers.DbHelper.CreateDatabase();
+FileFlows.Server.Helpers.DbHelper.CreateDatabase().Wait();
 
 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -64,8 +64,8 @@ pl.ScanForPlugins();
 FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
 FileFlows.Server.Workers.Worker.StartWorkers();
 
-
 // this will run the asp.net app and wait until it is killed
 app.Run();
 
 FileFlows.Server.Workers.Worker.StopWorkers();
+

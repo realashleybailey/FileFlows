@@ -68,8 +68,10 @@
                                 case FormInputType.Int:
                                     {
                                         var value = GetValue<int>(field.Name);
+                                        int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
+                                        int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
                                         <InputNumber Label="@label" Value="@value" ValueChanged="@(x => UpdateValue(field.Name, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" />
+                            Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" />
                                     }
                                     break;
                                 case FormInputType.Switch:

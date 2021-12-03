@@ -64,5 +64,19 @@ namespace FileFlows.Server.Helpers
                 mutex.ReleaseMutex();
             }
         }
+
+        internal static async Task UpdateDateModified(Guid uid, DateTime date)
+        {
+            mutex.WaitOne();
+            try
+            {
+                var db = DbHelper.GetDb();
+                db.Execute($"update {nameof(DbObject)} set {nameof(DbObject.DateModified)} = @0", date);
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+        }
     }
 }

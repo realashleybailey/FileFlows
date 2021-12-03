@@ -13,6 +13,9 @@ namespace FileFlows.Server.Controllers
         {
             var libraryFiles = await base.GetDataList();
 
+            if (status != null)
+                libraryFiles = libraryFiles.Where(x => x?.Status == status.Value).ToList();
+
             if (status == FileStatus.Unprocessed)
                 return libraryFiles.OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                               .ThenBy(x => x.DateCreated);
@@ -122,6 +125,16 @@ namespace FileFlows.Server.Controllers
             {
                 libFile.Order = ++order;
                 await DbHelper.Update(libFile);
+            }
+        }
+
+        internal async Task AddMany(LibraryFile[] libraryFiles)
+        {
+            await DbHelper.AddMany(libraryFiles);
+            lock (Data)
+            {
+                foreach (var lf in libraryFiles)
+                    Data.Add(lf.Uid, lf);
             }
         }
 

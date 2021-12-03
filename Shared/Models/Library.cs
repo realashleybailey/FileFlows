@@ -13,5 +13,10 @@ namespace FileFlows.Shared.Models
         /// Gets or sets the number of seconds to scan files
         /// </summary>
         public int ScanInterval { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of seconds to wait before checking for file size changes when scanning the library
+        /// </summary>
+        public int FileSizeDetectionInterval { get; set; }
     }
 }

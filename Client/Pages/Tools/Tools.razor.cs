@@ -44,7 +44,7 @@ namespace FileFlows.Client.Pages
                     new FileFlows.Shared.Validators.Required()
                 }
             });
-            var result = await Editor.Open("Pages.Tool", Tool.Name, fields, Tool,
+            var result = await Editor.Open("Pages.Tool", "Pages.Tool.Title", fields, Tool,
               saveCallback: Save);
 #endif
             return false;

@@ -36,7 +36,14 @@ namespace FileFlows.Server.Helpers
 
         private static Database UseSqlLite()
         {
-            return new Database("Data Source=Data/FileFlows.sqlite;Version=3;", null, SQLiteFactory.Instance);
+            try
+            {
+                return new Database("Data Source=Data/FileFlows.sqlite;Version=3;", null, SQLiteFactory.Instance);
+            }catch(Exception ex)
+            {
+                Logger.Instance.ELog("Error loading database: " + ex.Message);
+                throw;
+            }
         }
 
         public static async Task<IEnumerable<T>> Select<T>() where T : ViObject, new()
@@ -289,10 +296,17 @@ namespace FileFlows.Server.Helpers
 
         public static async Task<bool> CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
-            if (UseMySql == false)
-                return await CreateSqliteDatabase();
-            else
-                return await CreateMySqlDatabase(connectionString);
+            try
+            {
+                if (UseMySql == false)
+                    return await CreateSqliteDatabase();
+                else
+                    return await CreateMySqlDatabase(connectionString);
+            }catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed creating database: " + ex.Message);
+                return false;
+            }
         }
 
         private static async Task<bool> CreateSqliteDatabase()

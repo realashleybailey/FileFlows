@@ -68,7 +68,7 @@
     }
   },
   "Pages": {
-    "Dashboard":{
+    "Dashboard": {
       "Title": "Home",
       "Labels": {
         "ShrinkageTitle": "Storage Saved",
@@ -76,56 +76,60 @@
         "OriginalSize": "Original Size",
         "Savings": "Savings"
       },
-      "ErrorMessages":{
-        "LogFailed":"Failed to retrieve log for worker"
+      "ErrorMessages": {
+        "LogFailed": "Failed to retrieve log for worker"
       },
-      "Messages":{
-        "CancelMesssage":"Are you sure you want to cancel the worker for {CurrentFile}?",
-        "Waiting":"Waiting for a file to process"
+      "Messages": {
+        "CancelMesssage": "Are you sure you want to cancel the worker for {CurrentFile}?",
+        "Waiting": "Waiting for a file to process"
       },
-      "Fields":{
-        "Log":"Log",
-        "CurrentStep":"Step",
-        "File":"File",
-        "Overall":"Overall",
-        "Current":"Current",
-        "Uid":"UID",
-        "Library":"Library",
-        "ProcessingTime":"Processing Time",
-        "Upcoming":"Upcoming",
-        "RecentlyFinished":"Recently Finished",
-        "WorkingFile":"Working File"
+      "Fields": {
+        "Log": "Log",
+        "CurrentStep": "Step",
+        "File": "File",
+        "Overall": "Overall",
+        "Current": "Current",
+        "Uid": "UID",
+        "Library": "Library",
+        "ProcessingTime": "Processing Time",
+        "Upcoming": "Upcoming",
+        "RecentlyFinished": "Recently Finished",
+        "WorkingFile": "Working File"
       }
     },
     "Flow": {
       "Title": "Flow",
-      "Labels":{
-        "EditFlow":"Flow: {Name}"
+      "Labels": {
+        "EditFlow": "Flow: {Name}"
       },
-      "Messages":{
-        "Cancel":"Are you sure you want to cancel and discard all changes?"
+      "Messages": {
+        "Cancel": "Are you sure you want to cancel and discard all changes?"
       }
     },
-    "Flows":{
-      "Title":"Flows"
+    "Flows": {
+      "Title": "Flows"
     },
     "Libraries": {
       "Title": "Libraries",
-      "ErrorMessages":{
-        "NoFlows":"There are no flows configured.\nCreate a flow before adding or updating a library."
+      "ErrorMessages": {
+        "NoFlows": "There are no flows configured.\nCreate a flow before adding or updating a library."
       }
     },
-    "Library":{
-      "Fields":{
-        "Name":"Name",
-        "Path":"Path",
-        "Enabled":"Enabled",
-        "Flow":"Flow",
-        "Filter":"Filter",
+    "Library": {
+      "Title": "Library",
+      "Fields": {
+        "Name": "Name",
+        "Path": "Path",
+        "Enabled": "Enabled",
+        "Flow": "Flow",
+        "Filter": "Filter",
         "Filter-Help": "An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
         "ScanInterval": "Scan Interval",
         "ScanInterval-Suffix": "Seconds",
-        "ScanInterval-Help": "The shortest possible time in seconds between scans.  It is not guaranteed to scan at this interval each time, as another scan might be in progress."
+        "ScanInterval-Help": "The shortest possible time in seconds between scans.  It is not guaranteed to scan at this interval each time, as another scan might be in progress.",
+        "FileSizeDetectionInterval": "File Detection Interval",
+        "FileSizeDetectionInterval-Suffix": "Seconds",
+        "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a reocrding every 20 seconds."
       }
     },
     "LibraryFiles": {
@@ -134,7 +138,7 @@
         "Ignore": "Ignore",
         "Process": "Process",
         "View": "View",
-        "MoveToTop":"Move To Top"
+        "MoveToTop": "Move To Top"
       }
     },
     "Plugins": {
@@ -162,8 +166,11 @@
         "WorkerFlowExecutor-Helper": "If the flow executor is enabled or not.  When this is disabled no flows will be run."
       }
     },
-    "Tools":{
-      "Title":"Tools"
+    "Tools": {
+      "Title": "Tools"
+    },
+    "Tool": {
+      "Title": "Tool"
     }
   },
   "Plugins": {

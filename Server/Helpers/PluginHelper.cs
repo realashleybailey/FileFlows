@@ -25,7 +25,7 @@ namespace FileFlows.Server.Helpers
             var dllPluginInfo = GetPlugins();
 
             var controller = new PluginController();
-            var dbPluginInfos = controller.GetAll().Result;
+            var dbPluginInfos = controller.GetDataList().Result;
 
             List<string> installed = new List<string>();
 
@@ -302,7 +302,7 @@ namespace FileFlows.Server.Helpers
         {
             List<Type> nodes = new List<Type>();
             var tNode = typeof(Node);
-            var plugins= new PluginController().GetAll().Result.Where(x => x.Deleted == false && x.Enabled);
+            var plugins= new PluginController().GetDataList().Result.Where(x => x.Deleted == false && x.Enabled);
             foreach (var plugin in plugins)
             {
                 var nodeTypes = GetAssemblyNodeTypes(plugin.Assembly)?.ToList();
@@ -352,6 +352,8 @@ namespace FileFlows.Server.Helpers
                 {
                     try
                     {
+                        if (k == "Name")
+                            continue; // this is just the display name in the flow UI
                         var prop = nt.GetProperty(k, BindingFlags.Instance | BindingFlags.Public);
                         if (prop == null)
                             continue;
@@ -365,7 +367,8 @@ namespace FileFlows.Server.Helpers
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Failed setting property: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                        Logger.Instance.ELog("Type: " + nt.Name + ", Property: " + k);
+                        Logger.Instance.ELog("Failed setting property: " + ex.Message + Environment.NewLine + ex.StackTrace);
                     }
                 }
             }

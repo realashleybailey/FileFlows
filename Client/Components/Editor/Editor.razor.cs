@@ -94,7 +94,7 @@ namespace FileFlows.Client.Components
         {
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
-            this.Title = title;
+            this.Title = Translater.TranslateIfNeeded(title);
             this.Fields = fields;
             this.ReadOnly = readOnly;
             this.Large = large;

@@ -44,6 +44,14 @@
                         <span>@item.Flow.Name</span>
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="Library" Width="14rem">
+                    <Header>
+                        Last Scanned
+                    </Header>
+                    <Cell Context="item">
+                        <span>@TimeSpanToString(item)</span>
+                    </Cell>
+                </FlowTableColumn>
                 <FlowTableColumn TItem="Library" Width="10rem">
                     <Header>
                         Enabled

@@ -33,7 +33,7 @@
         </ul>
     </Body>
     <Footer>
-        <RadzenButton Click=@Select Text="@lblSelect" Disabled="Selected == null" />
-        <RadzenButton Click=@Cancel Text="@lblCancel" />
+        <button @onclick=@Select disabled="@(Selected == null ? "disabled": null)">@lblSelect</button>
+        <button @onclick=@Cancel>@lblCancel</button>
     </Footer>
 </Modal>

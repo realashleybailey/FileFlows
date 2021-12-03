@@ -12,6 +12,8 @@
   filter: opacity(0.4);
   padding: 0.5rem;
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .status-picker .status .icon {
   margin-right: 1rem;

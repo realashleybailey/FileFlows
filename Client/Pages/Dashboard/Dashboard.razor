@@ -59,8 +59,8 @@
                                     </span>
                                     <div class="actions-wrapper">
                                         <div class="actions">
-                                            <RadzenButton Click="() => LogClicked(worker)" Text="@lblLog" />
-                                            <RadzenButton Click="() => CancelClicked(worker)" Text="@lblCancel" />
+                                            <button class="btn" @onclick="() => LogClicked(worker)">@lblLog</button>
+                                            <button class="btn" @onclick="() => CancelClicked(worker)">@lblCancel</button>
                                         </div>
                                     </div>
                                 }

@@ -4,6 +4,6 @@
 <InputWrapper Input="@this">
     <div class="input-file-wrapper">
         <VariableInput Uid="@Uid" Variables=@Variables @bind-Value="Value" Placeholder="@Placeholder" />
-        <RadzenButton Click=@Browse Text="..." />
+        <button @onclick=@Browse>...</button>
     </div>
 </InputWrapper>

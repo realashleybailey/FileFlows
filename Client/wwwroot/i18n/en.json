@@ -44,13 +44,20 @@
     }
   },
   "ErrorMessages": {
-    "UnexpectedError":"An unexpected error occurred",
+    "UnexpectedError": "An unexpected error occurred",
     "SaveFailed": "Failed to save",
     "DeleteFailed": "Failed to delete",
-    "NotFound":"Item not found",
-    "NameInUse":"Name is already in use",
+    "NotFound": "Item not found",
+    "NameInUse": "Name is already in use",
     "NameRequired": "Name is required",
     "DuplicatesFound": "Duplicates found"
+  },
+  "Times": {
+    "Never": "Never",
+    "SecondsAgo": "{num} {num, plural, one {second} other {seconds}} ago",
+    "MinutesAgo": "{num} {num, plural, one {minute} other {minutes}} ago",
+    "HoursAgo": "{num} {num, plural, one {hour} other {hour}} ago",
+    "DaysAgo": "{num} {num, plural, one {day} other {days}} ago"
   },
   "Flow": {
     "ErrorMessages":{

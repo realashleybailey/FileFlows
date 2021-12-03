@@ -159,6 +159,22 @@ namespace FileFlows.Client.Pages
 #endif
         }
 
+
+        private string TimeSpanToString(Library lib)
+        {
+            if (lib.LastScanned.Year < 2001)
+                return Translater.Instant("Times.Never");
+
+            if (lib.LastScannedAgo.TotalMinutes < 1)
+                return Translater.Instant("Times.SecondsAgo", new { num = (int)lib.LastScannedAgo.TotalSeconds });
+            if (lib.LastScannedAgo.TotalHours < 1)
+                return Translater.Instant("Times.MinutesAgo", new { num = (int)lib.LastScannedAgo.TotalSeconds });
+            if (lib.LastScannedAgo.TotalDays < 1)
+                return Translater.Instant("Times.HoursAgo", new { num = (int)lib.LastScannedAgo.TotalDays });
+            else
+                return Translater.Instant("Times.DaysAgo", new { num = (int)lib.LastScannedAgo.TotalDays });
+
+        }
     }
 
 }

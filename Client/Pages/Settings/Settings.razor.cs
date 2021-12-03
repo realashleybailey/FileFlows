@@ -5,6 +5,8 @@ namespace FileFlows.Client.Pages
     using Microsoft.AspNetCore.Components;
     using FileFlows.Shared;
     using FileFlows.Client.Components;
+    using System.Collections.Generic;
+    using FileFlows.Shared.Validators;
 
     public partial class Settings : ComponentBase
     {
@@ -16,11 +18,16 @@ namespace FileFlows.Client.Pages
         private string lblSave, lblSaving;
 
         private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
+
+        List<Validator> DirectoryValidators = new ();
+
         protected override async Task OnInitializedAsync()
         {
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             Blocker.Show("Loading Settings");
+
+            DirectoryValidators.Add(new Required());
 
 #if (!DEMO)
             var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");

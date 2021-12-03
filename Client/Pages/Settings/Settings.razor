@@ -4,27 +4,34 @@
 <PageView>
 
     <Head>
-        <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
+        <button @onclick=@Save>
+            @if(IsSaving)
+            {
+                @lblSaving
+            }
+            else
+            {
+                @lblSave
+            }
+        </button>
     </Head>
 
     <Body>
         <div class="settings">
-
-            <RadzenTemplateForm Data="@Model">
-                <Fieldset Title="Pages.Settings.Labels.General">
-                    <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
-                </Fieldset>
-                <Fieldset Title="Pages.Settings.Labels.Directories">
-                    <InputFile @bind-Value="@Model.TempPath" Directory="true" Label="Pages.Settings.Fields.TempPath" />
-                    <InputFile @bind-Value="@Model.LoggingPath" Directory="true"
-                        Label="Pages.Settings.Fields.LoggingPath" />
-                </Fieldset>
-                <Fieldset Title="Pages.Settings.Labels.Workers">
-                    <InputSwitch @bind-Value="@Model.WorkerScanner" Label="Pages.Settings.Fields.WorkerScanner" />
-                    <InputSwitch @bind-Value="@Model.WorkerFlowExecutor"
-                        Label="Pages.Settings.Fields.WorkerFlowExecutor" />
-                </Fieldset>
-            </RadzenTemplateForm>
+            <Fieldset Title="Pages.Settings.Labels.General">
+                <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
+            </Fieldset>
+            <Fieldset Title="Pages.Settings.Labels.Directories">
+                <InputFile @bind-Value="@Model.TempPath" Directory="true" Validators=@DirectoryValidators
+                    Label="Pages.Settings.Fields.TempPath" />
+                <InputFile @bind-Value="@Model.LoggingPath" Directory="true" Validators=@DirectoryValidators
+                    Label="Pages.Settings.Fields.LoggingPath" />
+            </Fieldset>
+            <Fieldset Title="Pages.Settings.Labels.Workers">
+                <InputSwitch @bind-Value="@Model.WorkerScanner" Label="Pages.Settings.Fields.WorkerScanner" />
+                <InputSwitch @bind-Value="@Model.WorkerFlowExecutor"
+                    Label="Pages.Settings.Fields.WorkerFlowExecutor" />
+            </Fieldset>
         </div>
     </Body>
 

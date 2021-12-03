@@ -30,7 +30,7 @@ namespace FileFlows.Server.Workers
                 //Logger.Instance.DLog("Scanner worker not enabled");
                 return;
             }
-            var libController = new Controllers.LibraryController();
+            var libController = new LibraryController();
             var libaries = libController.GetAll().Result;
             var libFileController = new LibraryFileController();
             List<LibraryFile> libraryFiles = libFileController.GetAll(null).Result?.ToList() ?? new ();
@@ -42,8 +42,7 @@ namespace FileFlows.Server.Workers
 
                 if (library.Enabled == false)
                     continue;
-                if(library.DateModified != library.DateCreated // library was just created, do a scan
-                    && library.DateModified > DateTime.Now.AddSeconds(-library.ScanInterval))
+                if(library.LastScanned > DateTime.Now.AddSeconds(-library.ScanInterval))
                     continue;
 
                 if (string.IsNullOrEmpty(library.Path) || Directory.Exists(library.Path) == false)
@@ -96,7 +95,7 @@ namespace FileFlows.Server.Workers
 
                 libFileController.AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
 
-                libController.UpdateDateModified(library.Uid).Wait();
+                libController.UpdateLastScanned(library.Uid).Wait();
             }
             Logger.Instance.DLog("Finished scanning libraries");
         }

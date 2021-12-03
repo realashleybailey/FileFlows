@@ -10,6 +10,17 @@ namespace FileFlows.Shared.Models
         public ObjectReference Flow { get; set; }
 
         /// <summary>
+        /// When the library was last scanned
+        /// </summary>
+        public DateTime LastScanned { get; set; }
+
+
+        /// <summary>
+        /// The timespan of when this was last scanned
+        /// </summary>
+        public TimeSpan LastScannedAgo => DateTime.Now - LastScanned;
+
+        /// <summary>
         /// Gets or sets the number of seconds to scan files
         /// </summary>
         public int ScanInterval { get; set; }

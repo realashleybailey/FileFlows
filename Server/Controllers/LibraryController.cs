@@ -14,7 +14,13 @@ namespace FileFlows.Server.Controllers
         public Task<Library> Get(Guid uid) => GetByUid(uid);
 
         [HttpPost]
-        public Task<Library> Save([FromBody] Library library) => base.Update(library, checkDuplicateName: true);
+        public Task<Library> Save([FromBody] Library library)
+        {
+            if (library.Uid == Guid.Empty)
+                library.LastScanned = DateTime.MinValue; // never scanned
+
+            return base.Update(library, checkDuplicateName: true);
+        }
 
         [HttpPut("state/{uid}")]
         public async Task<Library> SetState([FromRoute] Guid uid, [FromQuery] bool enable)
@@ -41,6 +47,15 @@ namespace FileFlows.Server.Controllers
                 lib.Flow.Name = name;
                 await Update(lib);
             }
+        }
+
+        internal async Task UpdateLastScanned(Guid uid)
+        {
+            var lib = await GetByUid(uid);
+            if (lib == null)
+                return;
+            lib.LastScanned = DateTime.Now;
+            await Update(lib);
         }
     }
 }

@@ -13,13 +13,21 @@
                 <Head>
                     @if (ReadOnly)
                     {
-                        <RadzenButton class="cancel-button" Click=@Cancel Text="@lblClose" />
+                        <button @onclick=@Cancel>@lblClose</button>
                     }
                     else
                     {
-                        <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
-
-                        <RadzenButton class="cancel-button" Click=@Cancel Text="@lblCancel" />
+                        <button @onclick=@Save> 
+                            @if (IsSaving)
+                            {
+                                @lblSaving
+                            }
+                            else
+                            {
+                                @lblSave
+                            }
+                        </button>
+                        <button @onclick=@Cancel>@lblCancel</button>
                     }
                 </Head>
 

@@ -11,7 +11,7 @@
             autocomplete="off" autofocus />
     </Body>
     <Footer>
-        <RadzenButton Click=@Accept Text="@lblOk" Disabled="@(String.IsNullOrWhiteSpace(Value))" />
-        <RadzenButton Click=@Cancel Text="@lblCancel" />
+        <button @onclick=@Accept disabled="@(String.IsNullOrWhiteSpace(Value) ? "disabled" : "null")">@lblOk</button>
+        <button @onclick=@Cancel>@lblCancel</button>
     </Footer>
 </Modal>

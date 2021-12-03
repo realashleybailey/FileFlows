@@ -74,5 +74,9 @@
   {
     "outputFile": "Components/Inputs/InputNumber/InputNumber.razor.css",
     "inputFile": "Components/Inputs/InputNumber/InputNumber.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/buttons.css",
+    "inputFile": "wwwroot/css/buttons.scss"
   }
 ]

@@ -2,7 +2,7 @@
 @typeparam TItem
 
 
-<button @onclick="@OnClick" disabled="@(Enabled == false)">
+<button class="flowtable-button" @onclick="@OnClick" disabled="@(Enabled == false)">
     @if (string.IsNullOrEmpty(Icon) == false)
     {
         <span class="icon @Icon"></span>

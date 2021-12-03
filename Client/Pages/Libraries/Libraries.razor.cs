@@ -20,7 +20,7 @@ namespace FileFlows.Client.Pages
 
         private async Task Add()
         {
-            await Edit(new Library() { Enabled = true, ScanInterval = 60 });
+            await Edit(new Library() { Enabled = true, ScanInterval = 60, FileSizeDetectionInterval = 5 });
         }
 #if (DEMO)
         public override async Task Load()

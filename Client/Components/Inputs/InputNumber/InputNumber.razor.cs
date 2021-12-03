@@ -8,18 +8,22 @@ namespace FileFlows.Client.Components.Inputs
     {
         public override bool Focus() => FocusUid();
 
-        private int _Min = 0, _Max = 10_000;
+        private int _Min = 0, _Max = int.MaxValue;
 
         [Parameter]
         public int Min { get => _Min; set => _Min = value; }
         [Parameter]
-        public int Max { get => _Max; set => _Max= value; }
+        public int Max { get => _Max; set => _Max = value == 0 ? int.MaxValue : Max; }
 
         private async Task ChangeValue(ChangeEventArgs e)
         {
-            if (int.TryParse(e.Value?.ToString() ?? "", out int value))
+            if (double.TryParse(e.Value?.ToString() ?? "", out double value))
             {
-                this.Value = value;
+                if (value > int.MaxValue)
+                    value = int.MaxValue;
+                else if (value < int.MinValue)
+                    value = int.MinValue;
+                this.Value = (int)value;
                 if (this.Value > Max)
                 {
                     this.Value = Max;

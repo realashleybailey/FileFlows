@@ -32,10 +32,7 @@ namespace FileFlows.Server.Workers
             try
             {
                 var controller = new LibraryFileController();
-                var file = controller.GetAll(FileStatus.Unprocessed).Result
-                                   .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
-                                   .ThenBy(x => x.DateCreated)
-                                   .FirstOrDefault();
+                var file = controller.GetAll(FileStatus.Unprocessed).Result?.FirstOrDefault();
                 if (file != null)
                 {
                     file.Status = FileStatus.Processing;

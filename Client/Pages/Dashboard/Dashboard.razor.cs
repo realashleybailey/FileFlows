@@ -62,7 +62,13 @@ namespace FileFlows.Client.Pages
         {
             Logger.Instance.DLog("Disposing the dashboard!");
             if (jsFunctions != null)
-                _ = jsFunctions.InvokeVoidAsync("DestroyAllCharts", this.Workers);
+            {
+                try
+                {
+                    _ = jsFunctions.InvokeVoidAsync("DestroyAllCharts", this.Workers);
+                }
+                catch (Exception) { }
+            }
             if (AutoRefreshTimer != null)
             {
                 AutoRefreshTimer.Stop();
@@ -109,7 +115,11 @@ namespace FileFlows.Client.Pages
                         this.Workers.AddRange(result.Data);
                     }
                     await WaitForRender();
-                    await jsFunctions.InvokeVoidAsync("InitChart", this.Workers, this.lblOverall, this.lblCurrent);
+                    try
+                    {
+                        await jsFunctions.InvokeVoidAsync("InitChart", this.Workers, this.lblOverall, this.lblCurrent);
+                    }
+                    catch(Exception) { }
                 }
 
                 var upcomingResult = await GetLibraryFiles("/api/library-file/upcoming", false);

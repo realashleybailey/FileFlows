@@ -1,5 +1,6 @@
 ﻿.navbar-toggler {
   background-color: transparent;
+  outline: none !important;
 }
 .navbar-toggler .fas, .navbar-toggler .far {
   font-size: 1.3rem;

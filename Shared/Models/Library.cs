@@ -29,5 +29,20 @@ namespace FileFlows.Shared.Models
         /// Gets or sets the number of seconds to wait before checking for file size changes when scanning the library
         /// </summary>
         public int FileSizeDetectionInterval { get; set; }
+
+        /// <summary>
+        /// Gets or sets the processing priority of this library
+        /// </summary>
+        public ProcessingPriority Priority { get; set; }
+    }
+
+    public enum ProcessingPriority
+    {
+        Lowest = -10,
+        Low = -5,
+        Normal = 0,
+        High = 5,
+        Highest = 10
+
     }
 }

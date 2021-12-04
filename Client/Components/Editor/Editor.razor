@@ -99,8 +99,9 @@
                                 case FormInputType.Select:
                                     {
                                         var value = GetValue<object>(field.Name, "");
+                                        bool allowClear = GetParameter<bool>(field, nameof(Components.Inputs.InputSelect.AllowClear), true);
                                         var options = GetParameter<List<FileFlows.Plugin.ListOption>>(field, "Options");
-                                        <InputSelect Label="@label" Value="@value" Options=@options
+                                        <InputSelect Label="@label" Value="@value" Options=@options AllowClear=@allowClear
                             ValueChanged="@(x => UpdateValue(field.Name, x))" Placeholder="@field.Placeholder" />
                                     }
                                     break;

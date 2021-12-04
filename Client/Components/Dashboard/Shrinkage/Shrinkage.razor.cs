@@ -38,7 +38,13 @@
         {
             Logger.Instance.DLog("Disposing the shrinkage");
             if (Dashboard.jsFunctions != null)
-                _ = Dashboard.jsFunctions.InvokeVoidAsync("DestroyChart", this.Uid);
+            {
+                try
+                {
+                    _ = Dashboard.jsFunctions.InvokeVoidAsync("DestroyChart", this.Uid);
+                }
+                catch (Exception) { }
+            }
             if (AutoRefreshTimer != null)
             {
                 AutoRefreshTimer.Stop();
@@ -68,10 +74,14 @@
 #endif
             HasData = Data.FinalSize > 0 && Data.OriginalSize > 0;
 
-            await Dashboard.jsFunctions.InvokeVoidAsync("InitPieChart", this.Uid, 
-                new [] { Data.FinalSize, Data.OriginalSize - Data.FinalSize }, 
-                new [] { lblFinalSize, lblSavings} 
-            );
+            try
+            {
+                await Dashboard.jsFunctions.InvokeVoidAsync("InitPieChart", this.Uid,
+                    new[] { Data.FinalSize, Data.OriginalSize - Data.FinalSize },
+                    new[] { lblFinalSize, lblSavings }
+                );
+            }
+            catch (Exception) { }
         }
 
     }

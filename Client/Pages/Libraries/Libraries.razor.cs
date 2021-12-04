@@ -96,6 +96,21 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
+                InputType = FileFlows.Plugin.FormInputType.Select,
+                Name = nameof(library.Priority),
+                Parameters = new Dictionary<string, object>{
+                    { "AllowClear", false },
+                    { "Options", new List<ListOption> {
+                        new ListOption { Value = ProcessingPriority.Lowest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Lowest)}" },
+                        new ListOption { Value = ProcessingPriority.Low, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Low)}" },
+                        new ListOption { Value = ProcessingPriority.Normal, Label =$"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Normal)}" },
+                        new ListOption { Value = ProcessingPriority.High, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.High)}" },
+                        new ListOption { Value = ProcessingPriority.Highest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Highest)}" }
+                    } }
+                }
+            });
+            fields.Add(new ElementField
+            {
                 InputType = FileFlows.Plugin.FormInputType.Int,
                 Parameters = new Dictionary<string, object>
                 {

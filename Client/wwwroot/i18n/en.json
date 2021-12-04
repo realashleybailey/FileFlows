@@ -34,13 +34,20 @@
       "DirectoryTitle":"Select A Directory"
     }
   },
-  "Enums":{
-    "FileStatus":{
-      "Processed":"Processed",
-      "Processing":"Processing",
-      "Unprocessed":"Unprocessed",
-      "FlowNotFound":"Flow Not Found",
-      "ProcessingFailed":"Processing Failed"
+  "Enums": {
+    "FileStatus": {
+      "Processed": "Processed",
+      "Processing": "Processing",
+      "Unprocessed": "Unprocessed",
+      "FlowNotFound": "Flow Not Found",
+      "ProcessingFailed": "Processing Failed"
+    },
+    "ProcessingPriority": {
+      "Lowest": "Lowest",
+      "Low": "Low",
+      "Normal": "Normal",
+      "High": "High",
+      "Highest": "Highest"
     }
   },
   "ErrorMessages": {
@@ -129,6 +136,8 @@
         "Path": "Path",
         "Enabled": "Enabled",
         "Flow": "Flow",
+        "Priority": "Priority",
+        "Priority-Help": "The priority with which files should be processed. If a higher prority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
         "Filter-Help": "An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
         "ScanInterval": "Scan Interval",

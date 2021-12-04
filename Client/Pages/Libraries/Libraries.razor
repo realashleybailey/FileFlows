@@ -44,7 +44,7 @@
                         <span>@item.Flow.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="Library" Width="14rem">
+                <FlowTableColumn TItem="Library" Width="12rem">
                     <Header>
                         Last Scanned
                     </Header>
@@ -52,7 +52,16 @@
                         <span>@TimeSpanToString(item)</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="Library" Width="10rem">
+                
+                <FlowTableColumn TItem="Library" Width="8rem">
+                    <Header>
+                        Priority
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Priority</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Library" Width="6rem">
                     <Header>
                         Enabled
                     </Header>

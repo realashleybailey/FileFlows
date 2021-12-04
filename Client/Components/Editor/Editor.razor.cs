@@ -172,14 +172,14 @@ namespace FileFlows.Client.Components
                 dict.Add(field, value);
         }
 
-        private T GetParameter<T>(ElementField field, string parameter)
+        private T GetParameter<T>(ElementField field, string parameter, T @default = default(T))
         {
             var dict = field?.Parameters as IDictionary<string, object>;
             if (dict?.ContainsKey(parameter) != true)
-                return default(T);
+                return @default;
             var val = dict[parameter];
             if (val == null)
-                return default(T);
+                return @default;
             try
             {
                 return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), val);
@@ -187,7 +187,7 @@ namespace FileFlows.Client.Components
             catch (Exception)
             {
                 Logger.Instance.ELog("Failed converted: " + parameter, val);
-                return default(T);
+                return @default;
             }
         }
 

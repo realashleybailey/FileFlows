@@ -1,4 +1,4 @@
-﻿button:not(.flowtable-button) {
+﻿button:not(.flowtable-button):not(.navbar-toggler) {
     font-size: 0.8rem !important;
     text-transform: uppercase;
     border-radius: unset !important;

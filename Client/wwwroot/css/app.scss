@@ -1,7 +1,8 @@
-﻿@import url('blocker.css');
-@import url('inputs.css');
-@import url('buttons.css');
-@import url('radzen.css');
+﻿@use 'blocker';
+@use 'inputs';
+@use 'buttons';
+@use 'modal';
+@use 'radzen';
 
 html {
     overflow: hidden;
@@ -119,36 +120,6 @@ a, .btn-link {
     z-index:2;
     background:rgba(var(--base-rgb), 0.7);
 }
-
-.vi-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index:5;
-    min-width:20rem;
-    
-    box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);  
-    background: rgba(var(--base-rgb), 0.8);
-    padding:1rem;
-    
-    .vi-modal-title {
-        color:var(--accent);        
-    }
-    .vi-modal-body {
-        margin:1rem 0;
-    }
-    .vi-modal-footer {
-        text-align: right;
-    }
-    .vi-modal-footer {
-        button {
-            width:6rem;
-            padding:0;
-        }
-    }
-}
-
 button {
     .fas, .far {
         width:1rem;

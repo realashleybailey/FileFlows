@@ -23,7 +23,7 @@ namespace FileFlows.Client.Pages
             await Edit(new Library() { Enabled = true, ScanInterval = 60, FileSizeDetectionInterval = 5 });
         }
 #if (DEMO)
-        public override async Task Load()
+        public override async Task Load(Guid? selectedUid = null)
         {
             this.Data = Enumerable.Range(1, 5).Select(x => new Library
             {

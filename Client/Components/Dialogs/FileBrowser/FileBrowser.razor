@@ -10,17 +10,17 @@
                 class="@(item == Selected ? "selected" : "")">
                     @if (item.IsDrive)
                     {
-                        <span class="far fa-hdd"></span>
+                        <span class="far fa-hdd" @onclick="() => DblClick(item)"></span>
                         <span class="name">@item.Name</span>
                     }
                     else if (item.IsParent)
                     {
-                        <span class="far fa-folder-open"></span>
+                        <span class="far fa-folder-open" @onclick="() => DblClick(item)"></span>
                         <span class="name">..</span>
                     }
                     else if (item.IsPath)
                     {
-                        <span class="far fa-folder"></span>
+                        <span class="far fa-folder" @onclick="() => DblClick(item)"></span>
                         <span class="name">@item.Name</span>
                     }
                     else

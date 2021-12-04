@@ -27,13 +27,17 @@
                 _Width = value ?? string.Empty;
                 if (_Width != string.Empty) {
                     className = string.Empty;
-                    style = $"width:{_Width};min-width:{_Width};max-width:{_Width}";
+                    //style = $"width:{_Width};min-width:{_Width};max-width:{_Width}";
+                    style = string.Empty;
                 }
                 else{
                     style = string.Empty;
                 }
             }
         }
+
+        [Parameter]
+        public string MobileWidth { get; set; }
 
         [Parameter]
         public string ColumnName { get; set; }

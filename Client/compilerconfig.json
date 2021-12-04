@@ -78,5 +78,21 @@
   {
     "outputFile": "wwwroot/css/buttons.css",
     "inputFile": "wwwroot/css/buttons.scss"
+  },
+  {
+    "outputFile": "Components/ViContainer/ViContainer.razor.css",
+    "inputFile": "Components/ViContainer/ViContainer.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/modal.css",
+    "inputFile": "wwwroot/css/modal.scss"
+  },
+  {
+    "outputFile": "Components/Dialogs/FileBrowser/FileBrowser.razor.css",
+    "inputFile": "Components/Dialogs/FileBrowser/FileBrowser.razor.scss"
+  },
+  {
+    "outputFile": "Components/Editor/Editor.razor.css",
+    "inputFile": "Components/Editor/Editor.razor.scss"
   }
 ]

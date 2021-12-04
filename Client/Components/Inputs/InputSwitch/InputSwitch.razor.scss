@@ -3,3 +3,13 @@ div {
     margin: 0;
     height: 1.6rem;
 }
+
+
+
+@media screen and (max-width:578px) {
+    .flow-switch-wrapper {
+        position: absolute;
+        top: -1.6rem;
+        right: 0;
+    }
+}

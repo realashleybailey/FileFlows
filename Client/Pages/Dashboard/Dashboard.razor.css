@@ -157,3 +157,32 @@
 .spacer {
   height: 2rem;
 }
+
+@media screen and (max-width: 576px) {
+  .worker-info .label-value {
+    flex-direction: column !important;
+  }
+
+  .working-file {
+    display: none !important;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  .actions button {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin: auto;
+  }
+  .actions button + button {
+    margin-left: 1rem;
+  }
+
+  ::deep .apexcharts-canvas {
+    width: 100% !important;
+    text-align: center;
+  }
+}

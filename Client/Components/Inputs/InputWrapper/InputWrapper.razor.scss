@@ -7,7 +7,6 @@
 
 .input-label {
     margin-bottom:auto;
-    color:rgba(var(--color-rgb), 0.7);
 }
 
 .error-text {
@@ -31,4 +30,16 @@
     flex-grow: 1;
     position: relative;
     margin: 1px; /* one pixel margin for outline of selected inputs */
+}
+
+
+@media screen and (max-width:578px) 
+{
+    .row {
+        flex-direction:column;
+    }
+    .input-label {
+        width:unset;
+        margin:unset;
+    }
 }

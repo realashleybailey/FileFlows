@@ -62,7 +62,7 @@
         private async Task Refresh()
         {
 #if (DEMO)
-            Data = new FileFlows.Shared.Models.ShrinkageData { FileSize = 10_000_000, OriginalSize = 25_000_000 };
+            Data = new FileFlows.Shared.Models.ShrinkageData { FinalSize = 10_000_000, OriginalSize = 25_000_000 };
 #else
             var result = await HttpHelper.Get<FileFlows.Shared.Models.ShrinkageData>("/api/library-file/shrinkage");
             if (result.Success)

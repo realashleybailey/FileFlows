@@ -138,6 +138,8 @@ namespace FileFlows.Client.Pages
             var result = await Editor.Open("Plugins." + plugin.Assembly.Replace(".dll", ""), plugin.Name, plugin.Fields, plugin.Settings,
                 saveCallback: SaveSettings);
             return false; // we dont need to reload the list
+#else
+            return false;
 #endif
         }
     }

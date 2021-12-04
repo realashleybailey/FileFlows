@@ -63,7 +63,7 @@
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="10rem">
+                <FlowTableColumn TItem="LibraryFile" Width="10rem" MobileWidth="0">
                     <Header>
                         Flow
                     </Header>
@@ -71,7 +71,7 @@
                         <span>@item.Flow.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="10rem">
+                <FlowTableColumn TItem="LibraryFile" Width="10rem" MobileWidth="0">
                     <Header>
                         Library
                     </Header>
@@ -79,7 +79,7 @@
                         <span>@item.Library.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed)">
+                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed)" MobileWidth="5rem">
                     <Header>
                         Time
                     </Header>
@@ -87,7 +87,7 @@
                         <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
+                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
                     <Header>
                         Size
                     </Header>

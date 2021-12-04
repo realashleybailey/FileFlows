@@ -18,6 +18,36 @@
         </div>
     </CascadingValue>
 
+    <style> 
+        @foreach(var col in this.ColumnList)
+        {
+            string hashcode = ".col-" + col.GetHashCode();
+            if(string.IsNullOrEmpty(col.Width) == false)
+            {
+                <text>
+                @hashcode { 
+                    min-width:@col.Width;
+                    max-width:@col.Width;
+                    width:@col.Width;
+                }
+                </text>
+            }
+            @if(string.IsNullOrEmpty(col.MobileWidth) == false)
+            {
+                <text>
+                    @@media screen and (max-width: 578px) {
+                        @hashcode {
+                            min-width:@(col.MobileWidth == "auto" ? "unset" : col.MobileWidth);
+                            max-width:@(col.MobileWidth == "auto" ? "unset" : col.MobileWidth);
+                            width:@(col.MobileWidth == "auto" ? "unset" : col.MobileWidth);
+
+                        }
+                    }
+                </text>
+            }
+        }
+    </style>
+
     <div class="flowtable-data">
 
         <div class="flowtable-header">
@@ -30,7 +60,8 @@
                 }
                 @foreach(var col in ColumnList)
                 {
-                    <span class="@col.ClassName @(col.Hidden ? "hidden" : "")" style="@col.Style">
+                    string hashcode = "col-" + col.GetHashCode();
+                    <span class="@col.ClassName @hashcode @(col.Hidden ? "hidden" : "")" style="@col.Style">
                         @col.Header
                     </span>
                 }
@@ -52,7 +83,8 @@
                         }
                         @foreach (var col in ColumnList)
                         {
-                            <span class="@col.ClassName @(col.Hidden ? "hidden": "")" style="@col.Style">
+                            string hashcode = "col-" + col.GetHashCode();
+                            <span class="@col.ClassName @hashcode @(col.Hidden ? "hidden": "")" style="@col.Style">
                                 @col.Cell(item.Key)
                             </span>
                         }

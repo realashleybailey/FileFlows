@@ -22,7 +22,7 @@ namespace FileFlows.Client.Pages
 
 
 #if (DEMO)
-        protected override Task<RequestResult<List<T>>> FetchData()
+        protected override Task<RequestResult<List<ffFlow>>> FetchData()
         {
             var results = Enumerable.Range(1, 10).Select(x => new ffFlow
             {
@@ -30,7 +30,7 @@ namespace FileFlows.Client.Pages
                 Name = "Demo Flow " + x,
                 Enabled = x < 5
             }).ToList();
-            return new RequestResult<List<ffFlow>> { Success = true, Data = results };
+            return Task.FromResult(new RequestResult<List<ffFlow>> { Success = true, Data = results });
         }
 #endif
 

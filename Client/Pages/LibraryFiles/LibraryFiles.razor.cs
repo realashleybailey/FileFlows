@@ -54,7 +54,7 @@ namespace FileFlows.Client.Pages
 
 
 #if (DEMO)
-        public override async Task Load()
+        public override async Task Load(Guid? selectedUid = null)
         {
             this.Data = Enumerable.Range(1, SelectedStatus == FileStatus.Processing ? 1 : 10).Select(x => new LibraryFile
             {

@@ -90,7 +90,7 @@ namespace FileFlows.Client.Components
                 this.RegisteredInputs.Add(input);
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null)
         {
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
@@ -99,6 +99,20 @@ namespace FileFlows.Client.Components
             this.ReadOnly = readOnly;
             this.Large = large;
             this.Visible = true;
+
+            lblSave = lblSave.EmptyAsNull() ?? "Labels.Save";
+            this.lblCancel = Translater.TranslateIfNeeded(lblCancel.EmptyAsNull() ?? "Labels.Cancel");
+
+            if (lblSave == "Labels.Save") {
+                this.lblSaving = Translater.Instant("Labels.Saving");
+                this.lblSave = Translater.Instant(lblSave);
+            }
+            else
+            {
+                this.lblSave = Translater.Instant(lblSave);
+                this.lblSaving = lblSave;
+            }
+
             this.RegisteredInputs.Clear();
             Logger.Instance.DLog("getting description for: " + typeName);
             this.EditorDescription = Translater.Instant(typeName + ".Description");

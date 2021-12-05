@@ -39,6 +39,20 @@ namespace FileFlows.Server.Controllers
         [HttpDelete]
         public Task Delete([FromBody] ReferenceModel model) => DeleteAll(model);
 
+        [HttpPut("rescan")]
+        public async Task Rescan([FromBody] ReferenceModel model)
+        {
+            foreach(var uid in model.Uids)
+            {
+                var item = await GetByUid(uid);
+                if (item == null)
+                    continue;
+                item.LastScanned = DateTime.MinValue;
+                await Update(item);
+
+            }
+        }
+
         internal async Task UpdateFlowName(Guid uid, string name)
         {
             var libraries = await GetDataList();

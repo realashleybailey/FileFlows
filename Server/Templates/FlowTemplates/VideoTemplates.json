@@ -1,0 +1,93 @@
+[
+  {
+    "name": "Blank Video Template",
+    "parts": [
+      {
+        "node": "VideoFile",
+        "uid": "00000000-0000-0000-0000-000000000001"
+      }
+    ]
+  },
+
+  {
+    "name": "Convert to H265/AC3 (NVIDIA)",
+    "parts": [
+      {
+        "node": "VideoFile",
+        "uid": "00000000-0000-0000-0000-000000000001",
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000002"
+          }
+        ]
+      },
+      {
+        "node": "Video_H265_AC3",
+        "uid": "00000000-0000-0000-0000-000000000002",
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          },
+          {
+            "output": 2,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          }
+        ],
+        "model": {
+          "NvidiaEncoding": true,
+          "Crf": 21
+        }
+      },
+      {
+        "node": "ReplaceOriginal",
+        "uid": "00000000-0000-0000-0000-000000000003"
+      }
+    ]
+  },
+
+  {
+    "name": "Convert to H265/AC3 (CPU)",
+    "parts": [
+      {
+        "node": "VideoFile",
+        "uid": "00000000-0000-0000-0000-000000000001",
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000002"
+          }
+        ]
+      },
+      {
+        "node": "Video_H265_AC3",
+        "uid": "00000000-0000-0000-0000-000000000002",
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          },
+          {
+            "output": 2,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          }
+        ],
+        "model": {
+          "NvidiaEncoding": false,
+          "Crf": 21
+        }
+      },
+      {
+        "node": "ReplaceOriginal",
+        "uid": "00000000-0000-0000-0000-000000000003"
+      }
+    ]
+  }
+]

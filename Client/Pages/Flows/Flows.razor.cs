@@ -13,6 +13,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using ffFlow = FileFlows.Shared.Models.Flow;
     using System;
+    using FileFlows.Client.Components.Inputs;
 
     public partial class Flows : ListPage<ffFlow>
     {
@@ -51,9 +52,67 @@ namespace FileFlows.Client.Pages
 #endif
         }
 
-        private void Add()
+        private async void Add()
         {
+#if (DEMO)
             NavigationManager.NavigateTo("flows/" + Guid.Empty);
+#else
+            Blocker.Show();
+            List<Plugin.ListOption> templates = null;
+            try
+            { 
+                var flowResult = await HttpHelper.Get<List<FileFlows.Shared.Models.Flow>>("/api/flow/templates");
+                if(flowResult.Success == false || flowResult.Data?.Any() != true)
+                {
+                    // no templates, give them a blank
+                    NavigationManager.NavigateTo("flows/" + Guid.Empty);
+                    return;
+                }
+
+                templates = flowResult.Data.Select(x => new Plugin.ListOption
+                {
+                    Label = x.Name,
+                    Value = x
+                }).ToList();
+            }
+            finally
+            {
+                Blocker.Hide();
+            }
+            templates.Insert(0, new Plugin.ListOption
+            {
+                Label = Translater.Instant("Pages.Flows.Template.BlankTemplate"),
+                Value = null
+            });
+
+            List<ElementField> fields = new List<ElementField>();
+            // add the name to the fields, so a node can be renamed
+            fields.Insert(0, new ElementField
+            {
+                Name = "PageDescription",
+                InputType = Plugin.FormInputType.Label
+            });
+            fields.Insert(1, new ElementField
+            {
+                Name = "Template",
+                InputType = Plugin.FormInputType.Select,
+                Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputSelect.Options), templates },
+                        { nameof(InputSelect.AllowClear), false}
+                    }
+            });
+
+            var newModelTask = Editor.Open("Pages.Flows.Template", "Pages.Flows.Template.Title", fields, new System.Dynamic.ExpandoObject(), lblSave: "Labels.Add");
+            await newModelTask;
+            if (newModelTask.IsCanceled || newModelTask.Result is IDictionary<string, object> == false)
+                return;
+
+            var newTemplate = ((IDictionary<string, object>)newModelTask.Result)["Template"] as FileFlows.Shared.Models.Flow;
+
+            App.Instance.NewFlowTemplate = newTemplate;
+            NavigationManager.NavigateTo("flows/" + Guid.Empty);
+#endif
         }
 
 

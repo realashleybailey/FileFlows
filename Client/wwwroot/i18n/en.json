@@ -16,6 +16,7 @@
     "Edit": "Edit",
     "Update": "Update",
     "Refresh": "Refresh",
+    "Rescan": "Rescan",
     "Help": "Help",
     "Name": "Name",
     "Log": "Log",
@@ -121,7 +122,16 @@
       }
     },
     "Flows": {
-      "Title": "Flows"
+      "Title": "Flows",
+      "Template": {
+        "Title": "Add Flow",
+        "BlankTemplate": "Blank Template",
+        "Fields": {
+          "PageDescription": "Select a template to base the flow on, this will help you get started with a flow. The nodes on the next page can be customised for your system.",
+          "Template": "Template",
+          "Template-Help": "The template to base the new flow on."
+        }
+      }
     },
     "Libraries": {
       "Title": "Libraries",
@@ -137,7 +147,7 @@
         "Enabled": "Enabled",
         "Flow": "Flow",
         "Priority": "Priority",
-        "Priority-Help": "The priority with which files should be processed. If a higher prority library has files waiting to be processed, those will be done first.",
+        "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
         "Filter-Help": "An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
         "ScanInterval": "Scan Interval",
@@ -145,7 +155,7 @@
         "ScanInterval-Help": "The shortest possible time in seconds between scans.  It is not guaranteed to scan at this interval each time, as another scan might be in progress.",
         "FileSizeDetectionInterval": "File Detection Interval",
         "FileSizeDetectionInterval-Suffix": "Seconds",
-        "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a reocrding every 20 seconds."
+        "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a recording every 20 seconds."
       }
     },
     "LibraryFiles": {

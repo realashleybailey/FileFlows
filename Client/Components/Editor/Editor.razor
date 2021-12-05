@@ -134,6 +134,14 @@
                             Validators=@field.Validators Placeholder="@field.Placeholder" />
                                     }
                                     break;
+                                case FormInputType.Label:
+                                {
+                                    <div class="input-label">
+                                        @Translater.TranslateIfNeeded(label)
+                                    </div>
+                                }
+                                break;
+
                                 default:
                                     {
                                         <span>couldnt find type @field.InputType</span>

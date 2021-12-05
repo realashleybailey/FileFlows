@@ -22,6 +22,8 @@ namespace FileFlows.Client
 
         public bool IsMobile => DisplayWidth > 0 && DisplayWidth <= 768;
 
+        public FileFlows.Shared.Models.Flow NewFlowTemplate { get; set; }
+
         private async Task LoadLanguage()
         {
             string langFile = await LoadLanguageFile("i18n/en.json?version=" + Globals.Version);

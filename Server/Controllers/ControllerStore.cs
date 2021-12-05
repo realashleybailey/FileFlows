@@ -23,6 +23,21 @@
             return (await GetData()).Any(x => uid != x.Key && x.Value.Name.ToLower() == name);
         }
 
+        protected async Task<string> GetNewUniqueName(string name)
+        {
+            string newName = name.Trim();
+            var names = (await GetData()).Select(x => x.Value.Name.ToLower()).ToList();
+            int count = 2;
+            while (names.Contains(newName.ToLower()))
+            {
+                newName = name + " (" + count + ")";
+                ++count;
+                if (count > 100)
+                    throw new Exception("Could not find unique name, aborting.");
+            }
+            return newName;
+        }
+
         protected void ClearData() => Data = null;
 
         internal async Task<Dictionary<Guid, T>> GetData()

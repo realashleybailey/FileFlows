@@ -188,7 +188,30 @@ namespace FileFlows.Client.Pages
                 return Translater.Instant("Times.HoursAgo", new { num = (int)lib.LastScannedAgo.TotalDays });
             else
                 return Translater.Instant("Times.DaysAgo", new { num = (int)lib.LastScannedAgo.TotalDays });
+        }
 
+        private async Task Rescan()
+        {
+            var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+            if (uids.Length == 0)
+                return; // nothing to rescan
+
+            Blocker.Show();
+            this.StateHasChanged();
+
+            try
+            {
+#if (!DEMO)
+                var deleteResult = await HttpHelper.Put($"{ApiUrl}/rescan", new ReferenceModel { Uids = uids });
+                if (deleteResult.Success == false)
+                    return;
+#endif
+            }
+            finally
+            {
+                Blocker.Hide();
+                this.StateHasChanged();
+            }
         }
     }
 

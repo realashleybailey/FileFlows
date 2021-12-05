@@ -8,10 +8,13 @@ namespace FileFlows.Server.Controllers
     using System.Dynamic;
     using FileFlows.Plugin;
     using FileFlows.Plugin.Attributes;
+    using FileFlows.Server.Models;
 
     [Route("/api/flow")]
     public class FlowController : ControllerStore<Flow>
     {
+        const int DEFAULT_XPOS = 450;
+        const int DEFAULT_YPOS = 50;
 
         [HttpGet]
         public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
@@ -82,8 +85,8 @@ namespace FileFlows.Server.Controllers
                     flow.Parts.Add(new FlowPart
                     {
                         Name = info.name,
-                        xPos = 450,
-                        yPos = 50,
+                        xPos = DEFAULT_XPOS,
+                        yPos = DEFAULT_YPOS,
                         Uid = Guid.NewGuid(),
                         Type = FlowElementType.Input,
                         Outputs = 1,
@@ -104,7 +107,7 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPut]
-        public async Task<Flow> Save([FromBody] Flow model)
+        public async Task<Flow> Save([FromBody] Flow model, [FromQuery] bool uniqueName = false)
         {
             if (model == null)
                 throw new Exception("No model");
@@ -113,9 +116,16 @@ namespace FileFlows.Server.Controllers
             if (string.IsNullOrWhiteSpace(model.Name))
                 throw new Exception("ErrorMessages.NameRequired");
             model.Name = model.Name.Trim();
-            bool inUse = await NameInUse(model.Uid, model.Name);
-            if (inUse)
-                throw new Exception("ErrorMessages.NameInUse");
+            if (uniqueName == false)
+            {
+                bool inUse = await NameInUse(model.Uid, model.Name);
+                if (inUse)
+                    throw new Exception("ErrorMessages.NameInUse");
+            }
+            else
+            {
+                model.Name = await GetNewUniqueName(model.Name);
+            }            
 
             if (model.Parts?.Any() != true)
                 throw new Exception("Flow.ErrorMessages.NoParts");
@@ -219,6 +229,83 @@ namespace FileFlows.Server.Controllers
                 }
                 return results;
             }
+        }
+
+        private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
+    
+        [HttpGet("templates")]
+        public List<Flow> GetTemplates()
+        {
+            var parts = GetElements().ToDictionary(x => x.Name, x => x);
+
+            List<Flow> templates = new List<Flow>();
+            foreach (var tf in GetTemplateFiles())
+            {
+                try
+                {
+                    string json = System.IO.File.ReadAllText(tf.FullName);
+                    var jsTemplates = System.Text.Json.JsonSerializer.Deserialize<FlowTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
+                    {
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true
+                    });
+                    foreach (var _jst in jsTemplates)
+                    {
+                        try
+                        {
+                            var jstJson = System.Text.Json.JsonSerializer.Serialize(_jst);
+                            // replace all the guids with unique guides
+                            for(int i = 1; i < 50; i++)
+                            {
+                                jstJson = jstJson.Replace("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i, Guid.NewGuid().ToString());
+                            }
+                            var jst = System.Text.Json.JsonSerializer.Deserialize<FlowTemplate>(jstJson);
+
+                            List<FlowPart> flowParts = new List<FlowPart>();
+                            int y = DEFAULT_YPOS;
+                            foreach (var jsPart in jst.Parts)
+                            {
+                                var element = parts[jsPart.Node];
+                                flowParts.Add(new FlowPart
+                                {
+                                    yPos = y,
+                                    xPos = DEFAULT_XPOS,
+                                    FlowElementUid = element.Uid,
+                                    Outputs = element.Outputs,
+                                    Inputs = element.Inputs,
+                                    Type = element.Type,
+                                    Uid = jsPart.Uid,
+                                    Icon = element.Icon,
+                                    Model = jsPart.Model,
+                                    OutputConnections = jsPart.Connections?.Select(x => new FlowConnection
+                                    {
+                                        Input = x.Input,
+                                        Output = x.Output,
+                                        InputNode = x.Node
+                                    }).ToList() ?? new List<FlowConnection>()
+                                });
+                                y += 150;
+                            }
+                            templates.Add(new Flow
+                            {
+                                Name = jst.Name,
+                                Enabled = true,
+                                Parts = flowParts
+                            });
+                        }
+                        catch(Exception ex)
+                        {
+                            Logger.Instance.ELog("Template: " + _jst.Name);
+                            Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                        }
+                    }
+                } 
+                catch (Exception ex)
+                {
+                    Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine + ex.StackTrace); 
+                }
+            }
+            return templates;
         }
     }
 

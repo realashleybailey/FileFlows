@@ -69,8 +69,18 @@ namespace FileFlows.Client.Pages
                 {
                     Available = elementsResult.Data;
                 }
-                var modelResult = await GetModel(API_URL + "/" + Uid.ToString());
-                await InitModel((modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() });
+                FileFlows.Shared.Models.Flow flow;
+                if (Uid == Guid.Empty && App.Instance.NewFlowTemplate != null)
+                {
+                    flow = App.Instance.NewFlowTemplate;
+                    App.Instance.NewFlowTemplate = null;
+                }
+                else
+                {
+                    var modelResult = await GetModel(API_URL + "/" + Uid.ToString());
+                    flow = (modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() };
+                }
+                await InitModel(flow);
 
                 var dotNetObjRef = DotNetObjectReference.Create(this);
                 await jsRuntime.InvokeVoidAsync("ffFlow.init", new object[] { "flow-parts", dotNetObjRef, this.Parts });

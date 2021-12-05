@@ -24,7 +24,8 @@ namespace FileFlows.Plugin
         LogView = 11,
         RegularExpression = 12,
         TextVariable = 13,
-        KeyValue = 14
+        KeyValue = 14,
+        Label = 15
     }
 
 

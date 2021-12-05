@@ -173,6 +173,13 @@ namespace FileFlows.Server.Controllers
             variables.Add("fileOrigExt", ".mkv");
             variables.Add("fileOrigFileName", "OriginalFile");
 
+            variables.Add("fileCreateYear", 2009);
+            variables.Add("fileCreateMonth", 3);
+            variables.Add("fileCreateDay", 1);
+            variables.Add("fileModifiedYear", 2019);
+            variables.Add("fileModifiedMonth", 6);
+            variables.Add("fileModifiedDay", 19);
+
             variables.Add("folderName", "FolderName");
             variables.Add("folderFullName", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
             variables.Add("folderOrigName", "FolderOriginalName");

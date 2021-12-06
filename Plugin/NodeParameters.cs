@@ -253,6 +253,7 @@ namespace FileFlows.Plugin
                 if (CreateLinuxDir(di.Parent) == false)
                     return false;
             }
+            Logger?.ILog("Creating folder: " + di.FullName);
 
             string cmd = $"mkdir {di.FullName.Replace(" ", "\\ ")}";
 
@@ -273,7 +274,9 @@ namespace FileFlows.Plugin
                     process.WaitForExit();
 
                     if (process.ExitCode == 0)
-                        return true;
+                    {
+                        return ChangeOwner(di.FullName);
+                    }
                     Logger?.ELog("Failed creating directory:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
                     if (string.IsNullOrWhiteSpace(error) == false)
                         Logger?.ELog("Error output:" + output);
@@ -287,12 +290,63 @@ namespace FileFlows.Plugin
             }
         }
 
-        public bool Chmod(string filePath, string permissions = "777", bool recursive = true) 
+        public bool ChangeOwner(string filePath, bool recursive = true) 
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
-            string cmd = $"chmod{(recursive ? " -R" : "")} {permissions} {filePath.Replace(" ", "\\ ")}";
+            if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
+                filePath += Path.DirectorySeparatorChar;
+
+            Logger?.ILog("Changing owner on folder: " + filePath);
+
+
+            string cmd = $"chown{(recursive ? " -R" : "")} nobody:users {filePath.Replace(" ", "\\ ")}";
+
+            try
+            {
+                using (var process = new System.Diagnostics.Process())
+                {
+                    process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
+
+                    process.Start();
+                    string output = process.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                        return SetPermissions(filePath);
+                    Logger?.ELog("Failed changing owner:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
+                    if(string.IsNullOrWhiteSpace(error) == false)
+                        Logger?.ELog("Error output:" + output);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger?.ELog("Failed changing owner: " + filePath + " => " + ex.Message);
+                return false;
+            }
+        }
+
+
+        public bool SetPermissions(string filePath, bool recursive = true)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return true; // its windows, lets just pretend we did this
+
+            if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
+                filePath += Path.DirectorySeparatorChar;
+
+            Logger?.ILog("Setting permissions on folder: " + filePath);
+
+
+            string cmd = $"chmod{(recursive ? " -R" : "")} 777 {filePath.Replace(" ", "\\ ")}";
 
             try
             {
@@ -313,14 +367,14 @@ namespace FileFlows.Plugin
                     if (process.ExitCode == 0)
                         return true;
                     Logger?.ELog("Failed setting permissions:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
-                    if(string.IsNullOrWhiteSpace(error) == false)
+                    if (string.IsNullOrWhiteSpace(error) == false)
                         Logger?.ELog("Error output:" + output);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Logger?.ELog("Failed settings permissions: " + ex.Message);
+                Logger?.ELog("Failed setting permissions: " + filePath + " => " + ex.Message);
                 return false;
             }
         }

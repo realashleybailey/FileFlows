@@ -1,6 +1,6 @@
 ﻿@namespace FileFlows.Client.Components.Common
 
-<label class="flow-switch">
-  <input type="checkbox" checked=@(Value ? "checked" : null) @onchange="OnChange">
+<label class="flow-switch" @onclick:preventDefault @onclick:stopPropagation @onclick="ToggleValue">
+  <input type="checkbox" checked=@(Value ? "checked" : null) @onchange="OnChange" @onclick:stopPropagation>
   <span class="slider round"></span>
 </label>

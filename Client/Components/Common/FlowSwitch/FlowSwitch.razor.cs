@@ -32,5 +32,10 @@
         {
             this.Value = args.Value as bool? == true;
         }
+
+        private void ToggleValue(EventArgs args)
+        {
+            this.Value = !this.Value;
+        }
     }
 }

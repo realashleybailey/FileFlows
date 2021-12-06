@@ -114,7 +114,7 @@ namespace FileFlows.Client.Components.Inputs
                     ErrorMessage = ""; // clear the error
                 _Value = value;
                 ValueChanged.InvokeAsync(value);
-                Field.InvokeValueChanged(this.Editor, value);
+                Field?.InvokeValueChanged(this.Editor, value);
             }
         }
 

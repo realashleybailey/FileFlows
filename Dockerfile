@@ -1,4 +1,5 @@
 FROM jrottenberg/ffmpeg:4.1-nvidia
+#FROM jrottenberg/ffmpeg:4.1-vaapi
 
 # expose the ports we need
 EXPOSE 5000

@@ -19,17 +19,24 @@ namespace FileFlows.Server.Controllers
             var libraries = await new LibraryController().GetData();
 
             if (status == FileStatus.Unprocessed)
-                return libraryFiles.OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
+            {
+                return libraryFiles
+                              .Where(x => 
+                                // unprocessed just show the enabled libraries
+                                libraries.ContainsKey(x.Library.Uid) && 
+                                libraries[x.Uid].Enabled
+                              ).OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                               .ThenByDescending(x =>
                               {
                                   // check the processing priority of the library
-                                  if(x.Library != null && libraries.ContainsKey(x.Library.Uid))
+                                  if (x.Library != null && libraries.ContainsKey(x.Library.Uid))
                                   {
                                       return (int)libraries[x.Library.Uid].Priority;
                                   }
                                   return (int)ProcessingPriority.Normal;
                               })
                               .ThenBy(x => x.DateCreated);
+            }
 
             if (status == FileStatus.Processing)
                 return libraryFiles;

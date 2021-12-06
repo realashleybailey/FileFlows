@@ -94,5 +94,9 @@
   {
     "outputFile": "Components/Editor/Editor.razor.css",
     "inputFile": "Components/Editor/Editor.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputSelect/InputSelect.razor.css",
+    "inputFile": "Components/Inputs/InputSelect/InputSelect.razor.scss"
   }
 ]

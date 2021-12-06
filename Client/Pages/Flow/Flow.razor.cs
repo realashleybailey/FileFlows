@@ -287,7 +287,15 @@ namespace FileFlows.Client.Pages
 
             string title = FlowHelper.FormatLabel(typeName);
             var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1);
-            await newModelTask;
+            try
+            {
+                await newModelTask;
+            }
+            catch (Exception)
+            {
+                // can throw if canceled
+                return null;
+            }
             if (newModelTask.IsCanceled == false)
             {
                 IsDirty = true;

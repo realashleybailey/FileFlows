@@ -1,6 +1,7 @@
 [
   {
     "name": "Blank Video Template",
+    "description": "A blank Video template with a single \"Video File\" input node.",
     "parts": [
       {
         "node": "VideoFile",
@@ -11,6 +12,8 @@
 
   {
     "name": "Convert to H265/AC3 (NVIDIA)",
+    "description": "Will convert videos to H265/AC3.   The original file will be replaced.\n\nIf the original file is already H265/AC3 the file will not be re-encoded.",
+    "group": "Video",
     "parts": [
       {
         "node": "VideoFile",
@@ -47,6 +50,8 @@
 
   {
     "name": "Convert to H265/AC3 (CPU)",
+    "description": "Will convert videos to H265/AC3.   The original file will be replaced.\n\nIf the original file is already H265/AC3 the file will not be re-encoded.",
+    "group": "Video",
     "parts": [
       {
         "node": "VideoFile",
@@ -84,6 +89,8 @@
 
   {
     "name": "Convert to H265/AC3 (NVIDIA) with Cropping",
+    "description": "Will convert videos to H265/AC3 and crop the video if black bars are detected.   The original file will be replaced.\n\nIf the original file is already H265/AC3 and no black bars are detected, the file will not be re-encoded.",
+    "group": "Video",
     "parts": [
       {
         "node": "VideoFile",
@@ -136,6 +143,8 @@
 
   {
     "name": "Convert to H265/AC3 (CPU) with Cropping",
+    "group": "Video",
+    "description": "Will convert videos to H265/AC3 and crop the video if black bars are detected.   The original file will be replaced.\n\nIf the original file is already H265/AC3 and no black bars are detected, the file will not be re-encoded.",
     "parts": [
       {
         "node": "VideoFile",
@@ -182,6 +191,87 @@
       {
         "node": "ReplaceOriginal",
         "uid": "00000000-0000-0000-0000-000000000004"
+      }
+    ]
+  },
+
+
+
+  {
+    "name": "Convert Video Downloads to H265/AC3",
+    "description": "Used to monitor a downloads directory from a download client, eg sabnzbd, and will convert downloaded movies into H265/AC3.\n\nNote: The \"Move File\" node is configured to move to \"/media/downloads/converted\" if this is not the directory you wish to use, edit this node after adding the template.",
+    "group": "Video Downloads",
+    "parts": [
+      {
+        "node": "VideoFile",
+        "uid": "00000000-0000-0000-0000-000000000001",
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000002"
+          }
+        ]
+      },
+      {
+        "node": "DetectBlackBars",
+        "uid": "00000000-0000-0000-0000-000000000002",
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          },
+          {
+            "output": 2,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          }
+        ]
+      },
+      {
+        "node": "Video_H265_AC3",
+        "uid": "00000000-0000-0000-0000-000000000003",
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000004"
+          },
+          {
+            "output": 2,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000004"
+          }
+        ],
+        "model": {
+          "NvidiaEncoding": false,
+          "Crf": 21
+        }
+      },
+      {
+        "node": "MoveFile",
+        "uid": "00000000-0000-0000-0000-000000000004",
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000005"
+          }
+        ],
+        "model": {
+          "DestinationPath": "/media/downloads/converted",
+          "MoveFolder": true,
+          "DeleteOriginal": true
+        }
+      },
+      {
+        "node": "DeleteSourceDirectory",
+        "uid": "00000000-0000-0000-0000-000000000005",
+        "model": {
+          "IfEmpty": true,
+          "IncludePatterns": [ "avi", "divx", "mkv", "mov", "mp4", "mpg", "mpeg" ]
+        }
       }
     ]
   }

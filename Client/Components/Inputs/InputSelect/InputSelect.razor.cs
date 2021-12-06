@@ -8,10 +8,17 @@ namespace FileFlows.Client.Components.Inputs
     using System.Text.Json;
     using System.Threading.Tasks;
     using FileFlows.Plugin;
+    using System;
 
     public partial class InputSelect : Input<object>
     {
+        private Dictionary<string, List<ListOption>> Groups = new Dictionary<string, List<ListOption>>();
         private readonly List<ListOption> _Options = new List<ListOption>();
+
+        [Parameter] public bool ShowDescription { get; set; }
+
+        private string Description { get; set; }
+
         [Parameter]
         public IEnumerable<ListOption> Options
         {
@@ -21,11 +28,21 @@ namespace FileFlows.Client.Components.Inputs
                 _Options.Clear();
                 if (value == null)
                     return;
+                string group = string.Empty;
+                Groups = new Dictionary<string, List<ListOption>>();
+                Groups.Add(string.Empty, new List<ListOption>());
                 foreach (var lo in value)
                 {
+                    if(lo.Value is string && (string)lo.Value == Globals.LIST_OPTION_GROUP)
+                    {
+                        group = lo.Label;
+                        Groups.Add(group, new List<ListOption>());
+                        continue;
+                    }
                     if (Translater.NeedsTranslating(lo.Label))
                         lo.Label = Translater.Instant(lo.Label);
                     _Options.Add(lo);
+                    Groups[group].Add(lo);
                 }
             }
         }
@@ -33,6 +50,8 @@ namespace FileFlows.Client.Components.Inputs
         public override bool Focus() => FocusUid();
 
         private bool _AllowClear = true;
+
+        private string lblSelectOne;
         [Parameter]
         public bool AllowClear { get => _AllowClear; set { _AllowClear = value; } }
 
@@ -47,10 +66,9 @@ namespace FileFlows.Client.Components.Inputs
                     this.Value = null;
                 else
                     this.Value = Options.ToArray()[value].Value;
+                UpdateDescription();
             }
         }
-
-        private string lblSelectOne;
 
         protected override void OnInitialized()
         {
@@ -95,6 +113,7 @@ namespace FileFlows.Client.Components.Inputs
         {
             if (int.TryParse(args?.Value?.ToString(), out int index))
                 SelectedIndex = index;
+            UpdateDescription();
         }
 
         public override async Task<bool> Validate()
@@ -105,6 +124,28 @@ namespace FileFlows.Client.Components.Inputs
                 return false;
             }
             return await base.Validate();
+        }
+
+        private void UpdateDescription()
+        {
+            Description = string.Empty;
+            if (this.ShowDescription == false)
+                return;
+
+            IDictionary<string, object> dict = Value as IDictionary<string, object>;
+
+            if (dict == null)
+            {
+                try
+                {
+                    string json = JsonSerializer.Serialize(Value);
+                    dict = (IDictionary<string, object>)JsonSerializer.Deserialize<System.Dynamic.ExpandoObject>(json);
+                }
+                catch (Exception) { }
+            }
+
+            if (dict?.ContainsKey("Description") == true)
+                Description = dict["Description"]?.ToString() ?? string.Empty;
         }
     }
 }

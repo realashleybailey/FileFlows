@@ -14,6 +14,9 @@ namespace FileFlows.Client.Components.Inputs
         string Help { get; set; }
         string Placeholder { get; set; }
         string ErrorMessage { get; set; }
+        bool HideLabel { get; set; }
+
+        FileFlows.Shared.Models.ElementField Field { get; set; }
 
         Task<bool> Validate();
 
@@ -37,6 +40,8 @@ namespace FileFlows.Client.Components.Inputs
 
         protected string LabelOriginal => _LabelOriginal;
 
+        [Parameter]
+        public bool HideLabel { get; set; }
 
         [Parameter]
         public string Label
@@ -61,6 +66,11 @@ namespace FileFlows.Client.Components.Inputs
                 }
             }
         }
+
+        [Parameter]
+        public bool ReadOnly { get; set; }
+        [Parameter]
+        public FileFlows.Shared.Models.ElementField Field { get; set; }
 
         public string Help { get; set; }
         public string _Placeholder;
@@ -96,6 +106,7 @@ namespace FileFlows.Client.Components.Inputs
             {
                 if (_Value == null && value == null)
                     return;
+
                 if (_Value != null && value != null && _Value.Equals(value)) return;
 
                 bool areEqual = System.Text.Json.JsonSerializer.Serialize(_Value) == System.Text.Json.JsonSerializer.Serialize(value);

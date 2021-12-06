@@ -61,7 +61,7 @@ namespace FileFlows.Client.Pages
             List<Plugin.ListOption> templates = null;
             try
             { 
-                var flowResult = await HttpHelper.Get<List<FileFlows.Shared.Models.Flow>>("/api/flow/templates");
+                var flowResult = await HttpHelper.Get<Dictionary<string, List<FileFlows.Shared.Models.Flow>>>("/api/flow/templates");
                 if(flowResult.Success == false || flowResult.Data?.Any() != true)
                 {
                     // no templates, give them a blank
@@ -69,11 +69,23 @@ namespace FileFlows.Client.Pages
                     return;
                 }
 
-                templates = flowResult.Data.Select(x => new Plugin.ListOption
+                templates = new();
+                foreach(var  group in flowResult.Data)
                 {
-                    Label = x.Name,
-                    Value = x
-                }).ToList();
+                    if(string.IsNullOrEmpty(group.Key) == false)
+                    {
+                        templates.Add(new Plugin.ListOption
+                        {
+                            Value = Globals.LIST_OPTION_GROUP,
+                            Label = group.Key
+                        });
+                    }
+                    templates.AddRange(group.Value.Select(x => new Plugin.ListOption
+                    {
+                        Label = x.Name,
+                        Value = x
+                    }));
+                }
             }
             finally
             {
@@ -97,16 +109,25 @@ namespace FileFlows.Client.Pages
                 Name = "Template",
                 InputType = Plugin.FormInputType.Select,
                 Parameters = new Dictionary<string, object>
-                    {
-                        { nameof(InputSelect.Options), templates },
-                        { nameof(InputSelect.AllowClear), false}
-                    }
+                {
+                    { nameof(InputSelect.HideLabel), true},
+                    { nameof(InputSelect.Options), templates },
+                    { nameof(InputSelect.AllowClear), false},
+                    { nameof(InputSelect.ShowDescription), true }
+                }
             });
 
             var newModelTask = Editor.Open("Pages.Flows.Template", "Pages.Flows.Template.Title", fields, new System.Dynamic.ExpandoObject(), lblSave: "Labels.Add");
-            await newModelTask;
-            if (newModelTask.IsCanceled || newModelTask.Result is IDictionary<string, object> == false)
-                return;
+            try
+            {
+                await newModelTask;
+                if (newModelTask.IsCanceled || newModelTask.Result is IDictionary<string, object> == false)
+                    return;
+            }
+            catch (Exception)
+            {
+                return; // throws if canceled
+            }
 
             var newTemplate = ((IDictionary<string, object>)newModelTask.Result)["Template"] as FileFlows.Shared.Models.Flow;
 

@@ -11,12 +11,35 @@
             }
             @{
                 int index = -1;
-            }
-            @foreach (var opt in Options)
-            {
-                ++index;
-                <option selected=@(SelectedIndex == index ? "selected" : null) value="@(index)">@opt.Label</option>
+                foreach (var group in Groups)
+                {
+                    if (group.Key == string.Empty)
+                    {                        
+                        foreach (var opt in group.Value)
+                        {
+                            ++index;
+                            <option selected=@(SelectedIndex == index ? "selected" : null) value="@(index)">@opt.Label</option>
+                        }
+                    }
+                    else
+                    {
+                        <optgroup label=@group.Key>
+                            @foreach (var opt in group.Value)
+                            {
+                                ++index;
+                                <option selected=@(SelectedIndex == index ? "selected" : null) value="@(index)">@opt.Label</option>
+                            }
+                        </optgroup>
+                    }
+                }
             }
         </select>
     </div>
 </InputWrapper>
+
+@if (ShowDescription)
+{
+    <div class="row">
+        <div class="input-select-description">@Description</div>
+    </div>
+}

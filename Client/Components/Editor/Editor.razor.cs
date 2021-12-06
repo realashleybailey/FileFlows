@@ -90,6 +90,11 @@ namespace FileFlows.Client.Components
                 this.RegisteredInputs.Add(input);
         }
 
+        internal Inputs.IInput GetRegisteredInput(string name)
+        {
+            return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
+        }
+
         internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null)
         {
             this.SaveCallback = saveCallback;
@@ -177,13 +182,13 @@ namespace FileFlows.Client.Components
 
         }
 
-        private void UpdateValue(string field, object value)
+        private void UpdateValue(ElementField field, object value)
         {
             var dict = (IDictionary<string, object>)Model;
-            if (dict.ContainsKey(field))
-                dict[field] = value;
+            if (dict.ContainsKey(field.Name))
+                dict[field.Name] = value;
             else
-                dict.Add(field, value);
+                dict.Add(field.Name, value);
         }
 
         private T GetParameter<T>(ElementField field, string parameter, T @default = default(T))
@@ -236,25 +241,6 @@ namespace FileFlows.Client.Components
             }
 
             return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), value);
-            // var valueType = value.GetType();
-            // try
-            // {
-            //     if (typeof(T).IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
-            //     {
-
-            //         // we have a list, we want to make it an array
-            //         var converted = FileFlows.Shared.Converter.ChangeListToArray<T>((IEnumerable)value, valueType);
-            //         return (T)converted;
-            //     }
-
-            //     return (T)Convert.ChangeType(value, typeof(T));
-            // }
-            // catch (Exception ex)
-            // {
-            //     Logger.Instance.DLog("Not of type: " + field + ", " + value.GetType());
-            //     Logger.Instance.WLog("error: " + ex.Message + "\n" + ex.StackTrace);
-            //     return @default;
-            // }
         }
     }
 }

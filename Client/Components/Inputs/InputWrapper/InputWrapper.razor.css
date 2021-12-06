@@ -27,6 +27,10 @@
   margin: 0.4rem auto auto;
 }
 
+.hide-label .input-label {
+  display: none;
+}
+
 .input-value {
   flex-grow: 1;
   position: relative;

@@ -4,7 +4,7 @@
     bool invalid = string.IsNullOrEmpty(Input?.ErrorMessage) == false;
 
 }
-<div class="row @(invalid ? "error" : "")">
+<div class="row @(invalid ? "error" : "") @(Input?.HideLabel == true ? "hide-label": "")">
     <div class="input-label">
         @if (string.IsNullOrEmpty(Input?.Label) == false)
         {

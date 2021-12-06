@@ -233,12 +233,58 @@ namespace FileFlows.Plugin
             if (di.Exists)
                 return true;
 
-            di.Create();
-            if (Chmod(directory))
-                Logger?.ILog("Succesfully set permissions on directory");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                di.Create();
             else
-                Logger?.ILog("Failed to set permissions on directory");
+                CreateLinuxDir(di);
+            //if (Chmod(directory))
+            //    Logger?.ILog("Succesfully set permissions on directory");
+            //else
+            //    Logger?.ILog("Failed to set permissions on directory");
             return di.Exists;
+        }
+
+        private bool CreateLinuxDir(DirectoryInfo di)
+        {
+            if (di.Exists)
+                return true;
+            if (di.Parent != null && di.Parent.Exists == false)
+            {
+                if (CreateLinuxDir(di.Parent) == false)
+                    return false;
+            }
+
+            string cmd = $"mkdir {di.FullName.Replace(" ", "\\ ")}";
+
+            try
+            {
+                using (var process = new System.Diagnostics.Process())
+                {
+                    process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
+
+                    process.Start();
+                    string output = process.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                        return true;
+                    Logger?.ELog("Failed creating directory:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
+                    if (string.IsNullOrWhiteSpace(error) == false)
+                        Logger?.ELog("Error output:" + output);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger?.ELog("Failed creating directory: " + di.FullName + " -> " + ex.Message);
+                return false;
+            }
         }
 
         public bool Chmod(string filePath, string permissions = "777", bool recursive = true) 

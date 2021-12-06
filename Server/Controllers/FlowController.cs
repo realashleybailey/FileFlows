@@ -241,11 +241,13 @@ namespace FileFlows.Server.Controllers
         private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
     
         [HttpGet("templates")]
-        public List<Flow> GetTemplates()
+        public Dictionary<string, List<Flow>> GetTemplates()
         {
             var parts = GetElements().ToDictionary(x => x.Name, x => x);
 
-            List<Flow> templates = new List<Flow>();
+            Dictionary<string, List<Flow>> templates = new ();
+            string group = string.Empty;
+            templates.Add(group, new List<Flow>());
             foreach (var tf in GetTemplateFiles())
             {
                 try
@@ -293,10 +295,15 @@ namespace FileFlows.Server.Controllers
                                 });
                                 y += 150;
                             }
-                            templates.Add(new Flow
+
+                            if (templates.ContainsKey(_jst.Group ?? String.Empty) == false)
+                                templates.Add(_jst.Group ?? String.Empty, new List<Flow>());
+
+                            templates[_jst.Group ?? String.Empty].Add(new Flow
                             {
                                 Name = jst.Name,
                                 Enabled = true,
+                                Description = jst.Description,
                                 Parts = flowParts
                             });
                         }

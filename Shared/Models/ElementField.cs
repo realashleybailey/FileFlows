@@ -19,6 +19,11 @@ namespace FileFlows.Shared.Models
         public Dictionary<string, object> Parameters { get; set; }
 
         public List<Validators.Validator> Validators { get; set; }
+
+        public delegate void ValueChangedEvent(object sender, object value);
+        public event ValueChangedEvent ValueChanged;
+
+        public void InvokeValueChanged(object sender, object value) => this.ValueChanged?.Invoke(sender, value);    
     }
 
 }

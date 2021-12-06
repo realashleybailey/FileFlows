@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Video Library",
+    "group": "Generic",
+    "description": "Generic video library that searches for common video file extensions",
+    "filter": "\\.(ts|mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|h(\\.)?26[45])$",
+    "path": "/media/videos",
+    "scanInterval": 60,
+    "fileSizeDetectionInterval": 30
+
+  },
+  {
+    "name": "Music Library",
+    "group": "Generic",
+    "description": "Generic music library that searches for common music file extensions",
+    "filter": "\\.(mp3|wav|ogg|aac|wma|flac|alac|m4a|m4p)$",
+    "path": "/media/music",
+    "scanInterval": 60,
+    "fileSizeDetectionInterval": 30
+
+  },
+  {
+    "name": "Picture Library",
+    "group": "Generic",
+    "description": "Generic picture library that searches for common picture file extensions",
+    "filter": "\\.(jpe?g|jpe|tiff?|gif|png|webp|bmp|psd|svg)$",
+    "path": "/media/pictures",
+    "scanInterval": 60,
+    "fileSizeDetectionInterval": 30
+
+  },
+
+  {
+    "name": "SABnzbd Videos",
+    "group": "Download Clients",
+    "description": "Library to monitor a \"complete\" downloads directory from SABnzbd.\n\nThis library can then use a flow to convert videos into a target format, and place those videos in destination folder e.g. \"converted\".\n\nThe application that instructed SABnzbd to do the download can monitor the \"converted\" folder for completed files.",
+    "filter": "^((?!_UNPACK).)*\\.(ts|mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|h(\\.)?26[45])$",
+    "path": "/media/downloads/complete",
+    "scanInterval": 60,
+    "fileSizeDetectionInterval": 5
+  },
+
+  {
+    "name": "Plex DVR",
+    "group": "DVR",
+    "description": "Library to monitor Plex DVR recordings so you can automatically convert these after they have completed.",
+    "filter": "^((?!\\.grab).)*\\.(ts|mp4|mkv|avi|mpg|mov|h(\\.)?26[45])$",
+    "path": "/media/downloads/complete",
+    "scanInterval": 60,
+    "fileSizeDetectionInterval": 30
+  }
+]

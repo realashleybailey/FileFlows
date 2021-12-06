@@ -3,6 +3,7 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
+    using FileFlows.Server.Models;
 
     [Route("/api/library")]
     public class LibraryController : ControllerStore<Library>
@@ -70,6 +71,47 @@ namespace FileFlows.Server.Controllers
                 return;
             lib.LastScanned = DateTime.Now;
             await Update(lib);
+        }
+
+
+        private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/LibraryTemplates").GetFiles("*.json");
+
+        [HttpGet("templates")]
+        public Dictionary<string, List<Library>> GetTemplates()
+        {
+            Dictionary<string, List<Library>> templates = new();
+            templates.Add(string.Empty, new List<Library>());
+            foreach (var tf in GetTemplateFiles())
+            {
+                try
+                {
+                    string json = System.IO.File.ReadAllText(tf.FullName);
+                    var jsTemplates = System.Text.Json.JsonSerializer.Deserialize<LibraryTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
+                    {
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true
+                    });
+                    foreach(var jst in jsTemplates ?? new LibraryTemplate[] { })
+                    {
+                        string group = jst.Group ?? string.Empty;
+                        if (templates.ContainsKey(group) == false)
+                            templates.Add(group, new List<Library>());
+                        templates[group].Add(new Library
+                        {
+                            Enabled = true,
+                            FileSizeDetectionInterval = jst.FileSizeDetectionInterval,
+                            Filter = jst.Filter ?? string.Empty,
+                            Name = jst.Name,
+                            Description = jst.Description,
+                            Path = jst.Path,
+                            Priority = jst.Priority,
+                            ScanInterval = jst.ScanInterval
+                        });
+                    }
+                }
+                catch (Exception) { }
+            }
+            return templates;
         }
     }
 }

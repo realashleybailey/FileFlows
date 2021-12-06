@@ -11,6 +11,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using FileFlows.Plugin;
     using System;
+    using FileFlows.Client.Components.Inputs;
 
     public partial class Libraries : ListPage<Library>
     {
@@ -65,6 +66,64 @@ namespace FileFlows.Client.Pages
 
             this.EditingItem = library;
             List<ElementField> fields = new List<ElementField>();
+            ElementField efTemplate = null;
+#if (!DEMO)
+            if (library == null || library.Uid == Guid.Empty)
+            {
+                // adding
+                Blocker.Show();
+                try
+                {
+                    var templateResult = await HttpHelper.Get<Dictionary<string, List<Library>>>("/api/library/templates");
+                    if (templateResult.Success == true || templateResult.Data?.Any() == true)
+                    {
+                        List<ListOption> templates = new();
+                        foreach (var group in templateResult.Data)
+                        {
+                            if (string.IsNullOrEmpty(group.Key) == false)
+                            {
+                                templates.Add(new ListOption
+                                {
+                                    Value = Globals.LIST_OPTION_GROUP,
+                                    Label = group.Key
+                                });
+                            }
+                            templates.AddRange(group.Value.Select(x => new ListOption
+                            {
+                                Label = x.Name,
+                                Value = x
+                            }));
+                        }
+                        templates.Insert(0, new ListOption
+                        {
+                            Label = "Custom",
+                            Value = null
+                        });
+                        efTemplate = new ElementField
+                        {
+                            Name = "Template",
+                            InputType = FormInputType.Select,
+                            Parameters = new Dictionary<string, object>
+                            {
+                                { nameof(InputSelect.Options), templates },
+                                { nameof(InputSelect.AllowClear), false},
+                                { nameof(InputSelect.ShowDescription), true }
+                            }
+                        };
+                        efTemplate.ValueChanged += TemplateValueChanged;
+                        fields.Add(efTemplate);
+                        fields.Add(new ElementField
+                        {
+                            InputType = FormInputType.HorizontalRule
+                        });
+                    }
+                }
+                finally
+                {
+                    Blocker.Hide();
+                }
+            }
+#endif
             fields.Add(new ElementField
             {
                 InputType = FileFlows.Plugin.FormInputType.Text,
@@ -136,7 +195,41 @@ namespace FileFlows.Client.Pages
             });
             var result = await Editor.Open("Pages.Library", "Pages.Library.Title", fields, library,
               saveCallback: Save);
+            if(efTemplate != null)
+            {
+                efTemplate.ValueChanged -= TemplateValueChanged;
+            }
             return false;
+        }
+
+        private void TemplateValueChanged(object sender, object value) 
+        {
+            if (value == null)
+                return;
+            Library template = value as Library;
+            if (template == null)
+                return;
+            Editor editor = sender as Editor;
+            if (editor == null)
+                return;
+            if (editor.Model == null)
+                editor.Model = new ExpandoObject();
+            IDictionary<string, object> model = editor.Model;
+            
+            SetModelProperty(nameof(template.Name), template.Name);
+            SetModelProperty(nameof(template.FileSizeDetectionInterval), template.FileSizeDetectionInterval);
+            SetModelProperty(nameof(template.Filter), template.Filter);
+            SetModelProperty(nameof(template.Path), template.Path);
+            SetModelProperty(nameof(template.Priority), template.Priority);
+            SetModelProperty(nameof(template.ScanInterval), template.ScanInterval);
+
+            void SetModelProperty(string property, object value)
+            {
+                if(model.ContainsKey(property))
+                    model[property] = value;
+                else
+                    model.Add(property, value);
+            }
         }
 
         async Task<bool> Save(ExpandoObject model)

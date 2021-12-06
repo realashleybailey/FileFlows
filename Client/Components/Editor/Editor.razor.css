@@ -21,6 +21,7 @@
 }
 .fields {
   flex-direction: column;
+  padding-right: 0.5rem;
   display: flex;
   height: 100%;
   overflow: auto;
@@ -50,4 +51,10 @@
 }
 .input-label {
   margin-bottom: 2rem;
+}
+
+.input-horizontal-rule {
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: solid 1px var(--input-background);
 }

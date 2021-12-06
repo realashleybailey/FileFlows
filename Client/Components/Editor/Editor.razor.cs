@@ -30,7 +30,7 @@ namespace FileFlows.Client.Components
 
         private List<ElementField> Fields { get; set; }
 
-        private ExpandoObject Model { get; set; }
+        public ExpandoObject Model { get; set; }
 
         TaskCompletionSource<ExpandoObject> OpenTask;
 

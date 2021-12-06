@@ -25,7 +25,8 @@ namespace FileFlows.Plugin
         RegularExpression = 12,
         TextVariable = 13,
         KeyValue = 14,
-        Label = 15
+        Label = 15,
+        HorizontalRule = 16
     }
 
 

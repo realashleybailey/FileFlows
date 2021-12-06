@@ -118,8 +118,7 @@ window.ffFlowPart = {
             let name = part.name;
             if (!name) {
                 name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1).replace(/_/g, ' ');
-                if (!window.safari) // safari doesnt like look behind regexs
-                    name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
+                name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
             }
             divName.innerHTML = name;
         } catch (err) {

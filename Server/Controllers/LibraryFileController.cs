@@ -74,7 +74,16 @@ namespace FileFlows.Server.Controllers
         public async Task<IEnumerable<LibraryStatus>> GetStatus()
         {
             var libraryFiles = await GetDataList();
-            return libraryFiles.GroupBy(x => x.Status)
+            var libraries = await new LibraryController().GetData();
+            return libraryFiles.Where(x =>
+            {
+                if (x.Status != FileStatus.Unprocessed)
+                    return true;
+                // unprocessed just show the enabled libraries
+                if (libraries.ContainsKey(x.Library.Uid) == false)
+                    return false;
+                return libraries[x.Uid].Enabled;
+            }).GroupBy(x => x.Status)
                                .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 
         }

@@ -24,7 +24,7 @@ namespace FileFlows.Server.Controllers
                               .Where(x => 
                                 // unprocessed just show the enabled libraries
                                 libraries.ContainsKey(x.Library.Uid) && 
-                                libraries[x.Uid].Enabled
+                                libraries[x.Library.Uid].Enabled
                               ).OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                               .ThenByDescending(x =>
                               {
@@ -82,7 +82,7 @@ namespace FileFlows.Server.Controllers
                 // unprocessed just show the enabled libraries
                 if (libraries.ContainsKey(x.Library.Uid) == false)
                     return false;
-                return libraries[x.Uid].Enabled;
+                return libraries[x.Library.Uid].Enabled;
             }).GroupBy(x => x.Status)
                                .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 

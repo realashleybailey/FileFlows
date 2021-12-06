@@ -19,6 +19,11 @@
 </head>
 
 <body>
+    <div id="unsupported-browser" style="display:none">
+        Your browser is unsupported.  We recommend Chrome, Firefox, Edge or Vivaldi.   
+        <span class="dismiss" onclick="document.getElementById('unsupported-browser').remove()">🗙</span>
+    </div>
+
     <div id="app">
         <div class="blocker">
             <div class="blocker-indicator">
@@ -78,6 +83,12 @@
     <script>require.config({ paths: { 'vs': '_content/BlazorMonaco/lib/monaco-editor/min/vs' } });</script>
     <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
     <script src="_content/BlazorMonaco/jsInterop.js"></script>
+
+    <script>
+        if (window.safari) {
+            document.getElementById("unsupported-browser").style.display = "unset";
+        }
+    </script>
 </body>
 
 </html>

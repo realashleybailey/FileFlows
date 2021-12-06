@@ -421,3 +421,24 @@ button .fas, button .far {
   bottom: 1px;
   left: 1px;
 }
+
+#unsupported-browser {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  line-height: 2rem;
+  font-size: 1.5rem;
+  background: var(--base);
+  border-bottom: solid 1px var(--accent);
+  color: var(--accent);
+  z-index: 100;
+  text-align: center;
+  padding: 1rem;
+}
+#unsupported-browser .dismiss {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+}

@@ -214,8 +214,8 @@ button:not(.flowtable-button):not(.navbar-toggler):disabled {
 @media screen and (min-width: 850px) {
   .pointer-add {
     position: fixed;
-    top: 100px;
-    left: 180px;
+    top: 81px;
+    left: 191px;
     width: 75px;
     background: var(--accent);
     height: 25px;

@@ -61,7 +61,7 @@ namespace FileFlows.Client.Pages
             List<Plugin.ListOption> templates = null;
             try
             { 
-                var flowResult = await HttpHelper.Get<Dictionary<string, List<FileFlows.Shared.Models.Flow>>>("/api/flow/templates");
+                var flowResult = await HttpHelper.Get<Dictionary<string, List<ffFlow>>>("/api/flow/templates");
                 if(flowResult.Success == false || flowResult.Data?.Any() != true)
                 {
                     // no templates, give them a blank
@@ -129,7 +129,7 @@ namespace FileFlows.Client.Pages
                 return; // throws if canceled
             }
 
-            var newTemplate = ((IDictionary<string, object>)newModelTask.Result)["Template"] as FileFlows.Shared.Models.Flow;
+            var newTemplate = ((IDictionary<string, object>)newModelTask.Result)["Template"] as ffFlow;
 
             App.Instance.NewFlowTemplate = newTemplate;
             NavigationManager.NavigateTo("flows/" + Guid.Empty);

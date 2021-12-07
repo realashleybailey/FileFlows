@@ -71,6 +71,7 @@
   display: flex;
   flex-direction: row;
   user-select: none;
+  width: 100%;
 }
 .flowtable-row:not(.flowtable-header-row) {
   border-top: none;

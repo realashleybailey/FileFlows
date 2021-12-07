@@ -34,7 +34,37 @@ namespace FileFlows.Server.Workers
                 else
                     dictNodes.Add(fp.FlowElementUid, 1);
             }
-            data.Nodes = dictNodes.Select(x => new TelemetryNode
+            data.Nodes = dictNodes.Select(x => new TelemetryDataSet
+            {
+                Name = x.Key,
+                Count = x.Value
+            }).ToList();
+
+            var libraries = new LibraryController().GetAll().Result;
+            dictNodes.Clear();
+            foreach(var lib in libraries?.Where(x => string.IsNullOrEmpty(x.Template) == false) ?? new List<Library>())
+            {
+                if (dictNodes.ContainsKey(lib.Template))
+                    dictNodes[lib.Template] = dictNodes[lib.Template] + 1;
+                else
+                    dictNodes.Add(lib.Template, 1);
+            }
+            data.LibraryTemplates = dictNodes.Select(x => new TelemetryDataSet
+            {
+                Name = x.Key,
+                Count = x.Value
+            }).ToList();
+
+
+            dictNodes.Clear();
+            foreach (var lib in flows?.Where(x => string.IsNullOrEmpty(x.Template) == false) ?? new List<Flow>())
+            {
+                if (dictNodes.ContainsKey(lib.Template))
+                    dictNodes[lib.Template] = dictNodes[lib.Template] + 1;
+                else
+                    dictNodes.Add(lib.Template, 1);
+            }
+            data.FlowTemplates = dictNodes.Select(x => new TelemetryDataSet
             {
                 Name = x.Key,
                 Count = x.Value
@@ -57,13 +87,16 @@ namespace FileFlows.Server.Workers
 
             public string Version { get; set; }
 
-            public List<TelemetryNode> Nodes { get; set; }
+            public List<TelemetryDataSet> Nodes { get; set; }
+            public List<TelemetryDataSet> LibraryTemplates { get; set; }
+            public List<TelemetryDataSet> FlowTemplates { get; set; }
 
             public int FilesProcessed { get; set; }
             public int FilesFailed { get; set; }
+
         }
 
-        public class TelemetryNode
+        public class TelemetryDataSet
         {
             public string Name { get; set; }
             public int Count { get; set; }

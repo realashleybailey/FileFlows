@@ -158,10 +158,11 @@ button {
     z-index: 100;
     text-align: center;
     padding: 1rem;
+
     .dismiss {
-        position:absolute;
-        top:1rem;
-        right:1rem;
-        cursor:pointer;
+        position: absolute;
+        top: 1.25rem;
+        right: 1.5rem;
+        cursor: pointer;
     }
 }

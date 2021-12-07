@@ -7,7 +7,7 @@ namespace FileFlows.Shared.Models
         public bool Enabled { get; set; }
         public string Path { get; set; }
         public string Filter { get; set; }
-
+        public string Template { get; set; }
         public string Description { get; set; }
         public ObjectReference Flow { get; set; }
 

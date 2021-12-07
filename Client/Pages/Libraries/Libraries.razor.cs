@@ -217,6 +217,7 @@ namespace FileFlows.Client.Pages
             IDictionary<string, object> model = editor.Model;
             
             SetModelProperty(nameof(template.Name), template.Name);
+            SetModelProperty(nameof(template.Template), template.Name);
             SetModelProperty(nameof(template.FileSizeDetectionInterval), template.FileSizeDetectionInterval);
             SetModelProperty(nameof(template.Filter), template.Filter);
             SetModelProperty(nameof(template.Path), template.Path);
@@ -275,10 +276,10 @@ namespace FileFlows.Client.Pages
 
             if (lib.LastScannedAgo.TotalMinutes < 1)
                 return Translater.Instant("Times.SecondsAgo", new { num = (int)lib.LastScannedAgo.TotalSeconds });
-            if (lib.LastScannedAgo.TotalHours < 1)
-                return Translater.Instant("Times.MinutesAgo", new { num = (int)lib.LastScannedAgo.TotalSeconds });
+            if (lib.LastScannedAgo.TotalHours < 1 && lib.LastScannedAgo.TotalMinutes < 120)
+                return Translater.Instant("Times.MinutesAgo", new { num = (int)lib.LastScannedAgo.TotalMinutes });
             if (lib.LastScannedAgo.TotalDays < 1)
-                return Translater.Instant("Times.HoursAgo", new { num = (int)lib.LastScannedAgo.TotalDays });
+                return Translater.Instant("Times.HoursAgo", new { num = (int)Math.Round(lib.LastScannedAgo.TotalHours) });
             else
                 return Translater.Instant("Times.DaysAgo", new { num = (int)lib.LastScannedAgo.TotalDays });
         }

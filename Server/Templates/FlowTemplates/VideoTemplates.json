@@ -117,7 +117,10 @@
             "input": 1,
             "node": "00000000-0000-0000-0000-000000000003"
           }
-        ]
+        ],
+        "model": {
+          "CroppingThreshold": 10
+        }
       },
       {
         "node": "Video_H265_AC3",
@@ -171,7 +174,10 @@
             "input": 1,
             "node": "00000000-0000-0000-0000-000000000003"
           }
-        ]
+        ],
+        "model": {
+          "CroppingThreshold": 10
+        }
       },
       {
         "node": "Video_H265_AC3",
@@ -227,7 +233,10 @@
             "input": 1,
             "node": "00000000-0000-0000-0000-000000000003"
           }
-        ]
+        ],
+        "model": {
+          "CroppingThreshold": 10
+        }
       },
       {
         "node": "Video_H265_AC3",

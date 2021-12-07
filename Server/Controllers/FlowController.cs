@@ -302,6 +302,7 @@ namespace FileFlows.Server.Controllers
                             templates[_jst.Group ?? String.Empty].Add(new Flow
                             {
                                 Name = jst.Name,
+                                Template = jst.Name,
                                 Enabled = true,
                                 Description = jst.Description,
                                 Parts = flowParts

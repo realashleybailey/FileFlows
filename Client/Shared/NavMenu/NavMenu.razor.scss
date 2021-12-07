@@ -40,17 +40,28 @@
     top: -2px;
 }
 
-.nav-item {
+.nav-menu-group, .nav-item {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
+}
+
+.nav-menu-group {
+    padding-left: 1rem;
+    padding-top: 1rem;
+    text-transform: uppercase;
+
     &:first-of-type {
-        padding-top: 1rem;
-    }
-    &:last-of-type {
-        padding-bottom: 1rem;
+        padding-top: 1.5rem;
     }
 
+    .icon {
+        display: none;
+    }
+}
+
+.nav-item {
     ::deep a {
+        padding-left:2rem;
         height: 2.5rem;
         display: flex;
         align-items: center;
@@ -97,5 +108,8 @@
     }
     .page-title{
         display:unset;
+    }
+    .nav-menu-group {
+        display:none;
     }
 }

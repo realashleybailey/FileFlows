@@ -7,15 +7,17 @@ namespace FileFlows.Client.Pages
     using FileFlows.Client.Components;
     using System.Collections.Generic;
     using FileFlows.Shared.Validators;
+    using Microsoft.JSInterop;
 
     public partial class Settings : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] IJSRuntime jsRuntime { get; set; }
 
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving;
+        private string lblSave, lblSaving, lblHelp;
 
         private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
 
@@ -25,6 +27,7 @@ namespace FileFlows.Client.Pages
         {
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
+            lblHelp = Translater.Instant("Labels.Help");
             Blocker.Show("Loading Settings");
 
             DirectoryValidators.Add(new Required());
@@ -57,6 +60,11 @@ namespace FileFlows.Client.Pages
                 this.Blocker.Hide();
             }
 #endif
+        }
+
+        private async void OpenHelp()
+        {
+            await jsRuntime.InvokeVoidAsync("open", "https://github.com/revenz/FileFlows/wiki/Settings", "_blank");
         }
     }
 }

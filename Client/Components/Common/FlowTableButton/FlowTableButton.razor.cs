@@ -10,7 +10,7 @@
     {
         [CascadingParameter] FlowTable<TItem> Table { get; set; }
 
-        private string _Label = string.Empty;
+        protected string _Label = string.Empty;
         [Parameter]
         public string Label
         {
@@ -21,8 +21,14 @@
             }
         }
 
+        protected string _Icon;
+
         [Parameter]
-        public string Icon { get; set; }
+        public string Icon
+        {
+            get => _Icon;
+            set { _Icon = value ?? string.Empty; }
+        }
 
         [Parameter]
         public bool Disabled { get; set; }
@@ -45,7 +51,7 @@
         [Parameter]
         public bool SelectedOneOrMore { get; set; }
 
-        private async Task OnClick()
+        protected virtual async Task OnClick()
         {
             await this.Clicked.InvokeAsync();
         }

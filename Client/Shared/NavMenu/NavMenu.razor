@@ -28,14 +28,24 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
-        @foreach (var item in MenuItems)
+        @foreach (var group  in MenuItems)
         {
-            <li class="nav-item @(item.Url.Replace("/", ""))">
-                <NavLink class="nav-link" href="@item.Url"
-                Match="@(item.Url == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)" @onclick="() => SetActive(item)">
-                    <span class="@item.Icon" aria-hidden="true"></span> @item.Title
-                </NavLink>
+            <li class="nav-menu-group">
+                @if(string.IsNullOrEmpty(group.Icon) == false)
+                {
+                    <span class="icon @group.Icon" aria-hidden="true"></span>
+                }
+                @group.Name
             </li>
+            @foreach (var item in group.Items)
+            {
+                <li class="nav-item @(item.Url.Replace("/", ""))">
+                    <NavLink class="nav-link" href="@item.Url"
+                    Match="@(item.Url == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)" @onclick="() => SetActive(item)">
+                        <span class="@item.Icon" aria-hidden="true"></span> @item.Title
+                    </NavLink>
+                </li>
+            }
         }
             <li class="nav-item help">
                 <a class="nav-link" href="https://github.com/revenz/FileFlows/wiki/Basic-Setup" target="_blank">

@@ -25,6 +25,8 @@ namespace FileFlows.Client.Pages
         public abstract string ApiUrl { get; }
         private bool _needsRendering = false;
 
+        protected bool Loaded { get; set; }
+
 
 
         public List<T> _Data = new List<T>();
@@ -98,6 +100,7 @@ namespace FileFlows.Client.Pages
             }
             finally
             {
+                this.Loaded = true;
                 Blocker.Hide();
                 await this.WaitForRender();
             }

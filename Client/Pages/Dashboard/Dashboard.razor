@@ -14,108 +14,142 @@
 
     <Body>
         <CascadingValue Value="this" IsFixed="true">
-            <div class="dashboard-wrapper">
-                <div class="dashboard">
+            @if(ConfiguredStatus < 2)
+            {
+                <h1>Not Yet Configured</h1>
+                <p>You have not yet configured any Flows or Libraries.</p><br/>
 
-                    @for (int i = 0; i < Workers.Count; i++)
-                    {
-                        var worker = Workers[i];
-                        var waiting = worker.Status == FileFlows.Shared.Models.ProcessStatus.Waiting;
-                        <div class="worker-wrapper @(waiting ? "waiting" : "")">
-                            <div class="chart-wrapper">
-                                <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>
-                            </div>
-                            <div class="worker-info">
-                                @if (waiting)
-                                {
-                                    <span class="waiting-icon"><i class="fas fa-bed"></i></span>
-                                    <span class="waiting-message">@lblWaiting</span>
-                                }
-                                else
-                                {
-                                    <span class="label-value current">
-                                        <span class="label">@lblFile</span>
-                                        <span class="value">@worker.RelativeFile</span>
-                                    </span>
-                                    <span class="label-value working-file">
-                                        <span class="label">@lblWorkingFile</span>
-                                        <span class="value">@worker.WorkingFile</span>
-                                    </span>
-                                    <span class="label-value library">
-                                        <span class="label">@lblLibrary</span>
-                                        <span class="value">@worker.Library.Name</span>
-                                    </span>
-                                    <span class="label-value current-step">
-                                        <span class="label">@lblCurrentStep</span>
-                                        <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
-                                    </span>
-                                    <span class="label-value processing-time">
-                                        <span class="label">@lblProcessingTime</span>
-                                        <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
-                                    </span>
-                                    <div class="actions-wrapper">
-                                        <div class="actions">
-                                            <button @onclick="() => LogClicked(worker)">@lblLog</button>
-                                            <button @onclick="() => CancelClicked(worker)">@lblCancel</button>
+                <h2>Step 1. Creating a Flow </h2>
+                <p>To use FileFlows a Flow must first be created.</p>
+                <p>A Flow can be thought of as a processing rule that is run against files.</p>
+                <p>You can have as many Flows as you like, ranging from many tasks.</p>
+                <p>For example, you can configure a Flow to convert video files from one format into another.  Or a Flow to move pictures into folders based on the date they were taken.</p>
+
+                @if (ConfiguredStatus == 0)
+                {
+                    <div class="not-configured-pointer step-flows">Step 1</div>
+                }
+                <br />
+
+                <h2>Step 2. Creating a Library</h2>
+                <p>FileFlows needs one or more Libraries to monitor for files.</p>
+                <p>These can be directories or drives.</p>
+                <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
+                @if (ConfiguredStatus == 1)
+                {
+                    <div class="not-configured-pointer step-library">Step 2</div>
+                }
+            }
+            else if (ConfiguredStatus == 1)
+            {               
+                // flow configured but no libraries
+                <p>no libaries are configured</p>
+            }
+            else
+            {
+                <div class="dashboard-wrapper">
+                    <div class="dashboard">
+
+                        @for (int i = 0; i < Workers.Count; i++)
+                        {
+                            var worker = Workers[i];
+                            var waiting = worker.Status == FileFlows.Shared.Models.ProcessStatus.Waiting;
+                            <div class="worker-wrapper @(waiting ? "waiting" : "")">
+                                <div class="chart-wrapper">
+                                    <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>
+                                </div>
+                                <div class="worker-info">
+                                    @if (waiting)
+                                    {
+                                        <span class="waiting-icon"><i class="fas fa-bed"></i></span>
+                                        <span class="waiting-message">@lblWaiting</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label-value current">
+                                            <span class="label">@lblFile</span>
+                                            <span class="value">@worker.RelativeFile</span>
+                                        </span>
+                                        <span class="label-value working-file">
+                                            <span class="label">@lblWorkingFile</span>
+                                            <span class="value">@worker.WorkingFile</span>
+                                        </span>
+                                        <span class="label-value library">
+                                            <span class="label">@lblLibrary</span>
+                                            <span class="value">@worker.Library.Name</span>
+                                        </span>
+                                        <span class="label-value current-step">
+                                            <span class="label">@lblCurrentStep</span>
+                                            <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
+                                        </span>
+                                        <span class="label-value processing-time">
+                                            <span class="label">@lblProcessingTime</span>
+                                            <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
+                                        </span>
+                                        <div class="actions-wrapper">
+                                            <div class="actions">
+                                                <button @onclick="() => LogClicked(worker)">@lblLog</button>
+                                                <button @onclick="() => CancelClicked(worker)">@lblCancel</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                }
+                                    }
+                                </div>
                             </div>
-                        </div>
-                    }
-                    
-                    <div class="shrinkage-chart">
-                        <FileFlows.Client.Components.Dashboard.Shrinkage></FileFlows.Client.Components.Dashboard.Shrinkage>
-                    </div>
+                        }
 
-                    @if (Upcoming.Any())
-                    {
-                        <div class="library-files upcoming @(Finished.Any() ? "" : "full-width")">
-                            <div class="title"><span>@lblUpcoming</span></div>
-                            <div class="table-wrapper">
-                                <RadzenDataGrid Data="@Upcoming" TItem="LibraryFile">
-                                    <Columns>
-                                        <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
+                        <div class="shrinkage-chart">
+                            <FileFlows.Client.Components.Dashboard.Shrinkage></FileFlows.Client.Components.Dashboard.Shrinkage>
+                        </div>
+
+                        @if (Upcoming.Any())
+                        {
+                            <div class="library-files upcoming @(Finished.Any() ? "" : "full-width")">
+                                <div class="title"><span>@lblUpcoming</span></div>
+                                <div class="table-wrapper">
+                                    <RadzenDataGrid Data="@Upcoming" TItem="LibraryFile">
+                                        <Columns>
+                                            <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
                                         Width="20rem" Frozen="true" />
-                                    </Columns>
-                                </RadzenDataGrid>
+                                        </Columns>
+                                    </RadzenDataGrid>
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
 
-                    @if (Finished.Any())
-                    {
-                        <div class="library-files finished @(Upcoming.Any() ? "" : "full-width")">
-                            <div class="title"><span>@lblRecentlyFinished</span></div>
-                            <div class="table-wrapper">
-                                <RadzenDataGrid Data="@Finished" TItem="LibraryFile">
-                                    <Columns>
-                                        <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
+                        @if (Finished.Any())
+                        {
+                            <div class="library-files finished @(Upcoming.Any() ? "" : "full-width")">
+                                <div class="title"><span>@lblRecentlyFinished</span></div>
+                                <div class="table-wrapper">
+                                    <RadzenDataGrid Data="@Finished" TItem="LibraryFile">
+                                        <Columns>
+                                            <RadzenDataGridColumn TItem="LibraryFile" Property="RelativePath" Title="Name"
                                         Width="20rem" Frozen="true" />
-                                        <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time"
+                                            <RadzenDataGridColumn TItem="LibraryFile" Property="ProcessingTime" Title="Time"
                                         Width="6rem" FormatString="{0:hh\:mm\:ss}">
-                                            <Template Context="data">
-                                                <a href="" @onclick="@(() => ShowFileInfo(data))"
+                                                <Template Context="data">
+                                                    <a href="" @onclick="@(() => ShowFileInfo(data))"
                                                 @onclick:preventDefault>@data.ProcessingTime.ToString(@"hh\:mm\:ss")</a>
-                                            </Template>
-                                        </RadzenDataGridColumn>                                    
-                                        <RadzenDataGridColumn TItem="LibraryFile" Property="FinalSize" Title="Size" Width="6rem">
-                                            <Template Context="data">
-                                                @{
-                                                    long fs = data.FinalSize;
-                                                    long os = data.OriginalSize;
-                                                    int width = (int)((((double)fs) / os) * 100);
-                                                    bool bigger = width > 100;
-                                                    if (width > 100)
-                                                        width = 100;
-                                                    string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
-                                                }
-                                                @if(fs > 0){
-                                                    <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
-                                                        <div class="amount" style="width:calc(@(width)% - 2px)"></div>
-                                                    </div>
-                                                }
-                                            </Template>
+                                                </Template>
+                                            </RadzenDataGridColumn>                                    
+                                            <RadzenDataGridColumn TItem="LibraryFile" Property="FinalSize" Title="Size" Width="6rem">
+                                                <Template Context="data">
+                                                    @{
+                                                        long fs = data.FinalSize;
+                                                        long os = data.OriginalSize;
+                                                        int width = (int)((((double)fs) / os) * 100);
+                                                        bool bigger = width > 100;
+                                                        if (width > 100)
+                                                            width = 100;
+                                                        string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
+                                                    }
+                                                    @if (fs > 0)
+                                                    {
+                                                        <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
+                                                            <div class="amount" style="width:calc(@(width)% - 2px)"></div>
+                                                        </div>
+                                                    }
+                                                </Template>
                                         </RadzenDataGridColumn>
                                     </Columns>
                                 </RadzenDataGrid>
@@ -123,9 +157,10 @@
                         </div>
                     }
 
-                    <div class="spacer"></div>
+                        <div class="spacer"></div>
+                    </div>
                 </div>
-            </div>
+            }
         </CascadingValue>
     </Body>
 </PageView>

@@ -22,7 +22,7 @@ namespace FileFlows.Client.Components.Common
 
         protected override async Task OnClick()
         {
-            string url = this.HelpUrl;
+            string url = this.HelpUrl;            
             if (string.IsNullOrEmpty(HelpUrl))
                 url = "https://github.com/revenz/FileFlows/wiki";
             else if (url.ToLower().StartsWith("http") == false)

@@ -10,6 +10,18 @@ namespace FileFlows.Server.Controllers
         private static Settings Instance;
         private static Mutex _mutex = new Mutex();
 
+        [HttpGet("is-configured")]
+        public int IsConfigured()
+        {
+            var libs = new LibraryController().GetData().Result?.Any() == true;
+            var flows = new FlowController().GetData().Result?.Any() == true;
+            if (libs && flows)
+                return 2;
+            if (flows)
+                return 1;
+            return 0;
+        }
+
         [HttpGet]
         public async Task<Settings> Get()
         {

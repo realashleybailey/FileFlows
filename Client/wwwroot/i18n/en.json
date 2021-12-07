@@ -84,7 +84,7 @@
   },
   "Pages": {
     "Dashboard": {
-      "Title": "Home",
+      "Title": "Dashboard",
       "Labels": {
         "ShrinkageTitle": "Storage Saved",
         "FinalSize": "Final Size",

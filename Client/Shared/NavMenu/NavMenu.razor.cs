@@ -27,7 +27,7 @@ namespace FileFlows.Client.Shared
                 Icon = "fas fa-info-circle",
                 Items = new List<NavMenuItem>
                 {
-                    new NavMenuItem("Pages.Dashboard.Title", "fas fa-home", ""),
+                    new NavMenuItem("Pages.Dashboard.Title", "fas fa-chart-pie", ""),
                     new NavMenuItem("Pages.LibraryFiles.Title", "fas fa-copy", "library-files")
                 }
             });

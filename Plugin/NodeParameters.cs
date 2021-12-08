@@ -34,13 +34,17 @@ namespace FileFlows.Plugin
 
         public Action<float>? PartPercentageUpdate { get; set; }
 
-        public NodeParameters(string filename)
+        public ProcessHelper Process { get; set; }
+
+        public NodeParameters(string filename, ILogger logger)
         {
             this.FileName = filename;
             this.WorkingFile = filename;
             this.RelativeFile = string.Empty;
             this.TempPath = string.Empty;
+            this.Logger = logger;
             InitFile(filename);
+            this.Process = new ProcessHelper(logger);
         }
 
         private void InitFile(string filename)
@@ -50,6 +54,7 @@ namespace FileFlows.Plugin
             UpdateVariables(new Dictionary<string, object> {
                 { "ext", fi.Extension ?? "" },
                 { "fileName", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
+                { "fileFullName", fi.FullName ?? "" },
                 { "fileSize", fi.Exists ? fi.Length : 0 },
                 { "fileCreateYear", fiOriginal.CreationTime.Year },
                 { "fileCreateMonth", fiOriginal.CreationTime.Month },
@@ -59,6 +64,7 @@ namespace FileFlows.Plugin
                 { "fileModifiedDay", fiOriginal.LastWriteTime.Day },
                 { "fileOrigExt", fiOriginal.Extension ?? "" },
                 { "fileOrigFileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
+                { "fileOrigFullName", fiOriginal.FullName ?? "" },
                 { "folderName", fi.Directory?.Name ?? "" },
                 { "folderFullName", fi.DirectoryName ?? "" },
                 { "folderOrigName", fiOriginal.Directory?.Name ?? "" },

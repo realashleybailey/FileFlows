@@ -28,7 +28,10 @@
                             foreach (var ele in grp)
                             {
                                 <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"
-                        ondragstart="ffFlow.Mouse.dragElementStart(event)">@Helpers.FlowHelper.FormatLabel(ele.Name)</li>
+                        ondragstart="ffFlow.Mouse.dragElementStart(event)">
+                                    <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
+                                    @Helpers.FlowHelper.FormatLabel(ele.Name)
+                                </li>
                             }
                         }
                     }

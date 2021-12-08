@@ -28,7 +28,9 @@ canvas {
 }
 
 .flow-elements {
-    width:14rem;
+    width:20vw;
+    min-width:12rem;
+    max-width:18rem;
     border-left: 1px solid var(--border-color);
     overflow-y:auto;
     ul {
@@ -64,8 +66,48 @@ canvas {
     }
 }
 .flow-element {
-    padding:0.25rem 0;
-    margin:0.5rem;
+    padding: 0.25rem 0.25rem;
+    margin: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    padding-left: 2.25rem;
+
+    .icon-wrapper {
+        width: 2rem;
+        border-right: solid 3px;
+        margin-right: 0.25rem;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        .icon {
+            padding-top:3px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+
+    &.Logic .icon-wrapper {
+        border-color: var(--flow-logic);
+    }
+
+    &.Input .icon-wrapper {
+        border-color: var(--flow-input);
+    }
+
+    &.Output .icon-wrapper {
+        border-color: var(--flow-output);
+    }
+
+    &.Process .icon-wrapper {
+        border-color: var(--flow-process);
+    }
+
+    .label {
+        flex-grow: 1;
+    }
 }
 
 ::deep .flow-part {

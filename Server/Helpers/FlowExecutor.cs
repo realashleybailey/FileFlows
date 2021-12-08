@@ -23,7 +23,10 @@ namespace FileFlows.Server.Helpers
         {
             return Task.Run(() =>
             {
-                var args = new NodeParameters(input);
+                var args = new NodeParameters(input, Logger ?? new FlowLogger()
+                {
+                    LogFile = logFile
+                });
                 args.TempPath = tempPath;
                 args.RelativeFile = relativePath;
 
@@ -31,10 +34,6 @@ namespace FileFlows.Server.Helpers
 
                 var fiInput = new FileInfo(input);
                 args.Result = NodeResult.Success;
-                args.Logger = Logger ?? new FlowLogger()
-                {
-                    LogFile = logFile
-                };
                 args.GetToolPath = (string name) => new Controllers.ToolController().GetByName(name)?.Result?.Path ?? "";
                 bool flowCompleted = false;
                 int count = 0;

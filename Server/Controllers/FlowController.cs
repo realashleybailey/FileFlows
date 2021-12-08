@@ -170,8 +170,10 @@ namespace FileFlows.Server.Controllers
 
             variables.Add("fileName", "Filename");
             variables.Add("fileSize", 1000);
+            variables.Add("fileFullName", "/media/temp/randomfile.ext");
             variables.Add("fileOrigExt", ".mkv");
             variables.Add("fileOrigFileName", "OriginalFile");
+            variables.Add("fileOrigFullName", "/media/files/filename.ext");
 
             variables.Add("fileCreateYear", 2009);
             variables.Add("fileCreateMonth", 3);

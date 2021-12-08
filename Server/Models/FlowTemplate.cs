@@ -8,6 +8,7 @@ namespace FileFlows.Server.Models
         public string Group { get; set; }
         public string Description { get; set; }
         public List<FlowTemplatePart> Parts { get; set; }
+        public List<Shared.Models.TemplateField> Fields { get; set; }
     }
 
     class FlowTemplatePart

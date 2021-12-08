@@ -269,7 +269,6 @@
           }
         ],
         "model": {
-          "DestinationPath": "/media/downloads/converted",
           "MoveFolder": true,
           "DeleteOriginal": true
         }
@@ -281,6 +280,16 @@
           "IfEmpty": true,
           "IncludePatterns": [ "avi", "divx", "mkv", "mov", "mp4", "mpg", "mpeg" ]
         }
+      }
+    ],
+    "fields": [
+      {
+        "uid": "00000000-0000-0000-0000-000000000004",
+        "type": "Directory",
+        "required": true,
+        "name": "DestinationPath",
+        "default": "/media",
+        "label": "Flow.Parts.MoveFile.Fields.DestinationPath"
       }
     ]
   }

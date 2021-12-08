@@ -47,6 +47,8 @@ namespace FileFlows.Client.Components
         private bool FocusFirst = false;
         private bool _needsRendering = false;
 
+        public RenderFragment AdditionalFields { get; set; }
+
         protected override void OnInitialized()
         {
             lblSave = Translater.Instant("Labels.Save");
@@ -95,7 +97,7 @@ namespace FileFlows.Client.Components
             return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null)
         {
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
@@ -104,6 +106,7 @@ namespace FileFlows.Client.Components
             this.ReadOnly = readOnly;
             this.Large = large;
             this.Visible = true;
+            this.AdditionalFields = additionalFields;
 
             lblSave = lblSave.EmptyAsNull() ?? "Labels.Save";
             this.lblCancel = Translater.TranslateIfNeeded(lblCancel.EmptyAsNull() ?? "Labels.Cancel");

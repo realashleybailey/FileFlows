@@ -241,13 +241,13 @@ namespace FileFlows.Server.Controllers
         private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
     
         [HttpGet("templates")]
-        public Dictionary<string, List<Flow>> GetTemplates()
+        public Dictionary<string, List<FlowTemplateModel>> GetTemplates()
         {
             var parts = GetElements().ToDictionary(x => x.Name, x => x);
 
-            Dictionary<string, List<Flow>> templates = new ();
+            Dictionary<string, List<FlowTemplateModel>> templates = new ();
             string group = string.Empty;
-            templates.Add(group, new List<Flow>());
+            templates.Add(group, new List<FlowTemplateModel>());
             foreach (var tf in GetTemplateFiles())
             {
                 try
@@ -263,10 +263,18 @@ namespace FileFlows.Server.Controllers
                         try
                         {
                             var jstJson = System.Text.Json.JsonSerializer.Serialize(_jst);
+                            List<TemplateField> fields = _jst.Fields ?? new List<TemplateField>();
                             // replace all the guids with unique guides
                             for(int i = 1; i < 50; i++)
                             {
-                                jstJson = jstJson.Replace("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i, Guid.NewGuid().ToString());
+                                Guid oldUid = new Guid("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i);
+                                Guid newUid = Guid.NewGuid();
+                                foreach(var field in fields)
+                                {
+                                    if (field.Uid == oldUid)
+                                        field.Uid = newUid;
+                                }
+                                jstJson = jstJson.Replace(oldUid.ToString(), newUid.ToString());
                             }
                             var jst = System.Text.Json.JsonSerializer.Deserialize<FlowTemplate>(jstJson);
 
@@ -297,15 +305,19 @@ namespace FileFlows.Server.Controllers
                             }
 
                             if (templates.ContainsKey(_jst.Group ?? String.Empty) == false)
-                                templates.Add(_jst.Group ?? String.Empty, new List<Flow>());
+                                templates.Add(_jst.Group ?? String.Empty, new List<FlowTemplateModel>());
 
-                            templates[_jst.Group ?? String.Empty].Add(new Flow
+                            templates[_jst.Group ?? String.Empty].Add(new FlowTemplateModel
                             {
-                                Name = jst.Name,
-                                Template = jst.Name,
-                                Enabled = true,
-                                Description = jst.Description,
-                                Parts = flowParts
+                                Fields = fields,
+                                Flow = new Flow
+                                {
+                                    Name = jst.Name,
+                                    Template = jst.Name,
+                                    Enabled = true,
+                                    Description = jst.Description,
+                                    Parts = flowParts
+                                }
                             });
                         }
                         catch(Exception ex)

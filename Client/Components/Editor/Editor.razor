@@ -157,6 +157,11 @@
                                     break;
                             }
                         }
+
+                        @if(AdditionalFields != null)
+                        {
+                            @AdditionalFields
+                        }
                         <div class="empty"></div>
                     </div>
                 </CascadingValue>

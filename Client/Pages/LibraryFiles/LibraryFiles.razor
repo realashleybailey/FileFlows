@@ -4,7 +4,7 @@
 
 @page "/library-files"
 
-<PageView Flex="@true">
+<PageView Flex="@true" Title="@Title">
 
     <Head>
     </Head>
@@ -32,6 +32,9 @@
                             break;
                         case FileStatus.ProcessingFailed:
                             <span class="icon far fa-times-circle"></span>
+                            break;
+                        case FileStatus.OutOfSchedule:
+                            <span class="icon far fa-calendar-times"></span>
                             break;
 
                     }

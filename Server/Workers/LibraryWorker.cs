@@ -45,6 +45,9 @@ namespace FileFlows.Server.Workers
                 if(library.LastScanned > DateTime.Now.AddSeconds(-library.ScanInterval))
                     continue;
 
+                if (ScheduleHelper.InSchedule(library.Schedule) == false)
+                    continue;
+
                 if (string.IsNullOrEmpty(library.Path) || Directory.Exists(library.Path) == false)
                 {
                     Logger.Instance.WLog($"Library '{library.Name}' path not found: {library.Path}");

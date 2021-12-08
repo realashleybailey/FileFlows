@@ -36,7 +36,24 @@
     }
   },
   "Enums": {
+    "Days": {
+      "Monday": "Monday",
+      "Tuesday": "Tuesday",
+      "Wednesday": "Wednesday",
+      "Thursday": "Thursday",
+      "Friday": "Friday",
+      "Saturday": "Saturday",
+      "Sunday": "Sunday",
+      "Mon": "Mon",
+      "Tue": "Tue",
+      "Wed": "Wed",
+      "Thu": "Thu",
+      "Fri": "Fri",
+      "Sat": "Sat",
+      "Sun": "Sun"
+    },
     "FileStatus": {
+      "OutOfSchedule": "Out Of Schedule",
       "Processed": "Processed",
       "Processing": "Processing",
       "Unprocessed": "Unprocessed",

@@ -4,10 +4,21 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
     using FileFlows.Server.Models;
+    using System.Text.RegularExpressions;
 
     [Route("/api/library")]
     public class LibraryController : ControllerStore<Library>
     {
+        internal override async Task<List<Library>> GetDataList()
+        {
+            return (await GetData()).Values.Select(x =>
+            {
+                if (string.IsNullOrEmpty(x.Schedule))
+                    x.Schedule = new string('1', 672);
+                return x;
+            }).ToList();
+        }
+
         [HttpGet]
         public async Task<IEnumerable<Library>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
 
@@ -19,6 +30,8 @@ namespace FileFlows.Server.Controllers
         {
             if (library.Uid == Guid.Empty)
                 library.LastScanned = DateTime.MinValue; // never scanned
+            if (Regex.IsMatch(library.Schedule, "^[01]{672}$") == false)
+                library.Schedule = new string('1', 672);
 
             return base.Update(library, checkDuplicateName: true);
         }

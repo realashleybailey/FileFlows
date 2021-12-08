@@ -11,6 +11,8 @@ namespace FileFlows.Shared.Models
         public string Description { get; set; }
         public ObjectReference Flow { get; set; }
 
+        public string Schedule { get; set; }
+
         /// <summary>
         /// When the library was last scanned
         /// </summary>

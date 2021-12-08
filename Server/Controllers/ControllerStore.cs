@@ -61,7 +61,7 @@
             return Data;
         }
 
-        internal async Task<List<T>> GetDataList() => (await GetData()).Values.ToList();
+        internal virtual async Task<List<T>> GetDataList() => (await GetData()).Values.ToList();
 
         protected async Task<T> GetByUid(Guid uid)
         {

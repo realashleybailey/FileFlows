@@ -26,7 +26,8 @@ namespace FileFlows.Plugin
         TextVariable = 13,
         KeyValue = 14,
         Label = 15,
-        HorizontalRule = 16
+        HorizontalRule = 16,
+        Schedule = 17
     }
 
 

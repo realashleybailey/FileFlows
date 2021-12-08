@@ -130,6 +130,13 @@
                             Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
                                     }
                                     break;
+                                case FormInputType.Schedule:
+                                    {
+                                        var value = GetValue<string>(field.Name);
+                                        <InputSchedule Field=@field Label="@label" Value="@value" ReadOnly=@readOnly 
+                                            ValueChanged="@(x => UpdateValue(field, x))" HideLabel=@hideLabel />
+                                    }
+                                    break;
                                 case FormInputType.KeyValue:
                                     {
                                         var value = GetValue<List<KeyValuePair<string, string>>>(field.Name);

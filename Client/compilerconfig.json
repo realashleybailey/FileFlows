@@ -98,5 +98,9 @@
   {
     "outputFile": "Components/Inputs/InputSelect/InputSelect.razor.css",
     "inputFile": "Components/Inputs/InputSelect/InputSelect.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/FlowSchedule/FlowSchedule.razor.css",
+    "inputFile": "Components/Common/FlowSchedule/FlowSchedule.razor.scss"
   }
 ]

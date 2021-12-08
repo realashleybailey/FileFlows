@@ -21,7 +21,7 @@ namespace FileFlows.Client.Pages
 
         private async Task Add()
         {
-            await Edit(new Library() { Enabled = true, ScanInterval = 60, FileSizeDetectionInterval = 5 });
+            await Edit(new Library() { Enabled = true, ScanInterval = 60, FileSizeDetectionInterval = 5, Schedule = new String('1', 672) });
         }
 #if (DEMO)
         public override async Task Load(Guid? selectedUid = null)
@@ -126,7 +126,7 @@ namespace FileFlows.Client.Pages
 #endif
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Text,
+                InputType = FormInputType.Text,
                 Name = nameof(library.Name),
                 Validators = new List<FileFlows.Shared.Validators.Validator> {
                     new FileFlows.Shared.Validators.Required()
@@ -134,7 +134,7 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Folder,
+                InputType = FormInputType.Folder,
                 Name = nameof(library.Path),
                 Validators = new List<FileFlows.Shared.Validators.Validator> {
                     new FileFlows.Shared.Validators.Required()
@@ -142,12 +142,12 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Text,
+                InputType = FormInputType.Text,
                 Name = nameof(library.Filter)
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Select,
+                InputType = FormInputType.Select,
                 Name = nameof(library.Flow),
                 Parameters = new Dictionary<string, object>{
                     { "Options", flowOptions.ToList() }
@@ -155,7 +155,7 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Select,
+                InputType = FormInputType.Select,
                 Name = nameof(library.Priority),
                 Parameters = new Dictionary<string, object>{
                     { "AllowClear", false },
@@ -170,7 +170,7 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Int,
+                InputType = FormInputType.Int,
                 Parameters = new Dictionary<string, object>
                 {
                     { "Min", 10 },
@@ -180,7 +180,7 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Int,
+                InputType = FormInputType.Int,
                 Parameters = new Dictionary<string, object>
                 {
                     { "Min", 0 },
@@ -190,8 +190,17 @@ namespace FileFlows.Client.Pages
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Switch,
+                InputType = FormInputType.Switch,
                 Name = nameof(library.Enabled)
+            });
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Schedule,
+                Name = nameof(library.Schedule),
+                Parameters = new Dictionary<string, object>
+                {
+                    { "HideLabel", true }
+                }
             });
             var result = await Editor.Open("Pages.Library", "Pages.Library.Title", fields, library,
               saveCallback: Save);

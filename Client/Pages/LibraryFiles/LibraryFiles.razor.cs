@@ -25,9 +25,13 @@ namespace FileFlows.Client.Pages
 
         private int Count;
 
+        private string Title;
+        private string lblLibraryFiles;
+
         private void SetSelected(LibraryStatus status)
         {
             SelectedStatus = status.Status;
+            Title = lblLibraryFiles + ": " + status.Name;
             _ = this.Refresh();
         }
 
@@ -96,6 +100,8 @@ namespace FileFlows.Client.Pages
         {
             base.OnInitialized();
             lblMoveToTop = Translater.Instant("Pages.LibraryFiles.Buttons.MoveToTop");
+            lblLibraryFiles = Translater.Instant("Pages.LibraryFiles.Title");
+            Title = lblLibraryFiles + ": " + Translater.Instant("Enums.FileStatus." + FileStatus.Unprocessed);
         }
 
         private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
@@ -119,7 +125,7 @@ namespace FileFlows.Client.Pages
             var result = await GetStatus();
             if (result.Success)
             {
-                var order = new List<FileStatus> { FileStatus.Unprocessed, FileStatus.Processing, FileStatus.Processed, FileStatus.FlowNotFound, FileStatus.ProcessingFailed };
+                var order = new List<FileStatus> { FileStatus.Unprocessed, FileStatus.OutOfSchedule, FileStatus.Processing, FileStatus.Processed, FileStatus.FlowNotFound, FileStatus.ProcessingFailed };
                 foreach (var s in order)
                 {
                     if (result.Data.Any(x => x.Status == s) == false && s != FileStatus.FlowNotFound)

@@ -31,7 +31,6 @@
     }
 }
 
-
 @media screen and (min-width: 769px) 
 {   
     .status-picker {
@@ -73,4 +72,21 @@
     position: relative;
     top: 9px;
     right: 4px;
+}
+
+@media screen and (max-width: 1200px) and (min-width:768px) {
+    .status .name {
+        display: none !important;
+    }
+    .status .icon {
+        font-size: 2rem !important;
+        top: 0.75rem;
+    }
+    .status .count {
+        line-height: 2.75rem !important;
+        margin-left: 4rem !important;
+    }
+    .status-picker {
+        height:4rem;
+    }
 }

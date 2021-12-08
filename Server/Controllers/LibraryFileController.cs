@@ -7,25 +7,36 @@ namespace FileFlows.Server.Controllers
     [Route("/api/library-file")]
     public class LibraryFileController : ControllerStore<LibraryFile>
     {
-
         [HttpGet]
         public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
         {
             var libraryFiles = await base.GetDataList();
 
             if (status != null)
-                libraryFiles = libraryFiles.Where(x => x?.Status == status.Value).ToList();
+            {
+                FileStatus searchStatus = status.Value == FileStatus.OutOfSchedule ? FileStatus.Unprocessed : status.Value;
+                libraryFiles = libraryFiles.Where(x => x.Status == searchStatus).ToList();
+            }
 
             var libraries = await new LibraryController().GetData();
 
-            if (status == FileStatus.Unprocessed)
+
+            if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule)
             {
                 return libraryFiles
-                              .Where(x => 
-                                // unprocessed just show the enabled libraries
-                                libraries.ContainsKey(x.Library.Uid) && 
-                                libraries[x.Library.Uid].Enabled
-                              ).OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
+                              .Where(x =>
+                              {
+                                  // unprocessed just show the enabled libraries
+                                  if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
+                                      return false;
+                                  var lib = libraries[x.Library.Uid];
+                                  if (lib.Enabled == false)
+                                      return false;
+                                  if (ScheduleHelper.InSchedule(lib.Schedule) == false)
+                                      return status == FileStatus.OutOfSchedule;
+                                  return status == FileStatus.Unprocessed;
+                              })
+                              .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
                               .ThenByDescending(x =>
                               {
                                   // check the processing priority of the library
@@ -75,16 +86,24 @@ namespace FileFlows.Server.Controllers
         {
             var libraryFiles = await GetDataList();
             var libraries = await new LibraryController().GetData();
-            return libraryFiles.Where(x =>
+            var statuses = libraryFiles.Select(x =>
             {
                 if (x.Status != FileStatus.Unprocessed)
-                    return true;
+                    return x.Status;
                 // unprocessed just show the enabled libraries
                 if (libraries.ContainsKey(x.Library.Uid) == false)
-                    return false;
-                return libraries[x.Library.Uid].Enabled;
-            }).GroupBy(x => x.Status)
-                               .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
+                    return (FileStatus) (-99);
+
+                var lib = libraries[x.Library.Uid];
+                if (lib.Enabled == false)
+                    return (FileStatus)(-99);
+                if (ScheduleHelper.InSchedule(lib.Schedule) == false)
+                    return FileStatus.OutOfSchedule;
+                return FileStatus.Unprocessed;
+            });
+
+            return statuses.Where(x => (int)x != -99).GroupBy(x => x)
+                           .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 
         }
 

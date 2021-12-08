@@ -73,7 +73,9 @@ export function InitChart(data, lblOverall, lblCurrent) {
         }
 
         if (updated === false) {
-            new ApexCharts(document.querySelector(".chart-" + i), options).render();
+            let eleChart = document.querySelector(".chart-" + i);
+            if (eleChart)
+                new ApexCharts(eleChart, options).render();
         }
     }
 }
@@ -120,9 +122,13 @@ export function InitPieChart(elementId, series, labels) {
     };
     try {
         DestroyChart(elementId);
-        PieCharts[elementId] = new ApexCharts(document.getElementById(elementId), options);
-        PieCharts[elementId].render();
-    } catch (err) { } // cant throw if being destroyed when navigating away
+        let eleChart = document.getElementById(elementId);
+        if (eleChart)
+        {
+            PieCharts[elementId] = new ApexCharts(eleChart, options);
+            PieCharts[elementId].render();
+        }
+    } catch (err) { } // can throw if being destroyed when navigating away
 }
 
 export function DestroyChart(id) {

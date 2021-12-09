@@ -32,7 +32,7 @@ namespace FileFlows.Server.Controllers
                                   var lib = libraries[x.Library.Uid];
                                   if (lib.Enabled == false)
                                       return false;
-                                  if (ScheduleHelper.InSchedule(lib.Schedule) == false)
+                                  if (TimeHelper.InSchedule(lib.Schedule) == false)
                                       return status == FileStatus.OutOfSchedule;
                                   return status == FileStatus.Unprocessed;
                               })
@@ -97,7 +97,7 @@ namespace FileFlows.Server.Controllers
                 var lib = libraries[x.Library.Uid];
                 if (lib.Enabled == false)
                     return (FileStatus)(-99);
-                if (ScheduleHelper.InSchedule(lib.Schedule) == false)
+                if (TimeHelper.InSchedule(lib.Schedule) == false)
                     return FileStatus.OutOfSchedule;
                 return FileStatus.Unprocessed;
             });

@@ -45,7 +45,7 @@ namespace FileFlows.Server.Helpers
                         if (existing.Version == dll.Version && existing.Deleted == false)
                             continue;
                         existing.Version = dll.Version;
-                        existing.DateModified = DateTime.Now;
+                        existing.DateModified = DateTime.UtcNow;
                         existing.HasSettings = hasSettings;
                         existing.Deleted = false;
                         controller.Update(existing).Wait();
@@ -54,8 +54,8 @@ namespace FileFlows.Server.Helpers
                     {
                         // new dll
                         Logger.Instance.ILog("Adding new plug: " + dll.Name + ", " + dll.Assembly);
-                        dll.DateCreated = DateTime.Now;
-                        dll.DateModified = DateTime.Now;
+                        dll.DateCreated = DateTime.UtcNow;
+                        dll.DateModified = DateTime.UtcNow;
                         dll.HasSettings = hasSettings;
                         dll.Enabled = true;
                         dll.Uid = Guid.NewGuid();
@@ -72,7 +72,7 @@ namespace FileFlows.Server.Helpers
             {
                 Logger.Instance.DLog("Missing plugin dll: " + dll.Assembly);
                 dll.Deleted = true;
-                dll.DateModified = DateTime.Now;
+                dll.DateModified = DateTime.UtcNow;
                 controller.Update(dll).Wait();
             }
         }

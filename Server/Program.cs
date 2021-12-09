@@ -48,6 +48,9 @@ FileFlows.Shared.Logger.Instance = FileFlows.Server.Logger.Instance;
 //    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
 FileFlows.Server.Helpers.DbHelper.CreateDatabase().Wait();
 
+// do this so the settings object is loaded, and the time zone is set
+new FileFlows.Server.Controllers.SettingsController().Get().Wait();
+
 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
 FileFlows.Server.Globals.Version = fvi?.FileVersion ?? String.Empty;

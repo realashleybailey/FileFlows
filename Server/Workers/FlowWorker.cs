@@ -94,7 +94,7 @@ namespace FileFlows.Server.Workers
                 }
 
                 Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
-                libFile.ProcessingStarted = System.DateTime.Now;
+                libFile.ProcessingStarted = DateTime.UtcNow;
                 controller.Update(libFile).Wait();
                 this.Status.CurrentFile = libFile.Name;
                 this.Status.CurrentUid = libFile.Uid;
@@ -104,7 +104,7 @@ namespace FileFlows.Server.Workers
                 this.Status.CurrentPart = 0;
                 this.Status.CurrentPartPercent = 0;
                 this.Status.CurrentPartName = string.Empty;
-                this.Status.StartedAt = DateTime.Now;
+                this.Status.StartedAt = DateTime.UtcNow;
                 this.Status.WorkingFile = libFile.Name;
                 Executor = new FlowExecutor();
                 CurrentFlowLogger = new FlowLogger
@@ -133,7 +133,7 @@ namespace FileFlows.Server.Workers
                 libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
                 libFile.OutputPath = task.Result.WorkingFile;
                 libFile.FinalSize = new FileInfo(libFile.OutputPath).Length;                
-                libFile.ProcessingEnded = System.DateTime.Now;
+                libFile.ProcessingEnded = DateTime.UtcNow;
                 controller.Update(libFile).Wait();
             }
             finally

@@ -112,11 +112,15 @@ namespace FileFlows.Client.Components.Inputs
                 bool areEqual = System.Text.Json.JsonSerializer.Serialize(_Value) == System.Text.Json.JsonSerializer.Serialize(value);
                 if (areEqual == false) // for lists/arrays if they havent really changed, empty to empty, dont clear validation
                     ErrorMessage = ""; // clear the error
+
                 _Value = value;
+                ValueUpdated();
                 ValueChanged.InvokeAsync(value);
                 Field?.InvokeValueChanged(this.Editor, value);
             }
         }
+
+        protected virtual void ValueUpdated() { }
 
         [Parameter]
         public EventCallback<T> ValueChanged { get; set; }

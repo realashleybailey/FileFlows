@@ -22,7 +22,7 @@ namespace FileFlows.Shared.Models
         /// <summary>
         /// The timespan of when this was last scanned
         /// </summary>
-        public TimeSpan LastScannedAgo => DateTime.Now - LastScanned;
+        public TimeSpan LastScannedAgo => DateTime.UtcNow - LastScanned;
 
         /// <summary>
         /// Gets or sets the number of seconds to scan files

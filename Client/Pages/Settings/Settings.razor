@@ -24,6 +24,7 @@
         <div class="settings">
             <Fieldset Title="Pages.Settings.Labels.General">
                 <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
+                <InputSelect Value="@Model.TimeZone" ValueChanged="TimeZoneChanged" Label="Pages.Settings.Fields.TimeZone" Options="@TimeZones" />
             </Fieldset>
             <Fieldset Title="Pages.Settings.Labels.Directories">
                 <InputFile @bind-Value="@Model.TempPath" Directory="true" Validators=@DirectoryValidators

@@ -28,7 +28,7 @@ namespace FileFlows.Shared.Models
                 if (Status == FileStatus.Unprocessed)
                     return new TimeSpan();
                 if (Status == FileStatus.Processing)
-                    return DateTime.Now.Subtract(ProcessingStarted);
+                    return DateTime.UtcNow.Subtract(ProcessingStarted);
                 return ProcessingEnded.Subtract(ProcessingStarted);
             }
         }

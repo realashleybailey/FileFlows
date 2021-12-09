@@ -18,6 +18,7 @@ namespace FileFlows.Client.Components.Inputs
         [Parameter] public bool ShowDescription { get; set; }
 
         private string Description { get; set; }
+        private bool UpdatingValue = false;
 
         [Parameter]
         public IEnumerable<ListOption> Options
@@ -74,7 +75,15 @@ namespace FileFlows.Client.Components.Inputs
         {
             base.OnInitialized();
             lblSelectOne = Translater.Instant("Labels.SelectOne");
-            int startIndex = -1;
+            ValueUpdated();
+        }
+
+        protected override void ValueUpdated()
+        {
+            if (UpdatingValue)
+                return;
+
+            int startIndex = SelectedIndex;
             if (Value != null)
             {
                 var opt = Options.ToArray();
@@ -106,14 +115,23 @@ namespace FileFlows.Client.Components.Inputs
                     Value = Options.FirstOrDefault()?.Value;
                 }
             }
-            SelectedIndex = startIndex;
+            if(startIndex != SelectedIndex)
+                SelectedIndex = startIndex;
         }
 
         private void SelectionChanged(ChangeEventArgs args)
         {
-            if (int.TryParse(args?.Value?.ToString(), out int index))
-                SelectedIndex = index;
-            UpdateDescription();
+            UpdatingValue = true;
+            try
+            {
+                if (int.TryParse(args?.Value?.ToString(), out int index))
+                    SelectedIndex = index;
+                UpdateDescription();
+            }
+            finally
+            {
+                UpdatingValue = false;
+            }
         }
 
         public override async Task<bool> Validate()

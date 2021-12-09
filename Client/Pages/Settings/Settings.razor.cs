@@ -8,6 +8,7 @@ namespace FileFlows.Client.Pages
     using System.Collections.Generic;
     using FileFlows.Shared.Validators;
     using Microsoft.JSInterop;
+    using FileFlows.Plugin;
 
     public partial class Settings : ComponentBase
     {
@@ -23,6 +24,9 @@ namespace FileFlows.Client.Pages
 
         List<Validator> DirectoryValidators = new ();
 
+        List<ListOption> TimeZones;
+
+
         protected override async Task OnInitializedAsync()
         {
             lblSave = Translater.Instant("Labels.Save");
@@ -32,6 +36,16 @@ namespace FileFlows.Client.Pages
 
             DirectoryValidators.Add(new Required());
 
+            TimeZones = new List<ListOption>();
+            foreach (var tz in System.TimeZoneInfo.GetSystemTimeZones())
+            {
+                TimeZones.Add(new ListOption
+                {
+                    Label = tz.DisplayName,
+                    Value = tz.Id
+                });
+            }
+
 #if (!DEMO)
             var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
             if (response.Success)
@@ -40,6 +54,11 @@ namespace FileFlows.Client.Pages
             }
 #endif
             Blocker.Hide();
+        }
+
+        private void TimeZoneChanged(object value)
+        {
+            this.Model.TimeZone = value as string ?? string.Empty;
         }
 
 

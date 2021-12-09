@@ -24,6 +24,8 @@ namespace FileFlows.Client
 
         public FileFlows.Shared.Models.Flow NewFlowTemplate { get; set; }
 
+        public static FileFlows.Shared.Models.Settings Settings;
+
         private async Task LoadLanguage()
         {
             string langFile = await LoadLanguageFile("i18n/en.json?version=" + Globals.Version);
@@ -50,6 +52,8 @@ namespace FileFlows.Client
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;
             DisplayHeight = dimensions.height;
+
+            Settings = (await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings")).Data ?? new FileFlows.Shared.Models.Settings();
             await Task.Run(async () =>
             {
                 await LoadLanguage();

@@ -171,7 +171,8 @@
         "ScanInterval-Help": "The shortest possible time in seconds between scans.  It is not guaranteed to scan at this interval each time, as another scan might be in progress.",
         "FileSizeDetectionInterval": "File Detection Interval",
         "FileSizeDetectionInterval-Suffix": "Seconds",
-        "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a recording every 20 seconds."
+        "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a recording every 20 seconds.",
+        "Schedule": "Schedule"
       }
     },
     "LibraryFiles": {

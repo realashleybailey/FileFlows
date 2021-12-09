@@ -42,10 +42,10 @@ namespace FileFlows.Server.Workers
 
                 if (library.Enabled == false)
                     continue;
-                if(library.LastScanned > DateTime.Now.AddSeconds(-library.ScanInterval))
+                if(library.LastScanned > DateTime.UtcNow.AddSeconds(-library.ScanInterval))
                     continue;
 
-                if (ScheduleHelper.InSchedule(library.Schedule) == false)
+                if (TimeHelper.InSchedule(library.Schedule) == false)
                     continue;
 
                 if (string.IsNullOrEmpty(library.Path) || Directory.Exists(library.Path) == false)
@@ -145,7 +145,7 @@ namespace FileFlows.Server.Workers
         {
             try
             {
-                if (file.LastAccessTime < DateTime.Now.AddSeconds(-10))
+                if (file.LastAccessTimeUtc < DateTime.UtcNow.AddSeconds(-10))
                 {
                     // check if the file size changes
                     long fs = file.Length;

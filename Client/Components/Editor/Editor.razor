@@ -37,144 +37,33 @@
                             @if(string.IsNullOrEmpty(EditorDescription) == false){
                                 <div class="description">@EditorDescription</div>
                             }
-
-                            @foreach (var field in Fields.OrderBy(x => x.Order))
-                        {
-                            string label = TypeName + ".Fields." + field.Name;
-                            bool readOnly = GetParameter<bool>(field, "ReadOnly");
-                            bool hideLabel = GetParameter<bool>(field, "HideLabel");
-                            switch (field.InputType)
+                            @if (Fields?.Any() == true)
                             {
-                                case FormInputType.Text:
-                                    {
-                                        var value = GetValue<string>(field.Name) ?? "";
-                                        <InputText Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.TextVariable:
-                                    {
-                                        var value = GetValue<string>(field.Name) ?? "";
-                                        <InputTextVariables Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.TextArea:
-                                    {
-                                        var value = GetValue<string>(field.Name) ?? "";
-                                        <InputTextArea Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.LogView:
-                                    {
-                                        var value = GetValue<string>(field.Name) ?? "";
-                                        var refreshUrl = GetParameter<string>(field, nameof(Components.Inputs.InputLogView.RefreshUrl)) ?? "";
-                                        var refreshSeconds = GetParameter<int>(field, nameof(Components.Inputs.InputLogView.RefreshSeconds));
-                                        <InputLogView Field=@field Label="@label" Value="@value" RefreshUrl="@refreshUrl"
-                            RefreshSeconds="@refreshSeconds" Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Int:
-                                    {
-                                        var value = GetValue<int>(field.Name);
-                                        int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
-                                        int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
-                                        <InputNumber Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Switch:
-                                    {
-                                        var value = GetValue<bool>(field.Name);
-                                        <InputSwitch Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.StringArray:
-                                    {
-                                        var value = GetValue<string[]>(field.Name, new string[] { });
-                                        <InputArray Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Select:
-                                    {
-                                        var value = GetValue<object>(field.Name, "");
-                                        bool allowClear = GetParameter<bool>(field, nameof(Components.Inputs.InputSelect.AllowClear), true);
-                                        bool showDescription= GetParameter<bool>(field, nameof(Components.Inputs.InputSelect.ShowDescription), true);
-                                        var options = GetParameter<List<FileFlows.Plugin.ListOption>>(field, "Options");
-                                        <InputSelect Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Options=@options AllowClear=@allowClear
-                            ValueChanged="@(x => UpdateValue(field, x))" Placeholder="@field.Placeholder" ShowDescription=@showDescription HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.File:
-                                    {
-                                        var value = GetValue<string>(field.Name, "");
-                                        var extensions = GetParameter<List<string>>(field, "Extensions")?.ToArray();
-                                        <InputFile Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Extensions=@extensions Validators=@field.Validators
-                            ValueChanged="@(x => UpdateValue(field, x))" Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Folder:
-                                    {
-                                        var value = GetValue<string>(field.Name, "");
-                                        <InputFile Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Directory=@true Validators=@field.Validators
-                            ValueChanged="@(x => UpdateValue(field, x))" Variables=@field.Variables  Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Code:
-                                    {
-                                        var value = GetValue<string>(field.Name);
-                                        <InputCode Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Schedule:
-                                    {
-                                        var value = GetValue<string>(field.Name);
-                                        <InputSchedule Field=@field Label="@label" Value="@value" ReadOnly=@readOnly 
-                                            ValueChanged="@(x => UpdateValue(field, x))" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.KeyValue:
-                                    {
-                                        var value = GetValue<List<KeyValuePair<string, string>>>(field.Name);
-                                        <InputKeyValue Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-                            Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
-                                    }
-                                    break;
-                                case FormInputType.Label:
-                                {
-                                    <div class="input-label">
-                                        @Translater.TranslateIfNeeded(label)
-                                    </div>
-                                }
-                                break;
-                                case FormInputType.HorizontalRule:
-                                {
-                                    <div class="input-horizontal-rule"></div>
-                                }
-                                break;
+                                <FlowPanel Fields=@Fields></FlowPanel>
 
-                                default:
-                                    {
-                                        <span>couldnt find type @field.InputType</span>
-                                    }
-                                    break;
+                                @if (AdditionalFields != null)
+                                {
+                                    @AdditionalFields
+                                }
+                                <div class="empty"></div>
                             }
-                        }
+                            @if(Tabs?.Any() == true)
+                            {
+                                <FlowTabs>
+                                @foreach(var tab in Tabs)
+                                {
+                                    <FlowTab Title=@tab.Key>
+                                        <FlowPanel Fields=@tab.Value></FlowPanel>
 
-                        @if(AdditionalFields != null)
-                        {
-                            @AdditionalFields
-                        }
-                        <div class="empty"></div>
-                    </div>
-                </CascadingValue>
-            </Body>
-        </ViContainer>
+                                    </FlowTab>
+                                }
+                                </FlowTabs>
+                            }
+                        </div>
+                    </CascadingValue>
+                </Body>
+            </ViContainer>
+        </div>
+
     </div>
-
-</div>
 }

@@ -23,12 +23,14 @@ namespace FileFlows.Client.Components
         public string Title { get; set; }
         public string Icon { get; set; }
 
-        private string TypeName { get; set; }
+        public string TypeName { get; set; }
         private bool IsSaving { get; set; }
 
         private string lblSave, lblSaving, lblCancel, lblClose;
 
         private List<ElementField> Fields { get; set; }
+
+        private Dictionary<string, List<ElementField>> Tabs { get; set; }
 
         public ExpandoObject Model { get; set; }
 
@@ -97,12 +99,13 @@ namespace FileFlows.Client.Components
             return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null)
         {
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
             this.Title = Translater.TranslateIfNeeded(title);
             this.Fields = fields;
+            this.Tabs = tabs;
             this.ReadOnly = readOnly;
             this.Large = large;
             this.Visible = true;
@@ -174,18 +177,22 @@ namespace FileFlows.Client.Components
             OpenTask.TrySetResult(this.Model);
 
             this.Visible = false;
-            this.Fields.Clear();
+            this.Fields?.Clear();
+            this.Tabs?.Clear();
         }
 
         private void Cancel()
         {
             OpenTask.TrySetCanceled();
             this.Visible = false;
-            this.Fields.Clear();
+            if(this.Fields != null)
+                this.Fields.Clear();
+            if(this.Tabs != null)
+                this.Tabs.Clear();
 
         }
 
-        private void UpdateValue(ElementField field, object value)
+        internal void UpdateValue(ElementField field, object value)
         {
             var dict = (IDictionary<string, object>)Model;
             if (dict.ContainsKey(field.Name))
@@ -194,7 +201,7 @@ namespace FileFlows.Client.Components
                 dict.Add(field.Name, value);
         }
 
-        private T GetParameter<T>(ElementField field, string parameter, T @default = default(T))
+        internal T GetParameter<T>(ElementField field, string parameter, T @default = default(T))
         {
             var dict = field?.Parameters as IDictionary<string, object>;
             if (dict?.ContainsKey(parameter) != true)
@@ -213,7 +220,7 @@ namespace FileFlows.Client.Components
             }
         }
 
-        private T GetValue<T>(string field, T @default = default(T))
+        internal T GetValue<T>(string field, T @default = default(T))
         {
             var dict = (IDictionary<string, object>)Model;
             if (dict.ContainsKey(field) == false)

@@ -143,8 +143,6 @@ namespace FileFlows.Client.Pages
 
                     this.StateHasChanged();
                 }
-
-
             }
             catch (Exception)
             {

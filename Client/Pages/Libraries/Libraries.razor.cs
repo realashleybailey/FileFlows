@@ -53,162 +53,10 @@ namespace FileFlows.Client.Pages
 
         public override async Task<bool> Edit(Library library)
         {
-            Blocker.Show();
-            var flowResult = await GetFlows();
-            Blocker.Hide();
-            if (flowResult.Success == false || flowResult.Data?.Any() != true)
-            {
-                ShowEditHttpError(flowResult, "Pages.Libraries.ErrorMessages.NoFlows");
-                return false;
-            }
-            var flowOptions = flowResult.Data.Select(x => new ListOption { Value = new ObjectReference { Name = x.Name, Uid = x.Uid }, Label = x.Name });
-
 
             this.EditingItem = library;
-            List<ElementField> fields = new List<ElementField>();
-            ElementField efTemplate = null;
-#if (!DEMO)
-            if (library == null || library.Uid == Guid.Empty)
-            {
-                // adding
-                Blocker.Show();
-                try
-                {
-                    var templateResult = await HttpHelper.Get<Dictionary<string, List<Library>>>("/api/library/templates");
-                    if (templateResult.Success == true || templateResult.Data?.Any() == true)
-                    {
-                        List<ListOption> templates = new();
-                        foreach (var group in templateResult.Data)
-                        {
-                            if (string.IsNullOrEmpty(group.Key) == false)
-                            {
-                                templates.Add(new ListOption
-                                {
-                                    Value = Globals.LIST_OPTION_GROUP,
-                                    Label = group.Key
-                                });
-                            }
-                            templates.AddRange(group.Value.Select(x => new ListOption
-                            {
-                                Label = x.Name,
-                                Value = x
-                            }));
-                        }
-                        templates.Insert(0, new ListOption
-                        {
-                            Label = "Custom",
-                            Value = null
-                        });
-                        efTemplate = new ElementField
-                        {
-                            Name = "Template",
-                            InputType = FormInputType.Select,
-                            Parameters = new Dictionary<string, object>
-                            {
-                                { nameof(InputSelect.Options), templates },
-                                { nameof(InputSelect.AllowClear), false},
-                                { nameof(InputSelect.ShowDescription), true }
-                            }
-                        };
-                        efTemplate.ValueChanged += TemplateValueChanged;
-                        fields.Add(efTemplate);
-                        fields.Add(new ElementField
-                        {
-                            InputType = FormInputType.HorizontalRule
-                        });
-                    }
-                }
-                finally
-                {
-                    Blocker.Hide();
-                }
-            }
-#endif
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Text,
-                Name = nameof(library.Name),
-                Validators = new List<FileFlows.Shared.Validators.Validator> {
-                    new FileFlows.Shared.Validators.Required()
-                }
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Folder,
-                Name = nameof(library.Path),
-                Validators = new List<FileFlows.Shared.Validators.Validator> {
-                    new FileFlows.Shared.Validators.Required()
-                }
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Text,
-                Name = nameof(library.Filter)
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Select,
-                Name = nameof(library.Flow),
-                Parameters = new Dictionary<string, object>{
-                    { "Options", flowOptions.ToList() }
-                }
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Select,
-                Name = nameof(library.Priority),
-                Parameters = new Dictionary<string, object>{
-                    { "AllowClear", false },
-                    { "Options", new List<ListOption> {
-                        new ListOption { Value = ProcessingPriority.Lowest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Lowest)}" },
-                        new ListOption { Value = ProcessingPriority.Low, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Low)}" },
-                        new ListOption { Value = ProcessingPriority.Normal, Label =$"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Normal)}" },
-                        new ListOption { Value = ProcessingPriority.High, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.High)}" },
-                        new ListOption { Value = ProcessingPriority.Highest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Highest)}" }
-                    } }
-                }
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Int,
-                Parameters = new Dictionary<string, object>
-                {
-                    { "Min", 10 },
-                    { "Max", 24 * 60 * 60 }
-                },
-                Name = nameof(library.ScanInterval)
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Int,
-                Parameters = new Dictionary<string, object>
-                {
-                    { "Min", 0 },
-                    { "Max", 300 }
-                },
-                Name = nameof(library.FileSizeDetectionInterval)
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Switch,
-                Name = nameof(library.Enabled)
-            });
-            fields.Add(new ElementField
-            {
-                InputType = FormInputType.Schedule,
-                Name = nameof(library.Schedule),
-                Parameters = new Dictionary<string, object>
-                {
-                    { "HideLabel", true }
-                }
-            });
-            var result = await Editor.Open("Pages.Library", "Pages.Library.Title", fields, library,
-              saveCallback: Save);
-            if(efTemplate != null)
-            {
-                efTemplate.ValueChanged -= TemplateValueChanged;
-            }
-            return false;
+
+            return await OpenEditor(library);
         }
 
         private void TemplateValueChanged(object sender, object value) 
@@ -255,7 +103,7 @@ namespace FileFlows.Client.Pages
                 var saveResult = await HttpHelper.Post<Library>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
+                    NotificationService.Notify(NotificationSeverity.Error, Translater.TranslateIfNeeded(saveResult.Body?.EmptyAsNull() ?? "ErrorMessages.SaveFailed"));
                     return false;
                 }
 

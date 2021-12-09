@@ -102,5 +102,13 @@
   {
     "outputFile": "Components/Common/FlowSchedule/FlowSchedule.razor.css",
     "inputFile": "Components/Common/FlowSchedule/FlowSchedule.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/FlowTabs/FlowTabs.razor.css",
+    "inputFile": "Components/Common/FlowTabs/FlowTabs.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/FlowTabs/FlowTab.razor.css",
+    "inputFile": "Components/Common/FlowTabs/FlowTab.razor.scss"
   }
 ]

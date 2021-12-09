@@ -26,6 +26,7 @@ namespace FileFlows.Client.Pages
         private bool _needsRendering = false;
 
         protected bool Loaded { get; set; }
+        protected bool HasData { get; set; }
 
 
 
@@ -100,6 +101,7 @@ namespace FileFlows.Client.Pages
             }
             finally
             {
+                HasData = this.Data?.Any() == true;
                 this.Loaded = true;
                 Blocker.Hide();
                 await this.WaitForRender();

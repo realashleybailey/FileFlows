@@ -1,16 +1,10 @@
-﻿namespace FileFlows.Server.Helpers
+﻿using NodaTime;
+
+namespace FileFlows.Server.Helpers
 {
     public class TimeHelper
     {
-        private static TimeZoneInfo _UserTimeZone = TimeZoneInfo.Local;
-        public static TimeZoneInfo UserTimeZone
-        {
-            get => _UserTimeZone;
-            set
-            {
-                _UserTimeZone = value ?? TimeZoneInfo.Local;
-            }
-        }
+        public static string UserTimeZone { get; set; }
 
         internal static int GetCurrentQuarter()
         {
@@ -28,7 +22,12 @@
 
         internal static DateTime UserNow()
         {
-            return TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserTimeZone);
+            if (UserTimeZone == null)
+                return DateTime.UtcNow;
+
+            var instant = Instant.FromDateTimeUtc(DateTime.UtcNow);
+            return instant.InZone(DateTimeZoneProviders.Tzdb[UserTimeZone]).ToDateTimeUnspecified();
+            //return TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserTimeZone);
         }
 
         internal static bool InSchedule(string schedule)

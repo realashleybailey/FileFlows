@@ -30,6 +30,15 @@ namespace FileFlows.Server.Controllers
             return 0;
         }
 
+        [HttpGet("current")]
+        public object Current()
+        {
+            int quarter = TimeHelper.GetCurrentQuarter();
+            var date = TimeHelper.UserNow().ToString();
+            var utcNow = DateTime.UtcNow;
+            return new { TimeHelper.UserTimeZone, quarter, date, utcNow};
+        }
+
         [HttpGet]
         public async Task<Settings> Get()
         {
@@ -54,7 +63,7 @@ namespace FileFlows.Server.Controllers
 
         private void InitTimeZone(Settings settings)
         {
-            TimeHelper.UserTimeZone = TimeZoneInfo.GetSystemTimeZones().Where(x => x.Id == settings.TimeZone).FirstOrDefault();
+            TimeHelper.UserTimeZone = settings.TimeZone;
         }
 
         [HttpPut]

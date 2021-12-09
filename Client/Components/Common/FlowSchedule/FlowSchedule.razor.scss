@@ -1,20 +1,15 @@
-﻿$borderColor: var(--input-background);
-
-.flow-schedule {
+﻿.flow-schedule {
     user-select:none;
 }
 
-table, tbody tr, td {
-    //border:solid 1px $borderColor;
-}
 td {
-    border: solid 1px $borderColor;
+    border: solid 1px var(--input-background);
 }
 
 table {
     width:100%;
     table-layout:fixed;
-    font-size:min(1rem, 2vw) !important;
+    font-size:min(1rem, 4vw) !important;
 }
 thead {
     text-align:center;
@@ -37,8 +32,8 @@ thead {
     border-left:none;
 }
 .day-label {
-    width: min(5vw, 3rem);
     border: none;
+    width: 5ch;
 }
 .meridian {
     th + th {
@@ -49,7 +44,26 @@ thead {
     }
 }
 .spacer{
-    width:0.5rem;
-    border-top:none;
-    border-bottom:none;
+    display:none;
+}
+
+.schedule-pm {
+    margin-top:2rem;
+}
+
+@media screen and (min-width: 720px){
+    .flow-schedule {
+        display:flex;
+        flex-direction:row;
+    }
+    .spacer{ 
+        width:1rem;
+        display:unset;
+    }
+    .schedule-pm {
+        margin-top:unset;
+        .day-label {
+            display:none;
+        }
+    }
 }

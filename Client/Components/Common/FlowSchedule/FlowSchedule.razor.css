@@ -9,7 +9,7 @@ td {
 table {
   width: 100%;
   table-layout: fixed;
-  font-size: min(1rem, 2vw) !important;
+  font-size: min(1rem, 4vw) !important;
 }
 
 thead {
@@ -38,8 +38,8 @@ thead {
 }
 
 .day-label {
-  width: min(5vw, 3rem);
   border: none;
+  width: 5ch;
 }
 
 .meridian th + th {
@@ -50,7 +50,28 @@ thead {
 }
 
 .spacer {
-  width: 0.5rem;
-  border-top: none;
-  border-bottom: none;
+  display: none;
+}
+
+.schedule-pm {
+  margin-top: 2rem;
+}
+
+@media screen and (min-width: 720px) {
+  .flow-schedule {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .spacer {
+    width: 1rem;
+    display: unset;
+  }
+
+  .schedule-pm {
+    margin-top: unset;
+  }
+  .schedule-pm .day-label {
+    display: none;
+  }
 }

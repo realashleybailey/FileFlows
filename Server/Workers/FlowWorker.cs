@@ -8,7 +8,6 @@ namespace FileFlows.Server.Workers
 {
     public class FlowWorker : Worker
     {
-
         public static readonly List<FlowWorker> RegisteredFlowWorkers = new List<FlowWorker>();
 
         public readonly FlowWorkerStatus Status = new FlowWorkerStatus();
@@ -22,6 +21,45 @@ namespace FileFlows.Server.Workers
         {
             this.Status.Uid = this.Uid;
             RegisteredFlowWorkers.Add(this);
+        }
+
+        private static List<Guid> FlowExecutions = new List<Guid>();
+        private static int MaxFlowExecutions = 1;
+
+        private static Guid GetExecution()
+        {
+            mutex.WaitOne();
+            try
+            {
+                if(FlowExecutions.Count >= MaxFlowExecutions)
+                    return Guid.Empty;
+                Guid guid = Guid.NewGuid();
+                FlowExecutions.Add(guid);
+                return guid;
+            }
+            catch (Exception) { return Guid.Empty; }
+            finally
+            {
+                mutex.ReleaseMutex();
+
+            }
+        }
+
+        private static void CompleteExecution(Guid guid)
+        {
+            mutex.WaitOne();
+            try
+            {
+                if (FlowExecutions.Contains(guid))
+                    FlowExecutions.Remove(guid);
+            }
+            catch(Exception) { }
+            finally
+            {
+                mutex.ReleaseMutex();
+
+            }
+
         }
 
 
@@ -63,96 +101,107 @@ namespace FileFlows.Server.Workers
                 return;
             }
 
-            var libFile = GetLibraryFile();
-            if (libFile == null)
-                return; // nothing to process
-
-            string tempPath = settings.TempPath;
-            if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
-            {
-                Logger.Instance.ELog("Temp Path not set, cannot process");
+            var execution = GetExecution();
+            if (execution == Guid.Empty)
                 return;
-            }
-
 
             try
             {
-                var controller = new LibraryFileController();
-                var flowController = new FlowController();
-                FileInfo file = new FileInfo(libFile.Name);
-                if (file.Exists == false)
+                var libFile = GetLibraryFile();
+                if (libFile == null)
+                    return; // nothing to process
+
+                string tempPath = settings.TempPath;
+                if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
                 {
-                    controller.DeleteAll(libFile.Uid).Wait();
-                    return;
-                }
-                var flow = flowController.Get(libFile.Flow.Uid).Result;
-                if (flow == null || flow.Uid == Guid.Empty)
-                {
-                    libFile.Status = FileStatus.FlowNotFound;
-                    controller.Update(libFile).Wait();
+                    Logger.Instance.ELog("Temp Path not set, cannot process");
                     return;
                 }
 
-                Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
-                libFile.ProcessingStarted = DateTime.UtcNow;
-                controller.Update(libFile).Wait();
-                this.Status.CurrentFile = libFile.Name;
-                this.Status.CurrentUid = libFile.Uid;
-                this.Status.RelativeFile = libFile.RelativePath;
-                this.Status.Library = libFile.Library;
-                this.Status.TotalParts = flow.Parts.Count;
-                this.Status.CurrentPart = 0;
-                this.Status.CurrentPartPercent = 0;
-                this.Status.CurrentPartName = string.Empty;
-                this.Status.StartedAt = DateTime.UtcNow;
-                this.Status.WorkingFile = libFile.Name;
-                Executor = new FlowExecutor();
-                CurrentFlowLogger = new FlowLogger
-                {
-                    File = libFile,
-                    LogFile = System.IO.Path.Combine(settings.LoggingPath, libFile.Uid.ToString() + ".log")
-                };
-                Executor.Logger = CurrentFlowLogger;
-                Executor.Flow = flow;
-                Executor.OnPartPercentageUpdate += OnPartPercentageUpdate;
-                Executor.OnStepChange += OnStepChange;
-                libFile.OriginalSize = file.Length;
-                Task<Plugin.NodeParameters> task = null;
+
                 try
                 {
-                    task = Executor.Run(file.FullName, libFile.RelativePath, tempPath, settings.GetLogFile(libFile.Uid));
-                    task.Wait();
+                    var controller = new LibraryFileController();
+                    var flowController = new FlowController();
+                    FileInfo file = new FileInfo(libFile.Name);
+                    if (file.Exists == false)
+                    {
+                        controller.DeleteAll(libFile.Uid).Wait();
+                        return;
+                    }
+                    var flow = flowController.Get(libFile.Flow.Uid).Result;
+                    if (flow == null || flow.Uid == Guid.Empty)
+                    {
+                        libFile.Status = FileStatus.FlowNotFound;
+                        controller.Update(libFile).Wait();
+                        return;
+                    }
+
+                    Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
+                    libFile.ProcessingStarted = DateTime.UtcNow;
+                    controller.Update(libFile).Wait();
+                    this.Status.CurrentFile = libFile.Name;
+                    this.Status.CurrentUid = libFile.Uid;
+                    this.Status.RelativeFile = libFile.RelativePath;
+                    this.Status.Library = libFile.Library;
+                    this.Status.TotalParts = flow.Parts.Count;
+                    this.Status.CurrentPart = 0;
+                    this.Status.CurrentPartPercent = 0;
+                    this.Status.CurrentPartName = string.Empty;
+                    this.Status.StartedAt = DateTime.UtcNow;
+                    this.Status.WorkingFile = libFile.Name;
+                    Executor = new FlowExecutor();
+                    CurrentFlowLogger = new FlowLogger
+                    {
+                        File = libFile,
+                        LogFile = System.IO.Path.Combine(settings.LoggingPath, libFile.Uid.ToString() + ".log")
+                    };
+                    Executor.Logger = CurrentFlowLogger;
+                    Executor.Flow = flow;
+                    Executor.OnPartPercentageUpdate += OnPartPercentageUpdate;
+                    Executor.OnStepChange += OnStepChange;
+                    libFile.OriginalSize = file.Length;
+                    Task<Plugin.NodeParameters> task = null;
+                    try
+                    {
+                        task = Executor.Run(file.FullName, libFile.RelativePath, tempPath, settings.GetLogFile(libFile.Uid));
+                        task.Wait();
+                    }
+                    finally
+                    {
+                        Executor.OnPartPercentageUpdate -= OnPartPercentageUpdate;
+                        Executor.OnStepChange -= OnStepChange;
+                        Executor = null;
+                    }
+                    Logger.Instance.DLog("FlowWorker.Executor.Status: " + task.Result.Result);
+                    libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
+                    libFile.OutputPath = task.Result.WorkingFile;
+                    libFile.FinalSize = new FileInfo(libFile.OutputPath).Length;
+                    libFile.ProcessingEnded = DateTime.UtcNow;
+                    controller.Update(libFile).Wait();
                 }
                 finally
                 {
-                    Executor.OnPartPercentageUpdate -= OnPartPercentageUpdate;
-                    Executor.OnStepChange -= OnStepChange;
-                    Executor = null;
+                    this.Status.CurrentFile = string.Empty;
+                    this.Status.CurrentUid = Guid.Empty;
+                    this.Status.RelativeFile = string.Empty;
+                    this.Status.Library = new ObjectReference { Name = string.Empty, Uid = Guid.Empty };
+                    this.Status.TotalParts = 0;
+                    this.Status.CurrentPart = 0;
+                    this.Status.CurrentPartPercent = 0;
+                    this.Status.CurrentPartName = string.Empty;
+                    this.Status.WorkingFile = string.Empty;
+                    this.Status.StartedAt = new DateTime(1970, 1, 1);
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1_000);
+                        Trigger();
+                    });
                 }
-                Logger.Instance.DLog("FlowWorker.Executor.Status: " + task.Result.Result);
-                libFile.Status = task.Result.Result == Plugin.NodeResult.Success ? FileStatus.Processed : FileStatus.ProcessingFailed;
-                libFile.OutputPath = task.Result.WorkingFile;
-                libFile.FinalSize = new FileInfo(libFile.OutputPath).Length;                
-                libFile.ProcessingEnded = DateTime.UtcNow;
-                controller.Update(libFile).Wait();
             }
             finally
             {
-                this.Status.CurrentFile = string.Empty;
-                this.Status.CurrentUid = Guid.Empty;
-                this.Status.RelativeFile = string.Empty;
-                this.Status.Library = new ObjectReference { Name = string.Empty, Uid = Guid.Empty };
-                this.Status.TotalParts = 0;
-                this.Status.CurrentPart = 0;
-                this.Status.CurrentPartPercent = 0;
-                this.Status.CurrentPartName = string.Empty;
-                this.Status.WorkingFile = string.Empty;
-                this.Status.StartedAt = new DateTime(1970, 1, 1);
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(1_000);
-                    Trigger();
-                });
+                CompleteExecution(execution);
             }
         }
 

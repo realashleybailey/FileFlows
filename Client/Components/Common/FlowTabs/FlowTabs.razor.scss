@@ -13,6 +13,13 @@
     padding-left:1rem;
 }
 
+
+@media screen and (max-width:500px){
+    .flow-tab-buttons {
+        padding-left: 0;
+    }
+}
+
 .tab-button {
     width: 8rem;
     overflow-x: hidden;

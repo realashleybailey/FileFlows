@@ -122,11 +122,6 @@
             });
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Text,
-                Name = nameof(library.Filter)
-            });
-            fields.Add(new ElementField
-            {
                 InputType = FormInputType.Select,
                 Name = nameof(library.Flow),
                 Parameters = new Dictionary<string, object>{
@@ -161,6 +156,12 @@
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
+                InputType = FormInputType.Label,
+                Name = "ScheduleDescription"
+            });
+
+            fields.Add(new ElementField
+            {
                 InputType = FormInputType.Schedule,
                 Name = nameof(library.Schedule),
                 Parameters = new Dictionary<string, object>
@@ -174,6 +175,11 @@
         private List<ElementField> TabAdvanced(Library library)
         {
             List<ElementField> fields = new List<ElementField>();
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Text,
+                Name = nameof(library.Filter)
+            });
             fields.Add(new ElementField
             {
                 InputType = FormInputType.Int,

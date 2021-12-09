@@ -13,18 +13,20 @@ namespace FileFlows.Server.Controllers
         [HttpGet("is-configured")]
         public async Task<int> IsConfigured([FromQuery(Name = "tz")] string timeZoneId)
         {
-            var libs = new LibraryController().GetData().Result?.Any() == true;
-            var flows = new FlowController().GetData().Result?.Any() == true;
-            if (libs && flows)
-                return 2;
-            if (flows)
-                return 1;
+            // this updates the TZ with the TZ from the client if not set
             var settings = await Get();
             if (string.IsNullOrEmpty(settings.TimeZone))
             {
                 settings.TimeZone = timeZoneId;
                 await Save(settings);
             }
+
+            var libs = new LibraryController().GetData().Result?.Any() == true;
+            var flows = new FlowController().GetData().Result?.Any() == true;
+            if (libs && flows)
+                return 2;
+            if (flows)
+                return 1;
             return 0;
         }
 

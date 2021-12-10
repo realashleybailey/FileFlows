@@ -11,7 +11,7 @@
 
     public partial class FlowSchedule: ComponentBase
     {
-        private string _Value = new string('0', 672);
+        private string _Value = new string('1', 672);
         [Parameter]
         public string Value
         {
@@ -19,8 +19,8 @@
             set
             {
                 string v = value;
-                if (_Value == null || Regex.IsMatch(_Value, "^[01]{672}$") == false)
-                    v = new string('0', 672);
+                if (v == null || Regex.IsMatch(v, "^[01]{672}$") == false)
+                    v = new string('1', 672);
                 if(_Value != v)
                 {
                     _Value = v;

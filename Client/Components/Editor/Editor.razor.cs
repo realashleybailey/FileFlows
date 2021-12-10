@@ -111,6 +111,9 @@ namespace FileFlows.Client.Components
 
         internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null)
         {
+            this.RegisteredInputs.Clear();
+            var expandoModel = ConverToExando(model);
+            this.Model = expandoModel;
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
             this.Title = Translater.TranslateIfNeeded(title);
@@ -134,12 +137,9 @@ namespace FileFlows.Client.Components
                 this.lblSaving = lblSave;
             }
 
-            this.RegisteredInputs.Clear();
             Logger.Instance.DLog("getting description for: " + typeName);
             this.EditorDescription = Translater.Instant(typeName + ".Description");
             Logger.Instance.DLog("getting description for: " + typeName, this.EditorDescription);
-            var expandoModel = ConverToExando(model);
-            this.Model = expandoModel;
             OpenTask = new TaskCompletionSource<ExpandoObject>();
             this.FocusFirst = true;
             this.StateHasChanged();

@@ -15,6 +15,7 @@ namespace FileFlows.Client.Pages
     using System;
     using FileFlows.Client.Components.Inputs;
     using System.Dynamic;
+    using Microsoft.AspNetCore.Components.Rendering;
 
     public partial class Flows : ListPage<ffFlow>
     {
@@ -122,7 +123,7 @@ namespace FileFlows.Client.Pages
 
             fields.Insert(1, efTemplate);
 
-            var newModelTask = Editor.Open("Pages.Flows.Template", "Pages.Flows.Template.Title", fields, new System.Dynamic.ExpandoObject(), lblSave: "Labels.Add");
+            var newModelTask = Editor.Open("Pages.Flows.Template", "Pages.Flows.Template.Title", fields, new ExpandoObject(), lblSave: "Labels.Add");
             try
             {
                 await newModelTask;
@@ -145,7 +146,7 @@ namespace FileFlows.Client.Pages
         private ffFlow GetNewFlowTemplate(ExpandoObject newModel)
         {
             var dict = (IDictionary<string, object>)newModel;
-            var newTemplate = dict["Template"] as FlowTemplateModel;
+            var newTemplate = dict.ContainsKey("Template") ? dict["Template"] as FlowTemplateModel : null;
 
             var newFlowTemplate = newTemplate?.Flow;
 
@@ -164,6 +165,9 @@ namespace FileFlows.Client.Pages
                     var part = newFlowTemplate.Parts.Where(x => x.Uid.ToString() == nodeId).FirstOrDefault();
                     if (part != null)
                     {
+                        // set the model incase its null
+                        part.Model ??= new ExpandoObject();
+
                         var pmDict = part.Model as IDictionary<string, object>;
                         if (pmDict != null)
                         {
@@ -224,6 +228,11 @@ namespace FileFlows.Client.Pages
                         }));
                         builder.CloseComponent();
                     }
+                    else if(field.Type == "Switch")
+                    {
+                        FlowTemplateEditor_AddSwitch(builder, field, count, editor, flowTemplate);
+
+                    }
                 }
             };
         }
@@ -233,6 +242,54 @@ namespace FileFlows.Client.Pages
             if(item != null)
                 NavigationManager.NavigateTo("flows/" + item.Uid);
             return await Task.FromResult(false);
+        }
+
+        private void FlowTemplateEditor_AddSwitch(RenderTreeBuilder builder, TemplateField field, int count, Editor editor, FlowTemplateModel flowTemplate)
+        {
+            int fieldCount = 0;
+            builder.OpenComponent<InputSwitch>(++count);
+            builder.AddAttribute(++fieldCount, nameof(InputFile.Help), Translater.TranslateIfNeeded(field.Help));
+            builder.AddAttribute(++fieldCount, nameof(InputFile.Label), field.Label);
+            bool @default = ((System.Text.Json.JsonElement)field.Default).GetBoolean();
+
+            object trueValue = true;
+            object falseValue = false;
+            if (field.Value != null)
+            {
+                if (field.Value is System.Text.Json.JsonElement je)
+                {
+                    Dictionary<string, object> jeValue = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(je.ToJson());
+                    if (jeValue != null)
+                    {
+                        if (jeValue.ContainsKey("true"))
+                            trueValue = jeValue["true"];
+                        if (jeValue.ContainsKey("false"))
+                            falseValue = jeValue["false"];
+                    }
+                }
+            }
+
+            builder.AddAttribute(++fieldCount, nameof(InputFile.Value), @default);
+            builder.AddAttribute(++fieldCount, nameof(InputFile.ValueChanged), EventCallback.Factory.Create<bool>(this, arg =>
+            {
+                SetValue(arg);
+            }));
+            builder.CloseComponent();
+
+            SetValue(@default);
+
+            void SetValue(bool @checked)
+            {
+
+                var em = editor.Model as IDictionary<string, object>;
+                if (em == null)
+                    return;
+                string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
+                if (em.ContainsKey(key))
+                    em[key] = @checked ? trueValue : falseValue;
+                else
+                    em.Add(key, @checked ? trueValue : falseValue);
+            }
         }
     }
 

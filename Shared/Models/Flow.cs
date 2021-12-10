@@ -25,6 +25,8 @@ namespace FileFlows.Shared.Models
         public bool Required { get; set; }
         public string Name { get; set; }
         public string Label { get; set; }
+        public string Help { get; set; }
         public object Default { get; set; }
+        public object Value { get; set; }
     }
 }

@@ -283,7 +283,20 @@ namespace FileFlows.Client.Pages
             // add the name to the model, since this is actually bound on the part not model, but we need this 
             // so the user can update the name
             if (model is IDictionary<string, object> dict)
+            {
                 dict["Name"] = part.Name ?? string.Empty;
+
+                //foreach (var key in dict.Keys.ToArray())
+                //{
+                //    if(dict[key] is JsonElement je)
+                //    {
+                //        if (je.ValueKind == JsonValueKind.String)
+                //            dict[key] = je.GetString();
+                //        else if (je.ValueKind == JsonValueKind.Number)
+                //            dict[key] = je.GetInt32();
+                //    }
+                //}
+            }
 
             string title = FlowHelper.FormatLabel(typeName);
             var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1);
@@ -299,7 +312,7 @@ namespace FileFlows.Client.Pages
             if (newModelTask.IsCanceled == false)
             {
                 IsDirty = true;
-                Logger.Instance.DLog("model updated:" + System.Text.Json.JsonSerializer.Serialize(newModelTask.Result));
+                Logger.Instance.DLog("model updated:" + JsonSerializer.Serialize(newModelTask.Result));
                 var newModel = newModelTask.Result;
                 int outputs = -1;
                 if (part.Model is IDictionary<string, object> dictNew)

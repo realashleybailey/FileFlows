@@ -33,6 +33,7 @@ namespace FileFlows.Client.Components.Inputs
         protected string Uid = System.Guid.NewGuid().ToString();
         private string _Label;
         private string _LabelOriginal;
+        private string _Help;
         public EventHandler<bool> ValidStateChanged { get; set; }
 
         public string Suffix { get; set; }
@@ -55,7 +56,8 @@ namespace FileFlows.Client.Components.Inputs
                 if (Translater.NeedsTranslating(_LabelOriginal))
                 {
                     _Label = Translater.Instant(_LabelOriginal);
-                    Help = Translater.Instant(_LabelOriginal + "-Help");
+                    if(string.IsNullOrEmpty(_Help))
+                        _Help = Translater.Instant(_LabelOriginal + "-Help");
                     Suffix = Translater.Instant(_LabelOriginal + "-Suffix");
                     Prefix = Translater.Instant(_LabelOriginal + "-Prefix");
                     Placeholder = Translater.Instant(_LabelOriginal + "-Placeholder").EmptyAsNull() ?? _Label;
@@ -72,7 +74,8 @@ namespace FileFlows.Client.Components.Inputs
         [Parameter]
         public FileFlows.Shared.Models.ElementField Field { get; set; }
 
-        public string Help { get; set; }
+        [Parameter]
+        public string Help { get => _Help; set { if (string.IsNullOrEmpty(value) == false) _Help = value; } }
         public string _Placeholder;
 
         [Parameter]

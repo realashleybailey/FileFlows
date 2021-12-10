@@ -366,18 +366,26 @@ namespace FileFlows.Server.Helpers
 
         private static async Task AddInitialData(Database db)
         {
+            bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
             await AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",
-                Path = "/usr/local/bin/ffmpeg",
+                Path = windows ? @"c:\utils\ffmpeg\ffmpeg.exe" : "/usr/local/bin/ffmpeg",
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow
             });
             await AddOrUpdateObject(db, new Settings
             {
                 Name = "Settings",
+#if (DEBUG)
+                TempPath = windows ? @"d:\videos\temp" : "/temp",
+                LoggingPath = "/app/Logs",
+#else
                 TempPath = "/temp",
                 LoggingPath = "/app/Logs",
+#endif
+                WorkerFlowExecutor = true,
+                WorkerScanner = true,
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow
             });

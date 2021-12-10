@@ -75,7 +75,8 @@
     "NotFound": "Item not found",
     "NameInUse": "Name is already in use",
     "NameRequired": "Name is required",
-    "DuplicatesFound": "Duplicates found"
+    "DuplicatesFound": "Duplicates found",
+    "NoFlowSpecified": "No flow specified, you must select a flow to create a library"
   },
   "Times": {
     "Never": "Never",
@@ -135,7 +136,7 @@
         "EditFlow": "Flow: {Name}"
       },
       "Messages": {
-        "Cancel": "Are you sure you want to cancel and discard all changes?"
+        "Close": "Are you sure you want to close and discard all changes?"
       }
     },
     "Flows": {

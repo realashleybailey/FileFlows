@@ -16,6 +16,11 @@ namespace FileFlows.Server.Models
         public string Node { get; set; }
         public Guid Uid { get; set; }
         public ExpandoObject Model { get; set; }
+        public string Name { get; set; }
+
+        public int? Outputs { get; set; }
+        public int? xPos { get; set; }
+        public int? yPos { get; set; }
 
         public List<FlowTemplateConnection> Connections { get; set; }
     }

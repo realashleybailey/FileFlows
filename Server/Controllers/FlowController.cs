@@ -285,14 +285,16 @@ namespace FileFlows.Server.Controllers
                             foreach (var jsPart in jst.Parts)
                             {
                                 var element = parts[jsPart.Node];
+
                                 flowParts.Add(new FlowPart
                                 {
-                                    yPos = y,
-                                    xPos = DEFAULT_XPOS,
+                                    yPos = jsPart.yPos ?? y,
+                                    xPos = jsPart.xPos ?? DEFAULT_XPOS,
                                     FlowElementUid = element.Uid,
-                                    Outputs = element.Outputs,
+                                    Outputs = jsPart.Outputs ?? element.Outputs,
                                     Inputs = element.Inputs,
                                     Type = element.Type,
+                                    Name = jsPart.Name ?? string.Empty,
                                     Uid = jsPart.Uid,
                                     Icon = element.Icon,
                                     Model = jsPart.Model,

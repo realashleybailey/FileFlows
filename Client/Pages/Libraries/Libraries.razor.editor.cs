@@ -126,6 +126,10 @@
                 Name = nameof(library.Flow),
                 Parameters = new Dictionary<string, object>{
                     { "Options", flowOptions.ToList() }
+                },
+                Validators = new List<FileFlows.Shared.Validators.Validator>
+                {
+                    new FileFlows.Shared.Validators.Required()
                 }
             });
             fields.Add(new ElementField

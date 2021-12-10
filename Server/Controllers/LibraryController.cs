@@ -28,6 +28,8 @@ namespace FileFlows.Server.Controllers
         [HttpPost]
         public Task<Library> Save([FromBody] Library library)
         {
+            if (library?.Flow == null)
+                throw new Exception("ErrorMessages.NoFlowSpecified");
             if (library.Uid == Guid.Empty)
                 library.LastScanned = DateTime.MinValue; // never scanned
             if (Regex.IsMatch(library.Schedule, "^[01]{672}$") == false)

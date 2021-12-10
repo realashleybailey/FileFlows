@@ -270,7 +270,8 @@
         ],
         "model": {
           "MoveFolder": true,
-          "DeleteOriginal": true
+          "DeleteOriginal": true,
+          "DestinationPath": "/media"
         }
       },
       {

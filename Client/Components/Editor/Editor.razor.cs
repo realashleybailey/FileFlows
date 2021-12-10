@@ -49,7 +49,17 @@ namespace FileFlows.Client.Components
         private bool FocusFirst = false;
         private bool _needsRendering = false;
 
-        public RenderFragment AdditionalFields { get; set; }
+
+        private RenderFragment _AdditionalFields;
+        public RenderFragment AdditionalFields
+        {
+            get => _AdditionalFields;
+            set
+            {
+                _AdditionalFields = value;
+                this.StateHasChanged();
+            }
+        }
 
         protected override void OnInitialized()
         {
@@ -194,6 +204,8 @@ namespace FileFlows.Client.Components
 
         internal void UpdateValue(ElementField field, object value)
         {
+            if (Model == null)
+                return;
             var dict = (IDictionary<string, object>)Model;
             if (dict.ContainsKey(field.Name))
                 dict[field.Name] = value;
@@ -222,6 +234,8 @@ namespace FileFlows.Client.Components
 
         internal T GetValue<T>(string field, T @default = default(T))
         {
+            if (Model == null)
+                return @default;
             var dict = (IDictionary<string, object>)Model;
             if (dict.ContainsKey(field) == false)
             {

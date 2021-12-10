@@ -231,7 +231,10 @@ namespace FileFlows.Client.Pages
                     else if(field.Type == "Switch")
                     {
                         FlowTemplateEditor_AddSwitch(builder, field, count, editor, flowTemplate);
-
+                    }
+                    else if (field.Type == "Select")
+                    {
+                        FlowTemplateEditor_AddSelect(builder, field, count, editor, flowTemplate);
                     }
                 }
             };
@@ -248,8 +251,8 @@ namespace FileFlows.Client.Pages
         {
             int fieldCount = 0;
             builder.OpenComponent<InputSwitch>(++count);
-            builder.AddAttribute(++fieldCount, nameof(InputFile.Help), Translater.TranslateIfNeeded(field.Help));
-            builder.AddAttribute(++fieldCount, nameof(InputFile.Label), field.Label);
+            builder.AddAttribute(++fieldCount, nameof(InputSwitch.Help), Translater.TranslateIfNeeded(field.Help));
+            builder.AddAttribute(++fieldCount, nameof(InputSwitch.Label), field.Label);
             bool @default = ((System.Text.Json.JsonElement)field.Default).GetBoolean();
 
             object trueValue = true;
@@ -269,8 +272,8 @@ namespace FileFlows.Client.Pages
                 }
             }
 
-            builder.AddAttribute(++fieldCount, nameof(InputFile.Value), @default);
-            builder.AddAttribute(++fieldCount, nameof(InputFile.ValueChanged), EventCallback.Factory.Create<bool>(this, arg =>
+            builder.AddAttribute(++fieldCount, nameof(InputSwitch.Value), @default);
+            builder.AddAttribute(++fieldCount, nameof(InputSwitch.ValueChanged), EventCallback.Factory.Create<bool>(this, arg =>
             {
                 SetValue(arg);
             }));
@@ -290,6 +293,52 @@ namespace FileFlows.Client.Pages
                 else
                     em.Add(key, @checked ? trueValue : falseValue);
             }
+        }
+
+
+        private void FlowTemplateEditor_AddSelect(RenderTreeBuilder builder, TemplateField field, int count, Editor editor, FlowTemplateModel flowTemplate)
+        {
+            int fieldCount = 0;
+            builder.OpenComponent<InputSelect>(++count);
+            builder.AddAttribute(++fieldCount, nameof(InputSelect.Help), Translater.TranslateIfNeeded(field.Help));
+            builder.AddAttribute(++fieldCount, nameof(InputSelect.Label), field.Label);
+
+            string jsonParameters = System.Text.Json.JsonSerializer.Serialize(field.Parameters);
+            var parameters = System.Text.Json.JsonSerializer.Deserialize<TemplateSelectParameters>(System.Text.Json.JsonSerializer.Serialize(field.Parameters), new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            builder.AddAttribute(++fieldCount, nameof(InputSelect.Options), parameters.Options);
+
+            builder.AddAttribute(++fieldCount, nameof(InputSelect.Validators), new List<FileFlows.Shared.Validators.Validator>
+            {
+                new FileFlows.Shared.Validators.Required()
+            });
+
+            builder.AddAttribute(++fieldCount, nameof(InputSelect.ValueChanged), EventCallback.Factory.Create<object>(this, arg =>
+            {
+                SetValue(arg);
+            }));
+            builder.CloseComponent();
+
+            void SetValue(object value)
+            {
+
+                var em = editor.Model as IDictionary<string, object>;
+                if (em == null)
+                    return;
+                string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
+                if (em.ContainsKey(key))
+                    em[key] = value;
+                else
+                    em.Add(key, value);
+            }
+        }
+
+
+        private class TemplateSelectParameters
+        {
+            public List<Plugin.ListOption> Options { get; set; }
         }
     }
 

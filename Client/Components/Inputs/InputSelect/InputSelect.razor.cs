@@ -34,6 +34,9 @@ namespace FileFlows.Client.Components.Inputs
                 Groups.Add(string.Empty, new List<ListOption>());
                 foreach (var lo in value)
                 {
+                    if (lo.Value is JsonElement je && je.ValueKind == JsonValueKind.String)
+                        lo.Value = je.GetString();  // this can happen from the Templates where the object is a JsonElement
+
                     if(lo.Value is string && (string)lo.Value == Globals.LIST_OPTION_GROUP)
                     {
                         group = lo.Label;

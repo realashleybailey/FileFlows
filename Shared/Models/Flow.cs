@@ -28,5 +28,6 @@ namespace FileFlows.Shared.Models
         public string Help { get; set; }
         public object Default { get; set; }
         public object Value { get; set; }
+        public object Parameters { get; set; }  
     }
 }

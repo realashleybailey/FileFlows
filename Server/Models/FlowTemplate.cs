@@ -9,6 +9,8 @@ namespace FileFlows.Server.Models
         public string Description { get; set; }
         public List<FlowTemplatePart> Parts { get; set; }
         public List<Shared.Models.TemplateField> Fields { get; set; }
+        public int? Order { get; set; }
+        public bool Save { get; set; }
     }
 
     class FlowTemplatePart

@@ -16,6 +16,8 @@ namespace FileFlows.Shared.Models
     {
         public Flow Flow { get; set; }
         public List<TemplateField> Fields { get; set; }
+        public int? Order { get; set; }
+        public bool Save { get; set; }
     }
 
     public class TemplateField

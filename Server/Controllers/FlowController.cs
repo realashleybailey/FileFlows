@@ -218,7 +218,7 @@ namespace FileFlows.Server.Controllers
                     return results;
 
 
-                foreach (var p in flowParts)
+                foreach (var p in flowParts ?? new List<FlowPart>())
                 {
                     if (checkedParts.Contains(p) || p == part)
                         continue;
@@ -314,6 +314,8 @@ namespace FileFlows.Server.Controllers
                             templates[_jst.Group ?? String.Empty].Add(new FlowTemplateModel
                             {
                                 Fields = fields,
+                                Order = _jst.Order,
+                                Save = jst.Save,
                                 Flow = new Flow
                                 {
                                     Name = jst.Name,
@@ -335,6 +337,15 @@ namespace FileFlows.Server.Controllers
                 {
                     Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine + ex.StackTrace); 
                 }
+            }
+            foreach(var gn in templates.Keys.ToArray())
+            {
+                templates[gn] = templates[gn].OrderBy(x =>
+                {
+                    if (x.Order == null)
+                        return int.MaxValue;
+                    return x.Order;
+                }).ThenBy(x => x.Flow.Name).ToList();
             }
             return templates;
         }

@@ -145,7 +145,7 @@
         "Title": "Add Flow",
         "BlankTemplate": "Blank Template",
         "Fields": {
-          "PageDescription": "Select a template to base the flow on, this will help you get started with a flow. The nodes on the next page can be customised for your system.",
+          "PageDescription": "Select a template to base the flow on, this will help you get started with a flow.",
           "Template": "Template"
         }
       }

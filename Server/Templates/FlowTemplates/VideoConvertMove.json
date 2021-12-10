@@ -1,7 +1,7 @@
 [
   {
-    "name": "Convert Video",
-    "description": "Will convert videos to the specified format.   The original file will be replaced.\n\nIf the original file is already format the file will not be re-encoded.",
+    "name": "Convert Video and Move",
+    "description": "Will convert videos to the specified format and move them to a different destination directory.\n\nThis is useful to use as a go between for a download client like SABnzbd and a program such as Sonarr or Radarr.\n\nThe file will not be re-encoded as it's already in the target format.\n\nThe file will be moved to a different directory, regardless if it needed to be encoded or not.",
     "group": "Video",
     "save": true,
     "parts": [
@@ -95,6 +95,11 @@
             "output": 1,
             "input": 1,
             "node": "00000000-0000-0000-0000-000000000006"
+          },
+          {
+            "output": 2,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000006"
           }
         ],
         "model": {
@@ -105,10 +110,50 @@
       },
 
       {
-        "node": "ReplaceOriginal",
+        "node": "MoveFile",
         "uid": "00000000-0000-0000-0000-000000000006",
-        "xPos": 400,
-        "yPos": 650
+        "xPos": 575,
+        "yPos": 650,
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000007"
+          }
+        ],
+        "model": {
+          "MoveFolder": true,
+          "DeleteOriginal": true,
+          "DestinationPath": "/media"
+        }
+      },
+      {
+        "node": "Function",
+        "name": "Delete Dir?",
+        "uid": "00000000-0000-0000-0000-000000000007",
+        "xPos": 575,
+        "yPos": 780,
+        "outputs": 2,
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000008"
+          }
+        ],
+        "model": {
+          "Outputs": 2
+        }
+      },
+      {
+        "node": "DeleteSourceDirectory",
+        "uid": "00000000-0000-0000-0000-000000000008",
+        "xPos": 350,
+        "yPos": 910,
+        "model": {
+          "IfEmpty": true,
+          "IncludePatterns": [ "avi", "divx", "mkv", "mov", "mp4", "mpg", "mpeg" ]
+        }
       }
     ],
 
@@ -178,6 +223,29 @@
               "value": "mp3"
             }
           ]
+        }
+      },
+
+      {
+        "uid": "00000000-0000-0000-0000-000000000006",
+        "type": "Directory",
+        "required": true,
+        "label": "Destination",
+        "help": "The destination directory where the final file should be saved to",
+        "name": "DestinationPath",
+        "default": "/media"
+      },
+
+      {
+        "uid": "00000000-0000-0000-0000-000000000007",
+        "type": "Switch",
+        "name": "Code",
+        "default": true,
+        "label": "Delete Source Directory",
+        "help": "If the source directory should be deleted.  This will only be deleted if there are no other video files found in this directory",
+        "value": {
+          "true": "/* return 1 here to delete the source directory */\nreturn 1;",
+          "false": "/* return 2 here to NOT delete the source directory */\nreturn 2;"
         }
       },
 

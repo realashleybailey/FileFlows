@@ -1,6 +1,8 @@
 [
   {
     "name": "Blank Video Template",
+    "group": "Video",
+    "order": 1,
     "description": "A blank Video template with a single \"Video File\" input node.",
     "parts": [
       {
@@ -8,100 +10,5 @@
         "uid": "00000000-0000-0000-0000-000000000001"
       }
     ]
-  },
-
-
-
-  {
-    "name": "Convert Video Downloads to H265/AC3",
-    "description": "Used to monitor a downloads directory from a download client, eg sabnzbd, and will convert downloaded movies into H265/AC3.\n\nNote: The \"Move File\" node is configured to move to \"/media/downloads/converted\" if this is not the directory you wish to use, edit this node after adding the template.",
-    "group": "Video",
-    "parts": [
-      {
-        "node": "VideoFile",
-        "uid": "00000000-0000-0000-0000-000000000001",
-        "connections": [
-          {
-            "input": 1,
-            "output": 1,
-            "node": "00000000-0000-0000-0000-000000000002"
-          }
-        ]
-      },
-      {
-        "node": "DetectBlackBars",
-        "uid": "00000000-0000-0000-0000-000000000002",
-        "connections": [
-          {
-            "output": 1,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000003"
-          },
-          {
-            "output": 2,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000003"
-          }
-        ],
-        "model": {
-          "CroppingThreshold": 10
-        }
-      },
-      {
-        "node": "Video_H265_AC3",
-        "uid": "00000000-0000-0000-0000-000000000003",
-        "connections": [
-          {
-            "output": 1,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000004"
-          },
-          {
-            "output": 2,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000004"
-          }
-        ],
-        "model": {
-          "NvidiaEncoding": false,
-          "Crf": 21
-        }
-      },
-      {
-        "node": "MoveFile",
-        "uid": "00000000-0000-0000-0000-000000000004",
-        "connections": [
-          {
-            "output": 1,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000005"
-          }
-        ],
-        "model": {
-          "MoveFolder": true,
-          "DeleteOriginal": true,
-          "DestinationPath": "/media"
-        }
-      },
-      {
-        "node": "DeleteSourceDirectory",
-        "uid": "00000000-0000-0000-0000-000000000005",
-        "model": {
-          "IfEmpty": true,
-          "IncludePatterns": [ "avi", "divx", "mkv", "mov", "mp4", "mpg", "mpeg" ]
-        }
-      }
-    ],
-    "fields": [
-      {
-        "uid": "00000000-0000-0000-0000-000000000004",
-        "type": "Directory",
-        "required": true,
-        "name": "DestinationPath",
-        "default": "/media",
-        "label": "Flow.Parts.MoveFile.Fields.DestinationPath"
-      }
-    ]
   }
-
 ]

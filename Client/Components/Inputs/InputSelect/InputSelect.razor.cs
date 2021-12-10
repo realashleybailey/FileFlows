@@ -129,6 +129,8 @@ namespace FileFlows.Client.Components.Inputs
             {
                 if (int.TryParse(args?.Value?.ToString(), out int index))
                     SelectedIndex = index;
+                else
+                    Logger.Instance.DLog("Unable to find index of: ",  args?.Value);
                 UpdateDescription();
             }
             finally

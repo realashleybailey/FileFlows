@@ -167,3 +167,19 @@ button {
         cursor: pointer;
     }
 }
+
+.flow-template-description {
+    white-space: pre-wrap;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--color-darkest);
+    white-space: pre-wrap;
+    margin-left:14rem;
+    margin-top:0.25rem;
+}
+@media screen and (max-width: 576px){
+    .flow-template-description {
+        margin-left:0;
+    }
+}

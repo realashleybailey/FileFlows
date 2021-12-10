@@ -136,17 +136,25 @@ namespace FileFlows.Client.Pages
             }
             efTemplate.ValueChanged -= EfTemplate_ValueChanged;
 
-            var newFlowTemplate = GetNewFlowTemplate(newModelTask.Result);
-
-            App.Instance.NewFlowTemplate = newFlowTemplate;
-            NavigationManager.NavigateTo("flows/" + Guid.Empty);
+            var newFlowTemplate = await GetNewFlowTemplate(newModelTask.Result);
+            if (newFlowTemplate.Uid != Guid.Empty)
+            {
+                // was saved, refresh list
+                await this.Refresh();
+            }
+            else
+            {
+                // edit it
+                App.Instance.NewFlowTemplate = newFlowTemplate;
+                NavigationManager.NavigateTo("flows/" + Guid.Empty);
+            }
 #endif
         }
 
-        private ffFlow GetNewFlowTemplate(ExpandoObject newModel)
+        private async Task<ffFlow> GetNewFlowTemplate(ExpandoObject newModel)
         {
             var dict = (IDictionary<string, object>)newModel;
-            var newTemplate = dict.ContainsKey("Template") ? dict["Template"] as FlowTemplateModel : null;
+            var newTemplate = dict.ContainsKey("Template") ? dict["Template"] as FlowTemplateModel : null;            
 
             var newFlowTemplate = newTemplate?.Flow;
 
@@ -179,6 +187,22 @@ namespace FileFlows.Client.Pages
                     }
                 }
             }
+
+            if (newTemplate.Save)
+            {
+                Blocker.Show();
+                try
+                {
+                    var result = await HttpHelper.Put<ffFlow>("/api/flow?uniqueName=true", newFlowTemplate);
+                    if (result.Success)
+                        newFlowTemplate = result.Data;
+                }
+                finally
+                {
+                    Blocker.Hide();
+                }
+            }
+
             return newFlowTemplate;
         }
 
@@ -189,44 +213,25 @@ namespace FileFlows.Client.Pages
             var editor = sender as Editor;
             if (editor == null)
                 return;
-            if (fields.Count == 0)
-            {
-                editor.AdditionalFields = null;
-                return;
-            }
             editor.AdditionalFields = builder =>
             {
+                if (string.IsNullOrEmpty(flowTemplate?.Flow.Description))
+                {
+                    editor.AdditionalFields = null;
+                    return;
+                }
                 int count = 0;
+                builder.OpenElement(++count, "div");
+                builder.AddAttribute(1, "class", "input-label flow-template-description");
+                builder.AddContent(2, flowTemplate.Flow.Description);
+                builder.CloseComponent();
+
+
                 foreach (var field in fields)
                 {
                     if (field.Type == "Directory")
                     {
-                        int fieldCount = 0;
-                        builder.OpenComponent<InputFile>(++count);
-                        builder.AddAttribute(++fieldCount, nameof(InputFile.Directory), true);
-                        builder.AddAttribute(++fieldCount, nameof(InputFile.Label), field.Label);
-                        if (field.Required)
-                            builder.AddAttribute(++fieldCount, nameof(InputFile.Validators), new List<FileFlows.Shared.Validators.Validator>
-                                {
-                                    new FileFlows.Shared.Validators.Required()
-                                });
-                        object @default = field.Default;
-                        if (@default is System.Text.Json.JsonElement je)
-                            @default = je.GetString() ?? string.Empty;
-
-                        builder.AddAttribute(++fieldCount, nameof(InputFile.Value), @default as string ?? string.Empty);
-                        builder.AddAttribute(++fieldCount, nameof(InputFile.ValueChanged), EventCallback.Factory.Create<string>(this, arg =>
-                        {
-                            var em = editor.Model as IDictionary<string, object>;
-                            if (em == null)
-                                return;
-                            string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
-                            if (em.ContainsKey(key))
-                                em[key] = arg;
-                            else
-                                em.Add(key, arg);
-                        }));
-                        builder.CloseComponent();
+                        FlowTemplateEditor_AddDirectory(builder, field, count, editor, flowTemplate);
                     }
                     else if(field.Type == "Switch")
                     {
@@ -245,6 +250,39 @@ namespace FileFlows.Client.Pages
             if(item != null)
                 NavigationManager.NavigateTo("flows/" + item.Uid);
             return await Task.FromResult(false);
+        }
+
+
+        private void FlowTemplateEditor_AddDirectory(RenderTreeBuilder builder, TemplateField field, int count, Editor editor, FlowTemplateModel flowTemplate)
+        {
+            int fieldCount = 0;
+            builder.OpenComponent<InputFile>(++count);
+            builder.AddAttribute(++fieldCount, nameof(InputSwitch.Help), Translater.TranslateIfNeeded(field.Help));
+            builder.AddAttribute(++fieldCount, nameof(InputSwitch.Label), field.Label);
+
+            builder.AddAttribute(++fieldCount, nameof(InputFile.Directory), true);
+            if (field.Required)
+                builder.AddAttribute(++fieldCount, nameof(InputFile.Validators), new List<FileFlows.Shared.Validators.Validator>
+                                {
+                                    new FileFlows.Shared.Validators.Required()
+                                });
+            object @default = field.Default;
+            if (@default is System.Text.Json.JsonElement je)
+                @default = je.GetString() ?? string.Empty;
+
+            builder.AddAttribute(++fieldCount, nameof(InputFile.Value), @default as string ?? string.Empty);
+            builder.AddAttribute(++fieldCount, nameof(InputFile.ValueChanged), EventCallback.Factory.Create<string>(this, arg =>
+            {
+                var em = editor.Model as IDictionary<string, object>;
+                if (em == null)
+                    return;
+                string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
+                if (em.ContainsKey(key))
+                    em[key] = arg;
+                else
+                    em.Add(key, arg);
+            }));
+            builder.CloseComponent();
         }
 
         private void FlowTemplateEditor_AddSwitch(RenderTreeBuilder builder, TemplateField field, int count, Editor editor, FlowTemplateModel flowTemplate)

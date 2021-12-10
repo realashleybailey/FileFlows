@@ -20,6 +20,8 @@
 
         private string lblOriginalSize, lblFinalSize, lblSavings, lblShrinkageTitle;
 
+        private bool HasRendered = false;
+
         protected override async Task OnInitializedAsync()
         {
             lblOriginalSize = Translater.Instant("Pages.Dashboard.Labels.OriginalSize");
@@ -58,6 +60,18 @@
             _ = Refresh();
         }
 
+        protected override void OnAfterRender(bool firstRender)
+        {
+            this.HasRendered = true;
+            base.OnAfterRender(firstRender);
+        }
+
+        private async Task WaitUntilHasRendered()
+        {
+            while (this.HasRendered == false)
+                await Task.Delay(50);
+        }
+
 
         private async Task Refresh()
         {
@@ -73,15 +87,20 @@
                 Data = new FileFlows.Shared.Models.ShrinkageData();
 #endif
             HasData = Data.FinalSize > 0 && Data.OriginalSize > 0;
+            await WaitUntilHasRendered();
 
             try
             {
-                await Dashboard.jsFunctions.InvokeVoidAsync("InitPieChart", this.Uid,
+                var jsObject = await Dashboard.GetJsFunctionObject();
+                await jsObject.InvokeVoidAsync("InitPieChart", this.Uid,
                     new[] { Data.FinalSize, Data.OriginalSize - Data.FinalSize },
                     new[] { lblFinalSize, lblSavings }
                 );
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+            {
+                Logger.Instance.ELog("Failed initing pie chart: " + ex.Message);
+            }
         }
 
     }

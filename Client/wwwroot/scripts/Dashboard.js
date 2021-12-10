@@ -128,7 +128,8 @@ export function InitPieChart(elementId, series, labels) {
             PieCharts[elementId] = new ApexCharts(eleChart, options);
             PieCharts[elementId].render();
         }
-    } catch (err) { } // can throw if being destroyed when navigating away
+    } catch (err) {
+    } // can throw if being destroyed when navigating away
 }
 
 export function DestroyChart(id) {

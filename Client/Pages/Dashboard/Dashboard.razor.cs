@@ -55,10 +55,28 @@ namespace FileFlows.Client.Pages
             lblLibrary = Translater.Instant("Pages.Dashboard.Fields.Library");
             lblWorkingFile = Translater.Instant("Pages.Dashboard.Fields.WorkingFile");
             lblRecentlyFinished = Translater.Instant("Pages.Dashboard.Fields.RecentlyFinished");
-            jsFunctions = await jSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Dashboard.js");
+            await GetJsFunctionObject();
             await this.Refresh();
         }
 
+        private System.Threading.Mutex mutexJsFunctions = new ();
+        public async Task<IJSObjectReference> GetJsFunctionObject()
+        {
+            if (jsFunctions != null)
+                return jsFunctions;
+            mutexJsFunctions.WaitOne();
+            if (jsFunctions != null)
+                return jsFunctions; // incase was fetched while mutex was locked
+            try
+            {
+                jsFunctions = await jSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Dashboard.js");
+                return jsFunctions;
+            }
+            finally
+            {
+                mutexJsFunctions.ReleaseMutex();
+            }
+        }
 
         public void Dispose()
         {

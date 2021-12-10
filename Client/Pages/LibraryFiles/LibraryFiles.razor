@@ -94,7 +94,7 @@
                         <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
+                <FlowTableColumn TItem="LibraryFile" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
                     <Header>
                         Size
                     </Header>

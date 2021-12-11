@@ -144,6 +144,18 @@ namespace FileFlows.Server.Workers
                         return;
                     }
 
+                    // update the library file to reference the updated flow (if changed)
+                    if (libFile.Flow.Name != flow.Name || libFile.Flow.Uid != flow.Uid)
+                    {
+                        libFile.Flow = new ObjectReference
+                        {
+                            Uid = flow.Uid,
+                            Name = flow.Name,
+                            Type = typeof(Flow)?.FullName ?? String.Empty
+                        };
+                        controller.Update(libFile).Wait();
+                    }
+
 
                     Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
                     libFile.ProcessingStarted = DateTime.UtcNow;

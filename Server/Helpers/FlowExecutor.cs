@@ -3,6 +3,7 @@ namespace FileFlows.Server.Helpers
     using FileFlows.Shared.Models;
     using FileFlows.Plugin;
     using FileFlows.Server.Workers;
+    using FileFlows.Shared;
 
     public class FlowExecutor
     {
@@ -30,6 +31,8 @@ namespace FileFlows.Server.Helpers
                 args.TempPath = tempPath;
                 args.RelativeFile = relativePath;
 
+                args.Logger.ILog("Excecuting Flow: " + Flow.Name);
+
                 args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
 
                 var fiInput = new FileInfo(input);
@@ -55,7 +58,7 @@ namespace FileFlows.Server.Helpers
 
                         try
                         {
-                            args.Logger?.DLog("Executing part:" + part.Name);
+                            args.Logger?.DLog("Executing part:" + (part.Name?.EmptyAsNull() ?? part.GetType().FullName));
                             CurrentNode = pluginLoader.LoadNode(part);
                             //CurrentNode = NodeHelper.LoadNode(context, part);
 

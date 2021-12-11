@@ -55,7 +55,7 @@ namespace FileFlows.Server.Helpers
 
                         try
                         {
-                            args.Logger.DLog("Executing part:" + part.Name);
+                            args.Logger?.DLog("Executing part:" + part.Name);
                             CurrentNode = pluginLoader.LoadNode(part);
                             //CurrentNode = NodeHelper.LoadNode(context, part);
 
@@ -63,21 +63,21 @@ namespace FileFlows.Server.Helpers
                             if (OnStepChange != null)
                                 OnStepChange(step, CurrentNode.Name, args.WorkingFile);
 
-                            args.Logger.DLog("node: " + CurrentNode.Name);
+                            args.Logger?.DLog("node: " + CurrentNode.Name);
                             int output = CurrentNode.Execute(args);
                             if (CurrentNode == null)
                             {
                                 // happens when canceled    
-                                args.Logger.ELog("node was canceled error code:", CurrentNode?.Name);
+                                args.Logger?.ELog("node was canceled error code:", CurrentNode?.Name);
                                 args.Result = NodeResult.Failure;
                                 flowCompleted = true;
                                 break;
                             }
-                            args.Logger.DLog("output: " + output);
+                            args.Logger?.DLog("output: " + output);
                             if (output == -1)
                             {
                                 // the execution failed                     
-                                args.Logger.ELog("node returned error code:", CurrentNode?.Name);
+                                args.Logger?.ELog("node returned error code:", CurrentNode?.Name);
                                 args.Result = NodeResult.Failure;
                                 flowCompleted = true;
                                 break;
@@ -85,7 +85,7 @@ namespace FileFlows.Server.Helpers
                             var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
                             if (outputNode == null)
                             {
-                                args.Logger.DLog("flow completed");
+                                args.Logger?.DLog("flow completed");
                                 // flow has completed
                                 flowCompleted = true;
                                 args.Result = NodeResult.Success;
@@ -99,7 +99,7 @@ namespace FileFlows.Server.Helpers
                             if (part == null)
                             {
                                 // couldnt find the connection, maybe bad data, but flow has now finished
-                                args.Logger.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
+                                args.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
                                 flowCompleted = true;
                                 break;
                             }
@@ -112,7 +112,7 @@ namespace FileFlows.Server.Helpers
                     catch (Exception ex)
                     {
                         args.Result = NodeResult.Failure;
-                        args.Logger.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                        args.Logger?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                     }
                 }
 

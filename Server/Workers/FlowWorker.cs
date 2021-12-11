@@ -129,13 +129,21 @@ namespace FileFlows.Server.Workers
                         controller.DeleteAll(libFile.Uid).Wait();
                         return;
                     }
-                    var flow = flowController.Get(libFile.Flow.Uid).Result;
+                    var lib = new LibraryController().Get(libFile.Library.Uid).Result;
+                    if(lib == null)
+                    {
+                        controller.DeleteAll(libFile.Uid).Wait();
+                        return;
+                    }
+
+                    var flow = flowController.Get(lib.Flow?.Uid ?? Guid.Empty).Result;
                     if (flow == null || flow.Uid == Guid.Empty)
                     {
                         libFile.Status = FileStatus.FlowNotFound;
                         controller.Update(libFile).Wait();
                         return;
                     }
+
 
                     Logger.Instance.ILog("############################# PROCESSING:  " + file.FullName);
                     libFile.ProcessingStarted = DateTime.UtcNow;

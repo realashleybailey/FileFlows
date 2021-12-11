@@ -253,7 +253,7 @@ namespace FileFlows.Plugin
 
         private string EscapePathForLinux(string path)
         {
-            path = Regex.Replace(path, "([\\'\"\\$\\?\\*])", "\\$1");
+            path = Regex.Replace(path, "([\\'\"\\$\\?\\*()\\s])", "\\$1");
             return path;
         }
 

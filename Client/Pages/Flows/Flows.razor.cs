@@ -139,7 +139,7 @@ namespace FileFlows.Client.Pages
             efTemplate.ValueChanged -= EfTemplate_ValueChanged;
 
             var newFlowTemplate = await GetNewFlowTemplate(newModelTask.Result);
-            if (newFlowTemplate.Uid != Guid.Empty)
+            if (newFlowTemplate != null && newFlowTemplate.Uid != Guid.Empty)
             {
                 // was saved, refresh list
                 await this.Refresh();
@@ -188,7 +188,7 @@ namespace FileFlows.Client.Pages
                 }
             }
 
-            if (newTemplate.Save)
+            if (newTemplate?.Save == true)
             {
                 Blocker.Show();
                 try

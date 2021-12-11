@@ -1,0 +1,210 @@
+[
+  {
+    "name": "Convert Video and Copy",
+    "description": "Will convert videos to the specified format.   The original file will be replaced.\n\nIf the original file is already format the file will not be re-encoded.",
+    "group": "Video",
+    "save": true,
+    "parts": [
+      {
+        "node": "VideoFile",
+        "uid": "00000000-0000-0000-0000-000000000001",
+        "xPos": 375,
+        "yPos": 10,
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000002"
+          }
+        ]
+      },
+
+      {
+        "node": "Function",
+        "name": "Check Black Bars?",
+        "uid": "00000000-0000-0000-0000-000000000002",
+        "xPos": 375,
+        "yPos": 130,
+        "outputs": 2,
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000003"
+          },
+          {
+            "input": 1,
+            "output": 2,
+            "node": "00000000-0000-0000-0000-000000000004"
+          }
+        ],
+        "model": {
+          "Outputs": 2
+        }
+      },
+
+
+      {
+        "node": "DetectBlackBars",
+        "uid": "00000000-0000-0000-0000-000000000003",
+        "xPos": 170,
+        "yPos": 260,
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000004"
+          },
+          {
+            "output": 2,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000004"
+          }
+        ],
+        "model": {
+          "CroppingThreshold": 10
+        }
+      },
+
+      {
+        "node": "Function",
+        "name": "Set Video Codec",
+        "uid": "00000000-0000-0000-0000-000000000004",
+        "xPos": 575,
+        "yPos": 400,
+        "outputs": 1,
+        "connections": [
+          {
+            "input": 1,
+            "output": 1,
+            "node": "00000000-0000-0000-0000-000000000005"
+          }
+        ],
+        "model": {
+          "Outputs": 1
+        }
+      },
+
+      {
+        "node": "VideoEncode",
+        "uid": "00000000-0000-0000-0000-000000000005",
+        "xPos": 575,
+        "yPos": 500,
+        "connections": [
+          {
+            "output": 1,
+            "input": 1,
+            "node": "00000000-0000-0000-0000-000000000006"
+          }
+        ],
+        "model": {
+          "VideoCodec": "{VideoCodec}",
+          "VideoCodecParameters": "{VideoCodecParameters}",
+          "Extension": "{Extension}"
+        }
+      },
+
+      {
+        "node": "CopyFile",
+        "uid": "00000000-0000-0000-0000-000000000006",
+        "xPos": 400,
+        "yPos": 650
+      }
+    ],
+
+
+    "fields": [
+      {
+        "uid": "00000000-0000-0000-0000-000000000004",
+        "type": "Select",
+        "name": "Code",
+        "label": "Video Codec",
+        "help": "The video codec to use for encoding",
+        "parameters": {
+          "options": [
+            {
+              "label": "CPU Encoding",
+              "value": "###GROUP###"
+            },
+            {
+              "label": "H264 (CPU)",
+              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'libx264';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
+              "label": "H265 (CPU)",
+              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'libx265';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
+              "label": "MPEG4",
+              "value": "Variables.VideoCodec = 'mpeg4';\nVariables.VideoCodecParameters = 'libxvid';\nVariables.Extension = 'mp4';\nreturn 1;"
+            },
+            {
+              "label": "NVIDIA Hardware Encoding",
+              "value": "###GROUP###"
+            },
+            {
+              "label": "H264 (NVIDIA)",
+              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264_nvenc';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
+              "label": "H265 (NVIDIA)",
+              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_nvenc -preset hq';\nVariables.Extension = 'mkv';\nreturn 1;"
+            }
+          ]
+        }
+      },
+      {
+        "uid": "00000000-0000-0000-0000-000000000005",
+        "type": "Select",
+        "name": "AudioCodec",
+        "label": "Audio Codec",
+        "help": "The audio codec to use for encoding",
+        "parameters": {
+          "options": [
+            {
+              "label": "AC3",
+              "value": "ac3"
+            },
+            {
+              "label": "AAC",
+              "value": "aac"
+            },
+            {
+              "label": "E-AC3",
+              "value": "eac3"
+            },
+            {
+              "label": "MP3",
+              "value": "mp3"
+            }
+          ]
+        }
+      },
+
+      {
+        "uid": "00000000-0000-0000-0000-000000000006",
+        "type": "Directory",
+        "required": true,
+        "label": "Destination",
+        "help": "The destination directory where the final file should be saved to",
+        "name": "DestinationPath",
+        "default": "/media"
+      },
+
+      {
+        "uid": "00000000-0000-0000-0000-000000000002",
+        "type": "Switch",
+        "name": "Code",
+        "default": false,
+        "label": "Crop Black Bars",
+        "help": "Automatically crop black bars if detected",
+        "value": {
+          "true": "/* return 1 here to detect black bars */\nreturn 1;",
+          "false": "/* return 2 here to skip detecting black bars */\nreturn 2;"
+        }
+      }
+    ]
+  }
+
+
+] 

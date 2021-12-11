@@ -16,12 +16,14 @@ namespace FileFlows.Client.Pages
     using FileFlows.Client.Components.Inputs;
     using System.Dynamic;
     using Microsoft.AspNetCore.Components.Rendering;
+    using System.Text.RegularExpressions;
 
     public partial class Flows : ListPage<ffFlow>
     {
         [Inject] NavigationManager NavigationManager { get; set; }
 
         public override string ApiUrl => "/api/flow";
+
 
 
 #if (DEMO)
@@ -165,8 +167,6 @@ namespace FileFlows.Client.Pages
                 {
                     if (k == "Template")
                         continue;
-                    if (k.StartsWith(newTemplate.Flow.Uid.ToString()) == false)
-                        continue;
                     var ids = k.Split(';');
                     string nodeId = ids[1];
                     string fieldName = ids[2];
@@ -213,36 +213,56 @@ namespace FileFlows.Client.Pages
             var editor = sender as Editor;
             if (editor == null)
                 return;
-            editor.AdditionalFields = builder =>
+
+            if (string.IsNullOrEmpty(flowTemplate?.Flow.Description))
             {
-                if (string.IsNullOrEmpty(flowTemplate?.Flow.Description))
+                editor.AdditionalFields = null;
+                return;
+            }
+
+            if(editor.Model is IDictionary<string, object> dict)
+            {
+                int hashCode = flowTemplate.GetHashCode();
+                foreach(var key in dict.Keys.ToArray())
                 {
-                    editor.AdditionalFields = null;
-                    return;
+                    if (Regex.IsMatch(key, @"^[\d]+;[\w\d\-]{36};(.*?)$") == false)
+                        continue;
+                    if (key.StartsWith(hashCode + ";") == false)
+                        dict.Remove(key);
                 }
-                int count = 0;
-                builder.OpenElement(++count, "div");
-                builder.AddAttribute(1, "class", "input-label flow-template-description");
-                builder.AddContent(2, flowTemplate.Flow.Description);
-                builder.CloseComponent();
+            }
+            editor.AdditionalFields = null;
+
+            _ = Task.Run(async () =>
+            {
+                await WaitForRender();
+
+                editor.AdditionalFields = builder =>
+                {
+                    int count = 0;
+                    builder.OpenElement(++count, "div");
+                    builder.AddAttribute(1, "class", "input-label flow-template-description");
+                    builder.AddContent(2, flowTemplate.Flow.Description);
+                    builder.CloseComponent();
 
 
-                foreach (var field in fields)
-                {
-                    if (field.Type == "Directory")
+                    foreach (var field in fields)
                     {
-                        FlowTemplateEditor_AddDirectory(builder, field, count, editor, flowTemplate);
+                        if (field.Type == "Directory")
+                        {
+                            FlowTemplateEditor_AddDirectory(builder, field, count, editor, flowTemplate);
+                        }
+                        else if (field.Type == "Switch")
+                        {
+                            FlowTemplateEditor_AddSwitch(builder, field, count, editor, flowTemplate);
+                        }
+                        else if (field.Type == "Select")
+                        {
+                            FlowTemplateEditor_AddSelect(builder, field, count, editor, flowTemplate);
+                        }
                     }
-                    else if(field.Type == "Switch")
-                    {
-                        FlowTemplateEditor_AddSwitch(builder, field, count, editor, flowTemplate);
-                    }
-                    else if (field.Type == "Select")
-                    {
-                        FlowTemplateEditor_AddSelect(builder, field, count, editor, flowTemplate);
-                    }
-                }
-            };
+                };
+            });
         }
 
         public override async Task<bool> Edit(ffFlow item)
@@ -250,6 +270,23 @@ namespace FileFlows.Client.Pages
             if(item != null)
                 NavigationManager.NavigateTo("flows/" + item.Uid);
             return await Task.FromResult(false);
+        }
+
+        private string GetFieldName(FlowTemplateModel flowTemplate, TemplateField field)
+        {
+            return flowTemplate.GetHashCode() + ";" + field.Uid + ";" + field.Name;
+        }
+
+        private void SetFieldValue(FlowTemplateModel flowTemplate, TemplateField field, Editor editor, object value)
+        {
+            var em = editor.Model as IDictionary<string, object>;
+            if (em == null)
+                return;
+            string key = GetFieldName(flowTemplate, field);
+            if (em.ContainsKey(key))
+                em[key] = value;
+            else
+                em.Add(key, value);
         }
 
 
@@ -273,14 +310,7 @@ namespace FileFlows.Client.Pages
             builder.AddAttribute(++fieldCount, nameof(InputFile.Value), @default as string ?? string.Empty);
             builder.AddAttribute(++fieldCount, nameof(InputFile.ValueChanged), EventCallback.Factory.Create<string>(this, arg =>
             {
-                var em = editor.Model as IDictionary<string, object>;
-                if (em == null)
-                    return;
-                string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
-                if (em.ContainsKey(key))
-                    em[key] = arg;
-                else
-                    em.Add(key, arg);
+                SetFieldValue(flowTemplate, field, editor, arg);
             }));
             builder.CloseComponent();
         }
@@ -321,15 +351,7 @@ namespace FileFlows.Client.Pages
 
             void SetValue(bool @checked)
             {
-
-                var em = editor.Model as IDictionary<string, object>;
-                if (em == null)
-                    return;
-                string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
-                if (em.ContainsKey(key))
-                    em[key] = @checked ? trueValue : falseValue;
-                else
-                    em.Add(key, @checked ? trueValue : falseValue);
+                SetFieldValue(flowTemplate, field, editor, @checked ? trueValue : falseValue);
             }
         }
 
@@ -355,22 +377,9 @@ namespace FileFlows.Client.Pages
 
             builder.AddAttribute(++fieldCount, nameof(InputSelect.ValueChanged), EventCallback.Factory.Create<object>(this, arg =>
             {
-                SetValue(arg);
+                SetFieldValue(flowTemplate, field, editor, arg);
             }));
             builder.CloseComponent();
-
-            void SetValue(object value)
-            {
-
-                var em = editor.Model as IDictionary<string, object>;
-                if (em == null)
-                    return;
-                string key = flowTemplate.Flow.Uid + ";" + field.Uid + ";" + field.Name;
-                if (em.ContainsKey(key))
-                    em[key] = value;
-                else
-                    em.Add(key, value);
-            }
         }
 
 

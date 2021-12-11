@@ -59,7 +59,7 @@ namespace FileFlows.Client.Pages
         {
             await Task.CompletedTask;
         }
-        private async Task WaitForRender()
+        protected async Task WaitForRender()
         {
             _needsRendering = true;
             StateHasChanged();

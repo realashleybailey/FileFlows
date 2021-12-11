@@ -100,7 +100,7 @@
         "model": {
           "VideoCodec": "{VideoCodec}",
           "VideoCodecParameters": "{VideoCodecParameters}",
-          "Extension": "mkv"
+          "Extension": "{Extension}"
         }
       },
 
@@ -128,15 +128,15 @@
             },
             {
               "label": "H264 (CPU)",
-              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'libx264';\nreturn 1;"
+              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'libx264';\nVariables.Extension = 'mkv';\nreturn 1;"
             },
             {
               "label": "H265 (CPU)",
-              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'libx265';\nreturn 1;"
+              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'libx265';\nVariables.Extension = 'mkv';\nreturn 1;"
             },
             {
               "label": "MPEG4",
-              "value": "Variables.VideoCodec = 'mpeg4';\nVariables.VideoCodecParameters = 'mpeg4 -vtag xvid';\nreturn 1;"
+              "value": "Variables.VideoCodec = 'mpeg4';\nVariables.VideoCodecParameters = 'libxvid';\nVariables.Extension = 'mp4';\nreturn 1;"
             },
             {
               "label": "NVIDIA Hardware Encoding",
@@ -144,11 +144,11 @@
             },
             {
               "label": "H264 (NVIDIA)",
-              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264_nvenc';\nreturn 1;"
+              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264_nvenc';\nVariables.Extension = 'mkv';\nreturn 1;"
             },
             {
               "label": "H265 (NVIDIA)",
-              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_nvenc -preset hq';\nreturn 1;"
+              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_nvenc -preset hq';\nVariables.Extension = 'mkv';\nreturn 1;"
             }
           ]
         }

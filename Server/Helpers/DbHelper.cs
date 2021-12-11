@@ -318,6 +318,11 @@ namespace FileFlows.Server.Helpers
 
             if (System.IO.File.Exists(dbFile) == false)
                 SQLiteConnection.CreateFile(dbFile);
+            else
+            {
+                // create backup 
+                File.Copy(dbFile, dbFile + ".backup", true);
+            }
 
             using (var con = new SQLiteConnection($"Data Source={dbFile};Version=3;"))
             {

@@ -2,6 +2,7 @@ namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
+    using System.Text.RegularExpressions;
 
     public class NodeParameters
     {
@@ -250,6 +251,12 @@ namespace FileFlows.Plugin
             return di.Exists;
         }
 
+        private string EscapePathForLinux(string path)
+        {
+            path = Regex.Replace(path, "([\\'\"\\$\\?\\*])", "\\$1");
+            return path;
+        }
+
         private bool CreateLinuxDir(DirectoryInfo di)
         {
             if (di.Exists)
@@ -261,7 +268,7 @@ namespace FileFlows.Plugin
             }
             Logger?.ILog("Creating folder: " + di.FullName);
 
-            string cmd = $"mkdir {di.FullName.Replace(" ", "\\ ")}";
+            string cmd = $"mkdir {EscapePathForLinux(di.FullName)}";
 
             try
             {
@@ -307,7 +314,7 @@ namespace FileFlows.Plugin
             Logger?.ILog("Changing owner on folder: " + filePath);
 
 
-            string cmd = $"chown{(recursive ? " -R" : "")} nobody:users {filePath.Replace(" ", "\\ ")}";
+            string cmd = $"chown{(recursive ? " -R" : "")} nobody:users {EscapePathForLinux(filePath)}";
 
             try
             {
@@ -352,7 +359,7 @@ namespace FileFlows.Plugin
             Logger?.ILog("Setting permissions on folder: " + filePath);
 
 
-            string cmd = $"chmod{(recursive ? " -R" : "")} 777 {filePath.Replace(" ", "\\ ")}";
+            string cmd = $"chmod{(recursive ? " -R" : "")} 777 {EscapePathForLinux(filePath)}";
 
             try
             {

@@ -53,7 +53,14 @@ namespace FileFlows.Client
             DisplayWidth = dimensions.width;
             DisplayHeight = dimensions.height;
 
+#if (DEMO)
+            Settings = new FileFlows.Shared.Models.Settings
+            {
+                
+            };
+#else
             Settings = (await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings")).Data ?? new FileFlows.Shared.Models.Settings();
+#endif
             await Task.Run(async () =>
             {
                 await LoadLanguage();

@@ -1,3 +1,6 @@
+using FileFlows.Node.Workers;
+using FileFlows.Server.Workers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -44,6 +47,8 @@ app.MapControllerRoute(
 
 FileFlows.Shared.Logger.Instance = FileFlows.Server.Logger.Instance;
 
+FileFlows.Server.Services.InitServices.Init();
+
 //if (FileFlows.Server.Globals.IsDevelopment == false)
 //    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
 FileFlows.Server.Helpers.DbHelper.CreateDatabase().Wait();
@@ -61,14 +66,18 @@ Console.WriteLine(new string('=', 50));
 
 FileFlows.Shared.Helpers.HttpHelper.Client = new HttpClient();
 
-using var pl = new FileFlows.Server.Helpers.PluginHelper();
+using var pl = new FileFlows.ServerShared.Helpers.PluginHelper();
 pl.ScanForPlugins();
 
-FileFlows.Server.Workers.LibraryWorker.ResetProcessing();
-FileFlows.Server.Workers.Worker.StartWorkers();
+LibraryWorker.ResetProcessing();
+WorkerManager.StartWorkers(
+    new LibraryWorker(),
+    //new FlowWorker(isServer: true),
+    new TelemetryReporter()
+);
 
 // this will run the asp.net app and wait until it is killed
 app.Run();
 
-FileFlows.Server.Workers.Worker.StopWorkers();
+WorkerManager.StopWorkers();
 

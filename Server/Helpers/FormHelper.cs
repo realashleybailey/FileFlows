@@ -36,7 +36,6 @@ namespace FileFlows.Server.Helpers
                             continue;
 
                         object value = attProp.GetValue(attribute);
-                        Logger.Instance.DLog(attProp.Name, value);
                         ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
 
                     }

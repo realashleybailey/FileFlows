@@ -4,7 +4,7 @@
     using System.ComponentModel.DataAnnotations;
     using FileFlows.Plugin.Attributes;
 
-    public class Settings : ViObject
+    public class Settings : FileFlowObject
     {
         [Folder(1)]
         [Required]

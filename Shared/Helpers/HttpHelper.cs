@@ -47,7 +47,7 @@ namespace FileFlows.Shared.Helpers
                 if (url.Contains("i18n") == false && url.StartsWith("http") == false)
                     url = "http://localhost:6868" + url;
 #endif
-                Logger.Instance.DLog("About to request: " + url);
+                Logger.Instance?.DLog("About to request: " + url);
                 var request = new HttpRequestMessage
                 {
                     Method = method,
@@ -58,7 +58,7 @@ namespace FileFlows.Shared.Helpers
                 if (method == HttpMethod.Post && data == null)
                 {
                     // if this is null, asp.net will return a 415 content not support, as the content-type will not be set
-                    request.Content = new StringContent("", System.Text.Encoding.UTF8, "application/json");
+                    request.Content = new StringContent("", Encoding.UTF8, "application/json");
                 }
 
                 var response = await Client.SendAsync(request);
@@ -79,7 +79,7 @@ namespace FileFlows.Shared.Helpers
                         PropertyNameCaseInsensitive = true,
                         Converters = { new FileFlows.Shared.Json.ValidatorConverter() }
                     };
-                    T result = typeof(T) == typeof(string) ? (T)(object)body : System.Text.Json.JsonSerializer.Deserialize<T>(body, options);
+                    T result = typeof(T) == typeof(string) ? (T)(object)body : JsonSerializer.Deserialize<T>(body, options);
                     return new RequestResult<T> { Success = true, Body = body, Data = result };
                 }
                 else

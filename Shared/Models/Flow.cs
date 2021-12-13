@@ -3,7 +3,7 @@ namespace FileFlows.Shared.Models
     using System;
     using System.Collections.Generic;
 
-    public class Flow : ViObject
+    public class Flow : FileFlowObject
     {
         public bool Enabled { get; set; }
         public string Description { get; set; }

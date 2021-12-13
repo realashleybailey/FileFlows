@@ -5,7 +5,7 @@ namespace FileFlows.Shared.Models
     using System.Dynamic;
     using System.Text.Json.Serialization;
 
-    public class PluginInfo : ViObject
+    public class PluginInfo : FileFlowObject
     {
         public bool Enabled { get; set; }
         public string Assembly { get; set; }

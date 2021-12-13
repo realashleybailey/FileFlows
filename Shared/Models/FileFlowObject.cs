@@ -3,7 +3,7 @@ namespace FileFlows.Shared.Models
     using System;
     using System.Text.Json.Serialization;
 
-    public class ViObject
+    public class FileFlowObject
     {
         public Guid Uid { get; set; }
         public string Name { get; set; }

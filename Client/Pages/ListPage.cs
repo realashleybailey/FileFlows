@@ -14,7 +14,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Client.Components.Common;
     using System;
 
-    public abstract class ListPage<T> : ComponentBase where T : ViObject
+    public abstract class ListPage<T> : ComponentBase where T : FileFlowObject
     {
         protected FlowTable<T> Table { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }

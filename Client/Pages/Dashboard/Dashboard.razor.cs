@@ -41,7 +41,11 @@ namespace FileFlows.Client.Pages
             AutoRefreshTimer.Interval = 5_000;
             AutoRefreshTimer.AutoReset = true;
             AutoRefreshTimer.Start();
+#if (DEMO)
+            ConfiguredStatus = 2;
+#else
             ConfiguredStatus = (await HttpHelper.Get<int>("/api/settings/is-configured?tz=" + TimeZoneInfo.Local.Id)).Data;
+#endif
             lblLog = Translater.Instant("Labels.Log");
             lblCancel = Translater.Instant("Labels.Cancel");
             lblWaiting = Translater.Instant("Pages.Dashboard.Messages.Waiting");

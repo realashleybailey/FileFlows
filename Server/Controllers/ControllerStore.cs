@@ -4,10 +4,10 @@
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Mvc;
 
-    public abstract class ControllerStore<T>:Controller where T : ViObject, new()
+    public abstract class ControllerStore<T>:Controller where T : FileFlowObject, new()
     {
         protected static Dictionary<Guid, T> Data;
-        private static Mutex _mutex = new Mutex(false);
+        protected static Mutex _mutex = new Mutex(false);
 
         protected async Task<IEnumerable<string>> GetNames(Guid? uid = null)
         {

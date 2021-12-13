@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
+using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Workers

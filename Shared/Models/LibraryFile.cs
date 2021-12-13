@@ -2,7 +2,7 @@ namespace FileFlows.Shared.Models
 {
     using System;
 
-    public class LibraryFile : ViObject
+    public class LibraryFile : FileFlowObject
     {
         public string RelativePath { get; set; }
 
@@ -14,6 +14,8 @@ namespace FileFlows.Shared.Models
 
         public long OriginalSize { get; set; }
         public long FinalSize { get; set; }
+        public Guid NodeUid { get; set; }
+        public Guid WorkerUid { get; set; }
 
         public DateTime ProcessingStarted { get; set; }
         public DateTime ProcessingEnded { get; set; }

@@ -6,7 +6,7 @@ $copyright = "Copyright 2021 - John Andrews"
 # build plugin
 # build 0.0.1.0 so included one is always greater
 dotnet.exe build Plugin\Plugin.csproj --configuration Release  /p:AssemblyVersion=0.0.1.0 /p:Version=0.0.1.0 /p:CopyRight=$copyright --output ../FileFlowsPlugins 
-Remove-Item ../FileFlowsPlugins/Plugin.deps.json
+Remove-Item ../FileFlowsPlugins/FileFlows.Plugin.deps.json
 # remove old plugins directories
 Remove-Item .\Server\Plugins\* -Recurse -ErrorAction SilentlyContinue 
 

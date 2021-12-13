@@ -1,5 +1,6 @@
 ﻿using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
+using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 
@@ -14,11 +15,12 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            if (Settings?.DisableTelemetry == true)
+            var settings = new SettingsController().Get().Result;
+            if (settings?.DisableTelemetry == true)
                 return; // they have turned it off, dont report anything
 
             TelemetryData data = new TelemetryData();
-            data.ClientUid = Settings.Uid;
+            data.ClientUid = settings.Uid;
             data.Version = Globals.Version;
             var libFiles = new LibraryFileController().GetAll(null).Result;
             data.FilesFailed = libFiles.Where(x => x.Status == FileStatus.ProcessingFailed).Count();

@@ -190,6 +190,7 @@ namespace FileFlows.Client.Pages
 
             if (newTemplate?.Save == true)
             {
+#if (DEMO == false)
                 Blocker.Show();
                 try
                 {
@@ -201,6 +202,7 @@ namespace FileFlows.Client.Pages
                 {
                     Blocker.Hide();
                 }
+#endif
             }
 
             return newFlowTemplate;

@@ -4,6 +4,7 @@ namespace FileFlows.Server.Helpers
     using FileFlows.Plugin;
     using FileFlows.Server.Workers;
     using FileFlows.Shared;
+    using FileFlows.ServerShared.Helpers;
 
     public class FlowExecutor
     {
@@ -31,7 +32,7 @@ namespace FileFlows.Server.Helpers
                 args.TempPath = tempPath;
                 args.RelativeFile = relativePath;
 
-                args.Logger.ILog("Excecuting Flow: " + Flow.Name);
+                args.Logger?.ILog("Excecuting Flow: " + Flow.Name);
 
                 args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
 

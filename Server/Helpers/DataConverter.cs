@@ -5,14 +5,14 @@ using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Helpers
 {
-    public class DataConverter : JsonConverter<ViObject>
+    public class DataConverter : JsonConverter<FileFlowObject>
     {
-        public override ViObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override FileFlowObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
         }
 
-        public override void Write(Utf8JsonWriter writer, ViObject value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, FileFlowObject value, JsonSerializerOptions options)
         {
             var properties = value.GetType().GetProperties();
 

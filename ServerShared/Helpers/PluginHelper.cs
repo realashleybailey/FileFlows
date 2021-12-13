@@ -1,9 +1,9 @@
-namespace FileFlows.Server.Helpers
+﻿namespace FileFlows.ServerShared.Helpers
 {
     using System.Dynamic;
     using System.Reflection;
     using FileFlows.Plugin;
-    using FileFlows.Server.Controllers;
+    using FileFlows.ServerShared.Services;
     using FileFlows.Shared.Models;
 
     /// <summary>
@@ -17,15 +17,27 @@ namespace FileFlows.Server.Helpers
         {
             //  Context = new HostAssemblyLoadContext(GetPluginDirectory());
         }
+#if (DEBUG)
+        private static string GetPluginDirectory()
+        {
+            string dir = new DirectoryInfo(".").FullName;
+            dir = dir.Substring(0, dir.LastIndexOf("FileFlows") - 1).Replace("\\", "/");
+            if (dir.EndsWith("FileFLows/FileFlows") == false)
+                dir += "/FileFlows";
+            dir += "/Server/Plugins";
+            return dir;
+        }
+#else
         private static string GetPluginDirectory() => new DirectoryInfo("Plugins").FullName;
+#endif
 
 
         public void ScanForPlugins()
         {
             var dllPluginInfo = GetPlugins();
 
-            var controller = new PluginController();
-            var dbPluginInfos = controller.GetDataList().Result;
+            var controller = PluginService.Load();
+            var dbPluginInfos = controller.GetAll().Result;
 
             List<string> installed = new List<string>();
 
@@ -174,13 +186,13 @@ namespace FileFlows.Server.Helpers
             return results;
         }
 
-        internal Dictionary<string, object> GetPartVariables(string flowElementUid)
+        public Dictionary<string, object> GetPartVariables(string flowElementUid)
         {
             var nt = GetNodeType(flowElementUid);
             if (nt == null)
                 return new Dictionary<string, object>();
             var node = Activator.CreateInstance(nt) as Node;
-            if(node?.Variables == null || node.Variables.Count == 0)
+            if (node?.Variables == null || node.Variables.Count == 0)
                 return new Dictionary<string, object>();
             return node.Variables;
         }
@@ -189,10 +201,10 @@ namespace FileFlows.Server.Helpers
         /// Gets the info for the default InputFile node
         /// </summary>
         /// <returns>the info for the default InputFile node</returns>
-        internal (string name, string fullName) GetInputFileInfo()
+        public (string name, string fullName) GetInputFileInfo()
         {
             string dir = GetPluginDirectory("BasicNodes");
-            if(string.IsNullOrEmpty(dir))
+            if (string.IsNullOrEmpty(dir))
                 return (string.Empty, string.Empty);
             string assembglyFile = Path.Combine(dir, "BasicNodes.dll");
             var inputFileType = GetAssemblyNodeTypes(assembglyFile)?.Where(x => x.Name == "InputFile").FirstOrDefault();
@@ -201,7 +213,7 @@ namespace FileFlows.Server.Helpers
             return new(inputFileType.Name, inputFileType.FullName);
         }
 
-        internal IEnumerable<FlowElement> GetElements()
+        public IEnumerable<FlowElement> GetElements()
         {
             var nodeTypes = GetNodeTypes();
             List<FlowElement> elements = new List<FlowElement>();
@@ -229,7 +241,7 @@ namespace FileFlows.Server.Helpers
             return elements.OrderBy(x => x.Group).ThenBy(x => x.Type).ThenBy(x => x.Name);
         }
 
-        internal PluginInfo LoadPluginInfo(PluginInfo pi)
+        public PluginInfo LoadPluginInfo(PluginInfo pi)
         {
             pi.Settings ??= new System.Dynamic.ExpandoObject();
             var dict = (IDictionary<string, object>)pi.Settings;
@@ -302,7 +314,7 @@ namespace FileFlows.Server.Helpers
         {
             List<Type> nodes = new List<Type>();
             var tNode = typeof(Node);
-            var plugins= new PluginController().GetDataList().Result.Where(x => x.Deleted == false && x.Enabled);
+            var plugins = PluginService.Load().GetAll().Result.Where(x => x.Deleted == false && x.Enabled);
             foreach (var plugin in plugins)
             {
                 var nodeTypes = GetAssemblyNodeTypes(plugin.Assembly)?.ToList();

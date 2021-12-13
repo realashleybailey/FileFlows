@@ -7,6 +7,40 @@ namespace FileFlows.Server.Controllers
     [Route("/api/library-file")]
     public class LibraryFileController : ControllerStore<LibraryFile>
     {
+
+        /// <summary>
+        /// Gets the next library file for processing, and puts it into progress
+        /// </summary>
+        /// <param name="nodeUid">the Uid of the node processing hte file </param>
+        /// <param name="workerUid">the UId of the worker</param>
+        /// <returns>the next library file to process</returns>
+        [HttpGet("next-file")]
+        public async Task<LibraryFile> GetNext([FromQuery] Guid nodeUid, [FromQuery] Guid workerUid)
+        {
+            var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
+            _mutex.WaitOne();
+            try
+            {
+                // iterate these incase, something starts processing
+                for(int i = 0; i < data.Length; i++)
+                {
+                    if(data[i].Status ==  FileStatus.Unprocessed)
+                    {
+                        data[i].Status = FileStatus.Processing;
+                        data[i].NodeUid = nodeUid;
+                        data[i].WorkerUid = workerUid;
+                        data[i] = await DbManager.Update(data[i]);
+                        return data[i];
+                    }
+                }
+                return null;
+            }
+            finally
+            {
+                _mutex.ReleaseMutex();
+            }
+        }
+
         [HttpGet]
         public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
         {
@@ -112,6 +146,23 @@ namespace FileFlows.Server.Controllers
         public async Task<LibraryFile> Get(Guid uid)
         {
             return await GetByUid(uid);
+        }
+
+
+        [HttpPut]
+        public async Task<LibraryFile> Update([FromBody] LibraryFile file)
+        {
+            var existing = await GetByUid(file.Uid);
+            if (existing == null)
+                throw new Exception("Not found");
+            existing.Status = file.Status;
+            existing.NodeUid = file.NodeUid;
+            existing.FinalSize = file.FinalSize;
+            existing.Flow = file.Flow;
+            existing.ProcessingEnded = file.ProcessingEnded;
+            existing.ProcessingStarted = file.ProcessingStarted;
+            existing.WorkerUid = file.WorkerUid;
+            return await base.Update(existing);
         }
 
         [HttpGet("{uid}/log")]

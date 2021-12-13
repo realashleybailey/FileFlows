@@ -46,7 +46,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        public static async Task<IEnumerable<T>> Select<T>() where T : ViObject, new()
+        public static async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
         {
             using (var db = GetDb())
             {
@@ -66,7 +66,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        public static async Task<T> Single<T>() where T : ViObject, new()
+        public static async Task<T> Single<T>() where T : FileFlowObject, new()
         {
             using (var db = GetDb())
             {
@@ -77,7 +77,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        public static async Task<T> Single<T>(Guid uid) where T : ViObject, new()
+        public static async Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
         {
             using (var db = GetDb())
             {
@@ -88,7 +88,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        public static async Task<T> SingleByName<T>(string name) where T : ViObject, new()
+        public static async Task<T> SingleByName<T>(string name) where T : FileFlowObject, new()
         {
             using (var db = GetDb())
             {
@@ -118,7 +118,7 @@ namespace FileFlows.Server.Helpers
         /// This will batch insert many objects into thee datbase
         /// </summary>
         /// <param name="items">Items to insert</param>
-        internal static async Task AddMany(ViObject[] items)
+        internal static async Task AddMany(FileFlowObject[] items)
         {
             if (items?.Any() != true)
                 return;
@@ -136,7 +136,7 @@ namespace FileFlows.Server.Helpers
                 {
                     var obj = items[j];
                     // need to case obj to (ViObject) here so the DataConverter is used
-                    string json = System.Text.Json.JsonSerializer.Serialize((ViObject)obj, serializerOptions);
+                    string json = System.Text.Json.JsonSerializer.Serialize((FileFlowObject)obj, serializerOptions);
 
                     var type = obj.GetType();
                     obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
@@ -162,7 +162,7 @@ namespace FileFlows.Server.Helpers
 
         }
 
-        public static async Task<T> Single<T>(string andWhere, params object[] args) where T : ViObject, new()
+        public static async Task<T> Single<T>(string andWhere, params object[] args) where T : FileFlowObject, new()
         {
             using (var db = GetDb())
             {
@@ -173,7 +173,7 @@ namespace FileFlows.Server.Helpers
                 return Convert<T>(dbObject);
             }
         }
-        private static T Convert<T>(DbObject dbObject) where T : ViObject, new()
+        private static T Convert<T>(DbObject dbObject) where T : FileFlowObject, new()
         {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
             {
@@ -196,7 +196,7 @@ namespace FileFlows.Server.Helpers
         //     return Convert<T>(updated);
         // }
 
-        public static async Task<T> Update<T>(T obj) where T : ViObject, new()
+        public static async Task<T> Update<T>(T obj) where T : FileFlowObject, new()
         {
             if (obj == null)
                 return new T();
@@ -206,14 +206,14 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        private static async Task<T> AddOrUpdateObject<T>(IDatabase db, T obj) where T : ViObject
+        private static async Task<T> AddOrUpdateObject<T>(IDatabase db, T obj) where T : FileFlowObject
         {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
             {
                 Converters = { new DataConverter(), new BoolConverter() }
             };
             // need to case obj to (ViObject) here so the DataConverter is used
-            string json = System.Text.Json.JsonSerializer.Serialize((ViObject)obj, serializerOptions);
+            string json = System.Text.Json.JsonSerializer.Serialize((FileFlowObject)obj, serializerOptions);
 
             var type = obj.GetType();
             obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
@@ -247,7 +247,7 @@ namespace FileFlows.Server.Helpers
             return obj;
         }
 
-        public static async Task Delete<T>(params Guid[] uids) where T : ViObject
+        public static async Task Delete<T>(params Guid[] uids) where T : FileFlowObject
         {
             if (uids?.Any() != true)
                 return; // nothing to delete

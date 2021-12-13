@@ -178,6 +178,11 @@
         "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any library files be processed outside of the schedule.\n"
       }
     },
+    "LibraryFile": {
+      "Fields": {
+        "Log": "Log"
+      }
+    },
     "LibraryFiles": {
       "Title": "Library Files",
       "Buttons": {

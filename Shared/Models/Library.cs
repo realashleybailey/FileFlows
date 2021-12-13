@@ -1,8 +1,6 @@
 namespace FileFlows.Shared.Models
 {
-    using System;
-
-    public class Library : ViObject
+    public class Library : FileFlowObject
     {
         public bool Enabled { get; set; }
         public string Path { get; set; }

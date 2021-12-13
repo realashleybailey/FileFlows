@@ -39,7 +39,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        internal static async Task<T> Single<T>() where T : ViObject, new()
+        internal static async Task<T> Single<T>() where T : FileFlowObject, new()
         {
             mutex.WaitOne();
             try
@@ -52,7 +52,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        internal static async Task<T> Update<T>(T model) where T : ViObject, new()
+        internal static async Task<T> Update<T>(T model) where T : FileFlowObject, new()
         {
             mutex.WaitOne();
             try

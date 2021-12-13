@@ -8,6 +8,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
     using FileFlows.Shared.Helpers;
+    using FileFlows.ServerShared.Helpers;
 
     [Route("/api/plugin")]
     public class PluginController : ControllerStore<PluginInfo>

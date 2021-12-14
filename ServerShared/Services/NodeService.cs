@@ -38,7 +38,7 @@
 
         public async Task<ProcessingNode> Register(string address)
         {
-            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/node?address=" + Uri.EscapeDataString(address));
+            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/node/register?address=" + Uri.EscapeDataString(address));
             if (result.Success == false)
                 throw new Exception("Failed to register node: " + result.Body);
             return result.Data;

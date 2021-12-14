@@ -29,6 +29,7 @@ namespace FileFlows.Server.Controllers
                         data[i].Status = FileStatus.Processing;
                         data[i].NodeUid = nodeUid;
                         data[i].WorkerUid = workerUid;
+                        data[i].ProcessingStarted = DateTime.UtcNow;
                         data[i] = await DbManager.Update(data[i]);
                         return data[i];
                     }

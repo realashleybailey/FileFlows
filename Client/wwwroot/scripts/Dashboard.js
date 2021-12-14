@@ -55,13 +55,6 @@ export function InitChart(data, lblOverall, lblCurrent) {
             options.series.push(worker.currentPartPercent);
             options.labels.push(lblCurrent);
         }
-        if (!worker.currentFile) {
-            // currently not processing anything
-            options.plotOptions.radialBar.dataLabels.total.label = '';
-            options.plotOptions.radialBar.dataLabels.total.formatter = function (val) {
-                return "";
-            };
-        }
 
         let updated = false;
 

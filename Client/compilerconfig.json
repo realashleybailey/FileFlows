@@ -118,5 +118,9 @@
   {
     "outputFile": "Components/Inputs/InputSchedule/InputSchedule.razor.css",
     "inputFile": "Components/Inputs/InputSchedule/InputSchedule.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputText/InputText.razor.css",
+    "inputFile": "Components/Inputs/InputText/InputText.razor.scss"
   }
 ]

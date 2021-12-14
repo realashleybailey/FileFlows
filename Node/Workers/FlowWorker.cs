@@ -23,24 +23,35 @@
         {
             Logger.Instance?.DLog("FlowWorker.Execute");
             var nodeService = NodeService.Load();
-            var node = isServer ? nodeService.GetServerNode().Result : nodeService.Register(Environment.MachineName).Result;
+            ProcessingNode node;
+            try
+            {
+                node = isServer ? nodeService.GetServerNode().Result : nodeService.Register(Environment.MachineName).Result;
+            }
+            catch(Exception ex)
+            {
+                Logger.Instance?.ELog("Failed to register node: " + ex.Message);
+                return;
+            }
+            if(isServer == false)
+            {
+                FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
+            }
             node.Enabled = true;
             if (string.IsNullOrEmpty(node.TempPath))
                 node.TempPath = @"d:\videos\temp";
-            if (string.IsNullOrEmpty(node.LoggingPath))
-                node.LoggingPath = @"d:\videos\logging";
 
             if (node?.Enabled != true)
             {
                 Logger.Instance?.DLog("Flow executor not enabled");
                 return;
             }
-            if(node.Threads == 0)
-                node.Threads = 1;
+            if(node.FlowRunners == 0)
+                node.FlowRunners = 1;
 
-            if (node.Threads <= ExecutingRunners.Count)
+            if (node.FlowRunners <= ExecutingRunners.Count)
             {
-                Logger.Instance?.DLog("At limit of running executors: " + node.Threads);
+                Logger.Instance?.DLog("At limit of running executors: " + node.FlowRunners);
                 return; // already maximum executors running
             }
 
@@ -103,6 +114,7 @@
                     LibraryFile = libFile,
                     Log = String.Empty,
                     NodeUid = node.Uid,
+                    NodeName = node.Name,
                     RelativeFile = libFile.RelativePath,
                     Library = libFile.Library,
                     TotalParts = flow.Parts.Count,
@@ -119,7 +131,7 @@
                     ExecutingRunners.Add(runner);
                 }
                 runner.OnFlowCompleted += Runner_OnFlowCompleted;
-                _ = runner.Run();
+                Task.Run(() => runner.Run());
             }
             finally
             {

@@ -52,6 +52,7 @@ namespace FileFlows.Client.Shared
                 {
                     new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                     new NavMenuItem("Pages.Tools.Title", "fas fa-tools", "tools"),
+                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes"),
                     new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings")
                 }
             });

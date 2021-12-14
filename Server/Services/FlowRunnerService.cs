@@ -8,16 +8,16 @@
 
     public class FlowRunnerService : IFlowRunnerService
     {
-        public Task<FlowExecutorInfo> Start(FlowExecutorInfo info) => Task.FromResult(new WorkerController().StartWork(info));
+        public Task<FlowExecutorInfo> Start(FlowExecutorInfo info) => new WorkerController(null).StartWork(info);
         public Task Complete(FlowExecutorInfo info)
         {
-            new WorkerController().FinishWork(info);
+            new WorkerController(null).FinishWork(info);
             return Task.CompletedTask;
         }
 
         public Task Update(FlowExecutorInfo info)
         {
-            new WorkerController().UpdateWork(info);
+            new WorkerController(null).UpdateWork(info);
             return Task.CompletedTask;
         }
     }

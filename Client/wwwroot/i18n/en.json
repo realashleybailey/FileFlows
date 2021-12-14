@@ -113,11 +113,12 @@
         "LogFailed": "Failed to retrieve log for worker"
       },
       "Messages": {
-        "CancelMesssage": "Are you sure you want to cancel the worker for {CurrentFile}?",
+        "CancelMesssage": "Are you sure you want to cancel the worker for {RelativeFile}?",
         "Waiting": "Waiting for a file to process"
       },
       "Fields": {
         "Log": "Log",
+        "Node": "Node",
         "CurrentStep": "Step",
         "File": "File",
         "Overall": "Overall",
@@ -192,15 +193,42 @@
         "MoveToTop": "Move To Top"
       }
     },
+    "Nodes": {
+      "Title": "Nodes",
+      "Labels": {
+        "FileFlowsServer": "Internal Processing Node"
+      },
+      "Fields": {
+        "FlowRunners": "Flow Runners",
+        "Address": "Address",
+        "Enabled": "Enabled"        
+      }
+    },
+    "ProcessingNode": {
+      "Title": "Node",
+      "Fields": {
+        "TempPath": "Temp Directory",
+        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",
+        "FlowRunners": "Flow Runners",
+        "FlowRunners-Help": "The number of flow runner instances available to execute a flow.",
+        "Address": "Address",
+        "Address-Help": "The address (hostname or IP Address) of the node.  You should not change this unless you have changed the address of the node.  For example, if you have change the computer name of the processing node.",
+        "Enabled": "Enabled",
+        "Mappings": "Mappings",
+        "MappingsKey": "Server",
+        "MappingsValue": "Node",
+        "Mappings-Help": "Mappings allow you to map a path from the server to a location on the node.\nFor example you may map Server:'/usr/local/bin/ffmpeg' to Node:'C:\\Utils\\ffmpeg\\ffmpeg.exe'"
+      }
+    },
     "Plugins": {
       "Title": "Plugins"
     },
     "Settings": {
       "Title": "Settings",
       "Labels": {
-        "General": "General",
         "Directories": "Directories",
-        "Workers": "Workers"
+        "Workers": "Workers",
+        "Miscellaneous": "Miscellaneous"
       },
       "Fields": {
         "Telemetry": "Telemetry",
@@ -214,7 +242,9 @@
         "WorkerScanner": "Library Scanner",
         "WorkerScanner-Helper": "If the library scanner is enabled.  When this is disabled the libraries will not be scanned for files.",
         "WorkerFlowExecutor": "Flow Executor",
-        "WorkerFlowExecutor-Helper": "If the flow executor is enabled or not.  When this is disabled no flows will be run."
+        "WorkerFlowExecutor-Helper": "If the flow executor is enabled or not.  When this is disabled no flows will be run.",
+        "FlowRunners": "Flow Runners",
+        "FlowRunners-Help": "The number of flow runner instances available to execute a flow."
       }
     },
     "Tools": {

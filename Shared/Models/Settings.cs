@@ -21,6 +21,8 @@
 
         public bool DisableTelemetry { get; set; }
 
+        public int FlowRunners { get; set; }
+
         public string TimeZone { get; set; }
 
         public string GetLogFile(System.Guid uid)

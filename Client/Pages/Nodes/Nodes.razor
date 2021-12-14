@@ -1,0 +1,58 @@
+@namespace FileFlows.Client.Pages
+@using FileFlows.Shared.Models
+@inherits ListPage<ProcessingNode>
+
+@page "/nodes"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <FlowTable @ref="Table" Data="@Data" TItem="ProcessingNode" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="ProcessingNode" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="ProcessingNode" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="ProcessingNode" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />                
+                <FlowTableHelpButton TItem="ProcessingNode" HelpUrl="ProcessingNodes" />
+            </ToolBar>
+
+            <Columns>
+                <FlowTableColumn TItem="ProcessingNode">
+                    <Header>
+                        Name
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="ProcessingNode" Width="30vw" MobileWidth="0">
+                    <Header>
+                        Address
+                    </Header>
+                    <Cell Context="item">
+                        @if(item.Address != FileFlowsServer)
+                        {
+                            <span>@item.Address</span>
+                        }else
+                        {
+                            <span>Internal</span>
+                        }
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="ProcessingNode" Width="6rem">
+                    <Header>
+                        Runners
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.FlowRunners</span>
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
+
+    </Body>
+
+</PageView>

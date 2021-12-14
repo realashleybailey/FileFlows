@@ -5,10 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
+
 
 var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
 provider.Mappings[".br"] = "text/plain";
@@ -72,9 +74,11 @@ pl.ScanForPlugins();
 LibraryWorker.ResetProcessing();
 WorkerManager.StartWorkers(
     new LibraryWorker(),
-    //new FlowWorker(isServer: true),
+    new FlowWorker(isServer: true),
     new TelemetryReporter()
 );
+
+app.MapHub<FileFlows.Server.Hubs.FlowHub>("/flow");
 
 // this will run the asp.net app and wait until it is killed
 app.Run();

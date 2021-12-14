@@ -3,6 +3,8 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Shared.Models;
     using FileFlows.Server.Workers;
+    using Microsoft.AspNetCore.SignalR;
+    using FileFlows.Server.Hubs;
 
     /// <summary>
     /// This controller will be responsible for knowing about the workers and the nodes
@@ -12,12 +14,35 @@ namespace FileFlows.Server.Controllers
     [Route("/api/worker")]
     public class WorkerController : Controller
     {
-        private readonly Dictionary<Guid, FlowExecutorInfo> Executors = new ();
+        private readonly static Dictionary<Guid, FlowExecutorInfo> Executors = new ();
         private static Mutex mutex = new();
 
-        [HttpPost("work/start")]
-        public FlowExecutorInfo StartWork([FromBody] FlowExecutorInfo info)
+        private IHubContext<FlowHub> Context;
+
+        public WorkerController(IHubContext<FlowHub> context)
         {
+            this.Context = context;
+        }
+
+        private async Task<string> GetLogFileName(Guid libraryFileUid)
+        {
+            var settings = await new SettingsController().Get();
+            string logFile = Path.Combine(settings.LoggingPath, libraryFileUid + ".log");
+            return logFile;
+        }
+
+        [HttpPost("work/start")]
+        public async Task<FlowExecutorInfo> StartWork([FromBody] FlowExecutorInfo info)
+        {
+            try
+            {
+                // try to delete a log file for this library file if one already exists (incase the flow was cancelled and now its being re-run)                
+                string logFile = await GetLogFileName(info.LibraryFile.Uid);
+                if (System.IO.File.Exists(logFile))
+                    System.IO.File.Delete(logFile);
+            }
+            catch (Exception) { }
+
             mutex.WaitOne();
             try
             {
@@ -32,11 +57,21 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPost("work/finish")]
-        public void FinishWork([FromBody] FlowExecutorInfo info)
+        public async void FinishWork([FromBody] FlowExecutorInfo info)
         {
             mutex.WaitOne();
             try
             {
+                if(string.IsNullOrEmpty(info.Log) == false)
+                {
+                    // this contains the full log file, save it incase a message was lost or recieved out of order during processing
+                    try
+                    {
+                        string logfile = await GetLogFileName(info.LibraryFile.Uid);
+                        System.IO.File.WriteAllText(logfile, info.Log);
+                    }
+                    catch (Exception) { }  
+                }
                 if (Executors.ContainsKey(info.Uid))
                     Executors.Remove(info.Uid);
             }
@@ -79,6 +114,7 @@ namespace FileFlows.Server.Controllers
                 CurrentPartPercent = x.CurrentPartPercent,
                 Library = x.Library,
                 NodeUid = x.NodeUid,
+                NodeName = x.NodeName,
                 RelativeFile = x.RelativeFile,
                 StartedAt = x.StartedAt,
                 TotalParts = x.TotalParts,
@@ -87,40 +123,20 @@ namespace FileFlows.Server.Controllers
             });
         }
 
-        //[HttpGet("{uid}")]
-        //public Worker Get(Guid uid)
-        //{
-        //    if(Globals.Demo)
-        //        return new Worker {    }
-        //    FlowWorker.RegisteredFlowWorkers.FirstOrDefault(x => x.Status.Uid == uid);
-        //}
-
         [HttpGet("{uid}/log")]
-        public string Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
+        public async Task<string> Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
         {
-            FlowExecutorInfo exec = null;
-            if (Executors.TryGetValue(uid, out exec) == false)
-                return String.Empty;
-
-            if (lineCount == 0)
-                return exec.Log;
-
-            var log = exec.Log.Split(new String[] { "\r\n", "\n" }, StringSplitOptions.None);
-            if (lineCount > 0 && log.Length < lineCount)
-                return String.Join(Environment.NewLine, log.Skip(log.Length  - lineCount));
-            return String.Join(Environment.NewLine, log);
+            var settings = await new SettingsController().Get();
+            string file = Path.Combine(settings.LoggingPath, uid + ".log");
+            if(System.IO.File.Exists(file))
+                return System.IO.File.ReadAllText(file);
+            return String.Empty;
         }
 
         [HttpDelete("{uid}")]
         public async Task Abort(Guid uid)
         {
-            // need a way to broadcast a cancel command to workers... hmmm grpc... websocket....
-
-            //var worker = FlowWorker.RegisteredFlowWorkers.FirstOrDefault(x => x.Status.Uid == uid);
-            //if (worker == null)
-            //    return;
-
-            //await worker.Abort();
+            await this.Context.Clients.All.SendAsync("AbortFlow", uid);
         }
     }
 }

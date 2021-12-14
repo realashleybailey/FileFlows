@@ -56,7 +56,7 @@
         {
             try
             {
-                var result = await HttpHelper.Post<FlowExecutorInfo>($"{ServiceBaseUrl}/worker/work/update", info);
+                var result = await HttpHelper.Post($"{ServiceBaseUrl}/worker/work/update", info);
                 if (result.Success == false)
                     throw new Exception("Failed to update work: " + result.Body);
             }

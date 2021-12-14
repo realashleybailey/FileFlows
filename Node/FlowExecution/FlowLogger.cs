@@ -8,7 +8,6 @@ namespace FileFlows.Node.FlowExecution
 
     public class FlowLogger : ILogger
     {
-        public string LogFile { get; set; }
         List<string> log = new List<string>();
         public void DLog(params object[] args) => Log(LogType.Debug, args);
         public void ELog(params object[] args) => Log(LogType.Error, args);
@@ -19,6 +18,11 @@ namespace FileFlows.Node.FlowExecution
         private enum LogType
         {
             Error, Warning, Info, Debug
+        }
+        IFlowRunnerCommunicator Communicator;
+        public FlowLogger(IFlowRunnerCommunicator communicator)
+        {
+            this.Communicator = communicator;
         }
 
         private void Log(LogType type, params object[] args)
@@ -32,18 +36,11 @@ namespace FileFlows.Node.FlowExecution
                 System.Text.Json.JsonSerializer.Serialize(x)));
             log.Add(message);
             Console.WriteLine(message);
-            if (string.IsNullOrEmpty(LogFile) == false)
-                System.IO.File.AppendAllText(LogFile, message + Environment.NewLine);
-        }
-
-        internal string GetPreview(int lineCount = 50)
-        {
-            lock (log)
+            try
             {
-                if(lineCount > 0 && log.Count < lineCount)
-                    return String.Join(Environment.NewLine, log.Skip(log.Count - lineCount));
-                return String.Join(Environment.NewLine, log);
+                Communicator.LogMessage(message).Wait();
             }
+            catch (Exception ex) { }
         }
 
         public override string ToString() => String.Join(Environment.NewLine, log);

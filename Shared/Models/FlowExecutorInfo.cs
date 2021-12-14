@@ -4,6 +4,7 @@ public class FlowExecutorInfo
 {
     public Guid Uid { get; set; }
     public Guid NodeUid { get; set; }
+    public string NodeName { get; set; }
 
     public string Log { get; set; }
 

@@ -11,8 +11,7 @@ public class FlowRunner
     private FlowExecutorInfo Info;
     private Flow Flow;
     private ProcessingNode Node;
-    private CancellationToken CancellationToken = new CancellationToken();
-
+    private CancellationTokenSource CancellationToken = new CancellationTokenSource();
 
     public FlowRunner(FlowExecutorInfo info, Flow flow, ProcessingNode node)
     {
@@ -23,6 +22,8 @@ public class FlowRunner
 
     public delegate void FlowCompleted(FlowRunner sender, bool success);
     public event FlowCompleted OnFlowCompleted;
+    private NodeParameters nodeParameters;
+    private Node currentNode;
 
     public async Task Run()
     {
@@ -33,7 +34,17 @@ public class FlowRunner
             if (updated == null)
                 return; // failed to update
             Info.Uid = updated.Uid;
-            RunActual();
+            var communicator = FlowRunnerCommunicator.Load(Info.LibraryFile.Uid);
+            communicator.OnCancel += Communicator_OnCancel;
+            try
+            {
+                RunActual(communicator);
+            }
+            finally
+            {
+                communicator.OnCancel -= Communicator_OnCancel;
+                communicator.Close();
+            }
         }
         catch (Exception ex)
         {
@@ -45,52 +56,102 @@ public class FlowRunner
         }
     }
 
+    private void Communicator_OnCancel()
+    {
+        CancellationToken.Cancel();
+        if (currentNode != null)
+            currentNode.Cancel().Wait();
+    }
+
     public async Task Finish()
     {
-        var service = FlowRunnerService.Load();
-        await service.Complete(Info);
+
+        if (nodeParameters.Logger is FlowLogger fl)
+            Info.Log = fl.ToString();
+        await Complete();
         OnFlowCompleted?.Invoke(this, Info.LibraryFile.Status == FileStatus.Processed);
+    }
+
+    private async Task Complete()
+    {
+        DateTime start = DateTime.Now;
+        do
+        {
+            try
+            {
+                var service = FlowRunnerService.Load();
+                await service.Complete(Info);
+                return;
+            }
+            catch (Exception) { }
+            await Task.Delay(30_000);
+        } while (DateTime.Now.Subtract(start) < new TimeSpan(0, 10, 0));
+        Logger.Instance?.ELog("Failed to inform server of flow completion");
     }
 
     private void StepChanged(int step, string partName)
     {
         Info.CurrentPartName = partName;
         Info.CurrentPart = step;
-        var service = FlowRunnerService.Load();
-        service.Update(Info);
+        try
+        {
+            var service = FlowRunnerService.Load();
+            service.Update(Info);
+        }
+        catch (Exception) 
+        { 
+            // silently fail, not a big deal, just incremental progress update
+        }
     }
 
     private void UpdatePartPercentage(float percentage)
     {
         Info.CurrentPartPercent = percentage;
-        var service = FlowRunnerService.Load();
-        service.Update(Info);
+        try { 
+            var service = FlowRunnerService.Load();
+            service.Update(Info);
+        }
+        catch (Exception)
+        {
+            // silently fail, not a big deal, just incremental progress update
+        }
     }
 
     private void SetStatus(FileStatus status)
     {
+        DateTime start = DateTime.Now;
         Info.LibraryFile.Status = status;
-        var service = FlowRunnerService.Load();
-        service.Update(Info);
+        do
+        {
+            try
+            {
+                var service = FlowRunnerService.Load();
+                service.Update(Info);
+                return;
+            }
+            catch (Exception ex)
+            {
+                // this is more of a problem, its not ideal, so we do try again
+                Logger.Instance?.WLog("Failed to set status on server: " + ex.Message);
+            }
+            Thread.Sleep(5_000);
+        } while (DateTime.Now.Subtract(start) < new TimeSpan(0, 3, 0));
     }
 
-    private void RunActual() 
+    private void RunActual(IFlowRunnerCommunicator communicator) 
     {
-        var args = new NodeParameters(Info.LibraryFile.Name, new FlowLogger()
-        {
-            LogFile = Path.Combine(Node.LoggingPath, Info.LibraryFile.Uid + ".log")
-        });
-        args.TempPath = Node.TempPath;
-        args.RelativeFile = Info.LibraryFile.RelativePath;
-        args.PartPercentageUpdate = UpdatePartPercentage;
+        nodeParameters = new NodeParameters(Info.LibraryFile.Name, new FlowLogger(communicator));
+        nodeParameters.TempPath = Node.TempPath;
+        nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
+        nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
 
-        args.Logger!.ILog("Excecuting Flow: " + Flow.Name);
+        nodeParameters.Logger!.ILog("Excecuting Flow: " + Flow.Name);
 
         //args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
 
         var fiInput = new FileInfo(Info.LibraryFile.Name);
-        args.Result = NodeResult.Success;
-        args.GetToolPath = (string name) =>
+        nodeParameters.Result = NodeResult.Success;
+        nodeParameters.GetToolPath = (string name) =>
         {
             // new Controllers.ToolController().GetByName(name)?.Result?.Path ?? "";
             var nodeService = NodeService.Load();
@@ -102,7 +163,7 @@ public class FlowRunner
         var part = Flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
         if (part == null)
         {
-            args.Logger!.ELog("Failed to find Input node");
+            nodeParameters.Logger!.ELog("Failed to find Input node");
             SetStatus(FileStatus.ProcessingFailed);
             return;
         }
@@ -112,18 +173,18 @@ public class FlowRunner
         var pluginLoader = PluginService.Load();
 
         while (count++ < 50)
-        {
+        { 
             if (CancellationToken.IsCancellationRequested)
             {
-                args.Logger?.WLog("Flow was canceled");
-                args.Result = NodeResult.Failure;
+                nodeParameters.Logger?.WLog("Flow was canceled");
+                nodeParameters.Result = NodeResult.Failure;
                 SetStatus(FileStatus.ProcessingFailed);                
                 return;
             }
             if (part == null)
             {
-                args.Logger?.WLog("Flow part was null");
-                args.Result = NodeResult.Failure;
+                nodeParameters.Logger?.WLog("Flow part was null");
+                nodeParameters.Result = NodeResult.Failure;
                 SetStatus(FileStatus.ProcessingFailed);
                 return;
             }
@@ -131,38 +192,38 @@ public class FlowRunner
             try
             {
 
-                args.Logger?.DLog("Executing part:" + (part!.Name?.EmptyAsNull() ?? part!.GetType().FullName ?? "unknown"));
-                var currentNode = pluginLoader.LoadNode(part!).Result;
-
+                nodeParameters.Logger?.DLog("Executing part:" + (part!.Name?.EmptyAsNull() ?? part!.GetType().FullName ?? "unknown"));
+                currentNode = pluginLoader.LoadNode(part!).Result;
+                
                 if (currentNode == null)
                 {
                     // happens when canceled    
-                    args.Logger?.ELog("Failed to load node: " + part.Name);
+                    nodeParameters.Logger?.ELog("Failed to load node: " + part.Name);
                     SetStatus(FileStatus.ProcessingFailed);
-                    args.Result = NodeResult.Failure;
+                    nodeParameters.Result = NodeResult.Failure;
                     return;
                 }
                 ++step;
                 StepChanged(step, currentNode.Name);
 
-                args.Logger?.DLog("node: " + currentNode.Name);
-                int output = currentNode.Execute(args);
+                nodeParameters.Logger?.DLog("node: " + currentNode.Name);
+                int output = currentNode.Execute(nodeParameters);
 
-                args.Logger?.DLog("output: " + output);
+                nodeParameters.Logger?.DLog("output: " + output);
                 if (output == -1)
                 {
                     // the execution failed                     
-                    args.Logger?.ELog("node returned error code:", currentNode!.Name);
-                    args.Result = NodeResult.Failure;
+                    nodeParameters.Logger?.ELog("node returned error code:", currentNode!.Name);
+                    nodeParameters.Result = NodeResult.Failure;
                     SetStatus(FileStatus.ProcessingFailed);
                     return;
                 }
                 var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
                 if (outputNode == null)
                 {
-                    args.Logger?.DLog("flow completed");
+                    nodeParameters.Logger?.DLog("flow completed");
                     // flow has completed
-                    args.Result = NodeResult.Success;
+                    nodeParameters.Result = NodeResult.Success;
                     SetStatus(FileStatus.Processed);
                     return;
                 }
@@ -171,15 +232,15 @@ public class FlowRunner
                 if (part == null)
                 {
                     // couldnt find the connection, maybe bad data, but flow has now finished
-                    args.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
+                    nodeParameters.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
                     SetStatus(FileStatus.Processed);
                     return;
                 }
             }
             catch (Exception ex)
             {
-                args.Result = NodeResult.Failure;
-                args.Logger?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                nodeParameters.Result = NodeResult.Failure;
+                nodeParameters.Logger?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 SetStatus(FileStatus.ProcessingFailed);
                 return;
             }

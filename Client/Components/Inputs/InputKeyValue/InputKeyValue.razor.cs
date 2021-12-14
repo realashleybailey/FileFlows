@@ -64,10 +64,13 @@ namespace FileFlows.Client.Components.Inputs
 
         public override async Task<bool> Validate()
         {
+            this.Data ??= new();
+
             if (CheckForDuplicates() == false)
                 return false;
 
-            if (this.Data.Any() == false && Validators.Any(x => x.Type == "Required"))
+
+            if (this.Data.Any() == false && Validators?.Any(x => x.Type == "Required") == true)
             {
                 this.ErrorMessage = Translater.Instant("Validators.Required");
                 return false;
@@ -81,7 +84,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private bool CheckForDuplicates()
         {
-            DuplicateKey = this.Data.GroupBy(x => x.Key, x => x).FirstOrDefault(x => x.Count() > 1)?.Select(x => x.Key)?.FirstOrDefault();
+            DuplicateKey = this.Data?.GroupBy(x => x.Key, x => x)?.FirstOrDefault(x => x.Count() > 1)?.Select(x => x.Key)?.FirstOrDefault();
             if (DuplicateKey != null)
             {
                 Logger.Instance.WLog("Duplicates found, " + DuplicateKey);

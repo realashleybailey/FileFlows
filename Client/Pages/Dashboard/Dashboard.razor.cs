@@ -18,7 +18,7 @@ namespace FileFlows.Client.Pages
     {
         const string ApIUrl = "/api/worker";
         private bool Refreshing = false;
-        public readonly List<FlowWorkerStatus> Workers = new List<FlowWorkerStatus>();
+        public readonly List<FlowExecutorInfo> Workers = new List<FlowExecutorInfo>();
 
         public readonly List<LibraryFile> Upcoming = new List<LibraryFile>();
         public readonly List<LibraryFile> Finished = new List<LibraryFile>();
@@ -32,7 +32,7 @@ namespace FileFlows.Client.Pages
 
         public IJSObjectReference jsFunctions;
 
-        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished, lblWorkingFile, lblUid, lblLibrary;
+        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished, lblWorkingFile, lblUid, lblLibrary;
         private Timer AutoRefreshTimer;
         protected override async Task OnInitializedAsync()
         {
@@ -50,6 +50,7 @@ namespace FileFlows.Client.Pages
             lblCancel = Translater.Instant("Labels.Cancel");
             lblWaiting = Translater.Instant("Pages.Dashboard.Messages.Waiting");
             lblCurrentStep = Translater.Instant("Pages.Dashboard.Fields.CurrentStep");
+            lblNode= Translater.Instant("Pages.Dashboard.Fields.Node");
             lblFile = Translater.Instant("Pages.Dashboard.Fields.File");
             lblOverall = Translater.Instant("Pages.Dashboard.Fields.Overall");
             lblCurrent = Translater.Instant("Pages.Dashboard.Fields.Current");
@@ -175,7 +176,7 @@ namespace FileFlows.Client.Pages
             }
         }
 
-        async Task<RequestResult<List<FlowWorkerStatus>>> GetData()
+        async Task<RequestResult<List<FlowExecutorInfo>>> GetData()
         {
 #if (DEMO)
             return new RequestResult<List<FlowWorkerStatus>>
@@ -204,7 +205,7 @@ namespace FileFlows.Client.Pages
                 }
             };
 #else
-            return await HttpHelper.Get<List<FlowWorkerStatus>>(ApIUrl);
+            return await HttpHelper.Get<List<FlowExecutorInfo>>(ApIUrl);
 #endif
             
         }
@@ -231,11 +232,11 @@ namespace FileFlows.Client.Pages
 
         }
 
-        private async Task LogClicked(FlowWorkerStatus worker)
+        private async Task LogClicked(FlowExecutorInfo worker)
         {
             Blocker.Show();
             string log = string.Empty;
-            string url = $"{ApIUrl}/{worker.Uid}/log";
+            string url = $"{ApIUrl}/{worker.LibraryFile.Uid}/log";
             try
             {
                 var logResult = await GetLog(url);
@@ -262,7 +263,7 @@ namespace FileFlows.Client.Pages
                 }
             });
 
-            await Editor.Open("Pages.Dashboard", worker.CurrentFile, fields, new { Log = log }, large: true, readOnly: true);
+            await Editor.Open("Pages.Dashboard", worker.LibraryFile.Name, fields, new { Log = log }, large: true, readOnly: true);
         }
 
         private async Task<RequestResult<string>> GetLog(string url)
@@ -291,7 +292,7 @@ ffmpeg version 4.1.8 Copyright (c) 2000-2021 the FFmpeg developers
             return await HttpHelper.Get<string>(url);
         }
 
-        private async Task CancelClicked(FlowWorkerStatus worker)
+        private async Task CancelClicked(FlowExecutorInfo worker)
         {
             if (await Confirm.Show("Labels.Cancel",
                 Translater.Instant("Pages.Dashboard.Messages.CancelMesssage", worker)) == false)
@@ -301,7 +302,7 @@ ffmpeg version 4.1.8 Copyright (c) 2000-2021 the FFmpeg developers
             Blocker.Show();
             try
             {
-                await HttpHelper.Delete($"{ApIUrl}/{worker.Uid}");
+                await HttpHelper.Delete($"{ApIUrl}/{worker.LibraryFile.Uid}");
                 await Task.Delay(1000);
                 await Refresh();
             }

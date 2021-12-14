@@ -9,6 +9,12 @@
     {
         public Task<ProcessingNode> GetServerNode() => new NodeController().GetServerNode();
 
+        public async Task<string> GetToolPath(string name)
+        {
+            var result = await new ToolController().GetByName(name);
+            return result?.Path ?? string.Empty;
+        }
+
         public Task<ProcessingNode> Register(string address) => new NodeController().Register(address);
     }
 }

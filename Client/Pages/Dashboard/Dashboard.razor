@@ -45,23 +45,32 @@
             {
                 <div class="dashboard-wrapper">
                     <div class="dashboard">
-
-                        @for (int i = 0; i < Workers.Count; i++)
-                        {
-                            var worker = Workers[i];
-                            var waiting = worker.Status == FileFlows.Shared.Models.ProcessStatus.Waiting;
-                            <div class="worker-wrapper @(waiting ? "waiting" : "")">
+                        @if(Workers?.Any() != true)
+                        {                            
+                            <div class="worker-wrapper waiting">
                                 <div class="chart-wrapper">
-                                    <div class="chart chart-@i @(waiting ? "waiting" : "")"></div>
+                                    <div class="chart chart-0 waiting"></div>
                                 </div>
                                 <div class="worker-info">
-                                    @if (waiting)
-                                    {
-                                        <span class="waiting-icon"><i class="fas fa-bed"></i></span>
-                                        <span class="waiting-message">@lblWaiting</span>
-                                    }
-                                    else
-                                    {
+                                    <span class="waiting-icon"><i class="fas fa-bed"></i></span>
+                                    <span class="waiting-message">@lblWaiting</span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Workers.Count; i++)
+                            {
+                                var worker = Workers[i];
+                                <div class="worker-wrapper">
+                                    <div class="chart-wrapper">
+                                        <div class="chart chart-@i"></div>
+                                    </div>
+                                    <div class="worker-info">
+                                        <span class="label-value current">
+                                            <span class="label">@lblNode</span>
+                                            <span class="value">@worker.NodeName</span>
+                                        </span>
                                         <span class="label-value current">
                                             <span class="label">@lblFile</span>
                                             <span class="value">@worker.RelativeFile</span>
@@ -88,9 +97,9 @@
                                                 <button @onclick="() => CancelClicked(worker)">@lblCancel</button>
                                             </div>
                                         </div>
-                                    }
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
 
                         <div class="shrinkage-chart">

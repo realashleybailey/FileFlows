@@ -21,7 +21,6 @@ namespace FileFlows.Client.Pages
         public readonly List<FlowExecutorInfo> Workers = new List<FlowExecutorInfo>();
 
         public readonly List<LibraryFile> Upcoming = new List<LibraryFile>();
-        public readonly List<LibraryFile> Finished = new List<LibraryFile>();
         private bool _needsRendering = false;
 
         private int ConfiguredStatus = 2;
@@ -32,7 +31,7 @@ namespace FileFlows.Client.Pages
 
         public IJSObjectReference jsFunctions;
 
-        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblUpcoming, lblRecentlyFinished, lblWorkingFile, lblUid, lblLibrary;
+        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblWorkingFile, lblUid, lblLibrary;
         private Timer AutoRefreshTimer;
         protected override async Task OnInitializedAsync()
         {
@@ -56,10 +55,8 @@ namespace FileFlows.Client.Pages
             lblCurrent = Translater.Instant("Pages.Dashboard.Fields.Current");
             lblUid = Translater.Instant("Pages.Dashboard.Fields.Uid");
             lblProcessingTime = Translater.Instant("Pages.Dashboard.Fields.ProcessingTime");
-            lblUpcoming = Translater.Instant("Pages.Dashboard.Fields.Upcoming");
             lblLibrary = Translater.Instant("Pages.Dashboard.Fields.Library");
             lblWorkingFile = Translater.Instant("Pages.Dashboard.Fields.WorkingFile");
-            lblRecentlyFinished = Translater.Instant("Pages.Dashboard.Fields.RecentlyFinished");
             await GetJsFunctionObject();
             await this.Refresh();
         }
@@ -108,21 +105,6 @@ namespace FileFlows.Client.Pages
             _ = Refresh();
         }
 
-        private async Task<RequestResult<List<LibraryFile>>> GetLibraryFiles(string url, bool completed)
-        {
-#if (DEMO)
-            var data = Enumerable.Range(1, 10).Select(x => new LibraryFile
-            {
-                Name = completed ? $"Completed File {x}.mkv" : $"Unprocessed {x}.mkv",
-                RelativePath = completed ? $"Completed File {x}.mkv" : $"Unprocessed {x}.mkv",
-                ProcessingStarted = DateTime.Now.AddMinutes(-5),
-                ProcessingEnded = DateTime.Now
-            }).ToList();
-            return new RequestResult<List<LibraryFile>> { Success = true, Data = data };
-#else
-            return await HttpHelper.Get<List<LibraryFile>>(url);
-#endif
-        }
 
         async Task Refresh()
         {
@@ -145,26 +127,6 @@ namespace FileFlows.Client.Pages
                         await jsFunctions.InvokeVoidAsync("InitChart", this.Workers, this.lblOverall, this.lblCurrent);
                     }
                     catch(Exception) { }
-                }
-
-                var upcomingResult = await GetLibraryFiles("/api/library-file/upcoming", false);
-                if (upcomingResult.Success)
-                {
-                    this.Upcoming.Clear();
-                    if (upcomingResult.Data.Any())
-                        this.Upcoming.AddRange(upcomingResult.Data);
-
-                    this.StateHasChanged();
-                }
-
-                var finishedResult = await GetLibraryFiles("/api/library-file/recently-finished", true);
-                if (finishedResult.Success)
-                {
-                    this.Finished.Clear();
-                    if (finishedResult.Data.Any())
-                        this.Finished.AddRange(finishedResult.Data);
-
-                    this.StateHasChanged();
                 }
             }
             catch (Exception)
@@ -226,11 +188,6 @@ namespace FileFlows.Client.Pages
             _needsRendering = false;
         }
 
-        private async Task ShowFileInfo(LibraryFile file)
-        {
-            await Helpers.LibraryFileEditor.Open(Blocker, NotificationService, Editor, file);
-
-        }
 
         private async Task LogClicked(FlowExecutorInfo worker)
         {

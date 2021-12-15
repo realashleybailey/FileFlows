@@ -30,10 +30,18 @@
             throw new NotImplementedException();
         }
 
-        public Task<string> GetToolPath(string name)
+        public async Task<string> GetToolPath(string name)
         {
-            // todo 
-            return Task.FromResult(@"C:\utils\ffmpeg\ffmpeg.exe");
+            try
+            {
+                var result = await HttpHelper.Get<Tool>(ServiceBaseUrl + "/tool/name/" + Uri.EscapeDataString(name));
+                return result.Data.Path;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog("Failed to locate tool: " + name + " => " + ex.Message);
+                return string.Empty;
+            }
         }
 
         public async Task<ProcessingNode> Register(string address)

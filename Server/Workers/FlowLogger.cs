@@ -32,7 +32,8 @@ namespace FileFlows.Server.Workers
                 x.GetType().IsPrimitive || x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
             log.Add(message);
-            Console.WriteLine(message);
+            if(type != LogType.Debug)
+                Console.WriteLine(message);
             if (string.IsNullOrEmpty(LogFile) == false)
                 System.IO.File.AppendAllText(LogFile, message + Environment.NewLine);
         }

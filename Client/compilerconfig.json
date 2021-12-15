@@ -122,5 +122,25 @@
   {
     "outputFile": "Components/Inputs/InputText/InputText.razor.css",
     "inputFile": "Components/Inputs/InputText/InputText.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputSlider/InputSlider.razor.css",
+    "inputFile": "Components/Inputs/InputSlider/InputSlider.razor.scss"
+  },
+  {
+    "outputFile": "Components/Dashboard/RecentlyFinished/RecentlyFinished.razor.css",
+    "inputFile": "Components/Dashboard/RecentlyFinished/RecentlyFinished.razor.scss"
+  },
+  {
+    "outputFile": "Components/Dashboard/Upcoming/Upcoming.razor.css",
+    "inputFile": "Components/Dashboard/Upcoming/Upcoming.razor.scss"
+  },
+  {
+    "outputFile": "Components/Dashboard/LibraryFilesSummary/LibraryFilesSummary.razor.css",
+    "inputFile": "Components/Dashboard/LibraryFilesSummary/LibraryFilesSummary.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputTextArea/InputTextArea.razor.css",
+    "inputFile": "Components/Inputs/InputTextArea/InputTextArea.razor.scss"
   }
 ]

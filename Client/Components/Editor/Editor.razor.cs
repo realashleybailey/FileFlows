@@ -162,7 +162,6 @@ namespace FileFlows.Client.Components
             bool valid = true;
             foreach (var input in RegisteredInputs)
             {
-                Logger.Instance.DLog("Validating input: " + input.Label);
                 bool iValid = await input.Validate();
                 if (iValid == false)
                 {
@@ -171,12 +170,7 @@ namespace FileFlows.Client.Components
                 }
             }
             if (valid == false)
-            {
-                Logger.Instance.DLog("not valid!");
                 return;
-            }
-
-            Logger.Instance.DLog("editor is valid!");
 
             if (SaveCallback != null)
             {

@@ -33,21 +33,15 @@
                 Logger.Instance?.ELog("Failed to register node: " + ex.Message);
                 return;
             }
+
             if(isServer == false)
-            {
                 FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
-            }
-            node.Enabled = true;
-            if (string.IsNullOrEmpty(node.TempPath))
-                node.TempPath = @"d:\videos\temp";
 
             if (node?.Enabled != true)
             {
                 Logger.Instance?.DLog("Flow executor not enabled");
                 return;
             }
-            if(node.FlowRunners == 0)
-                node.FlowRunners = 1;
 
             if (node.FlowRunners <= ExecutingRunners.Count)
             {
@@ -145,6 +139,7 @@
 
         private void Runner_OnFlowCompleted(FlowRunner sender, bool success)
         {
+            System.Threading.Thread.Sleep(5000);
             lock (this.ExecutingRunners)
             {
                 if(ExecutingRunners.Contains(sender))

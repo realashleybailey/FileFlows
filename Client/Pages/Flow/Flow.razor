@@ -12,8 +12,17 @@
     </HeadLeft>
 
     <Head>
-        <RadzenButton class="save-button" BusyText="@lblSaving" IsBusy=@IsSaving Click=@Save Text="@lblSave" />
-        <RadzenButton Click=@Close Text="@lblClose" />
+        <button class="save-button" @onclick="() => Save()">
+            @if(IsSaving)
+            {
+                @lblSaving
+            }
+            else
+            {
+                @lblSave
+            }
+        </button>
+        <button @onclick="() => Close()">@lblClose</button>
     </Head>
 
     <Body>

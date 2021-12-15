@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await HttpHelper.Post<FlowExecutorInfo>($"{ServiceBaseUrl}/worker/work/finish", info);
+                var result = await HttpHelper.Post($"{ServiceBaseUrl}/worker/work/finish", info);
                 if (result.Success == false)
                     throw new Exception("Failed to finish work: " + result.Body);
             }

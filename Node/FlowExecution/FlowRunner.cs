@@ -106,7 +106,10 @@ public class FlowRunner
 
     private void UpdatePartPercentage(float percentage)
     {
+        float diff = Math.Abs(Info.CurrentPartPercent - percentage);
         Info.CurrentPartPercent = percentage;
+        if (diff < 0.1)
+            return; // so small no need to tell server about update;
         try { 
             var service = FlowRunnerService.Load();
             service.Update(Info);
@@ -121,6 +124,12 @@ public class FlowRunner
     {
         DateTime start = DateTime.Now;
         Info.LibraryFile.Status = status;
+        if(status == FileStatus.Processed)
+        {
+            Info.LibraryFile.FinalSize = new FileInfo(nodeParameters.WorkingFile).Length;
+            Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
+            Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
+        }
         do
         {
             try
@@ -140,7 +149,7 @@ public class FlowRunner
 
     private void RunActual(IFlowRunnerCommunicator communicator) 
     {
-        nodeParameters = new NodeParameters(Info.LibraryFile.Name, new FlowLogger(communicator));
+        nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator));
         nodeParameters.TempPath = Node.TempPath;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
@@ -155,7 +164,7 @@ public class FlowRunner
         {
             // new Controllers.ToolController().GetByName(name)?.Result?.Path ?? "";
             var nodeService = NodeService.Load();
-            return nodeService.GetToolPath(name).Result;
+            return Node.Map(nodeService.GetToolPath(name).Result);
         };
         int count = 0;
 

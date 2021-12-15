@@ -13,7 +13,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{uid}")]
         public Task<Tool> Get(Guid uid) => GetByUid(uid);
 
-        [HttpGet("{uid}")]
+        [HttpGet("name/{name}")]
         public async Task<Tool?> GetByName(string name)
         {
             var list = await GetData();

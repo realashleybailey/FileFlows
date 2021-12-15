@@ -27,7 +27,8 @@ namespace FileFlows.Plugin
         KeyValue = 14,
         Label = 15,
         HorizontalRule = 16,
-        Schedule = 17
+        Schedule = 17,
+        Slider = 18
     }
 
 

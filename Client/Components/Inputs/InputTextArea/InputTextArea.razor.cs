@@ -4,5 +4,9 @@ namespace FileFlows.Client.Components.Inputs
     public partial class InputTextArea : Input<string>
     {
         public override bool Focus() => FocusUid();
+        protected override void ValueUpdated()
+        {
+            ClearError();
+        }
     }
 }

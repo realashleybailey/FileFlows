@@ -16,6 +16,7 @@ namespace FileFlows.Server.Controllers
     {
         private readonly static Dictionary<Guid, FlowExecutorInfo> Executors = new ();
         private static Mutex mutex = new();
+        private Queue<Guid> CompletedExecutors = new Queue<Guid>(50);
 
         private IHubContext<FlowHub> Context;
 
@@ -47,6 +48,7 @@ namespace FileFlows.Server.Controllers
             try
             {
                 info.Uid = Guid.NewGuid();
+                info.LastUpdate = DateTime.UtcNow;
                 Executors.Add(info.Uid, info);
                 return info;
             }
@@ -74,6 +76,13 @@ namespace FileFlows.Server.Controllers
                 }
                 if (Executors.ContainsKey(info.Uid))
                     Executors.Remove(info.Uid);
+                else
+                    Logger.Instance?.DLog("Could not remove: " + info.Uid);
+                CompletedExecutors.Append(info.Uid);
+            }
+            catch(Exception ex)
+            {
+                Logger.Instance?.ELog("Failed to finish work: " + ex.Message);
             }
             finally
             {
@@ -84,15 +93,40 @@ namespace FileFlows.Server.Controllers
         [HttpPost("work/update")]
         public void UpdateWork([FromBody] FlowExecutorInfo info)
         {
+            if (info.LibraryFile != null)
+            {
+                new LibraryFileController().Update(info.LibraryFile).Wait(); // incase the status of the library file has changed
+                if (info.LibraryFile.Status == FileStatus.ProcessingFailed || info.LibraryFile.Status == FileStatus.Processed)
+                {
+                    mutex.WaitOne();
+                    try
+                    {
+                        if (Executors.ContainsKey(info.Uid)) 
+                            Executors.Remove(info.Uid);
+                        return;
+                    }
+                    finally
+                    {
+                        mutex.ReleaseMutex();
+                    }
+                }
+            }
+
             mutex.WaitOne();
             try
             {
-                if (info.LibraryFile != null)
-                    new LibraryFileController().Update(info.LibraryFile).Wait(); // incase the status of the library file has changed
-                if (Executors.ContainsKey(info.Uid))
-                    Executors[info.Uid] = info;
-                else
-                    Executors.Add(info.Uid, info);
+                if (CompletedExecutors.Contains(info.Uid))
+                    return; // this call was delayed for some reason
+
+                
+                info.LastUpdate = DateTime.UtcNow;
+                lock (Executors)
+                {
+                    if (Executors.ContainsKey(info.Uid))
+                        Executors[info.Uid] = info;
+                    //else
+                      //  Executors.Add(info.Uid, info);
+                }
 
             }
             finally
@@ -104,23 +138,31 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public IEnumerable<FlowExecutorInfo> GetAll()
         {
-            // we don't want to return the logs here, too big
-            return Executors.Values.Select(x => new FlowExecutorInfo
+            mutex.WaitOne();
+            try
             {
-                // have to create a new object, otherwise if we chagne the log we change the log on the shared object
-                LibraryFile = x.LibraryFile,
-                CurrentPart = x.CurrentPart,
-                CurrentPartName = x.CurrentPartName,
-                CurrentPartPercent = x.CurrentPartPercent,
-                Library = x.Library,
-                NodeUid = x.NodeUid,
-                NodeName = x.NodeName,
-                RelativeFile = x.RelativeFile,
-                StartedAt = x.StartedAt,
-                TotalParts = x.TotalParts,
-                Uid = x.Uid,
-                WorkingFile = x.WorkingFile
-            });
+                // we don't want to return the logs here, too big
+                return Executors.Values.Select(x => new FlowExecutorInfo
+                {
+                    // have to create a new object, otherwise if we chagne the log we change the log on the shared object
+                    LibraryFile = x.LibraryFile,
+                    CurrentPart = x.CurrentPart,
+                    CurrentPartName = x.CurrentPartName,
+                    CurrentPartPercent = x.CurrentPartPercent,
+                    Library = x.Library,
+                    NodeUid = x.NodeUid,
+                    NodeName = x.NodeName,
+                    RelativeFile = x.RelativeFile,
+                    StartedAt = x.StartedAt,
+                    TotalParts = x.TotalParts,
+                    Uid = x.Uid,
+                    WorkingFile = x.WorkingFile
+                });
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
         }
 
         [HttpGet("{uid}/log")]
@@ -137,6 +179,28 @@ namespace FileFlows.Server.Controllers
         public async Task Abort(Guid uid)
         {
             await this.Context.Clients.All.SendAsync("AbortFlow", uid);
+            
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(10_000);
+                mutex.WaitOne();
+                try
+                {
+                    if (Executors.TryGetValue(uid, out FlowExecutorInfo info))
+                    {
+                        if (info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
+                        {
+                            // its gone quiet, kill it
+                            Executors.Remove(uid);
+                        }
+                    }
+                }
+                finally
+                {
+                    mutex.ReleaseMutex();
+                }
+
+            });
         }
     }
 }

@@ -23,15 +23,15 @@
 
                 <FlowTableColumn TItem="ffFlow">
                     <Header>
-                        Name
+                        @Globals.lblName
                     </Header>
                     <Cell Context="item">
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="ffFlow" Width="12rem" MobileWidth="4rem">
+                <FlowTableColumn TItem="ffFlow" Width="6rem" MobileWidth="4rem">
                     <Header>
-                        Enabled
+                        @Globals.lblEnabled
                     </Header>
                     <Cell Context="item">
                         <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />

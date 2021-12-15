@@ -1,0 +1,50 @@
+﻿@namespace FileFlows.Client.Components.Dashboard
+
+@if(Data != null && Data.Count > 0)
+{
+    <div class="library-files @(Completed ? "finished" : "upcoming")">
+        <div class="title"><span>@lblRecentlyFinished</span></div>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        @if (Completed)
+                        {
+                            <th style="width:6rem">Time</th>
+                            <th style="width:6rem">Size</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Data)
+                    {
+                        <tr>
+                            <td>@item.RelativePath</td>
+                            @if (Completed)
+                            {
+                                long fs = item.FinalSize;
+                                long os = item.OriginalSize;
+                                int width = (int)((((double)fs) / os) * 100);
+                                bool bigger = width > 100;
+                                if (width > 100)
+                                    width = 100;
+                                string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
+
+                                <td><a href="#" @onclick:preventDefault @onclick="() => ShowFileInfo(item)">@item.ProcessingTime.ToString(@"hh\:mm\:ss")</a></td>
+                                <td>                                        
+                                    @if (fs > 0)
+                                    {
+                                        <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
+                                            <div class="amount" style="width:calc(@(width)% - 2px)"></div>
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

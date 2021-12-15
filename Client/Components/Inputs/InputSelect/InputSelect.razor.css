@@ -1,5 +1,6 @@
 ﻿select {
   width: 100%;
+  max-width: 40rem;
   background-color: var(--input-background) !important;
   color: var(--color) !important;
   height: 2.1875rem;

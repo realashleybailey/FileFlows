@@ -48,6 +48,15 @@
     Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel />
             }
             break;
+        case FormInputType.Slider:
+            {
+                var value = GetValue<int>(field.Name);
+                int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
+                int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
+                <InputSlider Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
+    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel />
+            }
+            break;
         case FormInputType.Switch:
             {
                 var value = GetValue<bool>(field.Name);

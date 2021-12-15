@@ -22,7 +22,7 @@
             <Columns>
                 <FlowTableColumn TItem="ProcessingNode">
                     <Header>
-                        Name
+                        @Globals.lblName
                     </Header>
                     <Cell Context="item">
                         <span>@item.Name</span>
@@ -30,7 +30,7 @@
                 </FlowTableColumn>
                 <FlowTableColumn TItem="ProcessingNode" Width="30vw" MobileWidth="0">
                     <Header>
-                        Address
+                        @lblAddress
                     </Header>
                     <Cell Context="item">
                         @if(item.Address != FileFlowsServer)
@@ -42,12 +42,20 @@
                         }
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="ProcessingNode" Width="6rem">
+                <FlowTableColumn TItem="ProcessingNode" Width="8rem">
                     <Header>
-                        Runners
+                        @lblRunners
                     </Header>
                     <Cell Context="item">
                         <span>@item.FlowRunners</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="ProcessingNode" Width="6rem" MobileWidth="4rem">
+                    <Header>
+                        @Globals.lblEnabled
+                    </Header>
+                    <Cell Context="item">
+                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
                     </Cell>
                 </FlowTableColumn>
             </Columns>

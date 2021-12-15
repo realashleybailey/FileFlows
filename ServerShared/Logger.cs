@@ -5,12 +5,15 @@ namespace FileFlows.ServerShared
         private enum LogType { Error, Warning, Debug, Info }
         private void Log(LogType type, object[] args)
         {
-            Console.WriteLine(type + " -> " + string.Join(", ", args.Select(x =>
-                x == null ? "null" :
-                x.GetType().IsPrimitive ? x.ToString() :
-                x is string ? x.ToString() :
-                System.Text.Json.JsonSerializer.Serialize(x)))
-            );
+            if (type == LogType.Debug)
+            {
+                Console.WriteLine(type + " -> " + string.Join(", ", args.Select(x =>
+                    x == null ? "null" :
+                    x.GetType().IsPrimitive ? x.ToString() :
+                    x is string ? x.ToString() :
+                    System.Text.Json.JsonSerializer.Serialize(x)))
+                );
+            }
         }
 
         public void ILog(params object[] args) => Log(LogType.Info, args);

@@ -37,13 +37,13 @@
   .dashboard .shrinkage-chart ::deep > div > div {
     margin: auto;
   }
-  .dashboard .library-files.full-width {
-    grid-column: 1/7;
-  }
-  .dashboard .library-files:not(.full-width).upcoming {
+  .dashboard ::deep .library-files.upcoming {
     grid-column: 1/4;
   }
-  .dashboard .library-files:not(.full-width).finished {
+  .dashboard ::deep .library-files.finished {
+    grid-column: 1/7;
+  }
+  .dashboard ::deep .library-files + .library-files {
     grid-column: 4/7;
   }
 
@@ -136,24 +136,6 @@
   margin-left: 0.5rem;
 }
 
-.library-files {
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
-  background: rgba(var(--base), 0.2);
-}
-.library-files .title {
-  height: 2.5rem;
-  color: var(--accent);
-  padding: 0.25rem 0.5rem;
-}
-.library-files .table-wrapping {
-  flex-grow: 1;
-}
-.library-files:last-child {
-  margin-bottom: 2rem;
-}
-
 .spacer {
   height: 2rem;
 }
@@ -194,6 +176,10 @@ h1, h2 {
 @media screen and (max-width: 850px) {
   .not-configured-pointer {
     display: none;
+  }
+
+  ::deep .library-files + .library-files {
+    margin-top: 2rem;
   }
 }
 @media screen and (min-width: 850px) {

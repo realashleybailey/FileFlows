@@ -196,17 +196,20 @@
     "Nodes": {
       "Title": "Nodes",
       "Labels": {
-        "FileFlowsServer": "Internal Processing Node"
+        "FileFlowsServer": "Internal Processing Node",
+        "Address": "Address",
+        "Runners": "Runnners"
       },
       "Fields": {
         "FlowRunners": "Flow Runners",
         "Address": "Address",
-        "Enabled": "Enabled"        
+        "Enabled": "Enabled"
       }
     },
     "ProcessingNode": {
       "Title": "Node",
       "Fields": {
+        "InternalProcesssNodeDescription": "This is the in-built processing node in the FileFlows.\n\nThis node allows you to run FileFlows without worrying about installing any other nodes on remote systems and lets you use FileFlows as a self contained application.\n\nYou can continue to use this internal node and additional processing nodes if you wish, or you can disable this node and only use additional nodes.",
         "TempPath": "Temp Directory",
         "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",
         "FlowRunners": "Flow Runners",
@@ -214,10 +217,13 @@
         "Address": "Address",
         "Address-Help": "The address (hostname or IP Address) of the node.  You should not change this unless you have changed the address of the node.  For example, if you have change the computer name of the processing node.",
         "Enabled": "Enabled",
+        "MappingsDescription": "Mappings allow you to map a path from the server to a location on the node.\n\nFor example you may map Server:'/usr/local/bin/ffmpeg' to Node:'C:\\Utils\\ffmpeg\\ffmpeg.exe'\n\nYou should add mappings for all libraries and tools that will be needed to run on the remote system.",
         "Mappings": "Mappings",
         "MappingsKey": "Server",
         "MappingsValue": "Node",
-        "Mappings-Help": "Mappings allow you to map a path from the server to a location on the node.\nFor example you may map Server:'/usr/local/bin/ffmpeg' to Node:'C:\\Utils\\ffmpeg\\ffmpeg.exe'"
+        "Schedule": "Schedule",
+        "Schedule-Help": "This schedule runs in the Time Zone of the node",
+        "ScheduleDescription": "This allows you to configure when this node will be active.\n\nThe node will not process any files outside of this configured schedule.\n"
       }
     },
     "Plugins": {
@@ -226,25 +232,13 @@
     "Settings": {
       "Title": "Settings",
       "Labels": {
-        "Directories": "Directories",
-        "Workers": "Workers",
-        "Miscellaneous": "Miscellaneous"
+        "General": "General"
       },
       "Fields": {
         "Telemetry": "Telemetry",
         "Telemetry-Help": "Telemetry is useful to help know what devices we need to support, what Flow parts are the most used and where we should focus on the development.",
-        "TempPath": "Temp Directory",
-        "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
-        "Workers": "Workers",
-        "Workers-Helper": "The number of workers that can run simultaneously",
-        "WorkerScanner": "Library Scanner",
-        "WorkerScanner-Helper": "If the library scanner is enabled.  When this is disabled the libraries will not be scanned for files.",
-        "WorkerFlowExecutor": "Flow Executor",
-        "WorkerFlowExecutor-Helper": "If the flow executor is enabled or not.  When this is disabled no flows will be run.",
-        "FlowRunners": "Flow Runners",
-        "FlowRunners-Help": "The number of flow runner instances available to execute a flow."
       }
     },
     "Tools": {

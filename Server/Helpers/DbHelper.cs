@@ -379,20 +379,31 @@ namespace FileFlows.Server.Helpers
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow
             });
+
             await AddOrUpdateObject(db, new Settings
             {
                 Name = "Settings",
 #if (DEBUG)
-                TempPath = windows ? @"d:\videos\temp" : "/temp",
                 LoggingPath = "/app/Logs",
 #else
-                TempPath = "/temp",
                 LoggingPath = "/app/Logs",
 #endif
-                WorkerFlowExecutor = true,
-                WorkerScanner = true,
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow
+            }); 
+
+            await AddOrUpdateObject(db, new ProcessingNode
+            {
+                Name = Globals.FileFlowsServer,
+                Address = Globals.FileFlowsServer,
+                Schedule = new string('1', 672),
+                Enabled = true,
+                FlowRunners = 1,
+#if (DEBUG)
+                TempPath = windows ? @"d:\videos\temp" : "/temp",
+#else
+                TempPath = windows ? @"d:\videos\temp" : "/temp",
+#endif
             });
         }
     }

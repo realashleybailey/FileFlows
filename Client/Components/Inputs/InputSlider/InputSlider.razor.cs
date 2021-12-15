@@ -4,7 +4,7 @@ namespace FileFlows.Client.Components.Inputs
     using Microsoft.JSInterop;
     using System.Threading.Tasks;
 
-    public partial class InputNumber : Input<int>
+    public partial class InputSlider : Input<int>
     {
         public override bool Focus() => FocusUid();
 

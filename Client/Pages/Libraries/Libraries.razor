@@ -24,7 +24,7 @@
             <Columns>
                 <FlowTableColumn TItem="Library" Width="14rem">
                     <Header>
-                        Name
+                        @Globals.lblName
                     </Header>
                     <Cell Context="item">
                         <span>@item.Name</span>
@@ -65,7 +65,7 @@
                 </FlowTableColumn>
                 <FlowTableColumn TItem="Library" Width="6rem" MobileWidth="4rem">
                     <Header>
-                        Enabled
+                        @Globals.lblEnabled
                     </Header>
                     <Cell Context="item">
                         <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />

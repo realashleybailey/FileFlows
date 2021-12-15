@@ -25,12 +25,6 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
-            var settings = new SettingsController().Get().Result;
-            if (settings?.WorkerScanner != true)
-            {
-                //Logger.Instance.DLog("Scanner worker not enabled");
-                return;
-            }
             var libController = new LibraryController();
             var libaries = libController.GetAll().Result;
             var libFileController = new LibraryFileController();

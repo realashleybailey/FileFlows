@@ -39,7 +39,10 @@ namespace FileFlows.Client.Shared
                 Items = new List<NavMenuItem>
                 {
                     new NavMenuItem("Pages.Flows.Title", "fas fa-sitemap", "flows"),
-                    new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries")
+                    new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"),
+#if (!DEMO)
+                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes")
+#endif
                 }
             });
 
@@ -52,7 +55,6 @@ namespace FileFlows.Client.Shared
                 {
                     new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                     new NavMenuItem("Pages.Tools.Title", "fas fa-tools", "tools"),
-                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes"),
                     new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings")
                 }
             });

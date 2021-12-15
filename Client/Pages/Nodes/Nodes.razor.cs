@@ -11,6 +11,15 @@ namespace FileFlows.Client.Pages
 
         private ProcessingNode EditingItem = null;
 
+        private string lblAddress, lblRunners;
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            lblAddress = Translater.Instant("Pages.Nodes.Labels.Address");
+            lblRunners = Translater.Instant("Pages.Nodes.Labels.Runners");
+        }
+
+
         private async Task Add()
         {
 #if (!DEMO)
@@ -29,70 +38,21 @@ namespace FileFlows.Client.Pages
         }
 
 
-        public override async Task<bool> Edit(ProcessingNode node)
+        async Task Enable(bool enabled, ProcessingNode node)
         {
-#if (!DEMO)
-            bool isServerNode = node.Address == FileFlowsServer;
-            node.Mappings ??= new();
-            this.EditingItem = node;
-            List<ElementField> fields = new List<ElementField>();
-            fields.Add(new ElementField
+#if (DEMO)
+            return;
+#else
+            Blocker.Show();
+            try
             {
-                InputType = Plugin.FormInputType.Text,
-                Name = nameof(node.Name),
-                Parameters = new ()
-                {
-                    { nameof(InputText.ReadOnly), isServerNode }
-                },
-                Validators = new List<FileFlows.Shared.Validators.Validator> {
-                    new FileFlows.Shared.Validators.Required()
-                }
-            });
-            if (isServerNode == false)
-            {
-                fields.Add(new ElementField
-                {
-                    InputType = Plugin.FormInputType.Text,
-                    Name = nameof(node.Address),
-                    Validators = new List<FileFlows.Shared.Validators.Validator> {
-                    new FileFlows.Shared.Validators.Required()
-                }
-                });
+                await HttpHelper.Put<ProcessingNode>($"{ApiUrl}/state/{node.Uid}?enable={enabled}");
             }
-            fields.Add(new ElementField
+            finally
             {
-                InputType = Plugin.FormInputType.Switch,
-                Name = nameof(node.Enabled)
-            });
-            fields.Add(new ElementField
-            {
-                InputType = Plugin.FormInputType.Int,
-                Name = nameof(node.FlowRunners),
-                Validators = new List<FileFlows.Shared.Validators.Validator> {
-                    new FileFlows.Shared.Validators.Range() { Minimum = 0, Maximum = 100 } // 100 is insane but meh, let them be insane 
-                }
-            });
-            fields.Add(new ElementField
-            {
-                InputType = isServerNode ? Plugin.FormInputType.Folder : Plugin.FormInputType.Text,
-                Name = nameof(node.TempPath),
-                Validators = new List<FileFlows.Shared.Validators.Validator> {
-                    new FileFlows.Shared.Validators.Required()
-                }
-            });
-            if (isServerNode == false)
-            {
-                fields.Add(new ElementField
-                {
-                    InputType = Plugin.FormInputType.KeyValue,
-                    Name = nameof(node.Mappings)
-                });
+                Blocker.Hide();
             }
-
-            var result = await Editor.Open("Pages.ProcessingNode", "Pages.ProcessingNode.Title", fields, node,large: true,
-              saveCallback: Save);
 #endif
-            return false;
         }
 
         async Task<bool> Save(ExpandoObject model)

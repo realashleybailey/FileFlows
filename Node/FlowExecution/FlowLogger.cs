@@ -35,7 +35,8 @@ namespace FileFlows.Node.FlowExecution
                 x.GetType().IsPrimitive || x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
             log.Add(message);
-            Console.WriteLine(message);
+            if(type != LogType.Debug)
+                Console.WriteLine(message);
             try
             {
                 Communicator.LogMessage(message).Wait();

@@ -18,6 +18,20 @@ namespace FileFlows.Server.Controllers
         [HttpPost]
         public Task<ProcessingNode> Save([FromBody] ProcessingNode node) => Update(node, checkDuplicateName: true);
 
+        [HttpPut("state/{uid}")]
+        public async Task<ProcessingNode> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
+        {
+            var node = await GetByUid(uid);
+            if (node == null)
+                throw new Exception("Node not found.");
+            if (enable != null)
+            {
+                node.Enabled = enable.Value;
+                await DbManager.Update(node);
+            }
+            return node;
+        }
+
 
         [HttpGet("register")]
         public async Task<ProcessingNode> Register([FromQuery]string address)
@@ -35,13 +49,18 @@ namespace FileFlows.Server.Controllers
             }
             var settings = await new SettingsController().Get();
             // doesnt exist, register a new node.
+            var tools = await new ToolController().GetAll();
+            bool isSystem = address == Globals.FileFlowsServer;
             var result = await Update(new ProcessingNode
             {
                 Name = address,
                 Address = address,
-                TempPath = settings.TempPath,
-                Enabled = true,
-                FlowRunners = settings.FlowRunners
+                Enabled = isSystem, // default to disabled so they have to configure it first
+                FlowRunners = 1,
+                Schedule = new string('1', 672),
+                Mappings = isSystem  ? null : tools.Select(x => new
+                    KeyValuePair<string, string>(x.Path, "")
+                ).ToList()
             });
             result.SignalrUrl = SignalrUrl;
             return result;
@@ -54,15 +73,21 @@ namespace FileFlows.Server.Controllers
             var node = data.Where(x => x.Value.Name == Globals.FileFlowsServer).Select(x => x.Value).FirstOrDefault();
             if (node == null)
             {
+                bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
                 node = await Update(new ProcessingNode
                 {
                     Name = Globals.FileFlowsServer,
-                    Address = Globals.FileFlowsServer
+                    Address = Globals.FileFlowsServer,
+                    Schedule = new string('1', 672),
+                    Enabled = true,
+                    FlowRunners = 1,
+#if (DEBUG)
+                    TempPath = windows ? @"d:\videos\temp" : "/temp",
+#else
+                    TempPath = windows ? @"d:\videos\temp" : "/temp",
+#endif
                 });
             }
-            node.FlowRunners = settings.FlowRunners;
-            node.Enabled = settings.WorkerFlowExecutor;
-            node.TempPath = settings.TempPath;
             node.SignalrUrl = SignalrUrl;
             return node;
         }

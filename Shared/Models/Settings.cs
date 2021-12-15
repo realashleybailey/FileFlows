@@ -6,22 +6,12 @@
 
     public class Settings : FileFlowObject
     {
-        [Folder(1)]
-        [Required]
-        public string TempPath { get; set; }
 
         [Folder(1)]
         [Required]
         public string LoggingPath { get; set; }
 
-        [Boolean(3)]
-        public bool WorkerScanner { get; set; }
-        [Boolean(4)]
-        public bool WorkerFlowExecutor { get; set; }
-
         public bool DisableTelemetry { get; set; }
-
-        public int FlowRunners { get; set; }
 
         public string TimeZone { get; set; }
 

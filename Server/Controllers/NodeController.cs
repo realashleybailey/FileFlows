@@ -20,7 +20,30 @@ namespace FileFlows.Server.Controllers
         public Task<ProcessingNode> Get(Guid uid) => GetByUid(uid);
 
         [HttpPost]
-        public Task<ProcessingNode> Save([FromBody] ProcessingNode node) => Update(node, checkDuplicateName: true);
+        public async Task<ProcessingNode> Save([FromBody] ProcessingNode node)
+        {
+            // see if we are updating the internal node
+            if(node.Address  == Globals.FileFlowsServer)
+            {
+                var internalNode = (await GetAll()).Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();
+                if(internalNode != null)
+                {
+                    internalNode.Schedule = node.Schedule;
+                    internalNode.FlowRunners = node.FlowRunners;
+                    internalNode.Enabled = node.Enabled;
+                    internalNode.TempPath = node.TempPath;
+                    return await Update(node, checkDuplicateName: true);
+                }
+                else
+                {
+                    // internal but doesnt exist
+                    node.Address = Globals.FileFlowsServer;
+                    node.Name = Globals.FileFlowsServer;
+                    node.Mappings = null; // no mappings for internal
+                }
+            }
+            return await Update(node, checkDuplicateName: true);
+        }
 
         [HttpDelete]
         public async Task Delete([FromBody] ReferenceModel model)

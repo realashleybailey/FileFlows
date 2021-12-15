@@ -7,7 +7,11 @@ namespace FileFlows.Server.Controllers
     [Route("/api/node")]
     public class NodeController : ControllerStore<ProcessingNode>
     {
+#if(DEBUG)
         internal static string SignalrUrl = "http://localhost:6868/flow";
+#else
+        internal static string SignalrUrl = "http://localhost:5000/flow";
+#endif
 
         [HttpGet]
         public async Task<IEnumerable<ProcessingNode>> GetAll() => (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);

@@ -76,7 +76,8 @@
     "NameInUse": "Name is already in use",
     "NameRequired": "Name is required",
     "DuplicatesFound": "Duplicates found",
-    "NoFlowSpecified": "No flow specified, you must select a flow to create a library"
+    "NoFlowSpecified": "No flow specified, you must select a flow to create a library",
+    "CannotDeleteInternalNode": "You cannot delete the internal processing node."
   },
   "Times": {
     "Never": "Never",

@@ -18,6 +18,15 @@ namespace FileFlows.Server.Controllers
         [HttpPost]
         public Task<ProcessingNode> Save([FromBody] ProcessingNode node) => Update(node, checkDuplicateName: true);
 
+        [HttpDelete]
+        public async Task Delete([FromBody] ReferenceModel model)
+        {
+            var internalNode = (await this.GetAll()).Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault()?.Uid ?? Guid.Empty;
+            if (model.Uids.Contains(internalNode))
+                throw new Exception("ErrorMessages.CannotDeleteInternalNode");
+            await DeleteAll(model);
+        }
+
         [HttpPut("state/{uid}")]
         public async Task<ProcessingNode> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
         {

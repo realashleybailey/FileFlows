@@ -10,6 +10,8 @@
         Task<ProcessingNode> GetServerNode();
 
         Task<string> GetToolPath(string name);
+
+        Task ClearWorkers(Guid nodeUid);
     }
 
     public class NodeService : Service, INodeService
@@ -22,6 +24,18 @@
             if (Loader == null)
                 return new NodeService();
             return Loader.Invoke();
+        }
+
+        public async Task ClearWorkers(Guid nodeUid)
+        {
+            try
+            {
+                await HttpHelper.Post(ServiceBaseUrl + "/worker/clear/" + Uri.EscapeDataString(nodeUid.ToString()));
+            }
+            catch (Exception)
+            {
+                return;
+            }
         }
 
         public Task<ProcessingNode> GetServerNode()

@@ -11,7 +11,7 @@
     transform: translate(-50%, -50%);
     min-width: 20rem;
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
-    background: rgba(var(--base-rgb), 0.8);
+    background: rgba(var(--base-rgb), 0.9);
   }
 
   .flow-modal-footer {

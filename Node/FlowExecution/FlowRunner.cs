@@ -150,6 +150,7 @@ public class FlowRunner
     private void RunActual(IFlowRunnerCommunicator communicator) 
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator));
+        Info.LibraryFile.OriginalSize = new FileInfo(nodeParameters.WorkingFile).Length;
         nodeParameters.TempPath = Node.TempPath;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;

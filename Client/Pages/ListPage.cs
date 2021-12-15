@@ -179,7 +179,10 @@ namespace FileFlows.Client.Pages
                 var deleteResult = await HttpHelper.Delete($"{ApiUrl}", new ReferenceModel { Uids = uids });
                 if (deleteResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
+                    if(Translater.NeedsTranslating(deleteResult.Body))
+                        NotificationService.Notify(NotificationSeverity.Error, Translater.Instant(deleteResult.Body));
+                    else
+                        NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
                     return;
                 }
 #endif

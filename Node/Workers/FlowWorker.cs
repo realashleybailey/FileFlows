@@ -14,9 +14,12 @@
 
         private readonly bool isServer;
 
+        private bool FirstExecute = true;
+
         public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 5)
         {
             this.isServer = isServer;
+            this.FirstExecute = true;
         }
 
         protected override void Execute()
@@ -36,6 +39,13 @@
 
             if(isServer == false)
                 FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
+
+            if (FirstExecute)
+            {
+                FirstExecute = false;
+                // tell the server to kill any flow executors from this node, incase this node was restarted
+                nodeService.ClearWorkers(node.Uid);
+            }
 
             if (node?.Enabled != true)
             {

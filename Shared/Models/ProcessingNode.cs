@@ -21,11 +21,14 @@ namespace FileFlows.Shared.Models
         {
             if (string.IsNullOrEmpty(path))
                 return string.Empty;
-            foreach(var mapping in Mappings)
+            if (Mappings != null && Mappings.Count > 0)
             {
-                if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
-                    continue;
-                path = Regex.Replace(path, Regex.Escape(mapping.Key), mapping.Value, RegexOptions.IgnoreCase);
+                foreach (var mapping in Mappings)
+                {
+                    if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
+                        continue;
+                    path = Regex.Replace(path, Regex.Escape(mapping.Key), mapping.Value, RegexOptions.IgnoreCase);
+                }
             }
             return path;
         }

@@ -119,6 +119,11 @@ namespace FileFlows.Client.Pages
                     this.Workers.Clear();
                     if (result.Data.Any())
                     {
+                        foreach(var worker in result.Data)
+                        {
+                            if (worker.NodeName == "FileFlowsServer")
+                                worker.NodeName = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
+                        }
                         this.Workers.AddRange(result.Data);
                     }
                     await WaitForRender();

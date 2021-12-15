@@ -38,7 +38,7 @@ namespace FileFlows.Client.Pages
                 fields.Add(new ElementField
                 {
                     InputType = FormInputType.Label,
-                    Name = "InternalProcesssProcessingNodeDescription"
+                    Name = "InternalProcessingNodeDescription"
                 });
             }
             else

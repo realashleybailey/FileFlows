@@ -210,7 +210,7 @@
     "ProcessingNode": {
       "Title": "Node",
       "Fields": {
-        "InternalProcesssNodeDescription": "This is the in-built processing node in the FileFlows.\n\nThis node allows you to run FileFlows without worrying about installing any other nodes on remote systems and lets you use FileFlows as a self contained application.\n\nYou can continue to use this internal node and additional processing nodes if you wish, or you can disable this node and only use additional nodes.",
+        "InternalProcessingNodeDescription": "This is the in-built processing node in the FileFlows.\n\nThis node allows you to run FileFlows without worrying about installing any other nodes on remote systems and lets you use FileFlows as a self contained application.\n\nYou can continue to use this internal node and additional processing nodes if you wish, or you can disable this node and only use additional nodes.",
         "TempPath": "Temp Directory",
         "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",
         "FlowRunners": "Flow Runners",

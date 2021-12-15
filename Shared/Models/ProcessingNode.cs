@@ -36,11 +36,14 @@ namespace FileFlows.Shared.Models
         {
             if (string.IsNullOrEmpty(path))
                 return string.Empty;
-            foreach (var mapping in Mappings)
+            if (Mappings != null && Mappings.Count > 0)
             {
-                if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
-                    continue;
-                path = Regex.Replace(path, Regex.Escape(mapping.Value), mapping.Key, RegexOptions.IgnoreCase);
+                foreach (var mapping in Mappings)
+                {
+                    if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
+                        continue;
+                    path = Regex.Replace(path, Regex.Escape(mapping.Value), mapping.Key, RegexOptions.IgnoreCase);
+                }
             }
             return path;
         }

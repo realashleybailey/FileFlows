@@ -75,7 +75,7 @@ namespace FileFlows.Server.Workers
 #if(DEBUG)
             var task = HttpHelper.Post("https://localhost:7197/api/telemetry", data);
 #else
-            var task = HttpHelper.Post("http://fileflows.com/api/telemetry", data);
+            var task = HttpHelper.Post("https://fileflows.com/api/telemetry", data);
             
 #endif
             task.Wait();

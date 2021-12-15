@@ -18,4 +18,4 @@ COPY /zpublish /app
 WORKDIR /app
 
 # run the server
-ENTRYPOINT [ "/app/Server", "--urls", "http://*:5000" ]
+ENTRYPOINT [ "/app/FileFlows.Server", "--urls", "http://*:5000" ]

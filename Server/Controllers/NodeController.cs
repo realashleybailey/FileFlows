@@ -32,7 +32,7 @@ namespace FileFlows.Server.Controllers
                     internalNode.FlowRunners = node.FlowRunners;
                     internalNode.Enabled = node.Enabled;
                     internalNode.TempPath = node.TempPath;
-                    return await Update(node, checkDuplicateName: true);
+                    return await Update(internalNode, checkDuplicateName: true);
                 }
                 else
                 {

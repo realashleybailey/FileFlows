@@ -27,7 +27,10 @@
     "Prompt": "Prompt",
     "SelectOne": "Select One",
     "Increase": "Increase",
-    "Decrease": "Decrease"
+    "Decrease": "Decrease",
+    "SpaceSavings": "{size} saved",
+    "SpaceIncrease": "{size} increase",
+    "Total": "Total"
   },
   "Dialogs":{
     "FileBrowser":{

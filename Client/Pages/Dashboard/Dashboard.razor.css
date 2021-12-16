@@ -22,29 +22,22 @@
 @media screen and (min-width: 850px) {
   .dashboard {
     display: grid;
-    grid-gap: 2rem;
-    grid-template-columns: repeat(6, calc(16.5% - 2rem));
+    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+    grid-gap: 1rem;
+    grd-auto-rows: 1fr;
   }
   .dashboard > div {
     margin: unset;
   }
-  .dashboard .worker-wrapper {
-    grid-column: 1/5;
+
+  ::deep .portlet {
+    box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
+    background: rgba(var(--base), 0.2);
   }
-  .dashboard .shrinkage-chart {
-    grid-column: 5/7;
-  }
-  .dashboard .shrinkage-chart ::deep > div > div {
-    margin: auto;
-  }
-  .dashboard ::deep .library-files.upcoming {
-    grid-column: 1/4;
-  }
-  .dashboard ::deep .library-files.finished {
-    grid-column: 1/7;
-  }
-  .dashboard ::deep .library-files + .library-files {
-    grid-column: 4/7;
+  ::deep .portlet .title {
+    height: 2.5rem;
+    color: var(--accent);
+    padding: 0.25rem 0.5rem;
   }
 
   .waiting-icon {

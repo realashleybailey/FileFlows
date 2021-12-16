@@ -1,15 +1,8 @@
 ﻿.library-files {
     display: flex;
     flex-direction: column;
-    box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
-    background: rgba(var(--base), 0.2);
 }
 
-.title {
-    height: 2.5rem;
-    color: var(--accent);
-    padding: 0.25rem 0.5rem;
-}
 
 table {
     color: var(--color);

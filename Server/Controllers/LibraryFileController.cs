@@ -267,6 +267,54 @@ namespace FileFlows.Server.Controllers
             };
         }
 
+        [HttpGet("shrinkage-groups")]
+        public async Task<Dictionary<string, ShrinkageData>> ShrinkageGroups()
+        {
+            var files = await GetDataList();
+            Dictionary<string, ShrinkageData> libraries = new ();
+            ShrinkageData total = new ShrinkageData();
+            foreach (var file in files)
+            {
+                if (file.Status != FileStatus.Processed || file.OriginalSize == 0 || file.FinalSize == 0)
+                    continue;
+                total.FinalSize += file.FinalSize;
+                total.OriginalSize += file.OriginalSize;
+                if (libraries.ContainsKey(file.Library.Name) == false)
+                {
+                    libraries.Add(file.Library.Name, new ShrinkageData()
+                    {
+                        FinalSize = file.FinalSize,
+                        OriginalSize = file.OriginalSize
+                    });
+                }
+                else
+                {
+
+                    libraries[file.Library.Name].OriginalSize += file.OriginalSize;
+                    libraries[file.Library.Name].FinalSize += file.FinalSize;
+                }
+            }
+#if (DEBUG)
+            Random rand = new Random(DateTime.Now.Millisecond);
+            double min = 10_000_000;
+            int count = 0;
+            libraries = Enumerable.Range(1, 6).Select(x => new ShrinkageData
+            {
+                FinalSize = rand.NextDouble() * min + min,
+                OriginalSize = rand.NextDouble() * min + min
+            }).ToDictionary(x => "Library " + (++count), x => x);
+            total.FinalSize = 0;
+            total.OriginalSize = 0;
+            foreach (var lib in libraries)
+            {
+                total.FinalSize += lib.Value.FinalSize;
+                total.OriginalSize += lib.Value.OriginalSize;
+            }
+#endif
+            if(libraries.ContainsKey("###TOTAL###") == false) // so unlikely, only if they named a library this, but just incase they did
+                libraries.Add("###TOTAL###", total);
+            return libraries;
+        }
         internal async Task UpdateFlowName(Guid uid, string name)
         {
             var libraryFiles = await GetDataList();

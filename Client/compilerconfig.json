@@ -142,5 +142,9 @@
   {
     "outputFile": "Components/Inputs/InputTextArea/InputTextArea.razor.css",
     "inputFile": "Components/Inputs/InputTextArea/InputTextArea.razor.scss"
+  },
+  {
+    "outputFile": "Components/Dashboard/ShrinkageBar/ShrinkageBar.razor.css",
+    "inputFile": "Components/Dashboard/ShrinkageBar/ShrinkageBar.razor.scss"
   }
 ]

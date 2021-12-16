@@ -1,0 +1,28 @@
+﻿@namespace FileFlows.Client.Components.Dashboard
+
+@if (Data != null && Data.Count > 1) // greater than one here since total is always included
+{
+    var total = Data.Last().Value;
+    double max = Math.Max(total.OriginalSize, total.FinalSize);
+    <div class="portlet">
+        <div class="title"><span>@lblShrinkageTitle</span></div>
+        <div class="portlet-body">
+            @foreach(var group in Data)
+            {
+                max = Math.Max(group.Value.OriginalSize, group.Value.FinalSize);
+                long diff = (long)Math.Abs(group.Value.OriginalSize - group.Value.FinalSize);
+                int origPercent = (int)((group.Value.OriginalSize / max) * 100);
+                int finalPercent = (int)((group.Value.FinalSize / max) * 100);
+                bool loss = finalPercent > origPercent;
+                string tooltip = Translater.Instant("Labels." + (loss ? "SpaceIncrease" : "SpaceSavings"), new { size = Helpers.FileSizeFormatter.FormatSize(diff) });
+                <div class="library @(group.Value == total ? "total": "")">
+                    <div class="name">@(group.Value == total ? lblTotal : group.Key)</div>
+                    <div class="bar @(finalPercent > origPercent ? "grew" : "")" title="@tooltip">
+                        <div class="bar-original" style="width:@(origPercent)%" />
+                        <div class="bar-final" style="width:@(finalPercent)%" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

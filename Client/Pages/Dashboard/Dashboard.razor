@@ -5,6 +5,8 @@
 
 @{
     string title = Workers?.FirstOrDefault()?.RelativeFile;
+    bool mobile = App.Instance.IsMobile;
+    bool shrinkageAdded = false;
 }
 
 <PageView Title=@title>
@@ -47,7 +49,7 @@
                     <div class="dashboard">
                         @if(Workers?.Any() != true)
                         {                            
-                            <div class="worker-wrapper waiting">
+                            <div class="worker-wrapper waiting portlet">
                                 <div class="chart-wrapper">
                                     <div class="chart chart-0 waiting"></div>
                                 </div>
@@ -62,7 +64,7 @@
                             for (int i = 0; i < Workers.Count; i++)
                             {
                                 var worker = Workers[i];
-                                <div class="worker-wrapper">
+                                <div class="worker-wrapper portlet">
                                     <div class="chart-wrapper">
                                         <div class="chart chart-@i"></div>
                                     </div>
@@ -99,13 +101,19 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                @if(i == 0 && mobile == false)
+                                {
+                                    shrinkageAdded = true;
+                                    <FileFlows.Client.Components.Dashboard.ShrinkageBar />                                    
+                                }
                             }
                         }
 
-
-                        <div class="shrinkage-chart">
-                            <FileFlows.Client.Components.Dashboard.Shrinkage></FileFlows.Client.Components.Dashboard.Shrinkage>
-                        </div>
+                        @if (shrinkageAdded == false)
+                        {
+                            <FileFlows.Client.Components.Dashboard.ShrinkageBar />
+                        }
                         
                         <FileFlows.Client.Components.Dashboard.LibraryFilesSummary />
                         <FileFlows.Client.Components.Dashboard.LibraryFilesSummary Completed=@true />

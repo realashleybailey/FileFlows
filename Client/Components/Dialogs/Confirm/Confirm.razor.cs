@@ -23,7 +23,6 @@ namespace FileFlows.Client.Components.Dialogs
 
         public static Task<bool> Show(string title, string message)
         {
-            Logger.Instance.DLog("showing confirm");
             if (Instance == null)
                 return Task.FromResult<bool>(false);
 
@@ -32,7 +31,6 @@ namespace FileFlows.Client.Components.Dialogs
 
         private Task<bool> ShowInstance(string title, string message)
         {
-            Logger.Instance.DLog("showing confirm instance");
             this.Title = Translater.TranslateIfNeeded(title?.EmptyAsNull() ?? "Labels.Confirm");
             this.Message = Translater.TranslateIfNeeded(message ?? "");
             this.Visible = true;

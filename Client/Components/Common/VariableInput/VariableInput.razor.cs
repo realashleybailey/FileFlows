@@ -107,7 +107,6 @@
 
         private async Task VariablesKeyDown(KeyboardEventArgs args)
         {
-            Logger.Instance.DLog("Variables shown keydwon:  " + args.Key);
             if (args.Key == "ArrowDown")
             {
                 if (++SelectedIndex >= VariablesFiltered.Count)
@@ -146,7 +145,6 @@
             }
             else if (args.Key.Length == 1)
             {
-                Logger.Instance.DLog("key: " + args.Key);
                 FilterText += args.Key.ToLower();
                 this.VariablesFiltered = Variables.Where(x => x.Key.ToLower().StartsWith(FilterText)).Select(x => x.Key).OrderBy(x => x).ToList();
                 this.SelectedIndex = 0;

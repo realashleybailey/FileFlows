@@ -99,7 +99,6 @@
         case FormInputType.Code:
             {
                 var value = GetValue<string>(field.Name);
-                FileFlows.Client.Logger.Instance.DLog("code value: " + value);
                 <InputCode Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
     Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
             }

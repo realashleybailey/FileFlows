@@ -96,7 +96,6 @@
 
         private void CheckItem(ChangeEventArgs e, TItem item)
         {
-            Logger.Instance.DLog("CheckItem", e);
             bool @checked = e.Value as bool? == true;
             if (@checked)
             {
@@ -139,7 +138,6 @@
 
         private async Task OnClick(TItem item)
         {
-            Logger.Instance.DLog("OnClick", item);
             if (this.SelectedItems.Contains(item) == false)
             {
                 this.SelectedItems.Add(item);
@@ -149,7 +147,6 @@
 
         private async Task OnDoubleClick(TItem item)
         {
-            Logger.Instance.DLog("OnClick", item);
             this.SelectedItems.Clear();
             this.SelectedItems.Add(item);
             this.NotifySelectionChanged();
@@ -158,7 +155,6 @@
 
         private void NotifySelectionChanged()
         {
-            Logger.Instance.DLog("NotifySelectionChanged");
             if (SelectionChanged != null)
                 SelectionChanged(new (SelectedItems)); // we want a clone of the list, not one they can modify 
         }

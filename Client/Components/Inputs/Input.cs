@@ -140,7 +140,6 @@ namespace FileFlows.Client.Components.Inputs
             if (this.Validators?.Any() != true)
                 return true;
             bool isValid = string.IsNullOrEmpty(ErrorMessage);
-            Logger.Instance.DLog("validating actual input: " + this.Label);
             foreach (var val in this.Validators)
             {
                 if (await val.Validate(this.Value) == false)

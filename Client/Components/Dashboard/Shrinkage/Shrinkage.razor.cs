@@ -38,7 +38,6 @@
         }
         public void Dispose()
         {
-            Logger.Instance.DLog("Disposing the shrinkage");
             if (Dashboard.jsFunctions != null)
             {
                 try

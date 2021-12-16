@@ -37,7 +37,6 @@ namespace FileFlows.Client.Components.Inputs
 
         private void OnEditorInit(MonacoEditorBase e)
         {
-            Logger.Instance.DLog("editor init done");
             _ = jsRuntime.InvokeVoidAsync("ffCode.initModel", Variables);
         }
 

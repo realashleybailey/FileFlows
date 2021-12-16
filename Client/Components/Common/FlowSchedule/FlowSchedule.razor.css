@@ -1,5 +1,6 @@
 ﻿.flow-schedule {
   user-select: none;
+  max-width: 60rem;
 }
 
 td {

@@ -26,6 +26,7 @@
 
         protected override async Task OnInitializedAsync()
         {
+            Dashboard.OnDisposing += Dispose;
             lblRecentlyFinished = Translater.Instant("Pages.Dashboard.Fields." + (Completed ? "RecentlyFinished" : "Upcoming"));
             AutoRefreshTimer = new Timer();
             AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;
@@ -34,9 +35,10 @@
             AutoRefreshTimer.Start();
             await Refresh();
         }
+
         public void Dispose()
         {
-            Logger.Instance.DLog("Disposing the libraryfilessummary");
+            Dashboard.OnDisposing -= Dispose;
             if (AutoRefreshTimer != null)
             {
                 AutoRefreshTimer.Stop();

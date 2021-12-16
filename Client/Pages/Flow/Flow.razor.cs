@@ -190,7 +190,6 @@ namespace FileFlows.Client.Pages
             {
 
                 var parts = await jsRuntime.InvokeAsync<List<FileFlows.Shared.Models.FlowPart>>("ffFlow.getModel");
-                Logger.Instance.DLog("Parts", parts);
 
                 Model ??= new ff();
                 Model.Name = this.Name;
@@ -247,7 +246,6 @@ namespace FileFlows.Client.Pages
             try
             {
                 var parts = await jsRuntime.InvokeAsync<List<FlowPart>>("ffFlow.getModel");
-                Logger.Instance.DLog("Parts: ", parts);
                 var variablesResult = await GetVariables(API_URL + "/" + part.Uid + "/variables", parts);
                 if (variablesResult.Success)
                     variables = variablesResult.Data;
@@ -312,7 +310,6 @@ namespace FileFlows.Client.Pages
             if (newModelTask.IsCanceled == false)
             {
                 IsDirty = true;
-                Logger.Instance.DLog("model updated:" + JsonSerializer.Serialize(newModelTask.Result));
                 var newModel = newModelTask.Result;
                 int outputs = -1;
                 if (part.Model is IDictionary<string, object> dictNew)
@@ -323,7 +320,6 @@ namespace FileFlows.Client.Pages
             }
             else
             {
-                Logger.Instance.DLog("model canceled");
                 return null;
             }
         }

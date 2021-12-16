@@ -14,7 +14,7 @@
     int hlDayEnd = MouseDown ? hlEnd / 96 : -1;
 }
 
-<div class="flow-schedule @DisplaySize" @onmouseleave="() => OnMouseLeave()">
+<div class="flow-schedule @DisplaySize" @onmouseleave="() => OnMouseLeave()" @onmouseover="(e) => OnMouseEnter(e)">
     <table class="schedule-am">
         <thead>
             <tr class="meridian">

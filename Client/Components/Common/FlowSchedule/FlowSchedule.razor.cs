@@ -82,7 +82,6 @@
 
         private void OnMouseUp(MouseEventArgs args, int qh)
         {
-            Logger.Instance.DLog("OnMouseUp!");
             MouseDown = false;
             int hlStart = Math.Min(MouseOverQh, MouseDownQh);
             int hlEnd = Math.Max(MouseOverQh, MouseDownQh);
@@ -112,10 +111,21 @@
             MouseOverQh = qh;
         }
 
+        private bool inside = false;
+
         private void OnMouseLeave()
         {
-            Logger.Instance.DLog("mouse leave!");
-            MouseDown = false;
+            inside = false;
+            //MouseDown = false;
+        }
+        private void OnMouseEnter(MouseEventArgs args)
+        {
+            if (inside)
+                return;
+            inside = true;
+                // if they come back into the control with the mouse not down, turn it off
+            if (MouseDown && args.Buttons != 1)
+                MouseDown = false;
         }
     }
 

@@ -33,6 +33,9 @@ namespace FileFlows.Client.Pages
 
         private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblWorkingFile, lblUid, lblLibrary;
         private Timer AutoRefreshTimer;
+
+        public delegate void Disposing();
+        public event Disposing OnDisposing;
         protected override async Task OnInitializedAsync()
         {
             AutoRefreshTimer = new Timer();
@@ -82,7 +85,7 @@ namespace FileFlows.Client.Pages
 
         public void Dispose()
         {
-            Logger.Instance.DLog("Disposing the dashboard!");
+            OnDisposing?.Invoke();
             if (jsFunctions != null)
             {
                 try

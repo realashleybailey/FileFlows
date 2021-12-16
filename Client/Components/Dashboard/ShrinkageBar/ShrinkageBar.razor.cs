@@ -27,6 +27,8 @@
             lblTotal = Translater.Instant("Labels.Total");
             lblOther = Translater.Instant("Labels.Other");
 
+            Dashboard.OnDisposing += Dispose;
+
             AutoRefreshTimer = new Timer();
             AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;
             AutoRefreshTimer.Interval = 60_000;
@@ -34,9 +36,11 @@
             AutoRefreshTimer.Start();
             await Refresh();
         }
+
+
         public void Dispose()
         {
-            Logger.Instance.DLog("Disposing the shrinkagebar");
+            Dashboard.OnDisposing -= Dispose;
             if (AutoRefreshTimer != null)
             {
                 AutoRefreshTimer.Stop();

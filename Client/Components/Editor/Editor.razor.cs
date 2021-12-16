@@ -137,9 +137,7 @@ namespace FileFlows.Client.Components
                 this.lblSaving = lblSave;
             }
 
-            Logger.Instance.DLog("getting description for: " + typeName);
             this.EditorDescription = Translater.Instant(typeName + ".Description");
-            Logger.Instance.DLog("getting description for: " + typeName, this.EditorDescription);
             OpenTask = new TaskCompletionSource<ExpandoObject>();
             this.FocusFirst = true;
             this.StateHasChanged();

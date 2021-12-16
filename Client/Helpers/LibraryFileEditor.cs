@@ -64,7 +64,6 @@ namespace FileFlows.Client.Helpers
             List<ElementField> fields = new List<ElementField>();
 
             bool processing = model.Status == FileStatus.Processing;
-            Logger.Instance.DLog("Item is processing: " + processing);
             fields.Add(new ElementField
             {
                 InputType = FileFlows.Plugin.FormInputType.LogView,

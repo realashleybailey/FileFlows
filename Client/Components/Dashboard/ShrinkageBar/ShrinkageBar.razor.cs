@@ -17,7 +17,7 @@
         private Dictionary<string, ShrinkageData> Data;
         private Timer AutoRefreshTimer;
 
-        private string lblTotal, lblShrinkageTitle;
+        private string lblTotal, lblOther, lblShrinkageTitle;
 
         private bool HasRendered = false;
 
@@ -25,6 +25,7 @@
         {
             lblShrinkageTitle = Translater.Instant("Pages.Dashboard.Labels.ShrinkageTitle");
             lblTotal = Translater.Instant("Labels.Total");
+            lblOther = Translater.Instant("Labels.Other");
 
             AutoRefreshTimer = new Timer();
             AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;

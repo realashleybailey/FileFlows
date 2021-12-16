@@ -28,9 +28,10 @@
     "SelectOne": "Select One",
     "Increase": "Increase",
     "Decrease": "Decrease",
-    "SpaceSavings": "{size} saved",
-    "SpaceIncrease": "{size} increase",
-    "Total": "Total"
+    "SpaceSavings": "{size} saved, {items} items",
+    "SpaceIncrease": "{size} increase, {items} items",
+    "Total": "Total",
+    "Other": "Other"
   },
   "Dialogs":{
     "FileBrowser":{

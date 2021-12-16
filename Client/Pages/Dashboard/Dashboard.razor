@@ -4,12 +4,11 @@
 @page "/"
 
 @{
-    string title = Workers?.FirstOrDefault()?.RelativeFile;
     bool mobile = App.Instance.IsMobile;
     bool shrinkageAdded = false;
 }
 
-<PageView Title=@title>
+<PageView>
 
     <Head>
     </Head>
@@ -49,7 +48,7 @@
                     <div class="dashboard">
                         @if(Workers?.Any() != true)
                         {                            
-                            <div class="worker-wrapper waiting portlet">
+                            @*<div class="worker-wrapper waiting portlet">
                                 <div class="chart-wrapper">
                                     <div class="chart chart-0 waiting"></div>
                                 </div>
@@ -57,7 +56,7 @@
                                     <span class="waiting-icon"><i class="fas fa-bed"></i></span>
                                     <span class="waiting-message">@lblWaiting</span>
                                 </div>
-                            </div>
+                            </div>*@
                         }
                         else
                         {

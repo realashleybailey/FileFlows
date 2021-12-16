@@ -2,21 +2,23 @@
 
 @if (Data != null && Data.Count > 1) // greater than one here since total is always included
 {
-    var total = Data.Last().Value;
+    const string KEY_TOTAL = "###TOTAL###";
+    const string KEY_OTHER = "###OTHER###";
+    var total = Data.Where(x => x.Key == KEY_TOTAL).Select(x => x.Value).FirstOrDefault() ?? new ShrinkageData();
     double max = Math.Max(total.OriginalSize, total.FinalSize);
     <div class="portlet">
         <div class="title"><span>@lblShrinkageTitle</span></div>
         <div class="portlet-body">
-            @foreach(var group in Data)
+            @foreach(var group in Data.OrderBy(x => x.Key == KEY_TOTAL ? 2 : x.Key == KEY_OTHER ? 1 : 0).ThenByDescending(x => x.Value.Items))
             {
                 max = Math.Max(group.Value.OriginalSize, group.Value.FinalSize);
                 long diff = (long)Math.Abs(group.Value.OriginalSize - group.Value.FinalSize);
                 int origPercent = (int)((group.Value.OriginalSize / max) * 100);
                 int finalPercent = (int)((group.Value.FinalSize / max) * 100);
                 bool loss = finalPercent > origPercent;
-                string tooltip = Translater.Instant("Labels." + (loss ? "SpaceIncrease" : "SpaceSavings"), new { size = Helpers.FileSizeFormatter.FormatSize(diff) });
+                string tooltip = Translater.Instant("Labels." + (loss ? "SpaceIncrease" : "SpaceSavings"), new { size = Helpers.FileSizeFormatter.FormatSize(diff), items = group.Value.Items });
                 <div class="library @(group.Value == total ? "total": "")">
-                    <div class="name">@(group.Value == total ? lblTotal : group.Key)</div>
+                    <div class="name">@(group.Value == total ? lblTotal : group.Key == KEY_OTHER ? lblOther : group.Key)</div>
                     <div class="bar @(finalPercent > origPercent ? "grew" : "")" title="@tooltip">
                         <div class="bar-original" style="width:@(origPercent)%" />
                         <div class="bar-final" style="width:@(finalPercent)%" />

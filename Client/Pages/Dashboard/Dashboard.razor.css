@@ -19,6 +19,16 @@
   flex-direction: column;
 }
 
+::deep .portlet {
+  box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
+  background: rgba(var(--base), 0.2);
+}
+::deep .portlet .title {
+  height: 2.5rem;
+  color: var(--accent);
+  padding: 0.25rem 0.5rem;
+}
+
 @media screen and (min-width: 850px) {
   .dashboard {
     display: grid;
@@ -28,16 +38,6 @@
   }
   .dashboard > div {
     margin: unset;
-  }
-
-  ::deep .portlet {
-    box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
-    background: rgba(var(--base), 0.2);
-  }
-  ::deep .portlet .title {
-    height: 2.5rem;
-    color: var(--accent);
-    padding: 0.25rem 0.5rem;
   }
 
   .waiting-icon {
@@ -159,6 +159,10 @@
   ::deep .apexcharts-canvas {
     width: 100% !important;
     text-align: center;
+  }
+
+  ::deep .portlet {
+    margin-bottom: 2rem;
   }
 }
 h1, h2 {

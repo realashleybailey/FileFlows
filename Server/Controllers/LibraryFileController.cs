@@ -279,6 +279,7 @@ namespace FileFlows.Server.Controllers
                     continue;
                 total.FinalSize += file.FinalSize;
                 total.OriginalSize += file.OriginalSize;
+                total.Items++;
                 if (libraries.ContainsKey(file.Library.Name) == false)
                 {
                     libraries.Add(file.Library.Name, new ShrinkageData()
@@ -292,23 +293,42 @@ namespace FileFlows.Server.Controllers
 
                     libraries[file.Library.Name].OriginalSize += file.OriginalSize;
                     libraries[file.Library.Name].FinalSize += file.FinalSize;
+                    libraries[file.Library.Name].Items++;
                 }
             }
+
+            if (libraries.Count > 5)
+            {
+                ShrinkageData other = new ShrinkageData();
+                while (libraries.Count > 4)
+                {
+                    List<string> toRemove = new();
+                    var sd = libraries.OrderBy(x => x.Value.Items).First();
+                    other.Items += sd.Value.Items;
+                    other.FinalSize += sd.Value.FinalSize;
+                    other.OriginalSize += sd.Value.OriginalSize;
+                    libraries.Remove(sd.Key);
+                }
+                libraries.Add("###OTHER###", other);
+            }
 #if (DEBUG)
-            Random rand = new Random(DateTime.Now.Millisecond);
-            double min = 10_000_000;
-            int count = 0;
-            libraries = Enumerable.Range(1, 6).Select(x => new ShrinkageData
+            if (libraries.Any() == false)
             {
-                FinalSize = rand.NextDouble() * min + min,
-                OriginalSize = rand.NextDouble() * min + min
-            }).ToDictionary(x => "Library " + (++count), x => x);
-            total.FinalSize = 0;
-            total.OriginalSize = 0;
-            foreach (var lib in libraries)
-            {
-                total.FinalSize += lib.Value.FinalSize;
-                total.OriginalSize += lib.Value.OriginalSize;
+                Random rand = new Random(DateTime.Now.Millisecond);
+                double min = 10_000_000;
+                int count = 0;
+                libraries = Enumerable.Range(1, 6).Select(x => new ShrinkageData
+                {
+                    FinalSize = rand.NextDouble() * min + min,
+                    OriginalSize = rand.NextDouble() * min + min
+                }).ToDictionary(x => "Library " + (++count), x => x);
+                total.FinalSize = 0;
+                total.OriginalSize = 0;
+                foreach (var lib in libraries)
+                {
+                    total.FinalSize += lib.Value.FinalSize;
+                    total.OriginalSize += lib.Value.OriginalSize;
+                }
             }
 #endif
             if(libraries.ContainsKey("###TOTAL###") == false) // so unlikely, only if they named a library this, but just incase they did

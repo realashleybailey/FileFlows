@@ -53,11 +53,22 @@
             DoubleClick="@OnDoubleClick">
             <ToolBar>                    
                 <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-                <FlowTableButton TItem="LibraryFile" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+                @if (SelectedStatus == FileStatus.Processing)
+                {
+                    <FlowTableButton TItem="LibraryFile" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
+                }
+                else
+                {
+                    <FlowTableButton TItem="LibraryFile" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+                }
                 
                 @if (SelectedStatus == FileStatus.Unprocessed)
                 {
                     <FlowTableButton TItem="LibraryFile" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
+                }
+                else if(SelectedStatus == FileStatus.ProcessingFailed)
+                {
+                    <FlowTableButton TItem="LibraryFile" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
                 }
             </ToolBar>
 

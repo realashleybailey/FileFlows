@@ -14,7 +14,7 @@ namespace FileFlows.Server.Controllers
     [Route("/api/worker")]
     public class WorkerController : Controller
     {
-        private readonly static Dictionary<Guid, FlowExecutorInfo> Executors = new ();
+        private readonly static Dictionary<Guid, FlowExecutorInfo> Executors = new();
         private Queue<Guid> CompletedExecutors = new Queue<Guid>(50);
 
         private IHubContext<FlowHub> Context;
@@ -89,7 +89,7 @@ namespace FileFlows.Server.Controllers
                     }
                 }
             }
-                            
+
             info.LastUpdate = DateTime.UtcNow;
             lock (Executors)
             {
@@ -106,7 +106,7 @@ namespace FileFlows.Server.Controllers
         [HttpPost("clear/{nodeUid}")]
         public async Task Clear([FromRoute] Guid nodeUid)
         {
-            lock (Executors) 
+            lock (Executors)
             {
                 var toRemove = Executors.Where(x => x.Value.NodeUid == nodeUid).ToArray();
                 foreach (var item in toRemove)
@@ -141,16 +141,41 @@ namespace FileFlows.Server.Controllers
         {
             var settings = await new SettingsController().Get();
             string file = Path.Combine(settings.LoggingPath, uid + ".log");
-            if(System.IO.File.Exists(file))
+            if (System.IO.File.Exists(file))
                 return System.IO.File.ReadAllText(file);
             return String.Empty;
+        }
+        [HttpDelete("by-file/{uid}")]
+        public async Task AbortByFile(Guid uid)
+        {
+            Guid executorId;
+            lock (Executors)
+            {
+                executorId = Executors.Where(x => x.Value.LibraryFile.Uid == uid).Select(x => x.Key).FirstOrDefault();
+            }
+            if (executorId == Guid.Empty)
+                return;
+            await Abort(executorId);
         }
 
         [HttpDelete("{uid}")]
         public async Task Abort(Guid uid)
         {
+            FlowExecutorInfo flowinfo;
+            Executors.TryGetValue(uid, out flowinfo);
+
             await this.Context.Clients.All.SendAsync("AbortFlow", uid);
-            
+
+            if (flowinfo?.LibraryFile != null) {
+                var libController = new LibraryFileController();
+                var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
+                if(libfile.Status == FileStatus.Processing)
+                {
+                    libfile.Status = FileStatus.ProcessingFailed;
+                    await libController.Update(libfile);
+                }
+            }
+
             _ = Task.Run(async () =>
             {
                 await Task.Delay(10_000);

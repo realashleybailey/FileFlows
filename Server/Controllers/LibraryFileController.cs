@@ -246,6 +246,31 @@ namespace FileFlows.Server.Controllers
             await DeleteAll(model);
         }
 
+        [HttpPost("reprocess")]
+        public async Task Reprocess([FromBody] ReferenceModel model)
+        {
+            if (model == null || model.Uids?.Any() != true)
+                return; // nothing to delete
+            var list = model.Uids.ToList();
+
+            // clear the list to make sure its upt to date
+            var libraryFiles = await GetData();
+            foreach (var uid in model.Uids)
+            {
+                LibraryFile item;
+                lock (libraryFiles)
+                {
+                    if (libraryFiles.ContainsKey(uid) == false)
+                        continue;
+                    item = libraryFiles[uid];
+                    if (item.Status != FileStatus.ProcessingFailed)
+                        continue;
+                    item.Status = FileStatus.Unprocessed;
+                }
+                await Update(item);
+            }
+        }
+
         [HttpGet("shrinkage")]
         public async Task<ShrinkageData> Shrinkage()
         {

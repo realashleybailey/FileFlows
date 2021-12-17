@@ -91,7 +91,7 @@ namespace FileFlows.Plugin
                 return;
             if (this.WorkingFile != this.FileName)
             {
-                this.WorkingFileSize = new FileInfo(WorkingFile).Length;
+                this.WorkingFileSize = new FileInfo(filename).Length;
                 string fileToDelete = this.WorkingFile;
                 if (dontDelete == false)
                 {

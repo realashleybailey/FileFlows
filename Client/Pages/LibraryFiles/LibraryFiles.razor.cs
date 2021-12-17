@@ -12,6 +12,7 @@ namespace FileFlows.Client.Pages
     using Radzen;
     using Microsoft.AspNetCore.Components;
     using FileFlows.Client.Components.Common;
+    using FileFlows.Client.Components.Dialogs;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {
@@ -162,6 +163,61 @@ namespace FileFlows.Client.Pages
             try
             {
                 await HttpHelper.Post(ApiUrl + "/move-to-top", new ReferenceModel { Uids = uids });                
+            }
+            finally
+            {
+                Blocker.Hide();
+            }
+            await Refresh();
+#endif
+        }
+
+
+        public async Task Cancel()
+        {
+#if (DEMO)
+            return;
+#else
+            var selected = Table.GetSelected().ToArray();
+            if (selected.Length == 0)
+                return; // nothing to cancel
+
+            if (await Confirm.Show("Labels.Cancel",
+                Translater.Instant("Labels.CancelItems", new { count = selected.Length })) == false)
+                return; // rejected the confirm
+
+            Blocker.Show();
+            this.StateHasChanged();
+            try
+            {
+                foreach(var item in selected)
+                    await HttpHelper.Delete($"/api/worker/by-file/{item.Uid}");
+
+            }
+            finally
+            {
+                Blocker.Hide();
+                this.StateHasChanged();
+            }
+            await Refresh();
+#endif
+        }
+
+        public async Task Reprocess()
+        {
+#if (DEMO)
+            return;
+#else
+
+            var selected = Table.GetSelected();
+            var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
+            if (uids.Length == 0)
+                return; // nothing to reprocess
+
+            Blocker.Show();
+            try
+            {
+                await HttpHelper.Post(ApiUrl + "/reprocess", new ReferenceModel { Uids = uids });
             }
             finally
             {

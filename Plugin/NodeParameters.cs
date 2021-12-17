@@ -22,6 +22,8 @@ namespace FileFlows.Plugin
         /// </summary>
         public string WorkingFile { get; private set; }
 
+        public long WorkingFileSize { get; private set; }
+
         public ILogger? Logger { get; set; }
 
         public NodeResult Result { get; set; } = NodeResult.Success;
@@ -30,6 +32,7 @@ namespace FileFlows.Plugin
         public Dictionary<string, object> Variables { get; set; } = new Dictionary<string, object>();
 
         public Func<string, string>? GetToolPath { get; set; }
+        public Func<string, string>? PathMapper { get; set; }
 
         public string TempPath { get; set; }
 
@@ -41,11 +44,19 @@ namespace FileFlows.Plugin
         {
             this.FileName = filename;
             this.WorkingFile = filename;
+            this.WorkingFileSize = new FileInfo(filename).Length;
             this.RelativeFile = string.Empty;
             this.TempPath = string.Empty;
             this.Logger = logger;
             InitFile(filename);
             this.Process = new ProcessHelper(logger);
+        }
+
+        public string MapPath(string path)
+        {
+            if (PathMapper == null)
+                return path;
+            return PathMapper(path);
         }
 
         private void InitFile(string filename)
@@ -80,6 +91,7 @@ namespace FileFlows.Plugin
                 return;
             if (this.WorkingFile != this.FileName)
             {
+                this.WorkingFileSize = new FileInfo(WorkingFile).Length;
                 string fileToDelete = this.WorkingFile;
                 if (dontDelete == false)
                 {
@@ -124,6 +136,7 @@ namespace FileFlows.Plugin
         public bool MoveFile(string destination)
         {
             bool moved = false;
+            destination = MapPath(destination);
             long fileSize = new FileInfo(WorkingFile).Length;
             Task task = Task.Run(() =>
             {
@@ -157,7 +170,7 @@ namespace FileFlows.Plugin
 
                 if (PartPercentageUpdate != null)
                     PartPercentageUpdate(currentSize / fileSize * 100);
-                System.Threading.Thread.Sleep(50);
+                Thread.Sleep(50);
             }
 
             if (moved == false)

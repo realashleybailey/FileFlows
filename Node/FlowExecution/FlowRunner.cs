@@ -126,7 +126,7 @@ public class FlowRunner
         Info.LibraryFile.Status = status;
         if(status == FileStatus.Processed)
         {
-            Info.LibraryFile.FinalSize = new FileInfo(nodeParameters.WorkingFile).Length;
+            Info.LibraryFile.FinalSize = nodeParameters.WorkingFileSize;
             Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
@@ -150,6 +150,7 @@ public class FlowRunner
     private void RunActual(IFlowRunnerCommunicator communicator) 
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator));
+        nodeParameters.PathMapper = (string path) => Node.Map(path);
         Info.LibraryFile.OriginalSize = new FileInfo(nodeParameters.WorkingFile).Length;
         nodeParameters.TempPath = Node.TempPath;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;

@@ -16,7 +16,7 @@
 
         private bool FirstExecute = true;
 
-        public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 5)
+        public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 30)
         {
             this.isServer = isServer;
             this.FirstExecute = true;
@@ -145,11 +145,11 @@
             }
             finally
             {
-                //_ = Task.Run(async () =>
-                //{
-                //    await Task.Delay(1_000);
-                //    Trigger();
-                //});
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(3_000);
+                    Trigger();
+                });
             }
         }
 

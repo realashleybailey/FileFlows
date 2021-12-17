@@ -14,6 +14,8 @@ namespace FileFlows.Client.Components
     using System.Linq;
     using System.ComponentModel;
     using FileFlows.Client.Components.Inputs;
+    using FileFlows.Plugin;
+    using System.Text.Json;
 
     public partial class Editor : ComponentBase
     {
@@ -215,7 +217,22 @@ namespace FileFlows.Client.Components
                 return @default;
             try
             {
-                return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), val);
+                T result = (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), val);
+                if(result is List<ListOption> options)
+                {
+                    foreach(var option in options)
+                    {
+                        if(option.Value is JsonElement je)
+                        {
+                            if (je.ValueKind == JsonValueKind.String)
+                                option.Value = je.GetString();
+                            else if (je.ValueKind == JsonValueKind.Number)
+                                option.Value = je.GetInt32();
+                        }
+                    }
+                }
+
+                return result;
             }
             catch (Exception)
             {

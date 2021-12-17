@@ -146,5 +146,9 @@
   {
     "outputFile": "Components/Dashboard/ShrinkageBar/ShrinkageBar.razor.css",
     "inputFile": "Components/Dashboard/ShrinkageBar/ShrinkageBar.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputChecklist/InputChecklist.razor.css",
+    "inputFile": "Components/Inputs/InputChecklist/InputChecklist.razor.scss"
   }
 ]

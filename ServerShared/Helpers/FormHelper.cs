@@ -41,6 +41,26 @@
 
                     }
 
+                    if(attribute is ChecklistAttribute chk)
+                    {
+                        // get the options
+                        if(string.IsNullOrWhiteSpace(chk.OptionsProperty) == false)
+                        {
+                            var chkProperty = type.GetProperty(chk.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
+                            if(chkProperty != null)
+                            {
+                                try
+                                {
+                                    ef.Parameters ??= new Dictionary<string, object>();
+                                    var options = chkProperty.GetValue(null) as List<Plugin.ListOption>;
+                                    if(ef.Parameters.ContainsKey("Options") == false && options != null)
+                                        ef.Parameters.Add("Options", options);
+                                }                                
+                                catch (Exception){}
+                            }
+                        }
+                    }
+
                     if (model.ContainsKey(prop.Name) == false)
                     {
                         var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;

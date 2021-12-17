@@ -1,0 +1,23 @@
+﻿ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0 0;
+}
+
+li {
+  padding: 0 0 0.5rem;
+  margin: 0;
+}
+
+span {
+  display: inline-block;
+}
+
+span + span {
+  margin-left: 0.25rem;
+}
+
+::deep input {
+  top: 0;
+  left: 0;
+}

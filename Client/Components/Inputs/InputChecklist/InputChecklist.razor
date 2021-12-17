@@ -1,0 +1,20 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<List<object>>
+
+<InputWrapper Input="@this">
+    <div class="input-checklist-wrapper">
+        <ul>
+        @foreach (var opt in Options ?? new List<FileFlows.Plugin.ListOption>())
+        {
+            <li>
+                <label>
+                    <span>
+                        <input type="checkbox" checked=@(Value.Contains(opt.Value) ? "checked" : null) @onchange="(e) => OnChange(e, opt)" @onclick:stopPropagation />                
+                    </span>
+                    <span>@opt.Label</span>
+                </label>
+            </li>
+        }
+        </ul>
+    </div>
+</InputWrapper>

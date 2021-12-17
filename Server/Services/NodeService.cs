@@ -18,6 +18,6 @@
             return result?.Path ?? string.Empty;
         }
 
-        public Task<ProcessingNode> Register(string address) => new NodeController().Register(address);
+        public Task<ProcessingNode> GetByAddress(string address) => new NodeController().GetByAddress(address);
     }
 }

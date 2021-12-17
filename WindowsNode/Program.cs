@@ -16,6 +16,8 @@ namespace FileFlows.WindowsNode
 
             HttpHelper.Client = new HttpClient();
 
+            FileFlows.Shared.Logger.Instance = new ServerShared.FileLogger(Application.ExecutablePath + ".log");
+
             AppSettings.Init();
 
             Application.Run(new Form1(minimize));

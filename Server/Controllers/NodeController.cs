@@ -68,6 +68,17 @@ namespace FileFlows.Server.Controllers
             return node;
         }
 
+        [HttpGet("by-address/{address}")]
+        public async Task<ProcessingNode> GetByAddress([FromRoute] string address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+                throw new ArgumentNullException(nameof(address));
+
+            address = address.Trim();
+            var data = await GetData();
+            var node = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
+            return node;
+        }
 
         [HttpGet("register")]
         public async Task<ProcessingNode> Register([FromQuery]string address)

@@ -33,7 +33,7 @@
             ProcessingNode node;
             try
             {
-                node = isServer ? nodeService.GetServerNode().Result : nodeService.Register(Environment.MachineName).Result;
+                node = isServer ? nodeService.GetServerNode().Result : nodeService.GetByAddress(Environment.MachineName).Result;
             }
             catch(Exception ex)
             {

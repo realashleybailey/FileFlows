@@ -5,7 +5,7 @@
 
     public interface INodeService
     {
-        Task<ProcessingNode> Register(string address);
+        Task<ProcessingNode> GetByAddress(string address);
 
         Task<ProcessingNode> GetServerNode();
 
@@ -58,9 +58,9 @@
             }
         }
 
-        public async Task<ProcessingNode> Register(string address)
+        public async Task<ProcessingNode> GetByAddress(string address)
         {
-            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/node/register?address=" + Uri.EscapeDataString(address));
+            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/node/by-address/" + Uri.EscapeDataString(address));
             if (result.Success == false)
                 throw new Exception("Failed to register node: " + result.Body);
             return result.Data;
@@ -76,7 +76,7 @@
                 TempPath = tempPath,
                 FlowRunners = runners,
                 Enabled = enabled
-            }, timeoutSeconds: 5);
+            }, timeoutSeconds: 15);
 
             if (result.Success == false)
                 throw new Exception("Failed to register node: " + result.Body);

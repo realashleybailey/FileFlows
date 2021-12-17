@@ -24,7 +24,7 @@
         {
             try
             {
-                var result = await HttpHelper.Get<Flow>($"{ServiceBaseUrl}/flow/" + uid.ToString());
+                var result = await HttpHelper.Get<Flow>($"{ServiceBaseUrl}/api/flow/" + uid.ToString());
                 if (result.Success == false)
                     throw new Exception("Failed to locate flow: " + result.Body);
                 return result.Data;

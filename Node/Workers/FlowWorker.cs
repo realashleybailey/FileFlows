@@ -75,11 +75,13 @@
             if (libFile == null)
                 return; // nothing to process
 
+            string workingFile = node.Map(libFile.Name);
+
             try
             {
                 var libfileService = LibraryFileService.Load();
                 var flowService = FlowService.Load();
-                FileInfo file = new FileInfo(libFile.Name);
+                FileInfo file = new FileInfo(workingFile);
                 if (file.Exists == false)
                 {
                     libfileService.Delete(libFile.Uid).Wait();
@@ -130,7 +132,7 @@
                     CurrentPartPercent = 0,
                     CurrentPartName = string.Empty,
                     StartedAt = DateTime.UtcNow,
-                    WorkingFile = libFile.Name
+                    WorkingFile = workingFile
                 };
 
                 var runner = new FlowRunner(info, flow, node);

@@ -28,7 +28,7 @@
         {
             try
             {
-                var result = await HttpHelper.Delete($"{ServiceBaseUrl}/library-file", new ReferenceModel { Uids = new[] { uid } });                
+                var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel { Uids = new[] { uid } });                
             }
             catch (Exception)
             {
@@ -41,7 +41,7 @@
             // can throw exception if nothing to process
             try
             {
-                var result = await HttpHelper.Get<LibraryFile>($"{ServiceBaseUrl}/library-file/next-file?nodeUid={Uri.EscapeDataString(nodeUid.ToString())}&workerUid={Uri.EscapeDataString(workerUid.ToString())}");
+                var result = await HttpHelper.Get<LibraryFile>($"{ServiceBaseUrl}/api/library-file/next-file?nodeUid={Uri.EscapeDataString(nodeUid.ToString())}&workerUid={Uri.EscapeDataString(workerUid.ToString())}");
                 if (result.Success == false)
                     return null; 
                 return result.Data;
@@ -54,7 +54,7 @@
 
         public async Task<LibraryFile> Update(LibraryFile libraryFile)
         {
-            var result = await HttpHelper.Put<LibraryFile>($"{ServiceBaseUrl}/library-file", libraryFile);
+            var result = await HttpHelper.Put<LibraryFile>($"{ServiceBaseUrl}/api/library-file", libraryFile);
             if (result.Success == false)
                 throw new Exception("Failed to update library file: " + result.Body);
             return result.Data;

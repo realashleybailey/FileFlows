@@ -30,7 +30,7 @@
         {
             try
             {
-                await HttpHelper.Post(ServiceBaseUrl + "/worker/clear/" + Uri.EscapeDataString(nodeUid.ToString()));
+                await HttpHelper.Post(ServiceBaseUrl + "/api/worker/clear/" + Uri.EscapeDataString(nodeUid.ToString()));
             }
             catch (Exception)
             {
@@ -48,7 +48,7 @@
         {
             try
             {
-                var result = await HttpHelper.Get<Tool>(ServiceBaseUrl + "/tool/name/" + Uri.EscapeDataString(name));
+                var result = await HttpHelper.Get<Tool>(ServiceBaseUrl + "/api/tool/name/" + Uri.EscapeDataString(name));
                 return result.Data.Path;
             }
             catch (Exception ex)
@@ -60,9 +60,10 @@
 
         public async Task<ProcessingNode> GetByAddress(string address)
         {            
-            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "api/node/by-address/" + Uri.EscapeDataString(address));
+            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/" + Uri.EscapeDataString(address));
             if (result.Success == false)
                 throw new Exception("Failed to register node: " + result.Body);
+            result.Data.SignalrUrl = ServiceBaseUrl + "/flow";
             return result.Data;
         }
         public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled)

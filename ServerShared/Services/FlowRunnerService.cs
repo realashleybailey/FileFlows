@@ -26,7 +26,7 @@
         {
             try
             {
-                var result = await HttpHelper.Post($"{ServiceBaseUrl}/worker/work/finish", info);
+                var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/finish", info);
                 if (result.Success == false)
                     throw new Exception("Failed to finish work: " + result.Body);
             }
@@ -40,7 +40,7 @@
         {
             try
             {
-                var result = await HttpHelper.Post<FlowExecutorInfo>($"{ServiceBaseUrl}/worker/work/start", info);
+                var result = await HttpHelper.Post<FlowExecutorInfo>($"{ServiceBaseUrl}/api/worker/work/start", info);
                 if (result.Success == false)
                     throw new Exception("Failed to start work: " + result.Body);
                 return result.Data;
@@ -56,7 +56,7 @@
         {
             try
             {
-                var result = await HttpHelper.Post($"{ServiceBaseUrl}/worker/work/update", info);
+                var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/update", info);
                 if (result.Success == false)
                     throw new Exception("Failed to update work: " + result.Body);
             }

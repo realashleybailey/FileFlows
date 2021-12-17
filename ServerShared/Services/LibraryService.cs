@@ -24,7 +24,7 @@
         {
             try
             {
-                var result = await HttpHelper.Get<Library>($"{ServiceBaseUrl}/library/" + uid.ToString());
+                var result = await HttpHelper.Get<Library>($"{ServiceBaseUrl}/api/library/" + uid.ToString());
                 if (result.Success == false)
                     throw new Exception("Failed to locate library: " + result.Body);
                 return result.Data;

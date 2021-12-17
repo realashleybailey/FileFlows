@@ -23,7 +23,7 @@ namespace FileFlows.ServerShared
                 x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
             Console.WriteLine(message);
-            System.IO.File.AppendAllText(logFile, message);
+            System.IO.File.AppendAllText(logFile, message + Environment.NewLine);
         }
 
         public void ILog(params object[] args) => Log(LogType.Info, args);

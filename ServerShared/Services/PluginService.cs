@@ -29,7 +29,7 @@
         {
             try
             {
-                var result = await HttpHelper.Get<List<PluginInfo>>($"{ServiceBaseUrl}/plugin");
+                var result = await HttpHelper.Get<List<PluginInfo>>($"{ServiceBaseUrl}/api/plugin");
                 if (result.Success == false)
                     throw new Exception("Failed to load plugin infos: " + result.Body);
                 return result.Data;

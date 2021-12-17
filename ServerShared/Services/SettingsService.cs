@@ -24,7 +24,7 @@
         {
             try
             {
-                var result = await HttpHelper.Get<Settings>($"{ServiceBaseUrl}/settings");
+                var result = await HttpHelper.Get<Settings>($"{ServiceBaseUrl}/api/settings");
                 if (result.Success == false)
                     throw new Exception("Failed to get settings: " + result.Body);
                 return result.Data;

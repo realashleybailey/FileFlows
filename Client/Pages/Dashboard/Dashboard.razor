@@ -3,11 +3,6 @@
 
 @page "/"
 
-@{
-    bool mobile = App.Instance.IsMobile;
-    bool shrinkageAdded = false;
-}
-
 <PageView>
 
     <Head>
@@ -100,19 +95,10 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                @if(i == 0 && mobile == false)
-                                {
-                                    shrinkageAdded = true;
-                                    <FileFlows.Client.Components.Dashboard.ShrinkageBar />                                    
-                                }
                             }
                         }
 
-                        @if (shrinkageAdded == false)
-                        {
-                            <FileFlows.Client.Components.Dashboard.ShrinkageBar />
-                        }
+                        <FileFlows.Client.Components.Dashboard.ShrinkageBar />
                         
                         <FileFlows.Client.Components.Dashboard.LibraryFilesSummary />
                         <FileFlows.Client.Components.Dashboard.LibraryFilesSummary Completed=@true />

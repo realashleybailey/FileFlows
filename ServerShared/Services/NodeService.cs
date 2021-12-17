@@ -59,8 +59,8 @@
         }
 
         public async Task<ProcessingNode> GetByAddress(string address)
-        {
-            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/node/by-address/" + Uri.EscapeDataString(address));
+        {            
+            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "api/node/by-address/" + Uri.EscapeDataString(address));
             if (result.Success == false)
                 throw new Exception("Failed to register node: " + result.Body);
             return result.Data;

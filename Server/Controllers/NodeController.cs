@@ -102,6 +102,49 @@ namespace FileFlows.Server.Controllers
             return result;
         }
 
+
+
+        [HttpPost("register")]
+        public async Task<ProcessingNode> RegisterPost([FromBody] RegisterModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model?.Address))
+                throw new ArgumentNullException(nameof(model.Address));
+            if (string.IsNullOrWhiteSpace(model?.TempPath))
+                throw new ArgumentNullException(nameof(model.TempPath));
+
+            var address = model.Address.Trim();
+            var data = await GetData();
+            var existing = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
+            if (existing != null)
+            {
+                if(existing.FlowRunners != model.FlowRunners || existing.TempPath != model.TempPath)
+                {
+                    existing.FlowRunners = model.FlowRunners;
+                    existing.TempPath = model.TempPath;
+                    await Update(existing);
+                }
+                existing.SignalrUrl = SignalrUrl;
+                return existing;
+            }
+            var settings = await new SettingsController().Get();
+            // doesnt exist, register a new node.
+            var tools = await new ToolController().GetAll();
+            var result = await Update(new ProcessingNode
+            {
+                Name = address,
+                Address = address,
+                Enabled = model.Enabled,
+                FlowRunners = model.FlowRunners,
+                TempPath = model.TempPath,
+                Schedule = new string('1', 672),
+                Mappings = tools.Select(x => new
+                   KeyValuePair<string, string>(x.Path, "")
+                ).ToList()
+            });
+            result.SignalrUrl = SignalrUrl;
+            return result;
+        }
+
         internal async Task<ProcessingNode> GetServerNode()
         {
             var data = await GetData();
@@ -126,6 +169,14 @@ namespace FileFlows.Server.Controllers
             }
             node.SignalrUrl = SignalrUrl;
             return node;
+        }
+
+        public class RegisterModel
+        {
+            public string Address { get; set; }
+            public string TempPath { get; set; }
+            public int FlowRunners { get; set; }
+            public bool Enabled { get; set; }
         }
     }
 

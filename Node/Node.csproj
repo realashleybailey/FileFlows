@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
 	<SelfContained>false</SelfContained>
@@ -9,7 +9,7 @@
 	<RuntimeIdentifier Condition=" '$(OS)' == 'Unix' ">linux-x64</RuntimeIdentifier>
 	<Nullable>enable</Nullable>
     <RootNamespace>FileFlows.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <AssemblyName>FileFlows.$(MSBuildProjectName)</AssemblyName>
+    <AssemblyName>FileFlows.$(MSBuildProjectName)</AssemblyName>	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,10 +22,5 @@
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.0" />
 	</ItemGroup>
-  <ItemGroup>
-    <None Update="node.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
 </Project>

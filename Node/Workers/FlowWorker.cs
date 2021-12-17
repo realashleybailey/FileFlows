@@ -22,8 +22,12 @@
             this.FirstExecute = true;
         }
 
+        public Func<bool> IsEnabledCheck { get; set; }
+
         protected override void Execute()
         {
+            if (IsEnabledCheck?.Invoke() == false)
+                return;
             Logger.Instance?.DLog("FlowWorker.Execute");
             var nodeService = NodeService.Load();
             ProcessingNode node;
@@ -139,11 +143,11 @@
             }
             finally
             {
-                _ = Task.Run(async () =>
-                {
-                    await Task.Delay(1_000);
-                    Trigger();
-                });
+                //_ = Task.Run(async () =>
+                //{
+                //    await Task.Delay(1_000);
+                //    Trigger();
+                //});
             }
         }
 

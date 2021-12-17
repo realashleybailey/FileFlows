@@ -4,6 +4,7 @@ namespace FileFlows.Shared.Helpers
     using System.Net.Http;
     using System.Text;
     using System.Text.Json;
+    using System.Threading;
     using System.Threading.Tasks;
     using FileFlows.Shared.Models;
 
@@ -15,14 +16,18 @@ namespace FileFlows.Shared.Helpers
         {
             return await MakeRequest<T>(HttpMethod.Get, url);
         }
+        public static async Task<RequestResult<T>> Get<T>(string url, int timeoutSeconds = 0)
+        {
+            return await MakeRequest<T>(HttpMethod.Get, url, timeoutSeconds: timeoutSeconds);
+        }
 #if (!DEMO)
         public static async Task<RequestResult<string>> Post(string url, object data = null)
         {
             return await MakeRequest<string>(HttpMethod.Post, url, data);
         }
-        public static async Task<RequestResult<T>> Post<T>(string url, object data = null)
+        public static async Task<RequestResult<T>> Post<T>(string url, object data = null, int timeoutSeconds = 0)
         {
-            return await MakeRequest<T>(HttpMethod.Post, url, data);
+            return await MakeRequest<T>(HttpMethod.Post, url, data, timeoutSeconds: timeoutSeconds);
         }
         public static async Task<RequestResult<string>> Put(string url, object data = null)
         {
@@ -39,7 +44,7 @@ namespace FileFlows.Shared.Helpers
         }
 #endif
 
-        private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null)
+        private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null, int timeoutSeconds = 0)
         {
             try
             {
@@ -61,7 +66,16 @@ namespace FileFlows.Shared.Helpers
                     request.Content = new StringContent("", Encoding.UTF8, "application/json");
                 }
 
-                var response = await Client.SendAsync(request);
+
+
+                HttpResponseMessage response;
+                if (timeoutSeconds > 0)
+                {
+                    using var cancelToken = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+                    response = await Client.SendAsync(request, cancelToken.Token);
+                }
+                else
+                    response = await Client.SendAsync(request);
 
                 if (typeof(T) == typeof(byte[]))
                 {
@@ -72,7 +86,7 @@ namespace FileFlows.Shared.Helpers
                 }
 
                 string body = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode && body.Contains("An unhandled error has occurred.") == false)
                 {
                     var options = new JsonSerializerOptions
                     {
@@ -84,6 +98,8 @@ namespace FileFlows.Shared.Helpers
                 }
                 else
                 {
+                    if (body.Contains("An unhandled error has occurred."))
+                        body = "An unhandled error has occurred."; // asp.net error
                     return new RequestResult<T> { Success = false, Body = body, Data = default(T) };
                 }
             }

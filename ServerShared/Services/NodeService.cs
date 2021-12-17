@@ -65,6 +65,24 @@
                 throw new Exception("Failed to register node: " + result.Body);
             return result.Data;
         }
+        public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled)
+        {
+            if(serverUrl.EndsWith("/"))
+                serverUrl = serverUrl.Substring(0, serverUrl.Length - 1);
+
+            var result = await HttpHelper.Post<ProcessingNode>(serverUrl + "/api/node/register", new 
+            {
+                Address = address,
+                TempPath = tempPath,
+                FlowRunners = runners,
+                Enabled = enabled
+            }, timeoutSeconds: 5);
+
+            if (result.Success == false)
+                throw new Exception("Failed to register node: " + result.Body);
+
+            return result.Data;
+        }
     }
 }
 

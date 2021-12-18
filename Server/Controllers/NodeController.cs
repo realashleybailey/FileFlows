@@ -132,6 +132,7 @@ namespace FileFlows.Server.Controllers
                 {
                     existing.FlowRunners = model.FlowRunners;
                     existing.TempPath = model.TempPath;
+                    existing.Enabled = model.Enabled;
                     await Update(existing);
                 }
                 existing.SignalrUrl = SignalrUrl;
@@ -148,9 +149,9 @@ namespace FileFlows.Server.Controllers
                 FlowRunners = model.FlowRunners,
                 TempPath = model.TempPath,
                 Schedule = new string('1', 672),
-                Mappings = tools.Select(x => new
+                Mappings = tools?.Select(x => new
                    KeyValuePair<string, string>(x.Path, "")
-                ).ToList()
+                )?.ToList() ?? new()
             });
             result.SignalrUrl = SignalrUrl;
             return result;

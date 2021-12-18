@@ -136,6 +136,7 @@ namespace FileFlows.Plugin
         public bool MoveFile(string destination)
         {
             bool moved = false;
+            Logger?.ILog("About to move file to: " + destination);
             destination = MapPath(destination);
             long fileSize = new FileInfo(WorkingFile).Length;
             Task task = Task.Run(() =>

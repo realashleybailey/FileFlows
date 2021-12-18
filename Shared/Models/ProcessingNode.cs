@@ -23,12 +23,17 @@ namespace FileFlows.Shared.Models
                 return string.Empty;
             if (Mappings != null && Mappings.Count > 0)
             {
+                // convert all \ to / for now
+                path = path.Replace("\\", "/");
                 foreach (var mapping in Mappings)
                 {
                     if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
                         continue;
-                    path = Regex.Replace(path, Regex.Escape(mapping.Key), mapping.Value, RegexOptions.IgnoreCase);
+                    path = Regex.Replace(path, Regex.Escape(mapping.Key.Replace("\\", "/")), mapping.Value.Replace("\\", "/"), RegexOptions.IgnoreCase);
                 }
+                // now convert / to path charcter
+                if (System.IO.Path.DirectorySeparatorChar != '/')
+                    path = path.Replace('/', System.IO.Path.DirectorySeparatorChar);
             }
             return path;
         }
@@ -43,6 +48,8 @@ namespace FileFlows.Shared.Models
                     if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
                         continue;
                     path = Regex.Replace(path, Regex.Escape(mapping.Value), mapping.Key, RegexOptions.IgnoreCase);
+                    path = Regex.Replace(path, Regex.Escape(mapping.Value.Replace("\\", "/")), mapping.Key, RegexOptions.IgnoreCase);
+                    path = Regex.Replace(path, Regex.Escape(mapping.Value.Replace("/", "\\")), mapping.Key, RegexOptions.IgnoreCase);
                 }
             }
             return path;

@@ -16,3 +16,4 @@ docker.xml
 /xdemopublish
 /Server/Properties/PublishProfiles/Default Settings.pubxml
 *.backup
+/deploy

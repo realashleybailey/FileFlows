@@ -1,16 +1,29 @@
-namespace FileFlows.Server
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FileFlows.ServerShared
 {
-    public class Logger : FileFlows.Plugin.ILogger
+    public class FileLogger : FileFlows.Plugin.ILogger
     {
+        private string logFile;
+        public FileLogger(string logFile)
+        {
+            this.logFile = logFile;
+        }
+
         private enum LogType { Error, Warning, Debug, Info }
         private void Log(LogType type, object[] args)
         {
-            Console.WriteLine(type + " -> " + string.Join(", ", args.Select(x =>
+            string message = type + " -> " + string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive ? x.ToString() :
                 x is string ? x.ToString() :
-                System.Text.Json.JsonSerializer.Serialize(x)))
-            );
+                System.Text.Json.JsonSerializer.Serialize(x)));
+            Console.WriteLine(message);
+            System.IO.File.AppendAllText(logFile, message + Environment.NewLine);
         }
 
         public void ILog(params object[] args) => Log(LogType.Info, args);
@@ -26,11 +39,6 @@ namespace FileFlows.Server
                 if (_Instance == null)
                     _Instance = new Logger();
                 return _Instance;
-            }
-            set
-            {
-                if (value != null)
-                    _Instance = value;
             }
         }
     }

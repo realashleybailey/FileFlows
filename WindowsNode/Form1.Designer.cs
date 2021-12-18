@@ -23,6 +23,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkRunAtStartup = new System.Windows.Forms.CheckBox();
             this.chkEnabled = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -33,7 +34,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.numRunners = new System.Windows.Forms.NumericUpDown();
             this.btnSave = new System.Windows.Forms.Button();
-            this.chkRunAtStartup = new System.Windows.Forms.CheckBox();
             this.contextMenuStripNotify.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -45,7 +45,7 @@
             this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.notifyIcon.ContextMenuStrip = this.contextMenuStripNotify;
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
-            this.notifyIcon.Text = "FileFlows";
+            this.notifyIcon.Text = "FileFlows Node";
             this.notifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseDoubleClick);
             // 
             // contextMenuStripNotify
@@ -100,6 +100,16 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "FileFlows Settings";
+            // 
+            // chkRunAtStartup
+            // 
+            this.chkRunAtStartup.AutoSize = true;
+            this.chkRunAtStartup.Location = new System.Drawing.Point(102, 166);
+            this.chkRunAtStartup.Name = "chkRunAtStartup";
+            this.chkRunAtStartup.Size = new System.Drawing.Size(100, 19);
+            this.chkRunAtStartup.TabIndex = 10;
+            this.chkRunAtStartup.Text = "Run at startup";
+            this.chkRunAtStartup.UseVisualStyleBackColor = true;
             // 
             // chkEnabled
             // 
@@ -191,16 +201,6 @@
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // chkRunAtStartup
-            // 
-            this.chkRunAtStartup.AutoSize = true;
-            this.chkRunAtStartup.Location = new System.Drawing.Point(102, 166);
-            this.chkRunAtStartup.Name = "chkRunAtStartup";
-            this.chkRunAtStartup.Size = new System.Drawing.Size(100, 19);
-            this.chkRunAtStartup.TabIndex = 10;
-            this.chkRunAtStartup.Text = "Run at startup";
-            this.chkRunAtStartup.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 

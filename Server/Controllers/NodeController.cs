@@ -3,15 +3,32 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
+    using System.Runtime.InteropServices;
 
     [Route("/api/node")]
     public class NodeController : ControllerStore<ProcessingNode>
     {
-#if(DEBUG)
-        internal static string SignalrUrl = "http://localhost:6868/flow";
+
+        static string _SignalrUrl;
+        internal static string SignalrUrl
+        {
+            get
+            {
+                if (_SignalrUrl == null) 
+                { 
+#if (DEBUG)
+                    _SignalrUrl = "http://localhost:6868/flow";
 #else
-        internal static string SignalrUrl = "http://localhost:5000/flow";
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        _SignalrUrl = "http://localhost:5151/flow";
+                    else
+                        _SignalrUrl = "http://localhost:5000/flow";
 #endif
+                }
+                return _SignalrUrl;
+            }
+        }
 
         [HttpGet]
         public async Task<IEnumerable<ProcessingNode>> GetAll() => (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);

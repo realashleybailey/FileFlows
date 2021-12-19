@@ -1,5 +1,5 @@
-if (Test-Path ..\deploy) {
-    Remove-Item ..\deploy -Recurse -Force
+if (Test-Path ..\..\deploy) {
+    Remove-Item ..\..\deploy -Recurse -Force
 }
 
 .\build-plugins.ps1
@@ -9,4 +9,4 @@ if (Test-Path ..\deploy) {
 .\build-server.ps1 --linux
 
 # no longer need plugins, delete them
-Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 
+Remove-Item ..\..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 

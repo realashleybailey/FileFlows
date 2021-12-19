@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsNode", "WindowsNode\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileFlowTests", "FileFlowTests\FileFlowTests.csproj", "{CB414395-F20A-4599-BA70-15F2244EF352}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsServer", "WindowsServer\WindowsServer.csproj", "{FBB3AB9A-922C-43DD-9CE0-A0D736B0E1AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsServer", "WindowsServer\WindowsServer.csproj", "{156F4D0D-645D-4BE4-801D-6536A177F93F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +59,10 @@ Global
 		{CB414395-F20A-4599-BA70-15F2244EF352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB414395-F20A-4599-BA70-15F2244EF352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB414395-F20A-4599-BA70-15F2244EF352}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FBB3AB9A-922C-43DD-9CE0-A0D736B0E1AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FBB3AB9A-922C-43DD-9CE0-A0D736B0E1AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FBB3AB9A-922C-43DD-9CE0-A0D736B0E1AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FBB3AB9A-922C-43DD-9CE0-A0D736B0E1AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{156F4D0D-645D-4BE4-801D-6536A177F93F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{156F4D0D-645D-4BE4-801D-6536A177F93F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{156F4D0D-645D-4BE4-801D-6536A177F93F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{156F4D0D-645D-4BE4-801D-6536A177F93F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

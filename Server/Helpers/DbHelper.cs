@@ -14,6 +14,7 @@ namespace FileFlows.Server.Helpers
     public class DbHelper
     {
         public static bool UseMySql = false;
+        private static string DbFilename;
 
         static string CreateDBSript =
             @$"CREATE TABLE {nameof(DbObject)}(
@@ -38,7 +39,7 @@ namespace FileFlows.Server.Helpers
         {
             try
             {
-                return new Database("Data Source=Data/FileFlows.sqlite;Version=3;", null, SQLiteFactory.Instance);
+                return new Database($"Data Source={DbFilename};Version=3;", null, SQLiteFactory.Instance);
             }catch(Exception ex)
             {
                 Logger.Instance.ELog("Error loading database: " + ex.Message);
@@ -309,12 +310,20 @@ namespace FileFlows.Server.Helpers
             }
         }
 
+        private static string GetDbFilename()
+        {
+            string dir = Program.GetAppDataDirectory();
+            dir = Path.Combine(dir, "Data");
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
+
+            DbFilename = Path.Combine(dir, "FileFlows.sqlite");
+            return DbFilename;
+        }
+
         private static async Task<bool> CreateSqliteDatabase()
         {
-            if (Directory.Exists("Data") == false)
-                Directory.CreateDirectory("Data");
-
-            string dbFile = "Data/FileFlows.sqlite";
+            string dbFile = GetDbFilename();
 
             if (System.IO.File.Exists(dbFile) == false)
                 SQLiteConnection.CreateFile(dbFile);

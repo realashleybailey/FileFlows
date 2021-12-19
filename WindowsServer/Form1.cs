@@ -10,16 +10,6 @@ namespace FileFlows.WindowsServer
             Url = "http://" + Environment.MachineName.ToLower() + ":5151/";
             InitializeComponent();
 
-            try
-            {
-                Server.WebServer.Start(new string[] { "--urls=http://[::]:5151" });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error starting server:" + ex.Message + Environment.NewLine + ex.StackTrace);
-                return;
-            }
-
             lnkOpen.Text = Url;
             this.Hide();
             this.WindowState = FormWindowState.Minimized;
@@ -28,7 +18,7 @@ namespace FileFlows.WindowsServer
 
         protected override void SetVisibleCore(bool value)
         {
-            if(IsHandleCreated == false && value)
+            if (IsHandleCreated == false && value)
             {
                 value = false;
                 CreateHandle();
@@ -58,7 +48,7 @@ namespace FileFlows.WindowsServer
             {
                 try
                 {
-                    await FileFlows.Server.WebServer.Stop();
+                    WebServerHelper.Stop();
                     this.QuitMe();
                 }
                 catch (Exception) { }

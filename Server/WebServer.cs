@@ -91,7 +91,9 @@ namespace FileFlows.Server
             app.MapHub<Hubs.FlowHub>("/flow");
 
             // this will run the asp.net app and wait until it is killed
+            Console.WriteLine("Running FileFlows Server");
             app.Run();
+            Console.WriteLine("Finished running FileFlows Server");
 
             WorkerManager.StopWorkers();
         }

@@ -1,5 +1,3 @@
-using FileFlows.ServerShared;
-
 namespace FileFlows.WindowsServer
 {
     internal static class Program
@@ -19,32 +17,10 @@ namespace FileFlows.WindowsServer
                     return;
                 }
 
-
-                string logfile = Application.ExecutablePath + ".log";
-                if (File.Exists(logfile))
-                {
-                    File.Move(logfile, Application.ExecutablePath + ".old.log", true);
-                }
-
-                Server.Logger.Instance = new ConsoleLogger();
-
-                FileStream ostream;
-                StreamWriter writer;
-                TextWriter oldOut = Console.Out;
-                ostream = new FileStream(Application.ExecutablePath + ".log", FileMode.Create, FileAccess.Write);
-                writer = new StreamWriter(ostream);
-                writer.AutoFlush = true;
-                Console.SetOut(writer);
-
-                Console.WriteLine("Starting app");
-
+                WebServerHelper.Start();
 
                 ApplicationConfiguration.Initialize();
                 Application.Run(new Form1());
-
-                Console.SetOut(oldOut);
-                writer.Close();
-                ostream.Close();
 
             }
         }

@@ -4,13 +4,11 @@ namespace FileFlows.WindowsServer
 {
     public partial class Form1 : Form
     {
-        readonly string Url;
         public Form1()
         {
-            Url = "http://" + Environment.MachineName.ToLower() + ":5151/";
             InitializeComponent();
 
-            lnkOpen.Text = Url;
+            lnkOpen.Text = Program.Url;
             this.Hide();
             this.WindowState = FormWindowState.Minimized;
             notifyIcon.Visible = true;
@@ -57,19 +55,14 @@ namespace FileFlows.WindowsServer
 
         private void lnkOpen_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            LaunchBrowser();
+            Program.LaunchBrowser();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LaunchBrowser();
+            Program.LaunchBrowser();
         }
 
-        private void LaunchBrowser()
-        {
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {Url}") { CreateNoWindow = true });
-
-        }
 
         private void shutDownToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -93,7 +86,7 @@ namespace FileFlows.WindowsServer
 
         private void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            LaunchBrowser();
+            Program.LaunchBrowser();
         }
     }
 }

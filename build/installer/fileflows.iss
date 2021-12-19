@@ -334,15 +334,8 @@ Source: "C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows\*"; Dest
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\FileFlows.exe"
 Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
 
-[CustomMessages]
-LaunchServer=Start FileFlows Server
-ServerName=FileFlows
-LaunchBrowser=Open FileFlows UI
-BrowserName=FileFlows UI
-
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: {cm:LaunchServer,{cm:ServerName}}; Flags: nowait postinstall skipifsilent
-Filename: "http://{computername}:5151/"; Description: {cm:LaunchBrowser,{cm:BrowserName}}; Flags: shellexec runasoriginaluser nowait postinstall skipifsilent   
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: {sys}\taskkill.exe; Parameters: "/f /im FileFlows.exe"; Flags: skipifdoesntexist runhidden

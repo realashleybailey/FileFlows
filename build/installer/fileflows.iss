@@ -24,7 +24,7 @@ DefaultDirName={autopf}\{#MyAppSetupName}
 UninstallDisplayIcon={app}\FileFlows.exe
 SourceDir=src
 OutputDir={#SourcePath}\bin
-;SetupIconFile=C:\Users\john\src\FileFlows\FileFlows\FileFlows Icon.ico
+SetupIconFile=C:\Users\john\src\FileFlows\FileFlows\FileFlows Icon.ico
 AllowNoIcons=yes
 
 PrivilegesRequired=admin

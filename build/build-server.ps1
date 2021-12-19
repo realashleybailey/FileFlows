@@ -58,7 +58,7 @@ if ([System.IO.File]::Exists($zip)) {
     Remove-Item $zip
 }
 
-#Compress-Archive -Path "$outdir\*" $zip
-#Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue 
+Compress-Archive -Path "$outdir\*" $zip
+Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue 
 
 Pop-Location

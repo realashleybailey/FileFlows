@@ -6,9 +6,9 @@ $version = "0.0.1.$revision"
 
 .\build-plugins.ps1
 .\build-spellcheck.ps1
-.\build-winnode.ps1
 .\build-server.ps1
 .\build-server.ps1 --linux
+.\build-winnode.ps1
 
 $compress = @{
     Path             = "..\deploy\FileFlows", "..\deploy\FileFlows-Node"

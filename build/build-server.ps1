@@ -41,7 +41,8 @@ Remove-Item $outdir\wwwroot\*.scss -Recurse -ErrorAction SilentlyContinue
 Remove-Item $outdir\wwwroot\*.scss -Recurse -ErrorAction SilentlyContinue 
 
 Remove-Item $outdir\Plugins -Recurse -ErrorAction SilentlyContinue 
-if ([System.IO.Directory]::Exists('deploy\Plugins')) {
+if ((Test-Path deploy\plugins) -eq $true) {
+    Write-Output "Copying plugins"
     Copy-Item -Path deploy\Plugins -Filter "*.*" -Recurse -Destination $outdir\Plugins -Container
 }
 

@@ -122,7 +122,12 @@ namespace FileFlows.WindowsNode
             EnableForm(false);
             Task.Run(async () =>
             {
-                var result = ConnectionTester.SaveConnection(url, path, runners, enabled);
+                List<KeyValuePair<string, string>> mappings = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("ffmpeg", Path.Combine(new FileInfo(Application.ExecutablePath).DirectoryName, "utils\\ffmpeg.exe"))
+                };
+
+                var result = ConnectionTester.SaveConnection(url, path, runners, enabled, mappings);
                 if (result.Item1)
                 {
                     // can connect

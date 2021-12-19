@@ -158,6 +158,21 @@ namespace FileFlows.Server.Controllers
             var settings = await new SettingsController().Get();
             // doesnt exist, register a new node.
             var tools = await new ToolController().GetAll();
+
+            if(model.Mappings?.Any() == true)
+            {
+                var ffmpegTool = tools.Where(x => x.Name.ToLower() == "ffmpeg").FirstOrDefault(); ;
+                if (ffmpegTool != null)
+                {
+                    // update ffmpeg with actual location
+                    var mapping = model.Mappings.Where(x => x.Key.ToLower() == "ffmpeg").FirstOrDefault();
+                    if(string.IsNullOrEmpty(mapping.Key) == false)
+                    {
+                        model.Mappings.Add(new KeyValuePair<string, string>(ffmpegTool.Path, mapping.Value));
+                    }
+                }
+            }
+
             var result = await Update(new ProcessingNode
             {
                 Name = address,
@@ -166,7 +181,7 @@ namespace FileFlows.Server.Controllers
                 FlowRunners = model.FlowRunners,
                 TempPath = model.TempPath,
                 Schedule = new string('1', 672),
-                Mappings = tools?.Select(x => new
+                Mappings = model.Mappings ?? tools?.Select(x => new
                    KeyValuePair<string, string>(x.Path, "")
                 )?.ToList() ?? new()
             });
@@ -206,6 +221,7 @@ namespace FileFlows.Server.Controllers
             public string TempPath { get; set; }
             public int FlowRunners { get; set; }
             public bool Enabled { get; set; }
+            public List<KeyValuePair<string, string>> Mappings;
         }
     }
 

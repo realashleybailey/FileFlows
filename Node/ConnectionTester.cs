@@ -6,7 +6,7 @@ namespace FileFlows.Node
 {
     public class ConnectionTester
     {
-        public static (bool, string) SaveConnection(string url, string tempPath, int runners, bool enabled)
+        public static (bool, string) SaveConnection(string url, string tempPath, int runners, bool enabled, List<KeyValuePair<string, string>> mappings)
         {
             if (string.IsNullOrWhiteSpace(url))
                 return (false, string.Empty);
@@ -25,7 +25,7 @@ namespace FileFlows.Node
             try
             {
                 var nodeService = new NodeService();
-                var result = nodeService.Register(url, Environment.MachineName, tempPath, runners, enabled).Result;
+                var result = nodeService.Register(url, Environment.MachineName, tempPath, runners, enabled, mappings).Result;
                 if (result == null)
                     return (false, "Failed to register");
                 return (true, url);

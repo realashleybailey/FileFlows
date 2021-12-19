@@ -2,6 +2,7 @@
 {
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared.Models;
+    using System.Runtime.InteropServices;
 
     public interface INodeService
     {
@@ -66,7 +67,7 @@
             result.Data.SignalrUrl = ServiceBaseUrl + "/flow";
             return result.Data;
         }
-        public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled)
+        public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled, List<KeyValuePair<string, string>> mappings)
         {
             if(serverUrl.EndsWith("/"))
                 serverUrl = serverUrl.Substring(0, serverUrl.Length - 1);
@@ -76,7 +77,8 @@
                 Address = address,
                 TempPath = tempPath,
                 FlowRunners = runners,
-                Enabled = enabled
+                Enabled = enabled,
+                Mappings = mappings
             }, timeoutSeconds: 15);
 
             if (result.Success == false)

@@ -43,6 +43,7 @@ Name: "{app}";
 
 [Files]
 Source: "C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Node\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\utils\ffmpeg\ffmpeg.exe"; DestDir: "{app}\tools"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\FileFlowsNode.exe"

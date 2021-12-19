@@ -47,9 +47,7 @@ namespace FileFlows.Server
             ostream.Close();
         }
 
-
-
-        internal static string GetAppDataDirectory()
+        internal static string GetAppDirectory()
         {
             var dir = Directory.GetCurrentDirectory();
             return dir;
@@ -57,7 +55,7 @@ namespace FileFlows.Server
 
         private static string GetLogFile()
         {
-            string dir = Path.Combine(GetAppDataDirectory(), "Logs");
+            string dir = Path.Combine(GetAppDirectory(), "Logs");
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
             return Path.Combine(dir, "FileFlows.log");

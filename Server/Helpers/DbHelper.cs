@@ -40,7 +40,8 @@ namespace FileFlows.Server.Helpers
             try
             {
                 return new Database($"Data Source={DbFilename};Version=3;", null, SQLiteFactory.Instance);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.Instance.ELog("Error loading database: " + ex.Message);
                 throw;
@@ -152,13 +153,13 @@ namespace FileFlows.Server.Helpers
                                    SqlEscape(json) +
                                    ");");
                 }
-                if(sql.Length > 0)
+                if (sql.Length > 0)
                 {
                     using (var db = GetDb())
                     {
                         await db.ExecuteAsync(sql.ToString());
                     }
-                }                    
+                }
             }
 
         }
@@ -303,7 +304,8 @@ namespace FileFlows.Server.Helpers
                     return await CreateSqliteDatabase();
                 else
                     return await CreateMySqlDatabase(connectionString);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.Instance.ELog("Failed creating database: " + ex.Message);
                 return false;
@@ -312,7 +314,7 @@ namespace FileFlows.Server.Helpers
 
         private static string GetDbFilename()
         {
-            string dir = Program.GetAppDataDirectory();
+            string dir = Program.GetAppDirectory();
             dir = Path.Combine(dir, "Data");
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
@@ -384,7 +386,7 @@ namespace FileFlows.Server.Helpers
             await AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",
-                Path = windows ? @"c:\utils\ffmpeg\ffmpeg.exe" : "/usr/local/bin/ffmpeg",
+                Path = windows ? Path.Combine(Program.GetAppDirectory(), @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow
             });
@@ -392,14 +394,14 @@ namespace FileFlows.Server.Helpers
             await AddOrUpdateObject(db, new Settings
             {
                 Name = "Settings",
-#if (DEBUG)
-                LoggingPath = "/app/Logs",
-#else
-                LoggingPath = "/app/Logs",
-#endif
+                LoggingPath = windows ? Path.Combine(Program.GetAppDirectory(), "Logs") : "/app/Logs",
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow
-            }); 
+            });
+
+            string tempPath = windows ? @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FileFlows\\Temp") : "/temp";
+            if (Directory.Exists(tempPath) == false)
+                Directory.CreateDirectory(tempPath);
 
             await AddOrUpdateObject(db, new ProcessingNode
             {
@@ -408,11 +410,7 @@ namespace FileFlows.Server.Helpers
                 Schedule = new string('1', 672),
                 Enabled = true,
                 FlowRunners = 1,
-#if (DEBUG)
-                TempPath = windows ? @"d:\videos\temp" : "/temp",
-#else
-                TempPath = windows ? @"d:\videos\temp" : "/temp",
-#endif
+                TempPath = tempPath,
             });
         }
     }

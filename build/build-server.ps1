@@ -7,7 +7,7 @@ $csVersion = "string Version = ""$version"""
 
 $runtime = 'win-x64'
 $year = (Get-Date).year
-$outdir = 'deploy/FileFlows-Windows'
+$outdir = 'deploy/FileFlows'
 if ($linux -eq $true) {
     $outdir = 'deploy/FileFlows-Linux'
     $runtime = 'linux-x64'    
@@ -54,13 +54,16 @@ if ( $linux -eq $false) {
     & 'C:\Program Files (x86)\Inno Setup 6\iscc.exe' /Odeploy 'build\installer\install.iss' 
 }
 
-$zip = "$outdir-$version.zip"
 
-if ([System.IO.File]::Exists($zip)) {
-    Remove-Item $zip
+if ($linux -eq $true) {
+    $zip = "$outdir-$version.zip"
+
+    if ([System.IO.File]::Exists($zip)) {
+        Remove-Item $zip
+    }
+
+    Compress-Archive -Path "$outdir\*" $zip
+    Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue 
 }
-
-Compress-Archive -Path "$outdir\*" $zip
-Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue 
 
 Pop-Location

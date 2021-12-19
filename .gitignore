@@ -17,3 +17,5 @@ docker.xml
 /Server/Properties/PublishProfiles/Default Settings.pubxml
 *.backup
 /deploy
+/build/installer/fileflows-node-install.iss
+/build/installer/install.iss

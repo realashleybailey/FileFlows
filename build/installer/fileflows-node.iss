@@ -325,7 +325,7 @@ Source: "netcorecheck.exe"; Flags: dontcopy noencryption
 Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #endif             
 
-Source: "C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows-Node\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Node\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\FileFlows.exe"

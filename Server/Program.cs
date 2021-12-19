@@ -52,17 +52,6 @@ namespace FileFlows.Server
         internal static string GetAppDataDirectory()
         {
             var dir = Directory.GetCurrentDirectory();
-            //string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            //string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            //if (dir.ToLower().Contains(programFiles.ToLower()))
-            //{
-            //    string path = Path.Combine(appData, "FileFlows");
-            //    if (Directory.Exists(path) == false)
-            //        Directory.CreateDirectory(path);
-            //    return path;
-            //}
-            )
             return dir;
         }
 

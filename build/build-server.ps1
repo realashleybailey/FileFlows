@@ -6,6 +6,7 @@ $copyright = "Copyright 2021 - John Andrews"
 $csVersion = "string Version = ""$version"""
 
 $runtime = 'win-x64'
+$year = (Get-Date).year
 $outdir = 'deploy/FileFlows-Windows'
 if ($linux -eq $true) {
     $outdir = 'deploy/FileFlows-Linux'
@@ -48,6 +49,7 @@ if ( $linux -eq $false) {
     (Get-Content build\installer\fileflows.iss) -replace '0.0.0.0', "$version" | Out-File build\installer\install.iss -Encoding ascii
     $curDir = Get-Location
     (Get-Content build\installer\install.iss) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\', "$curDir\" | Out-File build\installer\install.iss -Encoding ascii
+    (Get-Content build\installer\install.iss) -replace '2020', "$year" | Out-File build\installer\install.iss -Encoding ascii
     
     & 'C:\Program Files (x86)\Inno Setup 6\iscc.exe' /Odeploy 'build\installer\install.iss' 
 }

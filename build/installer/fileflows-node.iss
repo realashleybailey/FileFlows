@@ -276,9 +276,9 @@ end;
 #endif
 
 #define MyAppSetupName 'FileFlowsNode'
-#define MyAppCopyright 'Copyright © 2021 John Andrews'
+#define MyAppCopyright 'Copyright © 2020 John Andrews'
 #define MyAppName "FileFlowsNode"
-#define MyAppVersion "0.0.1.170"
+#define MyAppVersion "0.0.0.0"
 #define MyAppPublisher "John Andrews"
 #define MyAppURL "https://www.fileflows.com/"
 #define MyAppExeName "FileFlowsNode.exe"

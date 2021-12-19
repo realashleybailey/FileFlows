@@ -10,11 +10,6 @@ $version = "0.0.1.$revision"
 #.\build-server.ps1 --linux
 .\build-winnode.ps1
 
-$ffmpeg = 'c:\utils\ffmpeg\ffmpeg.exe'
-if ([System.IO.File]::Exists($ffmpeg)) {
-    Copy-Item $ffmpeg '..\deploy\FileFlows\ffmpeg.exe'
-}
-
 $compress = @{
     Path             = "..\deploy\FileFlows", "..\deploy\FileFlows-Node"
     CompressionLevel = "Optimal"

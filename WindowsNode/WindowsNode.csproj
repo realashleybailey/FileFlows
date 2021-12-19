@@ -9,7 +9,7 @@
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<PublishSingleFile>true</PublishSingleFile>
 	  <SelfContained>false</SelfContained>
-	  <AssemblyName>FileFlows.$(MSBuildProjectName)</AssemblyName>
+	  <AssemblyName>FileFlowsNode</AssemblyName>
     <RootNamespace>FileFlows.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 

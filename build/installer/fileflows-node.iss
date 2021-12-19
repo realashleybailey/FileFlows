@@ -24,7 +24,6 @@ DefaultDirName={autopf}\{#MyAppSetupName}
 UninstallDisplayIcon={app}\FileFlows.exe
 SourceDir=src
 OutputDir={#SourcePath}\bin
-SetupIconFile=C:\Users\john\src\FileFlows\FileFlows\FileFlows Icon.ico
 AllowNoIcons=yes
 
 MinVersion=6.0
@@ -44,10 +43,6 @@ Name: "{app}";
 [Files]
 Source: "C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Node\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\utils\ffmpeg\ffmpeg.exe"; DestDir: "{app}\tools"; Flags: ignoreversion recursesubdirs createallsubdirs
-
-[Icons]
-Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\FileFlowsNode.exe"
-Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

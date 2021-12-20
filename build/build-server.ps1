@@ -47,11 +47,14 @@ if ((Test-Path deploy\plugins) -eq $true) {
 
 if ( $linux -eq $false) {
     
-    (Get-Content build\installers\FileFlowInstallers\WindowsServerInstaller\Program.cs) -replace '0.0.0.0', "$version" | Out-File  build\installers\FileFlowInstallers\WindowsServerInstaller\Program.cs -Encoding ascii
-    $curDir = Get-Location
-    (Get-Content build\installers\FileFlowInstallers\WindowsServerInstaller\Program.cs) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\deploy\\FileFlows', "$curDir\deploy" | Out-File  build\installers\FileFlowInstallers\WindowsServerInstaller\Program.cs -Encoding ascii
+    (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
     if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {
+        
+        $curDir = Get-Location
+        #(Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\deploy\\FileFlows', "$curDir\deploy" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
+
+
         & 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' build\installers\FileFlowInstallers.sln
     }
     else {

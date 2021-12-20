@@ -11,9 +11,9 @@ namespace WindowsServerInstaller
     internal class Program
     {
         static Guid InstallGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CD");
-        static string VERSION = "0.0.1.191";
+        static string VERSION = "0.0.0.0";
         static string ffmpeg = @"C:\utils\ffmpeg\ffmpeg.exe";
-        static string ffPath = @"C:\Users\john\src\FileFlows\FileFlows\deploy";
+        static string ffPath = @"..\..\..\deploy";
 
         static public void Main(string[] args)
         {

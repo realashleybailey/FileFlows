@@ -6,7 +6,7 @@
 </auto-generated>
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="07a84d0a-c965-4ae8-958f-0800f13ad58d" Name="FileFlows" Language="1033" Codepage="Windows-1252" Version="0.0.1.191" UpgradeCode="07a84d0a-c965-4ae8-958f-0800f13ac5cd" Manufacturer="john">
+  <Product Id="07a84d0a-c965-4ae8-958f-0800f13ad592" Name="FileFlows" Language="1033" Codepage="Windows-1252" Version="0.0.1.196" UpgradeCode="07a84d0a-c965-4ae8-958f-0800f13ac5cd" Manufacturer="john">
     <Package InstallerVersion="200" Compressed="yes" SummaryCodepage="Windows-1252" Languages="1033" />
     <Media Id="1" Cabinet="FileFlows.cab" EmbedCab="yes" />
 
@@ -15,9 +15,25 @@
         <Directory Id="AppDataFolder.FileFlows" Name="FileFlows">
           <Directory Id="INSTALLDIR" Name="Server">
 
+            <Component Id="Component.FileFlows2d0.0.0.0.wixobj_2747145895" Guid="07a84d0a-c965-4ae8-958f-0800e9f4312e">
+              <File Id="FileFlows2d0.0.0.0.wixobj_2747145895" Source="..\..\..\deploy\FileFlows-0.0.0.0.wixobj" />
+              <RemoveFolder Id="INSTALLDIR" On="uninstall" />
+
+              <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                <RegistryValue Value="0" Type="string" KeyPath="yes" />
+              </RegistryKey>
+            </Component>
+
+            <Component Id="Component.FileFlows2d0.0.0.0.wxs_210141939" Guid="07a84d0a-c965-4ae8-958f-0800dc28d2e3">
+              <File Id="FileFlows2d0.0.0.0.wxs_210141939" Source="..\..\..\deploy\FileFlows-0.0.0.0.wxs" />
+
+              <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                <RegistryValue Value="0" Type="string" KeyPath="yes" />
+              </RegistryKey>
+            </Component>
+
             <Component Id="Component.FileFlows2d0.0.1.191.msi_3400749281" Guid="07a84d0a-c965-4ae8-958f-0800a08e4092">
               <File Id="FileFlows2d0.0.1.191.msi_3400749281" Source="..\..\..\deploy\FileFlows-0.0.1.191.msi" />
-              <RemoveFolder Id="INSTALLDIR" On="uninstall" />
 
               <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
                 <RegistryValue Value="0" Type="string" KeyPath="yes" />
@@ -5031,6 +5047,8 @@
     <UIRef Id="WixUI_ErrorProgressText" />
 
     <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
+      <ComponentRef Id="Component.FileFlows2d0.0.0.0.wixobj_2747145895" />
+      <ComponentRef Id="Component.FileFlows2d0.0.0.0.wxs_210141939" />
       <ComponentRef Id="Component.FileFlows2d0.0.1.191.msi_3400749281" />
       <ComponentRef Id="Component.FileFlows2dLinux2d0.0.1.179.zip_1279472792" />
       <ComponentRef Id="Component.FileFlows2dPortable2d0.0.1.179.zip_1720587481" />

@@ -24,7 +24,7 @@ Push-Location ..\
 (Get-Content Server\Server.csproj) -replace '<RuntimeIdentifier>[^<]+</RuntimeIdentifier>', "<RuntimeIdentifier>$runtime</RuntimeIdentifier>" | Out-File Server\Server.csproj
 (Get-Content Server\Server.csproj) -replace '<PublishSingleFile>[^<]+</PublishSingleFile>', "<PublishSingleFile>true</PublishSingleFile>" | Out-File Server\Server.csproj
 (Get-Content Server\Server.csproj) -replace '<SelfContained>[^<]+</SelfContained>', "<SelfContained>true</SelfContained>" | Out-File Server\Server.csproj
-(Get-Content Server\Server.csproj) -replace '<PublishTrimmed>[^<]+</PublishTrimmed>', "<PublishTrimmed>true</PublishTrimmed>" | Out-File Server\Server.csproj
+(Get-Content Server\Server.csproj) -replace '<PublishTrimmed>[^<]+</PublishTrimmed>', "<PublishTrimmed>false</PublishTrimmed>" | Out-File Server\Server.csproj
 
 if ( $linux -eq $true) {
     (Get-Content Server\Server.csproj) -replace '<AssemblyName>[^<]+</AssemblyName>', "<AssemblyName>FileFlows</AssemblyName>" | Out-File Server\Server.csproj

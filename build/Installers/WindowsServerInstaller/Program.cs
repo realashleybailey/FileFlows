@@ -6,8 +6,8 @@ using System.Linq;
 using WixSharp;
 using WixSharp.Controls;
 
-namespace WindowsServerInstaller
-{
+//namespace WindowsServerInstaller
+//{
     internal class Program
     {
         static Guid InstallGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CD");
@@ -19,7 +19,7 @@ namespace WindowsServerInstaller
 
         static public void Main(string[] args)
         {
-            var rootFiles = RecursiveFileAdd(ffPath + (Node ?  "-Node": ""));
+            var rootFiles = RecursiveFileAdd(ffPath + (Node ? "-Node" : ""));
             rootFiles.Add(new Dir("Tools", new WixSharp.File(ffmpeg)));
 
             var dir = new Dir(@"%AppData%\FileFlows\" + (Node ? "Node" : "Server"), rootFiles.ToArray());
@@ -32,26 +32,36 @@ namespace WindowsServerInstaller
             });
 
             Project project;
-            if (Node)
+            if (Node == false)
             {
-                project = new Project("FileFlows" + (Node ? " Node" : ""),
+                project = new Project("FileFlows",
                     dir, dirStartMenu,
-                    new CloseApplication("FileFlows.Server.exe"),
-                    new CloseApplication("FileFlows.exe")
+                    //new ManagedAction("FileFlowsAction"),
+                    new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
+                    {
+                        Timeout = 15
+                    }, new CloseApplication(new Id("fileflows.server"), "fileflows.server.exe", true, false)
+                    {
+                        Timeout = 15
+                    }
                 );
             }
             else
             {
-                project = new Project("FileFlows" + (Node ? " Node" : ""),
+                project = new Project("FileFlows Node",
                     dir, dirStartMenu,
-                    new CloseApplication("FileFlowsNode.exe")
+                    //new ManagedAction("FileFlowsNodeAction"),
+                    new CloseApplication(new Id("fileflowsnode"), "fileflowsnode.exe", true, false)
+                    {
+                        Timeout = 15
+                    }
                 );
             }
 
             project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
                 .Shortcuts = new[]{
                 new FileShortcut("FileFlows" + (Node ? " Node" :""), @"%AppData%\Microsoft\Windows\Start Menu\Programs\Startup")
-                {   
+                {
                     Arguments = "--silent"
                 }
             };
@@ -59,7 +69,7 @@ namespace WindowsServerInstaller
             project.MajorUpgrade = new MajorUpgrade
             {
                 AllowDowngrades = true,
-                Disallow = false,                
+                Disallow = false,
                 Schedule = UpgradeSchedule.afterInstallInitialize
             };
 
@@ -73,7 +83,7 @@ namespace WindowsServerInstaller
             project.OutDir = "..\\..\\..\\deploy";
             project.OutFileName = "FileFlows" + (Node ? "Node" : "") + "-" + VERSION;
             project.Version = new Version(VERSION);
-            
+
             Compiler.BuildMsi(project);
         }
 
@@ -95,4 +105,20 @@ namespace WindowsServerInstaller
             return items;
         }
     }
-}
+
+    public class CustonActions
+    {
+        [CustomAction]
+        public static ActionResult FileFlowsAction(Session session)
+        {
+            System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
+            return ActionResult.Success;
+        }
+        [CustomAction]
+        public static ActionResult FileFlowsNodeAction(Session session)
+        {
+            System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
+            return ActionResult.Success;
+        }
+    }
+//}

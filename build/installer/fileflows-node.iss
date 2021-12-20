@@ -25,7 +25,7 @@ UninstallDisplayIcon={app}\FileFlows.exe
 SourceDir=src
 OutputDir={#SourcePath}\bin
 AllowNoIcons=yes
-SetupIconFile=C:\Users\john\src\FileFlows\FileFlows\FileFlows Icon.ico
+//SetupIconFile=C:\Users\john\src\FileFlows\FileFlows\FileFlows Icon.ico
 
 MinVersion=6.0
 PrivilegesRequired=admin

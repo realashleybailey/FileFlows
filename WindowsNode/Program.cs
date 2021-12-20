@@ -22,15 +22,15 @@ namespace FileFlows.WindowsNode
                     return;
                 }
 
-                bool minimize = AppSettings.IsConfigured();
-                ApplicationConfiguration.Initialize();
-
                 HttpHelper.Client = new HttpClient();
 
                 FileFlows.Shared.Logger.Instance = new ServerShared.FileLogger(Application.ExecutablePath + ".log");
 
                 AppSettings.Init();
 
+
+                bool minimize = AppSettings.IsConfigured();
+                ApplicationConfiguration.Initialize();
                 Application.Run(new Form1(minimize));
             }
         }

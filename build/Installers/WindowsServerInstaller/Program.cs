@@ -31,8 +31,22 @@ namespace WindowsServerInstaller
                 WorkingDirectory = @"[INSTALLDIR]"
             });
 
-            var project = new Project("FileFlows" + (Node ? " Node" : ""),
-                dir, dirStartMenu);
+            Project project;
+            if (Node)
+            {
+                project = new Project("FileFlows" + (Node ? " Node" : ""),
+                    dir, dirStartMenu,
+                    new CloseApplication("FileFlows.Server.exe"),
+                    new CloseApplication("FileFlows.exe")
+                );
+            }
+            else
+            {
+                project = new Project("FileFlows" + (Node ? " Node" : ""),
+                    dir, dirStartMenu,
+                    new CloseApplication("FileFlowsNode.exe")
+                );
+            }
 
             project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
                 .Shortcuts = new[]{

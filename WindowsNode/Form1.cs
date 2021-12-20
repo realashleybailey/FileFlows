@@ -18,7 +18,7 @@ namespace FileFlows.WindowsNode
             if (minimize)
             {
                 this.Hide();
-                this.WindowState = FormWindowState.Minimized;   
+                this.WindowState = FormWindowState.Minimized;
                 notifyIcon.Visible = true;
             }
 
@@ -27,6 +27,16 @@ namespace FileFlows.WindowsNode
             {
                 IsEnabledCheck = () => AppSettings.Instance.Enabled
             });
+        }
+
+        protected override void SetVisibleCore(bool value)
+        {
+            if (IsHandleCreated == false && value)
+            {
+                value = false;
+                CreateHandle();
+            }
+            base.SetVisibleCore(value);
         }
 
         /// <summary>

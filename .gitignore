@@ -22,3 +22,4 @@ docker.xml
 /build/Installers/.vs/FileFlowInstallers/v17/TestStore/0
 /packages
 /build/Installers/.vs
+/build/Installers/WindowsServerInstaller/wix

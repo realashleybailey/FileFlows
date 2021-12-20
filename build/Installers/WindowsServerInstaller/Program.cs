@@ -31,7 +31,8 @@ namespace WindowsServerInstaller
                 WorkingDirectory = @"[INSTALLDIR]"
             });
 
-            var project = new Project("FileFlows" + (Node ? " Node" : ""), dir, dirStartMenu);
+            var project = new Project("FileFlows" + (Node ? " Node" : ""),
+                dir, dirStartMenu);
 
             project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
                 .Shortcuts = new[]{
@@ -47,6 +48,8 @@ namespace WindowsServerInstaller
                 Schedule = UpgradeSchedule.afterInstallInitialize,
                 DowngradeErrorMessage = "A later version of [ProductName] is already installed. Setup will now exit."
             };
+            foreach (var media in project.Media)
+                media.CompressionLevel = CompressionLevel.high;
 
             project.LicenceFile = "eula.rtf";
             project.BannerImage = "banner.png";
@@ -69,7 +72,10 @@ namespace WindowsServerInstaller
                 items.Add(sd);
             }
             foreach (var file in di.GetFiles())
-                items.Add(new WixSharp.File(file.FullName));
+            {
+                var wixFile = new WixSharp.File(file.FullName);
+                items.Add(wixFile);
+            }
 
             return items;
         }

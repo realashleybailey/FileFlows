@@ -16,11 +16,10 @@ namespace WindowsServerInstaller
         static bool Node = false;
         static string ffmpeg = @"C:\utils\ffmpeg\ffmpeg.exe";
         static string ffPath = @"..\..\..\deploy\FileFlows";
-        static string ffNodePath = @"..\..\..\deploy\FileFlows";
 
         static public void Main(string[] args)
         {
-            var rootFiles = RecursiveFileAdd(Node ? ffNodePath : ffPath);
+            var rootFiles = RecursiveFileAdd(ffPath + (Node ?  "-Node": ""));
             rootFiles.Add(new Dir("Tools", new WixSharp.File(ffmpeg)));
 
             var dir = new Dir(@"%AppData%\FileFlows\" + (Node ? "Node" : "Server"), rootFiles.ToArray());
@@ -41,7 +40,7 @@ namespace WindowsServerInstaller
             project.OutDir = "..\\..\\..\\deploy";
             project.OutFileName = "FileFlows" + (Node ? "Node" : "") + "-" + VERSION;
             project.Version = new Version(VERSION);
-
+            
             Compiler.BuildMsi(project);
         }
 

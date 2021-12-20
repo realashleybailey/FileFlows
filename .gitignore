@@ -20,3 +20,4 @@ docker.xml
 /build/installer/fileflows-node-install.iss
 /build/installer/install.iss
 /build/Installers/.vs/FileFlowInstallers/v17/TestStore/0
+/packages

@@ -29,7 +29,8 @@ if ( $linux -eq $true) {
     dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 }
 else {    
-    dotnet.exe publish 'WindowsServer\WindowsServer.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright    dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
+    dotnet.exe publish 'WindowsServer\WindowsServer.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright    
+    dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 }
 dotnet.exe publish Client\Client.csproj --configuration Release --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 

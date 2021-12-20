@@ -12,11 +12,13 @@ namespace FileFlows.WindowsNode
         [STAThread]
         static void Main(string[] args)
         {
+            bool silent = args?.FirstOrDefault() == "--silent";
             using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
             {
                 if (mutex.WaitOne(0, false) == false)
                 {
-                    MessageBox.Show("Instance already running", "FileFlows Node");
+                    if(silent == false)
+                        MessageBox.Show("Instance already running", "FileFlows Node");
                     return;
                 }
 

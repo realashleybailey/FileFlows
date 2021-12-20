@@ -12,18 +12,21 @@ namespace FileFlows.WindowsServer
         [STAThread]
         static void Main(string[] args)
         {
+            bool silent = args?.FirstOrDefault() == "--silent";
             using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
             {
                 if (mutex.WaitOne(0, false) == false)
                 {
-                    LaunchBrowser();// MessageBox.Show("Instance already running", "FileFlows");
+                    if(silent == false)
+                        LaunchBrowser();
                     return;
                 }
                 else
                 {
                     WebServerHelper.Start();
                     ApplicationConfiguration.Initialize();
-                    LaunchBrowser();
+                    if(silent == false)
+                        LaunchBrowser();
                     Application.Run(new Form1());
                 }
             }

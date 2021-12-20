@@ -36,6 +36,9 @@ namespace WindowsServerInstaller
             project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
                 .Shortcuts = new[]{
                 new FileShortcut("FileFlows" + (Node ? " Node" :""), @"%AppData%\Microsoft\Windows\Start Menu\Programs\Startup")
+                {   
+                    Arguments = "--silent"
+                }
             };
 
             project.MajorUpgrade = new MajorUpgrade

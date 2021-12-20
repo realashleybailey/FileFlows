@@ -29,8 +29,7 @@ if ( $linux -eq $true) {
     dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 }
 else {    
-    dotnet.exe publish 'WindowsServer\WindowsServer.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
-    dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
+    dotnet.exe publish 'WindowsServer\WindowsServer.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright    dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 }
 dotnet.exe publish Client\Client.csproj --configuration Release --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 
@@ -47,12 +46,18 @@ if ((Test-Path deploy\plugins) -eq $true) {
 }
 
 if ( $linux -eq $false) {
-    (Get-Content build\installer\fileflows.iss) -replace '0.0.0.0', "$version" | Out-File build\installer\install.iss -Encoding ascii
-    $curDir = Get-Location
-    (Get-Content build\installer\install.iss) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\', "$curDir\" | Out-File build\installer\install.iss -Encoding ascii
-    (Get-Content build\installer\install.iss) -replace '2020', "$year" | Out-File build\installer\install.iss -Encoding ascii
     
-    & 'C:\Program Files (x86)\Inno Setup 6\iscc.exe' /Odeploy 'build\installer\install.iss' 
+    (Get-Content WindowsServerInstaller\Program.cs) -replace '0.0.0.0', "$version" | Out-File  WindowsServerInstaller\Program.cs -Encoding ascii
+    $curDir = Get-Location
+    (Get-Content WindowsServerInstaller\Program.cs) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\deploy\\FileFlows', "$curDir\deploy" | Out-File  WindowsServerInstaller\Program.cs -Encoding ascii
+    msbuild.exe WindowsServerInstaller\WindowsServerInstaller.csproj
+
+    #(Get-Content build\installer\fileflows.iss) -replace '0.0.0.0', "$version" | Out-File build\installer\install.iss -Encoding ascii
+    #$curDir = Get-Location
+    #(Get-Content build\installer\install.iss) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\', "$curDir\" | Out-File build\installer\install.iss -Encoding ascii
+    #(Get-Content build\installer\install.iss) -replace '2020', "$year" | Out-File build\installer\install.iss -Encoding ascii
+    #
+    #& 'C:\Program Files (x86)\Inno Setup 6\iscc.exe' /Odeploy 'build\installer\install.iss' 
 }
 
 

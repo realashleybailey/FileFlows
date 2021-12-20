@@ -59,9 +59,12 @@ namespace WindowsServerInstaller
             project.MajorUpgrade = new MajorUpgrade
             {
                 AllowSameVersionUpgrades = true,
+                AllowDowngrades = true,
+                Disallow = false,                
                 Schedule = UpgradeSchedule.afterInstallInitialize,
                 DowngradeErrorMessage = "A later version of [ProductName] is already installed. Setup will now exit."
             };
+
             foreach (var media in project.Media)
                 media.CompressionLevel = CompressionLevel.high;
 

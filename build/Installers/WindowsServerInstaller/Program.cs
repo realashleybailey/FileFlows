@@ -35,17 +35,9 @@ namespace WindowsServerInstaller
 
             project.MajorUpgrade = new MajorUpgrade
             {
+                AllowSameVersionUpgrades = true,
                 Schedule = UpgradeSchedule.afterInstallInitialize,
-                AllowDowngrades = true,
-                IgnoreRemoveFailure = true,
-                AllowSameVersionUpgrades = false
-            };
-            project.MajorUpgradeStrategy = new MajorUpgradeStrategy()
-            {
-                UpgradeVersions = VersionRange.OlderThanThis,
-                PreventDowngradingVersions = VersionRange.NewerThanThis,
-                NewerProductInstalledErrorMessage = "A newer version of this product is already installed.",
-                RemoveExistingProductAfter = Step.InstallInitialize
+                DowngradeErrorMessage = "A later version of [ProductName] is already installed. Setup will now exit."
             };
 
             project.LicenceFile = "eula.rtf";

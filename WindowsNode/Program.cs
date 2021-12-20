@@ -19,7 +19,8 @@ namespace FileFlows.WindowsNode
                     MessageBox.Show("Instance already running", "FileFlows Node");
                     return;
                 }
-                bool minimize = args?.FirstOrDefault() == "-minimized";
+
+                bool minimize = AppSettings.IsConfigured();
                 ApplicationConfiguration.Initialize();
 
                 HttpHelper.Client = new HttpClient();

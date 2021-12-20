@@ -13,7 +13,6 @@ namespace FileFlows.WindowsNode
             this.txtTempPath.Text = AppSettings.Instance.TempPath ?? String.Empty;
             this.numRunners.Value = AppSettings.Instance.Runners;
             this.chkEnabled.Checked = AppSettings.Instance.Enabled;
-            this.chkRunAtStartup.Checked = DetectRunAtStartUp();
 
             if (minimize)
             {
@@ -84,7 +83,6 @@ namespace FileFlows.WindowsNode
             this.numRunners.Enabled = enable;
             this.btnSave.Enabled = enable;
             this.chkEnabled.Enabled = enable;
-            this.chkRunAtStartup.Enabled = enable;
         }
 
         private void SetUrl(string url)
@@ -115,9 +113,6 @@ namespace FileFlows.WindowsNode
             bool enabled = this.chkEnabled.Checked;
             if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
                 return;
-
-            bool runAtStartup = this.chkRunAtStartup.Checked;
-            RegisterRunAtStartUp(runAtStartup);
 
             EnableForm(false);
             Task.Run(async () =>
@@ -157,38 +152,6 @@ namespace FileFlows.WindowsNode
             {
                 this.txtTempPath.Text = folderBrowserDialog.SelectedPath;
             }
-        }
-
-
-
-        private void RegisterRunAtStartUp(bool run)
-        {
-            try
-            {
-                var regkey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", writable: true);
-                var key = regkey.GetValue("FileFlowsNode");
-                if (run && key == null)
-                {
-                    // not there
-                    regkey.SetValue("FileFlowsNode", "\"" + System.Reflection.Assembly.GetExecutingAssembly().Location + "\" -minimized");
-                }
-                else if (run == false && key != null)
-                {
-                    regkey.DeleteValue("FileFlowsNode", false);
-                }
-            }
-            catch (Exception) { }
-        }
-
-        private bool DetectRunAtStartUp()
-        {
-            try
-            {
-                var regkey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                return regkey.GetValue("FileFlowsNode") != null;
-            }
-            catch (Exception) { }
-            return false;
         }
     }
 }

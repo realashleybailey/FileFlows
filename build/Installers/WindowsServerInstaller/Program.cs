@@ -33,6 +33,11 @@ namespace WindowsServerInstaller
 
             var project = new Project("FileFlows" + (Node ? " Node" : ""), dir, dirStartMenu);
 
+            project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
+                .Shortcuts = new[]{
+                new FileShortcut("FileFlows" + (Node ? " Node" :""), @"%AppData%\Microsoft\Windows\Start Menu\Programs")
+            };
+
             project.MajorUpgrade = new MajorUpgrade
             {
                 AllowSameVersionUpgrades = true,

@@ -48,6 +48,11 @@ namespace FileFlows.WindowsNode
             return new();
         }
 
+        public static bool IsConfigured()
+        {
+            return string.IsNullOrWhiteSpace(Load().ServerUrl) == false;
+        }
+
         private static string GetAppSettingsFile()
         {
             return Path.Combine(GetPath(), "fileflows.config");

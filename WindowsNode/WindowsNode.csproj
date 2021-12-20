@@ -11,7 +11,12 @@
 	  <SelfContained>false</SelfContained>
 	  <AssemblyName>FileFlowsNode</AssemblyName>
     <RootNamespace>FileFlows.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <ApplicationIcon>FileFlows Icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="FileFlows Icon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Node\Node.csproj" />

@@ -16,7 +16,7 @@ namespace FileFlows.WindowsNode
             {
                 if (mutex.WaitOne(0, false) == false)
                 {
-                    MessageBox.Show("Instance already running", "FileFlows");
+                    MessageBox.Show("Instance already running", "FileFlows Node");
                     return;
                 }
                 bool minimize = args?.FirstOrDefault() == "-minimized";

@@ -11,30 +11,44 @@ namespace FileFlows.Node
             if (string.IsNullOrWhiteSpace(url))
                 return (false, string.Empty);
 
-            url = url.Trim().ToLower();
-            if (url.StartsWith("http") == false)
-                url = "http://" + url;
-            if (url.EndsWith("/") == false)
-                url += "/";
-            var match = Regex.Match(url, "http(s)?://[^/]+/");
-            if (match.Success == false)
-                return (false, string.Empty);
-
-            url = match.Value;
-
-            try
+            string address = url.ToLower().Replace("http://", "").Replace("https://", "");
+            int givenPort = 5151;
+            var portMatch = Regex.Match(address, @"(?<=(:))[\d]+");
+            if(portMatch != null && portMatch.Success)
             {
-                var nodeService = new NodeService();
-                var result = nodeService.Register(url, Environment.MachineName, tempPath, runners, enabled, mappings).Result;
-                if (result == null)
-                    return (false, "Failed to register");
-                return (true, url);
+                int.TryParse(portMatch.Value, out givenPort);
+            }
+            if (address.IndexOf(":") > 0)
+                address = address.Substring(0, address.IndexOf(":"));
 
-            }
-            catch (Exception ex)
+            if (address.IndexOf("/") > 0)
+                address = address.Substring(0, address.IndexOf("/"));
+
+            // try the common set of ports protocols
+            foreach (int port in new[] { givenPort, 5151, 5000, 80 }.Distinct())
             {
-                return (false, ex.Message);
+                if (port < 0 || port > 65535)
+                    continue;
+
+                foreach (string protocol in new[] { "https", "http" })
+                {
+                    try
+                    {
+                        var nodeService = new NodeService();
+                        string actualUrl = protocol + "://" + address + ":" + port + "/";
+                        var result = nodeService.Register(actualUrl, Environment.MachineName, tempPath, runners, enabled, mappings).Result;
+                        if (result == null)
+                            return (false, "Failed to register");
+                        return (true, actualUrl);
+
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
             }
+
+            return (false, "Failed to register");
         }
     }
 }

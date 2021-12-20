@@ -31,7 +31,7 @@ namespace WindowsServerInstaller
                 WorkingDirectory = @"[INSTALLDIR]"
             });
 
-            var project = new Project("FileFlows" + (Node ? "Node" : ""), dir, dirStartMenu);
+            var project = new Project("FileFlows" + (Node ? " Node" : ""), dir, dirStartMenu);
 
             project.MajorUpgrade = new MajorUpgrade
             {

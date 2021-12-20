@@ -1,5 +1,6 @@
 ﻿namespace FileFlows.ServerShared.Services
 {
+    using FileFlows.ServerShared.Models;
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared.Models;
     using System.Runtime.InteropServices;
@@ -67,12 +68,12 @@
             result.Data.SignalrUrl = ServiceBaseUrl + "/flow";
             return result.Data;
         }
-        public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled, List<KeyValuePair<string, string>> mappings)
+        public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled, List<RegisterModelMapping> mappings)
         {
             if(serverUrl.EndsWith("/"))
                 serverUrl = serverUrl.Substring(0, serverUrl.Length - 1);
 
-            var result = await HttpHelper.Post<ProcessingNode>(serverUrl + "/api/node/register", new 
+            var result = await HttpHelper.Post<ProcessingNode>(serverUrl + "/api/node/register", new RegisterModel
             {
                 Address = address,
                 TempPath = tempPath,

@@ -1,4 +1,5 @@
-﻿using FileFlows.ServerShared.Services;
+﻿using FileFlows.ServerShared.Models;
+using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Helpers;
 using System.Text.RegularExpressions;
 
@@ -6,7 +7,7 @@ namespace FileFlows.Node
 {
     public class ConnectionTester
     {
-        public static (bool, string) SaveConnection(string url, string tempPath, int runners, bool enabled, List<KeyValuePair<string, string>> mappings)
+        public static (bool, string) SaveConnection(string url, string tempPath, int runners, bool enabled, List<RegisterModelMapping> mappings)
         {
             if (string.IsNullOrWhiteSpace(url))
                 return (false, string.Empty);

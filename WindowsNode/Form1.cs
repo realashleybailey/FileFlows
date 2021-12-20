@@ -1,6 +1,7 @@
 using FileFlows.Node;
 using FileFlows.Node.Workers;
 using FileFlows.Server.Workers;
+using FileFlows.ServerShared.Models;
 
 namespace FileFlows.WindowsNode
 {
@@ -117,9 +118,13 @@ namespace FileFlows.WindowsNode
             EnableForm(false);
             Task.Run(async () =>
             {
-                List<KeyValuePair<string, string>> mappings = new List<KeyValuePair<string, string>>
+                List<RegisterModelMapping> mappings = new List<RegisterModelMapping>
                 {
-                    new KeyValuePair<string, string>("ffmpeg", Path.Combine(new FileInfo(Application.ExecutablePath).DirectoryName, "utils\\ffmpeg.exe"))
+                    new RegisterModelMapping
+                    { 
+                        Server = "ffmpeg",
+                        Local = Path.Combine(new FileInfo(Application.ExecutablePath).DirectoryName, "utils\\ffmpeg.exe")
+                    }
                 };
 
                 var result = ConnectionTester.SaveConnection(url, path, runners, enabled, mappings);

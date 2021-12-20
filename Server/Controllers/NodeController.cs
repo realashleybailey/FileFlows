@@ -4,6 +4,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
     using System.Runtime.InteropServices;
+    using FileFlows.ServerShared.Models;
 
     [Route("/api/node")]
     public class NodeController : ControllerStore<ProcessingNode>
@@ -161,14 +162,14 @@ namespace FileFlows.Server.Controllers
 
             if(model.Mappings?.Any() == true)
             {
-                var ffmpegTool = tools.Where(x => x.Name.ToLower() == "ffmpeg").FirstOrDefault(); ;
+                var ffmpegTool = tools.Where(x => x.Name.ToLower() == "ffmpeg").FirstOrDefault();
                 if (ffmpegTool != null)
                 {
                     // update ffmpeg with actual location
-                    var mapping = model.Mappings.Where(x => x.Key.ToLower() == "ffmpeg").FirstOrDefault();
-                    if(string.IsNullOrEmpty(mapping.Key) == false)
+                    var mapping = model.Mappings.Where(x => x.Server.ToLower() == "ffmpeg").FirstOrDefault();
+                    if(mapping != null)
                     {
-                        model.Mappings.Add(new KeyValuePair<string, string>(ffmpegTool.Path, mapping.Value));
+                        mapping.Server = ffmpegTool.Path;
                     }
                 }
             }
@@ -181,7 +182,7 @@ namespace FileFlows.Server.Controllers
                 FlowRunners = model.FlowRunners,
                 TempPath = model.TempPath,
                 Schedule = new string('1', 672),
-                Mappings = model.Mappings ?? tools?.Select(x => new
+                Mappings = model.Mappings?.Select(x => new KeyValuePair<string, string>(x.Server, x.Local))?.ToList() ?? tools?.Select(x => new
                    KeyValuePair<string, string>(x.Path, "")
                 )?.ToList() ?? new()
             });
@@ -196,7 +197,7 @@ namespace FileFlows.Server.Controllers
             var node = data.Where(x => x.Value.Name == Globals.FileFlowsServer).Select(x => x.Value).FirstOrDefault();
             if (node == null)
             {
-                bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+                bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);                
                 node = await Update(new ProcessingNode
                 {
                     Name = Globals.FileFlowsServer,
@@ -207,21 +208,12 @@ namespace FileFlows.Server.Controllers
 #if (DEBUG)
                     TempPath = windows ? @"d:\videos\temp" : "/temp",
 #else
-                    TempPath = windows ? @"d:\videos\temp" : "/temp",
+                    TempPath = windows ? Path.Combine(Program.GetAppDirectory(), "Temp") : "/temp",
 #endif
                 });
             }
             node.SignalrUrl = SignalrUrl;
             return node;
-        }
-
-        public class RegisterModel
-        {
-            public string Address { get; set; }
-            public string TempPath { get; set; }
-            public int FlowRunners { get; set; }
-            public bool Enabled { get; set; }
-            public List<KeyValuePair<string, string>> Mappings;
         }
     }
 

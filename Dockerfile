@@ -12,7 +12,7 @@ RUN apt-get update \
     libssl-dev
 
 # copy the publish into the app 
-COPY /zpublish /app
+COPY /deploy /app
 
 # set the working directory
 WORKDIR /app

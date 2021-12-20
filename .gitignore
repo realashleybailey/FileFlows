@@ -21,3 +21,4 @@ docker.xml
 /build/installer/install.iss
 /build/Installers/.vs/FileFlowInstallers/v17/TestStore/0
 /packages
+/build/Installers/.vs

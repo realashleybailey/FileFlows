@@ -10,12 +10,16 @@ if ((Test-Path ..\deploy\plugins) -eq $true) {
     Copy-Item -Path ..\deploy\Plugins -Filter "*.*" -Recurse -Destination ..\deploy\FileFlows-Node\Plugins -Container
 }
 
-(Get-Content installer\fileflows-node.iss) -replace '0.0.0.0', "$version" | Out-File installer\fileflows-node-install.iss -Encoding ascii
-$curDir = Get-Location
-$curDir = [System.IO.Directory]::GetParent($curDir)
-(Get-Content installer\fileflows-node-install.iss) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\', "$curDir\" | Out-File installer\fileflows-node-install.iss -Encoding ascii
-(Get-Content installer\fileflows-node-install.iss) -replace '2020', "$year" | Out-File installer\fileflows-node-install.iss -Encoding ascii
 
-& 'C:\Program Files (x86)\Inno Setup 6\iscc.exe' /O..\deploy 'installer\fileflows-node-install.iss' 
+(Get-Content installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
+(Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = false', "Node = true" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
+
+if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
+    $curDir = Get-Location
+    & 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' installers\FileFlowInstallers.sln
+}
+else {
+    msbuild.exe installers\FileFlowInstallers.sln
+}
 
 

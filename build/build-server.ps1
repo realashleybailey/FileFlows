@@ -50,24 +50,13 @@ if ( $linux -eq $false) {
     
     (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
-    if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {
-        
+    if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
         $curDir = Get-Location
-        #(Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\deploy\\FileFlows', "$curDir\deploy" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
-
-
         & 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' build\installers\FileFlowInstallers.sln
     }
     else {
         msbuild.exe build\installers\FileFlowInstallers.sln
     }
-
-    #(Get-Content build\installer\fileflows.iss) -replace '0.0.0.0', "$version" | Out-File build\installer\install.iss -Encoding ascii
-    #$curDir = Get-Location
-    #(Get-Content build\installer\install.iss) -replace 'C\:\\Users\\john\\src\\FileFlows\\FileFlows\\', "$curDir\" | Out-File build\installer\install.iss -Encoding ascii
-    #(Get-Content build\installer\install.iss) -replace '2020', "$year" | Out-File build\installer\install.iss -Encoding ascii
-    #
-    #& 'C:\Program Files (x86)\Inno Setup 6\iscc.exe' /Odeploy 'build\installer\install.iss' 
 }
 
 

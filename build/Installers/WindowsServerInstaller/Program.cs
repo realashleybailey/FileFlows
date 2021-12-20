@@ -33,6 +33,21 @@ namespace WindowsServerInstaller
 
             var project = new Project("FileFlows" + (Node ? "Node" : ""), dir, dirStartMenu);
 
+            project.MajorUpgrade = new MajorUpgrade
+            {
+                Schedule = UpgradeSchedule.afterInstallInitialize,
+                AllowDowngrades = true,
+                IgnoreRemoveFailure = true,
+                AllowSameVersionUpgrades = false
+            };
+            project.MajorUpgradeStrategy = new MajorUpgradeStrategy()
+            {
+                UpgradeVersions = VersionRange.OlderThanThis,
+                PreventDowngradingVersions = VersionRange.NewerThanThis,
+                NewerProductInstalledErrorMessage = "A newer version of this product is already installed.",
+                RemoveExistingProductAfter = Step.InstallInitialize
+            };
+
             project.LicenceFile = "eula.rtf";
             project.BannerImage = "banner.png";
             project.BackgroundImage = "background.png";

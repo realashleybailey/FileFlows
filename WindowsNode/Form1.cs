@@ -140,7 +140,7 @@ namespace FileFlows.WindowsNode
                     new RegisterModelMapping
                     { 
                         Server = "ffmpeg",
-                        Local = Path.Combine(new FileInfo(Application.ExecutablePath).DirectoryName, "utils\\ffmpeg.exe")
+                        Local = Path.Combine(new FileInfo(Application.ExecutablePath).DirectoryName, "Tools\\ffmpeg.exe")
                     }
                 };
 

@@ -15,18 +15,25 @@ namespace FileFlows.WindowsNode
             this.numRunners.Value = AppSettings.Instance.Runners;
             this.chkEnabled.Checked = AppSettings.Instance.Enabled;
 
-            if (minimize)
-            {
-                this.Hide();
-                this.WindowState = FormWindowState.Minimized;
-                notifyIcon.Visible = true;
-            }
 
             ServerShared.Services.Service.ServiceBaseUrl = this.txtServer.Text;
             WorkerManager.StartWorkers(new FlowWorker()
             {
                 IsEnabledCheck = () => AppSettings.Instance.Enabled
             });
+
+            if (minimize)
+            {
+                this.Hide();
+                this.WindowState = FormWindowState.Minimized;
+                notifyIcon.Visible = true;
+            }
+            else
+            {
+
+                this.Show();
+                this.WindowState = FormWindowState.Normal;
+            }
         }
 
         protected override void SetVisibleCore(bool value)

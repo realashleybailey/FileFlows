@@ -11,7 +11,7 @@ namespace FileFlows.Server.Helpers
                 return json;
             string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             json = Regex.Replace(json, "/media/([^/\"]+)/([^\"]*)", System.Web.HttpUtility.JavaScriptStringEncode(userDir + "\\$1\\$2"));
-            json = Regex.Replace(json, "/media([^\"]*)", System.Web.HttpUtility.JavaScriptStringEncode(userDir + "\\$1"));
+            json = Regex.Replace(json, "/media/([^\"]*)", System.Web.HttpUtility.JavaScriptStringEncode(userDir + "\\$1"));
             return json;
         }
     }

@@ -1,6 +1,6 @@
 $linux = $args[0] -eq '--linux'
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
-$version = "0.0.1.$revision"
+$version = "0.1.0.$revision"
 $year = (Get-Date).year
 $copyright = "Copyright $year - John Andrews"
 

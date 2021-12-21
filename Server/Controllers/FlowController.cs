@@ -10,6 +10,8 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Plugin.Attributes;
     using FileFlows.Server.Models;
     using FileFlows.ServerShared.Helpers;
+    using System.Runtime.InteropServices;
+    using System.Text.RegularExpressions;
 
     [Route("/api/flow")]
     public class FlowController : ControllerStore<Flow>
@@ -256,11 +258,12 @@ namespace FileFlows.Server.Controllers
                 try
                 {
                     string json = System.IO.File.ReadAllText(tf.FullName);
+                    json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
                     var jsTemplates = System.Text.Json.JsonSerializer.Deserialize<FlowTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
                     {
                         AllowTrailingCommas = true,
                         PropertyNameCaseInsensitive = true
-                    });
+                    }) ?? new FlowTemplate[] { };
                     foreach (var _jst in jsTemplates)
                     {
                         try

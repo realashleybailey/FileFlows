@@ -101,6 +101,7 @@ namespace FileFlows.Server.Controllers
                 try
                 {
                     string json = System.IO.File.ReadAllText(tf.FullName);
+                    json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
                     var jsTemplates = System.Text.Json.JsonSerializer.Deserialize<LibraryTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
                     {
                         AllowTrailingCommas = true,

@@ -1,5 +1,6 @@
-#FROM jrottenberg/ffmpeg:4.4-nvidia
-FROM jrottenberg/ffmpeg:4.1-vaapi
+FROM jrottenberg/ffmpeg:4.4-nvidia
+#FROM jrottenberg/ffmpeg:4.1-vaapi
+#FROM migoller/ffmpeg:latest
 
 # expose the ports we need
 EXPOSE 5000
@@ -13,6 +14,8 @@ RUN apt-get update \
 
 # copy the publish into the app 
 COPY /deploy /app
+
+COPY ../ffmpeg /ffmpeg
 
 # set the working directory
 WORKDIR /app

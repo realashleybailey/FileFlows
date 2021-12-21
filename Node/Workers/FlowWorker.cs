@@ -16,7 +16,7 @@
 
         private bool FirstExecute = true;
 
-        public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 30)
+        public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 10)
         {
             this.isServer = isServer;
             this.FirstExecute = true;

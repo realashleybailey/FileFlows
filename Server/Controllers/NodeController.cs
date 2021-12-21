@@ -146,7 +146,7 @@ namespace FileFlows.Server.Controllers
             var existing = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
             if (existing != null)
             {
-                if(existing.FlowRunners != model.FlowRunners || existing.TempPath != model.TempPath)
+                if(existing.FlowRunners != model.FlowRunners || existing.TempPath != model.TempPath || existing.Enabled != model.Enabled)
                 {
                     existing.FlowRunners = model.FlowRunners;
                     existing.TempPath = model.TempPath;

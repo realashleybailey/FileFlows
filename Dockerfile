@@ -15,7 +15,7 @@ RUN apt-get update \
 # copy the publish into the app 
 COPY /deploy /app
 
-COPY ../ffmpeg /ffmpeg
+COPY ffmpeg ffmpeg
 
 # set the working directory
 WORKDIR /app

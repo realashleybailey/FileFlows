@@ -141,6 +141,10 @@
                         {
                             result.Output = $"{outputBuilder}{errorBuilder}";
                         }
+                        else
+                        {
+                            result.Output = outputBuilder.ToString();
+                        }
                     }
                     else
                     {

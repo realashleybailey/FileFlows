@@ -2,6 +2,7 @@ using FileFlows.Node;
 using FileFlows.Node.Workers;
 using FileFlows.Server.Workers;
 using FileFlows.ServerShared.Models;
+using FileFlows.Shared;
 
 namespace FileFlows.WindowsNode
 {
@@ -19,7 +20,25 @@ namespace FileFlows.WindowsNode
             ServerShared.Services.Service.ServiceBaseUrl = this.txtServer.Text;
             WorkerManager.StartWorkers(new FlowWorker()
             {
-                IsEnabledCheck = () => AppSettings.Instance.Enabled
+                IsEnabledCheck = () => 
+                {
+                    if (AppSettings.IsConfigured() == false)
+                        return false;
+
+
+                    var nodeService = new ServerShared.Services.NodeService();
+                    try
+                    {
+                        var settings = nodeService.GetByAddress(Environment.MachineName).Result;
+                        UpdateSettings(settings);
+                        return AppSettings.Instance.Enabled;
+                    } 
+                    catch (Exception ex)
+                    {
+                        Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    }
+                    return false;
+                }
             });
 
             if (minimize)
@@ -34,6 +53,21 @@ namespace FileFlows.WindowsNode
                 this.Show();
                 this.WindowState = FormWindowState.Normal;
             }
+        }
+
+        private void UpdateSettings(Shared.Models.ProcessingNode node)
+        {
+            AppSettings.Instance.Enabled = node.Enabled;
+            AppSettings.Instance.Runners = node.FlowRunners;
+            AppSettings.Instance.TempPath = node.TempPath;
+            if (this.txtServer.InvokeRequired)
+            {
+                Invoke(new Action(() => UpdateSettings(node)));
+                return;
+            }
+            this.chkEnabled.Checked = node.Enabled;
+            this.numRunners.Value = node.FlowRunners;
+            this.txtTempPath.Text = node.TempPath;
         }
 
         protected override void SetVisibleCore(bool value)

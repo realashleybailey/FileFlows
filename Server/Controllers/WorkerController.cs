@@ -166,7 +166,9 @@ namespace FileFlows.Server.Controllers
 
             await this.Context.Clients.All.SendAsync("AbortFlow", uid);
 
-            if (flowinfo?.LibraryFile != null) {
+            if (flowinfo?.LibraryFile != null)
+            {
+                await this.Context.Clients.All.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
                 var libController = new LibraryFileController();
                 var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
                 if(libfile.Status == FileStatus.Processing)

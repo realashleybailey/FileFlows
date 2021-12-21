@@ -1,12 +1,12 @@
 $linux = $args[0] -eq '--linux'
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
 $version = "0.0.1.$revision"
-$copyright = "Copyright 2021 - John Andrews"
+$year = (Get-Date).year
+$copyright = "Copyright $year - John Andrews"
 
 $csVersion = "string Version = ""$version"""
 
 $runtime = 'win-x64'
-$year = (Get-Date).year
 $outdir = 'deploy/FileFlows'
 if ($linux -eq $true) {
     $outdir = 'deploy/FileFlows-Linux'
@@ -20,19 +20,11 @@ Push-Location ..\
 
 (Get-Content Server\Globals.cs) -replace 'public static bool Demo { get; set; } = (true|false);', "public static bool Demo { get; set; } = false;" | Out-File Server\Globals.cs
 
-
-#(Get-Content Server\Server.csproj) -replace '<RuntimeIdentifier>[^<]+</RuntimeIdentifier>', "<RuntimeIdentifier>$runtime</RuntimeIdentifier>" | Out-File Server\Server.csproj
-#(Get-Content Server\Server.csproj) -replace '<SelfContained>[^<]+</SelfContained>', "<SelfContained>true</SelfContained>" | Out-File Server\Server.csproj
-#(Get-Content Server\Server.csproj) -replace '<PublishTrimmed>[^<]+</PublishTrimmed>', "<PublishTrimmed>false</PublishTrimmed>" | Out-File Server\Server.csproj
-
 if ( $linux -eq $true) {
-    #(Get-Content Server\Server.csproj) -replace '<PublishSingleFile>[^<]+</PublishSingleFile>', "<PublishSingleFile>false</PublishSingleFile>" | Out-File Server\Server.csproj
     (Get-Content Server\Server.csproj) -replace '<AssemblyName>[^<]+</AssemblyName>', "<AssemblyName>FileFlows</AssemblyName>" | Out-File Server\Server.csproj
-    #(Get-Content Server\Server.csproj) -replace '<OutputType>[^<]+<OutputType>', "" | Out-File Server\Server.csproj
     dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 }
 else {    
-    #(Get-Content Server\Server.csproj) -replace '<PublishSingleFile>[^<]+</PublishSingleFile>', "<PublishSingleFile>true</PublishSingleFile>" | Out-File Server\Server.csproj
     (Get-Content Server\Server.csproj) -replace '<AssemblyName>[^<]+</AssemblyName>', "<AssemblyName>FileFlows.Server</AssemblyName>" | Out-File Server\Server.csproj
     dotnet.exe publish 'WindowsServer\WindowsServer.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright    
     dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained -p:PublishSingleFile=true --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright

@@ -1,4 +1,5 @@
-$copyright = "Copyright 2021 - John Andrews"
+$year = (Get-Date).year
+$copyright = "Copyright $year - John Andrews"
 
 
 # build plugin

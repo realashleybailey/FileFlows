@@ -194,6 +194,18 @@
             {
               "label": "H265 (NVIDIA)",
               "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_nvenc -preset hq';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
+              "label": "Intel Hardware Encoding",
+              "value": "###GROUP###"
+            },
+            {
+              "label": "H264 (Intel)",
+              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264_qsv';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
+              "label": "H265 (Intel)",
+              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_qsv -load_plugin hevc_hw';\nVariables.Extension = 'mkv';\nreturn 1;"
             }
           ]
         }

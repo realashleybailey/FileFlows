@@ -170,6 +170,8 @@
         "Path": "Path",
         "Enabled": "Enabled",
         "Flow": "Flow",
+        "Directories": "Directories",
+        "Directories-Help": "If this library monitors directories.  If off, the default, the library will monitor files.\nOnly use this to process a directory in flow.",
         "Priority": "Priority",
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",

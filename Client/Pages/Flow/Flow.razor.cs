@@ -246,6 +246,7 @@ namespace FileFlows.Client.Pages
             try
             {
                 var parts = await jsRuntime.InvokeAsync<List<FlowPart>>("ffFlow.getModel");
+                Logger.Instance.DLog("Parts", parts);
                 var variablesResult = await GetVariables(API_URL + "/" + part.Uid + "/variables", parts);
                 if (variablesResult.Success)
                     variables = variablesResult.Data;

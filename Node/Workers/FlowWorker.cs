@@ -80,16 +80,17 @@
             try
             {
                 var libfileService = LibraryFileService.Load();
-                var flowService = FlowService.Load();
-                FileInfo file = new FileInfo(workingFile);
-                if (file.Exists == false)
+                var libService = LibraryService.Load();
+                var lib = libService.Get(libFile.Library.Uid).Result;
+                if (lib == null)
                 {
                     libfileService.Delete(libFile.Uid).Wait();
                     return;
                 }
-                var libService = LibraryService.Load();
-                var lib = libService.Get(libFile.Library.Uid).Result;
-                if (lib == null)
+
+                var flowService = FlowService.Load();
+                FileSystemInfo file = lib.Directories ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
+                if (file.Exists == false)
                 {
                     libfileService.Delete(libFile.Uid).Wait();
                     return;
@@ -124,7 +125,7 @@
                     LibraryFile = libFile,
                     Log = String.Empty,
                     NodeUid = node.Uid,
-                    NodeName = node.Name,
+                    NodeName = node.Name,                
                     RelativeFile = libFile.RelativePath,
                     Library = libFile.Library,
                     TotalParts = flow.Parts.Count,
@@ -132,7 +133,9 @@
                     CurrentPartPercent = 0,
                     CurrentPartName = string.Empty,
                     StartedAt = DateTime.UtcNow,
-                    WorkingFile = workingFile
+                    WorkingFile = workingFile,
+                    IsDirectory = lib.Directories,
+                    LibraryPath = lib.Path
                 };
 
                 var runner = new FlowRunner(info, flow, node);

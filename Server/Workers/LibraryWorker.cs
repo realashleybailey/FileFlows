@@ -56,58 +56,108 @@ namespace FileFlows.Server.Workers
                 }
                 var flow = flows[library.Flow.Uid];
 
-                var files = GetFiles(new DirectoryInfo(library.Path));
-                Regex regexFilter = null;
-                try
-                {
-                    regexFilter = string.IsNullOrEmpty(library.Filter) ? null : new Regex(library.Filter, RegexOptions.IgnoreCase);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Instance.WLog($"Library '{library.Name}' filter '{library.Filter} is invalid: " + ex.Message);
-                    continue;
-                }
-                List<string> known = new ();
-
-                foreach (var libFile in libraryFiles)
-                {
-                    if(string.IsNullOrEmpty(libFile.Name) == false && known.Contains(libFile.Name.ToLower()) == false)
-                        known.Add(libFile.Name.ToLower());
-                    // need to also exclude the final output of a library file
-                    if(string.IsNullOrEmpty(libFile.OutputPath) == false && known.Contains(libFile.OutputPath.ToLower()) == false)
-                        known.Add(libFile.OutputPath.ToLower());
-                }
-                var tasks = new List<Task<LibraryFile>>();
-                foreach (var file in files)
-                {
-                    if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
-                        continue;
-
-                    if (known.Contains(file.FullName.ToLower()))
-                        continue; // already known
-
-                    tasks.Add(GetLibraryFile(library, flow, file));
-                }
-                Task.WaitAll(tasks.ToArray());
-
-
-                libFileController.AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
+                if (library.Directories)
+                    ScanForDirs(library, libraryFiles, flow);
+                else
+                    ScanFoFiles(library, libraryFiles, flow);
 
                 libController.UpdateLastScanned(library.Uid).Wait();
             }
             Logger.Instance.DLog("Finished scanning libraries");
         }
 
-        private async Task<LibraryFile?> GetLibraryFile(Library library, Flow flow, FileInfo file)
+        private void ScanForDirs(Library library, List<LibraryFile> libraryFiles, Flow flow)
         {
-            if (await CanAccess(file, library.FileSizeDetectionInterval) == false)
-                return null; // this can happen if the file is currently being written to, next scan will retest it
+            var dirs = new DirectoryInfo(library.Path).GetDirectories();
+            Regex regexFilter = null;
+            try
+            {
+                regexFilter = string.IsNullOrEmpty(library.Filter) ? null : new Regex(library.Filter, RegexOptions.IgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.WLog($"Library '{library.Name}' filter '{library.Filter} is invalid: " + ex.Message);
+                return;
+            }
+            List<string> known = new();
+
+            foreach (var libFile in libraryFiles)
+            {
+                if (libFile.IsDirectory == false)
+                    continue;
+                if (string.IsNullOrEmpty(libFile.Name) == false && known.Contains(libFile.Name.ToLower()) == false)
+                    known.Add(libFile.Name.ToLower());
+            }
+            var tasks = new List<Task<LibraryFile>>();
+            foreach (var dir in dirs)
+            {
+                if (regexFilter != null && regexFilter.IsMatch(dir.FullName) == false)
+                    continue;
+
+                if (known.Contains(dir.FullName.ToLower()))
+                    continue; // already known
+
+                tasks.Add(GetLibraryFile(library, flow, dir));
+            }
+            Task.WaitAll(tasks.ToArray());
+
+            new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
+        }
+        private void ScanFoFiles(Library library, List<LibraryFile> libraryFiles, Flow flow)
+        {
+            var files = GetFiles(new DirectoryInfo(library.Path));
+            Regex regexFilter = null;
+            try
+            {
+                regexFilter = string.IsNullOrEmpty(library.Filter) ? null : new Regex(library.Filter, RegexOptions.IgnoreCase);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.WLog($"Library '{library.Name}' filter '{library.Filter} is invalid: " + ex.Message);
+                return;
+            }
+            List<string> known = new();
+
+            foreach (var libFile in libraryFiles)
+            {
+                if (libFile.IsDirectory == true)
+                    continue;
+                if (string.IsNullOrEmpty(libFile.Name) == false && known.Contains(libFile.Name.ToLower()) == false)
+                    known.Add(libFile.Name.ToLower());
+                // need to also exclude the final output of a library file
+                if (string.IsNullOrEmpty(libFile.OutputPath) == false && known.Contains(libFile.OutputPath.ToLower()) == false)
+                    known.Add(libFile.OutputPath.ToLower());
+            }
+            var tasks = new List<Task<LibraryFile>>();
+            foreach (var file in files)
+            {
+                if (regexFilter != null && regexFilter.IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
+                    continue;
+
+                if (known.Contains(file.FullName.ToLower()))
+                    continue; // already known
+
+                tasks.Add(GetLibraryFile(library, flow, file));
+            }
+            Task.WaitAll(tasks.ToArray());
+
+            new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
+        }
+
+        private async Task<LibraryFile?> GetLibraryFile(Library library, Flow flow, FileSystemInfo info)
+        {
+            if (info is FileInfo fileInfo)
+            {
+                if (await CanAccess(fileInfo, library.FileSizeDetectionInterval) == false)
+                    return null; // this can happen if the file is currently being written to, next scan will retest it
+            }
 
             return new LibraryFile
             {
-                Name = file.FullName,
-                RelativePath = file.FullName.Substring(library.Path.Length + 1),
+                Name = info.FullName,
+                RelativePath = info.FullName.Substring(library.Path.Length + 1),
                 Status = FileStatus.Unprocessed,
+                IsDirectory = info is DirectoryInfo,
                 Library = new ObjectReference
                 {
                     Name = library.Name,

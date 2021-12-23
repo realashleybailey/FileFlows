@@ -34,22 +34,45 @@ namespace FileFlows.Plugin
         public Func<string, string>? GetToolPath { get; set; }
         public Func<string, string>? PathMapper { get; set; }
 
+        public bool IsDirectory { get; set; }
+        public string LibraryPath { get; set; }
+
         public string TempPath { get; set; }
 
         public Action<float>? PartPercentageUpdate { get; set; }
 
         public ProcessHelper Process { get; set; }
 
-        public NodeParameters(string filename, ILogger logger)
+        public NodeParameters(string filename, ILogger logger, bool isDirectory, string libraryPath)
         {
+            this.IsDirectory = isDirectory;
             this.FileName = filename;
+            this.LibraryPath = libraryPath;
             this.WorkingFile = filename;
-            this.WorkingFileSize = new FileInfo(filename).Length;
+            try
+            {
+                this.WorkingFileSize = IsDirectory ? GetDirectorySize(filename) : new FileInfo(filename).Length;
+            }
+            catch (Exception) { } // can fail in unit tests
             this.RelativeFile = string.Empty;
             this.TempPath = string.Empty;
             this.Logger = logger;
             InitFile(filename);
             this.Process = new ProcessHelper(logger);
+        }
+
+
+        public long GetDirectorySize(string path)
+        {
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(path);
+                return dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         public string MapPath(string path)
@@ -61,27 +84,54 @@ namespace FileFlows.Plugin
 
         private void InitFile(string filename)
         {
-            var fi = new FileInfo(filename);
-            var fiOriginal = new FileInfo(FileName);
-            UpdateVariables(new Dictionary<string, object> {
-                { "ext", fi.Extension ?? "" },
-                { "fileName", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
-                { "fileFullName", fi.FullName ?? "" },
-                { "fileSize", fi.Exists ? fi.Length : 0 },
-                { "fileCreateYear", fiOriginal.CreationTime.Year },
-                { "fileCreateMonth", fiOriginal.CreationTime.Month },
-                { "fileCreateDay", fiOriginal.CreationTime.Day },
-                { "fileModifiedYear", fiOriginal.LastWriteTime.Year },
-                { "fileModifiedMonth", fiOriginal.LastWriteTime.Month },
-                { "fileModifiedDay", fiOriginal.LastWriteTime.Day },
-                { "fileOrigExt", fiOriginal.Extension ?? "" },
-                { "fileOrigFileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
-                { "fileOrigFullName", fiOriginal.FullName ?? "" },
-                { "folderName", fi.Directory?.Name ?? "" },
-                { "folderFullName", fi.DirectoryName ?? "" },
-                { "folderOrigName", fiOriginal.Directory?.Name ?? "" },
-                { "folderOrigFullName", fiOriginal.DirectoryName ?? "" },
-            });
+            if (IsDirectory)
+            {
+                var di = new DirectoryInfo(filename);
+                var diOriginal = new DirectoryInfo(FileName);
+                UpdateVariables(new Dictionary<string, object> {
+                    { "folder.Name", di.Name ?? "" },
+                    { "folder.FullName", di.FullName ?? "" },
+
+                    { "folder.Date", diOriginal.CreationTime },
+                    { "folder.Date.Year", diOriginal.CreationTime.Year },
+                    { "folder.Date.Month", diOriginal.CreationTime.Month },
+                    { "folder.Date.Day", diOriginal.CreationTime.Day},
+
+                    { "folder.Orig.Name", diOriginal.Name ?? "" },
+                    { "folder.Orig.FullName", diOriginal.FullName ?? "" },
+                });
+            }
+            else
+            {
+                var fi = new FileInfo(filename);
+                var fiOriginal = new FileInfo(FileName);
+                UpdateVariables(new Dictionary<string, object> {
+                    { "ext", fi.Extension ?? "" },
+                    { "file.Name", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
+                    { "file.FullName", fi.FullName ?? "" },
+                    { "file.Extension", fi.Extension ?? "" },
+                    { "file.Size", fi.Exists ? fi.Length : 0 },
+                    { "file.Create", fiOriginal.CreationTime },
+                    { "file.Create.Year", fiOriginal.CreationTime.Year },
+                    { "file.Create.Month", fiOriginal.CreationTime.Month },
+                    { "file.Create.Day", fiOriginal.CreationTime.Day },
+
+                    { "file.Modified", fiOriginal.LastWriteTime },
+                    { "file.Modified.Year", fiOriginal.LastWriteTime.Year },
+                    { "file.Modified.Month", fiOriginal.LastWriteTime.Month },
+                    { "file.Modified.Day", fiOriginal.LastWriteTime.Day },
+
+                    { "file.Orig.Extension", fiOriginal.Extension ?? "" },
+                    { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
+                    { "file.Orig.FullName", fiOriginal.FullName ?? "" },
+
+                    { "folder.Name", fi.Directory?.Name ?? "" },
+                    { "folder.FullName", fi.DirectoryName ?? "" },
+
+                    { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
+                    { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" },
+                });
+            }
 
         }
 

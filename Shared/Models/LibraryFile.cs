@@ -23,6 +23,8 @@ namespace FileFlows.Shared.Models
         public FileStatus Status { get; set; }
         public int Order { get; set; }
 
+        public bool IsDirectory { get; set; }
+
         public TimeSpan ProcessingTime
         {
             get

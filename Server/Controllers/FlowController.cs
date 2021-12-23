@@ -169,26 +169,45 @@ namespace FileFlows.Server.Controllers
         {
             var variables = new Dictionary<string, object>();
             bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
-            variables.Add("ext", ".mkv");
+            
+            bool dir = flowParts?.Any(x => x.FlowElementUid.EndsWith("InputDirectory")) == true;
 
-            variables.Add("fileName", "Filename");
-            variables.Add("fileSize", 1000);
-            variables.Add("fileFullName", "/media/temp/randomfile.ext");
-            variables.Add("fileOrigExt", ".mkv");
-            variables.Add("fileOrigFileName", "OriginalFile");
-            variables.Add("fileOrigFullName", "/media/files/filename.ext");
+            if (dir)
+            {
+                variables.Add("folder.Name", "FolderName");
+                variables.Add("folder.FullName", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
+                variables.Add("folder.Date", DateTime.Now);
+                variables.Add("folder.Date.Day", DateTime.Now.Day);
+                variables.Add("folder.Date.Month", DateTime.Now.Month);
+                variables.Add("folder.Date.Year", DateTime.Now.Year);
+                variables.Add("folder.OrigName", "FolderOriginalName");
+                variables.Add("folder.OrigFullName", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
+            }
+            else
+            {
+                variables.Add("ext", ".mkv");
+                variables.Add("file.Name", "Filename");
+                variables.Add("file.Extension", ".mkv");
+                variables.Add("file.Size", 1000);
+                variables.Add("file.FullName", "/media/temp/randomfile.ext");
+                variables.Add("file.Orig.Extension", ".mkv");
+                variables.Add("file.Orig.FileName", "OriginalFile");
+                variables.Add("file.Orig.FullName", "/media/files/filename.ext");
 
-            variables.Add("fileCreateYear", 2009);
-            variables.Add("fileCreateMonth", 3);
-            variables.Add("fileCreateDay", 1);
-            variables.Add("fileModifiedYear", 2019);
-            variables.Add("fileModifiedMonth", 6);
-            variables.Add("fileModifiedDay", 19);
+                variables.Add("file.Create", DateTime.Now);
+                variables.Add("file.Create.Day", DateTime.Now.Day);
+                variables.Add("file.Create.Month", DateTime.Now.Month);
+                variables.Add("file.Create.Year", DateTime.Now.Year);
+                variables.Add("file.Modified", DateTime.Now);
+                variables.Add("file.Modified.Day", DateTime.Now.Day);
+                variables.Add("file.Modified.Month", DateTime.Now.Month);
+                variables.Add("file.Modified.Year", DateTime.Now.Year);
 
-            variables.Add("folderName", "FolderName");
-            variables.Add("folderFullName", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
-            variables.Add("folderOrigName", "FolderOriginalName");
-            variables.Add("folderOrigFullName", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
+                variables.Add("folder.Name", "FolderName");
+                variables.Add("folder.FullName", windows ? @"C:\Folder\SubFolder" : "/folder/subfolder");
+                variables.Add("folder.Orig.Name", "FolderOriginalName");
+                variables.Add("folder.Orig.FullName", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
+            }
 
             // get the connected nodes to this part
             var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();

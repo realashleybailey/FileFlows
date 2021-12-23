@@ -9,6 +9,11 @@ namespace FileFlows.Shared.Models
         public string Description { get; set; }
         public ObjectReference Flow { get; set; }
 
+        /// <summary>
+        /// If this library monitors for directories or files
+        /// </summary>
+        public bool Directories { get; set; }
+
         public string Schedule { get; set; }
 
         /// <summary>

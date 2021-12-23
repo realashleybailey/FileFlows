@@ -122,6 +122,11 @@
             });
             fields.Add(new ElementField
             {
+                InputType = FormInputType.Switch,
+                Name = nameof(library.Directories)
+            });
+            fields.Add(new ElementField
+            {
                 InputType = FormInputType.Select,
                 Name = nameof(library.Flow),
                 Parameters = new Dictionary<string, object>{

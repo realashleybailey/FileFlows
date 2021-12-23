@@ -126,7 +126,7 @@ public class FlowRunner
         Info.LibraryFile.Status = status;
         if(status == FileStatus.Processed)
         {
-            Info.LibraryFile.FinalSize = nodeParameters.WorkingFileSize;
+            Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
             Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
@@ -149,22 +149,18 @@ public class FlowRunner
 
     private void RunActual(IFlowRunnerCommunicator communicator) 
     {
-        nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator));
+        nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
-        Info.LibraryFile.OriginalSize = new FileInfo(nodeParameters.WorkingFile).Length;
+        Info.LibraryFile.OriginalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : new FileInfo(nodeParameters.WorkingFile).Length;
         nodeParameters.TempPath = Node.TempPath;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
 
         nodeParameters.Logger!.ILog("Excecuting Flow: " + Flow.Name);
 
-        //args.PartPercentageUpdate = (float percentage) => OnPartPercentageUpdate?.Invoke(percentage);
-
-        var fiInput = new FileInfo(Info.LibraryFile.Name);
         nodeParameters.Result = NodeResult.Success;
         nodeParameters.GetToolPath = (string name) =>
         {
-            // new Controllers.ToolController().GetByName(name)?.Result?.Path ?? "";
             var nodeService = NodeService.Load();
             return Node.Map(nodeService.GetToolPath(name).Result);
         };

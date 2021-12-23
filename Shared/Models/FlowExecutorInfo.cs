@@ -13,8 +13,10 @@ public class FlowExecutorInfo
     public string RelativeFile { get; set; }
 
     public ObjectReference Library { get; set; }
+    public string LibraryPath { get; set; }
 
     public string WorkingFile { get; set; }
+    public bool IsDirectory { get; set; }
 
     public int TotalParts { get; set; }
     public int CurrentPart { get; set; }

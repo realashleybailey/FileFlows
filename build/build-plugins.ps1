@@ -1,3 +1,8 @@
+$output = $args[0]
+if ([String]::IsNullOrEmpty($output)) {
+    $output = '../FileFlows/deploy/Plugins';
+}
+
 $year = (Get-Date).year
 $copyright = "Copyright $year - John Andrews"
 
@@ -29,11 +34,11 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
     $json += "`t},`n"
 
     # build an instance for FileFlow local code
-    dotnet build $_ --configuration Release /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary --output:../FileFlows/deploy/Plugins/$name/$version
-    Remove-Item ../FileFlows/deploy/Plugins/$name/$version/FileFLows.Plugin.dll -ErrorAction SilentlyContinue
-    Remove-Item ../FileFlows/deploy/Plugins/$name/$version/FileFLows.Plugin.pdb -ErrorAction SilentlyContinue
-    Remove-Item ../FileFlows/deploy/Plugins/$name/$version/*.deps.json -ErrorAction SilentlyContinue
-    Remove-Item ../FileFlows/deploy/Plugins/$name/$version/ref -Recurse -ErrorAction SilentlyContinue
+    dotnet build $_ --configuration Release /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary --output:$output/$name/$version
+    Remove-Item $output/$name/$version/FileFLows.Plugin.dll -ErrorAction SilentlyContinue
+    Remove-Item $output/$name/$version/FileFLows.Plugin.pdb -ErrorAction SilentlyContinue
+    Remove-Item $output/$name/$version/*.deps.json -ErrorAction SilentlyContinue
+    Remove-Item $output/$name/$version/ref -Recurse -ErrorAction SilentlyContinue
 }
 
 Pop-Location

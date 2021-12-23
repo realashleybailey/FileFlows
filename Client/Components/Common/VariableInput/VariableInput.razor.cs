@@ -86,10 +86,11 @@
         {
             if (args.Key == "{")
             {
-                this.VariablesFiltered = Variables.Keys.OrderBy(x => x).ToList();
+                // filter out any dots yet, these will only be shown if they reach that far to simplify the list
+                FilterText = string.Empty;
+                this.VariablesFiltered = GetFilteredList(string.Empty);
                 VariablesShown = true;
                 SelectedIndex = 0;
-                FilterText = string.Empty;
                 // get the caret index position
                 VariablesIndex = await GetCaretPosition();
                 ValueStart = VariablesIndex == 0 ? string.Empty : this.Value.Substring(0, VariablesIndex);
@@ -98,6 +99,7 @@
             else if (args.Key == "}")
             {
                 VariablesShown = false;
+                this.FilterText = string.Empty;
             }
             else if (VariablesShown)
             {
@@ -117,7 +119,7 @@
                 if (--SelectedIndex < 0)
                     SelectedIndex = VariablesFiltered.Count - 1;
             }
-            else if (args.Key == "Enter")
+            else if (args.Key == "Enter" || args.Key == "Tab")
             {
                 await InsertVariable(VariablesFiltered[SelectedIndex]);
             }
@@ -139,30 +141,70 @@
                 // need to update the filter
                 if (FilterText.Length > 0)
                     FilterText = FilterText.Substring(0, FilterText.Length - 1);
-                this.VariablesFiltered = Variables.Where(x => x.Key.ToLower().StartsWith(FilterText)).Select(x => x.Key).OrderBy(x => x).ToList();
+                this.VariablesFiltered = GetFilteredList(FilterText);
                 this.SelectedIndex = 0;
 
             }
             else if (args.Key.Length == 1)
             {
                 FilterText += args.Key.ToLower();
-                this.VariablesFiltered = Variables.Where(x => x.Key.ToLower().StartsWith(FilterText)).Select(x => x.Key).OrderBy(x => x).ToList();
+                this.VariablesFiltered = GetFilteredList(FilterText);
                 this.SelectedIndex = 0;
             }
         }
+
+        private List<string> GetFilteredList(string filter)
+        {
+            return Variables.Where(x => {
+                if (filter == string.Empty)
+                    return true;
+                if (x.Key.StartsWith(filter) == false)
+                    return false;
+                return true;
+            })
+            .Select(x =>
+            {
+                int index = x.Key.IndexOf(".", filter.Length);
+                if (index > 0)
+                    return x.Key.Substring(0, index + 1);
+                return x.Key;
+            })
+            .Distinct()
+            .OrderBy(x => x).ToList();
+        }
+
 
         private async Task InsertVariable(string text)
         {
             if (VariablesShown == false)
                 return;
-            VariablesShown = false;
 
-            string newValue = ValueStart + "{" + text + "}";
-            int newCaretPos = newValue.Length;
-            newValue += ValueEnd;
-            this.Value = newValue;
-            await Task.Delay(50);
-            await this.SetCaretPosition(newCaretPos);
+            if (text.EndsWith("."))
+            {
+                // part property, add more
+                this.FilterText = text;
+                this.VariablesFiltered = GetFilteredList(FilterText);
+                this.SelectedIndex = 0;
+
+                string newValue = ValueStart + "{" + text;
+                int newCaretPos = newValue.Length;
+                newValue += ValueEnd;
+                this.Value = newValue;
+                await Task.Delay(50);
+                await this.SetCaretPosition(newCaretPos);
+                return;
+            }
+            else
+            {
+
+                VariablesShown = false;
+                string newValue = ValueStart + "{" + text + "}";
+                int newCaretPos = newValue.Length;
+                newValue += ValueEnd;
+                this.Value = newValue;
+                await Task.Delay(50);
+                await this.SetCaretPosition(newCaretPos);
+            }
         }
 
         private async Task<int> GetCaretPosition()

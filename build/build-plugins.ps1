@@ -9,7 +9,7 @@ $copyright = "Copyright $year - John Andrews"
 
 # build plugin
 # build 0.0.1.0 so included one is always greater
-dotnet.exe build ..\Plugin\Plugin.csproj --configuration Release  /p:AssemblyVersion=0.0.1.0 /p:Version=0.0.1.0 /p:CopyRight=$copyright --output ../../FileFlowsPlugins 
+dotnet.exe build ..\Plugin\Plugin.csproj --configuration -m Release  /p:AssemblyVersion=0.0.1.0 /p:Version=0.0.1.0 /p:CopyRight=$copyright --output ../../FileFlowsPlugins  /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
 Remove-Item ../../FileFlowsPlugins/FileFlows.Plugin.deps.json
 
 Push-Location ..\..\FileFlowsPlugins

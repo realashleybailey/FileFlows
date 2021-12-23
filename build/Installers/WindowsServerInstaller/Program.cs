@@ -12,8 +12,8 @@ using WixSharp.Controls;
     {
         static Guid InstallGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CD");
         static Guid InstallNodeGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CE");
-        static string VERSION = "0.1.0.230";
-        static bool Node = true;
+        static string VERSION = "0.0.0.0";
+        static bool Node = false;
         static string ffmpeg = @"C:\utils\ffmpeg\ffmpeg.exe";
         static string ffPath = @"..\..\..\deploy\FileFlows";
 

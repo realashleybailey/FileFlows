@@ -1,3 +1,8 @@
+Write-Output "#################################"
+Write-Output "###      Building Server      ###"
+Write-Output "#################################"
+
+
 $linux = $args[0] -eq '--linux'
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
 $version = "0.1.0.$revision"

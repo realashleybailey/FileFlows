@@ -1,3 +1,7 @@
+Write-Output "#################################"
+Write-Output "###   Building Windows Node   ###"
+Write-Output "#################################"
+
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
 $version = "0.1.0.$revision"
 $year = (Get-Date).year

@@ -1,3 +1,8 @@
+Write-Output "##################################"
+Write-Output "###      Building Plugins      ###"
+Write-Output "##################################"
+
+
 $output = $args[0]
 if ([String]::IsNullOrEmpty($output)) {
     $output = '../FileFlows/deploy/Plugins';

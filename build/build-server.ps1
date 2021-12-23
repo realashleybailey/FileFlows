@@ -51,6 +51,7 @@ if ((Test-Path deploy\plugins) -eq $true) {
 if ( $linux -eq $false) {
     
     (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
+    (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = true', "Node = false" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
     if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
         $curDir = Get-Location

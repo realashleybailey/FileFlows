@@ -1,0 +1,10 @@
+﻿@namespace FileFlows.Client.Components
+
+@if(UpdateAvailable && Dismissed == false){
+    <div class="update-available">
+        @lblUpdateAvailable
+        <a target="_blank" href="https://fileflows.com/downloads">@LatestVersion.ToString()</a>
+        @lblUpdateAvailableSuffix
+        <span class="dismiss fas fa-times" @onclick="Dismiss"></span>
+    </div>
+}

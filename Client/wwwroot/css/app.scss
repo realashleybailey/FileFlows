@@ -146,28 +146,33 @@ button {
     }
 }
 
-#unsupported-browser {
+#unsupported-browser, .update-available {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    line-height: 2rem;
-    font-size: 1.5rem;
+    line-height: 1.5rem;
+    font-size: 1rem;
     background: var(--base);
     border-bottom: solid 1px var(--accent);
     color: var(--accent);
     z-index: 100;
     text-align: center;
+    text-transform: uppercase;
     padding: 1rem;
+    letter-spacing: 2px;
 
     .dismiss {
         position: absolute;
         top: 1.25rem;
         right: 1.5rem;
         cursor: pointer;
+        color: var(--accent);
     }
 }
-
+.update-available {
+    color:var(--color);
+}
 .flow-template-description {
     white-space: pre-wrap;
     margin-bottom: 1rem;
@@ -175,8 +180,8 @@ button {
     font-style: italic;
     color: var(--color-darkest);
     white-space: pre-wrap;
-    margin-left:14rem;
-    margin-top:0.25rem;
+    margin-left: 14rem;
+    margin-top: 0.25rem;
 }
 @media screen and (max-width: 576px){
     .flow-template-description {

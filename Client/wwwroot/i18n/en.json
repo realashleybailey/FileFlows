@@ -32,7 +32,8 @@
     "SpaceSavings": "{size} saved, {items} items",
     "SpaceIncrease": "{size} increase, {items} items",
     "Total": "Total",
-    "Other": "Other"
+    "Other": "Other",
+    "UpdateAvailable": "New version available {version}"
   },
   "Dialogs":{
     "FileBrowser":{

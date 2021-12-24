@@ -463,25 +463,32 @@ button .fas, button .far {
   left: 1px;
 }
 
-#unsupported-browser {
+#unsupported-browser, .update-available {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  line-height: 2rem;
-  font-size: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
   background: var(--base);
   border-bottom: solid 1px var(--accent);
   color: var(--accent);
   z-index: 100;
   text-align: center;
+  text-transform: uppercase;
   padding: 1rem;
+  letter-spacing: 2px;
 }
-#unsupported-browser .dismiss {
+#unsupported-browser .dismiss, .update-available .dismiss {
   position: absolute;
   top: 1.25rem;
   right: 1.5rem;
   cursor: pointer;
+  color: var(--accent);
+}
+
+.update-available {
+  color: var(--color);
 }
 
 .flow-template-description {

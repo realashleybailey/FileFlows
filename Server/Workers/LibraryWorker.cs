@@ -56,7 +56,7 @@ namespace FileFlows.Server.Workers
                 }
                 var flow = flows[library.Flow.Uid];
 
-                if (library.Directories)
+                if (library.Folders)
                     ScanForDirs(library, libraryFiles, flow);
                 else
                     ScanFoFiles(library, libraryFiles, flow);

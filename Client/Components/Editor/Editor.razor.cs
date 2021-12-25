@@ -106,6 +106,12 @@ namespace FileFlows.Client.Components
                 this.RegisteredInputs.Add(input);
         }
 
+        internal void RemoveRegisteredInputs(params string[] except)
+        {
+            var listExcept = except?.ToList() ?? new();
+            this.RegisteredInputs.RemoveAll(x => listExcept.Contains(x.Field?.Name ?? string.Empty) == false);
+        }
+
         internal Inputs.IInput GetRegisteredInput(string name)
         {
             return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();

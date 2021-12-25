@@ -284,17 +284,6 @@ namespace FileFlows.Client.Pages
             if (model is IDictionary<string, object> dict)
             {
                 dict["Name"] = part.Name ?? string.Empty;
-
-                //foreach (var key in dict.Keys.ToArray())
-                //{
-                //    if(dict[key] is JsonElement je)
-                //    {
-                //        if (je.ValueKind == JsonValueKind.String)
-                //            dict[key] = je.GetString();
-                //        else if (je.ValueKind == JsonValueKind.Number)
-                //            dict[key] = je.GetInt32();
-                //    }
-                //}
             }
 
             string title = FlowHelper.FormatLabel(typeName);

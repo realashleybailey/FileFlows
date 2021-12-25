@@ -101,7 +101,6 @@ window.ffFlow = {
         let yPos = event.clientY - bounds.top - 20;
 
         ffFlow.csharp.invokeMethodAsync("AddElement", ffFlow.Mouse.draggingElementUid).then(result => {
-            console.log('adding element', result);
             let element = result.element;
             if (!element) {
                 console.warn('element was null');
@@ -125,6 +124,11 @@ window.ffFlow = {
 
             ffFlowPart.addFlowPart(part);
             ffFlow.parts.push(part);
+
+            if (element.model && Object.keys(element.model).length > 0)
+            {
+                ffFlowPart.editFlowPart(part.uid, true);
+            }
         });
     },
 

@@ -123,7 +123,7 @@
             fields.Add(new ElementField
             {
                 InputType = FormInputType.Switch,
-                Name = nameof(library.Directories)
+                Name = nameof(library.Folders)
             });
             fields.Add(new ElementField
             {

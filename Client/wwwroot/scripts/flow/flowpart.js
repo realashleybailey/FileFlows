@@ -145,7 +145,7 @@ window.ffFlowPart = {
         ffFlow.redrawLines();
     },
 
-    editFlowPart: function (uid) {
+    editFlowPart: function (uid, deleteOnCancel) {
         let part = ffFlow.parts.filter(x => x.uid === uid)[0];
         if (!part)
             return;
@@ -153,8 +153,12 @@ window.ffFlowPart = {
         console.log('editing', part);
 
         ffFlow.csharp.invokeMethodAsync("Edit", part).then(result => {
-            if (!result || !result.model)
+            if (!result || !result.model) {
+                if (deleteOnCancel === true) {
+                    ffFlowPart.deleteFlowPart(uid);
+                }
                 return; // editor was canceled
+            }
             if (result.model.Name) {
                 part.name = result.model.Name;
                 delete result.model.Name;

@@ -89,7 +89,7 @@
                 }
 
                 var flowService = FlowService.Load();
-                FileSystemInfo file = lib.Directories ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
+                FileSystemInfo file = lib.Folders ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
                 if (file.Exists == false)
                 {
                     libfileService.Delete(libFile.Uid).Wait();
@@ -134,7 +134,7 @@
                     CurrentPartName = string.Empty,
                     StartedAt = DateTime.UtcNow,
                     WorkingFile = workingFile,
-                    IsDirectory = lib.Directories,
+                    IsDirectory = lib.Folders,
                     LibraryPath = lib.Path
                 };
 

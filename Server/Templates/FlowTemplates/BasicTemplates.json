@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Blank File Template",
+    "order": 1,
+    "description": "A blank file template with a single \"Input File\" input node.",
+    "parts": [
+      {
+        "node": "InputFile",
+        "uid": "00000000-0000-0000-0000-000000000001"
+      }
+    ]
+  },
+  {
+    "name": "Blank Folder Template",
+    "order": 2,
+    "description": "A blank folder template with a single \"Input Folder\" input node.",
+    "parts": [
+      {
+        "node": "InputFolder",
+        "uid": "00000000-0000-0000-0000-000000000001"
+      }
+    ]
+  }
+]

@@ -80,7 +80,7 @@ namespace FileFlows.Client.Pages
             SetModelProperty(nameof(template.Path), template.Path);
             SetModelProperty(nameof(template.Priority), template.Priority);
             SetModelProperty(nameof(template.ScanInterval), template.ScanInterval);
-            SetModelProperty(nameof(Library.Directories), false);
+            SetModelProperty(nameof(Library.Folders), false);
 
             void SetModelProperty(string property, object value)
             {

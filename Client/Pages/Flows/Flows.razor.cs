@@ -17,6 +17,7 @@ namespace FileFlows.Client.Pages
     using System.Dynamic;
     using Microsoft.AspNetCore.Components.Rendering;
     using System.Text.RegularExpressions;
+    using FileFlows.Plugin;
 
     public partial class Flows : ListPage<ffFlow>
     {
@@ -95,12 +96,6 @@ namespace FileFlows.Client.Pages
             {
                 Blocker.Hide();
             }
-            templates.Insert(0, new Plugin.ListOption
-            {
-                Label = Translater.Instant("Pages.Flows.Template.BlankTemplate"),
-                Value = null
-            });
-
             List<ElementField> fields = new List<ElementField>();
             // add the name to the fields, so a node can be renamed
             fields.Insert(0, new ElementField
@@ -124,6 +119,15 @@ namespace FileFlows.Client.Pages
             efTemplate.ValueChanged += EfTemplate_ValueChanged;
 
             fields.Insert(1, efTemplate);
+
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Text,
+                Name = nameof(ffFlow.Name),
+                Validators = new List<FileFlows.Shared.Validators.Validator> {
+                    new FileFlows.Shared.Validators.Required()
+                }
+            });
 
             var newModelTask = Editor.Open("Pages.Flows.Template", "Pages.Flows.Template.Title", fields, new ExpandoObject(), lblSave: "Labels.Add");
             try
@@ -159,13 +163,14 @@ namespace FileFlows.Client.Pages
             var newTemplate = dict.ContainsKey("Template") ? dict["Template"] as FlowTemplateModel : null;            
 
             var newFlowTemplate = newTemplate?.Flow;
+            string name = (string)dict[nameof(ffFlow.Name)];
 
             if (newFlowTemplate != null)
             {
                 // look for configured values
                 foreach (var k in dict.Keys)
                 {
-                    if (k == "Template")
+                    if (k == "Template" || k == nameof(ffFlow.Name))
                         continue;
                     var ids = k.Split(';');
                     string nodeId = ids[1];
@@ -188,6 +193,8 @@ namespace FileFlows.Client.Pages
                 }
             }
 
+            newFlowTemplate.Name = name;
+
             if (newTemplate?.Save == true)
             {
 #if (DEMO == false)
@@ -205,6 +212,7 @@ namespace FileFlows.Client.Pages
 #endif
             }
 
+
             return newFlowTemplate;
         }
 
@@ -216,6 +224,9 @@ namespace FileFlows.Client.Pages
             if (editor == null)
                 return;
 
+            editor.RemoveRegisteredInputs(nameof(ffFlow.Name), "Template");
+
+
             if (string.IsNullOrEmpty(flowTemplate?.Flow.Description))
             {
                 editor.AdditionalFields = null;
@@ -224,6 +235,7 @@ namespace FileFlows.Client.Pages
 
             if(editor.Model is IDictionary<string, object> dict)
             {
+                dict[nameof(ffFlow.Name)] = flowTemplate.Flow.Name?.IndexOf("Blank ") >= 0 ? string.Empty : flowTemplate.Flow.Name;
                 int hashCode = flowTemplate.GetHashCode();
                 foreach(var key in dict.Keys.ToArray())
                 {

@@ -150,5 +150,9 @@
   {
     "outputFile": "Components/Inputs/InputChecklist/InputChecklist.razor.css",
     "inputFile": "Components/Inputs/InputChecklist/InputChecklist.razor.scss"
+  },
+  {
+    "outputFile": "Pages/Log/Log.razor.css",
+    "inputFile": "Pages/Log/Log.razor.scss"
   }
 ]

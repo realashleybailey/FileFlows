@@ -52,7 +52,8 @@ namespace FileFlows.Shared.Helpers
                 if (url.Contains("i18n") == false && url.StartsWith("http") == false)
                     url = "http://localhost:6868" + url;
 #endif
-                Logger.Instance?.DLog("About to request: " + url);
+                if(url.Contains("fileflows.com") == false)
+                    Logger.Instance?.DLog("About to request: " + url);
                 var request = new HttpRequestMessage
                 {
                     Method = method,

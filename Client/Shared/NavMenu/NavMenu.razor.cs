@@ -58,6 +58,18 @@ namespace FileFlows.Client.Shared
                     new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings")
                 }
             });
+
+
+            MenuItems.Add(new NavMenuGroup
+            {
+                Name = "Help",
+                Icon = "fas fa-question-circle",
+                Items = new List<NavMenuItem>
+                {
+                    new NavMenuItem("Pages.Log.Title", "fas fa-file-alt", "log")
+                }
+            });
+
 #endif
 
             string currentRoute = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);

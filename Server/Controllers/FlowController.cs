@@ -12,6 +12,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.ServerShared.Helpers;
     using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
+    using FileFlows.Shared;
 
     [Route("/api/flow")]
     public class FlowController : ControllerStore<Flow>
@@ -61,9 +62,10 @@ namespace FileFlows.Server.Controllers
                 {
                     if (p.FlowElementUid.EndsWith("." + p.Name))
                         p.Name = string.Empty;
-                    string icon = elements.Where(x => x.Uid == p.FlowElementUid).Select(x => x.Icon).FirstOrDefault();
+                    string icon = elements?.Where(x => x.Uid == p.FlowElementUid)?.Select(x => x.Icon)?.FirstOrDefault() ?? string.Empty;
                     if (string.IsNullOrEmpty(icon) == false)
                         p.Icon = icon;
+                    p.Label = Translater.TranslateIfHasTranslation($"Flow.Parts.{p.FlowElementUid.Substring(p.FlowElementUid.LastIndexOf(".") + 1)}.Label", string.Empty);
                 }
                 return flow;
             }
@@ -193,6 +195,7 @@ namespace FileFlows.Server.Controllers
                 variables.Add("file.Orig.Extension", ".mkv");
                 variables.Add("file.Orig.FileName", "OriginalFile");
                 variables.Add("file.Orig.FullName", "/media/files/filename.ext");
+                variables.Add("file.Orig.Size", 1000);
 
                 variables.Add("file.Create", DateTime.Now);
                 variables.Add("file.Create.Day", DateTime.Now.Day);
@@ -283,7 +286,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("templates")]
         public Dictionary<string, List<FlowTemplateModel>> GetTemplates()
         {
-            var parts = GetElements().ToDictionary(x => x.Name, x => x);
+            var parts = GetElements().ToDictionary(x => x.Uid.Substring(x.Uid.LastIndexOf(".") + 1), x => x);
 
             Dictionary<string, List<FlowTemplateModel>> templates = new ();
             string group = string.Empty;

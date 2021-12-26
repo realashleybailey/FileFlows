@@ -263,7 +263,7 @@ namespace FileFlows.Server.Controllers
                     if (libraryFiles.ContainsKey(uid) == false)
                         continue;
                     item = libraryFiles[uid];
-                    if (item.Status != FileStatus.ProcessingFailed)
+                    if (item.Status != FileStatus.ProcessingFailed && item.Status != FileStatus.Processed)
                         continue;
                     item.Status = FileStatus.Unprocessed;
                 }

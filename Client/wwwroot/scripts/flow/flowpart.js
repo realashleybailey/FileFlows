@@ -12,7 +12,6 @@ window.ffFlowPart = {
     },
 
     addFlowPart: function (part) {
-        console.log('adding flowpart', part);
         let div = document.createElement('div');
         ffFlowPart.flowPartElements.push(div);
         div.setAttribute('id', part.uid);
@@ -113,9 +112,11 @@ window.ffFlowPart = {
         try {
             let divName = document.getElementById(part.uid);
             divName = divName.querySelector('.name');
-            if (!divName)
+            if (!divName) 
                 return;
             let name = part.name;
+            if (!name)
+                name = part.label;
             if (!name) {
                 name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1).replace(/_/g, ' ');
                 name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");

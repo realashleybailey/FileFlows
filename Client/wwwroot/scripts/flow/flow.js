@@ -106,9 +106,9 @@ window.ffFlow = {
                 console.warn('element was null');
                 return;
             }
-
             let part = {
                 name: '', // new part, dont set a name
+                label: element.name,
                 flowElementUid: element.uid,
                 type: element.type,
                 xPos: xPos - 30,

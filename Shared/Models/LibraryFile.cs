@@ -33,6 +33,8 @@ namespace FileFlows.Shared.Models
                     return new TimeSpan();
                 if (Status == FileStatus.Processing)
                     return DateTime.UtcNow.Subtract(ProcessingStarted);
+                if (ProcessingEnded < new DateTime(2000, 1, 1))
+                    return new TimeSpan();
                 return ProcessingEnded.Subtract(ProcessingStarted);
             }
         }

@@ -124,6 +124,7 @@ namespace FileFlows.Plugin
                     { "file.Orig.Extension", fiOriginal.Extension ?? "" },
                     { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
                     { "file.Orig.FullName", fiOriginal.FullName ?? "" },
+                    { "file.Orig.Size", fiOriginal.Length },
 
                     { "folder.Name", fi.Directory?.Name ?? "" },
                     { "folder.FullName", fi.DirectoryName ?? "" },

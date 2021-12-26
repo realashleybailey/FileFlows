@@ -130,6 +130,10 @@ public class FlowRunner
             Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
+        else if(status == FileStatus.ProcessingFailed)
+        {
+            Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
+        }
         do
         {
             try

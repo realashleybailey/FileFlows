@@ -14,7 +14,7 @@ namespace FileFlows.Shared.Models
         public float yPos { get; set; }
 
         public string Icon { get; set; }
-
+        public string Label { get; set; }
         public int Inputs { get; set; }
         public int Outputs { get; set; }
 

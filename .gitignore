@@ -25,3 +25,4 @@ docker.xml
 /build/Installers/WindowsServerInstaller/wix
 /ffmpeg
 /ffmpeg-release-amd64-static.tar.xz
+/Server/Logs

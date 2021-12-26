@@ -27,12 +27,14 @@
         </div>
     </div>
 }
-@if (string.IsNullOrEmpty(Input?.Help) == false)
+@if (string.IsNullOrEmpty(HelpHtml) == false)
 {
     <div class="row mt-0 @(invalid ? "error" : "")">
         <div class="input-label"></div>
         <div class="input-value">
-            <span class="help-text">@Input.Help</span>
+            <span class="help-text">
+                @((MarkupString)HelpHtml)
+            </span>
         </div>
     </div>
 }

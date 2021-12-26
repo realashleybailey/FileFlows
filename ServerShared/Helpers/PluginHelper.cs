@@ -221,7 +221,7 @@
             {
                 FlowElement element = new FlowElement();
                 element.Group = x.Namespace.Substring(x.Namespace.LastIndexOf(".") + 1);
-                string typeName = x.Name;
+                string typeName = x.Name;                
                 element.Name = Shared.Translater.TranslateIfHasTranslation("Flow.Parts." + typeName + ".Label", typeName);
                 element.Uid = x.FullName;
                 element.Fields = new();

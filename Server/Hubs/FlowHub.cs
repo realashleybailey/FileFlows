@@ -10,7 +10,14 @@
         {
             var settings = await new SettingsController().Get();
             Console.Write(libraryFileUid + " => " + message);
-            await File.AppendAllTextAsync(Path.Combine(settings.LoggingPath, libraryFileUid + ".log"), message + Environment.NewLine);
+            try
+            {
+                var fi = new FileInfo(Path.Combine(settings.LoggingPath, libraryFileUid + ".log"));
+                if(fi.Directory.Exists == false)
+                    fi.Directory.Create();
+                await File.AppendAllTextAsync(fi.FullName, message + Environment.NewLine);
+            }
+            catch (Exception ex) { }
 
         }
     }

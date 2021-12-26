@@ -52,7 +52,7 @@
         <FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple"
             DoubleClick="@OnDoubleClick">
             <ToolBar>                    
-                <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.Log" />
                 @if (SelectedStatus == FileStatus.Processing)
                 {
                     <FlowTableButton TItem="LibraryFile" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
@@ -66,7 +66,7 @@
                 {
                     <FlowTableButton TItem="LibraryFile" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
                 }
-                else if(SelectedStatus == FileStatus.ProcessingFailed)
+                else if(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed)
                 {
                     <FlowTableButton TItem="LibraryFile" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
                 }

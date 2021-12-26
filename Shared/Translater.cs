@@ -44,7 +44,7 @@ namespace FileFlows.Shared
                 }
             }
 
-            Console.WriteLine(Language.Keys.Count);
+            Logger?.ILog("Language keys found: " + Language.Keys.Count);
         }
         public static Dictionary<string, string> DeserializeAndFlatten(string json)
         {
@@ -116,6 +116,21 @@ namespace FileFlows.Shared
             {
                 Logger?.WLog("Failed to translating key: " + possibleKeys[0] + ", " + ex.Message);
                 return possibleKeys[0];
+            }
+        }
+
+        public static string TranslateIfHasTranslation(string key, string @default)
+        {
+            try
+            {
+                if (Language.ContainsKey(key) == false)
+                    return @default;
+                string msg = Language[key];
+                return Formatter.FormatMessage(msg, new { });
+            }
+            catch (Exception ex)
+            {
+                return @default;
             }
         }
     }

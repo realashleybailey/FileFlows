@@ -152,7 +152,7 @@ window.ffFlowPart = {
 
         console.log('editing', part);
 
-        ffFlow.csharp.invokeMethodAsync("Edit", part).then(result => {
+        ffFlow.csharp.invokeMethodAsync("Edit", part, deleteOnCancel === true).then(result => {
             if (!result || !result.model) {
                 if (deleteOnCancel === true) {
                     ffFlowPart.deleteFlowPart(uid);

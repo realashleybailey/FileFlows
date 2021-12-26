@@ -238,7 +238,7 @@ namespace FileFlows.Client.Pages
 
 
         [JSInvokable]
-        public async Task<object> Edit(ffPart part)
+        public async Task<object> Edit(ffPart part, bool isNew = false)
         {
             // get flow variables that we can pass onto the form
             Blocker.Show();
@@ -247,7 +247,7 @@ namespace FileFlows.Client.Pages
             {
                 var parts = await jsRuntime.InvokeAsync<List<FlowPart>>("ffFlow.getModel");
                 Logger.Instance.DLog("Parts", parts);
-                var variablesResult = await GetVariables(API_URL + "/" + part.Uid + "/variables", parts);
+                var variablesResult = await GetVariables(API_URL + "/" + part.Uid + "/variables?isNew=" + isNew, parts);
                 if (variablesResult.Success)
                     variables = variablesResult.Data;
             }
@@ -263,13 +263,14 @@ namespace FileFlows.Client.Pages
             }
 
             string typeName = part.FlowElementUid.Substring(part.FlowElementUid.LastIndexOf(".") + 1);
+            string typeDisplayName = Translater.TranslateIfHasTranslation($"Flow.Parts.{typeName}.Label", FlowHelper.FormatLabel(typeName));
 
             var fields = ObjectCloner.Clone(flowElement.Fields);
             // add the name to the fields, so a node can be renamed
             fields.Insert(0, new ElementField
             {
                 Name = "Name",
-                Placeholder = FlowHelper.FormatLabel(typeName),
+                Placeholder = typeDisplayName,
                 InputType = Plugin.FormInputType.Text
             });
 
@@ -286,7 +287,7 @@ namespace FileFlows.Client.Pages
                 dict["Name"] = part.Name ?? string.Empty;
             }
 
-            string title = FlowHelper.FormatLabel(typeName);
+            string title = typeDisplayName;
             var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1);
             try
             {

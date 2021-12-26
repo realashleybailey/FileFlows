@@ -1,3 +1,5 @@
+using FileFlows.Shared;
+
 namespace FileFlows.Server
 {
     public class Program

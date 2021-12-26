@@ -69,12 +69,15 @@ namespace FileFlows.Server
             //    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
             Helpers.DbHelper.CreateDatabase().Wait();
 
+
             // do this so the settings object is loaded, and the time zone is set
             new Controllers.SettingsController().Get().Wait();
 
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting File Flows " + Globals.Version);
             Logger.Instance.ILog(new string('=', 50));
+
+            Helpers.TranslaterHelper.InitTranslater();
 
             Shared.Helpers.HttpHelper.Client = new HttpClient();
 

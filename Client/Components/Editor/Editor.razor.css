@@ -37,7 +37,7 @@
   margin: 1px 0 0;
   /* 1px top for input outline border to be visible */
 }
-.fields ::deep .row + .row {
+.fields ::deep .row + .row, .fields ::deep .row + .input-text-variables, .fields ::deep .input-text-variables + .row {
   margin-top: 1rem;
 }
 

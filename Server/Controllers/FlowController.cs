@@ -165,10 +165,10 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPost("{uid}/variables")]
-        public Dictionary<string, object> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid)
+        public Dictionary<string, object> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid, [FromQuery] bool isNew = false)
         {
             var variables = new Dictionary<string, object>();
-            bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             
             bool dir = flowParts?.Any(x => x.FlowElementUid.EndsWith("InputDirectory")) == true;
 
@@ -209,6 +209,23 @@ namespace FileFlows.Server.Controllers
                 variables.Add("folder.Orig.FullName", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
             }
 
+            PluginHelper pluginHelper = new PluginHelper();
+
+            if (isNew)
+            {
+                // we add all variables on new, so they can hook up a connection easily
+                foreach (var p in flowParts ?? new List<FlowPart>())
+                {
+                    var partVariables = pluginHelper.GetPartVariables(p.FlowElementUid);
+                    foreach (var pv in partVariables)
+                    {
+                        if (variables.ContainsKey(pv.Key) == false)
+                            variables.Add(pv.Key, pv.Value);
+                    }
+                }
+                return variables;
+            }
+
             // get the connected nodes to this part
             var part = flowParts?.Where(x => x.Uid == partUid)?.FirstOrDefault();
             if (part == null)
@@ -220,7 +237,6 @@ namespace FileFlows.Server.Controllers
             if (parentParts.Any() == false)
                 return variables;
 
-            PluginHelper pluginHelper = new PluginHelper(); 
             foreach(var p in parentParts)
             {
                 var partVariables = pluginHelper.GetPartVariables(p.FlowElementUid);

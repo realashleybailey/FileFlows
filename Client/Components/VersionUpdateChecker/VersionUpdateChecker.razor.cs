@@ -42,8 +42,9 @@
 
         private async Task Refresh()
         {
-#if (DEMO)
+#if (DEMO || DEBUG)
 #else
+
             var result = await HttpHelper.Get<string>("https://fileflows.com/api/telemetry/latest-version");
             if (result.Success)
             {

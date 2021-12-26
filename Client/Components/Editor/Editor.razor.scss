@@ -43,7 +43,7 @@
             margin: 1px 0 0; /* 1px top for input outline border to be visible */
         }
 
-        .row + .row {
+        .row + .row, .row + .input-text-variables, .input-text-variables + .row {
             margin-top: 1rem;
         }
     }

@@ -154,5 +154,9 @@
   {
     "outputFile": "Pages/Log/Log.razor.css",
     "inputFile": "Pages/Log/Log.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputArray/InputArray.razor.css",
+    "inputFile": "Components/Inputs/InputArray/InputArray.razor.scss"
   }
 ]

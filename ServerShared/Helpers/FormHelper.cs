@@ -60,6 +60,25 @@
                             }
                         }
                     }
+                    if (attribute is SelectAttribute sel)
+                    {
+                        // get the options
+                        if (string.IsNullOrWhiteSpace(sel.OptionsProperty) == false)
+                        {
+                            var selProperty = type.GetProperty(sel.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
+                            if (selProperty != null)
+                            {
+                                try
+                                {
+                                    ef.Parameters ??= new Dictionary<string, object>();
+                                    var options = selProperty.GetValue(null) as List<Plugin.ListOption>;
+                                    if (ef.Parameters.ContainsKey("Options") == false && options != null)
+                                        ef.Parameters.Add("Options", options);
+                                }
+                                catch (Exception) { }
+                            }
+                        }
+                    }
 
                     if (model.ContainsKey(prop.Name) == false)
                     {

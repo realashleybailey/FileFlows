@@ -123,7 +123,7 @@
                     try
                     {
                         process.StartInfo = new ProcessStartInfo();
-                        process.StartInfo.FileName = windows ? "FileFlows.Runner.exe" : "FileFlows.Runner";
+                        process.StartInfo.FileName = windows ? "FileFlows.FlowRunner.exe" : "FileFlows.FlowRunner";
                         
                         foreach (var str in parameters)
                             process.StartInfo.ArgumentList.Add(str);
@@ -152,7 +152,9 @@
                 {
                     try
                     {
-                        Directory.Delete(Path.Combine(tempPath, "Runner-" + processUid.ToString()), true);
+                        string dir = Path.Combine(tempPath, "Runner-" + processUid.ToString());
+                        if(Directory.Exists(dir))
+                            Directory.Delete(dir, true);
                     }
                     catch (Exception ex)
                     {

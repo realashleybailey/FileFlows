@@ -38,6 +38,12 @@ namespace FileFlows.Server.Helpers
                     using var sr = new StreamReader(entry.Open());
                     string json = sr.ReadToEnd();
 
+                    if (string.IsNullOrEmpty(json))
+                    {
+                        Logger.Instance?.WLog("Unable to read plugininfo from file: " + ffplugin);
+                        continue;
+                    }
+
                     var langEntry = zf.GetEntry("en.json");
                     if (langEntry != null)
                     {
@@ -45,7 +51,14 @@ namespace FileFlows.Server.Helpers
                         langFiles.Add(srLang.ReadToEnd());
                     }
 
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
                     PluginInfo pi = JsonSerializer.Deserialize<PluginInfo>(json, options);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+                    if (pi == null)
+                    {
+                        Logger.Instance?.WLog("Unable to parse plugininfo from file: " + ffplugin);
+                        continue;
+                    }
 
                     var plugin = dbPluginInfos.FirstOrDefault(x => x.Name == pi.Name);
                     bool hasSettings = false; // todo pi.plugin == null ? false : FormHelper.GetFields(plugin.GetType(), new Dictionary<string, object>()).Any();
@@ -86,10 +99,20 @@ namespace FileFlows.Server.Helpers
 
             foreach (var plugin in dbPluginInfos.Where(x => installed.Contains(x.Name) == false))
             {
-                Logger.Instance.DLog("Missing plugin dll: " + plugin.Name);
-                plugin.Deleted = true;
-                plugin.DateModified = DateTime.UtcNow;
-                controller.Update(plugin).Wait();
+                if (String.IsNullOrEmpty(plugin.PackageName))
+                {
+                    Logger.Instance.DLog("Delete old plugin: " + plugin.Name);
+                    // its an old style plugin, perm delete it
+                    controller.Delete(new ReferenceModel { Uids = new[] { plugin.Uid } }).Wait();
+                }
+                else
+                {
+                    Logger.Instance.DLog("Missing plugin: " + plugin.Name);
+                    // mark as deleted.
+                    plugin.Deleted = true;
+                    plugin.DateModified = DateTime.UtcNow;
+                    controller.Update(plugin).Wait();
+                }
             }
 
             CreateLanguageFile(langFiles);

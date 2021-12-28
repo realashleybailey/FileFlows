@@ -9,6 +9,8 @@ namespace FileFlows.Shared.Models
         public string Version { get; set; }
         public bool Deleted { get; set; }
         public bool HasSettings { get; set; }
+
+        public string PackageName { get; set; }
         public ExpandoObject Settings { get; set; }
 
         public List<ElementField> Fields { get; set; }

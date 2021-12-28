@@ -28,9 +28,9 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             Console.WriteLine("Plugins found: " + plugins.Count);
             foreach (var plugin in plugins)
             {
-                Console.WriteLine("Saving info for plugin: " + plugin.Name);
-                string file = plugin.Name + ".plugininfo";
-                plugin.Name = new FileInfo(plugin.Name).Name.Replace(".dll", "");
+                Console.WriteLine("Saving info for plugin: " + plugin.PackageName);
+                string file = plugin.PackageName + ".plugininfo";
+                plugin.PackageName = new FileInfo(plugin.PackageName).Name.Replace(".dll", "");
                 string json = JsonSerializer.Serialize(plugin, new JsonSerializerOptions
                 {
                     WriteIndented = true,
@@ -65,8 +65,11 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
 
                     var plugin = (IPlugin)Activator.CreateInstance(pluginType);
                     var info = new PluginInfo();
-                    info.Name = dll.FullName;
+                    info.PackageName = dll.FullName;
                     var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(dll.FullName);
+                    if (fvi == null)
+                        continue;
+                    info.Name = fvi.ProductName ?? dll.Name;
                     info.Version = fvi.FileVersion.ToString();
                     info.Elements = GetElements(assembly);
                     results.Add(info);

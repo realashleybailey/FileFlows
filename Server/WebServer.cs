@@ -1,5 +1,6 @@
 ﻿using FileFlows.Node.Workers;
 using FileFlows.Server.Workers;
+using System.Text.RegularExpressions;
 
 namespace FileFlows.Server
 {
@@ -18,10 +19,18 @@ namespace FileFlows.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             int port = 5000;
 #if (DEBUG)
             port = 6868;
 #endif
+            string url = args?.Where(x => x.StartsWith("--urls=")).FirstOrDefault();
+            if(string.IsNullOrEmpty(url) == false)
+            {
+                var portMatch = Regex.Match(url, @"(?<=(:))[\d]+");
+                if (portMatch.Success)
+                    port = int.Parse(portMatch.Value);
+            }
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

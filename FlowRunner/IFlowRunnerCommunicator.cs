@@ -19,6 +19,7 @@ namespace FileFlows.FlowRunner
         public FlowRunnerCommunicator(Guid libraryFileUid)
         {
             this.LibraryFileUid = libraryFileUid;
+            Console.WriteLine("SignalrUrl:" + SignalrUrl);
             connection = new HubConnectionBuilder()
                                 .WithUrl(new Uri(SignalrUrl))
                                 .WithAutomaticReconnect()

@@ -89,12 +89,16 @@ namespace FileFlows.Server.Controllers
         [HttpGet("by-address/{address}")]
         public async Task<ProcessingNode> GetByAddress([FromRoute] string address)
         {
+            if (address == "INTERNAL_NODE")
+                return await GetServerNode();
+
             if (string.IsNullOrWhiteSpace(address))
                 throw new ArgumentNullException(nameof(address));
 
             address = address.Trim();
             var data = await GetData();
             var node = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
+            node.SignalrUrl = SignalrUrl;
             return node;
         }
 

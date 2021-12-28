@@ -40,10 +40,18 @@
             }
         }
 
-        public Task<ProcessingNode> GetServerNode()
+        public async Task<ProcessingNode> GetServerNode()
         {
-            // not implemented here, since the Server INodeService will implement this
-            throw new NotImplementedException();
+            try
+            {
+                var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/INTERNAL_NODE");
+                return result.Data;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog("Failed to locate server node: " + ex.Message);
+                return null;
+            }
         }
 
         public async Task<string> GetToolPath(string name)
@@ -61,12 +69,20 @@
         }
 
         public async Task<ProcessingNode> GetByAddress(string address)
-        {            
-            var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/" + Uri.EscapeDataString(address));
-            if (result.Success == false)
-                throw new Exception("Failed to register node: " + result.Body);
-            result.Data.SignalrUrl = ServiceBaseUrl + "/flow";
-            return result.Data;
+        {
+            try
+            {
+                var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/" + Uri.EscapeDataString(address));
+                if (result.Success == false)
+                    throw new Exception("Failed to register node: " + result.Body);
+                //result.Data.SignalrUrl = ServiceBaseUrl + "/flow";
+                return result.Data;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to get node by address: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                throw;
+            }
         }
         public async Task<ProcessingNode> Register(string serverUrl, string address, string tempPath, int runners, bool enabled, List<RegisterModelMapping> mappings)
         {

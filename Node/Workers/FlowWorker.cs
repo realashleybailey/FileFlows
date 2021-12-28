@@ -118,34 +118,42 @@
 #if (DEBUG)
                     FileFlows.FlowRunner.Program.Main(parameters);
 #else
-                using (Process process = new Process())
-                {
-                    try
+                    using (Process process = new Process())
                     {
-                        process.StartInfo = new ProcessStartInfo();
-                        process.StartInfo.FileName = windows ? "FileFlows.FlowRunner.exe" : "FileFlows.FlowRunner";
-                        
-                        foreach (var str in parameters)
-                            process.StartInfo.ArgumentList.Add(str);
+                        try
+                        {
+                            process.StartInfo = new ProcessStartInfo();
+#if (DEBUG)
+                            process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
+#else
+                            process.StartInfo.FileName = windows ? "FileFlows.FlowRunner.exe" : "FileFlows.FlowRunner";
+#endif
 
-                        process.StartInfo.UseShellExecute = false;
-                        process.StartInfo.RedirectStandardOutput = true;
-                        process.StartInfo.RedirectStandardError = true;
-                        process.StartInfo.CreateNoWindow = true;
-                        process.Start();
-                        string output = process.StandardError.ReadToEnd();
-                        if (string.IsNullOrEmpty(output) == false)
-                            Logger.Instance?.ILog(output);
-                        string error = process.StandardError.ReadToEnd();
-                        process.WaitForExit();
-                        if (string.IsNullOrEmpty(error) == false)
-                            Logger.Instance?.ELog(output);
+                            foreach (var str in parameters)
+                                process.StartInfo.ArgumentList.Add(str);
+
+                            process.StartInfo.UseShellExecute = false;
+                            process.StartInfo.RedirectStandardOutput = true;
+                            process.StartInfo.RedirectStandardError = true;
+                            process.StartInfo.CreateNoWindow = true;
+                            process.Start();
+                            string output = process.StandardOutput.ReadToEnd();
+                            if (string.IsNullOrEmpty(output) == false)
+                                Logger.Instance?.ILog(output);
+                            string error = process.StandardError.ReadToEnd();
+                            process.WaitForExit();
+                            if (string.IsNullOrEmpty(error) == false)
+                                Logger.Instance?.ELog(output);
+                            if(process.ExitCode != 0)
+                                throw new Exception("Invalid exit code: " + process.ExitCode);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Instance?.ELog("Error executing runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                            libFile.Status = FileStatus.ProcessingFailed;
+                            libFileService.Update(libFile);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.Instance?.ELog("Error executing runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
-                    }
-            }
 #endif
                 }
                 finally

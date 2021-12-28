@@ -34,12 +34,18 @@ namespace FileFlows.FlowRunner
                 ExtractPlugins(pluginsPath, workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
+                Shared.Helpers.HttpHelper.Client = new HttpClient();
                 Execute(server, tempPath, libfileUid, workingDir);
             }
             catch (Exception ex)
             {
                 Environment.ExitCode = 1;
                 Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                while(ex.InnerException != null)
+                {
+                    Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    ex = ex.InnerException;
+                }
                 return;
             }
         }
@@ -70,15 +76,24 @@ namespace FileFlows.FlowRunner
             var nodeService = NodeService.Load();
             try
             {
-                node = isServer ? nodeService.GetServerNode().Result : nodeService.GetByAddress(Environment.MachineName).Result;
+                string address = isServer ? "INTERNAL_NODE" : Environment.MachineName;
+                Console.WriteLine("Address: "+ address);
+                var nodeTask = nodeService.GetByAddress(address);
+                Console.WriteLine("Waiting on node task");
+                nodeTask.Wait();
+                Console.WriteLine("Completed node task");
+                node = nodeTask.Result;
+                if (node == null)
+                    throw new Exception("Failed to load node!!!!");
+                Console.WriteLine("Node SignalrUrl: " + node.SignalrUrl);
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to register node: " + ex.Message);
+                Console.WriteLine("Failed to register node: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                throw;
             }
 
-            //if (isServer == false)
-                FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
+            FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
 
             var libFileService = LibraryFileService.Load();
             var libFile = libFileService.Get(libfileUid).Result;
@@ -146,8 +161,7 @@ namespace FileFlows.FlowRunner
             };
 
             var runner = new Runner(info, flow, node, workingDir);
-            var task = runner.Run();
-            task.Wait();
+            runner.Run();
         }
 
     }

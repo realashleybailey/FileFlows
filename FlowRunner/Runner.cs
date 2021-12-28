@@ -27,12 +27,12 @@ public class Runner
     private NodeParameters nodeParameters;
     private Node currentNode;
 
-    public async Task Run()
+    public void Run()
     {
         try
         {
             var service = FlowRunnerService.Load();
-            var updated = await service.Start(Info);
+            var updated = service.Start(Info).Result;
             if (updated == null)
                 return; // failed to update
             Info.Uid = updated.Uid;
@@ -50,11 +50,13 @@ public class Runner
         }
         catch (Exception ex)
         {
-            Logger.Instance.ELog("Error in FlowRunner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            string msg = "Error in FlowRunner: " + ex.Message + Environment.NewLine + ex.StackTrace;
+            Console.WriteLine(msg);
+            Logger.Instance.ELog(msg);
         }
         finally
         {
-            await Finish();
+            Finish().Wait();
         }
     }
 

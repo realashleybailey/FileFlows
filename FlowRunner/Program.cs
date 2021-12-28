@@ -23,6 +23,12 @@ namespace FileFlows.FlowRunner
                 if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
                     throw new Exception("Temp path doesnt exist: " + tempPath);
 
+                string baseUrl = GetArgument(args, "--baseUrl");
+                if (string.IsNullOrEmpty(baseUrl))
+                    throw new Exception("baseUrl not set");
+                Console.WriteLine("Base URL: " + baseUrl);
+                Service.ServiceBaseUrl = baseUrl;
+
                 string pluginsPath = GetArgument(args, "--pluginsPath");
                 if(string.IsNullOrEmpty(pluginsPath) || Directory.Exists(pluginsPath) == false)
                     throw new Exception("Plugin path doesnt exist: " + pluginsPath);

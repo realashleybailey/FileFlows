@@ -9,7 +9,6 @@ namespace FileFlows.Server.Controllers
     [Route("/api/node")]
     public class NodeController : ControllerStore<ProcessingNode>
     {
-
         static string _SignalrUrl;
         internal static string SignalrUrl
         {

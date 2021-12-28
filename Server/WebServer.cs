@@ -18,6 +18,11 @@ namespace FileFlows.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            int port = 5000;
+#if (DEBUG)
+            port = 6868;
+#endif
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSignalR();
@@ -81,6 +86,8 @@ namespace FileFlows.Server
 
             Shared.Helpers.HttpHelper.Client = new HttpClient();
 
+            ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{port}";
+
             Helpers.PluginScanner.Scan();
 
             LibraryWorker.ResetProcessing();
@@ -94,7 +101,7 @@ namespace FileFlows.Server
 
             // this will run the asp.net app and wait until it is killed
             Console.WriteLine("Running FileFlows Server");
-            app.Run();
+            app.Run($"http://[::]:{port}/");
             Console.WriteLine("Finished running FileFlows Server");
 
             WorkerManager.StopWorkers();

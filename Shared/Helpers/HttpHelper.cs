@@ -68,7 +68,7 @@ namespace FileFlows.Shared.Helpers
                 }
 
 
-
+                Console.WriteLine("Making request[" + method + "]: " + url);
                 HttpResponseMessage response;
                 if (timeoutSeconds > 0)
                 {

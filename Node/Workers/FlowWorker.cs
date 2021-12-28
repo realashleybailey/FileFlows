@@ -112,6 +112,8 @@
                         PluginsPath,
                         "--tempPath",
                         tempPath,
+                        "--baseUrl",
+                        Service.ServiceBaseUrl,
                         isServer ? "--server" : "--notserver"
                     };
 

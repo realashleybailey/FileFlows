@@ -1,4 +1,11 @@
 ﻿.log {
   white-space: pre;
   font-family: monospace;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem;
+  overflow: auto;
 }

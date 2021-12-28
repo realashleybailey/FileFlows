@@ -28,7 +28,6 @@ namespace FileFlows.Server.Controllers
                     DateCreated = plugin.DateCreated,
                     DateModified = plugin.DateModified,
                     Enabled = plugin.Enabled,
-                    Assembly = plugin.Assembly,
                     Version = plugin.Version,
                     Deleted = plugin.Deleted,
                     HasSettings = plugin.HasSettings,
@@ -79,34 +78,9 @@ namespace FileFlows.Server.Controllers
         private string GetPluginsDir() => Path.Combine(Program.GetAppDirectory(), "Plugins");
 
         [HttpGet("language/{langCode}.json")]
-        public string LanguageFile([FromQuery] string langCode = "en")
+        public IActionResult LanguageFile([FromQuery] string langCode = "en")
         {
-            var json = "{}";
-            try
-            {
-                foreach (var dir in new DirectoryInfo(GetPluginsDir()).GetDirectories())
-                {
-                    foreach (var jf in dir.GetFiles("*.json"))
-                    {
-                        if (jf.Name.Contains(".deps."))
-                            continue;
-                        try
-                        {
-                            string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf.FullName));
-                            json = updated;
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Instance.ELog("Error loading plugin json[0]:" + ex.Message + Environment.NewLine + ex.StackTrace);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-            return json;
+            return File("i18n/plugins.en.json", "text/json");
         }
 
         [HttpGet("plugin-packages")]
@@ -153,6 +127,14 @@ namespace FileFlows.Server.Controllers
             plugin.Fields = null;
             await Update(plugin);
             return true;
+        }
+
+        [HttpDelete]
+        public async Task Delete([FromBody] ReferenceModel model)
+        {
+            if (model == null || model.Uids?.Any() != true)
+                return; // nothing to delete
+            await DeleteAll(model);
         }
     }
 }

@@ -26,3 +26,4 @@ docker.xml
 /ffmpeg
 /ffmpeg-release-amd64-static.tar.xz
 /Server/Logs
+/Server/wwwroot/i18n

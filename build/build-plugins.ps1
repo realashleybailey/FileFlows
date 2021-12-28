@@ -30,7 +30,9 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
         -replace '(?<=(Version>([\d]+\.){3}))([\d]+)(?=<)', $revision |
     Out-File $_
 
+    
     $name = [System.IO.Path]::GetFileNameWithoutExtension($_) 
+    Write-Output "Building Plugin $name"
     $version = [Regex]::Match((Get-Content $_), "(?<=(Version>))([\d]+\.){3}[\d]+(?=<)").Value
     
     $json += "`t{`n"
@@ -49,8 +51,8 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
     Push-Location ../FileFlows/PluginInfoGenerator
     dotnet run ../deploy/Plugins/$name
     Pop-Location
-
     Move-Item $output/$name/*.plugininfo $output/$name/.plugininfo
+    Move-Item $output/$name/*.en.json $output/$name/en.json
 
     # construct .ffplugin file
     $compress = @{
@@ -68,8 +70,8 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
     Remove-Item $output/$name -Recurse -ErrorAction SilentlyContinue
 
     if ([String]::IsNullOrEmpty($output2) -eq $false) {
-        Write-Output "Moving file to $output2"
-        Move-Item "$output/$name.ffplugin" "$output2/"
+        Write-Output "Moving file to $output2"        
+        Move-Item "$output/$name.ffplugin" "$output2/" -Force
     }
 }
 

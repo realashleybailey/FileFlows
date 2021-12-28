@@ -13,13 +13,15 @@ namespace FileFlows.Server.Helpers
             Logger.Instance.ILog("Plugin path:" + pluginDir);
 
             var controller = new PluginController();
-            var dbPluginInfos = controller.GetAll().Result.Select(x => (PluginInfo)x).ToList();
+            var dbPluginInfos = controller.GetDataList().Result;
 
             List<string> installed = new List<string>();
             var options = new JsonSerializerOptions
             {
                 Converters = { new Shared.Json.ValidatorConverter() }
             };
+
+            List<string> langFiles = new List<string>();
 
             foreach (string ffplugin in Directory.GetFiles(pluginDir, "*.ffplugin", SearchOption.AllDirectories))
             {
@@ -36,14 +38,21 @@ namespace FileFlows.Server.Helpers
                     using var sr = new StreamReader(entry.Open());
                     string json = sr.ReadToEnd();
 
+                    var langEntry = zf.GetEntry("en.json");
+                    if (langEntry != null)
+                    {
+                        using var srLang = new StreamReader(langEntry.Open());
+                        langFiles.Add(srLang.ReadToEnd());
+                    }
+
                     PluginInfo pi = JsonSerializer.Deserialize<PluginInfo>(json, options);
 
-                    var plugin = dbPluginInfos.FirstOrDefault(x => x.Assembly == pi.Assembly);
+                    var plugin = dbPluginInfos.FirstOrDefault(x => x.Name == pi.Name);
                     bool hasSettings = false; // todo pi.plugin == null ? false : FormHelper.GetFields(plugin.GetType(), new Dictionary<string, object>()).Any();
 
                     bool isNew = plugin == null;
                     plugin ??= new();
-                    installed.Add(pi.Assembly);
+                    installed.Add(pi.Name);
                     plugin.Version = pi.Version;
                     plugin.DateModified = DateTime.UtcNow;
                     plugin.HasSettings = hasSettings;
@@ -59,9 +68,8 @@ namespace FileFlows.Server.Helpers
                     else
                     {
                         // new dll
-                        Logger.Instance.ILog("Adding new plugin: " + pi.Name + ", " + pi.Assembly);
+                        Logger.Instance.ILog("Adding new plugin: " + pi.Name);
                         plugin.Name = pi.Name;
-                        plugin.Assembly = pi.Assembly;
                         plugin.DateCreated = DateTime.UtcNow;
                         plugin.DateModified = DateTime.UtcNow;
                         plugin.HasSettings = hasSettings;
@@ -76,15 +84,48 @@ namespace FileFlows.Server.Helpers
                 }
             }
 
-            foreach (var dll in dbPluginInfos.Where(x => installed.Contains(x.Assembly) == false))
+            foreach (var plugin in dbPluginInfos.Where(x => installed.Contains(x.Name) == false))
             {
-                Logger.Instance.DLog("Missing plugin dll: " + dll.Assembly);
-                dll.Deleted = true;
-                dll.DateModified = DateTime.UtcNow;
-                controller.Update(dll).Wait();
+                Logger.Instance.DLog("Missing plugin dll: " + plugin.Name);
+                plugin.Deleted = true;
+                plugin.DateModified = DateTime.UtcNow;
+                controller.Update(plugin).Wait();
             }
 
+            CreateLanguageFile(langFiles);
+
             Logger.Instance.ILog("Finished scanning for plugins");
+        }
+
+
+        static void CreateLanguageFile(List<string> jsonFiles)
+        {
+            var json = "{}";
+            try
+            {
+                foreach (var jf in jsonFiles)
+                {
+                    try
+                    {
+                        string updated = JsonHelper.Merge(json, jf);
+                        json = updated;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Instance.ELog("Error loading plugin json[0]:" + ex.Message + Environment.NewLine + ex.StackTrace);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+
+            string dir = Path.Combine(Program.GetAppDirectory(), "wwwroot/i18n");
+            if(Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
+
+            File.WriteAllText(Path.Combine(dir, "plugins.en.json"), json);        
         }
     }
 }

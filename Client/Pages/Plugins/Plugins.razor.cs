@@ -135,7 +135,7 @@ namespace FileFlows.Client.Pages
                 this.StateHasChanged();
             }
             this.EditingPlugin = plugin;
-            var result = await Editor.Open("Plugins." + plugin.Assembly.Replace(".dll", ""), plugin.Name, plugin.Fields, plugin.Settings,
+            var result = await Editor.Open("Plugins." + plugin.Name, plugin.Name, plugin.Fields, plugin.Settings,
                 saveCallback: SaveSettings);
             return false; // we dont need to reload the list
 #else

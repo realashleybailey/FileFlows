@@ -8,9 +8,9 @@ namespace FileFlows.Server.Helpers
     {
         public static void Scan()
         {
-            //var dllPluginInfo = GetPlugins();
-
+            Logger.Instance.ILog("Scanning for plugins");
             var pluginDir = Path.Combine(Program.GetAppDirectory(), "Plugins");
+            Logger.Instance.ILog("Plugin path:" + pluginDir);
 
             var controller = new PluginController();
             var dbPluginInfos = controller.GetAll().Result.Select(x => (PluginInfo)x).ToList();
@@ -23,6 +23,7 @@ namespace FileFlows.Server.Helpers
 
             foreach (string ffplugin in Directory.GetFiles(pluginDir, "*.ffplugin", SearchOption.AllDirectories))
             {
+                Logger.Instance?.ILog("Plugin file found: " + ffplugin);
                 try
                 {
                     using var zf = System.IO.Compression.ZipFile.Open(ffplugin, System.IO.Compression.ZipArchiveMode.Read);
@@ -56,7 +57,7 @@ namespace FileFlows.Server.Helpers
                     else
                     {
                         // new dll
-                        Logger.Instance.ILog("Adding new plug: " + pi.Name + ", " + pi.Assembly);
+                        Logger.Instance.ILog("Adding new plugin: " + pi.Name + ", " + pi.Assembly);
                         plugin.Name = pi.Name;
                         plugin.Assembly = pi.Assembly;
                         plugin.DateCreated = DateTime.UtcNow;
@@ -80,6 +81,8 @@ namespace FileFlows.Server.Helpers
                 dll.DateModified = DateTime.UtcNow;
                 controller.Update(dll).Wait();
             }
+
+            Logger.Instance.ILog("Finished scanning for plugins");
         }
     }
 }

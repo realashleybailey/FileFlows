@@ -1,6 +1,3 @@
-if (Test-Path ..\deploy) {
-    Remove-Item ..\deploy -Recurse -Force
-}
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
 $version = "0.1.0.$revision"
 

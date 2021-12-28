@@ -1,5 +1,9 @@
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
 $version = "0.1.0.$revision"
+if ((Test-Path ../deploy/Plugins) -eq $false) {
+    Write-Error "No plugins directory found"
+    return
+}
 
 #.\build-plugins.ps1
 .\build-spellcheck.ps1

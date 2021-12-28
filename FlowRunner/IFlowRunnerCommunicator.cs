@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 
-namespace FileFlows.Node.FlowExecution
+namespace FileFlows.FlowRunner
 {
     public interface IFlowRunnerCommunicator
     {

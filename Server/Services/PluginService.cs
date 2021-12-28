@@ -12,12 +12,5 @@
     {
         public Task<List<PluginInfo>> GetAll() => new PluginController().GetDataList();
         public Task<PluginInfo> Update(PluginInfo pluginInfo) => new PluginController().Update(pluginInfo);
-
-        public Task<Node> LoadNode(FlowPart part)
-        {
-            using var pluginLoader = new PluginHelper();
-            return Task.FromResult(pluginLoader.LoadNode(part));
-        }
-
     }
 }

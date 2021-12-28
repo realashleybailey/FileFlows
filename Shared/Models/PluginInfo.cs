@@ -15,6 +15,8 @@ namespace FileFlows.Shared.Models
         public ExpandoObject Settings { get; set; }
 
         public List<ElementField> Fields { get; set; }
+
+        public List<FlowElement> Elements { get; set; }
     }
 
     public class PluginInfoModel : PluginInfo

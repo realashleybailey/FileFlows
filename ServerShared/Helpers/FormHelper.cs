@@ -6,7 +6,7 @@
     using FileFlows.Plugin.Attributes;
     using FileFlows.Shared.Models;
 
-    class FormHelper
+    public class FormHelper
     {
         public static List<ElementField> GetFields(Type type, IDictionary<string, object> model)
         {

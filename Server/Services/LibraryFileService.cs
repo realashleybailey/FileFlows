@@ -8,7 +8,9 @@
 
     public class LibraryFileService : ILibraryFileService
     {
-        public Task Delete(Guid uid) => new LibraryFileController().Delete(new ReferenceModel {  Uids = new [] { uid } });  
+        public Task Delete(Guid uid) => new LibraryFileController().Delete(new ReferenceModel {  Uids = new [] { uid } });
+
+        public Task<LibraryFile> Get(Guid uid) => new LibraryFileController().Get(uid);
 
         public Task<LibraryFile> GetNext(Guid nodeUid, Guid workerUid) => new LibraryFileController().GetNext(nodeUid, workerUid);
 

@@ -48,7 +48,17 @@ namespace FileFlows.Shared.Json
 
         public override void Write(Utf8JsonWriter writer, Validator value, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            writer.WriteStartObject();
+            var properties = value.GetType().GetProperties();
+
+            foreach (var prop in properties)
+            {
+                var propValue = prop.GetValue(value);
+                writer.WritePropertyName(prop.Name);
+                JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);
+            }
+
+            writer.WriteEndObject();
         }
     }
 }

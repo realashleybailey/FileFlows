@@ -10,6 +10,7 @@ namespace FileFlows.Shared.Models
         public string Name { get; set; }
 
         public string Icon { get; set; }
+        public Dictionary<string, object> Variables { get; set; }
 
         public int Inputs { get; set; }
         public int Outputs { get; set; }

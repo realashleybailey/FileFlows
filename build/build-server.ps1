@@ -23,16 +23,24 @@ Push-Location ..\
 (Get-Content Client\Globals.cs) -replace 'string Version = \"[\d\.]+\"', $csVersion | Out-File Client\Globals.cs
 (Get-Content Server\Globals.cs) -replace 'string Version = \"[\d\.]+\"', $csVersion | Out-File Server\Globals.cs
 
+(Get-Content Server\Server.csproj) -replace '<Version>[^<]+</Version>', "<Version>$version</Version>" | Out-File Server\Server.csproj
+(Get-Content Server\Server.csproj) -replace '<ProductVersion>[^<]+</ProductVersion>', "<ProductVersion>$version</ProductVersion>" | Out-File Server\Server.csproj
+(Get-Content Server\Server.csproj) -replace '<Copyright>[^<]+</Copyright>', "<Copyright>$copyright</Copyright>" | Out-File Server\Server.csproj
+(Get-Content Client\Client.csproj) -replace '<Version>[^<]+</Version>', "<Version>$version</Version>" | Out-File Client\Client.csproj
+(Get-Content Client\Client.csproj) -replace '<ProductVersion>[^<]+</ProductVersion>', "<ProductVersion>$version</ProductVersion>" | Out-File Client\Client.csproj
+(Get-Content Client\Client.csproj) -replace '<Copyright>[^<]+</Copyright>', "<Copyright>$copyright</Copyright>" | Out-File Client\Client.csproj
+
+
 (Get-Content Server\Globals.cs) -replace 'public static bool Demo { get; set; } = (true|false);', "public static bool Demo { get; set; } = false;" | Out-File Server\Globals.cs
 
 if ( $linux -eq $true) {
     (Get-Content Server\Server.csproj) -replace '<AssemblyName>[^<]+</AssemblyName>', "<AssemblyName>FileFlows</AssemblyName>" | Out-File Server\Server.csproj
-    dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
+    dotnet.exe publish 'Server\Server.csproj' /p:WarningLevel=1 --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
 }
 else {    
     (Get-Content Server\Server.csproj) -replace '<AssemblyName>[^<]+</AssemblyName>', "<AssemblyName>FileFlows.Server</AssemblyName>" | Out-File Server\Server.csproj
-    dotnet.exe publish 'WindowsServer\WindowsServer.csproj' --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
-    dotnet.exe publish 'Server\Server.csproj' --runtime $runtime --configuration Release --self-contained -p:PublishSingleFile=true --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
+    dotnet.exe publish 'WindowsServer\WindowsServer.csproj' /p:WarningLevel=1 --runtime $runtime --configuration Release --self-contained --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
+    dotnet.exe publish 'Server\Server.csproj' /p:WarningLevel=1 --runtime $runtime --configuration Release --self-contained -p:PublishSingleFile=true --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625
 }
 dotnet.exe publish Client\Client.csproj --configuration Release --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright
 
@@ -51,7 +59,7 @@ if ((Test-Path deploy\plugins) -eq $true) {
 if ( $linux -eq $false) {
     
     (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
-    (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = true', "Node = false" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
+    (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace 'Node = true', "Node = false" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
     if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
         $curDir = Get-Location

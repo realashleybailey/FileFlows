@@ -1,28 +1,49 @@
 ﻿namespace FileFlows.Node.Workers
 {
-    using FileFlows.Node.FlowExecution;
     using FileFlows.ServerShared.Services;
     using FileFlows.ServerShared.Workers;
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
+    using System.Diagnostics;
+    using System.Runtime.InteropServices;
+    using System.Text.RegularExpressions;
 
     public class FlowWorker : Worker
     {
         public readonly Guid Uid = Guid.NewGuid();
 
-        private readonly List<FlowRunner> ExecutingRunners = new List<FlowRunner>();
+        private readonly List<Guid> ExecutingRunners = new List<Guid>();
 
         private readonly bool isServer;
 
         private bool FirstExecute = true;
+        private string PluginsPath;
 
         public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 10)
         {
             this.isServer = isServer;
             this.FirstExecute = true;
+#if (DEBUG)
+            PluginsPath = "../Server/Plugins";
+#else
+            var dir = Directory.GetCurrentDirectory();
+            PluginsPath = Path.Combine(dir, "Plugins");
+#endif
         }
 
         public Func<bool> IsEnabledCheck { get; set; }
+
+        private string EscapePath(bool windows, string path)
+        {
+            if (windows == false)
+            {
+                path = Regex.Replace(path, "([\\'\"\\$\\?\\*()\\s])", "\\$1");
+                return path;
+            }else
+            {
+                return "\"" + Regex.Replace(path, @"(\\+)$", @"$1$1") + "\"";
+            }
+        }
 
         protected override void Execute()
         {
@@ -40,9 +61,6 @@
                 Logger.Instance?.ELog("Failed to register node: " + ex.Message);
                 return;
             }
-
-            if(isServer == false)
-                FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
 
             if (FirstExecute)
             {
@@ -69,101 +87,86 @@
                 Logger.Instance?.ELog("Temp Path not set, cannot process");
                 return;
             }
-
             var libFileService = LibraryFileService.Load();
             var libFile = libFileService.GetNext(node.Uid, Uid).Result;
             if (libFile == null)
                 return; // nothing to process
 
-            string workingFile = node.Map(libFile.Name);
-
-            try
+            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            Guid processUid = Guid.NewGuid();
+            lock (ExecutingRunners)
             {
-                var libfileService = LibraryFileService.Load();
-                var libService = LibraryService.Load();
-                var lib = libService.Get(libFile.Library.Uid).Result;
-                if (lib == null)
+                ExecutingRunners.Add(processUid);
+            }
+            Task.Run(() =>
+            {
+                try
                 {
-                    libfileService.Delete(libFile.Uid).Wait();
-                    return;
-                }
-
-                var flowService = FlowService.Load();
-                FileSystemInfo file = lib.Folders ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
-                if (file.Exists == false)
-                {
-                    libfileService.Delete(libFile.Uid).Wait();
-                    return;
-                }
-
-                var flow = flowService.Get(lib.Flow?.Uid ?? Guid.Empty).Result;
-                if (flow == null || flow.Uid == Guid.Empty)
-                {
-                    libFile.Status = FileStatus.FlowNotFound;
-                    libfileService.Update(libFile).Wait();
-                    return;
-                }
-
-                // update the library file to reference the updated flow (if changed)
-                if (libFile.Flow.Name != flow.Name || libFile.Flow.Uid != flow.Uid)
-                {
-                    libFile.Flow = new ObjectReference
+                    var parameters = new string[]
                     {
-                        Uid = flow.Uid,
-                        Name = flow.Name,
-                        Type = typeof(Flow)?.FullName ?? String.Empty
+                        "--uid",
+                        processUid.ToString(),
+                        "--libfile",
+                        libFile.Uid.ToString(),
+                        "--pluginsPath",
+                        PluginsPath,
+                        "--tempPath",
+                        tempPath,
+                        isServer ? "--server" : "--notserver"
                     };
-                    libfileService.Update(libFile).Wait();
-                }
 
-                Logger.Instance?.ILog("############################# PROCESSING:  " + file.FullName);
-                libFile.ProcessingStarted = DateTime.UtcNow;
-                libfileService.Update(libFile).Wait();
-
-                var info = new FlowExecutorInfo
+#if (DEBUG)
+                    FileFlows.FlowRunner.Program.Main(parameters);
+#else
+                using (Process process = new Process())
                 {
-                    LibraryFile = libFile,
-                    Log = String.Empty,
-                    NodeUid = node.Uid,
-                    NodeName = node.Name,                
-                    RelativeFile = libFile.RelativePath,
-                    Library = libFile.Library,
-                    TotalParts = flow.Parts.Count,
-                    CurrentPart = 0,
-                    CurrentPartPercent = 0,
-                    CurrentPartName = string.Empty,
-                    StartedAt = DateTime.UtcNow,
-                    WorkingFile = workingFile,
-                    IsDirectory = lib.Folders,
-                    LibraryPath = lib.Path
-                };
+                    try
+                    {
+                        process.StartInfo = new ProcessStartInfo();
+                        process.StartInfo.FileName = windows ? "FileFlows.Runner.exe" : "FileFlows.Runner";
+                        
+                        foreach (var str in parameters)
+                            process.StartInfo.ArgumentList.Add(str);
 
-                var runner = new FlowRunner(info, flow, node);
-                lock (ExecutingRunners)
-                {
-                    ExecutingRunners.Add(runner);
-                }
-                runner.OnFlowCompleted += Runner_OnFlowCompleted;
-                Task.Run(() => runner.Run());
+                        process.StartInfo.UseShellExecute = false;
+                        process.StartInfo.RedirectStandardOutput = true;
+                        process.StartInfo.RedirectStandardError = true;
+                        process.StartInfo.CreateNoWindow = true;
+                        process.Start();
+                        string output = process.StandardError.ReadToEnd();
+                        if (string.IsNullOrEmpty(output) == false)
+                            Logger.Instance?.ILog(output);
+                        string error = process.StandardError.ReadToEnd();
+                        process.WaitForExit();
+                        if (string.IsNullOrEmpty(error) == false)
+                            Logger.Instance?.ELog(output);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Instance?.ELog("Error executing runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    }
             }
-            finally
-            {
-                _ = Task.Run(async () =>
+#endif
+                }
+                finally
                 {
-                    await Task.Delay(3_000);
+                    try
+                    {
+                        Directory.Delete(Path.Combine(tempPath, "Runner-" + processUid.ToString()), true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Instance?.WLog("Failed to clean up runner directory: " + ex.Message);
+                    }
+                    lock (ExecutingRunners)
+                    {
+                        if (ExecutingRunners.Contains(processUid))
+                            ExecutingRunners.Remove(processUid);
+                    }
+                    Thread.Sleep(3_000);
                     Trigger();
-                });
-            }
-        }
-
-        private void Runner_OnFlowCompleted(FlowRunner sender, bool success)
-        {
-            System.Threading.Thread.Sleep(5000);
-            lock (this.ExecutingRunners)
-            {
-                if(ExecutingRunners.Contains(sender))
-                    ExecutingRunners.Remove(sender);
-            }
+                }
+            });
         }
     }
 }

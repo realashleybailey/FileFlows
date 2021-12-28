@@ -6,7 +6,7 @@
     {
         public static void Init()
         {
-            Node.FlowExecution.FlowRunnerCommunicator.SignalrUrl = Controllers.NodeController.SignalrUrl;
+            //Node.FlowExecution.FlowRunnerCommunicator.SignalrUrl = Controllers.NodeController.SignalrUrl;
 
             ServerShared.Services.SettingsService.Loader = () => new SettingsService();
             ServerShared.Services.NodeService.Loader = () => new NodeService();

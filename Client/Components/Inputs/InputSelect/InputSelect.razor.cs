@@ -66,7 +66,7 @@ namespace FileFlows.Client.Components.Inputs
             set
             {
                 _SelectedIndex = value;
-                if (value == -1)
+                if (value == -1 || Options == null || Options.Any() == false)
                     this.Value = null;
                 else
                     this.Value = Options.ToArray()[value].Value;

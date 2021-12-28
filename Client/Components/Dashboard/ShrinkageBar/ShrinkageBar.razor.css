@@ -34,7 +34,7 @@
   box-shadow: inset 0 3px 3px 3px rgba(0, 0, 0, 0.2);
 }
 .library .bar:not(.grew) .bar-final {
-  background: repeating-linear-gradient(45deg, rgba(var(--accent-rgb), 0.7), rgba(var(--accent-rgb), 0.7) 3px, rgba(var(--accent-rgb), 0.3) 3px, rgba(var(--accent-rgb), 0.3) 6px);
+  background: var(--accent);
   box-shadow: inset 0 5px rgba(255, 255, 255, 0.2);
   border-top-right-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
@@ -43,11 +43,11 @@
   z-index: 2;
   border-top-right-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  background: repeating-linear-gradient(45deg, #9b0000, #9b0000 20px, #640000 20px, #640000 40px);
+  background: #9b0000;
   box-shadow: inset 0 5px rgba(255, 255, 255, 0.2);
 }
 .library .bar.grew .bar-final {
   z-index: 3;
-  background: repeating-linear-gradient(45deg, #640000, #640000 3px, #320000 3px, #320000 6px);
+  background: #640000;
   box-shadow: inset 0 3px 3px 3px rgba(0, 0, 0, 0.2);
 }

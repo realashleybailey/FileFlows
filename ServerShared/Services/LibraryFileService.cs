@@ -7,6 +7,8 @@
     {
         Task<LibraryFile> GetNext(Guid nodeUid, Guid workerUid);
 
+        Task<LibraryFile> Get(Guid uid);
+
         Task Delete(Guid uid);
 
         Task<LibraryFile> Update(LibraryFile libraryFile);
@@ -33,6 +35,21 @@
             catch (Exception)
             {
                 return;
+            }
+        }
+
+        public async Task<LibraryFile> Get(Guid uid)
+        {
+            try
+            {
+                var result = await HttpHelper.Get<LibraryFile>($"{ServiceBaseUrl}/api/library-file/{uid}");
+                if (result.Success == false)
+                    return null;
+                return result.Data;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 

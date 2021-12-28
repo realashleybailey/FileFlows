@@ -10,7 +10,6 @@
 
         Task<List<PluginInfo>> GetAll();
         Task<PluginInfo> Update(PluginInfo pluginInfo);
-        Task<Node> LoadNode(FlowPart part);
     }
 
     public class PluginService : Service, IPluginService
@@ -39,12 +38,6 @@
                 Logger.Instance?.WLog("Failed to get plugin infos: " + ex.Message);
                 return new List<PluginInfo>();
             }
-        }
-
-        public Task<Node> LoadNode(FlowPart part)
-        {
-            using var pluginLoader = new PluginHelper();
-            return Task.FromResult(pluginLoader.LoadNode(part));
         }
 
         public async Task<PluginInfo> Update(PluginInfo pluginInfo)

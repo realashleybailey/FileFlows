@@ -81,8 +81,7 @@ namespace FileFlows.Server
 
             Shared.Helpers.HttpHelper.Client = new HttpClient();
 
-            using var pl = new ServerShared.Helpers.PluginHelper();
-            pl.ScanForPlugins();
+            Helpers.PluginScanner.Scan();
 
             LibraryWorker.ResetProcessing();
             WorkerManager.StartWorkers(

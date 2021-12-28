@@ -179,8 +179,9 @@ namespace FileFlows.Server.Helpers
         {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
             {
-                Converters = { new BoolConverter() }
+                Converters = { new BoolConverter(), new Shared.Json.ValidatorConverter() }
             };
+                
             // need to case obj to (ViObject) here so the DataConverter is used
             T result = System.Text.Json.JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
             result.Uid = Guid.Parse(dbObject.Uid);
@@ -212,7 +213,7 @@ namespace FileFlows.Server.Helpers
         {
             var serializerOptions = new System.Text.Json.JsonSerializerOptions
             {
-                Converters = { new DataConverter(), new BoolConverter() }
+                Converters = { new DataConverter(), new BoolConverter(), new Shared.Json.ValidatorConverter() }
             };
             // need to case obj to (ViObject) here so the DataConverter is used
             string json = System.Text.Json.JsonSerializer.Serialize((FileFlowObject)obj, serializerOptions);

@@ -369,5 +369,13 @@ namespace FileFlows.Server.Controllers
                 await Update(lf);
             }
         }
+
+#if (DEBUG)
+        [HttpGet("stream")]
+        public async Task<IActionResult> StreamFile([FromQuery] string file)
+        {
+            return File(System.IO.File.OpenRead(file), "applicaaiton/octet-stream");
+        }
+#endif
     }
 }

@@ -1,26 +1,28 @@
-﻿namespace FileFlows.Node.FlowExecution;
+﻿namespace FileFlows.FlowRunner;
 
 using FileFlows.Plugin;
 using FileFlows.ServerShared.Services;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
+using System.Reflection;
 
-
-public class FlowRunner
+public class Runner
 {
     private FlowExecutorInfo Info;
     private Flow Flow;
     private ProcessingNode Node;
     private CancellationTokenSource CancellationToken = new CancellationTokenSource();
+    private string WorkingDir;
 
-    public FlowRunner(FlowExecutorInfo info, Flow flow, ProcessingNode node)
+    public Runner(FlowExecutorInfo info, Flow flow, ProcessingNode node, string workingDir)
     {
         this.Info = info;
         this.Flow = flow;
         this.Node = node;
+        this.WorkingDir = workingDir;
     }
 
-    public delegate void FlowCompleted(FlowRunner sender, bool success);
+    public delegate void FlowCompleted(Runner sender, bool success);
     public event FlowCompleted OnFlowCompleted;
     private NodeParameters nodeParameters;
     private Node currentNode;
@@ -151,12 +153,12 @@ public class FlowRunner
         } while (DateTime.Now.Subtract(start) < new TimeSpan(0, 3, 0));
     }
 
-    private void RunActual(IFlowRunnerCommunicator communicator) 
+    private void RunActual(IFlowRunnerCommunicator communicator)
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
         Info.LibraryFile.OriginalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : new FileInfo(nodeParameters.WorkingFile).Length;
-        nodeParameters.TempPath = Node.TempPath;
+        nodeParameters.TempPath = WorkingDir;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
 
@@ -184,12 +186,12 @@ public class FlowRunner
         var pluginLoader = PluginService.Load();
 
         while (count++ < 50)
-        { 
+        {
             if (CancellationToken.IsCancellationRequested)
             {
                 nodeParameters.Logger?.WLog("Flow was canceled");
                 nodeParameters.Result = NodeResult.Failure;
-                SetStatus(FileStatus.ProcessingFailed);                
+                SetStatus(FileStatus.ProcessingFailed);
                 return;
             }
             if (part == null)
@@ -204,8 +206,8 @@ public class FlowRunner
             {
 
                 nodeParameters.Logger?.DLog("Executing part:" + (part!.Name?.EmptyAsNull() ?? part!.GetType().FullName ?? "unknown"));
-                currentNode = pluginLoader.LoadNode(part!).Result;
-                
+                currentNode = LoadNode(part!);
+
                 if (currentNode == null)
                 {
                     // happens when canceled    
@@ -258,4 +260,57 @@ public class FlowRunner
         }
     }
 
+    private Type? GetNodeType(string fullName)
+    {
+        foreach (var dll in new DirectoryInfo(WorkingDir).GetFiles("*.dll", SearchOption.AllDirectories))
+        {
+            try
+            {
+                //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+                var assembly = Assembly.LoadFrom(dll.FullName);
+                var types = assembly.GetTypes();
+                var pluginType = types.Where(x => x.IsAbstract == false && x.FullName == fullName).FirstOrDefault();
+                if (pluginType != null)
+                    return pluginType;
+            }
+            catch (Exception) { }
+        }
+        return null;
+    }
+
+    private Node LoadNode(FlowPart part)
+    {
+        var nt = GetNodeType(part.FlowElementUid);
+        if (nt == null)
+            return new Node();
+        var node = Activator.CreateInstance(nt);
+        if (part.Model is IDictionary<string, object> dict)
+        {
+            foreach (var k in dict.Keys)
+            {
+                try
+                {
+                    if (k == "Name")
+                        continue; // this is just the display name in the flow UI
+                    var prop = nt.GetProperty(k, BindingFlags.Instance | BindingFlags.Public);
+                    if (prop == null)
+                        continue;
+
+                    if (dict[k] == null)
+                        continue;
+
+                    var value = FileFlows.Shared.Converter.ConvertObject(prop.PropertyType, dict[k]);
+                    if (value != null)
+                        prop.SetValue(node, value);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.ELog("Type: " + nt.Name + ", Property: " + k);
+                    Logger.Instance.ELog("Failed setting property: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                }
+            }
+        }
+        return (Node)node;
+
+    }
 }

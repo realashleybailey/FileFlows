@@ -14,7 +14,7 @@ namespace FileFlows.Server.Controllers
     public class PluginController : ControllerStore<PluginInfo>
     {
         [HttpGet]
-        public async Task<IEnumerable<PluginInfoModel>> GetAll()
+        public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = false)
         {
             var plugins = (await GetDataList()).Where(x => x.Deleted == false);
             List<PluginInfoModel> pims = new List<PluginInfoModel>();
@@ -33,7 +33,8 @@ namespace FileFlows.Server.Controllers
                     Deleted = plugin.Deleted,
                     HasSettings = plugin.HasSettings,
                     Settings = plugin.Settings,
-                    Fields = plugin.Fields
+                    Fields = plugin.Fields,
+                    Elements = includeElements ? plugin.Elements : null
                 };
                 var package = packages.FirstOrDefault(x => x.Name.ToLower().Replace(" ", "") == x.Name.ToLower().Replace(" ", ""));
                 pim.LatestVersion = package?.Version ?? "";
@@ -62,11 +63,7 @@ namespace FileFlows.Server.Controllers
         public async Task<PluginInfo> Get([FromRoute] Guid uid)
         {
             var pi = await GetByUid(uid);
-            if (pi == null)
-                return new PluginInfo();
-
-            using var pluginLoader = new PluginHelper();
-            return pluginLoader.LoadPluginInfo(pi);
+            return pi ?? new();
         }
 
         [HttpPost("{uid}/settings")]
@@ -79,23 +76,23 @@ namespace FileFlows.Server.Controllers
             return await Update(pi);
         }
 
+        private string GetPluginsDir() => Path.Combine(Program.GetAppDirectory(), "Plugins");
+
         [HttpGet("language/{langCode}.json")]
         public string LanguageFile([FromQuery] string langCode = "en")
         {
             var json = "{}";
             try
             {
-                using var pluginHelper = new PluginHelper();
-                var pluginDirs = pluginHelper.GetPluginDirectories();
-                foreach (var dir in pluginDirs)
+                foreach (var dir in new DirectoryInfo(GetPluginsDir()).GetDirectories())
                 {
-                    foreach (var jf in Directory.GetFiles(dir, "*.json"))
+                    foreach (var jf in dir.GetFiles("*.json"))
                     {
-                        if (jf.Contains(".deps."))
+                        if (jf.Name.Contains(".deps."))
                             continue;
                         try
                         {
-                            string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf));
+                            string updated = JsonHelper.Merge(json, System.IO.File.ReadAllText(jf.FullName));
                             json = updated;
                         }
                         catch (Exception ex)

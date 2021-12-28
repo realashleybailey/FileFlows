@@ -56,7 +56,7 @@ namespace FileFlows.Server.Controllers
                 if (flow == null)
                     return flow;
 
-                var elements = GetElements();
+                var elements = await GetElements();
 
                 foreach (var p in flow.Parts)
                 {
@@ -83,19 +83,19 @@ namespace FileFlows.Server.Controllers
                     flow.Name = "New Flow " + (++count);
                 }
                 // try find basic node
-                using var pluginLoader = new PluginHelper();
-                var info = pluginLoader.GetInputFileInfo();
-                if (string.IsNullOrEmpty(info.name) == false)
+                var elements = await GetElements();
+                var info = elements.Where(x => x.Uid == "FileFlows.BasicNodes.File.InputFile").FirstOrDefault();
+                if (string.IsNullOrEmpty(info.Name) == false)
                 {
                     flow.Parts.Add(new FlowPart
                     {
-                        Name = info.name,
+                        Name = "InputFile",
                         xPos = DEFAULT_XPOS,
                         yPos = DEFAULT_YPOS,
                         Uid = Guid.NewGuid(),
                         Type = FlowElementType.Input,
                         Outputs = 1,
-                        FlowElementUid = info.fullName,
+                        FlowElementUid = info.Name,
                         Icon = "far fa-file"
                     });
                 }
@@ -105,10 +105,11 @@ namespace FileFlows.Server.Controllers
 
 
         [HttpGet("elements")]
-        public IEnumerable<FlowElement> GetElements()
+        public async Task<FlowElement[]> GetElements()
         {
-            using var pluginLoader = new PluginHelper();
-            return pluginLoader.GetElements();
+            var plugins = await new PluginController().GetAll(includeElements: true);
+            var results = plugins.Where(x => x.Elements != null).SelectMany(x => x.Elements)?.ToArray();
+            return results ?? new FlowElement[] { };
         }
 
         [HttpPut]
@@ -167,7 +168,7 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpPost("{uid}/variables")]
-        public Dictionary<string, object> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid, [FromQuery] bool isNew = false)
+        public async Task<Dictionary<string, object>> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid, [FromQuery] bool isNew = false)
         {
             var variables = new Dictionary<string, object>();
             bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -212,14 +213,19 @@ namespace FileFlows.Server.Controllers
                 variables.Add("folder.Orig.FullName", windows ? @"C:\OriginalFolder\SubFolder" : "/originalFolder/subfolder");
             }
 
-            PluginHelper pluginHelper = new PluginHelper();
+            //p.FlowElementUid == FileFlows.VideoNodes.DetectBlackBars
+            var flowElements = await GetElements();
+            flowElements ??= new FlowElement[] { };
+            var dictFlowElements = flowElements.ToDictionary(x => x.Uid, x => x);
 
             if (isNew)
             {
                 // we add all variables on new, so they can hook up a connection easily
                 foreach (var p in flowParts ?? new List<FlowPart>())
                 {
-                    var partVariables = pluginHelper.GetPartVariables(p.FlowElementUid);
+                    if (dictFlowElements.ContainsKey(p.FlowElementUid) == false)
+                        continue;
+                    var partVariables = dictFlowElements[p.FlowElementUid].Variables ?? new Dictionary<string, object>();
                     foreach (var pv in partVariables)
                     {
                         if (variables.ContainsKey(pv.Key) == false)
@@ -242,7 +248,10 @@ namespace FileFlows.Server.Controllers
 
             foreach(var p in parentParts)
             {
-                var partVariables = pluginHelper.GetPartVariables(p.FlowElementUid);
+                if (dictFlowElements.ContainsKey(p.FlowElementUid) == false)
+                    continue;
+
+                var partVariables = dictFlowElements[p.FlowElementUid].Variables ?? new Dictionary<string, object>();
                 foreach (var pv in partVariables)
                 {
                     if (variables.ContainsKey(pv.Key) == false)
@@ -284,9 +293,10 @@ namespace FileFlows.Server.Controllers
         private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
     
         [HttpGet("templates")]
-        public Dictionary<string, List<FlowTemplateModel>> GetTemplates()
+        public async Task<Dictionary<string, List<FlowTemplateModel>>> GetTemplates()
         {
-            var parts = GetElements().ToDictionary(x => x.Uid.Substring(x.Uid.LastIndexOf(".") + 1), x => x);
+            var elements = await GetElements();
+            var parts = elements.ToDictionary(x => x.Uid.Substring(x.Uid.LastIndexOf(".") + 1), x => x);
 
             Dictionary<string, List<FlowTemplateModel>> templates = new ();
             string group = string.Empty;

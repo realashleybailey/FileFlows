@@ -29,7 +29,10 @@ namespace FileFlows.Server.Helpers
                     using var zf = System.IO.Compression.ZipFile.Open(ffplugin, System.IO.Compression.ZipArchiveMode.Read);
                     var entry = zf.GetEntry(".plugininfo");
                     if (entry == null)
+                    {
+                        Logger.Instance?.WLog("Unable to find .plugininfo file");
                         continue;
+                    }
                     using var sr = new StreamReader(entry.Open());
                     string json = sr.ReadToEnd();
 
@@ -50,8 +53,7 @@ namespace FileFlows.Server.Helpers
 
                     if (isNew == false)
                     {
-                        if (plugin.Version == pi.Version && plugin.Deleted == false)
-                            continue;
+                        Logger.Instance.ILog("Updating plugin: " + pi.Name);
                         controller.Update(plugin).Wait();
                     }
                     else
@@ -70,7 +72,7 @@ namespace FileFlows.Server.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.ELog("Failed to scan for plugins: " + ex.Message);
+                    Logger.Instance?.ELog($"Failed to scan plugin {ffplugin}: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 }
             }
 

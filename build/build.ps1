@@ -1,4 +1,4 @@
-. build-variables.ps1
+. .\build-variables.ps1
 
 Remove-Item ../deploy/* -Recurse -Force -Exclude *.ffplugin -ErrorAction SilentlyContinue 
 

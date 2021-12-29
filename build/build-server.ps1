@@ -2,7 +2,7 @@ Write-Output "#################################"
 Write-Output "###      Building Server      ###"
 Write-Output "#################################"
 
-. build-variables.ps1
+. .\build-variables.ps1
 
 $linux = $args[0] -eq '--linux'
 

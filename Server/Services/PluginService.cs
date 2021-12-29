@@ -10,6 +10,8 @@
 
     public class PluginService : IPluginService
     {
+        public Task<byte[]> Download(PluginInfo plugin) => new PluginController().DownloadPackage(plugin);
+
         public Task<List<PluginInfo>> GetAll() => new PluginController().GetDataList();
         public Task<PluginInfo> Update(PluginInfo pluginInfo) => new PluginController().Update(pluginInfo);
     }

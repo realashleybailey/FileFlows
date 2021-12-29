@@ -13,6 +13,13 @@ span {
 span + span {
     margin-left:0.25rem;
 }
+label:read-only {
+    filter: opacity(0.5);
+}
+
+input:disabled{
+    cursor:default !important;
+}
 
 ::deep input {
     top:0;

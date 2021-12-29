@@ -10,6 +10,8 @@
 
         Task<List<PluginInfo>> GetAll();
         Task<PluginInfo> Update(PluginInfo pluginInfo);
+
+        Task<byte[]> Download(PluginInfo plugin);
     }
 
     public class PluginService : Service, IPluginService
@@ -22,6 +24,22 @@
             if (Loader == null)
                 return new PluginService();
             return Loader.Invoke();
+        }
+
+        public async Task<byte[]> Download(PluginInfo plugin)
+        {
+            try
+            {
+                var result = await HttpHelper.Post<byte[]>($"{ServiceBaseUrl}/api/plugin/download-package", plugin);
+                if (result.Success == false)
+                    throw new Exception("Failed to download plugin package: " + result.Body);
+                return result.Data;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.WLog("Failed to get plugin infos: " + ex.Message);
+                return new byte[] { };
+            }
         }
 
         public async Task<List<PluginInfo>> GetAll()

@@ -62,10 +62,7 @@ namespace FileFlows.Client.Components
             this.StateHasChanged();
             try
             {
-#if (DEBUG)
-                await Task.Delay(5_000);
-#endif
-                var result = await HttpHelper.Get<List<PluginPackageInfo>>(ApiUrl + "/plugin-packages");
+                var result = await HttpHelper.Get<List<PluginPackageInfo>>(ApiUrl + "/plugin-packages?missing=true");
                 if (result.Success == false)
                 {
                     // close this and show message
@@ -100,6 +97,32 @@ namespace FileFlows.Client.Components
 
         private async Task Download()
         {
+            var selected = Table.GetSelected().ToArray();
+            var items = selected.Select(x => x.Package).ToList();
+            if (items.Any() == false)
+                return;
+            this.Blocker.Show();
+            this.StateHasChanged();
+            try
+            {
+                this.Updated = true;
+                var result = await HttpHelper.Post(ApiUrl + "/download", new { Packages = items });
+                if (result.Success == false)
+                {
+                    // close this and show message
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Error: " + ex.Message);
+            }
+            finally
+            {
+                this.Blocker.Hide();
+                this.StateHasChanged();
+            }
+            await LoadData();
         }
 
         private async Task ViewAction()

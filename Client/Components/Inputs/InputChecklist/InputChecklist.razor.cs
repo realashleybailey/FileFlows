@@ -45,6 +45,11 @@ namespace FileFlows.Client.Components.Inputs
 
         private void OnChange(ChangeEventArgs args, ListOption opt)
         {
+            if (ReadOnly)
+            {
+                this.StateHasChanged();
+                return;
+            }
             bool @checked = args.Value as bool? == true;
             if (@checked && this.Value.Contains(opt.Value) == false)
                 this.Value.Add(opt.Value);

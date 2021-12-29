@@ -166,6 +166,8 @@ public class Runner
 
         nodeParameters.Logger!.ILog("Excecuting Flow: " + Flow.Name);
 
+        DownloadPlugins();
+
         nodeParameters.Result = NodeResult.Success;
         nodeParameters.GetToolPath = (string name) =>
         {
@@ -259,6 +261,30 @@ public class Runner
                 SetStatus(FileStatus.ProcessingFailed);
                 return;
             }
+        }
+    }
+
+    private void DownloadPlugins()
+    {
+        var service = PluginService.Load();
+        var plugins = service.GetAll().Result;
+        foreach (var plugin in plugins)
+        {
+            nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
+            if(Directory.Exists(nodeParameters.TempPath) == false)
+                Directory.CreateDirectory(nodeParameters.TempPath);
+            string file = Path.Combine(nodeParameters.TempPath, $"{plugin.PackageName}.ffplugin");
+            var data = service.Download(plugin).Result;
+            if (data == null || data.Length == 0)
+                throw new Exception("Failed to download plugin: " + plugin.PackageName);
+
+            string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
+            if (Directory.Exists(destDir))
+                Directory.Delete(destDir, true);
+
+            File.WriteAllBytes(file, data);                
+            System.IO.Compression.ZipFile.ExtractToDirectory(file, destDir);
+            File.Delete(file);
         }
     }
 

@@ -36,6 +36,13 @@ namespace FileFlows.Shared
 
             if (valueType == typeof(Int64) && type == typeof(Int32))
                 return Convert.ToInt32(value);
+            if(type == typeof(List<object>) && value is IEnumerable enumerable)
+            {
+                List<object> result = new();
+                foreach (object item in enumerable)
+                    result.Add(item);
+                return result;
+            }
             return Convert.ChangeType(value, type);
         }
 

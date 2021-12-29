@@ -85,12 +85,20 @@ namespace FileFlows.Server.Controllers
         }
 
         [HttpGet("plugin-packages")]
-        public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages()
+        public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages([FromQuery] bool missing = false)
         {
             // should expose user configurable repositories
             var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>(PLUGIN_BASE_URL + "?rand=" + System.DateTime.Now.ToFileTime());
             if (plugins.Success == false || plugins.Data == null)
                 return new PluginPackageInfo[] { };
+
+            if (missing)
+            {
+                // remove plugins already installed
+                var installed = (await GetDataList()).Select(x => x.PackageName).ToList();
+                return plugins.Data.Where(x => installed.Contains(x.Package) == false);
+            }
+
             return plugins.Data;
         }
 
@@ -125,7 +133,69 @@ namespace FileFlows.Server.Controllers
         {
             if (model == null || model.Uids?.Any() != true)
                 return; // nothing to delete
+
+            var items = await GetDataList();
+            var deleting = items.Where(x => model.Uids.Contains(x.Uid));
             await DeleteAll(model);
+            foreach(var item in deleting)
+            {
+                PluginScanner.Delete(item.PackageName);
+            }
+
+        }
+
+        [HttpPost("download")]
+        public async Task Download([FromBody] DownloadModel model)
+        {
+            if (model == null || model.Packages?.Any() != true)
+                return; // nothing to delete
+
+            foreach(var package in model.Packages)
+            {
+                try
+                {
+                    string dlPackage = package;
+                    if (dlPackage.EndsWith(".ffplugin") == false)
+                        dlPackage += ".ffplugin";
+                    var dlResult = await HttpHelper.Get<byte[]>(PLUGIN_BASE_URL + "/download/" + dlPackage);
+                    if (dlResult.Success)
+                        PluginScanner.UpdatePlugin(package, dlResult.Data);
+                }
+                catch (Exception ex)
+                { 
+                    Logger.Instance?.ELog($"Failed downloading plugin package: '{package}' => {ex.Message}");
+                }
+            }
+        }
+
+        [HttpPost("download-package")]
+        public async Task<byte[]> DownloadPackage([FromBody] PluginInfo model)
+        {
+            if (model == null)
+                throw new ArgumentNullException("model");
+
+            var actual = await Get(model.Uid);
+            if (actual == null)
+                throw new Exception("UID not found");
+
+            if(actual.Version != model.Version)
+                throw new Exception("Version mismatch");
+
+            string dir = PluginScanner.GetPluginDirectory();
+            string file = Path.Combine(dir, actual.PackageName);
+            if (file.EndsWith(".ffplugin") == false)
+                file += ".ffplugin";
+
+            if (System.IO.File.Exists(file) == false)
+                throw new Exception("File not found");
+
+            byte[] data = System.IO.File.ReadAllBytes(file);
+            return data;
+        }
+
+        public class DownloadModel
+        {
+            public List<string> Packages { get; set; }
         }
     }
 }

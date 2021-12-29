@@ -29,15 +29,8 @@ namespace FileFlows.FlowRunner
                 Console.WriteLine("Base URL: " + baseUrl);
                 Service.ServiceBaseUrl = baseUrl;
 
-                string pluginsPath = GetArgument(args, "--pluginsPath");
-                if(string.IsNullOrEmpty(pluginsPath) || Directory.Exists(pluginsPath) == false)
-                    throw new Exception("Plugin path doesnt exist: " + pluginsPath);
-
                 string workingDir = Path.Combine(tempPath, "Runner-" + uid);
                 Directory.CreateDirectory(workingDir);
-
-                // unzip all plugins to this directory
-                ExtractPlugins(pluginsPath, workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
                 Shared.Helpers.HttpHelper.Client = new HttpClient();
@@ -53,15 +46,6 @@ namespace FileFlows.FlowRunner
                     ex = ex.InnerException;
                 }
                 return;
-            }
-        }
-
-        private static void ExtractPlugins(string pluginsPath, string destination)
-        {
-            foreach(var pi in new DirectoryInfo(pluginsPath).GetFiles("*.ffplugin"))
-            {
-                string name = pi.Name.Substring(0, pi.Name.Length - pi.Extension.Length);
-                System.IO.Compression.ZipFile.ExtractToDirectory(pi.FullName, Path.Combine(destination, name));
             }
         }
 

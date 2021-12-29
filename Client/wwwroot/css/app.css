@@ -82,7 +82,7 @@ input[type=checkbox] {
   top: 7px;
   left: 3px;
 }
-input[type=checkbox]:checked {
+input[type=checkbox]:checked:not([readonly]) {
   border-color: var(--accent) !important;
 }
 
@@ -97,6 +97,10 @@ input[type=checkbox]::before {
   box-shadow: inset 1em 1em var(--accent);
   /* Windows High Contrast Mode */
   background-color: transparent;
+}
+
+input[type=checkbox][readonly]::before {
+  box-shadow: inset 1em 1em var(--input-background);
 }
 
 input[type=checkbox]:checked::before {

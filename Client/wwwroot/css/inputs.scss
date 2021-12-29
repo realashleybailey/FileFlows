@@ -35,7 +35,7 @@ input[type="checkbox"] {
     position:relative;
     top: 7px;
     left: 3px;
-    &:checked {
+    &:checked:not([readonly]) {
         border-color: var(--accent) !important;
     }
 }
@@ -47,10 +47,13 @@ input[type="checkbox"]::before {
     clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
     transform: scale(0);
     transform-origin: bottom left;
-    transition: 120ms transform ease-in-out;
+    transition: 120ms transform ease-in-out;    
     box-shadow: inset 1em 1em var(--accent);
     /* Windows High Contrast Mode */
     background-color: transparent;
+}
+input[type="checkbox"][readonly]::before {
+    box-shadow: inset 1em 1em var(--input-background);
 }
 
 input[type="checkbox"]:checked::before {

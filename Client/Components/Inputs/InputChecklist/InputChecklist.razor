@@ -7,9 +7,15 @@
         @foreach (var opt in Options ?? new List<FileFlows.Plugin.ListOption>())
         {
             <li>
-                <label>
+                <label readonly="@(ReadOnly ? "readonly" : null)">
                     <span>
-                        <input type="checkbox" checked=@(Value.Contains(opt.Value) ? "checked" : null) @onchange="(e) => OnChange(e, opt)" @onclick:stopPropagation />                
+                        @if (ReadOnly)
+                        {
+                            <input type="checkbox" readonly checked=@(Value.Contains(opt.Value) ? "checked" : null) disabled />
+                        }else
+                        {
+                            <input type="checkbox" checked=@(Value.Contains(opt.Value) ? "checked" : null) @onchange="(e) => OnChange(e, opt)" @onclick:stopPropagation />                
+                        }
                     </span>
                     <span>@opt.Label</span>
                 </label>

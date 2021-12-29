@@ -68,6 +68,7 @@ namespace FileFlows.Server.Helpers
                     bool isNew = plugin == null;
                     plugin ??= new();
                     installed.Add(pi.Name);
+                    plugin.PackageName = pi.PackageName;
                     plugin.Version = pi.Version;
                     plugin.DateModified = DateTime.UtcNow;
                     plugin.HasSettings = hasSettings;
@@ -142,6 +143,19 @@ namespace FileFlows.Server.Helpers
             {
                 Logger.Instance?.ELog("Failed updating plugin: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return false;
+            }
+        }
+
+        internal static void Delete(string packageName)
+        {
+            string file = Path.Combine(GetPluginDirectory(), packageName + ".ffplugin");
+            if(File.Exists(file))
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch { }
             }
         }
 

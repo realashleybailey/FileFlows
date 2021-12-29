@@ -279,7 +279,14 @@ namespace FileFlows.Client.Components
                 return (T)value;
             }
 
-            return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), value);
+            try
+            {
+                return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), value);
+            }
+            catch(Exception ex)
+            {
+                return default(T);
+            }
         }
     }
 }

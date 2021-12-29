@@ -17,18 +17,11 @@
         private readonly bool isServer;
 
         private bool FirstExecute = true;
-        private string PluginsPath;
 
         public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 10)
         {
             this.isServer = isServer;
             this.FirstExecute = true;
-#if (DEBUG)
-            PluginsPath = "../Server/Plugins";
-#else
-            var dir = Directory.GetCurrentDirectory();
-            PluginsPath = Path.Combine(dir, "Plugins");
-#endif
         }
 
         public Func<bool> IsEnabledCheck { get; set; }
@@ -44,6 +37,7 @@
                 return "\"" + Regex.Replace(path, @"(\\+)$", @"$1$1") + "\"";
             }
         }
+
 
         protected override void Execute()
         {
@@ -81,6 +75,7 @@
                 return; // already maximum executors running
             }
 
+
             string tempPath = node.TempPath;
             if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
             {
@@ -102,14 +97,13 @@
             {
                 try
                 {
+
                     var parameters = new string[]
                     {
                         "--uid",
                         processUid.ToString(),
                         "--libfile",
                         libFile.Uid.ToString(),
-                        "--pluginsPath",
-                        PluginsPath,
                         "--tempPath",
                         tempPath,
                         "--baseUrl",

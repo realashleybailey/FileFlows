@@ -277,7 +277,10 @@ public class Runner
             string file = Path.Combine(nodeParameters.TempPath, $"{plugin.PackageName}.ffplugin");
             var data = service.Download(plugin).Result;
             if (data == null || data.Length == 0)
+            {
+                nodeParameters.Logger?.ELog("Failed to download plugin: " + plugin.PackageName);
                 throw new Exception("Failed to download plugin: " + plugin.PackageName);
+            }
 
             string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
             if (Directory.Exists(destDir))

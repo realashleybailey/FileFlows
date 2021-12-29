@@ -160,14 +160,23 @@ namespace FileFlows.Server.Controllers
         public async Task<byte[]> DownloadPackage([FromBody] PluginInfo model)
         {
             if (model == null)
+            {
+                Logger.Instance?.ELog("Download Package Error: model was null");
                 throw new ArgumentNullException("model");
+            }
 
             var actual = await Get(model.Uid);
             if (actual == null)
+            {
+                Logger.Instance?.ELog("Download Package Error: UID not found");
                 throw new Exception("UID not found");
+            }
 
-            if(actual.Version != model.Version)
+            if (actual.Version != model.Version)
+            {
+                Logger.Instance?.ELog("Download Package Error: Version mismatch");
                 throw new Exception("Version mismatch");
+            }
 
             string dir = PluginScanner.GetPluginDirectory();
             string file = Path.Combine(dir, actual.PackageName);
@@ -175,10 +184,21 @@ namespace FileFlows.Server.Controllers
                 file += ".ffplugin";
 
             if (System.IO.File.Exists(file) == false)
+            {
+                Logger.Instance?.ELog("Download Package Error: File not found => " + file);
                 throw new Exception("File not found");
+            }
 
-            byte[] data = System.IO.File.ReadAllBytes(file);
-            return data;
+            try
+            {
+                byte[] data = System.IO.File.ReadAllBytes(file);
+                return data;
+            }
+            catch(Exception ex)
+            {
+                Logger.Instance?.ELog("Download Package Error: Failed to read data => " + ex.Message); ;
+                throw;
+            }
         }
 
         public class DownloadModel

@@ -37,7 +37,7 @@
             }
             catch (Exception ex)
             {
-                Logger.Instance?.WLog("Failed to get plugin infos: " + ex.Message);
+                Logger.Instance?.WLog("Failed to download plugin package: " + ex.Message);
                 return new byte[] { };
             }
         }

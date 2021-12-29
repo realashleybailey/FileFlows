@@ -156,32 +156,25 @@ namespace FileFlows.Server.Controllers
             }
         }
 
-        [HttpPost("download-package")]
-        public async Task<byte[]> DownloadPackage([FromBody] PluginInfo model)
+        [HttpGet("download-package/{package}")]
+        public async Task<FileStreamResult> DownloadPackage([FromRoute] string package)
         {
-            if (model == null)
+            if (string.IsNullOrEmpty(package))
             {
-                Logger.Instance?.ELog("Download Package Error: model was null");
-                throw new ArgumentNullException("model");
+                Logger.Instance?.ELog("Download Package Error: package not set");
+                throw new ArgumentNullException(nameof(package));
             }
+            if (package.EndsWith(".ffplugin") == false)
+                package += ".ffplugin";
 
-            var actual = await Get(model.Uid);
-            if (actual == null)
+            if(System.Text.RegularExpressions.Regex.IsMatch(package, "^[a-zA-Z0-9_\\-]+\\.ffplugin$") == false)
             {
-                Logger.Instance?.ELog("Download Package Error: UID not found");
-                throw new Exception("UID not found");
-            }
-
-            if (actual.Version != model.Version)
-            {
-                Logger.Instance?.ELog("Download Package Error: Version mismatch");
-                throw new Exception("Version mismatch");
+                Logger.Instance?.ELog("Download Package Error: invalid package: " + package);
+                throw new Exception("Download Package Error: invalid package: " + package);
             }
 
             string dir = PluginScanner.GetPluginDirectory();
-            string file = Path.Combine(dir, actual.PackageName);
-            if (file.EndsWith(".ffplugin") == false)
-                file += ".ffplugin";
+            string file = Path.Combine(dir, package);
 
             if (System.IO.File.Exists(file) == false)
             {
@@ -191,8 +184,7 @@ namespace FileFlows.Server.Controllers
 
             try
             {
-                byte[] data = System.IO.File.ReadAllBytes(file);
-                return data;
+                return File(System.IO.File.OpenRead(file), "application/octet-stream");
             }
             catch(Exception ex)
             {

@@ -12,6 +12,8 @@ namespace FileFlows.Shared.Helpers
     {
         public static HttpClient Client { get; set; }
 
+        public static Plugin.ILogger Logger { get; set; }
+
         public static async Task<RequestResult<T>> Get<T>(string url)
         {
             return await MakeRequest<T>(HttpMethod.Get, url);
@@ -21,9 +23,9 @@ namespace FileFlows.Shared.Helpers
             return await MakeRequest<T>(HttpMethod.Get, url, timeoutSeconds: timeoutSeconds);
         }
 #if (!DEMO)
-        public static async Task<RequestResult<string>> Post(string url, object data = null)
+        public static async Task<RequestResult<string>> Post(string url, object data = null, bool noLog = false)
         {
-            return await MakeRequest<string>(HttpMethod.Post, url, data);
+            return await MakeRequest<string>(HttpMethod.Post, url, data, noLog: noLog);
         }
         public static async Task<RequestResult<T>> Post<T>(string url, object data = null, int timeoutSeconds = 0)
         {
@@ -44,7 +46,16 @@ namespace FileFlows.Shared.Helpers
         }
 #endif
 
-        private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null, int timeoutSeconds = 0)
+        private static void Log(string message)
+        {
+            var logger = Logger ?? Shared.Logger.Instance;
+            if(logger != null)
+                logger.ILog(message);
+            else
+                Console.WriteLine(message);
+        }
+
+        private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null, int timeoutSeconds = 0, bool noLog = false)
         {
             try
             {
@@ -52,8 +63,6 @@ namespace FileFlows.Shared.Helpers
                 if (url.Contains("i18n") == false && url.StartsWith("http") == false)
                     url = "http://localhost:6868" + url;
 #endif
-                if(url.Contains("fileflows.com") == false)
-                    Logger.Instance?.DLog("About to request: " + url);
                 var request = new HttpRequestMessage
                 {
                     Method = method,
@@ -67,8 +76,8 @@ namespace FileFlows.Shared.Helpers
                     request.Content = new StringContent("", Encoding.UTF8, "application/json");
                 }
 
-
-                Console.WriteLine("Making request[" + method + "]: " + url);
+                if(noLog == false)
+                    Log("Making request[" + method + "]: " + url);
                 HttpResponseMessage response;
                 if (timeoutSeconds > 0)
                 {
@@ -101,6 +110,8 @@ namespace FileFlows.Shared.Helpers
                 {
                     if (body.Contains("An unhandled error has occurred."))
                         body = "An unhandled error has occurred."; // asp.net error
+                    if(noLog == false)
+                        Log("Error Body: " + body);
                     return new RequestResult<T> { Success = false, Body = body, Data = default(T) };
                 }
             }

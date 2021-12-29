@@ -139,7 +139,7 @@
                             string error = process.StandardError.ReadToEnd();
                             process.WaitForExit();
                             if (string.IsNullOrEmpty(error) == false)
-                                Logger.Instance?.ELog(output);
+                                Logger.Instance?.ELog(error);
                             if(process.ExitCode != 0)
                                 throw new Exception("Invalid exit code: " + process.ExitCode);
                         }

@@ -30,9 +30,9 @@
         {
             try
             {
-                var result = await HttpHelper.Post<byte[]>($"{ServiceBaseUrl}/api/plugin/download-package", plugin);
+                var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/plugin/download-package/{plugin.PackageName}");
                 if (result.Success == false)
-                    throw new Exception("Failed to download plugin package: " + result.Body);
+                    throw new Exception(result.Body);
                 return result.Data;
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@
             {
                 var result = await HttpHelper.Get<List<PluginInfo>>($"{ServiceBaseUrl}/api/plugin");
                 if (result.Success == false)
-                    throw new Exception("Failed to load plugin infos: " + result.Body);
+                    throw new Exception(result.Body);
                 return result.Data;
             }
             catch (Exception ex)

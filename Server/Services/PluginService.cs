@@ -10,7 +10,13 @@
 
     public class PluginService : IPluginService
     {
-        public Task<byte[]> Download(PluginInfo plugin) => new PluginController().DownloadPackage(plugin);
+        public async Task<byte[]> Download(PluginInfo plugin)
+        {
+            var result = await new PluginController().DownloadPackage(plugin.PackageName);
+            using var ms = new MemoryStream();
+            result.FileStream.CopyTo(ms);
+            return ms.ToArray();
+        }
 
         public Task<List<PluginInfo>> GetAll() => new PluginController().GetDataList();
         public Task<PluginInfo> Update(PluginInfo pluginInfo) => new PluginController().Update(pluginInfo);

@@ -42,17 +42,16 @@ public class Runner
             {
                 RunActual(communicator);
             }
+            catch(Exception ex)
+            {
+                nodeParameters?.Logger?.ELog("Error in runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                throw;
+            }
             finally
             {
                 communicator.OnCancel -= Communicator_OnCancel;
                 communicator.Close();
             }
-        }
-        catch (Exception ex)
-        {
-            string msg = "Error in FlowRunner: " + ex.Message + Environment.NewLine + ex.StackTrace;
-            Console.WriteLine(msg);
-            Logger.Instance.ELog(msg);
         }
         finally
         {
@@ -163,6 +162,7 @@ public class Runner
         nodeParameters.TempPath = WorkingDir;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
+        Shared.Helpers.HttpHelper.Logger = nodeParameters.Logger;
 
         nodeParameters.Logger!.ILog("Excecuting Flow: " + Flow.Name);
 

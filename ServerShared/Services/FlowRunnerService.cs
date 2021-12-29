@@ -56,7 +56,7 @@
         {
             try
             {
-                var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/update", info);
+                var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/update", info, noLog: true);
                 if (result.Success == false)
                     throw new Exception("Failed to update work: " + result.Body);
             }

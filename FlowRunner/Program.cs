@@ -10,6 +10,7 @@ namespace FileFlows.FlowRunner
     {
         public static void Main(string[] args)
         {
+            int exitCode = 0;
             try
             {
                 args ??= new string[] { };
@@ -38,7 +39,7 @@ namespace FileFlows.FlowRunner
             }
             catch (Exception ex)
             {
-                Environment.ExitCode = 1;
+                exitCode = 1;
                 Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 while(ex.InnerException != null)
                 {
@@ -46,6 +47,11 @@ namespace FileFlows.FlowRunner
                     ex = ex.InnerException;
                 }
                 return;
+            }
+            finally
+            {
+                Console.WriteLine("Exit Code: " + exitCode);
+                Environment.ExitCode = exitCode;
             }
         }
 

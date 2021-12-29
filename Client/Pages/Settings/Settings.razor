@@ -26,6 +26,7 @@
                 <InputFile @bind-Value="@Model.LoggingPath" Directory="true" Validators=@DirectoryValidators
                     Label="Pages.Settings.Fields.LoggingPath" />
                 <InputSelect Value="@Model.TimeZone" ValueChanged="TimeZoneChanged" Label="Pages.Settings.Fields.TimeZone" Options="@TimeZones" />
+                <InputSwitch @bind-Value="@Model.AutoUpdatePlugins" Inverse="@true" Label="Pages.Settings.Fields.AutoUpdatePlugins" />
                 <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
             </Fieldset>
         </div>

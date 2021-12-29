@@ -266,8 +266,10 @@
       "Fields": {
         "Telemetry": "Telemetry",
         "Telemetry-Help": "Telemetry is useful to help know what devices we need to support, what Flow parts are the most used and where we should focus on the development.",
+        "AutoUpdatePlugins": "Auto Update Plugins",
+        "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "LoggingPath": "Logging Directory",
-        "LoggingPath-Help": "This is where log files will be created.",
+        "LoggingPath-Help": "This is where log files will be created."
       }
     },
     "Tools": {

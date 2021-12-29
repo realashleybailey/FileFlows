@@ -11,6 +11,8 @@
         [Required]
         public string LoggingPath { get; set; }
 
+        public bool AutoUpdatePlugins { get; set; }
+
         public bool DisableTelemetry { get; set; }
 
         public string TimeZone { get; set; }

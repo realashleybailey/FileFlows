@@ -317,8 +317,8 @@ namespace FileFlows.Server.Helpers
         {
             string dir = Program.GetAppDirectory();
             dir = Path.Combine(dir, "Data");
-            if (Directory.Exists(dir) == false)
-                Directory.CreateDirectory(dir);            
+
+            Plugin.Helpers.FileHelper.CreateDirectoryIfNotExists(Logger.Instance, dir);
 
             DbFilename = Path.Combine(dir, "FileFlows.sqlite");
             return DbFilename;
@@ -406,6 +406,7 @@ namespace FileFlows.Server.Helpers
             await AddOrUpdateObject(db, new Settings
             {
                 Name = "Settings",
+                AutoUpdatePlugins = true,
                 LoggingPath = windows ? Path.Combine(Program.GetAppDirectory(), "Logs") : "/app/Logs",
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow

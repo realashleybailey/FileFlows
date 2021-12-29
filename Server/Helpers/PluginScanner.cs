@@ -138,10 +138,15 @@ namespace FileFlows.Server.Helpers
         private static void EnsureDefaultsExist(string pluginDir)
         {
             DirectoryInfo di = new DirectoryInfo(pluginDir);
+            Plugin.Helpers.FileHelper.CreateDirectoryIfNotExists(Logger.Instance, di.FullName);
+
             var rootPlugins = new DirectoryInfo(Path.Combine(di.Parent.FullName, "Plugins"));
 
             if (rootPlugins.Exists == false)
+            {
+                Logger.Instance?.ILog("Root plugin directory not found: " + rootPlugins);
                 return;
+            }
 
             foreach(var file in rootPlugins.GetFiles("*.ffplugin"))
             {

@@ -80,8 +80,7 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
         }
     }
     else {
-        Write-Error 'ERROR: Failed to generate plugin info files'
-        return
+        Write-Error "WARNING: Failed to generate plugin info files for: $package"        
     }
 
     Remove-Item $output/$package -Recurse -ErrorAction SilentlyContinue

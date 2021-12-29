@@ -57,12 +57,14 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             {
                 WriteIndented = true
             });
+            Console.WriteLine("Saving nfo file to: " + output);
             File.WriteAllText(output, json);
         }
 
         public static PluginInfo LoadPlugin(FileInfo dll, FileInfo csproj)
         {
             Console.WriteLine("Checking dll: " + dll);
+            Console.WriteLine("CSProject: " + csproj);
             var test = new Node();
             //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
             var assembly = Assembly.LoadFrom(dll.FullName);

@@ -54,10 +54,21 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
         # only actually create the plugin if plugins were found in it      
         
         #read nfo file
-        $pluginNfo = [System.IO.File]::ReadAllText("../$output/$package/.nfo");
-        Write-Output "Plugin NFO: $pluginNfo"
-        $json += $pluginNfo + ",`n"
-        Remove-Item $output/$package/.nfo -Force
+        # build server needs ../, locally we cant have it
+        if([System.IO.File]::Exists("../$output/$package/.nfo"))
+        {
+            $pluginNfo = [System.IO.File]::ReadAllText("../$output/$package/.nfo");
+            Write-Output "Plugin NFO: $pluginNfo"
+            $json += $pluginNfo + ",`n"
+            Remove-Item "../$output/$package/.nfo" -Force
+        }
+        else
+        {
+            $pluginNfo = [System.IO.File]::ReadAllText("$output/$package/.nfo");
+            Write-Output "Plugin NFO: $pluginNfo"
+            $json += $pluginNfo + ",`n"
+            Remove-Item $output/$package/.nfo -Force
+        }
 
         Move-Item $output/$package/*.en.json $output/$package/en.json -Force
 
@@ -80,7 +91,7 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
         }
     }
     else {
-        Write-Error "WARNING: Failed to generate plugin info files for: $package"        
+        Write-Warning "WARNING: Failed to generate plugin info files for: $package"        
     }
 
     Remove-Item $output/$package -Recurse -ErrorAction SilentlyContinue

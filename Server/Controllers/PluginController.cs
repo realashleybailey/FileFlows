@@ -43,22 +43,6 @@ namespace FileFlows.Server.Controllers
             return pims;
         }
 
-        [HttpPut("state/{uid}")]
-        public async Task<PluginInfo> SetState([FromRoute] Guid uid, [FromQuery] bool enable)
-        {
-            var plugin = await GetByUid(uid);;
-            if (plugin == null)
-                throw new Exception("Plugin not found.");
-
-            if (plugin.Name == "Basic Nodes" && enable == false)
-                return plugin; // dont let them disable the basic nodes
-            if (enable == plugin.Enabled)
-                return plugin;
-                        
-            plugin.Enabled = enable;
-            return await Update(plugin);
-        }
-
         [HttpGet("{uid}")]
         public async Task<PluginInfo> Get([FromRoute] Guid uid)
         {

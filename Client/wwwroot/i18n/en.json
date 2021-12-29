@@ -246,6 +246,9 @@
       "Labels": {
         "PluginBrowser": "Plugin Browser"
       },
+      "Messages": {
+        "DeletePlugins": "Are you sure you want to delete the selected {count, plural, one {plugin} other {plugins}}?\n\nDoing so will cause any Flows that use these plugins to stop working and processing will fail."
+      },
       "Fields": {
         "Authors": "Authors",
         "Version": "Version",

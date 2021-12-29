@@ -161,13 +161,15 @@ namespace FileFlows.Client.Pages
 #endif
         }
 
+        protected virtual string DeleteMessage => "Labels.DeleteItems";
+
         public async Task Delete()
         {
             var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
             if (uids.Length == 0)
                 return; // nothing to delete
             if (await Confirm.Show("Labels.Delete",
-                Translater.Instant("Labels.DeleteItems", new { count = uids.Length })) == false)
+                Translater.Instant(DeleteMessage, new { count = uids.Length })) == false)
                 return; // rejected the confirm
 
             Blocker.Show();

@@ -23,6 +23,7 @@ namespace FileFlows.Client.Pages
             _ = Load();
         }
 
+        protected override string DeleteMessage => "Pages.Plugins.Messages.DeletePlugins";
 
         async Task Add()
         {
@@ -30,26 +31,6 @@ namespace FileFlows.Client.Pages
             bool result = await PluginBrowser.Open();
             if (result)
                 await PluginsUpdated();
-#endif
-        }
-
-        async Task Enable(bool enabled, PluginInfo plugin)
-        {
-#if (!DEMO)
-            Blocker.Show();
-            this.StateHasChanged();
-            Data.Clear();
-            try
-            {
-                var result = await HttpHelper.Put<PluginInfo>($"{ApiUrl}/state/{plugin.Uid}?enable={enabled}");
-                if (result.Success)
-                    plugin.Enabled = result.Data.Enabled;
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
 #endif
         }
 

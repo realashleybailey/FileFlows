@@ -15,9 +15,9 @@
             DoubleClick="@OnDoubleClick">
             <ToolBar>            
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
-                <FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-                <FlowTableButton TItem="PluginInfoModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />                
+                <!--<FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />-->
+                <FlowTableButton TItem="PluginInfoModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
                 <FlowTableHelpButton TItem="PluginInfoModel" HelpUrl="Plugins" />
             </ToolBar>
 
@@ -45,14 +45,6 @@
                     </Header>
                     <Cell Context="item">
                         <span>@item.LatestVersion</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="PluginInfoModel" Width="6rem" MobileWidth="4rem">
-                    <Header>
-                        @Globals.lblEnabled
-                    </Header>
-                    <Cell Context="item">
-                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
                     </Cell>
                 </FlowTableColumn>
             </Columns>

@@ -162,5 +162,9 @@
   {
     "outputFile": "Components/PluginBrowser/PluginBrowser.razor.css",
     "inputFile": "Components/PluginBrowser/PluginBrowser.razor.scss"
+  },
+  {
+    "outputFile": "Components/Dialogs/Confirm/Confirm.razor.css",
+    "inputFile": "Components/Dialogs/Confirm/Confirm.razor.scss"
   }
 ]

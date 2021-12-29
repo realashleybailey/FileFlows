@@ -10,7 +10,7 @@
         public static bool MoveFile(string source, string destination)
         {
             System.IO.File.Move(source, destination);
-            return Plugin.Helpers.FileHelper.SetPermissions(Logger.Instance, destination);
+            return Plugin.Helpers.FileHelper.ChangeOwner(Logger.Instance, destination);
         }
     }
 }

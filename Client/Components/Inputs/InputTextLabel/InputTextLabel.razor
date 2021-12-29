@@ -1,0 +1,16 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<string>
+
+<InputWrapper Input="@this">
+    @if (Link)
+    {
+        <a href="@Value" target="_blank">@Value</a>
+    }
+    else if (Pre)
+    {
+        <span class="pre-text">@Value</span>
+    }
+    else {
+        <span>@Value</span>
+    }
+</InputWrapper>

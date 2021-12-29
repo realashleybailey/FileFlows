@@ -12,6 +12,7 @@ namespace FileFlows.Client.Components.Inputs
         [Parameter]
         public List<ListOption> Options { get; set; }
 
+        [Parameter] public bool ListOnly { get; set; }
         //public override bool Focus() => FocusUid();
 
         protected override void OnInitialized()

@@ -51,9 +51,10 @@
         case FormInputType.Checklist:
             {
                 var value = GetValue<List<object>>(field.Name);
+                var listOnly = GetParameter<bool>(field, "ListOnly");
                 var options = GetParameter<List<ListOption>>(field, nameof(Components.Inputs.InputChecklist.Options));
                 <InputChecklist Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Options="@options" HideLabel=@hideLabel />
+    Validators=@field.Validators Options="@options" HideLabel=@hideLabel ListOnly=@listOnly />
             }
             break;
         case FormInputType.Slider:
@@ -125,19 +126,26 @@
     Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
             }
             break;
+        case FormInputType.TextLabel:
+            {
+                    var value = GetValue<object>(field.Name).ToString();
+                    var pre = GetParameter<bool>(field, nameof(InputTextLabel.Pre));
+                    var link = GetParameter<bool>(field, nameof(InputTextLabel.Link));
+                    <InputTextLabel Field=@field Label="@label" Value="@value" HideLabel=@hideLabel Pre=@pre Link=@link />
+            }
+            break;
         case FormInputType.Label:
-        {
-            <div class="input-label">
-                @Translater.TranslateIfNeeded(label)
-            </div>
-        }
-        break;
+            {
+                <div class="input-label">
+                    @Translater.TranslateIfNeeded(label)
+                </div>
+            }
+            break;
         case FormInputType.HorizontalRule:
-        {
-            <div class="input-horizontal-rule"></div>
-        }
-        break;
-
+            {
+                <div class="input-horizontal-rule"></div>
+            }
+            break;
         default:
             {
                 <span>couldnt find type @field.InputType</span>

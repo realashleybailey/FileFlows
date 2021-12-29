@@ -29,7 +29,8 @@ namespace FileFlows.Plugin
         HorizontalRule = 16,
         Schedule = 17,
         Slider = 18,
-        Checklist = 19
+        Checklist = 19,
+        TextLabel = 20
     }
 
 

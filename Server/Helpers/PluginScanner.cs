@@ -75,6 +75,9 @@ namespace FileFlows.Server.Helpers
                     plugin.Deleted = false;
                     plugin.Fields = pi.Fields;
                     plugin.Elements = pi.Elements;
+                    plugin.Authors = pi.Authors;
+                    plugin.Url = pi.Url;
+                    plugin.Description = pi.Description;
 
                     Logger.Instance.ILog("Plugin.Name: " + plugin.Name);
                     Logger.Instance.ILog("Plugin.PackageName: " + plugin.PackageName);

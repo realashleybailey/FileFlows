@@ -166,5 +166,9 @@
   {
     "outputFile": "Components/Dialogs/Confirm/Confirm.razor.css",
     "inputFile": "Components/Dialogs/Confirm/Confirm.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputTextLabel/InputTextLabel.razor.css",
+    "inputFile": "Components/Inputs/InputTextLabel/InputTextLabel.razor.scss"
   }
 ]

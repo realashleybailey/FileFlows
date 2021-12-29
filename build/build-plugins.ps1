@@ -60,7 +60,7 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
             $pluginNfo = [System.IO.File]::ReadAllText("../$output/$package/.nfo");
             Write-Output "Plugin NFO: $pluginNfo"
             $json += $pluginNfo + ",`n"
-            Remove-Item "../$output/$package/.nfo" -Force
+            [System.IO.File]::Delete("../$output/$package/.nfo")
         }
         else
         {
@@ -68,6 +68,7 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
             Write-Output "Plugin NFO: $pluginNfo"
             $json += $pluginNfo + ",`n"
             Remove-Item $output/$package/.nfo -Force
+            [System.IO.File]::Delete("$output/$package/.nfo")
         }
 
         Move-Item $output/$package/*.en.json $output/$package/en.json -Force

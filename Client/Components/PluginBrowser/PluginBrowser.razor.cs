@@ -139,46 +139,34 @@ namespace FileFlows.Client.Components
                 new ElementField
                 {
                     Name = nameof(plugin.Name),
-                    InputType = FormInputType.Text,
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { nameof(InputText.ReadOnly), true }
-                    }
+                    InputType = FormInputType.TextLabel
                 },
                 new ElementField
                 {
                     Name = nameof(plugin.Authors),
-                    InputType = FormInputType.Text,
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { nameof(InputText.ReadOnly), true }
-                    }
+                    InputType = FormInputType.TextLabel
                 },
                 new ElementField
                 {
                     Name = nameof(plugin.Version),
-                    InputType = FormInputType.Text,
-                    Parameters = new Dictionary<string, object>
-                    {
-                        { nameof(InputText.ReadOnly), true }
-                    }
+                    InputType = FormInputType.TextLabel
                 },
                 new ElementField
                 {
                     Name = nameof(plugin.Url),
-                    InputType = FormInputType.Text,
+                    InputType = FormInputType.TextLabel,
                     Parameters = new Dictionary<string, object>
                     {
-                        { nameof(InputText.ReadOnly), true }
+                        { nameof(InputTextLabel.Link), true }
                     }
                 },
                 new ElementField
                 {
                     Name = nameof(plugin.Description),                    
-                    InputType = FormInputType.TextArea,
+                    InputType = FormInputType.TextLabel,
                     Parameters = new Dictionary<string, object>
                     {
-                        { nameof(InputText.ReadOnly), true }
+                        { nameof(InputTextLabel.Pre), true }
                     }
                 },
                 new ElementField
@@ -187,7 +175,7 @@ namespace FileFlows.Client.Components
                     InputType = FormInputType.Checklist,
                     Parameters = new Dictionary<string, object>
                     {
-                        { nameof(InputText.ReadOnly), true },
+                        { nameof(InputChecklist.ListOnly), true },
                         { 
                             nameof(InputChecklist.Options), 
                             plugin.Elements.Select(x => new ListOption{ Label = x, Value = x }).ToList()

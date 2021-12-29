@@ -13,7 +13,7 @@ span {
 span + span {
     margin-left:0.25rem;
 }
-label:read-only {
+label[readonly] {
     filter: opacity(0.5);
 }
 
@@ -24,4 +24,13 @@ input:disabled{
 ::deep input {
     top:0;
     left:0;
+}
+.list-only
+{
+    li {
+        padding:0 0 0.25rem;
+    }
+    span {
+        color:rgba(var(--color-rgb), 0.7);
+    }
 }

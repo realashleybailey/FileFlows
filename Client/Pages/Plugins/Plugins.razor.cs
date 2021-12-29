@@ -11,6 +11,8 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
+    using FileFlows.Plugin;
+    using FileFlows.Client.Components.Inputs;
 
     public partial class Plugins : ListPage<PluginInfoModel>
     {
@@ -120,6 +122,67 @@ namespace FileFlows.Client.Pages
 #else
             return false;
 #endif
+        }
+
+
+        private async Task AboutAction()
+        {
+            var item = Table.GetSelected().FirstOrDefault();
+            if (item != null)
+                await About(item);
+        }
+
+        private async Task About(PluginInfoModel plugin)
+        {
+            await Editor.Open("Pages.Plugins", plugin.Name, new List<ElementField>
+            {
+                new ElementField
+                {
+                    Name = nameof(plugin.Name),
+                    InputType = FormInputType.TextLabel
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Authors),
+                    InputType = FormInputType.TextLabel
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Version),
+                    InputType = FormInputType.TextLabel
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Url),
+                    InputType = FormInputType.TextLabel,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputTextLabel.Link), true }
+                    }
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Description),
+                    InputType = FormInputType.TextLabel,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputTextLabel.Pre), true }
+                    }
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Elements),
+                    InputType = FormInputType.Checklist,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputChecklist.ListOnly), true },
+                        {
+                            nameof(InputChecklist.Options),
+                            plugin.Elements?.Select(x => new ListOption{ Label = x.Name, Value = x })?.ToList() ?? new List<ListOption>()
+                        }
+                    }
+                },
+            }, plugin, readOnly: true);;
         }
     }
 

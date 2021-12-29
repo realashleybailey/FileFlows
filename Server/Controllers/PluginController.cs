@@ -15,7 +15,7 @@ namespace FileFlows.Server.Controllers
     {
         const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
         [HttpGet]
-        public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = false)
+        public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = true)
         {
             var plugins = (await GetDataList()).Where(x => x.Deleted == false);
             List<PluginInfoModel> pims = new List<PluginInfoModel>();
@@ -34,6 +34,10 @@ namespace FileFlows.Server.Controllers
                     HasSettings = plugin.HasSettings,
                     Settings = plugin.Settings,
                     Fields = plugin.Fields,
+                    Authors = plugin.Authors,
+                    Url =  plugin.Url,
+                    PackageName = plugin.PackageName,
+                    Description = plugin.Description,   
                     Elements = includeElements ? plugin.Elements : null
                 };
                 var package = packages.FirstOrDefault(x => x.Name.ToLower().Replace(" ", "") == x.Name.ToLower().Replace(" ", ""));

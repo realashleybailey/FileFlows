@@ -143,8 +143,12 @@ button:not(.flowtable-button):not(.navbar-toggler):disabled {
   color: var(--input-background);
 }
 
+.flow-modal-background-overlay {
+  z-index: 10 !important;
+}
+
 .flow-modal {
-  z-index: 5;
+  z-index: 11;
   padding: 1rem;
 }
 

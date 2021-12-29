@@ -1,5 +1,9 @@
-﻿.flow-modal {
-  z-index: 5;
+﻿.flow-modal-background-overlay {
+  z-index: 10 !important;
+}
+
+.flow-modal {
+  z-index: 11;
   padding: 1rem;
 }
 

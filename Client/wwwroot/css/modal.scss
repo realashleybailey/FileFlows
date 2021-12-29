@@ -1,7 +1,9 @@
-﻿
+﻿.flow-modal-background-overlay{
+    z-index:10 !important;
+}
 
 .flow-modal {
-    z-index: 5;
+    z-index: 11;
     padding: 1rem;
 }
 @media screen and (min-width: 578.0001px) {

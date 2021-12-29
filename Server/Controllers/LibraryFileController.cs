@@ -374,7 +374,13 @@ namespace FileFlows.Server.Controllers
         [HttpGet("stream")]
         public async Task<IActionResult> StreamFile([FromQuery] string file)
         {
-            return File(System.IO.File.OpenRead(file), "applicaaiton/octet-stream");
+            // this method is testing if streaming a file to a node is doable
+            // instead of having to setup mappings
+            // ffmpeg handles it, but not every node would. so maybe have to bake in to the input node somehow...
+            // but doing that VideoInput can stream the file to get the info, thats a lot of data to stream over
+            // then its still on server, then when VideoEncode executes, we have to read the entire file again
+            // thats less than ideal... so maybe just delete this code...
+            return File(System.IO.File.OpenRead(file), "applicaiton/octet-stream");
         }
 #endif
     }

@@ -7,6 +7,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace PluginInfoGenerator // Note: actual namespace depends on the project name.
 {
@@ -14,72 +15,91 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
     {
         public static void Main(string[] args)
         {
-            string dir = args.FirstOrDefault();
-            if(string.IsNullOrEmpty(dir))
+            if(args.Length != 2)
             {
-                Console.WriteLine("No plugin directory defined");
-                Environment.ExitCode = 1;
+                Console.WriteLine("Must specify first the DLL then the csproj file");
                 return;
             }
-            dir = new DirectoryInfo(dir).FullName;
-            Console.WriteLine("Scanning directory: " + dir);
 
-            var plugins = ScanForPlugins(dir);
-            Console.WriteLine("Plugins found: " + plugins.Count);
-            foreach (var plugin in plugins)
+            var plugin = LoadPlugin(new FileInfo(args[0]), new FileInfo(args[1]));
+            if(plugin == null)
             {
-                Console.WriteLine("Saving info for plugin: " + plugin.PackageName);
-                string file = plugin.PackageName + ".plugininfo";
-                plugin.PackageName = new FileInfo(plugin.PackageName).Name.Replace(".dll", "");
-                string json = JsonSerializer.Serialize(plugin, new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Converters = { new PluginInfoConverter() }
-                });
-                Console.WriteLine("File: " + file);
-                File.WriteAllText(file, json);
+                Console.WriteLine("Failed to load plugin");
+                return;
             }
+
+            Console.WriteLine("Saving info for plugin: " + plugin.PackageName);
+            string file = plugin.PackageName + ".plugininfo";
+            string nfoFile = plugin.PackageName + ".nfo";
+            plugin.PackageName = new FileInfo(plugin.PackageName).Name.Replace(".dll", "");
+            string json = JsonSerializer.Serialize(plugin, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new PluginInfoConverter() }
+            });
+            Console.WriteLine("File: " + file);
+            File.WriteAllText(file, json);
+            WriteBasicInfo(plugin, nfoFile);
             Console.WriteLine("Finished");
         }
 
-        public static List<PluginInfo> ScanForPlugins(string pluginDir)
+        private static void WriteBasicInfo(PluginInfo plugin, string output)
         {
-            List<PluginInfo> results = new List<PluginInfo>();
-            foreach (var dll in new DirectoryInfo(pluginDir).GetFiles("*.dll", SearchOption.AllDirectories))
-            {
-                Console.WriteLine("Checking dll: " + dll.FullName);
-                try
-                {
-                    var test = new Node();
-                    //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
-                    var assembly = Assembly.LoadFrom(dll.FullName);
-                    Console.WriteLine("Getting types");
-                    var types = assembly.GetTypes();
-                    Console.WriteLine("Got types");
-                    var pluginType = types.Where(x => x.IsAbstract == false && typeof(IPlugin).IsAssignableFrom(x)).FirstOrDefault();
-                    if (pluginType == null)
-                    {
-                        Console.WriteLine("Plugin type not found in dll: " + dll.FullName);
-                        continue;
-                    }
+            PluginBasicInfo info = new PluginBasicInfo();
+            info.Name = plugin.Name;
+            info.Version = plugin.Version;
+            info.Description = plugin.Description;
+            info.Package = plugin.PackageName;
+            info.Url = plugin.Url;
+            info.Elements = plugin.Elements.Select(x => x.Name).ToArray();
 
-                    var plugin = (IPlugin)Activator.CreateInstance(pluginType);
-                    var info = new PluginInfo();
-                    info.PackageName = dll.FullName;
-                    var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(dll.FullName);
-                    if (fvi == null)
-                        continue;
-                    info.Name = fvi.ProductName ?? dll.Name;
-                    info.Version = fvi.FileVersion.ToString();
-                    info.Elements = GetElements(assembly);
-                    results.Add(info);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace);
-                }
+            string json = JsonSerializer.Serialize(info, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            File.WriteAllText(output, json);
+        }
+
+        public static PluginInfo LoadPlugin(FileInfo dll, FileInfo csproj)
+        {
+            Console.WriteLine("Checking dll: " + dll);
+            var test = new Node();
+            //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+            var assembly = Assembly.LoadFrom(dll.FullName);
+            Console.WriteLine("Getting types");
+            var types = assembly.GetTypes();
+            Console.WriteLine("Got types");
+            var pluginType = types.Where(x => x.IsAbstract == false && typeof(IPlugin).IsAssignableFrom(x)).FirstOrDefault();
+            if (pluginType == null)
+            {
+                Console.WriteLine("Plugin type not found in dll: " + dll.FullName);
+                return null;
             }
-            return results;
+
+            var plugin = (IPlugin)Activator.CreateInstance(pluginType);
+            var info = new PluginInfo();
+            info.PackageName = dll.FullName;
+            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(dll.FullName);
+            if (fvi == null)
+                return null;
+            info.Name = fvi.ProductName ?? dll.Name;
+            info.Version = fvi.FileVersion.ToString();
+            info.Elements = GetElements(assembly);
+
+            string csProjFile = System.IO.File.ReadAllText(csproj.FullName);
+            info.Authors = GetFromCsProject(csProjFile, "Authors");
+            info.Description = GetFromCsProject(csProjFile, "Description");
+            info.Url = GetFromCsProject(csProjFile, "PackageProjectUrl");
+
+            return info;
+        }
+
+        private static string GetFromCsProject(string source, string attribute)
+        {
+            var match = Regex.Match(source, $"(?<=({attribute}>))[^<]+");
+            if (match.Success)
+                return match.Value;
+            return String.Empty;
         }
 
         static IEnumerable<Type> GetAssemblyNodeTypes(Assembly assembly)
@@ -123,5 +143,16 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             }
             return elements.OrderBy(x => x.Group).ThenBy(x => x.Type).ThenBy(x => x.Name).ToList();
         }
+    }
+
+    class PluginBasicInfo
+    {
+        public string Name { get; set; }
+        public string Version { get; set; }
+        public string Authors { get; set; }
+        public string Url { get; set; }
+        public string Description { get; set; }
+        public string Package { get; set; }
+        public string[] Elements { get; set; }
     }
 }

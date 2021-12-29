@@ -33,65 +33,54 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
     Out-File $_
 
         
-    $name = [System.IO.Path]::GetFileNameWithoutExtension($_) 
-    Write-Output "Building Plugin $name"
-    $version = [Regex]::Match((Get-Content $_), "(?<=(Version>))([\d]+\.){3}[\d]+(?=<)").Value
-    Write-Output "### Version: $version"
-    $description = [Regex]::Match((Get-Content $_), "(?<=(Description>))[^<]+").Value
-    Write-Output "### Description: $description"
-    $Authors = [Regex]::Match((Get-Content $_), "(?<=(Authors>))[^<]+").Value
-    Write-Output "### Authors: $Authors"
-    $url = [Regex]::Match((Get-Content $_), "(?<=(PackageProjectUrl>))[^<]+").Value
-    Write-Output "### Url: $url"
-    
+    $package = [System.IO.Path]::GetFileNameWithoutExtension($_) 
+    Write-Output "Building Plugin $package"
 
     # build an instance for FileFlow local code
-    dotnet build $_ /p:WarningLevel=1 --configuration Release /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary --output:$output/$name/  
-    Remove-Item $output/$name/FileFlows.Plugin.dll -ErrorAction SilentlyContinue
-    Remove-Item $output/$name/FileFlows.Plugin.pdb -ErrorAction SilentlyContinue
-    Remove-Item $output/$name/*.deps.json -ErrorAction SilentlyContinue
-    Remove-Item $output/$name/ref -Recurse -ErrorAction SilentlyContinue
+    dotnet build $_ /p:WarningLevel=1 --configuration Release /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary --output:$output/$package/  
+    Remove-Item $output/$package/FileFlows.Plugin.dll -ErrorAction SilentlyContinue
+    Remove-Item $output/$package/FileFlows.Plugin.pdb -ErrorAction SilentlyContinue
+    Remove-Item $output/$package/*.deps.json -ErrorAction SilentlyContinue
+    Remove-Item $output/$package/ref -Recurse -ErrorAction SilentlyContinue
 
     Push-Location ../FileFlows/PluginInfoGenerator
-    dotnet run ../deploy/Plugins/$name
+    dotnet run ../deploy/Plugins/$package/$package.dll ../../FileFlowsPlugins/$package/$package.csproj
     Pop-Location
-    Move-Item $output/$name/*.plugininfo $output/$name/.plugininfo -Force
+    Move-Item $output/$package/*.plugininfo $output/$package/.plugininfo -Force
+    Move-Item $output/$package/*.nfo $output/$package/.nfo -Force
 
-    if ((Test-Path -Path $output/$name/.plugininfo -PathType Leaf)) {
+    if ((Test-Path -Path $output/$package/.plugininfo -PathType Leaf)) {
 
-        # only actually create the plugin if plugins were found in it        
-        $json += "`t{`n"
-        $json += "`t`t""Name"": ""$name"",`n"
-        $json += "`t`t""Version"": ""$version"",`n"
-        $json += "`t`t""Authors"": ""$Authors"",`n"
-        $json += "`t`t""Url"": ""$url"",`n"
-        $json += "`t`t""Description"": ""$description"",`n"
-        $json += "`t`t""Package"": ""$name.ffplugin""`n"
-        $json += "`t},`n"
+        # only actually create the plugin if plugins were found in it      
         
+        #read nfo file
+        $pluginNfo = [System.IO.File]::ReadAllText("$output/$package/.nfo");
+        Write-Output "Plugin NFO: $pluginNfo"
+        $json += $pluginNfo + ",`n"
+        Remove-Item $output/$package/.nfo -Force
 
-        Move-Item $output/$name/*.en.json $output/$name/en.json -Force
+        Move-Item $output/$package/*.en.json $output/$package/en.json -Force
 
         # construct .ffplugin file
         $compress = @{
-            Path             = "$output/$name/*"
+            Path             = "$output/$package/*"
             CompressionLevel = "Optimal"
-            DestinationPath  = "$output/$name.zip"
+            DestinationPath  = "$output/$package.zip"
         }
-        Write-Output "Creating zip file $output/$name.zip"
+        Write-Output "Creating zip file $output/$package.zip"
 
         Compress-Archive @compress
 
-        Write-Output "Creating plugin file $output/$name.ffplugin"
-        Move-Item "$output/$name.zip" "$output/$name.ffplugin" -Force
+        Write-Output "Creating plugin file $output/$package.ffplugin"
+        Move-Item "$output/$package.zip" "$output/$package.ffplugin" -Force
 
         if ([String]::IsNullOrEmpty($output2) -eq $false) {
             Write-Output "Moving file to $output2"        
-            Copy-Item "$output/$name.ffplugin" "$output2/" -Force
+            Copy-Item "$output/$package.ffplugin" "$output2/" -Force
         }
     }
 
-    Remove-Item $output/$name -Recurse -ErrorAction SilentlyContinue
+    Remove-Item $output/$package -Recurse -ErrorAction SilentlyContinue
 }
 
 $json = $json.Substring(0, $json.lastIndexOf(',')) + "`n"

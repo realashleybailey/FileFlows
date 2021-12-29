@@ -10,6 +10,10 @@ namespace FileFlows.Shared.Models
         public bool Deleted { get; set; }
         public bool HasSettings { get; set; }
 
+        public string Url { get; set; }
+        public string Authors { get; set; }
+        public string Description { get; set; }
+
         public string PackageName { get; set; }
         public ExpandoObject Settings { get; set; }
 

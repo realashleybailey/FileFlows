@@ -47,6 +47,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
         {
             PluginBasicInfo info = new PluginBasicInfo();
             info.Name = plugin.Name;
+            info.Authors = plugin.Authors;
             info.Version = plugin.Version;
             info.Description = plugin.Description;
             info.Package = plugin.PackageName;

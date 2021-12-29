@@ -137,6 +137,7 @@ namespace FileFlows.Server.Helpers
 
         private static void EnsureDefaultsExist(string pluginDir)
         {
+            Logger.Instance.ILog("Ensuring default plugins exist: "+ pluginDir);
             DirectoryInfo di = new DirectoryInfo(pluginDir);
             FileHelper.CreateDirectoryIfNotExists(di.FullName);
 
@@ -147,9 +148,11 @@ namespace FileFlows.Server.Helpers
                 Logger.Instance?.ILog("Root plugin directory not found: " + rootPlugins);
                 return;
             }
-
-            foreach(var file in rootPlugins.GetFiles("*.ffplugin"))
+            var pluginFiles = rootPlugins.GetFiles("*.ffplugin");
+            Logger.Instance?.ILog($"Root plugins found: {pluginFiles.Length} in: {rootPlugins.FullName}");
+            foreach (var file in pluginFiles)
             {
+                Logger.Instance?.ILog($"Root plugin: {file.FullName}");
                 string dest = Path.Combine(pluginDir, file.Name);
                 if (File.Exists(dest))
                     continue;

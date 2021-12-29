@@ -122,13 +122,20 @@ namespace FileFlows.Plugin.Helpers
         }
 
 
-        public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true)
+        public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true, bool file = false)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
-            if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
-                filePath += Path.DirectorySeparatorChar;
+            if (file == false)
+            {
+                if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
+                    filePath += Path.DirectorySeparatorChar;
+            }
+            else
+            {
+                recursive = false;
+            }
 
             logger?.ILog("Setting permissions on folder: " + filePath);
 

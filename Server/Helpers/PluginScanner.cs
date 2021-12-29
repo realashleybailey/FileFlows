@@ -138,7 +138,7 @@ namespace FileFlows.Server.Helpers
         private static void EnsureDefaultsExist(string pluginDir)
         {
             DirectoryInfo di = new DirectoryInfo(pluginDir);
-            Plugin.Helpers.FileHelper.CreateDirectoryIfNotExists(Logger.Instance, di.FullName);
+            FileHelper.CreateDirectoryIfNotExists(di.FullName);
 
             var rootPlugins = new DirectoryInfo(Path.Combine(di.Parent.FullName, "Plugins"));
 

@@ -318,7 +318,7 @@ namespace FileFlows.Server.Helpers
             string dir = Program.GetAppDirectory();
             dir = Path.Combine(dir, "Data");
 
-            Plugin.Helpers.FileHelper.CreateDirectoryIfNotExists(Logger.Instance, dir);
+            FileHelper.CreateDirectoryIfNotExists(dir);
 
             DbFilename = Path.Combine(dir, "FileFlows.sqlite");
             return DbFilename;
@@ -335,7 +335,7 @@ namespace FileFlows.Server.Helpers
                 if (File.Exists(parentFile))
                 {
                     Logger.Instance.ILog("Moving parent folder db folder");
-                    File.Move(parentFile, dbFile);
+                    FileHelper.MoveFile(parentFile, dbFile);                    
                 }
             }
 

@@ -94,13 +94,15 @@ namespace FileFlows.Server
                 Logger.Instance?.ILog("Running inside docker container");
             Logger.Instance.ILog(new string('=', 50));
 
+            // need to scan for plugins before initing the translater as that depends on the plugins directory
+            Helpers.PluginScanner.Scan();
+
             Helpers.TranslaterHelper.InitTranslater();
 
             Shared.Helpers.HttpHelper.Client = new HttpClient();
 
             ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{port}";
 
-            Helpers.PluginScanner.Scan();
 
             LibraryWorker.ResetProcessing();
             WorkerManager.StartWorkers(

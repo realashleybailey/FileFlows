@@ -54,7 +54,7 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
         # only actually create the plugin if plugins were found in it      
         
         #read nfo file
-        $pluginNfo = [System.IO.File]::ReadAllText("$output/$package/.nfo");
+        $pluginNfo = [System.IO.File]::ReadAllText("../$output/$package/.nfo");
         Write-Output "Plugin NFO: $pluginNfo"
         $json += $pluginNfo + ",`n"
         Remove-Item $output/$package/.nfo -Force

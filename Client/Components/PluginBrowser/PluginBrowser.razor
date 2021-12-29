@@ -1,0 +1,55 @@
+@namespace FileFlows.Client.Components
+@using FileFlows.Shared
+@using FileFlows.Plugin;
+
+<div class="browser-wrapper @(Visible ? "visible" : "")">
+    <div class="background-overlay"></div>
+    <div class="browser">
+
+        <ViContainer Title="@lblTitle" Icon="fas fa-puzzle-piece" FullWidth=@true AlwaysShowTitle=@true>
+
+            <Head>
+                <button @onclick=@Close>@lblClose</button>
+            </Head>
+
+            <Body>
+                <div class="browser-content">
+                    <FlowTable @ref="Table" TItem="PluginPackageInfo" Selection="SelectionMode.Multiple" DoubleClick="@View">
+                        <ToolBar>                    
+                            <FlowTableButton TItem="PluginPackageInfo" Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
+                            <FlowTableButton TItem="PluginPackageInfo" Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                
+                        </ToolBar>
+
+                        <Columns>
+                            <FlowTableColumn TItem="PluginPackageInfo" Width="10rem">
+                                <Header>
+                                    @Globals.lblName
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@item.Name</span>
+                                </Cell>
+                            </FlowTableColumn>
+                            <FlowTableColumn TItem="PluginPackageInfo" Width="8rem">
+                                <Header>
+                                    Version
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@item.Version</span>
+                                </Cell>
+                            </FlowTableColumn>
+                            <FlowTableColumn TItem="PluginPackageInfo">
+                                <Header>
+                                    Description
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@item.Description</span>
+                                </Cell>
+                            </FlowTableColumn>
+                        </Columns>
+                    </FlowTable>
+                </div>
+            </Body>
+        </ViContainer>
+    </div>
+
+</div>

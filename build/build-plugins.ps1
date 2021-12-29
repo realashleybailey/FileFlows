@@ -49,7 +49,7 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
     Move-Item $output/$package/*.plugininfo $output/$package/.plugininfo -Force
     Move-Item $output/$package/*.nfo $output/$package/.nfo -Force
 
-    if ((Test-Path -Path $output/$package/.plugininfo -PathType Leaf)) {
+    if ( (Test-Path -Path $output/$package/.plugininfo -PathType Leaf) -and (Test-Path -Path $output/$package/.nfo -PathType Leaf)) {
 
         # only actually create the plugin if plugins were found in it      
         
@@ -78,6 +78,10 @@ Get-ChildItem -Path .\ -Filter *.csproj -Recurse -File -Name | ForEach-Object {
             Write-Output "Moving file to $output2"        
             Copy-Item "$output/$package.ffplugin" "$output2/" -Force
         }
+    }
+    else {
+        Write-Error 'ERROR: Failed to generate plugin info files'
+        return
     }
 
     Remove-Item $output/$package -Recurse -ErrorAction SilentlyContinue

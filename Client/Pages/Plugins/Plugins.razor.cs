@@ -16,6 +16,8 @@ namespace FileFlows.Client.Pages
     {
         public override string ApiUrl => "/api/plugin";
 
+        private PluginBrowser PluginBrowser { get; set; }
+
         protected override void OnInitialized()
         {
             _ = Load();
@@ -25,20 +27,9 @@ namespace FileFlows.Client.Pages
         async Task Add()
         {
 #if (!DEMO)
-            Blocker.Show();
-            this.StateHasChanged();
-            Data.Clear();
-            try
-            {
-                var result = await HttpHelper.Get<List<PluginPackageInfo>>(ApiUrl + "/plugin-packages");
-                if (result.Success)
-                    Logger.Instance.DLog("plugins", result.Data);
-            }
-            finally
-            {
-                Blocker.Hide();
-                this.StateHasChanged();
-            }
+            bool result = await PluginBrowser.Open();
+            if (result)
+                await PluginsUpdated();
 #endif
         }
 
@@ -74,7 +65,8 @@ namespace FileFlows.Client.Pages
             try
             {
                 var result = await HttpHelper.Post($"{ApiUrl}/update/{plugin.Uid}");
-                await this.Load();
+                if(result.Success)
+                    await PluginsUpdated();
             }
             finally
             {
@@ -82,6 +74,12 @@ namespace FileFlows.Client.Pages
                 this.StateHasChanged();
             }
 #endif
+        }
+
+        async Task PluginsUpdated()
+        {
+            await App.Instance.LoadLanguage();
+            await this.Load();
         }
 
         private PluginInfo EditingPlugin = null;

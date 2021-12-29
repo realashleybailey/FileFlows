@@ -13,6 +13,7 @@ namespace FileFlows.Server.Controllers
     [Route("/api/plugin")]
     public class PluginController : ControllerStore<PluginInfo>
     {
+        const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
         [HttpGet]
         public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = false)
         {
@@ -87,7 +88,7 @@ namespace FileFlows.Server.Controllers
         public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages()
         {
             // should expose user configurable repositories
-            var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>("https://github.com/revenz/FileFlowsPlugins/blob/master/plugins.json?raw=true&rand=" + System.DateTime.Now.ToFileTime());
+            var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>(PLUGIN_BASE_URL + "?rand=" + System.DateTime.Now.ToFileTime());
             if (plugins.Success == false || plugins.Data == null)
                 return new PluginPackageInfo[] { };
             return plugins.Data;
@@ -111,22 +112,12 @@ namespace FileFlows.Server.Controllers
                 return false;
             }
 
-            var zipResult = await HttpHelper.Get<byte[]>(ppi.Package);
-            if (zipResult.Success == false)
+            var dlResult = await HttpHelper.Get<byte[]>(PLUGIN_BASE_URL + "/download/" + ppi.Package);
+            if (dlResult.Success == false)
                 return false;
 
             // save the zip and unzip it
-            string zipFile = System.IO.Path.Combine("Plugins", plugin.Name + ".zip");
-            System.IO.File.WriteAllBytes(zipFile, zipResult.Data);
-
-            System.IO.Compression.ZipFile.ExtractToDirectory(zipFile, $"Plugins/{(plugin.Name.Replace(" ", ""))}/{ppi.Version}", true);
-
-            System.IO.File.Delete(zipFile);
-
-            plugin.Version = ppi.Version;
-            plugin.Fields = null;
-            await Update(plugin);
-            return true;
+            return PluginScanner.UpdatePlugin(ppi.Package, dlResult.Data);
         }
 
         [HttpDelete]

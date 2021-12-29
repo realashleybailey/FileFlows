@@ -16,11 +16,13 @@
     "Edit": "Edit",
     "Update": "Update",
     "Refresh": "Refresh",
+    "Download": "Download",
     "Enabled": "Enabled",
     "Rescan": "Rescan",
     "Help": "Help",
     "Name": "Name",
     "Log": "Log",
+    "View": "View",
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
@@ -240,7 +242,17 @@
       }
     },
     "Plugins": {
-      "Title": "Plugins"
+      "Title": "Plugins",
+      "Labels": {
+        "PluginBrowser": "Plugin Browser"
+      },
+      "Fields": {
+        "Authors": "Authors",
+        "Version": "Version",
+        "Url": "Home Page",
+        "Description": "Description",
+        "Elements": "Nodes"
+      }
     },
     "Settings": {
       "Title": "Settings",
@@ -259,16 +271,6 @@
     },
     "Tool": {
       "Title": "Tool"
-    }
-  },
-  "Plugins": {
-    "BasicNodes": {
-      "Fields": {
-        "HandBrakeCli": "HandBrake CLI",
-        "HandBrakeCli-Help": "The full location of the handbrakecli.exe.  HandBrakeCLI is used to encode the videos.",
-        "FFProbeExe": "FFProbe",
-        "FFProbeExe-Help": "The full location of the ffprobe.exe executable.  This is needed to scan the current videos to see if they need reencoding."
-      }
     }
   },
   "Validators":{

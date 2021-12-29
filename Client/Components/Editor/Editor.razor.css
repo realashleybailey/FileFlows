@@ -5,8 +5,12 @@
   bottom: 0;
   max-width: 100%;
   background: var(--base-darker);
-  z-index: 3;
+  z-index: 6;
   left: 0;
+}
+
+.background-overlay {
+  z-index: 5 !important;
 }
 
 @media screen and (min-width: 850px) {

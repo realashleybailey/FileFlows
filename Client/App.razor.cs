@@ -26,7 +26,7 @@ namespace FileFlows.Client
 
         public static FileFlows.Shared.Models.Settings Settings;
 
-        private async Task LoadLanguage()
+        public async Task LoadLanguage()
         {
             string langFile = await LoadLanguageFile("i18n/en.json?version=" + Globals.Version);
 #if (DEMO)

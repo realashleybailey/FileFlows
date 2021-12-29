@@ -8,4 +8,5 @@ public class PluginPackageInfo
     public string Url { get; set; }
     public string Description { get; set; }
     public string Package { get; set; }
+    public string[] Elements { get; set; }
 }

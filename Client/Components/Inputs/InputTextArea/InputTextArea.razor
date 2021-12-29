@@ -3,6 +3,6 @@
 
 <InputWrapper Input="@this">
     <div>
-        <textarea id=@Uid @bind-value="Value" @bind-value:event="oninput" placeholder="@Placeholder" rows="8"></textarea>
+        <textarea id=@Uid @bind-value="Value" @bind-value:event="oninput" placeholder="@Placeholder" rows="8" readonly="@(ReadOnly ? "readonly" : null)"></textarea>
     </div>
 </InputWrapper>

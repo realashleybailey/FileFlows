@@ -158,5 +158,9 @@
   {
     "outputFile": "Components/Inputs/InputArray/InputArray.razor.css",
     "inputFile": "Components/Inputs/InputArray/InputArray.razor.scss"
+  },
+  {
+    "outputFile": "Components/PluginBrowser/PluginBrowser.razor.css",
+    "inputFile": "Components/PluginBrowser/PluginBrowser.razor.scss"
   }
 ]

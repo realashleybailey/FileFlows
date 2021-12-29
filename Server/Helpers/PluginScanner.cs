@@ -6,10 +6,12 @@ namespace FileFlows.Server.Helpers
 {
     public class PluginScanner
     {
+        public static string GetPluginDirectory() => Path.Combine(Program.GetAppDirectory(), "Plugins");
+
         public static void Scan()
         {
             Logger.Instance.ILog("Scanning for plugins");
-            var pluginDir = Path.Combine(Program.GetAppDirectory(), "Plugins");
+            var pluginDir = GetPluginDirectory();
             Logger.Instance.ILog("Plugin path:" + pluginDir);
 
             var controller = new PluginController();
@@ -120,6 +122,28 @@ namespace FileFlows.Server.Helpers
             Logger.Instance.ILog("Finished scanning for plugins");
         }
 
+        internal static bool UpdatePlugin(string packageName, byte[] data)
+        {
+            try
+            {
+                string dest = Path.Combine(GetPluginDirectory(), packageName);
+                if (dest.EndsWith(".ffplugin") == false)
+                    dest += ".ffplugin";
+
+                // save the plugin
+                File.WriteAllBytes(dest, data);
+
+                // rescan for plugins
+                Scan();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog("Failed updating plugin: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                return false;
+            }
+        }
 
         static void CreateLanguageFile(List<string> jsonFiles)
         {

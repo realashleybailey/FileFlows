@@ -14,6 +14,9 @@ namespace FileFlows.Server.Helpers
             var pluginDir = GetPluginDirectory();
             Logger.Instance.ILog("Plugin path:" + pluginDir);
 
+            if (Program.Docker)
+                EnsureDefaultsExist(pluginDir);
+
             var controller = new PluginController();
             var dbPluginInfos = controller.GetDataList().Result;
 
@@ -130,6 +133,24 @@ namespace FileFlows.Server.Helpers
             CreateLanguageFile(langFiles);
 
             Logger.Instance.ILog("Finished scanning for plugins");
+        }
+
+        private static void EnsureDefaultsExist(string pluginDir)
+        {
+            DirectoryInfo di = new DirectoryInfo(pluginDir);
+            var rootPlugins = new DirectoryInfo(Path.Combine(di.Parent.FullName, "Plugins"));
+
+            if (rootPlugins.Exists == false)
+                return;
+
+            foreach(var file in rootPlugins.GetFiles("*.ffplugin"))
+            {
+                string dest = Path.Combine(pluginDir, file.Name);
+                if (File.Exists(dest))
+                    continue;
+                Logger.Instance?.ILog("Restoring default plugin: " + file.Name);
+                file.CopyTo(dest);
+            }
         }
 
         internal static bool UpdatePlugin(string packageName, byte[] data)

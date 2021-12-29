@@ -20,6 +20,7 @@ namespace FileFlows.Server
             var builder = WebApplication.CreateBuilder(args);
 
 
+
             int port = 5000;
 #if (DEBUG)
             port = 6868;
@@ -89,6 +90,8 @@ namespace FileFlows.Server
 
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting File Flows " + Globals.Version);
+            if(Program.Docker)
+                Logger.Instance?.ILog("Running inside docker container");
             Logger.Instance.ILog(new string('=', 50));
 
             Helpers.TranslaterHelper.InitTranslater();

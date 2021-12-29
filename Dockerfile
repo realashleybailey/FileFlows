@@ -50,4 +50,4 @@ COPY /deploy /app
 WORKDIR /app
 
 # run the server
-ENTRYPOINT [ "/app/FileFlows", "--urls", "http://*:5000" ]
+ENTRYPOINT [ "/app/FileFlows", "--urls=http://*:5000", "--docker" ]

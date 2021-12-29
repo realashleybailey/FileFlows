@@ -6,12 +6,6 @@ Write-Output "#################################"
 
 dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --configuration Release --self-contained /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright  /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625 --output ..\deploy\FileFlows-Node
 
-if ((Test-Path ..\deploy\plugins) -eq $true) {
-    Write-Output "Copying plugins"
-    Copy-Item -Path ..\deploy\Plugins -Filter "*.*" -Recurse -Destination ..\deploy\FileFlows-Node\Plugins -Container
-}
-
-
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = false', "Node = true" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 

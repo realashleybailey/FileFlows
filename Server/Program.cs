@@ -4,6 +4,9 @@ namespace FileFlows.Server
 {
     public class Program
     {
+
+        public static bool Docker { get; private set; }
+
         public static void Main(string[] args)
         {
             try
@@ -13,6 +16,9 @@ namespace FileFlows.Server
                 else
                 {
                     Console.WriteLine("Starting FileFlows Server...");
+                    
+                    Docker = args?.Any(x => x == "--docker") == true;
+
                     WebServer.Start(args);
                     Console.WriteLine("Exiting FileFlows Server...");
                 }
@@ -52,6 +58,13 @@ namespace FileFlows.Server
         internal static string GetAppDirectory()
         {
             var dir = Directory.GetCurrentDirectory();
+            if (Docker)
+            {
+                // docker we move this to the Data diretory which is configured outside of the docker image
+                // this is so the database and any plugins that are downloaded will be kept if the docker
+                // image is updated/redownloaded.
+                dir = Path.Combine(dir, "Data");
+            }
             return dir;
         }
 

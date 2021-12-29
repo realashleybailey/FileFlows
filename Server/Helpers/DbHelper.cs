@@ -318,7 +318,7 @@ namespace FileFlows.Server.Helpers
             string dir = Program.GetAppDirectory();
             dir = Path.Combine(dir, "Data");
             if (Directory.Exists(dir) == false)
-                Directory.CreateDirectory(dir);
+                Directory.CreateDirectory(dir);            
 
             DbFilename = Path.Combine(dir, "FileFlows.sqlite");
             return DbFilename;
@@ -327,6 +327,17 @@ namespace FileFlows.Server.Helpers
         private static async Task<bool> CreateSqliteDatabase()
         {
             string dbFile = GetDbFilename();
+
+            if (Program.Docker)
+            {
+                var fi = new FileInfo(dbFile);
+                string parentFile = Path.Combine(fi.Directory.Parent.FullName, fi.Name);
+                if (File.Exists(parentFile))
+                {
+                    Logger.Instance.ILog("Moving parent folder db folder");
+                    File.Move(parentFile, dbFile);
+                }
+            }
 
             if (System.IO.File.Exists(dbFile) == false)
                 SQLiteConnection.CreateFile(dbFile);

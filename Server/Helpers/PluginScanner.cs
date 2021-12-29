@@ -76,6 +76,12 @@ namespace FileFlows.Server.Helpers
                     plugin.Fields = pi.Fields;
                     plugin.Elements = pi.Elements;
 
+                    Logger.Instance.ILog("Plugin.Name: " + plugin.Name);
+                    Logger.Instance.ILog("Plugin.PackageName: " + plugin.PackageName);
+                    Logger.Instance.ILog("Plugin.Version: " + plugin.Version);
+                    Logger.Instance.ILog("Plugin.Url: " + plugin.Url);
+                    Logger.Instance.ILog("Plugin.Authors: " + plugin.Authors);
+
                     if (isNew == false)
                     {
                         Logger.Instance.ILog("Updating plugin: " + pi.Name);

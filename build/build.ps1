@@ -26,4 +26,4 @@ Remove-Item ..\deploy\FileFlows-Node -Recurse -ErrorAction SilentlyContinue
 Remove-Item ..\deploy\FileFlows -Recurse -ErrorAction SilentlyContinue 
 
 # no longer need plugins, delete them
-Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 
+# Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 

@@ -268,6 +268,7 @@ public class Runner
     {
         var service = PluginService.Load();
         var plugins = service.GetAll().Result;
+        DateTime start = DateTime.Now;
         foreach (var plugin in plugins)
         {
             nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
@@ -286,6 +287,8 @@ public class Runner
             System.IO.Compression.ZipFile.ExtractToDirectory(file, destDir);
             File.Delete(file);
         }
+        TimeSpan timeTaken = DateTime.Now - start;
+        nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());
     }
 
     private Type? GetNodeType(string fullName)

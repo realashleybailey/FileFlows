@@ -3,7 +3,7 @@ $version = "0.1.0.$revision"
 
 Remove-Item ../deploy/* -Recurse -Force -Exclude Plugins -ErrorAction SilentlyContinue 
 
-if ((Test-Path ../deploy/Plugins) -eq $false) {
+if([System.IO.Directory]::Exists("../deploy/Plugins") -eq $false) {
     Write-Error "ERROR: No plugins directory found"
     return
 }

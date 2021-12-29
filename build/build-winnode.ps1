@@ -2,10 +2,7 @@ Write-Output "#################################"
 Write-Output "###   Building Windows Node   ###"
 Write-Output "#################################"
 
-$revision = (git rev-list --count --first-parent HEAD) -join "`n"
-$version = "0.1.0.$revision"
-$year = (Get-Date).year
-$copyright = "Copyright $year - John Andrews"
+. build-variables.ps1
 
 dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --configuration Release --self-contained /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright  /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625 --output ..\deploy\FileFlows-Node
 

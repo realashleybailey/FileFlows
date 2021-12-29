@@ -2,12 +2,9 @@ Write-Output "##################################"
 Write-Output "###    Building Flow Runner    ###"
 Write-Output "##################################"
 
+. build-variables.ps1
 
 $linux = $args[0] -eq '--linux'
-$revision = (git rev-list --count --first-parent HEAD) -join "`n"
-$version = "0.1.0.$revision"
-$year = (Get-Date).year
-$copyright = "Copyright $year - John Andrews"
 
 $runtime = 'win-x64'
 $outdir = '../deploy/FileFlows-Runner'

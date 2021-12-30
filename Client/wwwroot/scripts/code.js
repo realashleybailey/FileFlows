@@ -7,6 +7,21 @@ window.ffCode = {
             "javascript"
         );
 
+        monaco.editor.createModel(
+            "const Flow = { " +
+            "CreateDirectoryIfNotExists: function (path:string)," +
+            "GetDirectorySize: function (path: string):number, " +
+            "GetParameter: function (key: string):any, " +
+            "MapPath: function (path: string):string, " +
+            "MoveFile: function (destination: string), " +
+            "ResetWorkingFile: function (), " +
+            "SetWorkingFile: function (filename: string, dontDelete: bool), " +
+            "SetParameter: function (key:string, value:any) " +
+            "}",
+            "javascript"
+        );
+
+
         if (variables) {
             var actualVaraibles = {};
             for (let k in variables) {
@@ -22,7 +37,6 @@ window.ffCode = {
                 if(!av[tk])
                     av[tk] = variables[k]
             }
-            console.log('actual variables', actualVaraibles);
             let js = "const Variables = " + JSON.stringify(actualVaraibles);
             monaco.editor.createModel(js, "javascript");
 

@@ -84,11 +84,13 @@ namespace FileFlows.Plugin
 
         private void InitFile(string filename)
         {
-            if (IsDirectory)
+            try
             {
-                var di = new DirectoryInfo(filename);
-                var diOriginal = new DirectoryInfo(FileName);
-                UpdateVariables(new Dictionary<string, object> {
+                if (IsDirectory)
+                {
+                    var di = new DirectoryInfo(filename);
+                    var diOriginal = new DirectoryInfo(FileName);
+                    UpdateVariables(new Dictionary<string, object> {
                     { "folder.Name", di.Name ?? "" },
                     { "folder.FullName", di.FullName ?? "" },
 
@@ -100,12 +102,12 @@ namespace FileFlows.Plugin
                     { "folder.Orig.Name", diOriginal.Name ?? "" },
                     { "folder.Orig.FullName", diOriginal.FullName ?? "" },
                 });
-            }
-            else
-            {
-                var fi = new FileInfo(filename);
-                var fiOriginal = new FileInfo(FileName);
-                UpdateVariables(new Dictionary<string, object> {
+                }
+                else
+                {
+                    var fi = new FileInfo(filename);
+                    var fiOriginal = new FileInfo(FileName);
+                    UpdateVariables(new Dictionary<string, object> {
                     { "ext", fi.Extension ?? "" },
                     { "file.Name", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
                     { "file.FullName", fi.FullName ?? "" },
@@ -124,7 +126,7 @@ namespace FileFlows.Plugin
                     { "file.Orig.Extension", fiOriginal.Extension ?? "" },
                     { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
                     { "file.Orig.FullName", fiOriginal.FullName ?? "" },
-                    { "file.Orig.Size", fiOriginal.Length },
+                    { "file.Orig.Size", fiOriginal.Exists ? fiOriginal.Length : 0 },
 
                     { "folder.Name", fi.Directory?.Name ?? "" },
                     { "folder.FullName", fi.DirectoryName ?? "" },
@@ -132,8 +134,15 @@ namespace FileFlows.Plugin
                     { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
                     { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" },
                 });
+                }
             }
+            catch (Exception) { }
 
+        }
+
+        public void ResetWorkingFile()
+        {
+            SetWorkingFile(this.FileName, dontDelete: true);
         }
 
         public void SetWorkingFile(string filename, bool dontDelete = false)

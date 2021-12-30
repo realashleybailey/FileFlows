@@ -72,7 +72,7 @@ public class Runner
     public async Task Finish()
     {
 
-        if (nodeParameters.Logger is FlowLogger fl)
+        if (nodeParameters?.Logger is FlowLogger fl)
             Info.Log = fl.ToString();
         await Complete();
         OnFlowCompleted?.Invoke(this, Info.LibraryFile.Status == FileStatus.Processed);

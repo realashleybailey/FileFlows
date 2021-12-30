@@ -36,6 +36,7 @@ namespace FileFlows.Server
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSignalR();
+            builder.Services.AddResponseCompression();
 
             app = builder.Build();
             
@@ -113,6 +114,8 @@ namespace FileFlows.Server
             );
 
             app.MapHub<Hubs.FlowHub>("/flow");
+
+            app.UseResponseCompression();
 
             // this will run the asp.net app and wait until it is killed
             Console.WriteLine("Running FileFlows Server");

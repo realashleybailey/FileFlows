@@ -11,11 +11,12 @@ namespace FileFlows.Server.Controllers
         /// <summary>
         /// Gets the next library file for processing, and puts it into progress
         /// </summary>
-        /// <param name="nodeUid">the Uid of the node processing hte file </param>
+        /// <param name="nodeName">the nameof hte node processing the file</param>
+        /// <param name="nodeUid">the Uid of the node processing the file </param>
         /// <param name="workerUid">the UId of the worker</param>
         /// <returns>the next library file to process</returns>
         [HttpGet("next-file")]
-        public async Task<LibraryFile> GetNext([FromQuery] Guid nodeUid, [FromQuery] Guid workerUid)
+        public async Task<LibraryFile> GetNext([FromQuery] string nodeName, [FromQuery] Guid nodeUid, [FromQuery] Guid workerUid)
         {
             var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
             _mutex.WaitOne();
@@ -24,10 +25,10 @@ namespace FileFlows.Server.Controllers
                 // iterate these incase, something starts processing
                 for(int i = 0; i < data.Length; i++)
                 {
-                    if(data[i].Status ==  FileStatus.Unprocessed)
+                    if (data[i].Status == FileStatus.Unprocessed)
                     {
                         data[i].Status = FileStatus.Processing;
-                        data[i].NodeUid = nodeUid;
+                        data[i].Node = new ObjectReference { Uid = nodeUid, Name = nodeName };
                         data[i].WorkerUid = workerUid;
                         data[i].ProcessingStarted = DateTime.UtcNow;
                         data[i] = await DbManager.Update(data[i]);
@@ -119,7 +120,7 @@ namespace FileFlows.Server.Controllers
         internal async Task ResetProcessingStatus(Guid nodeUid)
         {
             var libfiles = await GetDataList();
-            var uids = libfiles.Where(x => x.Status == FileStatus.Processing && x.NodeUid == nodeUid).Select(x => x.Uid).ToArray();
+            var uids = libfiles.Where(x => x.Status == FileStatus.Processing && x.Node?.Uid == nodeUid).Select(x => x.Uid).ToArray();
             if (uids.Any())
                 await Reprocess(new ReferenceModel { Uids = uids });
         }
@@ -165,7 +166,7 @@ namespace FileFlows.Server.Controllers
             if (existing == null)
                 throw new Exception("Not found");
             existing.Status = file.Status;
-            existing.NodeUid = file.NodeUid;
+            existing.Node = file.Node;
             existing.FinalSize = file.FinalSize;
             if(file.OriginalSize > 0)
                 existing.OriginalSize = file.OriginalSize;

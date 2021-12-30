@@ -4,7 +4,7 @@ namespace FileFlows.FlowRunner
 {
     public interface IFlowRunnerCommunicator
     {
-        Task LogMessage(string message);
+        Task LogMessage(Guid runnerUid, string message);
     }
 
     public class FlowRunnerCommunicator : IFlowRunnerCommunicator
@@ -56,15 +56,15 @@ namespace FileFlows.FlowRunner
             Console.WriteLine("Connection_Received", obj);
         }
 
-        public async Task LogMessage(string message)
+        public async Task LogMessage(Guid runnerUid, string message)
         {
             try
             {
-                await connection.InvokeAsync("LogMessage", LibraryFileUid, message);
+                await connection.InvokeAsync("LogMessage", runnerUid, LibraryFileUid, message);
             } 
             catch (Exception)
             {
-                // siliently fail here, we store the log in memory if one message fails its not a biggie
+                // silently fail here, we store the log in memory if one message fails its not a biggie
                 // once the flow is complete we send the entire log to the server to update
             }
         }

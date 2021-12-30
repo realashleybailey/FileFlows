@@ -200,10 +200,18 @@ namespace FileFlows.Plugin
                     else
                         CreateDirectoryIfNotExists(fileInfo?.DirectoryName);
 
-                    Logger?.ILog($"Moving file: \"{WorkingFile}\" to \"{destination}\"");
+                    Logger?.ILog($"Moving file: \"{WorkingFile}\" to \"{destination}\"");                    
                     System.IO.File.Move(WorkingFile, destination, true);
+                    Logger?.ILog("File moved successfully");
 
-                    SetWorkingFile(destination);
+                    this.WorkingFile = destination;
+                    try
+                    {
+                        // this can fail if the file is then moved really quickly by another process, radarr/sonarr etc
+                        Logger?.ILog("Initing new moved file");
+                        InitFile(destination);
+                    }
+                    catch (Exception ex) { }
 
                     moved = true;
                 }

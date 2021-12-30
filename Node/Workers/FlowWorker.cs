@@ -82,7 +82,7 @@
                 return;
             }
             var libFileService = LibraryFileService.Load();
-            var libFile = libFileService.GetNext(node.Uid, Uid).Result;
+            var libFile = libFileService.GetNext(node.Name, node.Uid, Uid).Result;
             if (libFile == null)
                 return; // nothing to process
 

@@ -39,7 +39,7 @@ namespace FileFlows.FlowRunner
                 Console.WriteLine(message);
             try
             {
-                Communicator.LogMessage(message).Wait();
+                Communicator.LogMessage(Program.Uid, message).Wait();
             }
             catch (Exception ex) { }
         }

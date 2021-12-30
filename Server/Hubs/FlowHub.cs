@@ -6,10 +6,10 @@
     public class FlowHub: Hub
     {
 
-        public async Task LogMessage(Guid libraryFileUid, string message)
+        public async Task LogMessage(Guid runnerUid, Guid libraryFileUid, string message)
         {
             var settings = await new SettingsController().Get();
-            Console.Write(libraryFileUid + " => " + message);
+            //Console.Write(libraryFileUid + " => " + message);
             try
             {
                 var fi = new FileInfo(Path.Combine(settings.LoggingPath, libraryFileUid + ".log"));

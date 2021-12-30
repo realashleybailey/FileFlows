@@ -166,7 +166,12 @@ namespace FileFlows.Server.Controllers
                 executorId = Executors.Where(x => x.Value.LibraryFile.Uid == uid).Select(x => x.Key).FirstOrDefault();
             }
             if (executorId == Guid.Empty)
+            {
+                Logger.Instance?.WLog("Failed to locate Flow executor with library file: " + uid);
+                foreach (var executor in Executors)
+                    Logger.Instance?.ILog($"Flow Executor: {executor.Key} = {executor.Value?.LibraryFile?.Uid} = {executor.Value?.LibraryFile?.Name}");
                 return;
+            }
             await Abort(executorId);
         }
 
@@ -178,17 +183,24 @@ namespace FileFlows.Server.Controllers
                 FlowExecutorInfo flowinfo;
                 Executors.TryGetValue(uid, out flowinfo);
 
+                Logger.Instance?.ILog("Sending AbortFlow " + uid);
                 await this.Context.Clients.All.SendAsync("AbortFlow", uid);
 
                 if (flowinfo?.LibraryFile != null)
                 {
+                    Logger.Instance?.ILog("Sending AbortFlow " + flowinfo.LibraryFile.Uid);
                     await this.Context.Clients.All.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
                     var libController = new LibraryFileController();
                     var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
                     if (libfile.Status == FileStatus.Processing)
                     {
                         libfile.Status = FileStatus.ProcessingFailed;
+                        Logger.Instance?.ILog("Library file setting status to failed: " + libfile.Status + " => " + libfile.RelativePath);
                         await libController.Update(libfile);
+                    }
+                    else
+                    {
+                        Logger.Instance?.ILog("Library file status doesnt need changing: " + libfile.Status + " => " + libfile.RelativePath);
                     }
                 }
 
@@ -201,8 +213,8 @@ namespace FileFlows.Server.Controllers
                         {
                             if (info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
                             {
-                            // its gone quiet, kill it
-                            Executors.Remove(uid);
+                                // its gone quiet, kill it
+                                Executors.Remove(uid);
                             }
                         }
                     }

@@ -8,6 +8,8 @@ namespace FileFlows.FlowRunner
 {
     public class Program
     {
+        public static Guid Uid { get; private set; }
+
         public static void Main(string[] args)
         {
             int exitCode = 0;
@@ -19,6 +21,7 @@ namespace FileFlows.FlowRunner
                 string uid = GetArgument(args, "--uid");
                 if (string.IsNullOrEmpty(uid))
                     throw new Exception("uid not set.");
+                Uid = Guid.Parse(uid);
 
                 string tempPath = GetArgument(args, "--tempPath");
                 if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)

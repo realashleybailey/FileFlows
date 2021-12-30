@@ -5,7 +5,7 @@
 
     public interface ILibraryFileService
     {
-        Task<LibraryFile> GetNext(Guid nodeUid, Guid workerUid);
+        Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid);
 
         Task<LibraryFile> Get(Guid uid);
 
@@ -53,12 +53,12 @@
             }
         }
 
-        public async Task<LibraryFile> GetNext(Guid nodeUid, Guid workerUid)
+        public async Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid)
         {
             // can throw exception if nothing to process
             try
             {
-                var result = await HttpHelper.Get<LibraryFile>($"{ServiceBaseUrl}/api/library-file/next-file?nodeUid={Uri.EscapeDataString(nodeUid.ToString())}&workerUid={Uri.EscapeDataString(workerUid.ToString())}");
+                var result = await HttpHelper.Get<LibraryFile>($"{ServiceBaseUrl}/api/library-file/next-file?nodeName={Uri.EscapeDataString(nodeName)}&nodeUid={Uri.EscapeDataString(nodeUid.ToString())}&workerUid={Uri.EscapeDataString(workerUid.ToString())}");
                 if (result.Success == false)
                     return null; 
                 return result.Data;

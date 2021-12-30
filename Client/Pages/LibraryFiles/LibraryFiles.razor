@@ -89,12 +89,20 @@
                         <span>@item.Flow.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0">
+                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing)">
                     <Header>
                         Library
                     </Header>
                     <Cell Context="item">
                         <span>@item.Library.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus != FileStatus.Processing)">
+                    <Header>
+                        Node
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Node?.Name</span>
                     </Cell>
                 </FlowTableColumn>
                 <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed)" MobileWidth="5rem">

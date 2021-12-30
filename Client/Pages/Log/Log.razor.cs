@@ -9,18 +9,26 @@ namespace FileFlows.Client.Pages
     public partial class Log : ComponentBase
     {
         [CascadingParameter] Blocker Blocker { get; set; }
+        [Inject] NavigationManager NavigationManager { get; set; }
         private string LogText { get; set; }
 #if (!DEMO)
         private Timer AutoRefreshTimer;
 
         protected override void OnInitialized()
         {
+            NavigationManager.LocationChanged += NavigationManager_LocationChanged;
             AutoRefreshTimer = new Timer();
             AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;
             AutoRefreshTimer.Interval = 5_000;
             AutoRefreshTimer.AutoReset = true;
             AutoRefreshTimer.Start();
             _ = Refresh();
+            
+        }
+
+        private void NavigationManager_LocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        {
+            Dispose();
         }
 
         public void Dispose()

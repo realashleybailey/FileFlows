@@ -12,7 +12,7 @@
 
         public Task<LibraryFile> Get(Guid uid) => new LibraryFileController().Get(uid);
 
-        public Task<LibraryFile> GetNext(Guid nodeUid, Guid workerUid) => new LibraryFileController().GetNext(nodeUid, workerUid);
+        public Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid) => new LibraryFileController().GetNext(nodeName, nodeUid, workerUid);
 
         public Task<LibraryFile> Update(LibraryFile libraryFile) => new LibraryFileController().Update(libraryFile);
     }

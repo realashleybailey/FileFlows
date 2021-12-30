@@ -68,10 +68,11 @@
     }
 }
 
-.shrinkage {
+.flow-bar {
+    height: 1rem;
     position: relative;
-    top: 9px;
-    right: 4px;
+    top: 10px;
+    width:calc(100% - 10px);
 }
 
 

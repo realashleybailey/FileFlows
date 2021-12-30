@@ -24,3 +24,7 @@ table td, table th {
 table tr:last-child td {
   border-bottom: none !important;
 }
+
+.flow-bar {
+  height: 1rem;
+}

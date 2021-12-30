@@ -1,0 +1,29 @@
+﻿.flow-bar {
+    flex-grow: 1;
+    position: relative;
+    margin: auto;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: var(--input-background);
+    box-shadow: inset 0 3px 3px 3px rgb(0 0 0 / 20%);
+
+    > div {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    .bar-value {
+        background: var(--accent);
+        box-shadow: inset 0 5px rgb(255 255 255 / 20%);
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+
+    &.grew {
+        .bar-value {
+            background: rgba(var(--color-rgb), 0.2);
+        }
+    }
+}

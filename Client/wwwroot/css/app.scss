@@ -3,6 +3,7 @@
 @use 'buttons';
 @use 'modal';
 @use 'pointer';
+@use 'bar';
 @use 'radzen';
 
 html {
@@ -131,20 +132,6 @@ button {
     flex-wrap:nowrap !important;
 }
 
-.shrinkage {
-    width: 100%;
-    background: var(--input-background);
-    height: 1rem;
-    position: relative;
-
-    .amount {
-        background: var(--accent);
-        position: absolute;
-        top: 1px;
-        bottom: 1px;
-        left: 1px;
-    }
-}
 
 #unsupported-browser, .update-available {
     position: fixed;

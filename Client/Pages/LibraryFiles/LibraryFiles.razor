@@ -120,8 +120,8 @@
                             string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
                         }
                         @if(fs > 0){
-                            <div class="shrinkage @(bigger ? "it-grew" : "")" title="@toolTip">
-                                <div class="amount" style="width:calc(@(width)% - 2px)"></div>
+                            <div class="flow-bar @(bigger ? "grew" : "")" title="@toolTip">
+                                <div class="bar-value" style="width:calc(@(width)% - 2px)"></div>
                             </div>
                         }
                     </Cell>

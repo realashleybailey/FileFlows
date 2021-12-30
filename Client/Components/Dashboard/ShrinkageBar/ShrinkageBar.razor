@@ -19,9 +19,8 @@
                 string tooltip = Translater.Instant("Labels." + (loss ? "SpaceIncrease" : "SpaceSavings"), new { size = Helpers.FileSizeFormatter.FormatSize(diff), items = group.Value.Items });
                 <div class="library @(group.Value == total ? "total": "")">
                     <div class="name">@(group.Value == total ? lblTotal : group.Key == KEY_OTHER ? lblOther : group.Key)</div>
-                    <div class="bar @(finalPercent > origPercent ? "grew" : "")" title="@tooltip">
-                        <div class="bar-original" style="width:@(origPercent)%" />
-                        <div class="bar-final" style="width:@(finalPercent)%" />
+                    <div class="flow-bar @(finalPercent > origPercent ? "grew" : "")" title="@tooltip">
+                        <div class="bar-value" style="width:@(finalPercent)%" />
                     </div>
                 </div>
             }

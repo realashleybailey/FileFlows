@@ -7,7 +7,7 @@ namespace FileFlows.Server
     public class WebServer
     {
         private static WebApplication app;
-
+        public static int Port { get; private set; }
         public static async Task Stop()
         {
             if (app == null)
@@ -21,16 +21,16 @@ namespace FileFlows.Server
 
 
 
-            int port = 5000;
+            Port = 5000;
 #if (DEBUG)
-            port = 6868;
+            Port = 6868;
 #endif
             string url = args?.Where(x => x.StartsWith("--urls=")).FirstOrDefault();
             if(string.IsNullOrEmpty(url) == false)
             {
                 var portMatch = Regex.Match(url, @"(?<=(:))[\d]+");
                 if (portMatch.Success)
-                    port = int.Parse(portMatch.Value);
+                    Port = int.Parse(portMatch.Value);
             }
 
             // Add services to the container.
@@ -101,7 +101,7 @@ namespace FileFlows.Server
 
             Shared.Helpers.HttpHelper.Client = new HttpClient();
 
-            ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{port}";
+            ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{Port}";
 
 
             LibraryWorker.ResetProcessing();

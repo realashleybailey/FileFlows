@@ -112,6 +112,7 @@ namespace FileFlows.Server.Controllers
                 foreach (var item in toRemove)
                     Executors.Remove(item.Key);
             }
+            await new LibraryFileController().ResetProcessingStatus(nodeUid);
         }
 
         [HttpGet]

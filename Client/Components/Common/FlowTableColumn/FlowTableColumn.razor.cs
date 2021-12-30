@@ -14,6 +14,7 @@
 
         [Parameter]
         public bool Hidden { get; set; }
+        [Parameter] public bool Pre { get; set; }
 
         string _Width = string.Empty;
         string className = "fillspace";

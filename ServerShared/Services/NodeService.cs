@@ -74,8 +74,8 @@
             {
                 var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/" + Uri.EscapeDataString(address));
                 if (result.Success == false)
-                    throw new Exception("Failed to register node: " + result.Body);
-                //result.Data.SignalrUrl = ServiceBaseUrl + "/flow";
+                    throw new Exception("Failed to register node: " + result.Body);                
+                result.Data.SignalrUrl = ServiceBaseUrl + "/" + result.Data.SignalrUrl;
                 return result.Data;
             }
             catch (Exception ex)

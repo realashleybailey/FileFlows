@@ -43,7 +43,6 @@
         {
             if (IsEnabledCheck?.Invoke() == false)
                 return;
-            Logger.Instance?.DLog("FlowWorker.Execute");
             var nodeService = NodeService.Load();
             ProcessingNode node;
             try

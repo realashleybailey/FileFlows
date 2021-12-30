@@ -37,7 +37,15 @@
                                     <span>@item.Version</span>
                                 </Cell>
                             </FlowTableColumn>
-                            <FlowTableColumn TItem="PluginPackageInfo">
+                            <FlowTableColumn TItem="PluginPackageInfo" Width="8rem">
+                                <Header>
+                                    Elements
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@(item.Elements?.Length ?? 0)</span>
+                                </Cell>
+                            </FlowTableColumn>
+                            <FlowTableColumn TItem="PluginPackageInfo" Pre=@true>
                                 <Header>
                                     Description
                                 </Header>

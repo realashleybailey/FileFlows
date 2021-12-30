@@ -9,27 +9,6 @@ namespace FileFlows.Server.Controllers
     [Route("/api/node")]
     public class NodeController : ControllerStore<ProcessingNode>
     {
-        static string _SignalrUrl;
-        internal static string SignalrUrl
-        {
-            get
-            {
-                if (_SignalrUrl == null) 
-                { 
-#if (DEBUG)
-                    _SignalrUrl = "http://localhost:6868/flow";
-#else
-
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        _SignalrUrl = "http://localhost:5151/flow";
-                    else
-                        _SignalrUrl = "http://localhost:5000/flow";
-#endif
-                }
-                return _SignalrUrl;
-            }
-        }
-
         [HttpGet]
         public async Task<IEnumerable<ProcessingNode>> GetAll() => (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);
 
@@ -97,7 +76,7 @@ namespace FileFlows.Server.Controllers
             address = address.Trim();
             var data = await GetData();
             var node = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
-            node.SignalrUrl = SignalrUrl;
+            node.SignalrUrl = "flow";
             return node;
         }
 
@@ -112,7 +91,7 @@ namespace FileFlows.Server.Controllers
             var existing = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
             if (existing != null)
             {
-                existing.SignalrUrl = SignalrUrl;
+                existing.SignalrUrl = "flow";
                 return existing;
             }
             var settings = await new SettingsController().Get();
@@ -130,7 +109,7 @@ namespace FileFlows.Server.Controllers
                     KeyValuePair<string, string>(x.Path, "")
                 ).ToList()
             });
-            result.SignalrUrl = SignalrUrl;
+            result.SignalrUrl = "flow";
             return result;
         }
 
@@ -156,7 +135,7 @@ namespace FileFlows.Server.Controllers
                     existing.Enabled = model.Enabled;
                     await Update(existing);
                 }
-                existing.SignalrUrl = SignalrUrl;
+                existing.SignalrUrl = "flow";
                 return existing;
             }
             var settings = await new SettingsController().Get();
@@ -189,7 +168,7 @@ namespace FileFlows.Server.Controllers
                    KeyValuePair<string, string>(x.Path, "")
                 )?.ToList() ?? new()
             });
-            result.SignalrUrl = SignalrUrl;
+            result.SignalrUrl = "flow";
             return result;
         }
 
@@ -215,7 +194,7 @@ namespace FileFlows.Server.Controllers
 #endif
                 });
             }
-            node.SignalrUrl = SignalrUrl;
+            node.SignalrUrl = "flow";
             return node;
         }
     }

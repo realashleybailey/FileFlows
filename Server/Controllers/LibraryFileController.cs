@@ -116,6 +116,14 @@ namespace FileFlows.Server.Controllers
                            .Take(10);
         }
 
+        internal async Task ResetProcessingStatus(Guid nodeUid)
+        {
+            var libfiles = await GetDataList();
+            var uids = libfiles.Where(x => x.Status == FileStatus.Processing && x.NodeUid == nodeUid).Select(x => x.Uid).ToArray();
+            if (uids.Any())
+                await Reprocess(new ReferenceModel { Uids = uids });
+        }
+
         [HttpGet("status")]
         public async Task<IEnumerable<LibraryStatus>> GetStatus()
         {

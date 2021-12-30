@@ -18,6 +18,11 @@
             return result?.Path ?? string.Empty;
         }
 
-        public Task<ProcessingNode> GetByAddress(string address) => new NodeController().GetByAddress(address);
+        public async Task<ProcessingNode> GetByAddress(string address)
+        {
+            var result = await new NodeController().GetByAddress(address);
+            result.SignalrUrl = $"http://localhost:{WebServer.Port}/flow";
+            return result;
+        }
     }
 }

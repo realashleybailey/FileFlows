@@ -30,6 +30,7 @@ namespace FileFlows.Server.Workers
             var libFileController = new LibraryFileController();
             List<LibraryFile> libraryFiles = libFileController.GetAll(null).Result?.ToList() ?? new ();
             Dictionary<Guid, Flow> flows = new FlowController().GetData().Result;
+            bool scannedAny = false;
             foreach (var library in libaries)
             {
                 if (library.ScanInterval < 10)
@@ -54,6 +55,7 @@ namespace FileFlows.Server.Workers
                     Logger.Instance.WLog($"Library '{library.Name}' flow not found");
                     continue;
                 }
+                scannedAny = true;
                 var flow = flows[library.Flow.Uid];
 
                 if (library.Folders)
@@ -63,7 +65,8 @@ namespace FileFlows.Server.Workers
 
                 libController.UpdateLastScanned(library.Uid).Wait();
             }
-            Logger.Instance.DLog("Finished scanning libraries");
+            if(scannedAny)
+                Logger.Instance.DLog("Finished scanning libraries");
         }
 
         private void ScanForDirs(Library library, List<LibraryFile> libraryFiles, Flow flow)

@@ -77,15 +77,26 @@ namespace FileFlows.Server.Controllers
         {
             if (info.LibraryFile != null)
             {
-                new LibraryFileController().Update(info.LibraryFile).Wait(); // incase the status of the library file has changed
-                if (info.LibraryFile.Status == FileStatus.ProcessingFailed || info.LibraryFile.Status == FileStatus.Processed)
+                var lfController = new LibraryFileController();
+                var existing = lfController.Get(info.LibraryFile.Uid).Result;
+                if (existing != null)
                 {
-                    lock (Executors)
+                    bool recentUpdate = existing.DateModified > DateTime.UtcNow.AddSeconds(-10);
+                    if ((existing.Status == FileStatus.ProcessingFailed && info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
                     {
-                        CompletedExecutors.Append(info.Uid);
-                        if (Executors.ContainsKey(info.Uid))
-                            Executors.Remove(info.Uid);
-                        return;
+                        existing = lfController.Update(info.LibraryFile).Result; // incase the status of the library file has changed
+                        
+                    }
+
+                    if (existing.Status == FileStatus.ProcessingFailed || existing.Status == FileStatus.Processed)
+                    {
+                        lock (Executors)
+                        {
+                            CompletedExecutors.Append(info.Uid);
+                            if (Executors.ContainsKey(info.Uid))
+                                Executors.Remove(info.Uid);
+                            return;
+                        }
                     }
                 }
             }
@@ -162,38 +173,45 @@ namespace FileFlows.Server.Controllers
         [HttpDelete("{uid}")]
         public async Task Abort(Guid uid)
         {
-            FlowExecutorInfo flowinfo;
-            Executors.TryGetValue(uid, out flowinfo);
-
-            await this.Context.Clients.All.SendAsync("AbortFlow", uid);
-
-            if (flowinfo?.LibraryFile != null)
+            try
             {
-                await this.Context.Clients.All.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
-                var libController = new LibraryFileController();
-                var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
-                if(libfile.Status == FileStatus.Processing)
+                FlowExecutorInfo flowinfo;
+                Executors.TryGetValue(uid, out flowinfo);
+
+                await this.Context.Clients.All.SendAsync("AbortFlow", uid);
+
+                if (flowinfo?.LibraryFile != null)
                 {
-                    libfile.Status = FileStatus.ProcessingFailed;
-                    await libController.Update(libfile);
-                }
-            }
-
-            _ = Task.Run(async () =>
-            {
-                await Task.Delay(10_000);
-                lock(Executors)
-                { 
-                    if (Executors.TryGetValue(uid, out FlowExecutorInfo info))
+                    await this.Context.Clients.All.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
+                    var libController = new LibraryFileController();
+                    var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
+                    if (libfile.Status == FileStatus.Processing)
                     {
-                        if (info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
-                        {
-                            // its gone quiet, kill it
-                            Executors.Remove(uid);
-                        }
+                        libfile.Status = FileStatus.ProcessingFailed;
+                        await libController.Update(libfile);
                     }
                 }
-            });
+
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(10_000);
+                    lock (Executors)
+                    {
+                        if (Executors.TryGetValue(uid, out FlowExecutorInfo info))
+                        {
+                            if (info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
+                            {
+                            // its gone quiet, kill it
+                            Executors.Remove(uid);
+                            }
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.WLog("Error aborting flow: " + ex.Message);
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ public class Runner
     private Flow Flow;
     private ProcessingNode Node;
     private CancellationTokenSource CancellationToken = new CancellationTokenSource();
+    private bool Canceled = false;
     private string WorkingDir;
 
     public Runner(FlowExecutorInfo info, Flow flow, ProcessingNode node, string workingDir)
@@ -61,7 +62,9 @@ public class Runner
 
     private void Communicator_OnCancel()
     {
+        nodeParameters?.Logger?.ILog("##### CANCELING FLOW!");
         CancellationToken.Cancel();
+        Canceled = true;
         if (currentNode != null)
             currentNode.Cancel().Wait();
     }
@@ -164,6 +167,7 @@ public class Runner
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
         Shared.Helpers.HttpHelper.Logger = nodeParameters.Logger;
 
+        nodeParameters.Logger!.ILog("File: " + nodeParameters.FileName);
         nodeParameters.Logger!.ILog("Excecuting Flow: " + Flow.Name);
 
         DownloadPlugins();
@@ -191,7 +195,7 @@ public class Runner
 
         while (count++ < 50)
         {
-            if (CancellationToken.IsCancellationRequested)
+            if (CancellationToken.IsCancellationRequested || Canceled)
             {
                 nodeParameters.Logger?.WLog("Flow was canceled");
                 nodeParameters.Result = NodeResult.Failure;

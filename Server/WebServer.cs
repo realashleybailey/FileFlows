@@ -108,6 +108,7 @@ namespace FileFlows.Server
             WorkerManager.StartWorkers(
                 new LibraryWorker(),
                 new FlowWorker(isServer: true),
+                new PluginUpdaterWorker(),
                 new TelemetryReporter()
             );
 

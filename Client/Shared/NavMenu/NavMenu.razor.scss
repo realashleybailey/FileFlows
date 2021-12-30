@@ -113,3 +113,28 @@
         display:none;
     }
 }
+
+@media screen and (max-height:780px){
+    .version-info {
+        display: none !important;
+    }
+}
+
+@media screen and (max-height:720px){
+    .nav-item {
+        padding-bottom:0.25rem;
+        ::deep a {
+            height:2rem;
+        }
+    }
+    .nav-menu-group {
+        padding-top:0.25rem;
+    }
+}
+
+@media screen and (max-height:574px) 
+{
+    .nav-menu-group {
+        display:none;
+    }
+}

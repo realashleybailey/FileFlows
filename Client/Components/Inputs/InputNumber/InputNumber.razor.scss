@@ -10,6 +10,7 @@ input {
     width:100%;
     display:flex;
     flex-direction: row;
+    max-width:40rem;
 }
 .flow-numeric{
     flex-grow:1;

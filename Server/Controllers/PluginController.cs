@@ -13,7 +13,7 @@ namespace FileFlows.Server.Controllers
     [Route("/api/plugin")]
     public class PluginController : ControllerStore<PluginInfo>
     {
-        const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
+        internal const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
         [HttpGet]
         public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = true)
         {
@@ -108,7 +108,11 @@ namespace FileFlows.Server.Controllers
                 return false;
             }
 
-            var dlResult = await HttpHelper.Get<byte[]>(PLUGIN_BASE_URL + "/download/" + ppi.Package);
+            string url = PLUGIN_BASE_URL + "/download/" + ppi.Package;
+            if (url.EndsWith(".ffplugin") == false)
+                url += ".ffplugin";
+
+            var dlResult = await HttpHelper.Get<byte[]>(url);
             if (dlResult.Success == false)
                 return false;
 

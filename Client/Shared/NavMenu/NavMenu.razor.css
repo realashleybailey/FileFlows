@@ -11,6 +11,10 @@
   height: 3.5rem;
 }
 
+.navbar-brand {
+  margin: 0.25rem 0 0 0.75rem;
+}
+
 .navbar-brand, .page-title {
   font-size: 1.5rem;
   font-style: italic;

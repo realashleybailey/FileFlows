@@ -170,5 +170,9 @@
   {
     "outputFile": "Components/Inputs/InputTextLabel/InputTextLabel.razor.css",
     "inputFile": "Components/Inputs/InputTextLabel/InputTextLabel.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/theme.css",
+    "inputFile": "wwwroot/css/theme.scss"
   }
 ]

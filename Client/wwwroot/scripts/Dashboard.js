@@ -48,6 +48,7 @@ export function InitChart(data, lblOverall, lblCurrent) {
                     }
                 }
             },
+            //colors: ['var(--accent)', 'var(--accent-complementary)'],
             series: [overall],
             labels: [lblOverall]
         };

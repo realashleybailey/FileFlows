@@ -39,16 +39,16 @@ namespace FileFlows.Client.Pages
         async Task Update()
         {
 #if (!DEMO)
-            var plugin = Table.GetSelected()?.FirstOrDefault();
-            if (plugin == null)
+            var plugins = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+            if (plugins?.Any() != true)
                 return;
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Post($"{ApiUrl}/update/{plugin.Uid}");
-                if(result.Success)
+                var result = await HttpHelper.Post($"{ApiUrl}/update", new ReferenceModel { Uids = plugins });
+                if (result.Success)
                     await PluginsUpdated();
             }
             finally

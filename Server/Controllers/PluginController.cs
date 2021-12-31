@@ -91,33 +91,41 @@ namespace FileFlows.Server.Controllers
         }
 
 
-        [HttpPost("update/{uid}")]
-        public async Task<bool> Update([FromRoute] Guid uid)
+        [HttpPost("update")]
+        public async Task<bool> Update([FromBody] ReferenceModel model)
         {
-            var plugin = await Get(uid);
-            if (plugin == null)
-                return false;
+            bool updated = false;
             var plugins = await GetPluginPackages();
-            var ppi = plugins.FirstOrDefault(x => x.Name.Replace(" ", "").ToLower() == plugin.Name.Replace(" ", "").ToLower());
-            if (ppi == null)
-                return false;
-
-            if (Version.Parse(ppi.Version) <= Version.Parse(plugin.Version))
+            
+            foreach (var uid in model?.Uids ?? new Guid[] { })
             {
-                // no new version, cannot update
-                return false;
+                var plugin = await Get(uid);
+                if (plugin == null)
+                    continue;
+
+                var ppi = plugins.FirstOrDefault(x => x.Name.Replace(" ", "").ToLower() == plugin.Name.Replace(" ", "").ToLower());
+
+                if (ppi == null)
+                    continue;
+
+                if (Version.Parse(ppi.Version) <= Version.Parse(plugin.Version))
+                {
+                    // no new version, cannot update
+                    continue;
+                }
+
+                string url = PLUGIN_BASE_URL + "/download/" + ppi.Package;
+                if (url.EndsWith(".ffplugin") == false)
+                    url += ".ffplugin";
+
+                var dlResult = await HttpHelper.Get<byte[]>(url);
+                if (dlResult.Success == false)
+                    continue;
+
+                // save the ffplugin file
+                updated |= PluginScanner.UpdatePlugin(ppi.Package, dlResult.Data);
             }
-
-            string url = PLUGIN_BASE_URL + "/download/" + ppi.Package;
-            if (url.EndsWith(".ffplugin") == false)
-                url += ".ffplugin";
-
-            var dlResult = await HttpHelper.Get<byte[]>(url);
-            if (dlResult.Success == false)
-                return false;
-
-            // save the zip and unzip it
-            return PluginScanner.UpdatePlugin(ppi.Package, dlResult.Data);
+            return updated;
         }
 
         [HttpDelete]

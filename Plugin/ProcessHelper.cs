@@ -13,6 +13,9 @@
         public bool Completed;
         public int? ExitCode;
         public string Output;
+
+        public string StandardOutput;
+        public string StandardError;
     }
 
     public class ExecuteArgs
@@ -135,6 +138,9 @@
                     {
                         result.Completed = true;
                         result.ExitCode = process.ExitCode;
+
+                        result.StandardError = errorBuilder.ToString();
+                        result.StandardOutput =outputBuilder.ToString();    
 
                         // Adds process output if it was completed with error
                         if (process.ExitCode != 0)

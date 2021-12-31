@@ -168,6 +168,10 @@
         "parameters": {
           "options": [
             {
+              "label": "Copy Video",
+              "value": "Variables.VideoCodec = '';\nVariables.VideoCodecParameters = '';\nVariables.Extension = '';\nreturn 1;"
+            },
+            {
               "label": "CPU Encoding",
               "value": "###GROUP###"
             },
@@ -218,6 +222,10 @@
         "help": "The audio codec to use for encoding",
         "parameters": {
           "options": [
+            {
+              "label": "Copy Audio",
+              "value": "COPY"
+            },
             {
               "label": "AC3",
               "value": "ac3"

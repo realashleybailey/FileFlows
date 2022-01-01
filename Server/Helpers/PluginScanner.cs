@@ -154,10 +154,11 @@ namespace FileFlows.Server.Helpers
             {
                 Logger.Instance?.ILog($"Root plugin: {file.FullName}");
                 string dest = Path.Combine(pluginDir, file.Name);
-                if (File.Exists(dest))
-                    continue;
+                // always restore, this means if the docker is updated, it contains the latest version.
+                // well this does have an issue if there is an updated plugin that is newer than the one 
+                // inside the docker.  so if thats an issue have to fix this later.
                 Logger.Instance?.ILog("Restoring default plugin: " + file.Name);
-                file.CopyTo(dest);
+                file.CopyTo(dest, true);
             }
         }
 

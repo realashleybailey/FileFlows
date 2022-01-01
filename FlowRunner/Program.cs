@@ -1,4 +1,5 @@
-﻿using FileFlows.ServerShared.Services;
+﻿using FileFlows.Plugin;
+using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Models;
 using System;
 using System.Collections.Generic;

@@ -27,7 +27,7 @@
                 ShowEditHttpError(flowResult, "Pages.Libraries.ErrorMessages.NoFlows");
                 return false;
             }
-            var flowOptions = flowResult.Data.Select(x => new ListOption { Value = new ObjectReference { Name = x.Name, Uid = x.Uid }, Label = x.Name });
+            var flowOptions = flowResult.Data.Select(x => new ListOption { Value = new ObjectReference { Name = x.Name, Uid = x.Uid, Type = x.GetType().FullName }, Label = x.Name });
             efTemplate = null;
 
             var tabs = new Dictionary<string, List<ElementField>>();

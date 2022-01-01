@@ -1,5 +1,6 @@
 namespace FileFlows.Shared.Models
 {
+    using FileFlows.Plugin;
     using System;
 
     public class LibraryFile : FileFlowObject

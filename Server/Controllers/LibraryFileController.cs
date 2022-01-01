@@ -3,6 +3,7 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
+    using FileFlows.Plugin;
 
     [Route("/api/library-file")]
     public class LibraryFileController : ControllerStore<LibraryFile>

@@ -19,6 +19,7 @@ namespace FileFlows.Client.Pages
     using System.Dynamic;
     using FileFlows.Shared.Models;
     using System.Text.Json;
+    using FileFlows.Plugin;
 
     public partial class Flow : ComponentBase
     {
@@ -274,9 +275,51 @@ namespace FileFlows.Client.Pages
                 InputType = Plugin.FormInputType.Text
             });
 
+
+            List<ListOption> flowOptions = null;
+            
             foreach (var field in fields)
             {
                 field.Variables = variables;
+                // special case, load "Flow" into FLOW_LIST
+                // this lets a plugin request the list of flows to be shown
+                if (field.Parameters?.Any() == true)
+                {
+                    if (field.Parameters.ContainsKey("OptionsProperty") && field.Parameters["OptionsProperty"] is JsonElement optProperty)
+                    {
+                        if (optProperty.ValueKind == JsonValueKind.String)
+                        {
+                            string optp = optProperty.GetString();
+                            Logger.Instance.DLog("OptionsProperty = " + optp);
+                            if (optp == "FLOW_LIST")
+                            {
+                                if(flowOptions == null)
+                                {
+                                    flowOptions = new List<ListOption>();
+                                    var flowsResult = await HttpHelper.Get<ff[]>($"/api/flow");
+                                    if (flowsResult.Success)
+                                    {
+                                        flowOptions = flowsResult.Data?.Where(x => x.Uid != Model?.Uid)?.OrderBy(x => x.Name)?.Select(x => new ListOption
+                                        {
+                                            Label = x.Name,
+                                            Value = new ObjectReference
+                                            {
+                                                Name = x.Name,
+                                                Uid = x.Uid,
+                                                Type = x.GetType().FullName
+                                            }
+                                        })?.ToList() ?? new List<ListOption>();
+                                    }
+
+                                }
+                                if (field.Parameters.ContainsKey("Options"))
+                                    field.Parameters["Options"] = flowOptions;
+                                else
+                                    field.Parameters.Add("Options", flowOptions);
+                            }
+                        }
+                    }
+                }
             }
 
             var model = part.Model ?? new ExpandoObject();
@@ -286,6 +329,8 @@ namespace FileFlows.Client.Pages
             {
                 dict["Name"] = part.Name ?? string.Empty;
             }
+
+
 
             string title = typeDisplayName;
             var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1);

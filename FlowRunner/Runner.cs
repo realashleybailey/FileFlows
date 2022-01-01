@@ -161,6 +161,16 @@ public class Runner
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
+        List<Guid> runFlows = new List<Guid>();
+        runFlows.Add(Flow.Uid);
+
+        ObjectReference gotoFlow = null;
+        nodeParameters.GotoFlow = (flow) =>
+        {
+            if (runFlows.Contains(flow.Uid))
+                throw new Exception($"Flow '{flow.Uid}' ['{flow.Name}'] has already been executed, cannot link to existing flow as this could cause an infinite loop.");
+            gotoFlow = flow;
+        };
         Info.LibraryFile.OriginalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : new FileInfo(nodeParameters.WorkingFile).Length;
         nodeParameters.TempPath = WorkingDir;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
@@ -228,34 +238,64 @@ public class Runner
                 StepChanged(step, currentNode.Name);
 
                 nodeParameters.Logger?.DLog("node: " + currentNode.Name);
+                gotoFlow = null; // clear it, incase this node requests going to a different flow
                 int output = currentNode.Execute(nodeParameters);
 
-                nodeParameters.Logger?.DLog("output: " + output);
-                if (output == -1)
+                if (gotoFlow != null)
                 {
-                    // the execution failed                     
-                    nodeParameters.Logger?.ELog("node returned error code:", currentNode!.Name);
-                    nodeParameters.Result = NodeResult.Failure;
-                    SetStatus(FileStatus.ProcessingFailed);
-                    return;
-                }
-                var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
-                if (outputNode == null)
-                {
-                    nodeParameters.Logger?.DLog("flow completed");
-                    // flow has completed
-                    nodeParameters.Result = NodeResult.Success;
-                    SetStatus(FileStatus.Processed);
-                    return;
-                }
+                    var fs = new FlowService();
+                    var newFlow = fs.Get(gotoFlow.Uid).Result;
+                    if (newFlow == null)
+                    {
+                        nodeParameters.Logger?.ELog("Unable goto flow with UID:" + gotoFlow.Uid + " (" + gotoFlow.Name + ")");
+                        nodeParameters.Result = NodeResult.Failure;
+                        SetStatus(FileStatus.ProcessingFailed);
+                        return;
+                    }
 
-                part = outputNode == null ? null : Flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
-                if (part == null)
+                    nodeParameters.Logger?.ILog("Changing flows to: " + newFlow.Name);
+                    this.Flow = newFlow;
+
+                    // find the first node
+                    part = Flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
+                    if (part == null)
+                    {
+                        nodeParameters.Logger!.ELog("Failed to find Input node");
+                        SetStatus(FileStatus.ProcessingFailed);
+                        return;
+                    }
+                    Info.TotalParts = Flow.Parts.Count;
+                    step = 0;
+                }
+                else
                 {
-                    // couldnt find the connection, maybe bad data, but flow has now finished
-                    nodeParameters.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
-                    SetStatus(FileStatus.Processed);
-                    return;
+                    nodeParameters.Logger?.DLog("output: " + output);
+                    if (output == -1)
+                    {
+                        // the execution failed                     
+                        nodeParameters.Logger?.ELog("node returned error code:", currentNode!.Name);
+                        nodeParameters.Result = NodeResult.Failure;
+                        SetStatus(FileStatus.ProcessingFailed);
+                        return;
+                    }
+                    var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
+                    if (outputNode == null)
+                    {
+                        nodeParameters.Logger?.DLog("flow completed");
+                        // flow has completed
+                        nodeParameters.Result = NodeResult.Success;
+                        SetStatus(FileStatus.Processed);
+                        return;
+                    }
+
+                    part = outputNode == null ? null : Flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
+                    if (part == null)
+                    {
+                        // couldnt find the connection, maybe bad data, but flow has now finished
+                        nodeParameters.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
+                        SetStatus(FileStatus.Processed);
+                        return;
+                    }
                 }
             }
             catch (Exception ex)

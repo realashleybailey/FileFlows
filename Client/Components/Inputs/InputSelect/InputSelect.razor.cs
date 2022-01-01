@@ -91,6 +91,7 @@ namespace FileFlows.Client.Components.Inputs
             {
                 var opt = Options.ToArray();
                 var valueJson = JsonSerializer.Serialize(Value);
+                var objReference = TryParseObjectReference(valueJson);
                 for (int i = 0; i < opt.Length; i++)
                 {
                     if (opt[i].Value == Value)
@@ -98,10 +99,22 @@ namespace FileFlows.Client.Components.Inputs
                         startIndex = i;
                         break;
                     }
-                    if (JsonSerializer.Serialize(opt[i].Value) == valueJson)
+                    string optJson = JsonSerializer.Serialize(opt[i].Value);                    
+                    if (optJson.ToLower() == valueJson.ToLower())
                     {
                         startIndex = i;
                         break;
+                    }
+
+                    if (objReference.Uid != Guid.Empty)
+                    {
+                        // incase the object reference name has changed, we look for the UID
+                        var otherObjReference = TryParseObjectReference(optJson);
+                        if (otherObjReference.Uid == objReference.Uid)
+                        {
+                            startIndex = i;
+                            break;
+                        }
                     }
                 }
             }
@@ -120,6 +133,18 @@ namespace FileFlows.Client.Components.Inputs
             }
             if(startIndex != SelectedIndex)
                 SelectedIndex = startIndex;
+        }
+
+        private ObjectReference TryParseObjectReference(string json)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<ObjectReference>(json);
+            }
+            catch (Exception)
+            {
+                return new ObjectReference { Name = string.Empty, Type = string.Empty, Uid = Guid.Empty };
+            }
         }
 
         private void SelectionChanged(ChangeEventArgs args)

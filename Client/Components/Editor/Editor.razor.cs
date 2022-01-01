@@ -132,6 +132,7 @@ namespace FileFlows.Client.Components
             this.Visible = true;
             this.AdditionalFields = additionalFields;
 
+
             lblSave = lblSave.EmptyAsNull() ?? "Labels.Save";
             this.lblCancel = Translater.TranslateIfNeeded(lblCancel.EmptyAsNull() ?? "Labels.Cancel");
 

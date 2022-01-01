@@ -1,8 +1,6 @@
 namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
-    using System.Runtime.InteropServices;
-    using System.Text.RegularExpressions;
 
     public class NodeParameters
     {
@@ -33,6 +31,8 @@ namespace FileFlows.Plugin
 
         public Func<string, string>? GetToolPath { get; set; }
         public Func<string, string>? PathMapper { get; set; }
+
+        public Action<ObjectReference> GotoFlow { get; set; }
 
         public bool IsDirectory { get; set; }
         public string LibraryPath { get; set; }
@@ -91,49 +91,49 @@ namespace FileFlows.Plugin
                     var di = new DirectoryInfo(filename);
                     var diOriginal = new DirectoryInfo(FileName);
                     UpdateVariables(new Dictionary<string, object> {
-                    { "folder.Name", di.Name ?? "" },
-                    { "folder.FullName", di.FullName ?? "" },
+                        { "folder.Name", di.Name ?? "" },
+                        { "folder.FullName", di.FullName ?? "" },
 
-                    { "folder.Date", diOriginal.CreationTime },
-                    { "folder.Date.Year", diOriginal.CreationTime.Year },
-                    { "folder.Date.Month", diOriginal.CreationTime.Month },
-                    { "folder.Date.Day", diOriginal.CreationTime.Day},
+                        { "folder.Date", diOriginal.CreationTime },
+                        { "folder.Date.Year", diOriginal.CreationTime.Year },
+                        { "folder.Date.Month", diOriginal.CreationTime.Month },
+                        { "folder.Date.Day", diOriginal.CreationTime.Day},
 
-                    { "folder.Orig.Name", diOriginal.Name ?? "" },
-                    { "folder.Orig.FullName", diOriginal.FullName ?? "" },
-                });
+                        { "folder.Orig.Name", diOriginal.Name ?? "" },
+                        { "folder.Orig.FullName", diOriginal.FullName ?? "" },
+                    });
                 }
                 else
                 {
                     var fi = new FileInfo(filename);
                     var fiOriginal = new FileInfo(FileName);
                     UpdateVariables(new Dictionary<string, object> {
-                    { "ext", fi.Extension ?? "" },
-                    { "file.Name", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
-                    { "file.FullName", fi.FullName ?? "" },
-                    { "file.Extension", fi.Extension ?? "" },
-                    { "file.Size", fi.Exists ? fi.Length : 0 },
-                    { "file.Create", fiOriginal.CreationTime },
-                    { "file.Create.Year", fiOriginal.CreationTime.Year },
-                    { "file.Create.Month", fiOriginal.CreationTime.Month },
-                    { "file.Create.Day", fiOriginal.CreationTime.Day },
+                        { "ext", fi.Extension ?? "" },
+                        { "file.Name", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
+                        { "file.FullName", fi.FullName ?? "" },
+                        { "file.Extension", fi.Extension ?? "" },
+                        { "file.Size", fi.Exists ? fi.Length : 0 },
+                        { "file.Create", fiOriginal.CreationTime },
+                        { "file.Create.Year", fiOriginal.CreationTime.Year },
+                        { "file.Create.Month", fiOriginal.CreationTime.Month },
+                        { "file.Create.Day", fiOriginal.CreationTime.Day },
 
-                    { "file.Modified", fiOriginal.LastWriteTime },
-                    { "file.Modified.Year", fiOriginal.LastWriteTime.Year },
-                    { "file.Modified.Month", fiOriginal.LastWriteTime.Month },
-                    { "file.Modified.Day", fiOriginal.LastWriteTime.Day },
+                        { "file.Modified", fiOriginal.LastWriteTime },
+                        { "file.Modified.Year", fiOriginal.LastWriteTime.Year },
+                        { "file.Modified.Month", fiOriginal.LastWriteTime.Month },
+                        { "file.Modified.Day", fiOriginal.LastWriteTime.Day },
 
-                    { "file.Orig.Extension", fiOriginal.Extension ?? "" },
-                    { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
-                    { "file.Orig.FullName", fiOriginal.FullName ?? "" },
-                    { "file.Orig.Size", fiOriginal.Exists ? fiOriginal.Length : 0 },
+                        { "file.Orig.Extension", fiOriginal.Extension ?? "" },
+                        { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
+                        { "file.Orig.FullName", fiOriginal.FullName ?? "" },
+                        { "file.Orig.Size", fiOriginal.Exists ? fiOriginal.Length : 0 },
 
-                    { "folder.Name", fi.Directory?.Name ?? "" },
-                    { "folder.FullName", fi.DirectoryName ?? "" },
+                        { "folder.Name", fi.Directory?.Name ?? "" },
+                        { "folder.FullName", fi.DirectoryName ?? "" },
 
-                    { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
-                    { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" },
-                });
+                        { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
+                        { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" },
+                    });
                 }
             }
             catch (Exception) { }
@@ -161,7 +161,7 @@ namespace FileFlows.Plugin
                         await Task.Delay(2_000); // wait 2 seconds for the file to be released if used
                         try
                         {
-                            System.IO.File.Delete(fileToDelete);
+                            File.Delete(fileToDelete);
                         }
                         catch (Exception ex)
                         {

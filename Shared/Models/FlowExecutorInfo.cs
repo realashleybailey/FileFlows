@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Shared.Models;
+﻿using FileFlows.Plugin;
+
+namespace FileFlows.Shared.Models;
 
 public class FlowExecutorInfo
 {

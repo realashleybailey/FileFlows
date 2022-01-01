@@ -1,4 +1,4 @@
-namespace FileFlows.Shared.Models
+﻿namespace FileFlows.Plugin
 {
     using System;
 

@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Workers;

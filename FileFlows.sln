@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsServer", "WindowsSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PluginInfoGenerator", "PluginInfoGenerator\PluginInfoGenerator.csproj", "{111A58D5-1780-4DEA-B667-37383798E780}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlowRunner", "FlowRunner\FlowRunner.csproj", "{91772B3A-AE4D-4817-9D3A-44073ECDE626}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlowRunner", "FlowRunner\FlowRunner.csproj", "{91772B3A-AE4D-4817-9D3A-44073ECDE626}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

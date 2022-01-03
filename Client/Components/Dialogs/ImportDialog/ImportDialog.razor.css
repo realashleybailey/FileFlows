@@ -1,0 +1,32 @@
+﻿.file-input {
+  height: 2.1875rem;
+  display: flex;
+  flex-direction: row;
+  margin: 2rem 0;
+  min-width: 25rem;
+}
+
+input {
+  height: 100%;
+  line-height: 100%;
+  flex-grow: 1;
+  outline: none;
+}
+
+label {
+  font-weight: normal;
+  outline: none !important;
+  box-shadow: none;
+  border-radius: unset !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  border: solid 1px var(--accent);
+  background-color: transparent;
+  color: var(--color) !important;
+  padding-top: 0.45rem;
+  height: 100%;
+}
+label:hover {
+  background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+  box-shadow: inset 0 -3px 0 0 var(--accent) !important;
+}

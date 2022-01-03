@@ -4,14 +4,11 @@ namespace FileFlows.Client.Pages
     using System.Dynamic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Radzen;
     using FileFlows.Client.Components;
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
-    using FileFlows.Plugin;
     using System;
-    using FileFlows.Client.Components.Inputs;
 
     public partial class Libraries : ListPage<Library>
     {
@@ -104,7 +101,7 @@ namespace FileFlows.Client.Pages
                 var saveResult = await HttpHelper.Post<Library>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, Translater.TranslateIfNeeded(saveResult.Body?.EmptyAsNull() ?? "ErrorMessages.SaveFailed"));
+                    Toast.ShowError( Translater.TranslateIfNeeded(saveResult.Body?.EmptyAsNull() ?? "ErrorMessages.SaveFailed"));
                     return false;
                 }
 

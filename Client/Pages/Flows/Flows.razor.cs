@@ -4,8 +4,6 @@ namespace FileFlows.Client.Pages
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using Radzen;
-    using Radzen.Blazor;
     using FileFlows.Client.Components;
     using FileFlows.Client.Components.Dialogs;
     using FileFlows.Shared.Helpers;
@@ -396,11 +394,47 @@ namespace FileFlows.Client.Pages
             builder.CloseComponent();
         }
 
+        private async Task Export()
+        {
+            var item = Table.GetSelected()?.FirstOrDefault();
+            if (item == null)
+                return;
+            string url = $"/api/flow/export/{item.Uid}";
+#if (DEBUG)
+            url = "http://localhost:6868" + url;
+#endif
+            NavigationManager.NavigateTo(url);
+        }
+
+        private async Task Import()
+        {
+            var json = await ImportDialog.Show();
+            if (string.IsNullOrEmpty(json))
+                return;
+
+            Blocker.Show();
+            try
+            {
+                var newFlow = await HttpHelper.Post<ffFlow>("/api/flow/import", json);
+                if (newFlow != null && newFlow.Success)
+                {
+                    await this.Refresh();
+                    Toast.ShowSuccess(Translater.Instant("Pages.Flows.Messages.FlowImported", new { name = newFlow.Data.Name }));
+                }
+            }
+            finally
+            {
+                Blocker.Hide();
+            }
+        }
+
 
         private class TemplateSelectParameters
         {
             public List<Plugin.ListOption> Options { get; set; }
         }
+
+
     }
 
 }

@@ -4,9 +4,6 @@ namespace FileFlows.Client.Pages
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Components;
-    using Radzen;
-    using Radzen.Blazor;
     using FileFlows.Client.Components;
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared;
@@ -78,7 +75,7 @@ namespace FileFlows.Client.Pages
                 var pluginResult = await HttpHelper.Post<PluginInfo>($"{ApiUrl}/{EditingPlugin.Uid}/settings", model);
                 if (pluginResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.SaveFailed"));
+                    Toast.ShowError( Translater.Instant("ErrorMessages.SaveFailed"));
                     return false;
                 }
                 return true;

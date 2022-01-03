@@ -12,7 +12,6 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
-    using Radzen;
 
     public partial class Dashboard : ComponentBase, IDisposable
     {
@@ -25,7 +24,6 @@ namespace FileFlows.Client.Pages
 
         private int ConfiguredStatus = 2;
         [Inject] public IJSRuntime jSRuntime { get; set; }
-        [Inject] public NotificationService NotificationService { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
 
@@ -207,7 +205,7 @@ namespace FileFlows.Client.Pages
                 var logResult = await GetLog(url);
                 if (logResult.Success == false || string.IsNullOrEmpty(logResult.Data))
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("Pages.Dashboard.ErrorMessages.LogFailed"));
+                    Toast.ShowError( Translater.Instant("Pages.Dashboard.ErrorMessages.LogFailed"));
                     return;
                 }
                 log = logResult.Data;

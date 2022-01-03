@@ -14,7 +14,6 @@ namespace FileFlows.Client.Pages
     using System;
     using FileFlows.Shared;
     using FileFlows.Client.Components.Dialogs;
-    using Radzen;
     using FileFlows.Shared.Helpers;
     using System.Dynamic;
     using FileFlows.Shared.Models;
@@ -26,7 +25,6 @@ namespace FileFlows.Client.Pages
         [CascadingParameter] public Editor Editor { get; set; }
         [Parameter] public System.Guid Uid { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
-        [Inject] public NotificationService NotificationService { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         private ffElement[] Available { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
@@ -212,7 +210,7 @@ namespace FileFlows.Client.Pages
                 }
                 else
                 {
-                    NotificationService.Notify(NotificationSeverity.Error,
+                    Toast.ShowError(
                         result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant($"ErrorMessages.UnexpectedError") : Translater.TranslateIfNeeded(result.Body),
                         duration: 60_000
                     );

@@ -1,8 +1,6 @@
 namespace FileFlows.Client.Pages
 {
-    using Radzen;
     using FileFlows.Client.Components;
-    using FileFlows.Client.Components.Inputs;
 
     public partial class Nodes : ListPage<ProcessingNode>
     {
@@ -68,7 +66,7 @@ namespace FileFlows.Client.Pages
                 var saveResult = await HttpHelper.Post<ProcessingNode>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
+                    Toast.ShowError( saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
                     return false;
                 }
 

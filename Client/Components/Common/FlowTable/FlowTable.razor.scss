@@ -10,6 +10,8 @@
 
     .flowtable-toolbar-buttons {
         flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     .flowtable-toolbar-filter {
@@ -22,8 +24,9 @@
             line-height: 1rem;
             padding-right: 1.75rem;
             border: 1px solid var(--input-background) !important;
-            &:focus{
-                border-color:var(--accent);
+
+            &:focus {
+                border-color: var(--accent);
             }
         }
 
@@ -43,6 +46,7 @@
         border: unset;
         border-radius: 0 !important;
         font-size: 0.8rem;
+        outline:none;
 
         &:hover {
             color: var(--color-rgb);

@@ -174,5 +174,13 @@
   {
     "outputFile": "wwwroot/css/theme.css",
     "inputFile": "wwwroot/css/theme.scss"
+  },
+  {
+    "outputFile": "Components/Dialogs/ImportDialog/ImportDialog.razor.css",
+    "inputFile": "Components/Dialogs/ImportDialog/ImportDialog.razor.scss"
+  },
+  {
+    "outputFile": "Components/Toast/Toast.razor.css",
+    "inputFile": "Components/Toast/Toast.razor.scss"
   }
 ]

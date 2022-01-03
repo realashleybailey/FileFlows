@@ -4,7 +4,11 @@
 @use 'modal';
 @use 'pointer';
 @use 'bar';
-@use 'radzen';
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    src:url('webfonts/SourceSansPro-Regular.woff') format('woff');
+}
 
 html {
     overflow: hidden;
@@ -17,8 +21,9 @@ html {
 }
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 16px;
+    font-weight:400;
     color: var(--color) !important;
     background: var(--base) !important;
 }
@@ -174,4 +179,10 @@ button {
     .flow-template-description {
         margin-left:0;
     }
+}
+
+
+
+input[type=file]{
+
 }

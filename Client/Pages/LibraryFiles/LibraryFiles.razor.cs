@@ -8,10 +8,6 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using System.Linq;
     using System;
-    using Microsoft.AspNetCore.Components.Web;
-    using Radzen;
-    using Microsoft.AspNetCore.Components;
-    using FileFlows.Client.Components.Common;
     using FileFlows.Client.Components.Dialogs;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
@@ -36,22 +32,6 @@ namespace FileFlows.Client.Pages
             _ = this.Refresh();
         }
 
-        private async void LoadPagedData(LoadDataArgs args)
-        {
-            this.Blocker.Show();
-            this.StateHasChanged();
-            try
-            {
-                var result = await HttpHelper.Get<List<LibraryFile>>($"{FetchUrl}?skip={args.Skip}&top={args.Top}");
-                if (result.Success)
-                    this.Data = result.Data;
-            }
-            finally
-            {
-                this.Blocker.Hide();
-                this.StateHasChanged();
-            }
-        }
         //protected virtual Task<RequestResult<List<LibraryFile>>> FetchData()
         //{
         //    return HttpHelper.Get<List<LibraryFile>>($"{FetchUrl}?skip=0&top=250");
@@ -144,7 +124,7 @@ namespace FileFlows.Client.Pages
 
         public override async Task<bool> Edit(LibraryFile item)
         {
-            await Helpers.LibraryFileEditor.Open(Blocker, NotificationService, Editor, item);
+            await Helpers.LibraryFileEditor.Open(Blocker, Editor, item);
             return false;
         }
 

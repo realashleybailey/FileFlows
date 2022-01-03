@@ -17,22 +17,21 @@
 
 .navbar-brand, .page-title {
   font-size: 1.5rem;
-  font-style: italic;
   font-weight: bold;
-  color: var(--accent) !important;
   display: none;
   cursor: pointer;
+}
+.navbar-brand.navbar-brand, .page-title.navbar-brand {
+  font-style: italic;
+  color: var(--accent) !important;
 }
 .navbar-brand svg, .page-title svg {
   margin-right: 0.25rem;
   position: relative;
   top: -0.1rem;
 }
-.navbar-brand.page-title, .page-title.page-title {
-  color: var(--color);
-}
 .navbar-brand .icon, .page-title .icon {
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
   font-size: 1.8rem;
   color: var(--accent);
 }

@@ -9,8 +9,6 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
-    using Radzen;
-    using Radzen.Blazor;
     using FileFlows.Client.Components.Common;
     using System;
 
@@ -19,7 +17,6 @@ namespace FileFlows.Client.Pages
         protected FlowTable<T> Table { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] public Editor Editor { get; set; }
-        [Inject] public NotificationService NotificationService { get; set; }
         public string lblAdd, lblEdit, lblDelete, lblDeleting, lblRefresh;
 
         public abstract string ApiUrl { get; }
@@ -134,7 +131,7 @@ namespace FileFlows.Client.Pages
 
         public void ShowEditHttpError<U>(RequestResult<U> result, string defaultMessage = "ErrorMessage.NotFound")
         {
-            NotificationService.Notify(NotificationSeverity.Error,
+            Toast.ShowError(
                 result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant(defaultMessage) : Translater.TranslateIfNeeded(result.Body),
                 duration: 60_000
             );
@@ -182,9 +179,9 @@ namespace FileFlows.Client.Pages
                 if (deleteResult.Success == false)
                 {
                     if(Translater.NeedsTranslating(deleteResult.Body))
-                        NotificationService.Notify(NotificationSeverity.Error, Translater.Instant(deleteResult.Body));
+                        Toast.ShowError( Translater.Instant(deleteResult.Body));
                     else
-                        NotificationService.Notify(NotificationSeverity.Error, Translater.Instant("ErrorMessages.DeleteFailed"));
+                        Toast.ShowError( Translater.Instant("ErrorMessages.DeleteFailed"));
                     return;
                 }
 #endif

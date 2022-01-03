@@ -13,6 +13,7 @@ namespace FileFlows.Server.Controllers
     using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
     using FileFlows.Shared;
+    using System.Text.Json;
 
     [Route("/api/flow")]
     public class FlowController : ControllerStore<Flow>
@@ -22,6 +23,44 @@ namespace FileFlows.Server.Controllers
 
         [HttpGet]
         public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
+
+        [HttpGet("export/{uid}")]
+        public async Task<IActionResult> Export([FromRoute] Guid uid)
+        {
+            var flow = await GetByUid(uid);
+            if(flow == null)
+                return NotFound();
+            string json = JsonSerializer.Serialize(flow, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(json);
+            return File(data, "application/octet-stream", flow.Name + ".json");
+        }
+
+        [HttpPost("import")]
+        public async Task<Flow> Import([FromBody] string json)
+        {
+            Flow flow = JsonSerializer.Deserialize<Flow>(json);    
+            if(flow == null)
+                throw new ArgumentNullException(nameof(flow));
+            if (flow.Parts == null || flow.Parts.Count == 0)
+                throw new ArgumentException(nameof(flow.Parts));
+
+            // generate new UIDs for each part
+            foreach(var part in flow.Parts)
+            {
+                Guid newGuid = Guid.NewGuid();
+                json = json.Replace(part.Uid.ToString(), newGuid.ToString());
+            }
+            // reparse with new UIDs
+            flow = JsonSerializer.Deserialize<Flow>(json);
+            flow.Uid = Guid.Empty;
+            flow.DateModified = DateTime.UtcNow;
+            flow.DateCreated = DateTime.UtcNow;
+            flow.Name = await GetNewUniqueName(flow.Name);
+            return await Update(flow);
+        }
 
 
         [HttpPut("state/{uid}")]

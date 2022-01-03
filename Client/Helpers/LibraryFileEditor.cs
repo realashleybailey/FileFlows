@@ -6,7 +6,6 @@ namespace FileFlows.Client.Helpers
     using FileFlows.Shared;
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared.Models;
-    using Radzen;
 
     public class LibraryFileEditor
     {
@@ -33,7 +32,7 @@ namespace FileFlows.Client.Helpers
 #endif
         }
 
-        public static async Task Open(Blocker blocker, NotificationService notificationService, Editor editor, LibraryFile item)
+        public static async Task Open(Blocker blocker, Editor editor, LibraryFile item)
         {
             LibraryFileModel model = null;
             string logUrl = ApIUrl + "/" + item.Uid + "/log";
@@ -43,7 +42,7 @@ namespace FileFlows.Client.Helpers
                 var result = await GetLibraryFile(ApIUrl + "/" + item.Uid);
                 if (result.Success == false)
                 {
-                    notificationService.Notify(NotificationSeverity.Error,
+                    Toast.ShowError(
                         result.Success || string.IsNullOrEmpty(result.Body) ? Translater.Instant("ErrorMessage.NotFound") : Translater.TranslateIfNeeded(result.Body),
                         duration: 60_000
                     );

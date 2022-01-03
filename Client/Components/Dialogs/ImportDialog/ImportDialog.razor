@@ -1,0 +1,20 @@
+@namespace FileFlows.Client.Components.Dialogs
+
+<Modal Title="@Title" Visible="Visible">
+
+    <Body>
+        <span>@Message</span>
+
+        <div class="file-input">            
+            <input type="text" readonly value="@FileName" />
+            <label for="@Uid" class="btn">
+                @lblBrowse
+            </label>
+        </div>
+        <Microsoft.AspNetCore.Components.Forms.InputFile OnChange="LoadFile" id="@Uid" style="display:none" accept=".json" />
+    </Body>
+    <Footer>
+        <button @onclick=@Accept disabled="@(HasFile ? null : "disabled")">@lblImport</button>
+        <button @onclick=@Cancel>@lblCancel</button>
+    </Footer>
+</Modal>

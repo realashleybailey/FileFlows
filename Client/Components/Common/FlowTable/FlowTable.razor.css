@@ -8,6 +8,8 @@
 }
 .flowtable-toolbar .flowtable-toolbar-buttons {
   flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .flowtable-toolbar .flowtable-toolbar-filter {
   width: 16rem;
@@ -37,6 +39,7 @@
   border: unset;
   border-radius: 0 !important;
   font-size: 0.8rem;
+  outline: none;
 }
 .flowtable-toolbar ::deep button:hover {
   color: var(--color-rgb);

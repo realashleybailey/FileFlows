@@ -19,6 +19,9 @@
     "Refresh": "Refresh",
     "Download": "Download",
     "Enabled": "Enabled",
+    "Export": "Export",
+    "Import": "Import",
+    "Browse": "Browse",
     "Rescan": "Rescan",
     "Help": "Help",
     "Name": "Name",
@@ -40,9 +43,13 @@
     "UpdateAvailable": "New version available {version}"
   },
   "Dialogs":{
-    "FileBrowser":{
-      "FileTitle":"Select A File",
-      "DirectoryTitle":"Select A Directory"
+    "FileBrowser": {
+      "FileTitle": "Select A File",
+      "DirectoryTitle": "Select A Directory"
+    },
+    "Import": {
+      "Title": "Import Flow",
+      "Message": "Select an exported flow to import into the system."
     }
   },
   "Enums": {
@@ -159,6 +166,9 @@
           "PageDescription": "Select a template to base the flow on, this will help you get started with a flow.",
           "Template": "Template"
         }
+      },
+      "Messages": {
+        "FlowImported": "Flow ''{name}'' imported"
       }
     },
     "Libraries": {
@@ -170,6 +180,7 @@
     "Library": {
       "Title": "Library",
       "Fields": {
+        "Template": "Template",
         "Name": "Name",
         "Path": "Path",
         "Enabled": "Enabled",

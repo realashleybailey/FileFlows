@@ -16,9 +16,11 @@
 
 .navbar-brand, .page-title {
     font-size: 1.5rem;
-    font-style: italic;
     font-weight: bold;
-    color:var(--accent) !important;
+    &.navbar-brand {
+        font-style: italic;
+        color:var(--accent) !important;
+    }
     display:none;
     cursor:pointer;
     svg {
@@ -26,11 +28,8 @@
         position: relative;
         top:-0.1rem;
     }
-    &.page-title {
-        color:var(--color);
-    }
     .icon {
-        margin-right:0.25rem;
+        margin-right:0.5rem;
         font-size:1.8rem;
         color:var(--accent);
     }

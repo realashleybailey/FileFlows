@@ -3,7 +3,6 @@ namespace FileFlows.Client.Pages
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Threading.Tasks;
-    using Radzen;
     using FileFlows.Client.Components;
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared;
@@ -63,7 +62,7 @@ namespace FileFlows.Client.Pages
                 var saveResult = await HttpHelper.Post<Tool>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
-                    NotificationService.Notify(NotificationSeverity.Error, saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
+                    Toast.ShowError( saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
                     return false;
                 }
 

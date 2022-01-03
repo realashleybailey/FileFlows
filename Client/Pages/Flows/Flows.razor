@@ -15,7 +15,12 @@
             <ToolBar>            
                 <FlowTableButton TItem="ffFlow" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
                 <FlowTableButton TItem="ffFlow" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-                <FlowTableButton TItem="ffFlow" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />                                         
+                <FlowTableButton TItem="ffFlow" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />      
+                @if (App.Instance.IsMobile == false)
+                {
+                    <FlowTableButton TItem="ffFlow" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import" />
+                    <FlowTableButton TItem="ffFlow" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export" />
+                }
                 <FlowTableHelpButton TItem="ffFlow" HelpUrl="Flows" />
             </ToolBar>
 

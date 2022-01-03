@@ -27,6 +27,9 @@
             }
         }
 
+        [Parameter]
+        public string MinWidth { get; set; }
+
         [Parameter] public EventCallback<TItem> DoubleClick { get; set; }
 
         private Dictionary<TItem, string> DisplayData = new ();

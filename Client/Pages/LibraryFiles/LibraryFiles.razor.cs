@@ -68,8 +68,14 @@ namespace FileFlows.Client.Pages
 
         public override string FetchUrl => ApiUrl + "?status=" + SelectedStatus;
 
+        private string NameMinWidth = "20ch";
+
         public override async Task PostLoad()
         {
+            if(App.Instance.IsMobile)
+                this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length / 2) ?? 0))) + "ch" : "20ch";
+            else
+                this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
             await RefreshStatus();
         }
         protected override async Task PostDelete()

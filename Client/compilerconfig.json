@@ -182,5 +182,9 @@
   {
     "outputFile": "Components/Toast/Toast.razor.css",
     "inputFile": "Components/Toast/Toast.razor.scss"
+  },
+  {
+    "outputFile": "Shared/MainLayout/MainLayout.razor.css",
+    "inputFile": "Shared/MainLayout/MainLayout.razor.scss"
   }
 ]

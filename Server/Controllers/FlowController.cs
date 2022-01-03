@@ -22,7 +22,7 @@ namespace FileFlows.Server.Controllers
         const int DEFAULT_YPOS = 50;
 
         [HttpGet]
-        public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
+        public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name.ToLower());
 
         [HttpGet("export/{uid}")]
         public async Task<IActionResult> Export([FromRoute] Guid uid)

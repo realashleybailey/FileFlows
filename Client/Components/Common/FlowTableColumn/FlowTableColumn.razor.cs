@@ -29,16 +29,32 @@
                 if (_Width != string.Empty) {
                     className = string.Empty;
                     //style = $"width:{_Width};min-width:{_Width};max-width:{_Width}";
-                    style = string.Empty;
+                    //style = string.Empty;
                 }
                 else{
-                    style = string.Empty;
+                    //style = string.Empty;
                 }
             }
         }
 
         [Parameter]
         public string MobileWidth { get; set; }
+
+        private string _MinWidth = string.Empty;    
+        [Parameter]
+        public string MinWidth
+        {
+            get => _MinWidth;
+            set
+            {
+                _MinWidth = value ?? string.Empty;
+                if (_MinWidth == string.Empty)
+                    style = string.Empty;
+                else
+                    style = $"min-width: {_MinWidth};";
+
+            }
+        }
 
         [Parameter]
         public string ColumnName { get; set; }

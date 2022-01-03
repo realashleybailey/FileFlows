@@ -1,7 +1,12 @@
 ﻿@namespace FileFlows.Client.Components.Common
 @typeparam TItem
 
+@{
+    string style = string.IsNullOrEmpty(MinWidth) ? "" : $"min-width:{MinWidth};";
+}
+
 <div class="flowtable">
+    <div class="flow-table-inner" style="@style">
 
     <CascadingValue Value="this">
         @Columns
@@ -92,5 +97,8 @@
                 </Virtualize>
             }
         </div>
+    </div>
+    
+
     </div>
 </div>

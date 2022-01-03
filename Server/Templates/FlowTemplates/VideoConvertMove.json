@@ -172,6 +172,18 @@
               "value": "Variables.VideoCodec = '';\nVariables.VideoCodecParameters = '';\nVariables.Extension = '';\nreturn 1;"
             },
             {
+              "label": "Automatic",
+              "value": "###GROUP###"
+            },
+            {
+              "label": "H264",
+              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
+              "label": "H265",
+              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'h265';\nVariables.Extension = 'mkv';\nreturn 1;"
+            },
+            {
               "label": "CPU Encoding",
               "value": "###GROUP###"
             },

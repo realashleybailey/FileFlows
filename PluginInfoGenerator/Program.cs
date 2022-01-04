@@ -52,6 +52,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             info.Description = plugin.Description;
             info.Package = plugin.PackageName;
             info.Url = plugin.Url;
+            info.MinimumVersion = plugin.MinimumVersion;
             info.Elements = plugin.Elements.Select(x => x.Name).ToArray();
 
             string json = JsonSerializer.Serialize(info, new JsonSerializerOptions
@@ -153,6 +154,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
     {
         public string Name { get; set; }
         public string Version { get; set; }
+        public string MinimumVersion { get; set; }
         public string Authors { get; set; }
         public string Url { get; set; }
         public string Description { get; set; }

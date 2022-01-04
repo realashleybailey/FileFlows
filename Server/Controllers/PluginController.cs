@@ -14,6 +14,7 @@ namespace FileFlows.Server.Controllers
     public class PluginController : ControllerStore<PluginInfo>
     {
         internal const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
+
         [HttpGet]
         public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = true)
         {
@@ -80,14 +81,17 @@ namespace FileFlows.Server.Controllers
             if (plugins.Success == false || plugins.Data == null)
                 return new PluginPackageInfo[] { };
 
+            Version ffVersion = new Version(Globals.Version);
+            var data = plugins.Data.Where(x => string.IsNullOrEmpty(x.MinimumVersion) || ffVersion >= new Version(x.MinimumVersion));
+
             if (missing)
             {
                 // remove plugins already installed
                 var installed = (await GetDataList()).Select(x => x.PackageName).ToList();
-                return plugins.Data.Where(x => installed.Contains(x.Package) == false);
+                return data.Where(x => installed.Contains(x.Package) == false);
             }
 
-            return plugins.Data;
+            return data;
         }
 
 

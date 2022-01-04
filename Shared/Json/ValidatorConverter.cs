@@ -17,14 +17,17 @@ namespace FileFlows.Shared.Json
         {
             using (var jsonDocument = JsonDocument.ParseValue(ref reader))
             {
-                if (jsonDocument.RootElement.TryGetProperty("type", out JsonElement typeValue))
+                foreach (string typeProperty in new[] { "Type", "type" })
                 {
-                    string typeName = typeValue.GetString();
-                    var vts = ValidatorTypes;
-                    if (vts.ContainsKey(typeName) == false)
-                        return new DefaultValidator();
-                    var type = vts[typeName];
-                    return (Validator)jsonDocument.Deserialize(type);
+                    if (jsonDocument.RootElement.TryGetProperty(typeProperty, out JsonElement typeValue))
+                    {
+                        string typeName = typeValue.GetString();
+                        var vts = ValidatorTypes;
+                        if (vts.ContainsKey(typeName) == false)
+                            return new DefaultValidator();
+                        var type = vts[typeName];
+                        return (Validator)jsonDocument.Deserialize(type);
+                    }
                 }
             }
             return new DefaultValidator();

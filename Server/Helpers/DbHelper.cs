@@ -16,7 +16,7 @@ namespace FileFlows.Server.Helpers
         public static bool UseMySql = false;
         private static string DbFilename;
 
-        static string CreateDBSript =
+        static string CreateDbScript =
             @$"CREATE TABLE {nameof(DbObject)}(
                 Uid             VARCHAR(36)           NOT NULL          PRIMARY KEY,
                 Name            VARCHAR(255)       NOT NULL,
@@ -355,7 +355,7 @@ namespace FileFlows.Server.Helpers
                     if (cmd.ExecuteScalar() != null)
                         return true;// tables exist, all good                    
                 }
-                using (var cmd = new SQLiteCommand(CreateDBSript, con))
+                using (var cmd = new SQLiteCommand(CreateDbScript, con))
                 {
                     cmd.ExecuteNonQuery();
                 }
@@ -385,7 +385,7 @@ namespace FileFlows.Server.Helpers
             // create new one pointing ot the database
             db = new Database(connectionString + "Database=FileFlows", null, MySqlConnector.MySqlConnectorFactory.Instance);
 
-            db.Execute(CreateDBSript);
+            db.Execute(CreateDbScript);
 
             await AddInitialData(db);
 

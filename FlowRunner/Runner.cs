@@ -5,6 +5,7 @@ using FileFlows.ServerShared.Services;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 public class Runner
 {
@@ -313,6 +314,9 @@ public class Runner
         var service = PluginService.Load();
         var plugins = service.GetAll().Result;
         DateTime start = DateTime.Now;
+        bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        bool is64bit = IntPtr.Size == 8;
         foreach (var plugin in plugins)
         {
             nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
@@ -333,6 +337,31 @@ public class Runner
             File.WriteAllBytes(file, data);                
             System.IO.Compression.ZipFile.ExtractToDirectory(file, destDir);
             File.Delete(file);
+
+            // check if there are runtime specific files that need to be moved
+            foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64" })
+            {
+                var runtimeDir = new DirectoryInfo(Path.Combine(destDir, "runtimes", rdir));
+                nodeParameters.Logger?.ILog("Searching for runtime directory: " + runtimeDir.FullName);
+                if (runtimeDir.Exists)
+                {
+                    foreach (var dll in runtimeDir.GetFiles("*.dll", SearchOption.AllDirectories))
+                    {
+                        try
+                        {
+
+                            nodeParameters.Logger?.ILog("Trying to move file: " + dll.FullName + " to " + destDir);
+                            dll.MoveTo(Path.Combine(destDir, dll.Name));
+                            nodeParameters.Logger?.ILog("Moved file: " + dll.FullName + " to " + destDir);
+                        }
+                        catch (Exception ex)
+                        {
+                            nodeParameters.Logger?.ILog("Failed to move file: " + ex.Message);
+                        }
+                    }
+                }
+            }
+
         }
         TimeSpan timeTaken = DateTime.Now - start;
         nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());

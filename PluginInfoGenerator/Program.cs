@@ -82,6 +82,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             var plugin = (IPlugin)Activator.CreateInstance(pluginType);
             var info = new PluginInfo();
             info.PackageName = dll.FullName;
+            info.MinimumVersion = plugin.MinimumVersion;
             var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(dll.FullName);
             if (fvi == null)
                 return null;

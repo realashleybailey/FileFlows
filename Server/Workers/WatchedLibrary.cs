@@ -60,14 +60,12 @@ namespace FileFlows.Server.Workers
         {
             if (IsMatch(e.FullPath) == false)
                 return;
-            Logger.Instance?.DLog("File deleted: " + e.FullPath);
         }
 
         private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
             if (IsMatch(e.FullPath) == false)
                 return;
-            Logger.Instance?.DLog("File renamed: " + e.FullPath + " vs " + e.OldFullPath);
             Changed = true;
         }
 
@@ -75,7 +73,6 @@ namespace FileFlows.Server.Workers
         {
             if (IsMatch(e.FullPath) == false)
                 return;
-            Logger.Instance?.DLog("File created: " + e.FullPath);
             Changed = true;
         }
 
@@ -94,9 +91,9 @@ namespace FileFlows.Server.Workers
                 if (KnownFile(e.FullPath))
                     return;
 
+                Logger.Instance.ILog("Detected new file: " + e.FullPath);
                 _ = AddLibraryFile(e.FullPath);
             }
-            Logger.Instance?.DLog("File changed: " + e.FullPath + " = " + e.ChangeType);
             Changed = true;
         }
 

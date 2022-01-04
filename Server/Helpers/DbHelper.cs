@@ -56,6 +56,14 @@ namespace FileFlows.Server.Helpers
                 return dbObjects.Select(x => Convert<T>(x));
             }
         }
+        public static async Task<IEnumerable<T>> Select<T>(string where, params object[] arguments) where T : FileFlowObject, new()
+        {
+            using (var db = GetDb())
+            {
+                var dbObjects = await db.FetchAsync<DbObject>($"where Type=@0 and {where} order by Name", typeof(T).FullName, arguments);
+                return dbObjects.Select(x => Convert<T>(x));
+            }
+        }
 
         public static async Task<IEnumerable<string>> GetNames<T>(string andWhere = "", params object[] args)
         {

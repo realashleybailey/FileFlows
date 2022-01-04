@@ -110,7 +110,7 @@
                         isServer ? "--server" : "--notserver"
                     };
 
-#if (DEBUG)
+#if (!DEBUG)
                     FileFlows.FlowRunner.Program.Main(parameters);
 #else
                     using (Process process = new Process())
@@ -168,7 +168,6 @@
                         if (ExecutingRunners.Contains(processUid))
                             ExecutingRunners.Remove(processUid);
                     }
-                    Thread.Sleep(3_000);
                     Trigger();
                 }
             });

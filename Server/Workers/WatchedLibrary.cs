@@ -58,6 +58,8 @@ namespace FileFlows.Server.Workers
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
+            Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + e.FullPath);
+
             if (IsMatch(e.FullPath) == false)
                 return;
 
@@ -68,12 +70,12 @@ namespace FileFlows.Server.Workers
             if (IsFileLocked(e.FullPath) == false)
             {
 
-                Logger.Instance.ILog("Detected new file: " + e.FullPath);
+                Logger.Instance.ILog("WatchedLibrary: Detected new file: " + e.FullPath);
                 _ = AddLibraryFile(e.FullPath);
             }
             else
             {
-                Logger.Instance.ILog("New file detected, but currently locked: " + e.FullPath);
+                Logger.Instance.ILog("WatchedLibrary: New file detected, but currently locked: " + e.FullPath);
             }
             Changed = true;
         }
@@ -84,7 +86,7 @@ namespace FileFlows.Server.Workers
             if (library.LastScanned < new DateTime(2020, 1, 1))
             {
                 ScanComplete = false; // this could happen if they click "Rescan" on the library page, this will force a full new scan
-                Logger.Instance?.ILog($"Library '{library.Name}' marked for full scan");
+                Logger.Instance?.ILog($"WatchedLibrary: Library '{library.Name}' marked for full scan");
             }
         }
 
@@ -160,7 +162,7 @@ namespace FileFlows.Server.Workers
 
             if (string.IsNullOrEmpty(Library.Path) || Directory.Exists(Library.Path) == false)
             {
-                Logger.Instance?.WLog($"Library '{Library.Name}' path not found: {Library.Path}");
+                Logger.Instance?.WLog($"WatchedLibrary: Library '{Library.Name}' path not found: {Library.Path}");
                 return false;
             }
 
@@ -254,7 +256,7 @@ namespace FileFlows.Server.Workers
             var flow = new FlowController().Get(Library.Flow.Uid).Result;
             if (flow == null)
             {
-                Logger.Instance?.WLog($"Library '{Library.Name}' flow not found");
+                Logger.Instance?.WLog($"WatchedLibrary: Library '{Library.Name}' flow not found");
                 return null;
             }
             return flow;
@@ -307,7 +309,7 @@ namespace FileFlows.Server.Workers
 
                     if (fs != file.Length)
                     {
-                        Logger.Instance.ILog("File size has changed, skipping for now: " + file.FullName);
+                        Logger.Instance.ILog("WatchedLibrary: File size has changed, skipping for now: " + file.FullName);
                         return false; // file size has changed, could still be being written too
                     }
                 }

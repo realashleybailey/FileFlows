@@ -98,7 +98,10 @@ namespace FileFlows.FlowRunner
             var libFileService = LibraryFileService.Load();
             var libFile = libFileService.Get(libfileUid).Result;
             if (libFile == null)
+            {
+                Console.WriteLine("Library file not found, must have been deleted from the library files.  Nothing to process");
                 return; // nothing to process
+            }
 
             string workingFile = node.Map(libFile.Name);
 
@@ -107,6 +110,7 @@ namespace FileFlows.FlowRunner
             var lib = libService.Get(libFile.Library.Uid).Result;
             if (lib == null)
             {
+                Console.WriteLine("Library was null, deleting library file");
                 libfileService.Delete(libFile.Uid).Wait();
                 return;
             }
@@ -115,6 +119,7 @@ namespace FileFlows.FlowRunner
             FileSystemInfo file = lib.Folders ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
             if (file.Exists == false)
             {
+                Console.WriteLine("Library file does not exist, deleting from library files: " + file.FullName);
                 libfileService.Delete(libFile.Uid).Wait();
                 return;
             }
@@ -122,6 +127,7 @@ namespace FileFlows.FlowRunner
             var flow = flowService.Get(lib.Flow?.Uid ?? Guid.Empty).Result;
             if (flow == null || flow.Uid == Guid.Empty)
             {
+                Console.WriteLine("Flow not found, cannot process file: " + file.FullName);
                 libFile.Status = FileStatus.FlowNotFound;
                 libfileService.Update(libFile).Wait();
                 return;

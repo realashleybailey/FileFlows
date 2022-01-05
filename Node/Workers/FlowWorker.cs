@@ -110,7 +110,7 @@
                         isServer ? "--server" : "--notserver"
                     };
 
-#if (DEBUG)
+#if (DEBUG && false)
                     FileFlows.FlowRunner.Program.Main(parameters);
 #else
                     using (Process process = new Process())
@@ -134,11 +134,32 @@
                             process.Start();
                             string output = process.StandardOutput.ReadToEnd();
                             if (string.IsNullOrEmpty(output) == false)
-                                Logger.Instance?.ILog(output);
+                            {
+                                Logger.Instance?.ILog(Environment.NewLine +
+                                    "==============================================================================" + Environment.NewLine +
+                                    "===                      PROCESSING NODE OUTPUT START                      ===" + Environment.NewLine +
+                                    "==============================================================================" + Environment.NewLine +
+                                    string.Join('\n', output.Split('\n').Select(x => "       " + x).ToArray()) + Environment.NewLine +
+                                    "==============================================================================" + Environment.NewLine +
+                                    "===                       PROCESSING NODE OUTPUT END                       ===" + Environment.NewLine +
+                                    "=============================================================================="
+                                    );
+                            }
                             string error = process.StandardError.ReadToEnd();
                             process.WaitForExit();
                             if (string.IsNullOrEmpty(error) == false)
-                                Logger.Instance?.ELog(error);
+                            {
+
+                                Logger.Instance?.ILog(Environment.NewLine +
+                                    "==============================================================================" + Environment.NewLine +
+                                    "===                   PROCESSING NODE ERROR OUTPUT START                   ===" + Environment.NewLine +
+                                    "==============================================================================" + Environment.NewLine +
+                                    string.Join('\n', error.Split('\n').Select(x => "       " + x).ToArray()) + Environment.NewLine +
+                                    "==============================================================================" + Environment.NewLine +
+                                    "===                    PROCESSING NODE ERROR OUTPUT END                    ===" + Environment.NewLine +
+                                    "=============================================================================="
+                                    );
+                            }
                             if(process.ExitCode != 0)
                                 throw new Exception("Invalid exit code: " + process.ExitCode);
                         }

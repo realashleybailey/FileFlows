@@ -18,6 +18,7 @@ namespace FileFlows.Server.Workers
 
         private bool ScanComplete = false;
 
+
         public WatchedLibrary(Library library)
         {
             this.Library = library;
@@ -41,9 +42,9 @@ namespace FileFlows.Server.Workers
                              NotifyFilters.Size;
             Watcher.IncludeSubdirectories = true;
             Watcher.Changed += Watcher_Changed;
-            Watcher.Created += Watcher_Created;
-            Watcher.Deleted += Watcher_Deleted;
-            Watcher.Renamed += Watcher_Renamed;
+            Watcher.Created += Watcher_Changed;
+            //Watcher.Deleted += Watcher_Changed;
+            Watcher.Renamed += Watcher_Changed;
             Watcher.EnableRaisingEvents = true;
             LibraryFiles = DbHelper.Select<LibraryFile>("lower(Name) like lower(@1)", library.Path + "%").Result.ToList();
         }
@@ -55,52 +56,40 @@ namespace FileFlows.Server.Workers
             return Filter.IsMatch(input);
         }
 
-
-        private void Watcher_Deleted(object sender, FileSystemEventArgs e)
-        {
-            if (IsMatch(e.FullPath) == false)
-                return;
-        }
-
-        private void Watcher_Renamed(object sender, RenamedEventArgs e)
-        {
-            if (IsMatch(e.FullPath) == false)
-                return;
-            Changed = true;
-        }
-
-        private void Watcher_Created(object sender, FileSystemEventArgs e)
-        {
-            if (IsMatch(e.FullPath) == false)
-                return;
-            Changed = true;
-        }
-
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (e.ChangeType != WatcherChangeTypes.Changed)
-            {
-                return;
-            }
             if (IsMatch(e.FullPath) == false)
+                return;
+
+            // new file we can process
+            if (KnownFile(e.FullPath))
                 return;
 
             if (IsFileLocked(e.FullPath) == false)
             {
-                // new file we can process
-                if (KnownFile(e.FullPath))
-                    return;
 
                 Logger.Instance.ILog("Detected new file: " + e.FullPath);
                 _ = AddLibraryFile(e.FullPath);
             }
+            else
+            {
+                Logger.Instance.ILog("New file detected, but currently locked: " + e.FullPath);
+            }
             Changed = true;
+        }
+
+        internal void UpdateLibrary(Library library)
+        {
+            this.Library = library;
         }
 
         public void Dispose()
         {
             if (Watcher != null)
             {
+                Watcher.Changed -= Watcher_Changed;
+                Watcher.Created -= Watcher_Changed;
+                Watcher.Renamed -= Watcher_Changed;
                 Watcher.EnableRaisingEvents = false;
                 Watcher.Dispose();
                 Watcher = null;
@@ -153,7 +142,7 @@ namespace FileFlows.Server.Workers
             if (TimeHelper.InSchedule(Library.Schedule) == false)
                 return false;
 
-            if (Changed == false && Library.LastScanned > DateTime.UtcNow.AddSeconds(-Library.ScanInterval))
+            if (Library.LastScanned > DateTime.UtcNow.AddSeconds(-Library.ScanInterval))
                 return false;
 
             if (ScanComplete && fullScan == false)
@@ -170,22 +159,11 @@ namespace FileFlows.Server.Workers
                 return false;
             }
 
-
-            if (Library.Flow == null)
-            {
-                Logger.Instance?.WLog($"Library '{Library.Name}' flow not found");
-                return false;
-            }
-
-            var flow = GetFlow();
-            if (flow == null)
-                return false;
-
             int count = LibraryFiles.Count;
             if (Library.Folders)
-                ScanForDirs(Library, flow);
+                ScanForDirs(Library);
             else
-                ScanFoFiles(Library, flow);
+                ScanFoFiles(Library);
 
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
 
@@ -194,7 +172,7 @@ namespace FileFlows.Server.Workers
         }
 
 
-        private void ScanForDirs(Library library, Flow flow)
+        private void ScanForDirs(Library library)
         {
             var dirs = new DirectoryInfo(library.Path).GetDirectories();
             List<string> known = new();
@@ -215,13 +193,13 @@ namespace FileFlows.Server.Workers
                 if (known.Contains(dir.FullName.ToLower()))
                     continue; // already known
 
-                tasks.Add(GetLibraryFile(flow, dir));
+                tasks.Add(GetLibraryFile(dir));
             }
             Task.WaitAll(tasks.ToArray());
 
             new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
         }
-        private void ScanFoFiles(Library library, Flow flow)
+        private void ScanFoFiles(Library library)
         {
             var files = GetFiles(new DirectoryInfo(library.Path));
             List<string> known = new();
@@ -245,7 +223,7 @@ namespace FileFlows.Server.Workers
                 if (known.Contains(file.FullName.ToLower()))
                     continue; // already known
 
-                tasks.Add(GetLibraryFile(flow, file));
+                tasks.Add(GetLibraryFile(file));
             }
             Task.WaitAll(tasks.ToArray());
 
@@ -254,14 +232,14 @@ namespace FileFlows.Server.Workers
 
         private async Task AddLibraryFile(string filename)
         {
-            var flow = GetFlow();
-            if (flow == null) 
-            {
-                ScanComplete = false; // was bad cant process this file cos no flow
-                return;
-            }
+            //var flow = GetFlow();
+            //if (flow == null) 
+            //{
+            //    ScanComplete = false; // was bad cant process this file cos no flow
+            //    return;
+            //}
 
-            var result = await GetLibraryFile(flow, new FileInfo(filename));
+            var result = await GetLibraryFile(new FileInfo(filename));
             if(result != null)
                 await new LibraryFileController().AddMany(new[] { result });
         }
@@ -277,7 +255,7 @@ namespace FileFlows.Server.Workers
             return flow;
         }
 
-        private async Task<LibraryFile> GetLibraryFile(Flow flow, FileSystemInfo info)
+        private async Task<LibraryFile> GetLibraryFile(FileSystemInfo info)
         {
             if (info is FileInfo fileInfo)
             {
@@ -297,12 +275,12 @@ namespace FileFlows.Server.Workers
                     Uid = Library.Uid,
                     Type = Library.GetType()?.FullName ?? string.Empty
                 },
-                Flow = new ObjectReference
-                {
-                    Name = flow.Name,
-                    Uid = flow.Uid,
-                    Type = flow.GetType()?.FullName ?? string.Empty
-                },
+                //Flow = new ObjectReference
+                //{
+                //    Name = flow.Name,
+                //    Uid = flow.Uid,
+                //    Type = flow.GetType()?.FullName ?? string.Empty
+                //},
                 Order = -1
             };
 

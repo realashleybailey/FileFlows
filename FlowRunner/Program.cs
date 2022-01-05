@@ -128,7 +128,7 @@ namespace FileFlows.FlowRunner
             }
 
             // update the library file to reference the updated flow (if changed)
-            if (libFile.Flow.Name != flow.Name || libFile.Flow.Uid != flow.Uid)
+            if (libFile.Flow?.Name != flow.Name || libFile.Flow?.Uid != flow.Uid)
             {
                 libFile.Flow = new ObjectReference
                 {

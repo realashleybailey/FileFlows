@@ -51,7 +51,7 @@ namespace FileFlows.Server.Workers
         {
             var libController = new LibraryController();
             var libraries = libController.GetAll().Result;
-            var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();
+            var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();            
 
 
             Watch(libraries.Where(x => WatchedLibraries.ContainsKey(x.Uid + ":" + x.Path) == false).ToArray());
@@ -64,6 +64,9 @@ namespace FileFlows.Server.Workers
             bool scannedAny = false;
             foreach(var libwatcher in WatchedLibraries.Values)
             {
+                var library = libraries.Where(x => libwatcher.Library.Uid == x.Uid).FirstOrDefault();
+                if (library != null)
+                    libwatcher.UpdateLibrary(library);
                 scannedAny |= libwatcher.Scan();
             }
             //foreach (var library in libraries)

@@ -148,20 +148,6 @@ namespace FileFlows.Server.Controllers
         {
             var plugins = await new PluginController().GetAll(includeElements: true);
             var results = plugins.Where(x => x.Elements != null).SelectMany(x => x.Elements)?.ToArray();
-            foreach(var element in results)
-            {
-                if (element.Outputs < 1)
-                    continue;
-
-                element.OutputLabels = new List<string>();
-                for(int i = 0; i < element.Outputs; i++)
-                {
-                    string label = Translater.Instant($"Flow.Parts.{element.Name}.Outputs.{(i + 1)}");
-                    if (label == (i + 1).ToString())
-                        label = string.Empty;
-                    element.OutputLabels.Add(label ?? string.Empty);
-                }
-            }
             return results ?? new FlowElement[] { };
         }
 

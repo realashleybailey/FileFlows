@@ -58,14 +58,14 @@ namespace FileFlows.Server.Workers
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + e.FullPath);
-
             if (IsMatch(e.FullPath) == false)
                 return;
 
             // new file we can process
             if (KnownFile(e.FullPath))
                 return;
+
+            Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + e.FullPath);
 
             if (IsFileLocked(e.FullPath) == false)
             {

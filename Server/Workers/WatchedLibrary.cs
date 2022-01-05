@@ -81,6 +81,11 @@ namespace FileFlows.Server.Workers
         internal void UpdateLibrary(Library library)
         {
             this.Library = library;
+            if (library.LastScanned < new DateTime(2020, 1, 1))
+            {
+                ScanComplete = false; // this could happen if they click "Rescan" on the library page, this will force a full new scan
+                Logger.Instance?.ILog($"Library '{library.Name}' marked for full scan");
+            }
         }
 
         public void Dispose()

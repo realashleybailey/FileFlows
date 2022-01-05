@@ -31,7 +31,7 @@ window.ffFlowPart = {
             else if (part.type == 3)
                 div.classList.add('Logic');
         }
-        //div.classList.add(part.selected);
+
         div.classList.add('size-' + Math.max(part.inputs, part.outputs));
 
         div.addEventListener("click", function (event) {
@@ -40,10 +40,12 @@ window.ffFlowPart = {
             ffFlowPart.unselectAll();
             div.classList.add('selected');
             ffFlow.SelectedPart = part;
+            ffFlow.selectNode(part);
         });
         div.addEventListener("dblclick", function (event) {
             event.stopImmediatePropagation();
             event.preventDefault();
+            ffFlow.setInfo(part.Name, 'Node');
             ffFlowPart.editFlowPart(part.uid);
         });
         div.setAttribute('tabIndex', -1);
@@ -106,6 +108,7 @@ window.ffFlowPart = {
         flowParts.appendChild(div);
 
         ffFlowPart.setPartName(part);
+        ffFlow.initOutputHints(part);
     },
 
     setPartName: function (part) {
@@ -121,6 +124,7 @@ window.ffFlowPart = {
                 name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1).replace(/_/g, ' ');
                 name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
             }
+            part.displayName = name;
             divName.innerHTML = name;
         } catch (err) {
             console.error(err);
@@ -128,7 +132,9 @@ window.ffFlowPart = {
     },
 
     deleteFlowPart: function (uid) {
-        console.log('deleting flow part:', uid);
+
+        console.log('deleting: ', uid);
+
         var div = document.getElementById(uid);
         if (div)
             div.remove();
@@ -141,8 +147,8 @@ window.ffFlowPart = {
                 break;
             }
         }
-        console.log('new parts', ffFlow.parts);
 
+        ffFlow.setInfo();
         ffFlow.redrawLines();
     },
 
@@ -174,6 +180,7 @@ window.ffFlowPart = {
                 ffFlowPart.updateOutputNodes(part.uid);
                 ffFlow.redrawLines();
             }
+            ffFlow.initOutputHints(part);
 
         });
     },

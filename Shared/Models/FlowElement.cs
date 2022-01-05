@@ -18,6 +18,8 @@ namespace FileFlows.Shared.Models
 
         public string Group { get; set; }
 
+        public List<string> OutputLabels { get; set; }
+
         public List<ElementField> Fields { get; set; }
 
         public ExpandoObject Model { get; set; }

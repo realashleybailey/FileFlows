@@ -40,7 +40,10 @@
     "SpaceIncrease": "{size} increase, {items} items",
     "Total": "Total",
     "Other": "Other",
-    "UpdateAvailable": "New version available {version}"
+    "UpdateAvailable": "New version available {version}",
+    "Output": "Output",
+    "Input": "Input",
+    "Node": "Node"
   },
   "Dialogs":{
     "FileBrowser": {

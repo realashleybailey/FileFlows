@@ -110,6 +110,9 @@ namespace FileFlows.Shared
                 string msg = Lookup(possibleKeys);
                 if (msg == "")
                     return "";
+                if (parameters is IDictionary<string, object> dict)
+                    return Formatter.FormatMessage(msg, dict);
+
                 return Formatter.FormatMessage(msg, parameters ?? new { });
             }
             catch (Exception ex)

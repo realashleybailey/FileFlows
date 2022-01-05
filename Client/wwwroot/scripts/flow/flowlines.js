@@ -72,7 +72,6 @@ class ffFlowLines {
         let suitable = target?.classList?.contains(this.ioIsInput ? 'output' : 'input') === true;
         if (suitable) {
             let input = this.isInput ? this.ioNode : target;
-            console.log('input', input);
             let output = this.isInput ? target : this.ioNode;
             let outputId = output.getAttribute('id');
 
@@ -94,14 +93,11 @@ class ffFlowLines {
 
                 if (ffFlow.SingleOutputConnection) {
                     connections = [{ index: index, part: part }];
-                    console.log('setting conncection: ', connections);
                     this.ioOutputConnections.set(outputId, connections);
-                    console.log('ioOutputConnections: ', this.ioOutputConnections);
                 }
                 else
                     connections.push({ index: index, part: part });
 
-                console.log('drawing new line', input, output);
                 this.drawLine(input, output);
             }
         }
@@ -115,6 +111,7 @@ class ffFlowLines {
     };
 
     redrawLines() {
+        ffFlow.selectConnection();
         this.ioLines = [];
         let outputs = document.querySelectorAll('.flow-part .output');
         for (let o of document.querySelectorAll('.flow-part .output, .flow-part .input'))
@@ -203,25 +200,10 @@ class ffFlowLines {
 
         context.lineWidth = 5;
         context.strokeStyle = this.lineColor;
-        //context.fill(path);
         context.stroke(path);
 
         this.ioLines.push({ path: path, output: output, connection: connection });
 
-        //context.beginPath();
-        // context.moveTo(srcX, srcY);
-        // if (Math.abs(destY - srcY) <= 50) {
-        //     context.lineTo(destX, destY);
-        // } else {
-        //     context.bezierCurveTo(srcX + 50, srcY + 50,
-        //         destX - 50, destY - 50,
-        //         destX, destY);
-        // }
-        // context.lineWidth = 5;
-        // if(!this.accentColor)
-        //     this.accentColor = this.colorFromCssClass('--accent');
-        // context.strokeStyle = this.accentColor;
-        // context.stroke();
     };
 
     getCanvas() {
@@ -237,11 +219,16 @@ class ffFlowLines {
         canvas.addEventListener('mousedown', function (event) {
             let ctx = self.ioContext;
             self.ioSelectedConnection = null;
+            let clearNode = true;
             for (let line of self.ioLines) {
                 // Check whether point is inside ellipse's stroke
                 if (ctx.isPointInStroke(line.path, event.offsetX, event.offsetY)) {
                     ctx.strokeStyle = self.accentColor;
                     self.ioSelectedConnection = line;
+                    let output = line.output.parentNode.parentNode.getAttribute('id');
+                    let outputNode = line.output.getAttribute('x-output');
+                    ffFlow.selectConnection(output, outputNode);
+                    clearNode = false;
                 }
                 else {
                     ctx.strokeStyle = self.lineColor;
@@ -250,11 +237,12 @@ class ffFlowLines {
                 // Draw ellipse
                 ctx.stroke(line.path);
             }
+            if (clearNode)
+                ffFlow.selectConnection();
         });
         canvas.addEventListener('keydown', function (event) {
-            if (event.code === 'Delete') {
-                self.deleteConnection();
-            }
+            if (event.code === 'Delete') 
+                self.deleteConnection();            
         });
         this.ioCanvas = canvas;
         return this.ioCanvas;
@@ -264,6 +252,8 @@ class ffFlowLines {
         if (!this.ioSelectedConnection)
             return;
 
+        ffFlow.selectConnection();
+
         let selected = this.ioSelectedConnection;
         let outputNodeUid = selected.output.getAttribute('id');
 
@@ -271,8 +261,6 @@ class ffFlowLines {
             this.ioOutputConnections.delete(outputNodeUid);
         } else {
             let connections = this.ioOutputConnections.get(outputNodeUid);
-            console.log('outputNodeUid', outputNodeUid);
-            console.log('connections', connections);
             let index = connections.indexOf(selected.connection);
             if (index >= 0) {
                 connections.splice(index, 1);

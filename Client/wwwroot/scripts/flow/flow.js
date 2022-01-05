@@ -2,11 +2,14 @@ window.ffFlow = {
     active: false,
     csharp: null,
     parts: [],
+    elements: [],
     FlowLines: new ffFlowLines(),
     Mouse: new ffFlowMouse(),
     SelectedPart: null,
     SingleOutputConnection: true,
     Vertical: true,
+    lblDelete: 'Delete',
+    lblNode: 'Node',
 
     reset: function () {
         ffFlow.active = false;
@@ -20,9 +23,20 @@ window.ffFlow = {
         ffFlowPart.unselectAll();
     },
 
-    init: function (container, csharp, parts) {
+    init: function (container, csharp, parts, elements) {
         ffFlow.csharp = csharp;
         ffFlow.parts = parts;
+        ffFlow.elements = elements;
+
+
+        ffFlow.csharp.invokeMethodAsync("Translate", `Labels.Delete`, null).then(result => {
+            ffFlow.lblDelete = result;
+        });
+
+        ffFlow.csharp.invokeMethodAsync("Translate", `Labels.Node`, null).then(result => {
+            ffFlow.lblNode = result;
+        });
+
         if (typeof (container) === 'string') {
             let c = document.getElementById(container);
             if (!c)
@@ -194,5 +208,108 @@ window.ffFlow = {
         console.log('model in js', this.parts);
 
         return this.parts;
+    },
+
+    getElement: function (uid) {
+        console.log('getting element: ' + uid);
+        return ffFlow.elements.filter(x => x.uid == uid)[0];
+    },
+
+
+    getPart: function (partUid) {
+        return ffFlow.parts.filter(x => x.uid == partUid)[0];
+    },
+
+    infobox: null,
+    infoboxSpan: null,
+    infoSelectedType: '', 
+    setInfo: function (message, type) {
+        if (!message) {
+            if (!ffFlow.infobox)
+                return;
+            ffFlow.infobox.style.display = 'none';
+        } else {
+            ffFlow.infoSelectedType = type;
+            if (!ffFlow.infobox) {
+                let box = document.createElement('div');
+                box.classList.add('info-box');
+
+                // remove button
+                let remove = document.createElement('span');
+                remove.classList.add('fas');
+                remove.classList.add('fa-trash');
+                remove.style.cursor = 'pointer';
+                remove.setAttribute('title', ffFlow.lblDelete);
+                remove.addEventListener("click", (e) => {
+                    if (ffFlow.infoSelectedType === 'Connection')
+                        ffFlow.FlowLines.deleteConnection();
+                    else if (ffFlow.infoSelectedType === 'Node') {
+                        if (ffFlow.SelectedPart)
+                            ffFlowPart.deleteFlowPart(ffFlow.SelectedPart.uid);
+                    }
+                }, false);
+                box.appendChild(remove);
+
+
+                ffFlow.infoboxSpan = document.createElement('span');
+                box.appendChild(ffFlow.infoboxSpan);
+
+
+                document.getElementById('flow-parts').appendChild(box);
+                ffFlow.infobox = box;
+            }
+            ffFlow.infobox.style.display = '';
+            ffFlow.infoboxSpan.innerText = message;
+        }
+    },
+
+    selectConnection: function (outputNode, output) {
+        if (!outputNode) {
+            ffFlow.setInfo();
+            return;
+        }
+
+        let part = ffFlow.getPart(outputNode);
+        if (!part) {
+            ffFlow.setInfo();
+            return;
+        }
+
+        ffFlow.setInfo(part.OutputLabels[output], 'Connection');
+    },
+
+    selectNode: function (part) {
+        if (!part) {
+            ffFlow.setInfo();
+            return;
+        }
+
+        if (!part.displayDescription) {
+            let element = ffFlow.getElement(part.flowElementUid);
+            ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Description`, part.model).then(result => {
+                part.displayDescription = ffFlow.lblNode + ': ' + (result === 'Description' || !result ? part.displayName : result);
+                ffFlow.setInfo(part.displayDescription, 'Node');
+            });
+        } else {
+            ffFlow.setInfo(part.displayDescription, 'Node');
+        }
+    },
+    setOutputHint(part, output) {
+        let element = ffFlow.getElement(part.flowElementUid);
+        console.log(element.name + '.model', part.model);
+        ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Outputs.${output}`, part.model).then(result => {
+            if (!part.OutputLabels) part.OutputLabels = {};
+            part.OutputLabels[output] = result;
+            let outputNode = document.getElementById(part.uid + '-output-' + output);
+            if (outputNode)
+                outputNode.setAttribute('title', result);
+        });
+    },
+    initOutputHints(part) {
+        if (!part || !part.outputs)
+            return;
+        for (let i = 0; i < part.outputs; i++) {
+            ffFlow.setOutputHint(part, i + 1);
+        }
     }
 }

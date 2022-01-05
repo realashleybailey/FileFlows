@@ -158,7 +158,7 @@ namespace FileFlows.Server.Workers
 
             if (ScanComplete && fullScan == false)
             {
-                Logger.Instance?.ILog($"Library '{Library.Name}' has full scan, using FileWatcherEvents now to watch for new files");
+                //Logger.Instance?.ILog($"Library '{Library.Name}' has full scan, using FileWatcherEvents now to watch for new files");
                 return false; // we can use the filesystem watchers for any more files
             }
 

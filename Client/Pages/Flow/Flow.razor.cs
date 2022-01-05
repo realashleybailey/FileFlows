@@ -19,6 +19,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using System.Text.Json;
     using FileFlows.Plugin;
+    using System.Text.RegularExpressions;
 
     public partial class Flow : ComponentBase
     {
@@ -82,7 +83,7 @@ namespace FileFlows.Client.Pages
                 await InitModel(flow);
 
                 var dotNetObjRef = DotNetObjectReference.Create(this);
-                await jsRuntime.InvokeVoidAsync("ffFlow.init", new object[] { "flow-parts", dotNetObjRef, this.Parts });
+                await jsRuntime.InvokeVoidAsync("ffFlow.init", new object[] { "flow-parts", dotNetObjRef, this.Parts, Available });
 
                 await WaitForRender();
                 await jsRuntime.InvokeVoidAsync("ffFlow.redrawLines");
@@ -178,6 +179,22 @@ namespace FileFlows.Client.Pages
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
             return new { element, uid = Guid.NewGuid() };
         }
+
+        [JSInvokable]
+        public string Translate(string key, ExpandoObject model)
+        {
+            string prefix = string.Empty;
+            if (key.Contains(".Outputs."))
+            {
+                prefix = Translater.Instant("Labels.Output") + " " + key.Substring(key.LastIndexOf(".")+ 1) + ": ";
+            }
+
+            string translated = Translater.Instant(key, model);
+            if (Regex.IsMatch(key, "^[\\d]+$"))
+                return string.Empty;
+            return prefix + translated;
+        }
+
         private async Task Save()
         {
 #if (DEMO)

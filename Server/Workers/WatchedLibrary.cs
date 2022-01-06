@@ -58,7 +58,7 @@ namespace FileFlows.Server.Workers
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (Directory.Exists(e.FullPath))
+            if (Library.Folders == false && Directory.Exists(e.FullPath))
             {
                 foreach(var file in Directory.GetFiles(e.FullPath, "*.*", SearchOption.AllDirectories))
                 {
@@ -77,7 +77,7 @@ namespace FileFlows.Server.Workers
             {
                 if (fullPath.Contains("_UNPACK_"))
                     return; // dont log this, too many
-                Logger.Instance.ILog("WatchedLibrary: File does not match library pattern: " + fullPath);
+                //Logger.Instance.DLog("WatchedLibrary: File does not match library pattern: " + fullPath);
                 return;
             }
 

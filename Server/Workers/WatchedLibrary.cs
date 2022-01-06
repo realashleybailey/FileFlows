@@ -59,11 +59,17 @@ namespace FileFlows.Server.Workers
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             if (IsMatch(e.FullPath) == false)
+            {
+                Logger.Instance.ILog("WatchedLibrary: File does not match library pattern: " + e.FullPath);
                 return;
+            }
 
             // new file we can process
             if (KnownFile(e.FullPath))
+            {
+                Logger.Instance.ILog("WatchedLibrary: Known file: " + e.FullPath);
                 return;
+            }
 
             Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + e.FullPath);
 

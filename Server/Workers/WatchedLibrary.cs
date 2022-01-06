@@ -9,7 +9,6 @@ namespace FileFlows.Server.Workers
     public class WatchedLibrary:IDisposable
     {
         private FileSystemWatcher Watcher;
-        private bool Changed = true;
         public Library Library { get;private set; } 
 
         public List<LibraryFile> LibraryFiles { get; private set; }
@@ -17,11 +16,12 @@ namespace FileFlows.Server.Workers
         private Regex? Filter;
 
         private bool ScanComplete = false;
-
+        private bool UseScanner = false;
 
         public WatchedLibrary(Library library)
         {
             this.Library = library;
+            this.UseScanner = library.Scan;
             if(string.IsNullOrEmpty(library.Filter) == false)
             {
                 try
@@ -30,11 +30,25 @@ namespace FileFlows.Server.Workers
                 }
                 catch (Exception) { }
             }
-            Watcher = new FileSystemWatcher(library.Path);
-            Watcher.NotifyFilter = 
+
+            LibraryFiles = DbHelper.Select<LibraryFile>("lower(Name) like lower(@1)", library.Path + "%").Result.ToList();
+            if(UseScanner == false)
+                SetupWatcher();
+        }
+        public void Dispose()
+        {
+            DisposeWatcher();
+        }
+
+        void SetupWatcher()
+        {
+            DisposeWatcher();
+
+            Watcher = new FileSystemWatcher(Library.Path);
+            Watcher.NotifyFilter =
                              //NotifyFilters.Attributes |
                              NotifyFilters.CreationTime |
-                             NotifyFilters.DirectoryName | 
+                             NotifyFilters.DirectoryName |
                              NotifyFilters.FileName |
                              // NotifyFilters.LastAccess |
                              NotifyFilters.LastWrite |
@@ -46,7 +60,20 @@ namespace FileFlows.Server.Workers
             //Watcher.Deleted += Watcher_Changed;
             Watcher.Renamed += Watcher_Changed;
             Watcher.EnableRaisingEvents = true;
-            LibraryFiles = DbHelper.Select<LibraryFile>("lower(Name) like lower(@1)", library.Path + "%").Result.ToList();
+
+        }
+
+        void DisposeWatcher()
+        {
+            if (Watcher != null)
+            {
+                Watcher.Changed -= Watcher_Changed;
+                Watcher.Created -= Watcher_Changed;
+                Watcher.Renamed -= Watcher_Changed;
+                Watcher.EnableRaisingEvents = false;
+                Watcher.Dispose();
+                Watcher = null;
+            }
         }
 
         private bool IsMatch(string input)
@@ -100,12 +127,31 @@ namespace FileFlows.Server.Workers
             {
                 Logger.Instance.ILog("WatchedLibrary: New file detected, but currently locked: " + fullPath);
             }
-            Changed = true;
         }
 
         internal void UpdateLibrary(Library library)
         {
             this.Library = library;
+
+            if (UseScanner && library.Scan == false)
+            {
+                Logger.Instance.ILog($"WatchedLibrary: Library '{library.Name}' switched to watched mode, starting watcher");
+                UseScanner = false;
+                SetupWatcher();
+            }
+            else if(UseScanner == false && library.Scan == true)
+            {
+                Logger.Instance.ILog($"WatchedLibrary: Library '{library.Name}' switched to scan mode, disposing watcher");
+                UseScanner = true;
+                DisposeWatcher();
+            }
+            else if(UseScanner == false && Watcher != null && Watcher.Path != library.Path)
+            {
+                // library path changed, need to change watcher
+                Logger.Instance.ILog($"WatchedLibrary: Library '{library.Name}' path changed, updating watched path");
+                SetupWatcher(); 
+            }
+
             if (library.LastScanned < new DateTime(2020, 1, 1))
             {
                 ScanComplete = false; // this could happen if they click "Rescan" on the library page, this will force a full new scan
@@ -113,18 +159,6 @@ namespace FileFlows.Server.Workers
             }
         }
 
-        public void Dispose()
-        {
-            if (Watcher != null)
-            {
-                Watcher.Changed -= Watcher_Changed;
-                Watcher.Created -= Watcher_Changed;
-                Watcher.Renamed -= Watcher_Changed;
-                Watcher.EnableRaisingEvents = false;
-                Watcher.Dispose();
-                Watcher = null;
-            }
-        }
 
         private bool KnownFile(string file)
         {
@@ -175,13 +209,11 @@ namespace FileFlows.Server.Workers
             if (Library.LastScanned > DateTime.UtcNow.AddSeconds(-Library.ScanInterval))
                 return false;
 
-            if (ScanComplete && fullScan == false)
+            if (UseScanner == false && ScanComplete && fullScan == false)
             {
                 //Logger.Instance?.ILog($"Library '{Library.Name}' has full scan, using FileWatcherEvents now to watch for new files");
                 return false; // we can use the filesystem watchers for any more files
             }
-
-            Changed = false;
 
             if (string.IsNullOrEmpty(Library.Path) || Directory.Exists(Library.Path) == false)
             {

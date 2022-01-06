@@ -190,6 +190,11 @@
             });
             fields.Add(new ElementField
             {
+                InputType = FormInputType.Switch,
+                Name = nameof(library.Scan)
+            });
+            fields.Add(new ElementField
+            {
                 InputType = FormInputType.Int,
                 Parameters = new Dictionary<string, object>
                 {

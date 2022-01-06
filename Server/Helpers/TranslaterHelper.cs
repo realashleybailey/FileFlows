@@ -7,7 +7,12 @@ namespace FileFlows.Server.Helpers
         internal static void InitTranslater(string langCode = "en")
         {
             string appdir = Program.GetAppDirectory();
-            string wwwroot = Path.Combine(appdir, $"wwwroot", "i18n", $"{langCode}.json");
+            string wwwroot = Path.Combine(appdir, $"wwwroot");
+            
+            if (Directory.Exists(wwwroot) == false)
+                wwwroot = Path.Combine(appdir, "..", "wwwroot");
+            wwwroot = Path.Combine(wwwroot, "i18n", $"{langCode}.json");
+
             List<string> json = new List<string>();
             if (File.Exists(wwwroot))
                 json.Add(File.ReadAllText(wwwroot));

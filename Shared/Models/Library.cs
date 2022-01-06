@@ -11,6 +11,8 @@ namespace FileFlows.Shared.Models
         public string Description { get; set; }
         public ObjectReference Flow { get; set; }
 
+        public bool Scan { get; set; }
+
         /// <summary>
         /// If this library monitors for folders or files
         /// </summary>

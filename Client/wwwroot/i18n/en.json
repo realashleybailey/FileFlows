@@ -202,7 +202,9 @@
         "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a recording every 20 seconds.",
         "Schedule": "Schedule",
         "Schedule-Help": "This schedule runs in the timezone configured under settings.",
-        "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any library files be processed outside of the schedule.\n"
+        "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any library files be processed outside of the schedule.\n",
+        "Scan": "Scan",
+        "Scan-Help":  "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected."
       }
     },
     "LibraryFile": {

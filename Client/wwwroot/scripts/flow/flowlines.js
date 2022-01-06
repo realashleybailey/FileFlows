@@ -220,10 +220,11 @@ class ffFlowLines {
             let ctx = self.ioContext;
             self.ioSelectedConnection = null;
             let clearNode = true;
+            let selectedLine = null;
             for (let line of self.ioLines) {
                 // Check whether point is inside ellipse's stroke
-                if (ctx.isPointInStroke(line.path, event.offsetX, event.offsetY)) {
-                    ctx.strokeStyle = self.accentColor;
+                if (!selectedLine && ctx.isPointInStroke(line.path, event.offsetX, event.offsetY)) {
+                    selectedLine = line;
                     self.ioSelectedConnection = line;
                     let output = line.output.parentNode.parentNode.getAttribute('id');
                     let outputNode = line.output.getAttribute('x-output');
@@ -232,10 +233,12 @@ class ffFlowLines {
                 }
                 else {
                     ctx.strokeStyle = self.lineColor;
+                    ctx.stroke(line.path);
                 }
-
-                // Draw ellipse
-                ctx.stroke(line.path);
+            }
+            if (selectedLine) {
+                ctx.strokeStyle = self.accentColor;
+                ctx.stroke(selectedLine.path);
             }
             if (clearNode)
                 ffFlow.selectConnection();

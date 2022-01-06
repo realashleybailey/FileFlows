@@ -58,30 +58,47 @@ namespace FileFlows.Server.Workers
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (IsMatch(e.FullPath) == false)
+            if (Directory.Exists(e.FullPath))
             {
-                Logger.Instance.ILog("WatchedLibrary: File does not match library pattern: " + e.FullPath);
+                foreach(var file in Directory.GetFiles(e.FullPath, "*.*", SearchOption.AllDirectories))
+                {
+                    FileChangeEvent(file);
+                }
+            }
+            else
+            {
+                FileChangeEvent(e.FullPath);
+            }
+        }
+
+        private void FileChangeEvent(string fullPath)
+        { 
+            if (IsMatch(fullPath) == false)
+            {
+                if (fullPath.Contains("_UNPACK_"))
+                    return; // dont log this, too many
+                Logger.Instance.ILog("WatchedLibrary: File does not match library pattern: " + fullPath);
                 return;
             }
 
             // new file we can process
-            if (KnownFile(e.FullPath))
+            if (KnownFile(fullPath))
             {
-                Logger.Instance.ILog("WatchedLibrary: Known file: " + e.FullPath);
+                Logger.Instance.ILog("WatchedLibrary: Known file: " + fullPath);
                 return;
             }
 
-            Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + e.FullPath);
+            Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + fullPath);
 
-            if (IsFileLocked(e.FullPath) == false)
+            if (IsFileLocked(fullPath) == false)
             {
 
-                Logger.Instance.ILog("WatchedLibrary: Detected new file: " + e.FullPath);
-                _ = AddLibraryFile(e.FullPath);
+                Logger.Instance.ILog("WatchedLibrary: Detected new file: " + fullPath);
+                _ = AddLibraryFile(fullPath);
             }
             else
             {
-                Logger.Instance.ILog("WatchedLibrary: New file detected, but currently locked: " + e.FullPath);
+                Logger.Instance.ILog("WatchedLibrary: New file detected, but currently locked: " + fullPath);
             }
             Changed = true;
         }

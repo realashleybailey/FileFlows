@@ -6,6 +6,7 @@
     using FileFlows.Shared.Models;
     using System.Diagnostics;
     using System.Runtime.InteropServices;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     public class FlowWorker : Worker
@@ -25,18 +26,6 @@
         }
 
         public Func<bool> IsEnabledCheck { get; set; }
-
-        private string EscapePath(bool windows, string path)
-        {
-            if (windows == false)
-            {
-                path = Regex.Replace(path, "([\\'\"\\$\\?\\*()\\s])", "\\$1");
-                return path;
-            }else
-            {
-                return "\"" + Regex.Replace(path, @"(\\+)$", @"$1$1") + "\"";
-            }
-        }
 
 
         protected override void Execute()
@@ -133,35 +122,35 @@
                             process.StartInfo.CreateNoWindow = true;
                             process.Start();
                             string output = process.StandardOutput.ReadToEnd();
+                            StringBuilder completeLog = new StringBuilder();
                             if (string.IsNullOrEmpty(output) == false)
                             {
-                                Logger.Instance?.ILog(Environment.NewLine +
+                                completeLog.AppendLine(
                                     "==============================================================================" + Environment.NewLine +
                                     "===                      PROCESSING NODE OUTPUT START                      ===" + Environment.NewLine +
                                     "==============================================================================" + Environment.NewLine +
-                                    string.Join('\n', output.Split('\n').Select(x => "       " + x).ToArray()) + Environment.NewLine +
+                                    output + Environment.NewLine +
                                     "==============================================================================" + Environment.NewLine +
                                     "===                       PROCESSING NODE OUTPUT END                       ===" + Environment.NewLine +
-                                    "=============================================================================="
-                                    );
+                                    "==============================================================================");
                             }
                             string error = process.StandardError.ReadToEnd();
                             process.WaitForExit();
                             if (string.IsNullOrEmpty(error) == false)
                             {
-
-                                Logger.Instance?.ILog(Environment.NewLine +
+                                completeLog.AppendLine(
                                     "==============================================================================" + Environment.NewLine +
                                     "===                   PROCESSING NODE ERROR OUTPUT START                   ===" + Environment.NewLine +
                                     "==============================================================================" + Environment.NewLine +
-                                    string.Join('\n', error.Split('\n').Select(x => "       " + x).ToArray()) + Environment.NewLine +
+                                    error  + Environment.NewLine +
                                     "==============================================================================" + Environment.NewLine +
                                     "===                    PROCESSING NODE ERROR OUTPUT END                    ===" + Environment.NewLine +
-                                    "=============================================================================="
-                                    );
+                                    "==============================================================================");
                             }
                             if(process.ExitCode != 0)
                                 throw new Exception("Invalid exit code: " + process.ExitCode);
+
+                            SaveLog(libFile, completeLog.ToString());
                         }
                         catch (Exception ex)
                         {
@@ -192,6 +181,18 @@
                     Trigger();
                 }
             });
+        }
+
+        private void SaveLog(LibraryFile libFile, string log)
+        { 
+            var service = new LibraryFileService();
+            bool saved = service.SaveFullLog(libFile.Uid, log).Result;
+            if (!saved)
+            {
+                // save to main output
+                log = string.Join('\n', log.Split('\n').Select(x => "       " + x).ToArray());
+                Logger.Instance?.DLog(Environment.NewLine + log);
+            }
         }
     }
 }

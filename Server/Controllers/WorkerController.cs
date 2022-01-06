@@ -68,7 +68,7 @@ namespace FileFlows.Server.Controllers
                 if (Executors.ContainsKey(info.Uid))
                     Executors.Remove(info.Uid);
                 else
-                    Logger.Instance?.DLog("Could not remove: " + info.Uid);
+                    Logger.Instance?.DLog("Could not remove as not in list of Executors: " + info.Uid);
             }
         }
 

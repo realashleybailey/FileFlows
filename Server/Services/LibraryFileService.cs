@@ -14,6 +14,9 @@
 
         public Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid) => new LibraryFileController().GetNext(nodeName, nodeUid, workerUid);
 
+        public Task<bool> SaveFullLog(Guid uid, string log) => new LibraryFileController().SaveFullLog(uid, log);
+
         public Task<LibraryFile> Update(LibraryFile libraryFile) => new LibraryFileController().Update(libraryFile);
+
     }
 }

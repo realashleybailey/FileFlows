@@ -12,6 +12,8 @@
         Task Delete(Guid uid);
 
         Task<LibraryFile> Update(LibraryFile libraryFile);
+
+        Task<bool> SaveFullLog(Guid uid, string log);
     }
 
     public class LibraryFileService : Service, ILibraryFileService
@@ -66,6 +68,21 @@
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        public async Task<bool> SaveFullLog(Guid uid, string log)
+        {
+            try
+            {
+                var result = await HttpHelper.Put<bool>($"{ServiceBaseUrl}/api/library-file/{uid}/full-log", log);
+                if (result.Success)
+                    return result.Data;
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

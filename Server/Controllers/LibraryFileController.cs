@@ -200,6 +200,26 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Saves the full log for a library file
+        /// Call this after processing has completed for a library file
+        /// </summary>
+        /// <param name="uid">The uid of the library file</param>
+        /// <param name="log">the log</param>
+        /// <returns>true if successfully saved log</returns>
+        [HttpPut("{uid}/full-log")]
+        public async Task<bool> SaveFullLog([FromRoute] Guid uid, [FromBody] string log)
+        {
+            try
+            {
+                var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
+                System.IO.File.WriteAllText(logFile, log);
+                return true;
+            }
+            catch (Exception) { }
+            return false;
+        }
+
         [HttpPost("move-to-top")]
         public async Task MoveToTop([FromBody] ReferenceModel model)
         {

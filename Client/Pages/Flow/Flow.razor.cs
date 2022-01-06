@@ -62,6 +62,7 @@ namespace FileFlows.Client.Pages
         private async Task Init()
         {
             this.Blocker.Show();
+            this.StateHasChanged();
             try
             {
                 var elementsResult = await GetElements(API_URL + "/elements");
@@ -92,6 +93,7 @@ namespace FileFlows.Client.Pages
             finally
             {
                 this.Blocker.Hide();
+                this.StateHasChanged();
             }
         }
 
@@ -161,6 +163,16 @@ namespace FileFlows.Client.Pages
             this.SetTitle();
             this.Model.Parts ??= new List<ffPart>(); // just incase its null
             this.Parts = this.Model.Parts;
+            foreach(var p in this.Parts)
+            {
+                if (string.IsNullOrEmpty(p.Name) == false || string.IsNullOrEmpty(p?.FlowElementUid))
+                    continue;
+                string type = p.FlowElementUid.Substring(p.FlowElementUid.LastIndexOf(".") + 1);
+                string name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
+                if (name == "Label")
+                    name = FlowHelper.FormatLabel(type);
+                p.Name = name;
+            }
 
             this.Name = model.Name ?? "";
 
@@ -177,6 +189,11 @@ namespace FileFlows.Client.Pages
         public object AddElement(string uid)
         {
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
+            string type = element.Uid.Substring(element.Uid.LastIndexOf(".") + 1);
+            string name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
+            if (name == "Label")
+                name = FlowHelper.FormatLabel(type);
+            element.Name = name; 
             return new { element, uid = Guid.NewGuid() };
         }
 

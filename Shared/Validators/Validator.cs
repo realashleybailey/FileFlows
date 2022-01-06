@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 
 namespace FileFlows.Shared.Validators
 {
+    [System.Text.Json.Serialization.JsonConverter(typeof(Json.ValidatorConverter))]
     public abstract class Validator
     {
         public string Type => this.GetType().Name;

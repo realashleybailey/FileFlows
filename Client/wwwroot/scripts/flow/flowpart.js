@@ -120,10 +120,9 @@ window.ffFlowPart = {
             let name = part.name;
             if (!name)
                 name = part.label;
-            if (!name) {
-                name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1).replace(/_/g, ' ');
-                name = name.replace(/(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])/g, " ");
-            }
+            if (!name) 
+                name = part.flowElementUid.substring(part.flowElementUid.lastIndexOf('.') + 1);
+
             part.displayName = name;
             divName.innerHTML = name;
         } catch (err) {

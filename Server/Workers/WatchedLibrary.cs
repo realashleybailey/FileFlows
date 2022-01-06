@@ -30,10 +30,15 @@ namespace FileFlows.Server.Workers
                 }
                 catch (Exception) { }
             }
-
-            LibraryFiles = DbHelper.Select<LibraryFile>("lower(Name) like lower(@1)", library.Path + "%").Result.ToList();
+            RefreshLibraryFiles();
             if(UseScanner == false)
                 SetupWatcher();
+        }
+
+        private void RefreshLibraryFiles()
+        {
+            if(string.IsNullOrEmpty(this.Library?.Path) == false)
+                LibraryFiles = DbHelper.Select<LibraryFile>("lower(Name) like lower(@1)", this.Library.Path + "%").Result.ToList();
         }
         public void Dispose()
         {
@@ -220,6 +225,9 @@ namespace FileFlows.Server.Workers
                 Logger.Instance?.WLog($"WatchedLibrary: Library '{Library.Name}' path not found: {Library.Path}");
                 return false;
             }
+
+            // refresh list of library files
+            RefreshLibraryFiles();
 
             int count = LibraryFiles.Count;
             if (Library.Folders)

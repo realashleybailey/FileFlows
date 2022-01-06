@@ -78,7 +78,7 @@ namespace FileFlows.Shared
             return (string.IsNullOrEmpty(prefix) ? name : prefix + "." + name);
         }
 
-        private static string Lookup(string[] possibleKeys)
+        private static string Lookup(string[] possibleKeys, bool supressWarnings = false)
         {
             foreach (string key in possibleKeys)
             {
@@ -94,20 +94,21 @@ namespace FileFlows.Shared
                 return Language["Labels.Name"];
 
             string result = possibleKeys?.FirstOrDefault() ?? "";
-            Logger?.WLog("Failed to lookup key: " + result);
+            if(supressWarnings == false)
+                Logger?.WLog("Failed to lookup key: " + result);
             result = result.Substring(result.LastIndexOf(".") + 1);
 
             return result;
         }
 
-        public static string Instant(string key, object parameters = null)
-            => Instant(new[] { key }, parameters);
+        public static string Instant(string key, object parameters = null, bool supressWarnings = false)
+            => Instant(new[] { key }, parameters, supressWarnings: supressWarnings);
 
-        public static string Instant(string[] possibleKeys, object parameters = null)
+        public static string Instant(string[] possibleKeys, object parameters = null, bool supressWarnings = false)
         {
             try
             {
-                string msg = Lookup(possibleKeys);
+                string msg = Lookup(possibleKeys, supressWarnings: supressWarnings);
                 if (msg == "")
                     return "";
                 if (parameters is IDictionary<string, object> dict)
@@ -117,7 +118,8 @@ namespace FileFlows.Shared
             }
             catch (Exception ex)
             {
-                Logger?.WLog("Failed to translating key: " + possibleKeys[0] + ", " + ex.Message);
+                if(supressWarnings == false)
+                    Logger?.WLog("Failed to translating key: " + possibleKeys[0] + ", " + ex.Message);
                 return possibleKeys[0];
             }
         }

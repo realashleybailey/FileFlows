@@ -35,7 +35,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             string json = JsonSerializer.Serialize(plugin, new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Converters = { new PluginInfoConverter() }
+                Converters = { new ValidatorConverter(), new PluginInfoConverter() }
             });
             Console.WriteLine("File: " + file);
             File.WriteAllText(file, json);

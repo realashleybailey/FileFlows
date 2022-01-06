@@ -275,6 +275,14 @@ window.ffFlow = {
             return;
         }
 
+        if (!part.OutputLabels) {
+            console.log('output labels null');
+            return;
+        }
+        if (part.OutputLabels.length <= output) {
+            console.log('output labels length less than output', output, part.OutputLabels);
+            return;
+        }
         ffFlow.setInfo(part.OutputLabels[output], 'Connection');
     },
 
@@ -286,6 +294,8 @@ window.ffFlow = {
 
         if (!part.displayDescription) {
             let element = ffFlow.getElement(part.flowElementUid);
+            if (!element)
+                return;
             ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Description`, part.model).then(result => {
                 part.displayDescription = ffFlow.lblNode + ': ' + (result === 'Description' || !result ? part.displayName : result);
                 ffFlow.setInfo(part.displayDescription, 'Node');

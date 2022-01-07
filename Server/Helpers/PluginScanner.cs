@@ -137,7 +137,7 @@ namespace FileFlows.Server.Helpers
 
         private static void EnsureDefaultsExist(string pluginDir)
         {
-            Logger.Instance.ILog("Ensuring default plugins exist: "+ pluginDir);
+            Logger.Instance.ILog("PluginScanner: Ensuring default plugins exist: " + pluginDir);
             DirectoryInfo di = new DirectoryInfo(pluginDir);
             FileHelper.CreateDirectoryIfNotExists(di.FullName);
 
@@ -145,20 +145,70 @@ namespace FileFlows.Server.Helpers
 
             if (rootPlugins.Exists == false)
             {
-                Logger.Instance?.ILog("Root plugin directory not found: " + rootPlugins);
+                Logger.Instance?.ILog("PluginScanner: Root plugin directory not found: " + rootPlugins);
                 return;
             }
             var pluginFiles = rootPlugins.GetFiles("*.ffplugin");
-            Logger.Instance?.ILog($"Root plugins found: {pluginFiles.Length} in: {rootPlugins.FullName}");
+            Logger.Instance?.ILog($"PluginScanner: Root plugins found: {pluginFiles.Length} in: {rootPlugins.FullName}");
             foreach (var file in pluginFiles)
             {
-                Logger.Instance?.ILog($"Root plugin: {file.FullName}");
+                Logger.Instance?.ILog($"PluginScanner: Root plugin: {file.FullName}");
                 string dest = Path.Combine(pluginDir, file.Name);
-                // always restore, this means if the docker is updated, it contains the latest version.
-                // well this does have an issue if there is an updated plugin that is newer than the one 
-                // inside the docker.  so if thats an issue have to fix this later.
-                Logger.Instance?.ILog("Restoring default plugin: " + file.Name);
+
+                if (File.Exists(dest))
+                {
+                    // make sure the existing plugin is not newer than the docker plugin
+                    var existing = GetFFPluginVersion(dest);
+                    var dockerVersion = GetFFPluginVersion(file.FullName);
+
+                    if(existing >= dockerVersion)
+                    {
+                        Logger.Instance?.DLog("PluginScanner: Existing plugin newer than docker plugin: " + file.Name);
+                        continue;
+                    }
+                }
+
+                Logger.Instance?.ILog("PluginScanner: Restoring default plugin: " + file.Name);
                 file.CopyTo(dest, true);
+            }
+        }
+
+        private static Version GetFFPluginVersion(string ffplugin)
+        {
+            if (File.Exists(ffplugin) == false)
+                return new Version();
+            try
+            {
+                using var zf = System.IO.Compression.ZipFile.Open(ffplugin, System.IO.Compression.ZipArchiveMode.Read);
+                var entry = zf.GetEntry(".plugininfo");
+                if (entry == null)
+                {
+                    Logger.Instance?.WLog("PluginScanner: Unable to find .plugininfo file");
+                    return new Version();
+                }
+                using var sr = new StreamReader(entry.Open());
+                string json = sr.ReadToEnd();
+
+                if (string.IsNullOrEmpty(json))
+                {
+                    Logger.Instance?.WLog("PluginScanner: Unable to read plugininfo from file: " + ffplugin);
+                    return new Version();
+                }
+                var options = new JsonSerializerOptions
+                {
+                    Converters = { new Shared.Json.ValidatorConverter() }
+                };
+
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+                PluginInfo pi = JsonSerializer.Deserialize<PluginInfo>(json, options);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+                return Version.Parse(pi.Version);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog("PluginScanner: Failed to get plugin version: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                return new Version();
             }
         }
 

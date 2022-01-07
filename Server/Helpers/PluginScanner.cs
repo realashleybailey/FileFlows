@@ -172,6 +172,7 @@ namespace FileFlows.Server.Helpers
 
                 // save the plugin
                 File.WriteAllBytes(dest, data);
+                Logger.Instance.ILog("PluginScanner: Saving plugin : " + dest);
 
                 // rescan for plugins
                 Scan();

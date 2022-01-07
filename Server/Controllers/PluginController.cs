@@ -82,7 +82,11 @@ namespace FileFlows.Server.Controllers
                 return new PluginPackageInfo[] { };
 
             Version ffVersion = new Version(Globals.Version);
+#if (DEBUG)
+            var data = plugins.Data;
+#else
             var data = plugins.Data.Where(x => string.IsNullOrEmpty(x.MinimumVersion) || ffVersion >= new Version(x.MinimumVersion));
+#endif
 
             if (missing)
             {

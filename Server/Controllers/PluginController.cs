@@ -110,11 +110,15 @@ namespace FileFlows.Server.Controllers
                 var ppi = plugins.FirstOrDefault(x => x.Name.Replace(" ", "").ToLower() == plugin.Name.Replace(" ", "").ToLower());
 
                 if (ppi == null)
+                {
+                    Logger.Instance.WLog("PluginUpdate: No plugin info found for plugin: " + plugin.Name);
                     continue;
+                }
 
                 if (Version.Parse(ppi.Version) <= Version.Parse(plugin.Version))
                 {
                     // no new version, cannot update
+                    Logger.Instance.WLog("PluginUpdate: No newer version to download for plugin: " + plugin.Name);
                     continue;
                 }
 
@@ -124,10 +128,19 @@ namespace FileFlows.Server.Controllers
 
                 var dlResult = await HttpHelper.Get<byte[]>(url);
                 if (dlResult.Success == false)
+                {
+                    Logger.Instance.WLog("PluginUpdate: Failed to download binary data from: " + url);
                     continue;
+                }
 
                 // save the ffplugin file
-                updated |= PluginScanner.UpdatePlugin(ppi.Package, dlResult.Data);
+                bool success = PluginScanner.UpdatePlugin(ppi.Package, dlResult.Data);
+                if(success)
+                    Logger.Instance.WLog("PluginUpdate: Successfully updated plugin: " + plugin.Name);
+                else
+                    Logger.Instance.WLog("PluginUpdate: Failed to updated plugin: " + plugin.Name);
+
+                updated |= success;
             }
             return updated;
         }

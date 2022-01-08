@@ -70,7 +70,17 @@
         private async Task Refresh()
         {
 #if (DEMO)
-            Data = new FileFlows.Shared.Models.ShrinkageData { FinalSize = 10_000_000, OriginalSize = 25_000_000 };
+            if (Data?.Any() != true)
+            {
+                Random random = new Random(DateTime.Now.Millisecond);
+
+                Data = Enumerable.Range(1, 5).ToDictionary(x => "Library " + x, x => new ShrinkageData
+                {
+                    FinalSize = random.Next(1_000, 10_000) * 10_000_000L,
+                    OriginalSize = random.Next(19_000, 50_000) * 10_000_000L,
+                    Items = random.Next(1000, 10_000)
+                });
+            }
 #else
             var result = await HttpHelper.Get<Dictionary<string,ShrinkageData>>("/api/library-file/shrinkage-groups");
             if (result.Success)

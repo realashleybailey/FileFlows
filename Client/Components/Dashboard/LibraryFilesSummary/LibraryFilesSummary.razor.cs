@@ -68,7 +68,17 @@
         private async Task Refresh()
         {
 #if (DEMO)
-            Data = new FileFlows.Shared.Models.ShrinkageData { FinalSize = 10_000_000, OriginalSize = 25_000_000 };
+            if (Data?.Any() != true)
+            {
+                Random random = new Random(DateTime.Now.Millisecond);
+                Data = Enumerable.Range(1, 10).Select(x => new LibraryFile
+                {
+                    Name = "Library File" + x,
+                    RelativePath = "Library File" + x,
+                    FinalSize = random.Next(100, 1_000) * 10_000_000L,
+                    OriginalSize = random.Next(1_000, 2_000) * 10_000_000L
+                }).ToList();
+            }
 #else
             var result = await GetLibraryFiles("/api/library-file/" + (Completed ? "recently-finished" : "upcoming"));
             if (result.Success)
@@ -86,8 +96,8 @@
 #if (DEMO)
             var data = Enumerable.Range(1, 10).Select(x => new LibraryFile
             {
-                Name = RecentlyFinished ? $"Completed File {x}.mkv" : $"Upcoming File {x}.mkv",
-                RelativePath = RecentlyFinished ? $"Completed File {x}.mkv" : $"Upcoming File {x}.mkv",
+                Name = $"File {x}.mkv",
+                RelativePath = $"File {x}.mkv",
                 ProcessingStarted = DateTime.Now.AddMinutes(-5),
                 ProcessingEnded = DateTime.Now
             }).ToList();

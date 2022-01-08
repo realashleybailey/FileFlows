@@ -12,6 +12,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
+    using FileFlows.Plugin;
 
     public partial class Dashboard : ComponentBase, IDisposable
     {
@@ -147,18 +148,22 @@ namespace FileFlows.Client.Pages
         async Task<RequestResult<List<FlowExecutorInfo>>> GetData()
         {
 #if (DEMO)
-            return new RequestResult<List<FlowWorkerStatus>>
+            return new RequestResult<List<FlowExecutorInfo>>
             {
                 Success = true,
-                Data = new List<FlowWorkerStatus>
+                Data = new List<FlowExecutorInfo>
                 {
-                    new FlowWorkerStatus
+                    new FlowExecutorInfo
                     {
-                        CurrentFile = "DemoFile.mkv",
+                        LibraryFile = new LibraryFile { Name = "DemoFile.mkv" },
+                        LibraryPath = @"C:\Videos",
                         CurrentPart = 1,
                         CurrentPartName = "Curren Flow Part",
                         CurrentPartPercent = 50,
-                        CurrentUid = Guid.NewGuid(),
+                        LastUpdate = DateTime.UtcNow,
+                        Log = "Test Log",
+                        NodeName = "Remote Processing Node",
+                        NodeUid = Guid.NewGuid(),
                         Library = new ObjectReference
                         {
                             Name = "Demo Library",

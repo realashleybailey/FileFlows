@@ -9,6 +9,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
     using System;
+    using FileFlows.Plugin;
 
     public partial class Libraries : ListPage<Library>
     {

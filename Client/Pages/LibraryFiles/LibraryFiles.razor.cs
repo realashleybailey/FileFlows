@@ -9,6 +9,7 @@ namespace FileFlows.Client.Pages
     using System.Linq;
     using System;
     using FileFlows.Client.Components.Dialogs;
+    using FileFlows.Plugin;
 
     public partial class LibraryFiles : ListPage<LibraryFile>
     {

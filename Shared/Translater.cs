@@ -34,14 +34,18 @@ namespace FileFlows.Shared
 
             foreach (var json in jsonFiles)
             {
-                var dict = DeserializeAndFlatten(json);
-                foreach (var key in dict.Keys)
+                try
                 {
-                    if (Language.ContainsKey(key))
-                        Language[key] = dict[key];
-                    else
-                        Language.Add(key, dict[key]);
+                    var dict = DeserializeAndFlatten(json);
+                    foreach (var key in dict.Keys)
+                    {
+                        if (Language.ContainsKey(key))
+                            Language[key] = dict[key];
+                        else
+                            Language.Add(key, dict[key]);
+                    }
                 }
+                catch (Exception) { }
             }
 
             Logger?.ILog("Language keys found: " + Language.Keys.Count);

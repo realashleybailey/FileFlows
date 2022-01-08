@@ -188,11 +188,12 @@
                 InputType = FormInputType.Text,
                 Name = nameof(library.Filter)
             });
-            fields.Add(new ElementField
+            var fieldScan = new ElementField
             {
                 InputType = FormInputType.Switch,
                 Name = nameof(library.Scan)
-            });
+            };
+            fields.Add(fieldScan);
             fields.Add(new ElementField
             {
                 InputType = FormInputType.Int,
@@ -201,7 +202,11 @@
                     { "Min", 10 },
                     { "Max", 24 * 60 * 60 }
                 },
-                Name = nameof(library.ScanInterval)
+                Name = nameof(library.ScanInterval),
+                DisabledConditions = new List<Condition>
+                {
+                    new EmptyCondition(fieldScan, library.Scan)
+                }
             });
             fields.Add(new ElementField
             {
@@ -211,7 +216,11 @@
                     { "Min", 0 },
                     { "Max", 300 }
                 },
-                Name = nameof(library.FileSizeDetectionInterval)
+                Name = nameof(library.FileSizeDetectionInterval),
+                DisabledConditions = new List<Condition>
+                {
+                    new EmptyCondition(fieldScan, library.Scan)
+                }
             });
             return fields;
         }

@@ -17,7 +17,7 @@ namespace FileFlows.Client.Components.Inputs
         protected override void OnInitialized()
         {
             string help = Regex.Replace(Input?.Help ?? string.Empty, "<.*?>", string.Empty);
-            foreach(Match match in Regex.Matches(help, @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)", RegexOptions.Multiline))
+            foreach (Match match in Regex.Matches(help, @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)", RegexOptions.Multiline))
             {
                 help = help.Replace(match.Value, $"<a target=\"_blank\" href=\"{HttpUtility.HtmlAttributeEncode(match.Value)}\">{HttpUtility.HtmlEncode(match.Value)}</a>");
             }

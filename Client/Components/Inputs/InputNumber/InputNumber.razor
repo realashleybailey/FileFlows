@@ -4,7 +4,7 @@
 <InputWrapper Input="@this">
     <div class="input-number-wrapper">
         <div class="flow-numeric">
-            <input id=@Uid type="number" value="@Value" @onchange="ChangeValue" placeholder="@Placeholder" min="@Min" max="@Max" />
+            <input id=@Uid type="number" value="@Value" disabled=@(Disabled ? string.Empty : null) @onchange="ChangeValue" placeholder="@Placeholder" min="@Min" max="@Max" />
         </div>
         @if (string.IsNullOrEmpty(Suffix) == false)
         {

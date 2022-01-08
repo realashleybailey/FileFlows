@@ -38,6 +38,10 @@
   /* one pixel margin for outline of selected inputs */
 }
 
+.row.disabled {
+  opacity: 0.3 !important;
+}
+
 @media screen and (max-width: 578px) {
   .row {
     flex-direction: column;

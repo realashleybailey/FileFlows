@@ -8,6 +8,7 @@ namespace FileFlows.Client.Components.Inputs
     using Microsoft.JSInterop;
     using System;
 
+    public delegate void DisabledChangeEvent(bool state);
     public interface IInput
     {
         string Label { get; set; }
@@ -15,6 +16,7 @@ namespace FileFlows.Client.Components.Inputs
         string Placeholder { get; set; }
         string ErrorMessage { get; set; }
         bool HideLabel { get; set; }
+        bool Disabled { get; set; }
 
         FileFlows.Shared.Models.ElementField Field { get; set; }
 
@@ -71,6 +73,9 @@ namespace FileFlows.Client.Components.Inputs
 
         [Parameter]
         public bool ReadOnly { get; set; }
+
+        public bool Disabled { get; set; }
+
         [Parameter]
         public FileFlows.Shared.Models.ElementField Field { get; set; }
 
@@ -132,7 +137,30 @@ namespace FileFlows.Client.Components.Inputs
         {
             base.OnInitialized();
             Editor.RegisterInput(this);
+
+            if (this.Field != null)
+            {
+                this.Field.DisabledChange += Field_DisabledChange;
+
+                if (this.Field.DisabledConditions?.Any() == true)
+                {
+                    bool disabled = false;
+                    foreach (var condition in this.Field.DisabledConditions)
+                        disabled |= condition.IsMatch;
+                    this.Disabled = disabled;
+                }
+            }
         }
+
+        private void Field_DisabledChange(bool state)
+        {
+            if(this.Disabled != state)
+            {
+                this.Disabled = state;
+                this.StateHasChanged();
+            }
+        }
+
         protected void ClearError() => this.ErrorMessage = "";
 
         public virtual async Task<bool> Validate()

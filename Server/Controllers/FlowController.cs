@@ -21,9 +21,18 @@ namespace FileFlows.Server.Controllers
         const int DEFAULT_XPOS = 450;
         const int DEFAULT_YPOS = 50;
 
+        /// <summary>
+        /// Get all flows in the system
+        /// </summary>
+        /// <returns>all flows in the system</returns>
         [HttpGet]
         public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name.ToLower());
 
+        /// <summary>
+        /// Exports a specific flow
+        /// </summary>
+        /// <param name="uid">The Flow UID</param>
+        /// <returns>A download response of the flow</returns>
         [HttpGet("export/{uid}")]
         public async Task<IActionResult> Export([FromRoute] Guid uid)
         {
@@ -38,6 +47,11 @@ namespace FileFlows.Server.Controllers
             return File(data, "application/octet-stream", flow.Name + ".json");
         }
 
+        /// <summary>
+        /// Imports a flow
+        /// </summary>
+        /// <param name="json">The json data to import</param>
+        /// <returns>The newly import flow</returns>
         [HttpPost("import")]
         public async Task<Flow> Import([FromBody] string json)
         {
@@ -63,6 +77,12 @@ namespace FileFlows.Server.Controllers
         }
 
 
+        /// <summary>
+        /// Sets the enabled state of a flow
+        /// </summary>
+        /// <param name="uid">The flow UID</param>
+        /// <param name="enable">Whether or not the flow should be enabled</param>
+        /// <returns>The updated flow</returns>
         [HttpPut("state/{uid}")]
         public async Task<Flow> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
         {
@@ -77,6 +97,11 @@ namespace FileFlows.Server.Controllers
             return flow;
         }
 
+        /// <summary>
+        /// Delete flows from the system
+        /// </summary>
+        /// <param name="model">A reference model containing UIDs to delete</param>
+        /// <returns>an awaited task</returns>
         [HttpDelete]
         public async Task Delete([FromBody] ReferenceModel model)
         {
@@ -85,6 +110,11 @@ namespace FileFlows.Server.Controllers
             await DeleteAll(model);
         }
 
+        /// <summary>
+        /// Get a flow
+        /// </summary>
+        /// <param name="uid">The Flow UID</param>
+        /// <returns>The flow instance</returns>
         [HttpGet("{uid}")]
         public async Task<Flow> Get(Guid uid)
         {
@@ -143,6 +173,10 @@ namespace FileFlows.Server.Controllers
         }
 
 
+        /// <summary>
+        /// Gets all nodes in the system
+        /// </summary>
+        /// <returns>Returns a list of all the nodes in the system</returns>
         [HttpGet("elements")]
         public async Task<FlowElement[]> GetElements()
         {
@@ -151,6 +185,12 @@ namespace FileFlows.Server.Controllers
             return results ?? new FlowElement[] { };
         }
 
+        /// <summary>
+        /// Saves a flow
+        /// </summary>
+        /// <param name="model">The flow being saved</param>
+        /// <param name="uniqueName">Whether or not a new unique name should be generated if the name already exists</param>
+        /// <returns>The saved flow</returns>
         [HttpPut]
         public async Task<Flow> Save([FromBody] Flow model, [FromQuery] bool uniqueName = false)
         {
@@ -184,6 +224,12 @@ namespace FileFlows.Server.Controllers
             return await Update(model);
         }
 
+        /// <summary>
+        /// Rename a flow
+        /// </summary>
+        /// <param name="uid">The Flow UID</param>
+        /// <param name="name">The new name</param>
+        /// <returns>an awaited task</returns>
         [HttpPut("{uid}/rename")]
         public async Task Rename([FromRoute] Guid uid, [FromQuery] string name)
         {
@@ -206,6 +252,13 @@ namespace FileFlows.Server.Controllers
             var libraries = new LibraryController().UpdateFlowName(flow.Uid, flow.Name);
         }
 
+        /// <summary>
+        /// Get variables for flow parts
+        /// </summary>
+        /// <param name="flowParts">The flow parts</param>
+        /// <param name="partUid">The specific part UID</param>
+        /// <param name="isNew">If the flow part is a new part</param>
+        /// <returns>The available variables for the flow part</returns>
         [HttpPost("{uid}/variables")]
         public async Task<Dictionary<string, object>> GetVariables([FromBody] List<FlowPart> flowParts, [FromRoute(Name ="uid")] Guid partUid, [FromQuery] bool isNew = false)
         {
@@ -331,6 +384,10 @@ namespace FileFlows.Server.Controllers
 
         private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
     
+        /// <summary>
+        /// Get flow templates
+        /// </summary>
+        /// <returns>A list of flow templates</returns>
         [HttpGet("templates")]
         public async Task<Dictionary<string, List<FlowTemplateModel>>> GetTemplates()
         {

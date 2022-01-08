@@ -43,6 +43,16 @@ namespace FileFlows.Server
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FileFlows", Version = "v1" });
+
+                var filePath = Path.Combine(System.AppContext.BaseDirectory, "FileFlows.Server.xml");
+                if (File.Exists(filePath))
+                    c.IncludeXmlComments(filePath);
+                else
+                {
+                    filePath = Path.Combine(System.AppContext.BaseDirectory, "FileFlows.xml");
+                    if (File.Exists(filePath))
+                        c.IncludeXmlComments(filePath);
+                }
             });
 
             app = builder.Build();

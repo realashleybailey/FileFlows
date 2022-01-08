@@ -15,6 +15,8 @@ namespace FileFlows.Shared.Models
         public string Placeholder { get; set; }
         public FormInputType InputType { get; set; }
 
+        public bool UiOnly { get; set; }
+
         public Dictionary<string, object> Variables { get; set; }
 
         public Dictionary<string, object> Parameters { get; set; }

@@ -163,7 +163,7 @@ namespace FileFlows.Client.Pages
             this.SetTitle();
             this.Model.Parts ??= new List<ffPart>(); // just incase its null
             this.Parts = this.Model.Parts;
-            foreach(var p in this.Parts)
+            foreach (var p in this.Parts)
             {
                 if (string.IsNullOrEmpty(p.Name) == false || string.IsNullOrEmpty(p?.FlowElementUid))
                     continue;
@@ -193,7 +193,7 @@ namespace FileFlows.Client.Pages
             string name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
             if (name == "Label")
                 name = FlowHelper.FormatLabel(type);
-            element.Name = name; 
+            element.Name = name;
             return new { element, uid = Guid.NewGuid() };
         }
 
@@ -203,7 +203,7 @@ namespace FileFlows.Client.Pages
             string prefix = string.Empty;
             if (key.Contains(".Outputs."))
             {
-                prefix = Translater.Instant("Labels.Output") + " " + key.Substring(key.LastIndexOf(".")+ 1) + ": ";
+                prefix = Translater.Instant("Labels.Output") + " " + key.Substring(key.LastIndexOf(".") + 1) + ": ";
             }
 
             string translated = Translater.Instant(key, model);
@@ -308,8 +308,16 @@ namespace FileFlows.Client.Pages
             });
 
 
+            if (flowElement.Uid == "FileFlows.BasicNodes.Functions.Function")
+            {
+                // special case
+                FunctionNode(fields);
+
+            }
+
+
             List<ListOption> flowOptions = null;
-            
+
             foreach (var field in fields)
             {
                 field.Variables = variables;
@@ -325,7 +333,7 @@ namespace FileFlows.Client.Pages
                             Logger.Instance.DLog("OptionsProperty = " + optp);
                             if (optp == "FLOW_LIST")
                             {
-                                if(flowOptions == null)
+                                if (flowOptions == null)
                                 {
                                     flowOptions = new List<ListOption>();
                                     var flowsResult = await HttpHelper.Get<ff[]>($"/api/flow");
@@ -391,5 +399,132 @@ namespace FileFlows.Client.Pages
                 return null;
             }
         }
+
+        private void FunctionNode(List<ElementField> fields)
+        {
+            var efTemplate = new ElementField
+            {
+                Name = "Template",
+                InputType = FormInputType.Select,                
+                UiOnly = true,
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(Components.Inputs.InputSelect.Options), GetCodeTemplates() }
+                }
+            };
+            efTemplate.ValueChanged += (object sender, object value) =>
+            {
+                if (value == null)
+                    return;
+                CodeTemplate template = value as CodeTemplate;
+                if (template == null || string.IsNullOrEmpty(template.Code))
+                    return;
+                Editor editor = sender as Editor;
+                if (editor == null)
+                    return;
+                if (editor.Model == null)
+                    editor.Model = new ExpandoObject();
+                IDictionary<string, object> model = editor.Model;
+
+                SetModelProperty(nameof(template.Outputs), template.Outputs);
+                SetModelProperty(nameof(template.Code), template.Code);
+
+                void SetModelProperty(string property, object value)
+                {
+                    if (model.ContainsKey(property))
+                        model[property] = value;
+                    else
+                        model.Add(property, value);
+                }
+            };
+            fields.Insert(2, efTemplate);
+        }
+
+        private List<ListOption> GetCodeTemplates()
+        {
+            var templates = new List<ListOption>();
+
+            templates.Add(new ListOption
+            {
+                Label = "Video: Resolution",
+                Value = new CodeTemplate
+                {
+                    Outputs = 4,
+                    Code =
+@"
+// get the first video stream, likely the only one
+let video = Variables.vi?.VideoInfo?.VideoStreams[0];
+if(!video)
+    return -1; // no video streams detected
+if(video.Width > 3700)
+    return 1; // 4k 
+if(video.Width > 1800)
+    return 2; // 1080p
+if(video.Width > 1200)
+    return 3; // 720p
+return 4; // SD
+"
+                }
+            });
+            templates.Add(new ListOption
+            {
+                Label = "Video: Downscale greater than 1080P",
+                Value = new CodeTemplate
+                {
+                    Outputs = 2,
+                    Code =
+@"
+// this template downscales a video with a width larger than 1920 down to 1920
+// it is suppose to be used before a 'Video Encode' node and can create a variable
+// to use in that node
+// It uses NVIDIA hardware encoding to encode to HEVC/H265
+// output 1 = needs to downscale
+// output 2 = does not need to downscale
+
+// get the first video stream, likely the only one
+let video = Variables.vi?.VideoInfo?.VideoStreams[0];
+if (!video)
+    return -1; // no video streams detected
+
+if (video.Width > 1920)
+{
+    // down scale to 1920 and encodes using NVIDIA
+	// then add a 'Video Encode' node and in that node 
+	// set 
+	// 'Video Codec' to 'hevc'
+	// 'Video Codec Parameters' to '{EncodingParameters}'
+	Logger.ILog(`Need to downscale from ${video.Width}x${video.Height}`);
+    Variables.EncodingParameters = '-vf scale=1920:-2:flags=lanczos -c:v hevc_nvenc -preset hq -crf 23'
+	return 1;
+}
+
+Logger.ILog('Do not need to downscale');
+return 2;
+"
+                }
+            });
+            templates.Add(new ListOption
+            {
+                Label = "File: Larger than 1GB",
+                Value = new CodeTemplate
+                {
+                    Outputs = 2,
+                    Code =
+@"
+if(Variables.file.Size > 1_000_000_000)
+	return 1;
+return 2;
+"
+                }
+            });
+            return templates.OrderBy(x => x.Label).ToList();
+        }
+
+        private class CodeTemplate
+        {
+            public string Code { get; set; }
+            public int Outputs { get; set; }
+        }
+
     }
 }

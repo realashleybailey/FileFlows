@@ -43,7 +43,8 @@
     "UpdateAvailable": "New version available {version}",
     "Output": "Output",
     "Input": "Input",
-    "Node": "Node"
+    "Node": "Node",
+    "BaseCodeOn": "Use Code Template"
   },
   "Dialogs":{
     "FileBrowser": {

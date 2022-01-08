@@ -205,6 +205,8 @@ namespace FileFlows.Client.Components
 
         internal void UpdateValue(ElementField field, object value)
         {
+            if (field.UiOnly)
+                return;
             if (Model == null)
                 return;
             var dict = (IDictionary<string, object>)Model;

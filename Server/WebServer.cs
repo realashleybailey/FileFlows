@@ -57,14 +57,15 @@ namespace FileFlows.Server
 
             app = builder.Build();
 
-            app.UseSwagger(c =>
-            {
-                //c.SerializeAsV2 = true;
-            });
+            app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
+                c.IndexStream = () => typeof(WebServer).Assembly.GetManifestResourceStream("FileFlows.Server.Resources.SwaggerIndex.html");
+
                 c.RoutePrefix = "api/help";
+                c.DocumentTitle = "FileFlows API";
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "FileFlows API");
+                c.InjectStylesheet("/css/swagger.min.css");
             });
 
             app.UseDefaultFiles();

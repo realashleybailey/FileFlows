@@ -1,0 +1,117 @@
+﻿body {
+    --color: rgb(240, 240, 240);
+    --color-rgb: 240, 240, 240;
+    --color-darker: rgb(220, 220, 220);
+    --color-darke-rgb: 220, 220, 220;
+    --color-darkest: rgb(160, 160, 160);
+    --color-darkest-rgb: 160, 160, 160;
+    --base: rgb(17, 18, 20);
+    --base-rgb: 7, 18, 20;
+    --base-darker: rgb(6, 17, 19);
+    --base-darker-rgb: 6, 17, 19;
+    --base-darkest: rgb(4, 11, 12);
+    --base-darkest-rgb: 4, 11, 12;
+    --accent: rgb(255, 0, 144);
+    --accent-rgb: 255, 0, 144;
+    --border-color: rgba(var(--color-rgb), 0.1);
+    --input-background: rgb(49, 49, 49);
+    --input-background-rgb: 49, 49, 49;
+    --primary: #0366d6;
+    --error: #ff4d76;
+    --modified: rgba(var(--accent-rgb), 0.4);
+    --flow-logic: var(--orange);
+    --flow-input: var(--indigo);
+    --flow-output: var(--green);
+    --flow-process: var(--cyan);
+}
+
+.topbar a img {
+    content: url('/images/logo.svg');
+    transform: scale(0.9);
+}
+.topbar-wrapper a::after {
+    content: 'API Documentation';
+    font-size:1rem;
+    white-space:nowrap;
+    padding-top:8px;
+    color:rgba(var(--color-rgb), 0.6);
+}
+body {
+    background: var(--base);
+}
+.swagger-ui {
+    color: var(--color) !important;
+
+    svg, .model-toggle:after {
+        filter: invert(100%) sepia(4%) saturate(1065%) hue-rotate(271deg) brightness(118%) contrast(88%);
+    }
+
+
+
+    .opblock .opblock-summary-description {
+        color: var(--color);
+    }
+
+    .opblock .opblock-summary-operation-id, .opblock .opblock-summary-path, .opblock .opblock-summary-path__deprecated {
+        color: var(--color);
+    }
+
+    .opblock-description-wrapper p, .opblock-external-docs-wrapper p, .opblock-title_normal p {
+        color: var(--color);
+    }
+
+    table thead tr td, table thead tr th {
+        color: var(--color);
+    }
+
+    .response-col_status, .response-col_links, .tab li, .opblock-tag, section.models h4, .model-title, .parameter__type, .parameter__name {
+        color: var(--color);
+    }
+
+    .opblock .opblock-section-header {
+        background: rgba(var(--accent-rgb), 0.2);
+
+        h4 {
+            color: var(--color);
+        }
+    }
+
+    section.models .model-container {
+        background: rgba(var(--color-rgb), 0.02);
+    }
+
+    .model {
+        color: #a9a9a9;
+    }
+
+    .topbar {
+        background: var(--base);
+    }
+
+    .topbar .download-url-wrapper {
+        display: none;
+    }
+
+    .wrapper.information-container {
+        display: none;
+    }
+
+    .btn {
+        height: 2.1875rem;
+        font-weight: normal;
+        outline: none !important;
+        line-height: initial;
+        box-shadow: none;
+        border-radius: unset !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase;
+        border: solid 1px var(--accent);
+        background-color: var(--base);
+        color: var(--color);
+
+        &:hover {
+            background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+            box-shadow: inset 0 -3px 0 0 var(--accent) !important;
+        }
+    }
+}

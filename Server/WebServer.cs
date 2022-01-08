@@ -1,6 +1,7 @@
 ﻿using FileFlows.Node.Workers;
 using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
+using Microsoft.OpenApi.Models;
 
 namespace FileFlows.Server
 {
@@ -38,8 +39,24 @@ namespace FileFlows.Server
             builder.Services.AddSignalR();
             builder.Services.AddResponseCompression();
 
+            builder.Services.AddMvc();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FileFlows", Version = "v1" });
+            });
+
             app = builder.Build();
-            
+
+            app.UseSwagger(c =>
+            {
+                //c.SerializeAsV2 = true;
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = "api/help";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FileFlows API");
+            });
+
             app.UseDefaultFiles();
 
             var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
@@ -60,6 +77,7 @@ namespace FileFlows.Server
 
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseRouting();
+
 
             Globals.IsDevelopment = app.Environment.IsDevelopment();
 

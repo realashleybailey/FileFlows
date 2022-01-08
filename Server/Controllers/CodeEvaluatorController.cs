@@ -13,6 +13,7 @@ namespace FileFlows.Server.Controllers
     using Jint;
 
     [Route("/api/code-eval")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CodeEvaluatorController : Controller
     {
         [HttpPost("validate")]

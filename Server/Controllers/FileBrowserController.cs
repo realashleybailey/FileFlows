@@ -10,6 +10,7 @@ namespace FileFlows.Server.Controllers
     using System.Text.RegularExpressions;
 
     [Route("/api/file-browser")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class FileBrowserController : Controller
     {
         [HttpGet]

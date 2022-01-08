@@ -15,6 +15,7 @@ The Video plugin lets you process video files to ensure they are in the format y
 
 ![image](https://user-images.githubusercontent.com/958400/142720537-df9341ea-c11d-432e-bd1c-07ae4ef3b43d.png)
 
+---
 
-License and Contribution
+## License and Contribution
 Copyright (C) John Andrews - All Rights Reserved

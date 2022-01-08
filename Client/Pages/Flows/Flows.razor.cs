@@ -396,6 +396,7 @@ namespace FileFlows.Client.Pages
 
         private async Task Export()
         {
+#if (!DEMO)
             var item = Table.GetSelected()?.FirstOrDefault();
             if (item == null)
                 return;
@@ -404,10 +405,12 @@ namespace FileFlows.Client.Pages
             url = "http://localhost:6868" + url;
 #endif
             NavigationManager.NavigateTo(url);
+#endif
         }
 
         private async Task Import()
         {
+#if (!DEMO)
             var json = await ImportDialog.Show();
             if (string.IsNullOrEmpty(json))
                 return;
@@ -426,6 +429,7 @@ namespace FileFlows.Client.Pages
             {
                 Blocker.Hide();
             }
+#endif
         }
 
 

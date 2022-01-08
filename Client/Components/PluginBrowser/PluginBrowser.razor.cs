@@ -97,6 +97,7 @@ namespace FileFlows.Client.Components
 
         private async Task Download()
         {
+#if (!DEMO)
             var selected = Table.GetSelected().ToArray();
             var items = selected.Select(x => x.Package).ToList();
             if (items.Any() == false)
@@ -123,6 +124,7 @@ namespace FileFlows.Client.Components
                 this.StateHasChanged();
             }
             await LoadData();
+#endif
         }
 
         private async Task ViewAction()

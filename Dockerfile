@@ -54,4 +54,4 @@ COPY /deploy /app
 WORKDIR /app
 
 # run the server
-ENTRYPOINT [ "dotnet", "FileFlows.Server.dll", "--urls=http://*:5000", "--docker" ]
+ENTRYPOINT [ "/root/.dotnet/dotnet", "FileFlows.Server.dll", "--urls=http://*:5000", "--docker" ]

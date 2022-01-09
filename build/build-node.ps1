@@ -23,4 +23,20 @@ else {
     msbuild.exe installers\FileFlowInstallers.sln
 }
 
+$zip = ".\deploy\FileFlows-Node-$version.zip"
+
+if ([System.IO.File]::Exists($zip)) {
+    Remove-Item $zip
+}
+
+$compress = @{
+    Path             = "..\deploy\FileFlows-Node"
+    CompressionLevel = "Optimal"
+    DestinationPath  = "..\deploy\FileFlows-Node-$version.zip"
+}
+Compress-Archive @compress
+
+Remove-Item ..\deploy\FileFlows-Node -Recurse -ErrorAction SilentlyContinue 
+
+
 

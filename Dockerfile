@@ -1,5 +1,5 @@
-#FROM lsiobase/ubuntu:focal
-FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
+FROM lsiobase/ubuntu:focal
+#FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 
 ############################################################ 
 ### Prepare the docker with ffmpeg and hardware encoders ###
@@ -35,6 +35,9 @@ RUN apt-get update \
     && apt-get dist-upgrade -y \
     && apt-get install -fy \
     libssl-dev
+
+RUN wget https://dot.net/v1/dotnet-install.sh \
+    && bash dotnet-install.sh -c Current
 
 
 ##########################################

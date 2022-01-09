@@ -87,7 +87,7 @@ internal class Program
         project.BackgroundImage = "background.png";
         project.GUID = Node ? InstallNodeGuid : InstallGuid;
         project.OutDir = "..\\..\\..\\deploy";
-        project.OutFileName = "FileFlows" + (Node ? "Node" : "") + "-" + VERSION;
+        project.OutFileName = "FileFlows" + (Node ? "-Node" : "") + "-" + VERSION;
         project.Version = new Version(VERSION);
 
         Compiler.BuildMsi(project);

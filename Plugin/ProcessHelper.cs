@@ -22,6 +22,7 @@
     {
         public string Command { get; set; } 
         public string Arguments { get; set; }
+        public string[] ArgumentList { get; set; }
         public int Timeout { get; set; }
         public string WorkingDirectory { get; set; }
         public delegate void OutputRecievedEvent(string output);
@@ -74,7 +75,16 @@
                 // To fix it you can try to add '#!/bin/bash' header to the script.
 
                 process.StartInfo.FileName = args.Command;
-                process.StartInfo.Arguments = args.Arguments ?? string.Empty;
+                if (args.ArgumentList?.Any() == true)
+                {
+                    foreach (var arg in args.ArgumentList)
+                        process.StartInfo.ArgumentList.Add(arg);
+                }
+                else if (string.IsNullOrEmpty(args.Arguments) == false)
+                {
+                    process.StartInfo.Arguments = args.Arguments;
+                }
+
                 if(string.IsNullOrEmpty(args.WorkingDirectory) == false)
                     process.StartInfo.WorkingDirectory = args.WorkingDirectory;
                 process.StartInfo.UseShellExecute = false;

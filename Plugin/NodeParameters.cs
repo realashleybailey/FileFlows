@@ -1,6 +1,7 @@
 namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
+    using System.Text;
 
     public class NodeParameters
     {
@@ -319,6 +320,22 @@ namespace FileFlows.Plugin
             return Helpers.FileHelper.CreateDirectoryIfNotExists(Logger, directory);
         }
 
+        /// <summary>
+        /// Executes a cmd and returns the result
+        /// </summary>
+        /// <param name="args">The execution parameters</param>
+        /// <returns>The result of the command</returns>
+        public ProcessResult Execute(ExecuteArgs args)
+        {
+            var result = Process.ExecuteShellCommand(args).Result;
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a new guid as a string
+        /// </summary>
+        /// <returns>a new guid as a string</returns>
+        public string NewGuid() => Guid.NewGuid().ToString();
     }
 
 

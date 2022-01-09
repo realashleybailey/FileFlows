@@ -402,6 +402,12 @@ namespace FileFlows.Client.Pages
 
         private void FunctionNode(List<ElementField> fields)
         {
+            var templates = GetCodeTemplates();
+            templates.Insert(0, new ListOption
+            {
+                Label = Translater.Instant("Labels.None"),
+                Value = null
+            });
             var efTemplate = new ElementField
             {
                 Name = "Template",
@@ -409,7 +415,8 @@ namespace FileFlows.Client.Pages
                 UiOnly = true,
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(Components.Inputs.InputSelect.Options), GetCodeTemplates() }
+                    { nameof(Components.Inputs.InputSelect.AllowClear), false },
+                    { nameof(Components.Inputs.InputSelect.Options), templates }
                 }
             };
             efTemplate.ValueChanged += (object sender, object value) =>
@@ -514,6 +521,43 @@ return 2;
 if(Variables.file.Size > 1_000_000_000)
 	return 1;
 return 2;
+"
+                }
+            });
+            templates.Add(new ListOption
+            {
+                Label = "Video: Manual FFMPEG",
+                Value = new CodeTemplate
+                {
+                    Outputs = 1,
+                    Code = @"
+let output = Flow.TempPath + '/' + Flow.NewGuid() + '.mkv';
+let ffmpeg = Flow.GetToolPath('ffmpeg');
+let process = Flow.Execute({
+	command: ffmpeg,
+	argumentList: [
+		'-i',
+		Variables.file.FullName,
+		'-c:v',
+		'libx265',
+		'-c:a',
+		'copy',
+		output
+	]
+});
+
+if(process.standardOutput)
+	Logger.ILog('Standard output: ' + process.standardOutput);
+if(process.starndardError)
+	Logger.ILog('Standard error: ' + process.starndardError);
+
+if(process.exitCode !== 0){
+	Logger.ELog('Failed processing ffmpeg: ' + process.exitCode);
+	return -1;
+}
+
+Flow.SetWorkingFile(output);
+return 1;
 "
                 }
             });

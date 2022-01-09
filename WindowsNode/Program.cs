@@ -1,3 +1,4 @@
+using FileFlows.Node;
 using FileFlows.Shared.Helpers;
 
 namespace FileFlows.WindowsNode

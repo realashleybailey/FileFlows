@@ -2,16 +2,19 @@
 
 Remove-Item ../deploy/* -Recurse -Force -Exclude *.ffplugin -ErrorAction SilentlyContinue 
 
-if([System.IO.Directory]::Exists("../deploy/Plugins") -eq $false) {
-    Write-Error "ERROR: No plugins directory found"
-    return
+
+$dev = $args[0] -eq '--dev'
+
+if ($dev -eq $false) {
+    if ([System.IO.Directory]::Exists("../deploy/Plugins") -eq $false) {
+        Write-Error "ERROR: No plugins directory found"
+        return
+    }
 }
 
 .\build-spellcheck.ps1
 .\build-flowrunner.ps1
 .\build-server.ps1
-.\build-flowrunner.ps1 --linux
-.\build-server.ps1 --linux
 .\build-winnode.ps1
 
 $compress = @{

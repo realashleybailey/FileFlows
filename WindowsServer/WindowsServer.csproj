@@ -9,9 +9,6 @@
     <AssemblyName>FileFlows</AssemblyName>
     <RootNamespace>FileFlows.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <ApplicationIcon>FileFlows Icon.ico</ApplicationIcon>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishSingleFile>true</PublishSingleFile>
-	  <SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>

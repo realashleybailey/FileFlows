@@ -1,4 +1,5 @@
-FROM lsiobase/ubuntu:focal
+#FROM lsiobase/ubuntu:focal
+FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 
 ############################################################ 
 ### Prepare the docker with ffmpeg and hardware encoders ###
@@ -50,4 +51,4 @@ COPY /deploy /app
 WORKDIR /app
 
 # run the server
-ENTRYPOINT [ "/app/FileFlows", "--urls=http://*:5000", "--docker" ]
+ENTRYPOINT [ "dotnet", "FileFlows.Server.dll", "--urls=http://*:5000", "--docker" ]

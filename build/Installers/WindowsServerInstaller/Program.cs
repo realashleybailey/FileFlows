@@ -12,8 +12,8 @@ internal class Program
 {
     static Guid InstallGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CD");
     static Guid InstallNodeGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CE");
-    static string VERSION = "0.0.0.0";
-    static bool Node = false;
+    static string VERSION = "0.2.1.352";
+    static bool Node = true;
     static string ffmpeg = @"C:\utils\ffmpeg\ffmpeg.exe";
     static string ffPath = @"..\..\..\deploy\FileFlows";
 
@@ -59,10 +59,10 @@ internal class Program
             );
         }
 
-        project.Actions = new WixSharp.Action[]
-        {
-            new ElevatedManagedAction(CustonActions.CheckVersion, "%this%")
-        };
+        //project.Actions = new WixSharp.Action[]
+        //{
+        //    new ElevatedManagedAction(CustonActions.CheckVersion, "%this%")
+        //};
 
         project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
             .Shortcuts = new[]{
@@ -112,76 +112,76 @@ internal class Program
     }
 }
 
-public class CustonActions
-{
-    [CustomAction]
-    public static ActionResult FileFlowsAction(Session session)
-    {
-        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
-        return ActionResult.Success;
-    }
-    [CustomAction]
-    public static ActionResult FileFlowsNodeAction(Session session)
-    {
-        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
-        return ActionResult.Success;
-    }
+//public class CustonActions
+//{
+//    [CustomAction]
+//    public static ActionResult FileFlowsAction(Session session)
+//    {
+//        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
+//        return ActionResult.Success;
+//    }
+//    [CustomAction]
+//    public static ActionResult FileFlowsNodeAction(Session session)
+//    {
+//        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
+//        return ActionResult.Success;
+//    }
 
 
-    static readonly List<string> runtimes = new List<string>()
-    {
-        "Microsoft.NETCore.App",//.NET Runtime
-        "Microsoft.AspNetCore.App",//ASP.NET Core Runtime
-        "Microsoft.WindowsDesktop.App",//.NET Desktop Runtime
-    };
+//    static readonly List<string> runtimes = new List<string>()
+//    {
+//        "Microsoft.NETCore.App",//.NET Runtime
+//        "Microsoft.AspNetCore.App",//ASP.NET Core Runtime
+//        "Microsoft.WindowsDesktop.App",//.NET Desktop Runtime
+//    };
 
-    [CustomAction]
-    public static ActionResult CheckVersion(Session session)
-    {
-        var minVersion = new Version(6, 0, 1);
-        var command = "/c dotnet --list-runtimes";// /c is important here
-        var output = string.Empty;
-        using (var p = new Process())
-        {
-            p.StartInfo = new ProcessStartInfo()
-            {
-                FileName = "cmd.exe",
-                Arguments = command,
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-            };
-            p.Start();
-            while (!p.StandardOutput.EndOfStream)
-            {
-                output += $"{p.StandardOutput.ReadLine()}{Environment.NewLine}";
-            }
-            p.WaitForExit();
-            if (p.ExitCode != 0)
-            {
-                session["DOTNETCORE1"] = "0";
-                return ActionResult.Success;
-                //throw new Exception($"{p.ExitCode}:{ p.StandardError.ReadToEnd()}");
-            }
-            session["DOTNETCORE1"] = (GetLatestVersionOfRuntime(runtimes[0], output) < minVersion) ? "0" : "1";
-            return ActionResult.Success;
-        }
-    }
+//    [CustomAction]
+//    public static ActionResult CheckVersion(Session session)
+//    {
+//        var minVersion = new Version(6, 0, 1);
+//        var command = "/c dotnet --list-runtimes";// /c is important here
+//        var output = string.Empty;
+//        using (var p = new Process())
+//        {
+//            p.StartInfo = new ProcessStartInfo()
+//            {
+//                FileName = "cmd.exe",
+//                Arguments = command,
+//                UseShellExecute = false,
+//                RedirectStandardError = true,
+//                RedirectStandardOutput = true,
+//                CreateNoWindow = true,
+//            };
+//            p.Start();
+//            while (!p.StandardOutput.EndOfStream)
+//            {
+//                output += $"{p.StandardOutput.ReadLine()}{Environment.NewLine}";
+//            }
+//            p.WaitForExit();
+//            if (p.ExitCode != 0)
+//            {
+//                session["DOTNETCORE1"] = "0";
+//                return ActionResult.Success;
+//                //throw new Exception($"{p.ExitCode}:{ p.StandardError.ReadToEnd()}");
+//            }
+//            session["DOTNETCORE1"] = (GetLatestVersionOfRuntime(runtimes[0], output) < minVersion) ? "0" : "1";
+//            return ActionResult.Success;
+//        }
+//    }
 
-    private static Version GetLatestVersionOfRuntime(string runtime, string runtimesList)
-    {
-        var latestLine = runtimesList.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains(runtime)).OrderBy(x => x).LastOrDefault();
-        if (latestLine != null)
-        {
-            Regex pattern = new Regex(@"\d+(\.\d+)+");
-            Match m = pattern.Match(latestLine);
-            string versionValue = m.Value;
-            if (Version.TryParse(versionValue, out var version))
-            {
-                return version;
-            }
-        }
-        return null;
-    }
-}
+//    private static Version GetLatestVersionOfRuntime(string runtime, string runtimesList)
+//    {
+//        var latestLine = runtimesList.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains(runtime)).OrderBy(x => x).LastOrDefault();
+//        if (latestLine != null)
+//        {
+//            Regex pattern = new Regex(@"\d+(\.\d+)+");
+//            Match m = pattern.Match(latestLine);
+//            string versionValue = m.Value;
+//            if (Version.TryParse(versionValue, out var version))
+//            {
+//                return version;
+//            }
+//        }
+//        return null;
+//    }
+//}

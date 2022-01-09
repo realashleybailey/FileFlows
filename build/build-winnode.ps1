@@ -10,7 +10,7 @@ Write-Output "#################################"
 (Get-Content ..\WindowsNode\WindowsNode.csproj) -replace '<ProductVersion>[^<]+</ProductVersion>', "<ProductVersion>$version</ProductVersion>" | Out-File ..\WindowsNode\WindowsNode.csproj
 (Get-Content ..\WindowsNode\WindowsNode.csproj) -replace '<Copyright>[^<]+</Copyright>', "<Copyright>$copyright</Copyright>" | Out-File ..\WindowsNode\WindowsNode.csproj
 
-dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --runtime win-x64 --configuration Release -p:PublishSingleFile=true --self-contained /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright  /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625 --output ..\deploy\FileFlows-Node
+dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --configuration Release /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright  /nowarn:CS8618 /nowarn:CS8601 /nowarn:CS8602 /nowarn:CS8603 /nowarn:CS8604 /nowarn:CS8618 /nowarn:CS8625 --output ..\deploy\FileFlows-Node
 
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = false', "Node = true" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii

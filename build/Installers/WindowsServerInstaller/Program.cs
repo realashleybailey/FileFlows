@@ -12,7 +12,7 @@ internal class Program
 {
     static Guid InstallGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CD");
     static Guid InstallNodeGuid = new Guid("07A84D0A-C965-4AE8-958F-0800F13AC5CE");
-    static string VERSION = "0.2.1.352";
+    static string VERSION = "0.2.1.355";
     static bool Node = true;
     static string ffmpeg = @"C:\utils\ffmpeg\ffmpeg.exe";
     static string ffPath = @"..\..\..\deploy\FileFlows";
@@ -64,7 +64,7 @@ internal class Program
         //    new ElevatedManagedAction(CustonActions.CheckVersion, "%this%")
         //};
 
-        project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
+        project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "-Node" : "") + ".exe")).First()
             .Shortcuts = new[]{
             new FileShortcut("FileFlows" + (Node ? " Node" :""), @"%AppData%\Microsoft\Windows\Start Menu\Programs\Startup")
             {

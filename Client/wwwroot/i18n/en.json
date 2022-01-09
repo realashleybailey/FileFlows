@@ -231,7 +231,7 @@
       "Labels": {
         "FileFlowsServer": "Internal Processing Node",
         "Address": "Address",
-        "Runners": "Runnners"
+        "Runners": "Runners"
       },
       "Fields": {
         "FlowRunners": "Flow Runners",

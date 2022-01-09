@@ -17,5 +17,6 @@ if ($dev -eq $false) {
 .\build-server.ps1
 .\build-node.ps1
 
-# no longer need plugins, delete them
+# no longer need plugins or flowrunner, delete them
 Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 
+Remove-Item ..\deploy\FileFlows-Runner -Recurse -ErrorAction SilentlyContinue 

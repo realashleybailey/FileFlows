@@ -13,15 +13,19 @@
     z-index: 5 !important;
 }
 
+::deep .top-row button + button {
+    margin-left:0.25rem;
+}
 
-@media screen and (min-width: 850px) 
-{
+
+@media screen and (min-width: 850px) {
     .editor {
-        left:unset;
-        width:700px;
-        border-left:solid 1px var(--border-color);
+        left: unset;
+        width: 700px;
+        border-left: solid 1px var(--border-color);
+
         &.large {
-            width:70vw;
+            width: 70vw;
         }
     }
 }

@@ -373,7 +373,7 @@ namespace FileFlows.Client.Pages
 
 
             string title = typeDisplayName;
-            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1);
+            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1, helpUrl: flowElement.HelpUrl);
             try
             {
                 await newModelTask;

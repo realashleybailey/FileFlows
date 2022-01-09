@@ -1,16 +1,33 @@
 namespace FileFlows.Plugin
 {
-
-    using FileFlows.Plugin;
+    /// <summary>
+    /// A FileFlows Node that can be used in a Flow
+    /// </summary>
     public class Node
     {
+        /// <summary>
+        /// Gets the type of node 
+        /// </summary>
         public virtual FlowElementType Type { get; }
 
+        /// <summary>
+        /// Gets the number of inputs this node has
+        /// </summary>
         public virtual int Inputs { get; }
+        /// <summary>
+        /// Gets the number of outputs this node has
+        /// </summary>
         public virtual int Outputs { get; }
 
+        /// <summary>
+        /// Gets the name of this node
+        /// </summary>
         public string Name => base.GetType().Name;
 
+        /// <summary>
+        /// Get the help URL for this node, will show a help button if set
+        /// </summary>
+        public virtual string HelpUrl => string.Empty;
 
         /// <summary>
         /// Get variables that can be used in other nodes such as a renamer node using variables to create a filename using variables from a previous node
@@ -21,6 +38,11 @@ namespace FileFlows.Plugin
         /// Gets the fontawesome icon to use in the flow 
         /// </summary>
         public virtual string Icon => string.Empty;
+
+
+        /// <summary>
+        /// Gets the group this node belongs to
+        /// </summary>
         public string Group
         {
             get

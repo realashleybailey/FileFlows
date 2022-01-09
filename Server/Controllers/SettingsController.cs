@@ -4,12 +4,20 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
 
+    /// <summary>
+    /// Settings Controller
+    /// </summary>
     [Route("/api/settings")]
     public class SettingsController : Controller
     {
         private static Settings Instance;
         private static Mutex _mutex = new Mutex();
 
+        /// <summary>
+        /// Whether or not the system is configured
+        /// </summary>
+        /// <param name="timeZoneId">The string timezone ID of the system</param>
+        /// <returns>return 2 if everything is configured, 1 if partially configured, 0 if not configured</returns>
         [HttpGet("is-configured")]
         public async Task<int> IsConfigured([FromQuery(Name = "tz")] string timeZoneId)
         {
@@ -30,15 +38,10 @@ namespace FileFlows.Server.Controllers
             return 0;
         }
 
-        [HttpGet("current")]
-        public object Current()
-        {
-            int quarter = TimeHelper.GetCurrentQuarter();
-            var date = TimeHelper.UserNow().ToString();
-            var utcNow = DateTime.UtcNow;
-            return new { TimeHelper.UserTimeZone, quarter, date, utcNow};
-        }
-
+        /// <summary>
+        /// Get the system settings
+        /// </summary>
+        /// <returns>The system settings</returns>
         [HttpGet]
         public async Task<Settings> Get()
         {
@@ -66,6 +69,11 @@ namespace FileFlows.Server.Controllers
             TimeHelper.UserTimeZone = settings.TimeZone;
         }
 
+        /// <summary>
+        /// Save the system settings
+        /// </summary>
+        /// <param name="model">the system settings to save</param>
+        /// <returns>The saved system settings</returns>
         [HttpPut]
         public async Task<Settings> Save([FromBody] Settings model)
         {

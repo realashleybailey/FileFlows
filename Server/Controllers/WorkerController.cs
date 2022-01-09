@@ -31,6 +31,11 @@ namespace FileFlows.Server.Controllers
             return logFile;
         }
 
+        /// <summary>
+        /// Start work, tells the server work has started on a flow runner
+        /// </summary>
+        /// <param name="info">The info about the work starting</param>
+        /// <returns>the updated info</returns>
         [HttpPost("work/start")]
         public async Task<FlowExecutorInfo> StartWork([FromBody] FlowExecutorInfo info)
         {
@@ -49,6 +54,10 @@ namespace FileFlows.Server.Controllers
             return info;
         }
 
+        /// <summary>
+        /// Finish work, tells the server work has finished on a flow runner
+        /// </summary>
+        /// <param name="info">Info about the finished work</param>
         [HttpPost("work/finish")]
         public async void FinishWork([FromBody] FlowExecutorInfo info)
         {
@@ -72,6 +81,10 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Update work, tells the server about updated work on a flow runner
+        /// </summary>
+        /// <param name="info">The updated work information</param>
         [HttpPost("work/update")]
         public void UpdateWork([FromBody] FlowExecutorInfo info)
         {
@@ -114,6 +127,12 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Clear all workers from a node.  Intended for clean up in case a node restarts.  
+        /// This is called when a node first starts.
+        /// </summary>
+        /// <param name="nodeUid">The UID of the processing node</param>
+        /// <returns>an awaited task</returns>
         [HttpPost("clear/{nodeUid}")]
         public async Task Clear([FromRoute] Guid nodeUid)
         {
@@ -126,6 +145,10 @@ namespace FileFlows.Server.Controllers
             await new LibraryFileController().ResetProcessingStatus(nodeUid);
         }
 
+        /// <summary>
+        /// Get all running flow executors
+        /// </summary>
+        /// <returns>A list of all running flow executors</returns>
         [HttpGet]
         public IEnumerable<FlowExecutorInfo> GetAll()
         {
@@ -148,6 +171,12 @@ namespace FileFlows.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Gets the log of a library file
+        /// </summary>
+        /// <param name="uid">The UID of the library file</param>
+        /// <param name="lineCount">The number of lines to fetch, 0 to fetch them all</param>
+        /// <returns>The log of a library file</returns>
         [HttpGet("{uid}/log")]
         public async Task<string> Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
         {
@@ -157,6 +186,12 @@ namespace FileFlows.Server.Controllers
                 return System.IO.File.ReadAllText(file);
             return String.Empty;
         }
+
+        /// <summary>
+        /// Abort work by library file
+        /// </summary>
+        /// <param name="uid">The UID of the library file to abort</param>
+        /// <returns>An awaited task</returns>
         [HttpDelete("by-file/{uid}")]
         public async Task AbortByFile(Guid uid)
         {
@@ -175,6 +210,11 @@ namespace FileFlows.Server.Controllers
             await Abort(executorId);
         }
 
+        /// <summary>
+        /// Abort work 
+        /// </summary>
+        /// <param name="uid">The UID of the client</param>
+        /// <returns>an awaited task</returns>
         [HttpDelete("{uid}")]
         public async Task Abort(Guid uid)
         {

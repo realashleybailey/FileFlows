@@ -10,11 +10,19 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Helpers;
     using FileFlows.ServerShared.Helpers;
 
+    /// <summary>
+    /// Plugin Controller
+    /// </summary>
     [Route("/api/plugin")]
     public class PluginController : ControllerStore<PluginInfo>
     {
         internal const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
 
+        /// <summary>
+        /// Get a list of all plugins in the system
+        /// </summary>
+        /// <param name="includeElements">If data should contain all the elements for the plugins</param>
+        /// <returns>a list of plugins</returns>
         [HttpGet]
         public async Task<IEnumerable<PluginInfoModel>> GetAll(bool includeElements = true)
         {
@@ -48,6 +56,11 @@ namespace FileFlows.Server.Controllers
             return pims;
         }
 
+        /// <summary>
+        /// Get the plugin info for a specific plugin
+        /// </summary>
+        /// <param name="uid">The uid of the plugin</param>
+        /// <returns>The plugin info for the plugin</returns>
         [HttpGet("{uid}")]
         public async Task<PluginInfo> Get([FromRoute] Guid uid)
         {
@@ -55,6 +68,12 @@ namespace FileFlows.Server.Controllers
             return pi ?? new();
         }
 
+        /// <summary>
+        /// Save plugin settings
+        /// </summary>
+        /// <param name="uid">The UID of the plugin</param>
+        /// <param name="settings">The settings model for the plugin</param>
+        /// <returns>The updated plugin info</returns>
         [HttpPost("{uid}/settings")]
         public async Task<PluginInfo> SaveSettings([FromRoute] Guid uid, [FromBody] ExpandoObject settings)
         {
@@ -65,14 +84,22 @@ namespace FileFlows.Server.Controllers
             return await Update(pi);
         }
 
-        private string GetPluginsDir() => Path.Combine(Program.GetAppDirectory(), "Plugins");
-
+        /// <summary>
+        /// Get the plugins translation file
+        /// </summary>
+        /// <param name="langCode">The language code to get the translations for</param>
+        /// <returns>The json plugin translation file</returns>
         [HttpGet("language/{langCode}.json")]
         public IActionResult LanguageFile([FromQuery] string langCode = "en")
         {
             return File("i18n/plugins.en.json", "text/json");
         }
 
+        /// <summary>
+        /// Get the available plugin packages 
+        /// </summary>
+        /// <param name="missing">If only missing plugins should be included, ie plugins not installed</param>
+        /// <returns>a list of plugins</returns>
         [HttpGet("plugin-packages")]
         public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages([FromQuery] bool missing = false)
         {
@@ -99,6 +126,11 @@ namespace FileFlows.Server.Controllers
         }
 
 
+        /// <summary>
+        /// Download the latest updates for plugins from the Plugin Repository
+        /// </summary>
+        /// <param name="model">The list of plugins to update</param>
+        /// <returns>if the updates were successful or not</returns>
         [HttpPost("update")]
         public async Task<bool> Update([FromBody] ReferenceModel model)
         {
@@ -149,6 +181,11 @@ namespace FileFlows.Server.Controllers
             return updated;
         }
 
+        /// <summary>
+        /// Delete plugins from the system
+        /// </summary>
+        /// <param name="model">A reference model containing UIDs to delete</param>
+        /// <returns>an awaited task</returns>
         [HttpDelete]
         public async Task Delete([FromBody] ReferenceModel model)
         {
@@ -165,6 +202,11 @@ namespace FileFlows.Server.Controllers
 
         }
 
+        /// <summary>
+        /// Download plugins into the FileFlows system
+        /// </summary>
+        /// <param name="model">A list of plugins to download</param>
+        /// <returns>an awaited task</returns>
         [HttpPost("download")]
         public async Task Download([FromBody] DownloadModel model)
         {
@@ -189,6 +231,11 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Download the plugin ffplugin file .  Only intended to be used by the FlowRunnner
+        /// </summary>
+        /// <param name="package">The plugin package name to download</param>
+        /// <returns>A download stream of the ffplugin file</returns>
         [HttpGet("download-package/{package}")]
         public async Task<FileStreamResult> DownloadPackage([FromRoute] string package)
         {
@@ -226,8 +273,14 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Download model
+        /// </summary>
         public class DownloadModel
         {
+            /// <summary>
+            /// A list of plugin packages to download
+            /// </summary>
             public List<string> Packages { get; set; }
         }
     }

@@ -137,6 +137,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
                 element.Type = instance.Type;
                 element.Icon = instance.Icon;
                 element.Variables = instance.Variables;
+                element.HelpUrl = instance.HelpUrl;
 
                 var model = new ExpandoObject(); ;
                 var dict = (IDictionary<string, object>)model;

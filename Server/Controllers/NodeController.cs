@@ -6,15 +6,32 @@ namespace FileFlows.Server.Controllers
     using System.Runtime.InteropServices;
     using FileFlows.ServerShared.Models;
 
+    /// <summary>
+    /// Processing node controller
+    /// </summary>
     [Route("/api/node")]
     public class NodeController : ControllerStore<ProcessingNode>
     {
+        /// <summary>
+        /// Gets a list of all processing nodes in the system
+        /// </summary>
+        /// <returns>a list of processing node</returns>
         [HttpGet]
         public async Task<IEnumerable<ProcessingNode>> GetAll() => (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);
 
+        /// <summary>
+        /// Get processing node
+        /// </summary>
+        /// <param name="uid">The UID of the processing node</param>
+        /// <returns>The processing node instance</returns>
         [HttpGet("{uid}")]
         public Task<ProcessingNode> Get(Guid uid) => GetByUid(uid);
 
+        /// <summary>
+        /// Saves a processing node
+        /// </summary>
+        /// <param name="node">The node to save</param>
+        /// <returns>The saved instance</returns>
         [HttpPost]
         public async Task<ProcessingNode> Save([FromBody] ProcessingNode node)
         {
@@ -41,6 +58,11 @@ namespace FileFlows.Server.Controllers
             return await Update(node, checkDuplicateName: true);
         }
 
+        /// <summary>
+        /// Delete processing nodes from the system
+        /// </summary>
+        /// <param name="model">A reference model containing UIDs to delete</param>
+        /// <returns>an awaited task</returns>
         [HttpDelete]
         public async Task Delete([FromBody] ReferenceModel model)
         {
@@ -50,6 +72,12 @@ namespace FileFlows.Server.Controllers
             await DeleteAll(model);
         }
 
+        /// <summary>
+        /// Set state of a processing node
+        /// </summary>
+        /// <param name="uid">The UID of the processing node</param>
+        /// <param name="enable">Whether or not this node is enabled and will process files</param>
+        /// <returns>an awaited task</returns>
         [HttpPut("state/{uid}")]
         public async Task<ProcessingNode> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
         {
@@ -64,6 +92,11 @@ namespace FileFlows.Server.Controllers
             return node;
         }
 
+        /// <summary>
+        /// Get processing node by address
+        /// </summary>
+        /// <param name="address">The address</param>
+        /// <returns>If found, the processing node</returns>
         [HttpGet("by-address/{address}")]
         public async Task<ProcessingNode> GetByAddress([FromRoute] string address)
         {
@@ -80,6 +113,11 @@ namespace FileFlows.Server.Controllers
             return node;
         }
 
+        /// <summary>
+        /// Register a processing node.  If already registered will return existing instance
+        /// </summary>
+        /// <param name="address">The address of the processing node</param>
+        /// <returns>The processing node instance</returns>
         [HttpGet("register")]
         public async Task<ProcessingNode> Register([FromQuery]string address)
         {
@@ -114,7 +152,11 @@ namespace FileFlows.Server.Controllers
         }
 
 
-
+        /// <summary>
+        /// Register a processing node.  If already registered will return existing instance
+        /// </summary>
+        /// <param name="model">The register model containing information about the processing node being registered</param>
+        /// <returns>The processing node instance</returns>
         [HttpPost("register")]
         public async Task<ProcessingNode> RegisterPost([FromBody] RegisterModel model)
         {

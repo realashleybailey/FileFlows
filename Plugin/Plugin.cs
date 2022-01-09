@@ -4,7 +4,7 @@ namespace FileFlows.Plugin
     {
         string Name { get; }
 
-        string MinimumVersion { get;  }
+        string MinimumVersion { get; }
 
         void Init();
     }

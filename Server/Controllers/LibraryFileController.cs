@@ -5,6 +5,9 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
     using FileFlows.Plugin;
 
+    /// <summary>
+    /// Library files controller
+    /// </summary>
     [Route("/api/library-file")]
     public class LibraryFileController : ControllerStore<LibraryFile>
     {
@@ -44,6 +47,13 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets all library files in the system
+        /// </summary>
+        /// <param name="status">The status to get, if missing will return all library files</param>
+        /// <param name="skip">The amount of items to skip</param>
+        /// <param name="top">The amount of items to grab, 0 to grab all</param>
+        /// <returns>A list of library files</returns>
         [HttpGet]
         public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
         {
@@ -101,15 +111,23 @@ namespace FileFlows.Server.Controllers
             return results;
         }
 
+        /// <summary>
+        /// Get next 10 upcoming files to process
+        /// </summary>
+        /// <returns>a list of upcoming files to process</returns>
         [HttpGet("upcoming")]
-        public async Task<IEnumerable<LibraryFile>> Upcoming([FromQuery] FileStatus? status)
+        public async Task<IEnumerable<LibraryFile>> Upcoming()
         {
             var libFiles = await GetAll(FileStatus.Unprocessed);
             return libFiles.Take(10);
         }
 
+        /// <summary>
+        /// Gets the last 10 successfully processed files
+        /// </summary>
+        /// <returns>the last successfully processed files</returns>
         [HttpGet("recently-finished")]
-        public async Task<IEnumerable<LibraryFile>> RecentlyFinished([FromQuery] FileStatus? status)
+        public async Task<IEnumerable<LibraryFile>> RecentlyFinished()
         {
             var libraryFiles = await GetDataList();
             return libraryFiles
@@ -126,6 +144,10 @@ namespace FileFlows.Server.Controllers
                 await Reprocess(new ReferenceModel { Uids = uids });
         }
 
+        /// <summary>
+        /// Gets the library status overview
+        /// </summary>
+        /// <returns>the library status overview</returns>
         [HttpGet("status")]
         public async Task<IEnumerable<LibraryStatus>> GetStatus()
         {
@@ -153,6 +175,11 @@ namespace FileFlows.Server.Controllers
         }
 
 
+        /// <summary>
+        /// Get a specific library file
+        /// </summary>
+        /// <param name="uid">The UID of the library file</param>
+        /// <returns>the library file instance</returns>
         [HttpGet("{uid}")]
         public async Task<LibraryFile> Get(Guid uid)
         {
@@ -160,6 +187,11 @@ namespace FileFlows.Server.Controllers
         }
 
 
+        /// <summary>
+        /// Update a library file
+        /// </summary>
+        /// <param name="file">The library file to update</param>
+        /// <returns>The updated library file</returns>
         [HttpPut]
         public async Task<LibraryFile> Update([FromBody] LibraryFile file)
         {
@@ -178,6 +210,11 @@ namespace FileFlows.Server.Controllers
             return await base.Update(existing);
         }
 
+        /// <summary>
+        /// Get the log of a library file
+        /// </summary>
+        /// <param name="uid">The UID of the library file</param>
+        /// <returns>The log of the library file</returns>
         [HttpGet("{uid}/log")]
         public async Task<string> GetLog(Guid uid)
         {
@@ -220,6 +257,11 @@ namespace FileFlows.Server.Controllers
             return false;
         }
 
+        /// <summary>
+        /// A reference model of library files to move to the top of the processing queue
+        /// </summary>
+        /// <param name="model">The reference model of items in order to move</param>
+        /// <returns>an awaited task</returns>
         [HttpPost("move-to-top")]
         public async Task MoveToTop([FromBody] ReferenceModel model)
         {
@@ -268,6 +310,11 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete library files from the system
+        /// </summary>
+        /// <param name="model">A reference model containing UIDs to delete</param>
+        /// <returns>an awaited task</returns>
         [HttpDelete]
         public async Task Delete([FromBody] ReferenceModel model)
         {
@@ -276,6 +323,11 @@ namespace FileFlows.Server.Controllers
             await DeleteAll(model);
         }
 
+        /// <summary>
+        /// Reprocess library files
+        /// </summary>
+        /// <param name="model">A reference model containing UIDs to reprocess</param>
+        /// <returns>an awaited task</returns>
         [HttpPost("reprocess")]
         public async Task Reprocess([FromBody] ReferenceModel model)
         {
@@ -301,6 +353,10 @@ namespace FileFlows.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets total shrinkage of all processed library files
+        /// </summary>
+        /// <returns>the total library file shrinkage</returns>
         [HttpGet("shrinkage")]
         public async Task<ShrinkageData> Shrinkage()
         {
@@ -322,6 +378,10 @@ namespace FileFlows.Server.Controllers
             };
         }
 
+        /// <summary>
+        /// Get library file shrinkage grouped by library
+        /// </summary>
+        /// <returns>the library file shrinkage data</returns>
         [HttpGet("shrinkage-groups")]
         public async Task<Dictionary<string, ShrinkageData>> ShrinkageGroups()
         {
@@ -401,17 +461,17 @@ namespace FileFlows.Server.Controllers
         }
 
 #if (DEBUG)
-        [HttpGet("stream")]
-        public async Task<IActionResult> StreamFile([FromQuery] string file)
-        {
-            // this method is testing if streaming a file to a node is doable
-            // instead of having to setup mappings
-            // ffmpeg handles it, but not every node would. so maybe have to bake in to the input node somehow...
-            // but doing that VideoInput can stream the file to get the info, thats a lot of data to stream over
-            // then its still on server, then when VideoEncode executes, we have to read the entire file again
-            // thats less than ideal... so maybe just delete this code...
-            return File(System.IO.File.OpenRead(file), "applicaiton/octet-stream");
-        }
+        //[HttpGet("stream")]
+        //public async Task<IActionResult> StreamFile([FromQuery] string file)
+        //{
+        //    // this method is testing if streaming a file to a node is doable
+        //    // instead of having to setup mappings
+        //    // ffmpeg handles it, but not every node would. so maybe have to bake in to the input node somehow...
+        //    // but doing that VideoInput can stream the file to get the info, thats a lot of data to stream over
+        //    // then its still on server, then when VideoEncode executes, we have to read the entire file again
+        //    // thats less than ideal... so maybe just delete this code...
+        //    return File(System.IO.File.OpenRead(file), "applicaiton/octet-stream");
+        //}
 #endif
     }
 }

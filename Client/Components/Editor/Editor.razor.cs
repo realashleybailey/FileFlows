@@ -16,19 +16,22 @@ namespace FileFlows.Client.Components
     using FileFlows.Client.Components.Inputs;
     using FileFlows.Plugin;
     using System.Text.Json;
+    using Microsoft.JSInterop;
 
     public partial class Editor : ComponentBase
     {
+        [Inject] IJSRuntime jsRuntime { get; set; }
 
         public bool Visible { get; set; }
 
         public string Title { get; set; }
+        public string HelpUrl { get; set; }
         public string Icon { get; set; }
 
         public string TypeName { get; set; }
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblCancel, lblClose;
+        private string lblSave, lblSaving, lblCancel, lblClose, lblHelp;
 
         private List<ElementField> Fields { get; set; }
 
@@ -69,6 +72,7 @@ namespace FileFlows.Client.Components
             lblSaving = Translater.Instant("Labels.Saving");
             lblCancel = Translater.Instant("Labels.Cancel");
             lblClose = Translater.Instant("Labels.Close");
+            lblHelp = Translater.Instant("Labels.Help");
         }
 
         protected override void OnAfterRender(bool firstRender)
@@ -117,7 +121,7 @@ namespace FileFlows.Client.Components
             return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null)
         {
             this.RegisteredInputs.Clear();
             var expandoModel = ConverToExando(model);
@@ -130,6 +134,7 @@ namespace FileFlows.Client.Components
             this.ReadOnly = readOnly;
             this.Large = large;
             this.Visible = true;
+            this.HelpUrl = helpUrl ?? string.Empty;
             this.AdditionalFields = additionalFields;
 
 
@@ -290,6 +295,13 @@ namespace FileFlows.Client.Components
             {
                 return default(T);
             }
+        }
+
+        void OpenHelp()
+        {
+            if (string.IsNullOrWhiteSpace(HelpUrl))
+                return;
+            _ = jsRuntime.InvokeVoidAsync("open", HelpUrl, "_blank");
         }
     }
 }

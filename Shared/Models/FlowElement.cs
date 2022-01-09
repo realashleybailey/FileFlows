@@ -14,6 +14,7 @@ namespace FileFlows.Shared.Models
 
         public int Inputs { get; set; }
         public int Outputs { get; set; }
+        public string HelpUrl { get; set; }
         public FlowElementType Type { get; set; }
 
         public string Group { get; set; }

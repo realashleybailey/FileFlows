@@ -19,7 +19,7 @@ if ((Test-Path ../deploy/FileFlows-Node) -eq $false) {
     New-Item -Path ../deploy/FileFlows-Node -ItemType directory
 }
 
-Copy-Item -Path $outdir -Filter "*.*" -Recurse -Destination "../deploy/FileFlows-Node" -Container
-Copy-Item -Path $outdir -Filter "*.*" -Recurse -Destination "../deploy/FileFlows" -Container
+Copy-Item $outdir -Filter "*.*" -Destination "../deploy/FileFlows-Node/" -Recurse
+Copy-Item $outdir -Filter "*.*" -Destination "../deploy/FileFlows/" -Recurse
 
 Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue

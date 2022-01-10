@@ -120,8 +120,9 @@
                                 process.StartInfo.FileName = GetDotnetLocation();
                                 process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner");
                             }
-
-                            process.StartInfo.WorkingDirectory = new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName;
+#if (!DEBUG)
+                            process.StartInfo.WorkingDirectory = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
+#endif
 
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);
@@ -170,7 +171,7 @@
                         }
                     }
 #endif
-                }
+                        }
                 finally
                 {
                     try

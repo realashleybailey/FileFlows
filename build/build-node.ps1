@@ -30,7 +30,7 @@ if ([System.IO.File]::Exists($zip)) {
 }
 
 $compress = @{
-    Path             = "..\deploy\FileFlows-Node"
+    Path             = "..\deploy\FileFlows-Node\*"
     CompressionLevel = "Optimal"
     DestinationPath  = "..\deploy\FileFlows-Node-$version.zip"
 }

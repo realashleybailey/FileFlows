@@ -58,7 +58,7 @@ if ([System.IO.File]::Exists($zip)) {
 }
 
 $compress = @{
-    Path             = $outdir
+    Path             = "$outdir\*"
     CompressionLevel = "Optimal"
     DestinationPath  = $zip
 }

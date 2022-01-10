@@ -19,4 +19,3 @@ if ($dev -eq $false) {
 
 # no longer need plugins or flowrunner, delete them
 Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 
-Remove-Item ..\deploy\FileFlows-Runner -Recurse -ErrorAction SilentlyContinue 

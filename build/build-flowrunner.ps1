@@ -19,9 +19,7 @@ if ((Test-Path ../deploy/FileFlows-Node) -eq $false) {
     New-Item -Path ../deploy/FileFlows-Node -ItemType directory
 }
 
-Copy-Item "$outdir/FileFlows.FlowRunner.exe" "../deploy/FileFlows-Node"
-Copy-Item "$outdir/FileFlows.FlowRunner.pdb" "../deploy/FileFlows-Node"
-Copy-Item "$outdir/FileFlows.FlowRunner.exe" "../deploy/FileFlows"
-Copy-Item "$outdir/FileFlows.FlowRunner.pdb" "../deploy/FileFlows"
+Copy-Item -Path $outdir -Filter "*.*" -Recurse -Destination "../deploy/FileFlows-Node" -Container
+Copy-Item -Path $outdir -Filter "*.*" -Recurse -Destination "../deploy/FileFlows" -Container
 
-#Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue
+Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue

@@ -107,11 +107,21 @@
                         try
                         {
                             process.StartInfo = new ProcessStartInfo();
+                            if (windows)
+                            {
 #if (DEBUG)
-                            process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
+                                process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
 #else
-                            process.StartInfo.FileName = windows ? "FileFlows.FlowRunner.exe" : "FileFlows.FlowRunner";
+                                process.StartInfo.FileName = "FileFlows.FlowRunner.exe";
 #endif
+                            }
+                            else
+                            {
+                                process.StartInfo.FileName = GetDotnetLocation();
+                                process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner");
+                            }
+
+                            process.StartInfo.WorkingDirectory = new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName;
 
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);
@@ -193,6 +203,22 @@
                 log = string.Join('\n', log.Split('\n').Select(x => "       " + x).ToArray());
                 Logger.Instance?.DLog(Environment.NewLine + log);
             }
+        }
+
+
+        private static string Dotnet = "";
+        private string GetDotnetLocation()
+        {
+            if(string.IsNullOrEmpty(Dotnet))
+            {
+                if (File.Exists("/root/.dotnet/dotnet"))
+                    Dotnet = "/root/.dotnet/dotnet"; // location of docker
+                else
+                {
+                    Dotnet = "dotnet";// assume in PATH
+                }
+            }
+            return Dotnet;
         }
     }
 }

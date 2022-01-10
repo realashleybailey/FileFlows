@@ -8,7 +8,8 @@ FROM lsiobase/ubuntu:focal
 ENV LIBVA_DRIVERS_PATH="/usr/lib/x86_64-linux-gnu/dri" \
     LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu" \
     NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
-    NVIDIA_VISIBLE_DEVICES="all" 
+    NVIDIA_VISIBLE_DEVICES="all" \
+    DOTNET_CLI_TELEMETRY_OPTOUT=true
 
 # ffmpeg from jellyfin, a little older but precompiled for us
 RUN apt-get update && \

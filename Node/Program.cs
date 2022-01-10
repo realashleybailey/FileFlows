@@ -111,9 +111,18 @@ namespace FileFlows.Node
 
             var settings = AppSettings.Instance;
             var nodeService = new NodeService();
-            var result = nodeService.Register(settings.ServerUrl, Environment.MachineName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
-            if (result == null)
+            Shared.Models.ProcessingNode result;
+            try
+            {
+                result = nodeService.Register(settings.ServerUrl, Environment.MachineName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
+                if (result == null)
+                    return false;
+            }
+            catch(Exception ex)
+            {
+                Shared.Logger.Instance?.ELog("Failed to register with server: " + ex.Message);
                 return false;
+            }
 
             Service.ServiceBaseUrl = settings.ServerUrl;
             if(Service.ServiceBaseUrl.EndsWith("/"))

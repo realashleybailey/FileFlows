@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using FileFlows.Node.Workers;
 using FileFlows.Server.Workers;
+using FileFlows.ServerShared.Models;
+using FileFlows.ServerShared.Services;
 
 namespace FileFlows.Node
 {
@@ -26,7 +30,14 @@ namespace FileFlows.Node
 
                 Shared.Helpers.HttpHelper.Client = new HttpClient();
 
+                Shared.Logger.Instance.ILog("Registering FileFlow Node");
+
+                if (Register() == false)
+                    return;
+
                 Shared.Logger.Instance.ILog("FileFlows node starting");
+
+
                 Shared.Logger.Instance.ILog("Press Esc to quit");
 
 
@@ -76,6 +87,35 @@ namespace FileFlows.Node
             {
                 Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
+        }
+
+        private static bool Register()
+        {
+            string dll = Assembly.GetExecutingAssembly().Location;
+            string path = new FileInfo(dll).DirectoryName;
+
+            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+
+            List<RegisterModelMapping> mappings = new List<RegisterModelMapping>
+            {
+                new RegisterModelMapping
+                {
+                    Server = "ffmpeg",
+                    Local = Path.Combine(path, "Tools", windows ? "ffmpeg.exe" : "ffmpeg")
+                }
+            };
+
+            var settings = AppSettings.Instance;
+            var nodeService = new NodeService();
+            var result = nodeService.Register(settings.ServerUrl, Environment.MachineName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
+            if (result == null)
+                return false;
+
+            settings.Enabled = result.Enabled;
+            settings.Runners = result.FlowRunners;
+            settings.Save();
+            return true;
         }
     }
 }

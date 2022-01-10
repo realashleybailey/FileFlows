@@ -34,12 +34,17 @@ namespace FileFlows.FlowRunner
                 Console.WriteLine("Base URL: " + baseUrl);
                 Service.ServiceBaseUrl = baseUrl;
 
+
+                string hostname = GetArgument(args, "--hostname");
+                if(string.IsNullOrWhiteSpace(hostname))
+                    hostname = Environment.MachineName;
+
                 string workingDir = Path.Combine(tempPath, "Runner-" + uid);
                 Directory.CreateDirectory(workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
                 Shared.Helpers.HttpHelper.Client = new HttpClient();
-                Execute(server, tempPath, libfileUid, workingDir);
+                Execute(server, tempPath, libfileUid, workingDir, hostname);
             }
             catch (Exception ex)
             {
@@ -70,13 +75,13 @@ namespace FileFlows.FlowRunner
         }
 
 
-        static void Execute(bool isServer, string tempPath, Guid libfileUid, string workingDir)
+        static void Execute(bool isServer, string tempPath, Guid libfileUid, string workingDir, string hostname)
         {
             ProcessingNode node;
             var nodeService = NodeService.Load();
             try
             {
-                string address = isServer ? "INTERNAL_NODE" : Environment.MachineName;
+                string address = isServer ? "INTERNAL_NODE" : hostname;
                 Console.WriteLine("Address: "+ address);
                 var nodeTask = nodeService.GetByAddress(address);
                 Console.WriteLine("Waiting on node task");

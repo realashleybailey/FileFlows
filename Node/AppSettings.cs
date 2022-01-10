@@ -12,6 +12,7 @@ namespace FileFlows.Node
     {
         public static string? ForcedServerUrl { get; set; }
         public static string? ForcedTempPath { get; set; }
+        public static string? ForcedHostName { get; set; }
 
         private string _ServerUrl = string.Empty;
         private string _TempPath = string.Empty;
@@ -40,6 +41,16 @@ namespace FileFlows.Node
             set
             {
                 _TempPath = value ?? String.Empty;
+            }
+        }
+
+        public string HostName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ForcedHostName) == false)
+                    return ForcedHostName;
+                return Environment.MachineName;
             }
         }
 

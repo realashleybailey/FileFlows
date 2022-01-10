@@ -19,10 +19,13 @@
 
         private bool FirstExecute = true;
 
-        public FlowWorker(bool isServer = false) : base(ScheduleType.Second, 10)
+        private string Hostname { get; set; }
+
+        public FlowWorker(string hostname, bool isServer = false) : base(ScheduleType.Second, 10)
         {
             this.isServer = isServer;
             this.FirstExecute = true;
+            this.Hostname = hostname;
         }
 
         public Func<bool> IsEnabledCheck { get; set; }
@@ -36,7 +39,7 @@
             ProcessingNode node;
             try
             {
-                node = isServer ? nodeService.GetServerNode().Result : nodeService.GetByAddress(Environment.MachineName).Result;
+                node = isServer ? nodeService.GetServerNode().Result : nodeService.GetByAddress(this.Hostname).Result;
             }
             catch(Exception ex)
             {
@@ -86,6 +89,7 @@
                 try
                 {
 
+#pragma warning disable CS8601 // Possible null reference assignment.
                     var parameters = new string[]
                     {
                         "--uid",
@@ -96,8 +100,11 @@
                         tempPath,
                         "--baseUrl",
                         Service.ServiceBaseUrl,
+                        isServer ? null : "--hostname",
+                        isServer ? null : Hostname,
                         isServer ? "--server" : "--notserver"
-                    };
+                    }.Where(x => x != null).ToArray();
+#pragma warning restore CS8601 // Possible null reference assignment.
 
 #if (DEBUG && false)
                     FileFlows.FlowRunner.Program.Main(parameters);

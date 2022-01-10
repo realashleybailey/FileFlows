@@ -18,7 +18,7 @@ namespace FileFlows.WindowsNode
 
 
             ServerShared.Services.Service.ServiceBaseUrl = this.txtServer.Text;
-            WorkerManager.StartWorkers(new FlowWorker()
+            WorkerManager.StartWorkers(new FlowWorker(Environment.MachineName)
             {
                 IsEnabledCheck = () => 
                 {

@@ -137,7 +137,7 @@ namespace FileFlows.Server
             LibraryWorker.ResetProcessing();
             WorkerManager.StartWorkers(
                 new LibraryWorker(),
-                new FlowWorker(isServer: true),
+                new FlowWorker(string.Empty, isServer: true),
                 new PluginUpdaterWorker(),
                 new TelemetryReporter()
             );

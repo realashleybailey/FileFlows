@@ -20,6 +20,7 @@ namespace FileFlows.Node
             {
                 AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
                 AppSettings.ForcedTempPath = Environment.GetEnvironmentVariable("TempPath");
+                AppSettings.ForcedHostName = Environment.GetEnvironmentVariable("NodeName");
 
                 Shared.Logger.Instance = new ServerShared.ConsoleLogger();
 
@@ -45,7 +46,7 @@ namespace FileFlows.Node
 
 
                 Shared.Logger.Instance.ILog("Starting workers");
-                WorkerManager.StartWorkers(new FlowWorker()
+                WorkerManager.StartWorkers(new FlowWorker(AppSettings.Instance.HostName)
                 {
                     IsEnabledCheck = () =>
                     {
@@ -56,7 +57,7 @@ namespace FileFlows.Node
                         var nodeService = new ServerShared.Services.NodeService();
                         try
                         {
-                            var settings = nodeService.GetByAddress(Environment.MachineName).Result;
+                            var settings = nodeService.GetByAddress(AppSettings.Instance.HostName).Result;
 
                             AppSettings.Instance.Enabled = settings.Enabled;
                             AppSettings.Instance.Runners = settings.FlowRunners;
@@ -73,11 +74,19 @@ namespace FileFlows.Node
                     }
                 });
 
-                while (true)
+                try
                 {
-                    var key = System.Console.ReadKey();
-                    if (key.Key == ConsoleKey.Escape)
-                        break;
+                    while (true)
+                    {
+                        var key = System.Console.ReadKey();
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+                }catch (Exception)
+                {
+                    // can throw an exception if not run from console
+                    Thread.Sleep(-1);
+                    
                 }
 
                 Shared.Logger.Instance.ILog("Stopping workers");
@@ -114,7 +123,7 @@ namespace FileFlows.Node
             Shared.Models.ProcessingNode result;
             try
             {
-                result = nodeService.Register(settings.ServerUrl, Environment.MachineName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
+                result = nodeService.Register(settings.ServerUrl, settings.HostName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
                 if (result == null)
                     return false;
             }

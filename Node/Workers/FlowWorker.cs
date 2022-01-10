@@ -107,24 +107,24 @@
                         try
                         {
                             process.StartInfo = new ProcessStartInfo();
+                            string dir = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
                             if (windows)
                             {
 #if (DEBUG)
                                 process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
 #else
-                                process.StartInfo.FileName = "FileFlows.FlowRunner.exe";
+                                string flowRunner = Path.Combine(dir, "FileFlows.FlowRunner" + (windows ? ".exe" : ".dll"));
+                                process.StartInfo.FileName = flowRunner;
 #endif
                             }
                             else
                             {
                                 process.StartInfo.FileName = GetDotnetLocation();
+                                process.StartInfo.WorkingDirectory = dir;
                                 process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");
                             }
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);
-#if (!DEBUG)
-                            process.StartInfo.WorkingDirectory = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
-#endif
 
                             Logger.Instance?.ILog("Executing: " + process.StartInfo.FileName + " " + String.Join(" ", process.StartInfo.ArgumentList.Select(x => "\"" + x + "\"")));
                             Logger.Instance?.ILog("Working Directory: " + process.StartInfo.WorkingDirectory);

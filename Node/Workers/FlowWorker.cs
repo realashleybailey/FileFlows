@@ -118,7 +118,7 @@
                             else
                             {
                                 process.StartInfo.FileName = GetDotnetLocation();
-                                process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner");
+                                process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");
                             }
 #if (!DEBUG)
                             process.StartInfo.WorkingDirectory = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");

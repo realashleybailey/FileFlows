@@ -123,9 +123,11 @@
 #if (!DEBUG)
                             process.StartInfo.WorkingDirectory = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
 #endif
-
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);
+
+                            Logger.Instance?.ILog("Executing: " + process.StartInfo.FileName + " " + String.Join(" ", process.StartInfo.ArgumentList.Select(x => "\"" + x + "\""));
+                            Logger.Instance?.ILog("Working Directory: " + process.StartInfo.WorkingDirectory);
 
                             process.StartInfo.UseShellExecute = false;
                             process.StartInfo.RedirectStandardOutput = true;
@@ -158,10 +160,12 @@
                                     "===                    PROCESSING NODE ERROR OUTPUT END                    ===" + Environment.NewLine +
                                     "==============================================================================");
                             }
-                            if(process.ExitCode != 0)
-                                throw new Exception("Invalid exit code: " + process.ExitCode);
 
                             SaveLog(libFile, completeLog.ToString());
+
+                            if (process.ExitCode != 0)
+                                throw new Exception("Invalid exit code: " + process.ExitCode);
+
                         }
                         catch (Exception ex)
                         {

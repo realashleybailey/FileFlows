@@ -115,6 +115,9 @@ namespace FileFlows.Node
             if (result == null)
                 return false;
 
+            Service.ServiceBaseUrl = result.Address;
+
+            Shared.Logger.Instance?.ILog("Successfully registered node");
             settings.Enabled = result.Enabled;
             settings.Runners = result.FlowRunners;
             settings.Save();

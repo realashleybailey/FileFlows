@@ -10,8 +10,39 @@ namespace FileFlows.Node
 {
     public class AppSettings
     {
-        public string ServerUrl { get; set; } = String.Empty;
-        public string TempPath { get; set; } = String.Empty;
+        public static string? ForcedServerUrl { get; set; }
+        public static string? ForcedTempPath { get; set; }
+
+        private string _ServerUrl = string.Empty;
+        private string _TempPath = string.Empty;
+        public string ServerUrl
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ForcedServerUrl) == false)
+                    return ForcedServerUrl;
+                return _ServerUrl;
+            }
+            set
+            {
+                _ServerUrl = value ?? String.Empty;
+            }
+        }
+
+        public string TempPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ForcedTempPath) == false)
+                    return ForcedTempPath;
+                return _TempPath;
+            }
+            set
+            {
+                _TempPath = value ?? String.Empty;
+            }
+        }
+
         public int Runners { get; set; }
         public bool Enabled { get; set; }
 

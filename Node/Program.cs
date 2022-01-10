@@ -18,6 +18,9 @@ namespace FileFlows.Node
         {
             try
             {
+                AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
+                AppSettings.ForcedTempPath = Environment.GetEnvironmentVariable("TempPath");
+
                 Shared.Logger.Instance = new ServerShared.ConsoleLogger();
 
                 AppSettings.Init();

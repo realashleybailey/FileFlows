@@ -112,17 +112,15 @@
 #if (DEBUG)
                                 process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
 #else
-                                process.StartInfo.FileName = "FileFlows.FlowRunner.exe";
+                                process.StartInfo.FileName = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner", "FileFlows-Runner.exe");
 #endif
                             }
                             else
                             {
                                 process.StartInfo.FileName = GetDotnetLocation();
                                 process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");
+                                process.StartInfo.WorkingDirectory = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
                             }
-#if (!DEBUG)
-                            process.StartInfo.WorkingDirectory = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
-#endif
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);
 

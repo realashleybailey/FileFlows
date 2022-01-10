@@ -103,7 +103,15 @@
                         Node
                     </Header>
                     <Cell Context="item">
-                        <span>@item.Node?.Name</span>
+                        @if(item.Node?.Name == "FileFlowsServer")
+                        {
+                            <span>@lblFileFlowsServer</span>
+                        }
+                        else
+                        {
+                            <span>@item.Node?.Name</span>
+                        }
+                            
                     </Cell>
                 </FlowTableColumn>
                 <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed)" MobileWidth="5rem">

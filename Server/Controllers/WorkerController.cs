@@ -205,6 +205,14 @@ namespace FileFlows.Server.Controllers
                 Logger.Instance?.WLog("Failed to locate Flow executor with library file: " + uid);
                 foreach (var executor in Executors)
                     Logger.Instance?.ILog($"Flow Executor: {executor.Key} = {executor.Value?.LibraryFile?.Uid} = {executor.Value?.LibraryFile?.Name}");
+                // may not have an executor, just update the status
+                var libfileController = new LibraryFileController();
+                var libFile = await libfileController.Get(uid);
+                if (libFile != null && libFile.Status == FileStatus.Processing)
+                {
+                    libFile.Status = FileStatus.ProcessingFailed;
+                    await libfileController.Update(libFile);
+                }
                 return;
             }
             await Abort(executorId);

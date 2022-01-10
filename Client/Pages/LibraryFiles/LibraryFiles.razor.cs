@@ -24,7 +24,7 @@ namespace FileFlows.Client.Pages
         private int Count;
 
         private string Title;
-        private string lblLibraryFiles;
+        private string lblLibraryFiles, lblFileFlowsServer;
 
         private void SetSelected(LibraryStatus status)
         {
@@ -89,7 +89,9 @@ namespace FileFlows.Client.Pages
             base.OnInitialized();
             lblMoveToTop = Translater.Instant("Pages.LibraryFiles.Buttons.MoveToTop");
             lblLibraryFiles = Translater.Instant("Pages.LibraryFiles.Title");
+            lblFileFlowsServer = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
             Title = lblLibraryFiles + ": " + Translater.Instant("Enums.FileStatus." + FileStatus.Unprocessed);
+
         }
 
         private async Task<RequestResult<List<LibraryStatus>>> GetStatus()

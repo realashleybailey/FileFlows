@@ -3,6 +3,8 @@ Write-Output "###   Building Windows Node   ###"
 Write-Output "#################################"
 
 . .\build-variables.ps1
+$csVersion = "string Version = ""$version"""
+(Get-Content ..\Node\Globals.cs) -replace 'string Version = \"[\d\.]+\"', $csVersion | Out-File ..\Node\Globals.cs
 
 (Get-Content ..\WindowsNode\WindowsNode.csproj) -replace '<PublishSingleFile>[^<]+</PublishSingleFile>', "" | Out-File ..\WindowsNode\WindowsNode.csproj
 (Get-Content ..\WindowsNode\WindowsNode.csproj) -replace '<RuntimeIdentifier>[^<]+</RuntimeIdentifier>', "" | Out-File ..\WindowsNode\WindowsNode.csproj
@@ -16,7 +18,6 @@ dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --configu
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = false', "Node = true" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
 if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
-    $curDir = Get-Location
     & 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' installers\FileFlowInstallers.sln
 }
 else {

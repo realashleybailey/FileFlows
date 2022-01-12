@@ -264,6 +264,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{packageName}/settings")]
         public async Task<string> GetPluginSettings([FromRoute]string packageName)
         {
+            Logger.Instance.DLog("Getting plugin settings for: " + packageName);
             var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
             if (obj == null)
                 return string.Empty;

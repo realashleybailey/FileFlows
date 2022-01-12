@@ -9,6 +9,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
     using FileFlows.Shared.Helpers;
     using FileFlows.ServerShared.Helpers;
+    using System.Text.Json;
 
     /// <summary>
     /// Plugin Controller
@@ -66,6 +67,17 @@ namespace FileFlows.Server.Controllers
             return pi ?? new();
         }
 
+        /// <summary>
+        /// Get the plugin info for a specific plugin by package name
+        /// </summary>
+        /// <param name="name">The package name of the plugin</param>
+        /// <returns>The plugin info for the plugin</returns>
+        [HttpGet("by-package-name/{name}")]
+        public async Task<PluginInfo> GetByPackageName([FromRoute] string name)
+        {
+            var pi = (await GetDataList()).Where(x => x.PackageName == name).FirstOrDefault();  
+            return pi ?? new();
+        }
 
         /// <summary>
         /// Get the plugins translation file
@@ -266,6 +278,50 @@ namespace FileFlows.Server.Controllers
         {
             Logger.Instance.DLog("Getting plugin settings for: " + packageName);
             var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
+
+            // need to decode any passwords
+            if (string.IsNullOrEmpty(obj.Json) == false) 
+            {
+                try
+                {
+                    var plugin = await GetByPackageName(packageName);
+                    if (string.IsNullOrEmpty(plugin?.Name) == false)
+                    {
+                        bool updated = false;
+
+                        IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(obj.Json);
+                        foreach (var key in dict.Keys.ToArray())
+                        {
+                            if(plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
+                            {
+                                // its a password, decrypt 
+                                string text = null;
+                                if (dict[key] is JsonElement je)
+                                {
+                                    text = je.GetString();
+                                }
+                                else if(dict[key] is string str)  
+                                {
+                                    text = str;
+                                }
+
+                                if (string.IsNullOrEmpty(text))
+                                    continue;
+
+                                dict[key] = Helpers.Decrypter.Decrypt(text);
+                                updated = true;
+                            }
+                        }
+                        if(updated)
+                            obj.Json = JsonSerializer.Serialize(dict);
+                    }
+                } 
+                catch (Exception ex)
+                {
+                    Logger.Instance.WLog("Failed to decrypting passwords in plugin settings: " + ex.Message);
+                }
+            }
+
             if (obj == null)
                 return string.Empty;
             return obj.Json ?? string.Empty;
@@ -280,6 +336,50 @@ namespace FileFlows.Server.Controllers
         [HttpPost("{packageName}/settings")]
         public async Task SetPluginSettingsJson([FromRoute] string packageName, [FromBody] string json)
         {
+            // need to decode any passwords
+            if (string.IsNullOrEmpty(json) == false)
+            {
+                try
+                {
+                    var plugin = await GetByPackageName(packageName);
+                    if (string.IsNullOrEmpty(plugin?.Name) == false)
+                    {
+                        bool updated = false;
+
+                        IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json);
+                        foreach (var key in dict.Keys.ToArray())
+                        {
+                            if (plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
+                            {
+                                // its a password, decrypt 
+                                string text = null;
+                                if (dict[key] is JsonElement je)
+                                {
+                                    text = je.GetString();
+                                }
+                                else if (dict[key] is string str)
+                                {
+                                    text = str;
+                                }
+
+                                if (string.IsNullOrEmpty(text))
+                                    continue;
+
+                                dict[key] = Helpers.Decrypter.Encrypt(text);
+                                updated = true;
+                            }
+                        }
+                        if (updated)
+                            json = JsonSerializer.Serialize(dict);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.WLog("Failed to encrypting passwords in plugin settings: " + ex.Message);
+                }
+            }
+
+
             var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
             obj ??= new Models.PluginSettingsModel();
             obj.Name = "PluginSettings_" + packageName;

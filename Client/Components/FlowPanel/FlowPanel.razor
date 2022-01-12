@@ -30,6 +30,13 @@
     Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
             }
             break;
+        case FormInputType.Password:
+            {
+                var value = GetValue<string>(field.Name) ?? "";
+                <InputPassword Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+            }
+            break;
         case FormInputType.LogView:
             {
                 var value = GetValue<string>(field.Name) ?? "";

@@ -30,7 +30,8 @@ namespace FileFlows.Plugin
         Schedule = 17,
         Slider = 18,
         Checklist = 19,
-        TextLabel = 20
+        TextLabel = 20,
+        Password = 21
     }
 
 

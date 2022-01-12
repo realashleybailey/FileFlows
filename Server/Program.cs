@@ -11,6 +11,8 @@ namespace FileFlows.Server
         {
             try
             {
+                InitEncryptionKey();
+
                 if (args.FirstOrDefault() == "--windows")
                     StartWindows(args.Skip(1).ToArray());
                 else
@@ -53,6 +55,30 @@ namespace FileFlows.Server
             Console.SetOut(oldOut);
             writer.Close();
             ostream.Close();
+        }
+
+        /// <summary>
+        /// Init the encryption key, by making this a file in app data, it wont be included with the database if provided to for support
+        /// It wont be lost if inside a docker container and updated
+        /// </summary>
+        private static void InitEncryptionKey()
+        {
+            string encryptionFile = Path.Combine(GetAppDirectory(), "encryptionkey.txt");
+            if (File.Exists(encryptionFile))
+            {
+                string key = File.ReadAllText(encryptionFile);
+                if (string.IsNullOrEmpty(key) == false)
+                {
+                    Helpers.Decrypter.EncryptionKey = key;
+                    return;
+                }
+            }
+            else
+            {
+                string key = Guid.NewGuid().ToString();
+                File.WriteAllText(encryptionFile, key);
+                Helpers.Decrypter.EncryptionKey = key;
+            }
         }
 
         internal static string GetAppDirectory()

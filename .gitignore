@@ -28,3 +28,4 @@ docker.xml
 /Server/Logs
 /Server/wwwroot/i18n
 *.plugininfo
+/Server/encryptionkey.txt

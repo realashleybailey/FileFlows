@@ -12,6 +12,7 @@
         Task<PluginInfo> Update(PluginInfo pluginInfo);
 
         Task<byte[]> Download(PluginInfo plugin);
+        Task<string> GetSettingsJson(string pluginPackageName);
     }
 
     public class PluginService : Service, IPluginService
@@ -55,6 +56,22 @@
             {
                 Logger.Instance?.WLog("Failed to get plugin infos: " + ex.Message);
                 return new List<PluginInfo>();
+            }
+        }
+
+        public async Task<string> GetSettingsJson(string pluginPackageName)
+        {
+            try
+            {
+                var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/plugin/{pluginPackageName}/settings");
+                if (result.Success == false)
+                    throw new Exception(result.Body);
+                return result.Data;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.WLog("Failed to get plugin settings: " + ex.Message);
+                return String.Empty;
             }
         }
 

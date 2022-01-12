@@ -15,6 +15,9 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
     {
         public static void Main(string[] args)
         {
+#if (DEBUG)
+            //args = new[] { @"C:\Users\john\src\FileFlows\FileFlowsPlugins\EmailNodes\bin\Debug\net6.0\EmailNodes.dll", @"C:\Users\john\src\FileFlows\FileFlowsPlugins\EmailNodes\EmailNodes.csproj" };
+#endif
             if(args.Length != 2)
             {
                 Console.WriteLine("Must specify first the DLL then the csproj file");
@@ -90,6 +93,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             info.Name = fvi.ProductName ?? dll.Name;
             info.Version = fvi.FileVersion.ToString();
             info.Elements = GetElements(assembly);
+            info.Settings = GetSettings(assembly);
 
             string csProjFile = System.IO.File.ReadAllText(csproj.FullName);
             info.Authors = GetFromCsProject(csProjFile, "Authors");
@@ -148,6 +152,19 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
                 elements.Add(element);
             }
             return elements.OrderBy(x => x.Group).ThenBy(x => x.Type).ThenBy(x => x.Name).ToList();
+        }
+
+
+        private static List<ElementField> GetSettings(Assembly assembly)
+        {
+            var tSettings = typeof(IPluginSettings);
+            var types = assembly.GetTypes().ToArray();
+            var settingType = types.Where(x => tSettings.IsAssignableFrom(x) && x.IsAbstract == false).FirstOrDefault();
+            if (settingType == null)
+                return new List<ElementField>();
+
+            var fields = FormHelper.GetFields(settingType, new Dictionary<string, object>());
+            return fields;
         }
     }
 

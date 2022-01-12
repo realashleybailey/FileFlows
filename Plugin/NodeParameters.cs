@@ -2,6 +2,7 @@ namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
     using System.Text;
+    using System.Text.Json;
 
     public class NodeParameters
     {
@@ -31,6 +32,8 @@ namespace FileFlows.Plugin
         public Dictionary<string, object> Variables { get; set; } = new Dictionary<string, object>();
 
         public Func<string, string>? GetToolPath { get; set; }
+
+        public Func<string, string> GetPluginSettingsJson { get; set; }
         public Func<string, string>? PathMapper { get; set; }
 
         public Action<ObjectReference> GotoFlow { get; set; }
@@ -336,6 +339,22 @@ namespace FileFlows.Plugin
         /// </summary>
         /// <returns>a new guid as a string</returns>
         public string NewGuid() => Guid.NewGuid().ToString();
+
+
+        /// <summary>
+        /// Loads the plugin settings
+        /// </summary>
+        /// <typeparam name="T">The plugin settings to load</typeparam>
+        /// <returns>The plugin settings</returns>
+        public T GetPluginSettings<T>() where T : IPluginSettings
+        {
+            string name = typeof(T).Namespace;
+            name = name.Substring(name.IndexOf(".") + 1);
+            string json = GetPluginSettingsJson(name);
+            if (string.IsNullOrEmpty(json))
+                return default(T);
+            return (T)JsonSerializer.Deserialize<T>(json);
+        }
     }
 
 

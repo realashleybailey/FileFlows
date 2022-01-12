@@ -189,6 +189,12 @@ public class Runner
             var nodeService = NodeService.Load();
             return Node.Map(nodeService.GetToolPath(name).Result);
         };
+        nodeParameters.GetPluginSettingsJson = (string pluginSettingsType) =>
+        {
+            var pluginService = PluginService.Load();
+            return pluginService.GetSettingsJson(pluginSettingsType).Result;
+        };
+
         int count = 0;
 
         // find the first node

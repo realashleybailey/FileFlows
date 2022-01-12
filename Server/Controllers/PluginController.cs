@@ -40,9 +40,7 @@ namespace FileFlows.Server.Controllers
                     Enabled = plugin.Enabled,
                     Version = plugin.Version,
                     Deleted = plugin.Deleted,
-                    HasSettings = plugin.HasSettings,
                     Settings = plugin.Settings,
-                    Fields = plugin.Fields,
                     Authors = plugin.Authors,
                     Url =  plugin.Url,
                     PackageName = plugin.PackageName,
@@ -68,21 +66,6 @@ namespace FileFlows.Server.Controllers
             return pi ?? new();
         }
 
-        /// <summary>
-        /// Save plugin settings
-        /// </summary>
-        /// <param name="uid">The UID of the plugin</param>
-        /// <param name="settings">The settings model for the plugin</param>
-        /// <returns>The updated plugin info</returns>
-        [HttpPost("{uid}/settings")]
-        public async Task<PluginInfo> SaveSettings([FromRoute] Guid uid, [FromBody] ExpandoObject settings)
-        {
-            var pi = await GetByUid(uid);
-            if (pi == null)
-                return new PluginInfo();
-            pi.Settings = settings;
-            return await Update(pi);
-        }
 
         /// <summary>
         /// Get the plugins translation file
@@ -271,6 +254,36 @@ namespace FileFlows.Server.Controllers
                 Logger.Instance?.ELog("Download Package Error: Failed to read data => " + ex.Message); ;
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Gets the json plugin settings for a plugin
+        /// </summary>
+        /// <param name="packageName">The full plugin name</param>
+        /// <returns>the plugin settings json</returns>
+        [HttpGet("{packageName}/settings")]
+        public async Task<string> GetPluginSettings([FromRoute]string packageName)
+        {
+            var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
+            if (obj == null)
+                return string.Empty;
+            return obj.Json ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Sets the json plugin settings for a plugin
+        /// </summary>
+        /// <param name="pluginSettingsType">The full plugin name</param>
+        /// <param name="json">the settings json</param>
+        /// <returns>an awaited task</returns>
+        [HttpPost("{packageName}/settings")]
+        public async Task SetPluginSettingsJson([FromRoute] string packageName, [FromBody] string json)
+        {
+            var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
+            obj ??= new Models.PluginSettingsModel();
+            obj.Name = "PluginSettings_" + packageName;
+            obj.Json = json ?? String.Empty;
+            await DbHelper.Update(obj);
         }
 
         /// <summary>

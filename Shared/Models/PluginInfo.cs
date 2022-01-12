@@ -8,6 +8,7 @@ namespace FileFlows.Shared.Models
         public bool Enabled { get; set; }
         public string Version { get; set; }
         public bool Deleted { get; set; }
+
         public bool HasSettings { get; set; }
 
         public string Url { get; set; }
@@ -15,10 +16,11 @@ namespace FileFlows.Shared.Models
         public string Description { get; set; }
         public string MinimumVersion { get; set; }
         public string PackageName { get; set; }
-        public ExpandoObject Settings { get; set; }
 
-        public List<ElementField> Fields { get; set; }
+        //public List<ElementField> Fields { get; set; }
 
+        public List<ElementField> Settings { get; set; }
+        
         public List<FlowElement> Elements { get; set; }
     }
 

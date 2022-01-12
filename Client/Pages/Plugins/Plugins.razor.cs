@@ -10,6 +10,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared.Models;
     using FileFlows.Plugin;
     using FileFlows.Client.Components.Inputs;
+    using System.Text.Json;
 
     public partial class Plugins : ListPage<PluginInfoModel>
     {
@@ -72,7 +73,8 @@ namespace FileFlows.Client.Pages
 
             try
             {
-                var pluginResult = await HttpHelper.Post<PluginInfo>($"{ApiUrl}/{EditingPlugin.Uid}/settings", model);
+                string json = System.Text.Json.JsonSerializer.Serialize(model);
+                var pluginResult = await HttpHelper.Post($"{ApiUrl}/{EditingPlugin.PackageName}/settings", json);
                 if (pluginResult.Success == false)
                 {
                     Toast.ShowError( Translater.Instant("ErrorMessages.SaveFailed"));
@@ -93,19 +95,20 @@ namespace FileFlows.Client.Pages
         public override async Task<bool> Edit(PluginInfoModel plugin)
         {
 #if (!DEMO)
-            if (plugin?.HasSettings != true)
+            if (plugin?.Settings?.Any() != true)
                 return false;
             Blocker.Show();
             this.StateHasChanged();
             Data.Clear();
 
+            ExpandoObject model = new ExpandoObject();
             try
             {
-                var pluginResult = await HttpHelper.Get<PluginInfo>($"{ApiUrl}/{plugin.Uid}");
+                var pluginResult = await HttpHelper.Get<string>($"{ApiUrl}/{plugin.PackageName}/settings");
                 if (pluginResult.Success == false)
                     return false;
-                plugin.Settings = pluginResult.Data.Settings;
-                plugin.Fields = pluginResult.Data.Fields;
+                if (string.IsNullOrWhiteSpace(pluginResult.Data) == false)
+                    model = JsonSerializer.Deserialize<ExpandoObject>(pluginResult.Data);
             }
             finally
             {
@@ -113,7 +116,11 @@ namespace FileFlows.Client.Pages
                 this.StateHasChanged();
             }
             this.EditingPlugin = plugin;
-            var result = await Editor.Open("Plugins." + plugin.Name, plugin.Name, plugin.Fields, plugin.Settings,
+
+            // clone the fields as they get wiped
+            var fields = plugin.Settings.ToList();
+
+            var result = await Editor.Open("Plugins." + plugin.PackageName, plugin.Name, fields, model,
                 saveCallback: SaveSettings);
             return false; // we dont need to reload the list
 #else
@@ -127,6 +134,13 @@ namespace FileFlows.Client.Pages
             var item = Table.GetSelected().FirstOrDefault();
             if (item != null)
                 await About(item);
+        }
+        private async Task DoubleClick(PluginInfoModel plugin)
+        {
+            if (plugin.Settings?.Any() == true)
+                await Edit(plugin);
+            else
+                await About(plugin);
         }
 
         private async Task About(PluginInfoModel plugin)

@@ -12,12 +12,12 @@
     <Body>
         
         <FlowTable @ref="Table" Data="@Data" TItem="PluginInfoModel" Selection="SelectionMode.Multiple"
-            DoubleClick="@About">
+            DoubleClick="@DoubleClick">
             <ToolBar>            
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
                 <FlowTableButton TItem="PluginInfoModel" Clicked=AboutAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.About" />                
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />                
-                <!--<FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />-->
+                <FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
                 <FlowTableHelpButton TItem="PluginInfoModel" HelpUrl="Plugins" />
             </ToolBar>
@@ -38,6 +38,17 @@
                     </Header>
                     <Cell Context="item">
                         <span>@(item.Elements?.Count ?? 0)</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="PluginInfoModel" Width="6rem" MobileWidth="0">
+                    <Header>
+                        Settings
+                    </Header>
+                    <Cell Context="item">
+                        @if(@item.Settings?.Any() == true)
+                        {
+                            <i class="fas fa-check"></i>
+                        }
                     </Cell>
                 </FlowTableColumn>
                 <FlowTableColumn TItem="PluginInfoModel" Width="10rem" MobileWidth="0">

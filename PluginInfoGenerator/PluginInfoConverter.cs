@@ -28,15 +28,11 @@
                     continue;
                 if (prop.Name == nameof(PluginInfo.Uid))
                     continue;
-                if (prop.Name == nameof(PluginInfo.Settings))
-                    continue;
                 if (prop.Name == nameof(PluginInfo.DateCreated))
                     continue;
                 if (prop.Name == nameof(PluginInfo.DateModified))
                     continue;
                 if (prop.Name == nameof(PluginInfo.Enabled))
-                    continue;
-                if (prop.Name == nameof(PluginInfo.HasSettings))
                     continue;
 
                 var propValue = prop.GetValue(value);

@@ -66,21 +66,19 @@ namespace FileFlows.Server.Helpers
                     }
 
                     var plugin = dbPluginInfos.FirstOrDefault(x => x.Name == pi.Name);
-                    bool hasSettings = false; // todo pi.plugin == null ? false : FormHelper.GetFields(plugin.GetType(), new Dictionary<string, object>()).Any();
-
                     bool isNew = plugin == null;
                     plugin ??= new();
                     installed.Add(pi.Name);
                     plugin.PackageName = pi.PackageName;
                     plugin.Version = pi.Version;
                     plugin.DateModified = DateTime.UtcNow;
-                    plugin.HasSettings = hasSettings;
                     plugin.Deleted = false;
-                    plugin.Fields = pi.Fields;
                     plugin.Elements = pi.Elements;
                     plugin.Authors = pi.Authors;
                     plugin.Url = pi.Url;
                     plugin.Description = pi.Description;
+                    plugin.Settings = pi.Settings;
+                    plugin.HasSettings = pi.Settings?.Any() == true;
 
                     Logger.Instance.ILog("Plugin.Name: " + plugin.Name);
                     Logger.Instance.ILog("Plugin.PackageName: " + plugin.PackageName);
@@ -100,7 +98,6 @@ namespace FileFlows.Server.Helpers
                         plugin.Name = pi.Name;
                         plugin.DateCreated = DateTime.UtcNow;
                         plugin.DateModified = DateTime.UtcNow;
-                        plugin.HasSettings = hasSettings;
                         plugin.Enabled = true;
                         plugin.Uid = Guid.NewGuid();
                         controller.Update(plugin).Wait();

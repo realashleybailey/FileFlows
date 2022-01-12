@@ -8,4 +8,9 @@ namespace FileFlows.Plugin
 
         void Init();
     }
+
+    public interface IPluginSettings
+    {
+
+    }
 }

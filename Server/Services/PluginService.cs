@@ -19,6 +19,9 @@
         }
 
         public Task<List<PluginInfo>> GetAll() => new PluginController().GetDataList();
+
+        public Task<string> GetSettingsJson(string pluginSettingsType) => new PluginController().GetPluginSettings(pluginSettingsType);
+
         public Task<PluginInfo> Update(PluginInfo pluginInfo) => new PluginController().Update(pluginInfo);
     }
 }

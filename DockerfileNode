@@ -29,6 +29,10 @@ RUN curl -s https://repositories.intel.com/graphics/intel-graphics.key | apt-key
     # do the actual intel install
     intel-media-va-driver-non-free vainfo mesa-va-drivers
 
+# install comskip
+RUN apt-get update \
+    && apt-get install -y comskip
+
 # install libssl-dev, needed for the asp.net application to run
 RUN apt-get update \
     && apt-get upgrade -y \

@@ -320,27 +320,42 @@ public class Runner
         var service = PluginService.Load();
         var plugins = service.GetAll().Result;
         DateTime start = DateTime.Now;
-        bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-        bool is64bit = IntPtr.Size == 8;
+        List<Task<bool>> tasks = new List<Task<bool>>();
         foreach (var plugin in plugins)
         {
+            tasks.Add(DownloadPlugin(service, plugin));
+        }
+
+        Task.WaitAll(tasks.ToArray());
+        TimeSpan timeTaken = DateTime.Now - start;
+        nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());
+    }
+
+
+    private async Task<bool> DownloadPlugin(IPluginService service, PluginInfo plugin)
+    {
+        try
+        {
+            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool is64bit = IntPtr.Size == 8;
+
             nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
-            if(Directory.Exists(nodeParameters.TempPath) == false)
+            if (Directory.Exists(nodeParameters.TempPath) == false)
                 Directory.CreateDirectory(nodeParameters.TempPath);
             string file = Path.Combine(nodeParameters.TempPath, $"{plugin.PackageName}.ffplugin");
-            var data = service.Download(plugin).Result;
+            var data = await service.Download(plugin);
             if (data == null || data.Length == 0)
             {
                 nodeParameters.Logger?.ELog("Failed to download plugin: " + plugin.PackageName);
-                throw new Exception("Failed to download plugin: " + plugin.PackageName);
+                return false;
             }
 
             string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
             if (Directory.Exists(destDir))
                 Directory.Delete(destDir, true);
 
-            File.WriteAllBytes(file, data);                
+            File.WriteAllBytes(file, data);
             System.IO.Compression.ZipFile.ExtractToDirectory(file, destDir);
             File.Delete(file);
 
@@ -367,10 +382,13 @@ public class Runner
                     }
                 }
             }
-
+            return true;
         }
-        TimeSpan timeTaken = DateTime.Now - start;
-        nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());
+        catch (Exception ex)
+        {
+            nodeParameters.Logger.ILog($"Failed downloading pugin '{plugin.Name}': " + ex.Message);
+            return false;
+        }
     }
 
     private Type? GetNodeType(string fullName)

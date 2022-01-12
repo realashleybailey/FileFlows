@@ -47,12 +47,6 @@ RUN wget https://dot.net/v1/dotnet-install.sh \
 # expose the ports we need
 EXPOSE 5000
 
-#ports for email
-EXPOSE 587 
-EXPOSE 25 
-EXPOSE 465
-EXPOSE 2525
-
 # copy the deploy file into the app directory
 COPY /deploy /app
 

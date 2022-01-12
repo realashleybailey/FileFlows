@@ -11,6 +11,7 @@ namespace FileFlows.Server
         {
             try
             {
+                Docker = args?.Any(x => x == "--docker") == true;
                 InitEncryptionKey();
 
                 if (args.FirstOrDefault() == "--windows")
@@ -18,8 +19,6 @@ namespace FileFlows.Server
                 else
                 {
                     Console.WriteLine("Starting FileFlows Server...");
-                    
-                    Docker = args?.Any(x => x == "--docker") == true;
 
                     WebServer.Start(args);
                     Console.WriteLine("Exiting FileFlows Server...");
@@ -63,7 +62,7 @@ namespace FileFlows.Server
         /// </summary>
         private static void InitEncryptionKey()
         {
-            string encryptionFile = Path.Combine(Directory.GetCurrentDirectory(), "Data", "encryptionkey.txt");
+            string encryptionFile = Path.Combine(GetAppDirectory(), "Data", "encryptionkey.txt");
             if (File.Exists(encryptionFile))
             {
                 string key = File.ReadAllText(encryptionFile);

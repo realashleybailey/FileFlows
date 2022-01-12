@@ -62,7 +62,7 @@ namespace FileFlows.Server
         /// </summary>
         private static void InitEncryptionKey()
         {
-            string encryptionFile = Path.Combine(GetAppDirectory(), "Data", "encryptionkey.txt");
+            string encryptionFile = Path.Combine(GetAppDirectory(), "encryptionkey.txt");
             if (File.Exists(encryptionFile))
             {
                 string key = File.ReadAllText(encryptionFile);

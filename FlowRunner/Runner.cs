@@ -340,6 +340,7 @@ public class Runner
             bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             bool is64bit = IntPtr.Size == 8;
 
+            DateTime dtDownload = DateTime.Now;
             nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
             if (Directory.Exists(nodeParameters.TempPath) == false)
                 Directory.CreateDirectory(nodeParameters.TempPath);
@@ -354,8 +355,10 @@ public class Runner
             string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
             if (Directory.Exists(destDir))
                 Directory.Delete(destDir, true);
-
             File.WriteAllBytes(file, data);
+            nodeParameters.Logger?.ILog($"Time taken to download plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtDownload)));
+
+            DateTime dtExtract = DateTime.Now;
             System.IO.Compression.ZipFile.ExtractToDirectory(file, destDir);
             File.Delete(file);
 
@@ -382,6 +385,8 @@ public class Runner
                     }
                 }
             }
+            nodeParameters.Logger?.ILog($"Time taken to extract plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtExtract)));
+
             return true;
         }
         catch (Exception ex)

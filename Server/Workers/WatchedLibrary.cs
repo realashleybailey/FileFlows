@@ -211,6 +211,9 @@ namespace FileFlows.Server.Workers
             if (TimeHelper.InSchedule(Library.Schedule) == false)
                 return false;
 
+            if (fullScan == false)
+                fullScan = Library.LastScanned < DateTime.UtcNow.AddHours(-1); // do a full scan every hour just incase we missed something
+
             if (Library.LastScanned > DateTime.UtcNow.AddSeconds(-Library.ScanInterval))
                 return false;
 
@@ -233,7 +236,7 @@ namespace FileFlows.Server.Workers
             if (Library.Folders)
                 ScanForDirs(Library);
             else
-                ScanFoFiles(Library);
+                ScanForFiles(Library);
 
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
 
@@ -269,7 +272,7 @@ namespace FileFlows.Server.Workers
 
             new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
         }
-        private void ScanFoFiles(Library library)
+        private void ScanForFiles(Library library)
         {
             var files = GetFiles(new DirectoryInfo(library.Path));
             List<string> known = new();

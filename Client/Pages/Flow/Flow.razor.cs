@@ -28,6 +28,7 @@ namespace FileFlows.Client.Pages
         [Inject] NavigationManager NavigationManager { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         private ffElement[] Available { get; set; }
+        private ffElement[] Filtered { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
 
         public ffPart SelectedPart { get; set; }
@@ -50,12 +51,32 @@ namespace FileFlows.Client.Pages
 
         private bool IsDirty = false;
 
+        private string _txtFilter = string.Empty;
+        private string lblFilter;
+
+        public string txtFilter
+        {
+            get => _txtFilter;
+            set
+            {
+                _txtFilter = value ?? string.Empty;
+                string filter = value.Trim().Replace(" ", "").ToLower();
+                if (filter == string.Empty)
+                    Filtered = Available;
+                else
+                {
+                    Filtered = Available.Where(x => x.Name.ToLower().Replace(" ", "").Contains(filter) || x.Group.ToLower().Replace(" ", "").Contains(filter)).ToArray();
+                }
+            }
+        }
+
         protected override void OnInitialized()
         {
             lblName = Translater.Instant("Labels.Name");
             lblSave = Translater.Instant("Labels.Save");
             lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
+            lblFilter = Translater.Instant("Labels.Filter");
             _ = Init();
         }
 
@@ -69,6 +90,7 @@ namespace FileFlows.Client.Pages
                 if (elementsResult.Success)
                 {
                     Available = elementsResult.Data;
+                    this.txtFilter = string.Empty;
                 }
                 FileFlows.Shared.Models.Flow flow;
                 if (Uid == Guid.Empty && App.Instance.NewFlowTemplate != null)

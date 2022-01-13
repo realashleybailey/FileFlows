@@ -28,10 +28,14 @@
     <Body>
         <div class="flow-container">
             <div class="flow-elements">
+                <div class="flow-elements-filter">
+                    <input type="text" @bind-value="txtFilter"  @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" />
+                    <i class="fas fa-search"></i>
+                </div>
                 <ul id="flow-elements-available">
-                    @if (Available != null)
+                    @if (Filtered != null)
                     {
-                        @foreach (var grp in Available.GroupBy(x => x.Group))
+                        @foreach (var grp in Filtered.GroupBy(x => x.Group))
                         {
                             <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
                             foreach (var ele in grp)

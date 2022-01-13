@@ -25,6 +25,7 @@
     "Rescan": "Rescan",
     "Help": "Help",
     "Name": "Name",
+    "Filter": "Filter",
     "Log": "Log",
     "View": "View",
     "Delete": "Delete",
@@ -286,7 +287,9 @@
         "AutoUpdatePlugins": "Auto Update Plugins",
         "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "LoggingPath": "Logging Directory",
-        "LoggingPath-Help": "This is where log files will be created."
+        "LoggingPath-Help": "This is where log files will be created.",
+        "TimeZone": "Time Zone",
+        "TimeZone-Help": "The Time Zone of the system.  This is used to calculate the schedules for libraries etc."
       }
     },
     "Tools": {

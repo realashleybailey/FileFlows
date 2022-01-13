@@ -28,15 +28,39 @@ canvas {
 }
 
 .flow-elements {
-    width:20vw;
-    min-width:12rem;
-    max-width:18rem;
+    width: 20vw;
+    min-width: 12rem;
+    max-width: 18rem;
     border-left: 1px solid var(--border-color);
-    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+
+    .flow-elements-filter {
+        margin: 0 0.5rem;
+        padding: 0.5rem 0;
+        border-bottom: solid 1px var(--border-color);
+        position: relative;
+
+        input {
+            width: 100%;
+        }
+
+        .fas {
+            position: absolute;
+            right: 0.5rem;
+            top: 1.1rem;
+            font-size: 0.8rem;
+            color: rgba(var(--color-rgb), 0.5);
+        }
+    }
+
+
     ul {
+        flex-grow:1;
         list-style: none;
-        margin:0;
-        padding:0;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
     }
 }
 

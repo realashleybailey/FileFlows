@@ -21,15 +21,18 @@ namespace FileFlows.Client.Pages
     using FileFlows.Plugin;
     using System.Text.RegularExpressions;
 
-    public partial class Flow : ComponentBase
+    public partial class Flow : ComponentBase, IDisposable
     {
         [CascadingParameter] public Editor Editor { get; set; }
         [Parameter] public System.Guid Uid { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
+        [Inject] IHotKeysService HotKeyService { get; set; }
         private ffElement[] Available { get; set; }
         private ffElement[] Filtered { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
+
+        private ElementReference eleFilter { get; set; }
 
         public ffPart SelectedPart { get; set; }
         [Inject]
@@ -40,6 +43,8 @@ namespace FileFlows.Client.Pages
         private ff Model { get; set; }
 
         private string Title { get; set; }
+
+        private bool EditorOpen = false;
 
         private string Name { get; set; }
 
@@ -77,7 +82,23 @@ namespace FileFlows.Client.Pages
             lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
             lblFilter = Translater.Instant("Labels.Filter");
+
+            HotKeyService.RegisterHotkey("Filter", "/", callback: () =>
+            {
+                if (EditorOpen) return;
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10);
+                    await eleFilter.FocusAsync();
+                    txtFilter = string.Empty;
+                });
+            });
             _ = Init();
+        }
+
+        public void Dispose()
+        {
+            HotKeyService.DeregisterHotkey("Filter");
         }
 
         private async Task Init()
@@ -395,6 +416,7 @@ namespace FileFlows.Client.Pages
 
 
             string title = typeDisplayName;
+            EditorOpen = true;
             var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1, helpUrl: flowElement.HelpUrl);
             try
             {
@@ -404,6 +426,10 @@ namespace FileFlows.Client.Pages
             {
                 // can throw if canceled
                 return null;
+            }
+            finally
+            {
+                EditorOpen = false;
             }
             if (newModelTask.IsCanceled == false)
             {

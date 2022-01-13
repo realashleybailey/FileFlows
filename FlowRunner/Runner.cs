@@ -114,9 +114,11 @@ public class Runner
     private void UpdatePartPercentage(float percentage)
     {
         float diff = Math.Abs(Info.CurrentPartPercent - percentage);
-        Info.CurrentPartPercent = percentage;
         if (diff < 0.1)
             return; // so small no need to tell server about update;
+
+        Info.CurrentPartPercent = percentage;
+
         try { 
             var service = FlowRunnerService.Load();
             service.Update(Info);

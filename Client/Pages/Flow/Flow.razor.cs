@@ -20,6 +20,7 @@ namespace FileFlows.Client.Pages
     using System.Text.Json;
     using FileFlows.Plugin;
     using System.Text.RegularExpressions;
+    using Microsoft.AspNetCore.Components.Web;
 
     public partial class Flow : ComponentBase, IDisposable
     {
@@ -90,7 +91,6 @@ namespace FileFlows.Client.Pages
                 {
                     await Task.Delay(10);
                     await eleFilter.FocusAsync();
-                    txtFilter = string.Empty;
                 });
             });
             _ = Init();
@@ -312,6 +312,15 @@ namespace FileFlows.Client.Pages
 #endif
         }
 
+        private async Task FilterKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Key != "Enter")
+                return;
+            if (this.Filtered.Length != 1)
+                return;
+            var item = this.Filtered[0];
+            await jsRuntime.InvokeVoidAsync("ffFlow.insertElement", item.Uid);
+        }
 
         [JSInvokable]
         public async Task<object> Edit(ffPart part, bool isNew = false)
@@ -430,6 +439,7 @@ namespace FileFlows.Client.Pages
             finally
             {
                 EditorOpen = false;
+                await jsRuntime.InvokeVoidAsync("ffFlowPart.focusElement", part.Uid.ToString());
             }
             if (newModelTask.IsCanceled == false)
             {

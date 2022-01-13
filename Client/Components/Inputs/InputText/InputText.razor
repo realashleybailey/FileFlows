@@ -3,7 +3,7 @@
 
 <InputWrapper Input="@this">
     <div>
-        <input type="text" id=@Uid @bind-value="Value" @bind-value:event="oninput" autocomplete="off" 
+        <input type="text" id=@Uid @bind-value="Value" @bind-value:event="oninput" autocomplete="off" @onkeydown="OnKeyDown"
         readonly="@(ReadOnly ? "readonly" : null)" placeholder="@Placeholder"  />
     </div>
 </InputWrapper>

@@ -1,6 +1,7 @@
 namespace FileFlows.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Web;
     using Microsoft.JSInterop;
     using System.Threading.Tasks;
 
@@ -45,6 +46,13 @@ namespace FileFlows.Client.Components.Inputs
         async Task UpdateInputValue()
         {
             await jsRuntime.InvokeVoidAsync("eval", new object[] { $"document.getElementById('{Uid}').value = " + this.Value });
+        }
+        private async Task OnKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Code == "Enter")
+                await OnSubmit.InvokeAsync();
+            else if (e.Code == "Escape")
+                await OnClose.InvokeAsync();
         }
     }
 }

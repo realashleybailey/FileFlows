@@ -44,7 +44,7 @@
                             }
                             @if (Fields?.Any() == true)
                             {
-                                <FlowPanel Fields=@Fields></FlowPanel>
+                                <FlowPanel Fields=@Fields OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
 
                                 @if (AdditionalFields != null)
                                 {
@@ -58,7 +58,7 @@
                                 @foreach(var tab in Tabs)
                                 {
                                     <FlowTab Title=@tab.Key>
-                                        <FlowPanel Fields=@tab.Value></FlowPanel>
+                                        <FlowPanel Fields=@tab.Value OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
 
                                     </FlowTab>
                                 }

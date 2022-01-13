@@ -105,16 +105,29 @@ window.ffFlow = {
         //     this.ioOutputConnections.get(output).push(input);
     },
 
-    drop: function (event, dropping) {
-        event.preventDefault();
-        if (dropping !== true)
-            return;
-        let bounds = event.target.getBoundingClientRect();
+    /*
+     * Called from C# code to insert a new element to the flow
+     */
+    insertElement: function (uid) {
+        ffFlow.drop(null, true, uid);
+    },
 
-        let xPos = event.clientX - bounds.left - 20;
-        let yPos = event.clientY - bounds.top - 20;
+    drop: function (event, dropping, uid) {
+        let xPos = 100, yPos = 100;
+        if (event) {
+            event.preventDefault();
+            if (dropping !== true)
+                return;
+            let bounds = event.target.getBoundingClientRect();
 
-        ffFlow.csharp.invokeMethodAsync("AddElement", ffFlow.Mouse.draggingElementUid).then(result => {
+            xPos = event.clientX - bounds.left - 20;
+            yPos = event.clientY - bounds.top - 20;
+        } else {
+        }
+        if (!uid)
+            uid = ffFlow.Mouse.draggingElementUid;
+
+        ffFlow.csharp.invokeMethodAsync("AddElement", uid).then(result => {
             let element = result.element;
             if (!element) {
                 console.warn('element was null');

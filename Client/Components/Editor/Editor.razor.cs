@@ -169,6 +169,16 @@ namespace FileFlows.Client.Components
         }
 
 
+        private async Task OnSubmit()
+        {
+            await this.Save();
+        }
+
+        private async Task OnClose()
+        {
+            this.Cancel();
+        }
+
         private async Task Save()
         {
             bool valid = true;

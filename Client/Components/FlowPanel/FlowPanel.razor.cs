@@ -10,6 +10,9 @@
 
         [CascadingParameter] public Editor Editor { get; set; }
 
+        [Parameter] public EventCallback OnSubmit { get; set; }
+        [Parameter] public EventCallback OnClose { get; set; }
+
         protected void UpdateValue(ElementField field, object value) => Editor.UpdateValue(field, value);
 
         protected T GetParameter<T>(ElementField field, string parameter, T @default = default(T)) => Editor.GetParameter<T>(field, parameter, @default);
@@ -17,6 +20,5 @@
         protected T GetValue<T>(string field, T @default = default(T)) => Editor.GetValue<T>(field, @default);
 
         protected string TypeName => Editor.TypeName;
-
     }
 }

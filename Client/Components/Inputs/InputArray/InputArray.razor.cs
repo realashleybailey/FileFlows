@@ -27,7 +27,15 @@ namespace FileFlows.Client.Components.Inputs
         {
             if (e.ShiftKey == false && e.AltKey == false && e.CtrlKey == false)
             {
-                if (e.Code == "Enter" || (EnterOnSpace && e.Code == "Space"))
+                if (e.Code == "Enter" && string.IsNullOrWhiteSpace(this.InputText))
+                {
+                    _ = this.OnSubmit.InvokeAsync();
+                }
+                else if (e.Code == "Escape")
+                {
+                    _ = OnClose.InvokeAsync();
+                }
+                else if (e.Code == "Enter" || (EnterOnSpace && e.Code == "Space"))
                 {
                     if (Add(InputText))
                         this.InputText = "";

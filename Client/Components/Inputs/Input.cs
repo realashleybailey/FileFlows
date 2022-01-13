@@ -18,6 +18,8 @@ namespace FileFlows.Client.Components.Inputs
         bool HideLabel { get; set; }
         bool Disabled { get; set; }
 
+        EventCallback OnSubmit { get; set; }
+
         FileFlows.Shared.Models.ElementField Field { get; set; }
 
         Task<bool> Validate();
@@ -42,6 +44,9 @@ namespace FileFlows.Client.Components.Inputs
         public string Prefix { get; set; }
 
         protected string LabelOriginal => _LabelOriginal;
+
+        [Parameter] public EventCallback OnSubmit { get; set; }
+        [Parameter] public EventCallback OnClose { get; set; }
 
         [Parameter]
         public bool HideLabel { get; set; }

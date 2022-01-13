@@ -13,28 +13,28 @@
             {
                 var value = GetValue<string>(field.Name) ?? "";
                 <InputText Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.TextVariable:
             {
                 var value = GetValue<string>(field.Name) ?? "";
                 <InputTextVariables Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.TextArea:
             {
                 var value = GetValue<string>(field.Name) ?? "";
                 <InputTextArea Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Password:
             {
                 var value = GetValue<string>(field.Name) ?? "";
                 <InputPassword Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.LogView:
@@ -52,7 +52,7 @@
                 int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
                 int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
                 <InputNumber Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Checklist:
@@ -61,7 +61,7 @@
                 var listOnly = GetParameter<bool>(field, "ListOnly");
                 var options = GetParameter<List<ListOption>>(field, nameof(Components.Inputs.InputChecklist.Options));
                 <InputChecklist Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Options="@options" HideLabel=@hideLabel ListOnly=@listOnly />
+    Validators=@field.Validators Options="@options" HideLabel=@hideLabel ListOnly=@listOnly OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Slider:
@@ -70,21 +70,21 @@
                 int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
                 int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
                 <InputSlider Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Switch:
             {
                 var value = GetValue<bool>(field.Name);
                 <InputSwitch Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.StringArray:
             {
                 var value = GetValue<string[]>(field.Name, new string[] { });
                 <InputArray Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Select:
@@ -94,7 +94,7 @@
                 bool showDescription= GetParameter<bool>(field, nameof(Components.Inputs.InputSelect.ShowDescription), true);
                 var options = GetParameter<List<FileFlows.Plugin.ListOption>>(field, "Options");
                 <InputSelect Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Options=@options AllowClear=@allowClear
-    ValueChanged="@(x => UpdateValue(field, x))" Placeholder="@field.Placeholder" ShowDescription=@showDescription HideLabel=@hideLabel />
+    ValueChanged="@(x => UpdateValue(field, x))" Placeholder="@field.Placeholder" ShowDescription=@showDescription HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.File:
@@ -102,35 +102,35 @@
                 var value = GetValue<string>(field.Name, "");
                 var extensions = GetParameter<List<string>>(field, "Extensions")?.ToArray();
                 <InputFile Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Extensions=@extensions Validators=@field.Validators
-    ValueChanged="@(x => UpdateValue(field, x))" Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    ValueChanged="@(x => UpdateValue(field, x))" Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Folder:
             {
                 var value = GetValue<string>(field.Name, "");
                 <InputFile Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Directory=@true Validators=@field.Validators
-    ValueChanged="@(x => UpdateValue(field, x))" Variables=@field.Variables  Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    ValueChanged="@(x => UpdateValue(field, x))" Variables=@field.Variables  Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Code:
             {
                 var value = GetValue<string>(field.Name);
                 <InputCode Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Variables=@field.Variables Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Schedule:
             {
                 var value = GetValue<string>(field.Name);
                 <InputSchedule Field=@field Label="@label" Value="@value" ReadOnly=@readOnly 
-                    ValueChanged="@(x => UpdateValue(field, x))" HideLabel=@hideLabel />
+                    ValueChanged="@(x => UpdateValue(field, x))" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.KeyValue:
             {
                 var value = GetValue<List<KeyValuePair<string, string>>>(field.Name);
                 <InputKeyValue Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel />
+    Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.TextLabel:

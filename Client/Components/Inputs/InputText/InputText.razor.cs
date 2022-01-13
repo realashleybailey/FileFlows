@@ -1,6 +1,7 @@
 namespace FileFlows.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Web;
 
     public partial class InputText : Input<string>
     {
@@ -9,6 +10,14 @@ namespace FileFlows.Client.Components.Inputs
         protected override void ValueUpdated()
         {
             ClearError();
+        }
+
+        private async Task OnKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Code == "Enter")
+                await OnSubmit.InvokeAsync();
+            else if (e.Code == "Escape")
+                await OnClose.InvokeAsync();
         }
     }
 }

@@ -2,7 +2,7 @@
 @inherits Input<string>
 @using BlazorMonaco
 
-<div class="row">
+<div class="row" @onkeydown="OnKeyDown">
     <MonacoEditor @ref="CodeEditor" ConstructionOptions="EditorConstructionOptions" OnDidInit="OnEditorInit"
         OnDidBlurEditorText="OnBlur" />
 </div>

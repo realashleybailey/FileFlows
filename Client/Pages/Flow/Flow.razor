@@ -29,7 +29,7 @@
         <div class="flow-container">
             <div class="flow-elements">
                 <div class="flow-elements-filter">
-                    <input @ref="eleFilter" type="text" @bind-value="txtFilter"  @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" />
+                    <input @ref="eleFilter" type="text" @bind-value="txtFilter" @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" @onkeydown="FilterKeyDown" />
                     <i class="fas fa-search"></i>
                 </div>
                 <ul id="flow-elements-available">

@@ -43,5 +43,10 @@ namespace FileFlows.Client.Components.Inputs
             string preview = Plugin.VariablesHelper.ReplaceVariables(this.Value, Variables, false);
             this.Preview = preview;             
         }
+
+        private void VariableOnSubmit()
+        {
+            _ = base.OnSubmit.InvokeAsync();
+        }
     }
 }

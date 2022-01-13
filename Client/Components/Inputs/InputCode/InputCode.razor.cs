@@ -6,6 +6,7 @@ namespace FileFlows.Client.Components.Inputs
     using Microsoft.JSInterop;
     using System.Collections.Generic;
     using FileFlows.Plugin;
+    using Microsoft.AspNetCore.Components.Web;
 
     public partial class InputCode : Input<string>
     {
@@ -57,6 +58,22 @@ namespace FileFlows.Client.Components.Inputs
             if (string.IsNullOrEmpty(this.Value) || CodeEditor == null)
                 return;
             CodeEditor.SetValue(this.Value.Trim());
+        }
+        private async Task OnKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Code == "Enter" && e.ShiftKey)
+            {
+                // for code the shortcut to submit is shift enter
+
+                // need to get value in code block
+                this.Updating = true;
+                this.Value = await CodeEditor.GetValue();
+                this.Updating = false;
+
+                await OnSubmit.InvokeAsync();
+            }
+            else if (e.Code == "Escape")
+                await OnClose.InvokeAsync();
         }
     }
 }

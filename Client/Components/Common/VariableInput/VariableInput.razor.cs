@@ -53,6 +53,12 @@
         [Parameter]
         public EventCallback<string> ValueChanged { get; set; }
 
+        [Parameter]
+        public EventCallback SubmitEvent { get; set; }
+        [Parameter]
+        public EventCallback CloseEvent { get; set; }
+        
+
 
         /// <summary>
         /// The index in the string the variable will be inserted at
@@ -104,6 +110,14 @@
             else if (VariablesShown)
             {
                 await VariablesKeyDown(args);
+            }
+            else if(args.Key == "Enter")
+            {
+                await this.SubmitEvent.InvokeAsync();
+            }
+            else if(args.Key == "Escape")
+            {
+                await this.CloseEvent.InvokeAsync();
             }
         }
 

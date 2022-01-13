@@ -11,6 +11,12 @@ window.ffFlowPart = {
             ele.classList.remove('selected');
     },
 
+    focusElement: function (uid) {
+        let ele = document.getElementById(uid);
+        if (ele)
+            ele.focus();
+    },
+
     addFlowPart: function (part) {
         let div = document.createElement('div');
         ffFlowPart.flowPartElements.push(div);
@@ -50,14 +56,16 @@ window.ffFlowPart = {
         });
         div.setAttribute('tabIndex', -1);
         div.addEventListener("keydown", function (event) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
             if (event.code === 'Delete' || event.code === 'Backspace') {
                 ffFlowPart.deleteFlowPart(part.uid);
+                event.stopImmediatePropagation();
+                event.preventDefault();
             }
             else if (event.code === 'Enter') {
                 ffFlowPart.editFlowPart(part.uid);
-            }
+                event.stopImmediatePropagation();
+                event.preventDefault();
+            }            
         });
 
 

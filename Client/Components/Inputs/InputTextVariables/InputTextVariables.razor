@@ -3,7 +3,7 @@
 
 <div class="input-text-variables">
     <InputWrapper Input="@this">
-        <VariableInput Uid="@Uid" Variables=@Variables @bind-Value="Value" Placeholder=@Placeholder />
+        <VariableInput Uid="@Uid" Variables=@Variables @bind-Value="Value" Placeholder=@Placeholder SubmitEvent="OnSubmit" CloseEvent="OnClose" />
     </InputWrapper>
 
     <InputWrapper>

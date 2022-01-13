@@ -9,6 +9,7 @@ namespace FileFlows.Client.Components.Inputs
     using System.Threading.Tasks;
     using FileFlows.Plugin;
     using System;
+    using Microsoft.AspNetCore.Components.Web;
 
     public partial class InputSelect : Input<object>
     {
@@ -194,6 +195,15 @@ namespace FileFlows.Client.Components.Inputs
 
             if (dict?.ContainsKey("Description") == true)
                 Description = dict["Description"]?.ToString() ?? string.Empty;
+        }
+
+
+        private async Task OnKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Code == "Enter")
+                await OnSubmit.InvokeAsync();
+            else if(e.Code == "Escape")
+                await OnClose.InvokeAsync();    
         }
     }
 }

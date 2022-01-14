@@ -3,6 +3,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
+using System.Runtime.InteropServices;
 
 namespace FileFlows.Server.Workers
 {
@@ -15,13 +16,27 @@ namespace FileFlows.Server.Workers
 
         protected override void Execute()
         {
+#if (DEBUG)
+            return;
+#endif
             var settings = new SettingsController().Get().Result;
             if (settings?.DisableTelemetry == true)
                 return; // they have turned it off, dont report anything
 
+            bool isDocker = Program.Docker;
+            bool isMacOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool isWindows = !isDocker && !isMacOs && !isLinux;
+
             TelemetryData data = new TelemetryData();
             data.ClientUid = settings.Uid;
             data.Version = Globals.Version;
+            data.ProcessingNodes = new NodeController().GetAll().Result.Count();
+            data.Architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString();
+            data.OS = isDocker ? "Docker" :
+                      isMacOs ? "MacOS" :
+                      isLinux ? "Linux" :
+                      "Windows";
             var libFiles = new LibraryFileController().GetAll(null).Result;
             data.FilesFailed = libFiles.Where(x => x.Status == FileStatus.ProcessingFailed).Count();
             data.FilesProcessed = libFiles.Where(x => x.Status == FileStatus.Processed).Count();
@@ -88,6 +103,10 @@ namespace FileFlows.Server.Workers
             public Guid ClientUid { get; set; }
 
             public string Version { get; set; }
+
+            public string OS { get; set; }
+            public string Architecture { get; set; }
+            public int ProcessingNodes { get; set; }
 
             public List<TelemetryDataSet> Nodes { get; set; }
             public List<TelemetryDataSet> LibraryTemplates { get; set; }

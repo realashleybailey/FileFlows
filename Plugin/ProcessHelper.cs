@@ -17,6 +17,14 @@
         public string StandardOutput;
         public string StandardError;
     }
+    public class ExecuteBasicArgs
+    {
+        public string Command { get; set; }
+        public string Arguments { get; set; }
+        public string[] ArgumentList { get; set; }
+        public int Timeout { get; set; }
+        public string WorkingDirectory { get; set; }
+    }
 
     public class ExecuteArgs
     {
@@ -42,15 +50,17 @@
         StringBuilder outputBuilder, errorBuilder;
         TaskCompletionSource<bool> outputCloseEvent, errorCloseEvent;
 
+        private bool Fake;
 
-
-        public ProcessHelper(ILogger logger)
+        public ProcessHelper(ILogger logger, bool fake)
         {
             this.Logger = logger;
+            this.Fake = fake;
         }
 
         public void Cancel()
         {
+            if (Fake) return;
             try
             {
                 if (this.process != null)
@@ -65,6 +75,8 @@
 
         public async Task<ProcessResult> ExecuteShellCommand(ExecuteArgs args)
         {
+            if (Fake) return new ProcessResult();  
+
             var result = new ProcessResult();
             this.Args = args;
 
@@ -181,7 +193,7 @@
         }
 
 
-        public void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
+        void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             // The output stream has been closed i.e. the process has terminated
             if (e.Data == null)
@@ -196,7 +208,7 @@
             }
         }
 
-        public void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
+        void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             // The error stream has been closed i.e. the process has terminated
             if (e.Data == null)

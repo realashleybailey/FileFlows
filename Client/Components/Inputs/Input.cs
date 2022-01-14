@@ -109,7 +109,7 @@ namespace FileFlows.Client.Components.Inputs
             }
         }
 
-        private T _Value;
+        protected T _Value;
 
         [Parameter]
         public T Value

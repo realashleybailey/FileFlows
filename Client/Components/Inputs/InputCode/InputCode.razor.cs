@@ -32,7 +32,7 @@ namespace FileFlows.Client.Components.Inputs
                 Minimap = new EditorMinimapOptions { Enabled = false },
                 Theme = "vs-dark",
                 Language = "javascript",
-                Value = this.Value ?? ""
+                Value = this.Value?.Trim() ?? ""
             };
         }
 

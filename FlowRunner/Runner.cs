@@ -186,7 +186,7 @@ public class Runner
         DownloadPlugins();
 
         nodeParameters.Result = NodeResult.Success;
-        nodeParameters.GetToolPath = (string name) =>
+        nodeParameters.GetToolPathActual = (string name) =>
         {
             var nodeService = NodeService.Load();
             return Node.Map(nodeService.GetToolPath(name).Result);

@@ -82,9 +82,9 @@ namespace FileFlows.Client.Pages
             lblSave = Translater.Instant("Labels.Save");
             lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
-            lblFilter = Translater.Instant("Labels.Filter");
+            lblFilter = Translater.Instant("Labels.FilterPlaceholder");
 
-            HotKeyService.RegisterHotkey("Filter", "/", callback: () =>
+            HotKeyService.RegisterHotkey("FlowFilter", "/", callback: () =>
             {
                 if (EditorOpen) return;
                 Task.Run(async () =>
@@ -98,7 +98,7 @@ namespace FileFlows.Client.Pages
 
         public void Dispose()
         {
-            HotKeyService.DeregisterHotkey("Filter");
+            HotKeyService.DeregisterHotkey("FlowFilter");
         }
 
         private async Task Init()
@@ -314,14 +314,21 @@ namespace FileFlows.Client.Pages
 
         private async Task FilterKeyDown(KeyboardEventArgs e)
         {
+            if (e.Key == "Escape")
+            {
+                this.txtFilter = String.Empty;
+                return;
+            }
             if (e.Key != "Enter")
                 return;
             if (this.Filtered.Length != 1)
                 return;
             var item = this.Filtered[0];
             await jsRuntime.InvokeVoidAsync("ffFlow.insertElement", item.Uid);
+            this.txtFilter = String.Empty;
         }
 
+        private Dictionary<string, object> EditorVariables;
         [JSInvokable]
         public async Task<object> Edit(ffPart part, bool isNew = false)
         {
@@ -359,12 +366,12 @@ namespace FileFlows.Client.Pages
                 InputType = Plugin.FormInputType.Text
             });
 
+            bool isFunctionNode = flowElement.Uid == "FileFlows.BasicNodes.Functions.Function";
 
-            if (flowElement.Uid == "FileFlows.BasicNodes.Functions.Function")
+            if (isFunctionNode)
             {
                 // special case
                 FunctionNode(fields);
-
             }
 
 
@@ -426,7 +433,8 @@ namespace FileFlows.Client.Pages
 
             string title = typeDisplayName;
             EditorOpen = true;
-            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1, helpUrl: flowElement.HelpUrl);
+            EditorVariables = variables;
+            var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1, helpUrl: flowElement.HelpUrl, saveCallback: isFunctionNode ? FunctionSaveCallback : null);           
             try
             {
                 await newModelTask;
@@ -456,6 +464,23 @@ namespace FileFlows.Client.Pages
             {
                 return null;
             }
+        }
+
+        private async Task<bool> FunctionSaveCallback(ExpandoObject model)
+        {
+            // need to test code
+            var dict = model as IDictionary<string, object>;
+            string code  = (dict?.ContainsKey("Code") == true ? dict["Code"] as string : null) ?? string.Empty;
+            var codeResult = await HttpHelper.Post<string>("/api/code-eval/validate", new { Code = code, Variables = EditorVariables });
+            string error = null;
+            if (codeResult.Success)
+            {
+                if (string.IsNullOrEmpty(codeResult.Data))
+                    return true;
+                error = codeResult.Data;
+            }
+            Toast.ShowError(error?.EmptyAsNull() ?? codeResult.Body, duration: 20_000);
+            return false;
         }
 
         private void FunctionNode(List<ElementField> fields)
@@ -565,6 +590,58 @@ if (video.Width > 1920)
 
 Logger.ILog('Do not need to downscale');
 return 2;
+"
+                }
+            });
+
+            templates.Add(new ListOption
+            {
+                Label = "Video: Bitrate greater than",
+                Value = new CodeTemplate
+                {
+                    Outputs = 2,
+                    Code =
+@"
+// check if the bitrate for a video is over a certain amount
+let MAX_BITRATE = 3_000_000; // bitrate is 3,000 KBps
+
+let vi = Variables.vi?.VideoInfo;
+if(!vi)
+	return -1; // no video information found
+
+// get the video stream
+let bitrate = vi.VideoStreams[0]?.Bitrate;
+
+if(!bitrate)
+{
+	// video stream doesn't have bitrate information
+	// need to use the overall bitrate
+	let overall = vi.Bitrate;
+	if(!overall)
+		return 0; // couldn't get overall bitrate either
+
+	// overall bitrate includes all audio streams, so we try and subtrack those
+	let calculated = overall;
+	if(vi.AudioStreams?.length) // check there are audio streams
+	{
+		for(let audio of vi.AudioStreams)
+		{
+			if(audio.Bitrate > 0)
+				calculated -= audio.Bitrate;
+			else{
+				// audio doesn't have bitrate either, so we just subtract 5% of the original bitrate
+				// this is a guess, but it should get us close
+				calculated -= (overall * 0.05);
+			}
+		}
+	}
+	bitrate = calculated;
+}
+
+// check if the bitrate is over the maximum bitrate
+if(bitrate > MAX_BITRATE)
+	return 1; // it is, so call output 1
+return 2; // it isn't so call output 2
 "
                 }
             });

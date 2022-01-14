@@ -31,7 +31,7 @@ namespace FileFlows.Plugin
         public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
         public Dictionary<string, object> Variables { get; set; } = new Dictionary<string, object>();
 
-        public Func<string, string>? GetToolPath { get; set; }
+        public Func<string, string>? GetToolPathActual { get; set; }
 
         public Func<string, string> GetPluginSettingsJson { get; set; }
         public Func<string, string>? PathMapper { get; set; }
@@ -47,27 +47,34 @@ namespace FileFlows.Plugin
 
         public ProcessHelper Process { get; set; }
 
+        private bool Fake = false;
+
         public NodeParameters(string filename, ILogger logger, bool isDirectory, string libraryPath)
         {
+            Fake = string.IsNullOrEmpty(filename);
             this.IsDirectory = isDirectory;
             this.FileName = filename;
             this.LibraryPath = libraryPath;
             this.WorkingFile = filename;
-            try
+            if (Fake == false)
             {
-                this.WorkingFileSize = IsDirectory ? GetDirectorySize(filename) : new FileInfo(filename).Length;
+                try
+                {
+                    this.WorkingFileSize = IsDirectory ? GetDirectorySize(filename) : new FileInfo(filename).Length;
+                }
+                catch (Exception) { } // can fail in unit tests
             }
-            catch (Exception) { } // can fail in unit tests
             this.RelativeFile = string.Empty;
             this.TempPath = string.Empty;
             this.Logger = logger;
             InitFile(filename);
-            this.Process = new ProcessHelper(logger);
+            this.Process = new ProcessHelper(logger, this.Fake);
         }
 
 
         public long GetDirectorySize(string path)
         {
+            if (Fake) return 100_000_000_000;
             try
             {
                 DirectoryInfo dir = new DirectoryInfo(path);
@@ -81,6 +88,7 @@ namespace FileFlows.Plugin
 
         public string MapPath(string path)
         {
+            if (Fake) return path;
             if (PathMapper == null)
                 return path;
             return PathMapper(path);
@@ -88,6 +96,7 @@ namespace FileFlows.Plugin
 
         private void InitFile(string filename)
         {
+            if (Fake) return;
             try
             {
                 if (IsDirectory)
@@ -146,11 +155,13 @@ namespace FileFlows.Plugin
 
         public void ResetWorkingFile()
         {
+            if (Fake) return;
             SetWorkingFile(this.FileName, dontDelete: true);
         }
 
         public void SetWorkingFile(string filename, bool dontDelete = false)
         {
+            if (Fake) return;
             if (this.WorkingFile == filename)
                 return;
             if (this.WorkingFile != this.FileName)
@@ -199,6 +210,7 @@ namespace FileFlows.Plugin
 
         public bool MoveFile(string destination)
         {
+            if (Fake) return true;
             bool moved = false;
             Logger?.ILog("About to move file to: " + destination);
             destination = MapPath(destination);
@@ -320,6 +332,7 @@ namespace FileFlows.Plugin
 
         public bool CreateDirectoryIfNotExists(string directory)
         {
+            if (Fake) return true;
             return Helpers.FileHelper.CreateDirectoryIfNotExists(Logger, directory);
         }
 
@@ -330,7 +343,27 @@ namespace FileFlows.Plugin
         /// <returns>The result of the command</returns>
         public ProcessResult Execute(ExecuteArgs args)
         {
+            if (Fake) return new ProcessResult {  ExitCode = 0, Completed = true };
             var result = Process.ExecuteShellCommand(args).Result;
+            return result;
+        }
+
+        /// <summary>
+        /// Executes a cmd and returns the result
+        /// </summary>
+        /// <param name="args">The execution parameters</param>
+        /// <returns>The result of the command</returns>
+        public ProcessResult Execute(string command = "", string arguments = "", string[] argumentList = null, int timeout = 0, string workingDirectory = "")
+        {
+            if (Fake) return new ProcessResult { ExitCode = 0, Completed = true };
+            var result = Process.ExecuteShellCommand(new ExecuteArgs
+            {
+                ArgumentList = argumentList,
+                Arguments = arguments,
+                Command = command,
+                Timeout = timeout,
+                WorkingDirectory = workingDirectory
+            }).Result;
             return result;
         }
 
@@ -348,12 +381,19 @@ namespace FileFlows.Plugin
         /// <returns>The plugin settings</returns>
         public T GetPluginSettings<T>() where T : IPluginSettings
         {
+            if (Fake) return default(T);
             string name = typeof(T).Namespace;
             name = name.Substring(name.IndexOf(".") + 1);
             string json = GetPluginSettingsJson(name);
             if (string.IsNullOrEmpty(json))
                 return default(T);
             return (T)JsonSerializer.Deserialize<T>(json);
+        }
+
+        public string GetToolPath(string tool)
+        {
+            if (Fake || GetToolPathActual == null) return string.Empty;
+            return GetToolPathActual(tool);
         }
     }
 

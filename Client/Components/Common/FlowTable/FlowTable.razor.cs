@@ -2,13 +2,15 @@
 {
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Web;
+    using Microsoft.JSInterop;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.Json;
     using System.Threading.Tasks;
 
-    public partial class FlowTable<TItem>: ComponentBase
+    public partial class FlowTable<TItem>: ComponentBase,IDisposable
     {
         private Dictionary<TItem, string> DataDictionary;
         private List<TItem> _Data;
@@ -29,6 +31,8 @@
 
         [Parameter]
         public string MinWidth { get; set; }
+
+        private ElementReference eleFilter { get; set; }
 
         [Parameter] public EventCallback<TItem> DoubleClick { get; set; }
 
@@ -55,6 +59,8 @@
         [Parameter]
         public RenderFragment Columns { get; set; }
 
+        [Inject] IJSRuntime jsRuntime{ get; set; }
+        [Inject] IHotKeysService HotKeyService { get; set; }
 
         List<FlowTableColumn<TItem>> ColumnList = new ();
         List<FlowTableButton<TItem>> Buttons = new();
@@ -62,7 +68,32 @@
         public delegate void SelectionChangedEvent(List<TItem> items);
         public event SelectionChangedEvent SelectionChanged;
 
+        private string lblFilter;
+
         public IEnumerable<TItem> GetSelected() => new List<TItem>(this.SelectedItems); // clone the list, dont give them the actual one
+
+        private string FlowTableHotkey;
+
+        protected override void OnInitialized()
+        {
+            FlowTableHotkey = Guid.NewGuid().ToString();
+            lblFilter = Translater.Instant("Labels.FilterPlaceholder");
+            HotKeyService.RegisterHotkey(FlowTableHotkey, "/", callback: () =>
+            {
+                Task.Run(async () =>
+                {
+                    bool editorOpen = await jsRuntime.InvokeAsync<int>("eval", "document.querySelectorAll('.editor-wrapper').length") > 0;
+                    if (editorOpen)
+                        return;
+                    await eleFilter.FocusAsync();
+                });
+            });
+        }
+
+        public void Dispose()
+        {
+            HotKeyService.DeregisterHotkey(FlowTableHotkey);
+        }
 
         internal void AddColumn(FlowTableColumn<TItem> col)
         {
@@ -162,6 +193,13 @@
                 SelectionChanged(new (SelectedItems)); // we want a clone of the list, not one they can modify 
         }
 
+        private async Task FilterKeyDown(KeyboardEventArgs args)
+        {
+            if(args.Key == "Escape")
+            {
+                this.FilterText = String.Empty;
+            }
+        }
     }
     public enum SelectionMode
     {

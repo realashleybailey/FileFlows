@@ -13,7 +13,6 @@ namespace FileFlows.Server.Helpers
 
     public class DbHelper
     {
-        public static bool UseMySql = false;
         private static string DbFilename;
 
         static string CreateDbScript =
@@ -29,13 +28,6 @@ namespace FileFlows.Server.Helpers
 
 
         internal static IDatabase GetDb()
-        {
-            if (UseMySql)
-                return new Database("Server=localhost;Uid=root;Pwd=root;Database=FileFlows", null, MySqlConnector.MySqlConnectorFactory.Instance);
-            return UseSqlLite();
-        }
-
-        private static Database UseSqlLite()
         {
             try
             {
@@ -271,48 +263,11 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        public static bool StartMySqlServer()
-        {
-            if (UseMySql == false)
-                return true;
-            Logger.Instance.ILog("Starting mysql service");
-            using (var p = Process.Start(new ProcessStartInfo
-            {
-                //FileName = "etc/init.d/mysql",
-                //Arguments = "start",
-                FileName = "service",
-                Arguments = "mysql start",
-                WorkingDirectory = "/"
-            }))
-            {
-                p.WaitForExit();
-                bool started = p.ExitCode == 0;
-                if (started == false)
-                    return false;
-            }
-            using (var p = Process.Start(new ProcessStartInfo
-            {
-                FileName = "mysql",
-                Arguments = "-uroot -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';\"",
-                WorkingDirectory = "/"
-            }))
-            {
-                p.WaitForExit();
-                bool started = p.ExitCode == 0;
-                if (started == false)
-                    return false;
-            }
-            return true;
-        }
-
         public static async Task<bool> CreateDatabase(string connectionString = "Server=localhost;Uid=root;Pwd=root;")
         {
             try
             {
-                if (UseMySql == false)
-                    return await CreateSqliteDatabase();
-                else
-                    return await CreateMySqlDatabase(connectionString);
+                return await CreateSqliteDatabase();
             }
             catch (Exception ex)
             {
@@ -370,37 +325,12 @@ namespace FileFlows.Server.Helpers
                 con.Close();
             }
 
-            using var db = UseSqlLite();
+            using var db = GetDb();
             await AddInitialData(db);
             return true;
         }
 
-        private static async Task<bool> CreateMySqlDatabase(string connectionString)
-        {
-            var db = new Database(connectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
-
-            bool exists = String.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = 'FileFlows'")) == false;
-            if (exists)
-            {
-                db.Dispose();
-                return true;
-            }
-
-            db.Execute("create database FileFlows");
-            // dispose of original one
-            db.Dispose();
-
-            // create new one pointing ot the database
-            db = new Database(connectionString + "Database=FileFlows", null, MySqlConnector.MySqlConnectorFactory.Instance);
-
-            db.Execute(CreateDbScript);
-
-            await AddInitialData(db);
-
-            return true;
-        }
-
-        private static async Task AddInitialData(Database db)
+        private static async Task AddInitialData(IDatabase db)
         {
             bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
             await AddOrUpdateObject(db, new Tool

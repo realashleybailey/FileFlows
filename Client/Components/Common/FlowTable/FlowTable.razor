@@ -17,7 +17,7 @@
                 @ToolBar
             </div>
             <div class="flowtable-toolbar-filter">
-                <input type="text" @bind-value="FilterText" @bind-value:event="oninput" autocomplete="off" />
+                <input @ref="eleFilter" type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" placeholder="@lblFilter" autocomplete="off" />
                 <i class="fas fa-search"></i>
             </div>
         </div>

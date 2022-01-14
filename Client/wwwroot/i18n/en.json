@@ -26,6 +26,7 @@
     "Help": "Help",
     "Name": "Name",
     "Filter": "Filter",
+    "FilterPlaceholder": "Filter (/)",
     "Log": "Log",
     "View": "View",
     "Delete": "Delete",

@@ -43,13 +43,8 @@ if ((Test-Path deploy\plugins) -eq $true) {
 (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
 (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace 'Node = true', "Node = false" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
-if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
-    $curDir = Get-Location
-    & 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' build\installers\FileFlowInstallers.sln        
-}
-else {
-    msbuild.exe build\installers\FileFlowInstallers.sln -m
-}
+# build the installer
+.\build-server.ps1 build\installers\FileFlowInstallers.sln
 
 $zip = "$outdir-$version.zip"
 

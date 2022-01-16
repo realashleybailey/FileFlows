@@ -17,12 +17,8 @@ dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --configu
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace '([\d]+.){3}[\d]+', "$version" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = false', "Node = true" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
-if (Test-Path -Path 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' -PathType Leaf) {        
-    & 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe' installers\FileFlowInstallers.sln
-}
-else {
-    msbuild.exe installers\FileFlowInstallers.sln
-}
+# build the installer
+.\build-server.ps1 installers\FileFlowInstallers.sln
 
 $zip = ".\deploy\FileFlows-Node-$version.zip"
 

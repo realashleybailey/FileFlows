@@ -44,7 +44,7 @@ if ((Test-Path deploy\plugins) -eq $true) {
 (Get-Content build\installers\WindowsServerInstaller\Program.cs) -replace 'Node = true', "Node = false" | Out-File  build\installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
 # build the installer
-.\build-server.ps1 build\installers\FileFlowInstallers.sln
+.\build-installer.ps1 build\installers\FileFlowInstallers.sln
 
 $zip = "$outdir-$version.zip"
 

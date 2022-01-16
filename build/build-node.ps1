@@ -18,7 +18,7 @@ dotnet.exe publish ..\WindowsNode\WindowsNode.csproj /p:WarningLevel=1 --configu
 (Get-Content installers\WindowsServerInstaller\Program.cs) -replace 'Node = false', "Node = true" | Out-File  installers\WindowsServerInstaller\Program.cs -Encoding ascii
 
 # build the installer
-.\build-installer.ps1 installers\FileFlowInstallers.sln
+.\build-installer.ps1 .
 
 $zip = ".\deploy\FileFlows-Node-$version.zip"
 

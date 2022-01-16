@@ -1,12 +1,14 @@
-using Microsoft.Deployment.WindowsInstaller;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.Xml;
+using Microsoft.Win32;
 using WixSharp;
-using WixSharp.Controls;
+using WixSharp.CommonTasks;
 
 internal class Program
 {

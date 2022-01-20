@@ -1,7 +1,6 @@
 ﻿namespace FileFlows.Plugin
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
@@ -32,6 +31,11 @@
         public string Arguments { get; set; }
         public string[] ArgumentList { get; set; }
         public int Timeout { get; set; }
+
+        /// <summary>
+        /// When silent, nothing will be logged
+        /// </summary>
+        public bool Silent { get; set; }
         public string WorkingDirectory { get; set; }
         public delegate void OutputRecievedEvent(string output);
         public event OutputRecievedEvent StandardOutput;
@@ -97,7 +101,7 @@
                     process.StartInfo.Arguments = args.Arguments;
                 }
 
-                if(string.IsNullOrEmpty(args.WorkingDirectory) == false)
+                if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
                     process.StartInfo.WorkingDirectory = args.WorkingDirectory;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;
@@ -105,11 +109,14 @@
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.CreateNoWindow = true;
 
-                Logger?.ILog(new string('=', 70));
-                Logger?.ILog($"Executing: {args.Command} {args.Arguments}");
-                if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
-                    Logger?.ILog($"Working Directory: {args.WorkingDirectory}");
-                Logger?.ILog(new string('=', 70));
+                if (args.Silent == false)
+                {
+                    Logger?.ILog(new string('=', 70));
+                    Logger?.ILog($"Executing: {args.Command} {args.Arguments}");
+                    if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
+                        Logger?.ILog($"Working Directory: {args.WorkingDirectory}");
+                    Logger?.ILog(new string('=', 70));
+                }
 
                 outputBuilder = new StringBuilder();
                 outputCloseEvent = new TaskCompletionSource<bool>();
@@ -162,7 +169,7 @@
                         result.ExitCode = process.ExitCode;
 
                         result.StandardError = errorBuilder.ToString();
-                        result.StandardOutput =outputBuilder.ToString();    
+                        result.StandardOutput = outputBuilder.ToString();    
 
                         // Adds process output if it was completed with error
                         if (process.ExitCode != 0)
@@ -203,7 +210,8 @@
             else
             {
                 Args?.OnStandardOutput(e.Data);
-                Logger.ILog(e.Data);
+                if(Args?.Silent != true)
+                    Logger.ILog(e.Data);
                 outputBuilder.AppendLine(e.Data);
             }
         }
@@ -218,7 +226,8 @@
             else
             {
                 Args?.OnErrorOutput(e.Data);
-                Logger.ILog(e.Data);
+                if (Args?.Silent != true)
+                    Logger.ILog(e.Data);
                 outputBuilder.AppendLine(e.Data);
             }
         }

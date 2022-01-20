@@ -116,7 +116,7 @@ namespace FileFlows.Server.Workers
             // new file we can process
             if (KnownFile(fullPath))
             {
-                Logger.Instance.ILog("WatchedLibrary: Known file: " + fullPath);
+                //Logger.Instance.ILog("WatchedLibrary: Known file: " + fullPath);
                 return;
             }
 
@@ -295,6 +295,7 @@ namespace FileFlows.Server.Workers
                 if (known.Contains(file.FullName.ToLower()))
                     continue; // already known
 
+                Logger.Instance.DLog("New unknown file: " + file.FullName);
                 tasks.Add(GetLibraryFile(file));
             }
             Task.WaitAll(tasks.ToArray());
@@ -332,7 +333,10 @@ namespace FileFlows.Server.Workers
             if (info is FileInfo fileInfo)
             {
                 if (await CanAccess(fileInfo, Library.FileSizeDetectionInterval) == false)
+                {
+                    Logger.Instance.DLog("Cannot access file: " + info.FullName);
                     return null; // this can happen if the file is currently being written to, next scan will retest it
+                }
             }
 
             var lf = new LibraryFile

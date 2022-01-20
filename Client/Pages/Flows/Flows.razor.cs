@@ -16,10 +16,12 @@ namespace FileFlows.Client.Pages
     using Microsoft.AspNetCore.Components.Rendering;
     using System.Text.RegularExpressions;
     using FileFlows.Plugin;
+    using Microsoft.JSInterop;
 
     public partial class Flows : ListPage<ffFlow>
     {
         [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] public IJSRuntime jsRuntime { get; set; }
 
         public override string ApiUrl => "/api/flow";
 
@@ -404,7 +406,7 @@ namespace FileFlows.Client.Pages
 #if (DEBUG)
             url = "http://localhost:6868" + url;
 #endif
-            NavigationManager.NavigateTo(url);
+            await jsRuntime.InvokeVoidAsync("ff.downloadFile", url);
 #endif
         }
 

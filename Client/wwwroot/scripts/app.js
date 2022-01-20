@@ -41,5 +41,13 @@ window.ff = {
                 callback();
         };
         document.body.appendChild(tag);
+    },
+    downloadFile: function (url) {
+        const anchorElement = document.createElement('a');
+        anchorElement.href = url;
+        anchorElement.download = 'file';
+        anchorElement.click();
+        anchorElement.remove();
+
     }
 };

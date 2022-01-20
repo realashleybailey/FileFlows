@@ -92,9 +92,7 @@ namespace FileFlows.Server.Workers
         {
             if (Library.Folders == false && Directory.Exists(e.FullPath))
             {
-                // save to variable to avoid collection was modified exception
-                var files = Directory.GetFiles(e.FullPath, "*.*", SearchOption.AllDirectories).ToArray();
-                foreach (var file in files)
+                foreach (var file in Directory.GetFiles(e.FullPath, "*.*", SearchOption.AllDirectories))
                 {
                     FileChangeEvent(file);
                 }

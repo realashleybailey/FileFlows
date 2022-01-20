@@ -302,11 +302,19 @@ namespace FileFlows.Server.Controllers
 
         internal async Task AddMany(LibraryFile[] libraryFiles)
         {
-            await DbHelper.AddMany(libraryFiles);
-            lock (Data)
+            try
             {
-                foreach (var lf in libraryFiles)
-                    Data.Add(lf.Uid, lf);
+                await DbHelper.AddMany(libraryFiles);
+                lock (Data)
+                {
+                    foreach (var lf in libraryFiles)
+                        Data.Add(lf.Uid, lf);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("LibraryFileController.AddMany: Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                throw;
             }
         }
 

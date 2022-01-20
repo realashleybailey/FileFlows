@@ -42,10 +42,10 @@ window.ff = {
         };
         document.body.appendChild(tag);
     },
-    downloadFile: function (url) {
+    downloadFile: function (url, filename) {
         const anchorElement = document.createElement('a');
         anchorElement.href = url;
-        anchorElement.download = 'file';
+        anchorElement.download = filename ? filename : 'File';
         anchorElement.click();
         anchorElement.remove();
 

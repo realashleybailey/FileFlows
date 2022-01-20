@@ -406,7 +406,7 @@ namespace FileFlows.Client.Pages
 #if (DEBUG)
             url = "http://localhost:6868" + url;
 #endif
-            await jsRuntime.InvokeVoidAsync("ff.downloadFile", url);
+            await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name });
 #endif
         }
 

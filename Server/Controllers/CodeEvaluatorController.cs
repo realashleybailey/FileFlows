@@ -38,12 +38,13 @@ namespace FileFlows.Server.Controllers
                 tcode = Regex.Replace(tcode, keyRegex, "Variables['" + k + "']");
             }
 
+            var logger = new TestLogger();
             var log = new
             {
-                ILog = new LogDelegate((object[] args) => { }),
-                DLog = new LogDelegate((object[] args) => { }),
-                WLog = new LogDelegate((object[] args) => { }),
-                ELog = new LogDelegate((object[] args) => { }),
+                ILog = new LogDelegate(logger.ILog),
+                DLog = new LogDelegate(logger.DLog),
+                WLog = new LogDelegate(logger.WLog),
+                ELog = new LogDelegate(logger.ELog)
             };
             var engine = new Engine(options =>
             {
@@ -71,6 +72,25 @@ namespace FileFlows.Server.Controllers
         {
             public string Code { get; set; }
             public Dictionary<string, object> Variables { get; set; }
+        }
+
+        private class TestLogger : FileFlows.Plugin.ILogger
+        {
+            public void DLog(params object[] args)
+            {
+            }
+
+            public void ELog(params object[] args)
+            {
+            }
+
+            public void ILog(params object[] args)
+            {
+            }
+
+            public void WLog(params object[] args)
+            {
+            }
         }
     }
 

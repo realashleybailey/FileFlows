@@ -11,6 +11,7 @@ namespace FileFlows.Server.Controllers
     using Jint.Runtime;
     using Jint.Native.Object;
     using Jint;
+    using System.Text.RegularExpressions;
 
     [Route("/api/code-eval")]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -30,7 +31,11 @@ namespace FileFlows.Server.Controllers
             string tcode = model.Code;
             foreach (string k in model.Variables.Keys.OrderByDescending(x => x.Length))
             {
-                tcode = tcode.Replace("Variables." + k, "Variables['" + k + "']");
+                // replace Variables.Key or Variables?.Key?.Subkey etc to just the variable
+                // so Variables.file?.Orig.Name, will be replaced to Variables["file.Orig.Name"] 
+                // since its just a dictionary key value 
+                string keyRegex = @"Variables(\?)?\." + k.Replace(".", @"(\?)?\.");
+                tcode = Regex.Replace(tcode, keyRegex, "Variables['" + k + "']");
             }
 
             var log = new

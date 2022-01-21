@@ -96,6 +96,7 @@ canvas {
 }
 .flow-element .icon-wrapper {
   width: 2rem;
+  min-width: 2rem;
   border-right: solid 3px;
   margin-right: 0.25rem;
   position: absolute;
@@ -160,9 +161,7 @@ canvas {
 ::deep .flow-part .name {
   flex-grow: 1;
   margin: auto 0.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 0.5rem 0;
 }
 ::deep .flow-part .draggable {
   position: absolute;
@@ -175,7 +174,7 @@ canvas {
   user-select: none;
 }
 ::deep .flow-part.vertical {
-  height: 4rem;
+  min-height: 4rem;
 }
 ::deep .flow-part.vertical.size-1, ::deep .flow-part.vertical.size-2, ::deep .flow-part.vertical.size-3 {
   width: 12rem;

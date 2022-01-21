@@ -26,7 +26,7 @@ namespace FileFlows.Client.Pages
     {
         [CascadingParameter] public Editor Editor { get; set; }
         [Parameter] public System.Guid Uid { get; set; }
-        [Inject] NavigationManager NavigationManager { get; set; }
+        [Inject] INavigationService NavigationService { get; set; }
         [CascadingParameter] Blocker Blocker { get; set; }
         [Inject] IHotKeysService HotKeyService { get; set; }
         private ffElement[] Available { get; set; }
@@ -60,6 +60,8 @@ namespace FileFlows.Client.Pages
         private string _txtFilter = string.Empty;
         private string lblFilter;
 
+        private Func<Task<bool>> NavigationCheck;
+
         public string txtFilter
         {
             get => _txtFilter;
@@ -84,6 +86,20 @@ namespace FileFlows.Client.Pages
             lblSaving = Translater.Instant("Labels.Saving");
             lblFilter = Translater.Instant("Labels.FilterPlaceholder");
 
+
+            NavigationCheck = async () =>
+            {
+                if (IsDirty)
+                {
+                    bool result = await Confirm.Show(lblClose, $"Pages.{nameof(Flow)}.Messages.Close");
+                    if (result == false)
+                        return false;
+                }
+                return true;
+            };
+
+            NavigationService.RegisterNavigationCallback(NavigationCheck);
+
             HotKeyService.RegisterHotkey("FlowFilter", "/", callback: () =>
             {
                 if (EditorOpen) return;
@@ -96,9 +112,12 @@ namespace FileFlows.Client.Pages
             _ = Init();
         }
 
+
         public void Dispose()
         {
             HotKeyService.DeregisterHotkey("FlowFilter");
+            NavigationService.UnRegisterNavigationCallback(NavigationCheck);
+
         }
 
         private async Task Init()
@@ -180,13 +199,7 @@ namespace FileFlows.Client.Pages
 
         async Task Close()
         {
-            if (IsDirty)
-            {
-                bool result = await Confirm.Show(lblClose, $"Pages.{nameof(Flow)}.Messages.Close");
-                if (result == false)
-                    return;
-            }
-            NavigationManager.NavigateTo("flows");
+            await NavigationService.NavigateTo("flows");
         }
 
 

@@ -7,6 +7,7 @@ namespace FileFlows.Client.Shared
 
     public partial class NavMenu
     {
+        [Inject] private INavigationService NavigationService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
         private List<NavMenuGroup> MenuItems = new List<NavMenuGroup>();
         private bool collapseNavMenu = true;
@@ -79,6 +80,13 @@ namespace FileFlows.Client.Shared
         private void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;
+        }
+
+        async Task Click(NavMenuItem item)
+        {
+            bool ok = await NavigationService.NavigateTo(item.Url);
+            if (ok)
+                SetActive(item);
         }
 
         private void SetActive(NavMenuItem item)

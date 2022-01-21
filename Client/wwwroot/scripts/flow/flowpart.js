@@ -188,6 +188,7 @@ window.ffFlowPart = {
                 ffFlow.redrawLines();
             }
             ffFlow.initOutputHints(part);
+            ffFlow.redrawLines();
 
         });
     },

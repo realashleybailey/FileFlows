@@ -11,10 +11,9 @@ namespace FileFlows.Client
     {
         public static App Instance { get; private set; }
 
-        [Inject]
-        public HttpClient Client { get; set; }
-        [Inject]
-        public IJSRuntime jsRuntime { get; set; }
+        [Inject] public HttpClient Client { get; set; }
+        [Inject] public IJSRuntime jsRuntime { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
         public bool LanguageLoaded { get; set; } = false;
 
         public int DisplayWidth { get; private set; }
@@ -54,6 +53,7 @@ namespace FileFlows.Client
             DisplayHeight = dimensions.height;
 
             HotKeysService.Init(jsRuntime);
+            NavigationService.NavigationManager = NavigationManager;
 
 #if (DEMO)
             Settings = new FileFlows.Shared.Models.Settings

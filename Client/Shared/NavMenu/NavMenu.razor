@@ -39,10 +39,10 @@
             @foreach (var item in group.Items)
             {
                 <li class="nav-item @(item.Url.Replace("/", ""))">
-                    <NavLink class="nav-link" href="@item.Url"
-                    Match="@(item.Url == "" ? NavLinkMatch.All : NavLinkMatch.Prefix)" @onclick="() => SetActive(item)">
+                    <a class="nav-link @(Active == item  ? "active": "")" href="@item.Url" @onclick:preventDefault @onclick:stopPropagation
+                    @onclick="() => Click(item)">
                         <span class="@item.Icon" aria-hidden="true"></span> @item.Title
-                    </NavLink>
+                    </a>
                 </li>
             }
         }

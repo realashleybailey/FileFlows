@@ -164,8 +164,6 @@ window.ffFlowPart = {
         if (!part)
             return;
 
-        console.log('editing', part);
-
         ffFlow.csharp.invokeMethodAsync("Edit", part, deleteOnCancel === true).then(result => {
             if (!result || !result.model) {
                 if (deleteOnCancel === true) {
@@ -173,8 +171,15 @@ window.ffFlowPart = {
                 }
                 return; // editor was canceled
             }
+            console.log('edit result:', result);
             if (result.model.Name) {
                 part.name = result.model.Name;
+                delete result.model.Name;
+            } else if (result.model.Name === '') {
+                part.name = '';
+                let dn = ffFlowPart.getNodeName(part.flowElementUid);
+                if (dn) 
+                    part.label = dn;
                 delete result.model.Name;
             }
             part.model = result.model;
@@ -191,6 +196,14 @@ window.ffFlowPart = {
             ffFlow.redrawLines();
 
         });
+    },
+
+    getNodeName: function (elementUid) {
+        let node = ffFlow.elements.filter(x => x.uid === elementUid)[0];
+        console.log('node', node.displayName, node);
+        if (node)
+            return node.displayName;
+        return '';
     },
 
 

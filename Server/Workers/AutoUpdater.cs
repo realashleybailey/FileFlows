@@ -25,7 +25,7 @@
                 Logger.Instance.ILog("AutoUpdater: Watch Directory:: " + UpdateDirectory);
             }
 
-            WindowsServerExe = Assembly.GetExecutingAssembly()?.FullName ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
+            WindowsServerExe = Assembly.GetExecutingAssembly()?.Location ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
 
             FileSystemWatcher watcher = new FileSystemWatcher(UpdateDirectory);
             watcher.NotifyFilter =

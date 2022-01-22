@@ -13,6 +13,7 @@
 
         public AutoUpdater() : base(ScheduleType.Hourly, 1)
         {
+            Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
             UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
             if (Directory.Exists(UpdateDirectory) == false)
             {
@@ -34,6 +35,8 @@
             watcher.Created += Watcher_Changed;
             watcher.Renamed += Watcher_Changed;
             watcher.EnableRaisingEvents = true;
+
+            CheckForUpdate();
         }
 
         protected override void Execute()
@@ -51,10 +54,15 @@
 
         private void CheckForUpdate()
         {
+            Logger.Instance.ILog("AutoUpdater: Checking for updates");
             var update = GetUpdate();
             if (string.IsNullOrEmpty(update.Item1))
+            {
+                Logger.Instance.ILog("AutoUpdater: No updates found");
                 return;
+            }
 
+            Logger.Instance.ILog("AutoUpdater: Found update: " + update.Item1);
             RunUpdate(update.Item1, update.Item2);
         }
 

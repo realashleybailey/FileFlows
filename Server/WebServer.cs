@@ -148,8 +148,8 @@ namespace FileFlows.Server
 
             // this will run the asp.net app and wait until it is killed
             Console.WriteLine("Running FileFlows Server");
-            //app.Run($"http://[::]:{port}/");
-            app.Run();
+            app.Run($"http://0.0.0.0:{Port}/");
+            //app.Run();
             Console.WriteLine("Finished running FileFlows Server");
 
             WorkerManager.StopWorkers();

@@ -10,6 +10,7 @@ Push-Location ..\
 
 (Get-Content Client\Globals.cs) -replace 'string Version = \"[\d\.]+\"', $csVersion | Out-File Client\Globals.cs
 (Get-Content Server\Globals.cs) -replace 'string Version = \"[\d\.]+\"', $csVersion | Out-File Server\Globals.cs
+(Get-Content WindowsServer\Globals.cs) -replace 'string Version = \"[\d\.]+\"', $csVersion | Out-File WindowsServer\Globals.cs
 
 (Get-Content Server\Server.csproj) -replace '<Version>[^<]+</Version>', "<Version>$version</Version>" | Out-File Server\Server.csproj
 (Get-Content Server\Server.csproj) -replace '<ProductVersion>[^<]+</ProductVersion>', "<ProductVersion>$version</ProductVersion>" | Out-File Server\Server.csproj

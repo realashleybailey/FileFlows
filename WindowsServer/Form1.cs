@@ -4,9 +4,11 @@ namespace FileFlows.WindowsServer
 {
     public partial class Form1 : Form
     {
+        internal static Form1 Instance { get;private set; } 
         public Form1()
         {
             InitializeComponent();
+            Instance = this;
 
             lnkOpen.Text = Program.Url;
             this.Hide();
@@ -29,7 +31,7 @@ namespace FileFlows.WindowsServer
             ShutDown();
         }
 
-        private void QuitMe()
+        internal void QuitMe()
         {
             if (this.InvokeRequired)
             {

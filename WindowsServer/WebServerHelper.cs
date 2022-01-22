@@ -10,6 +10,8 @@ namespace FileFlows.WindowsServer
     internal class WebServerHelper
     {
         static Process process;
+        static bool Stopping = false;
+        static DateTime LastStarted = DateTime.MinValue;
 
         public static void Start()
         {
@@ -27,12 +29,40 @@ namespace FileFlows.WindowsServer
 #endif
             process.StartInfo.Arguments = "--windows --urls=http://[::]:5151";
 
+            process.Exited += Process_Exited;
+
+            LastStarted = DateTime.Now;
             process.Start();
             ChildProcessTracker.AddProcess(process);
         }
 
+        private static void Process_Exited(object? sender, EventArgs e)
+        {
+            int exitCode = process.ExitCode;
+            if(exitCode == 99)
+            {
+                // special code for upgrade
+                Form1.Instance?.QuitMe();
+            }
+            else if(Stopping == false)
+            {
+                // process exited unexpectably, restart it
+                // but only if it last started more than 30 seconds ago, otherwise we could be in a crash loop
+                if (LastStarted < DateTime.Now.AddSeconds(-30))
+                {
+                    Start();
+                }
+                else
+                {
+                    // close the main server, something went wrong
+                    Form1.Instance?.QuitMe();
+                }
+            }
+        }
+
         public static void Stop()
         {
+            Stopping = true;
             try
             {
                 if (process != null)
@@ -50,6 +80,7 @@ namespace FileFlows.WindowsServer
             {
                 Console.WriteLine("Failed stopping webserver: " + ex.Message);
             }
+            Stopping = false;
         }
 
     }

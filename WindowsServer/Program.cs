@@ -31,6 +31,7 @@ namespace FileFlows.WindowsServer
                 }
             }
         }
+
         internal static void LaunchBrowser()
         {
             Process.Start(new ProcessStartInfo("cmd", $"/c start {Url}") { CreateNoWindow = true });

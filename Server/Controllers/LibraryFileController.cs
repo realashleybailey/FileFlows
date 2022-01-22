@@ -305,6 +305,9 @@ namespace FileFlows.Server.Controllers
             try
             {
                 await DbHelper.AddMany(libraryFiles);
+                if (Data == null)
+                    await GetData();
+
                 lock (Data)
                 {
                     foreach (var lf in libraryFiles)

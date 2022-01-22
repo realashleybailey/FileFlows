@@ -21,11 +21,13 @@
         public async Task<StatusModel> Get()
         {
             var status = new StatusModel();
-            status.Queue = (await new LibraryFileController().GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
+            var lfController = new LibraryFileController();
+            status.Queue = (await lfController.GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
+            status.Processed = (await lfController.GetAll(FileStatus.Processed))?.Count() ?? 0;
             var workerController = new WorkerController(null);
             var executors = workerController.GetAll()?.ToList() ?? new List<FlowExecutorInfo>();
             status.Processing = executors.Count;
-            if(executors.Any())
+            if (executors.Any())
             {
                 var time = executors.OrderByDescending(x => x.ProcessingTime).First().ProcessingTime;
                 if (time.Hours > 0)
@@ -54,6 +56,10 @@
             /// Gets the number of files being processed
             /// </summary>
             public int Processing { get; set; }
+            /// <summary>
+            /// Gets the number of files that have been processed
+            /// </summary>
+            public int Processed { get; set; }
             /// <summary>
             /// Gets the processing time of the longest running item in the queue
             /// </summary>

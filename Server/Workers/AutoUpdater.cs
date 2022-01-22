@@ -1,5 +1,6 @@
 ﻿namespace FileFlows.Server.Workers
 {
+    using FileFlows.Server.Controllers;
     using FileFlows.ServerShared.Workers;
     using System.Diagnostics;
     using System.Reflection;
@@ -11,7 +12,7 @@
         private static string UpdateDirectory;
         private static string WindowsServerExe;
 
-        public AutoUpdater() : base(ScheduleType.Hourly, 1)
+        public AutoUpdater() : base(ScheduleType.Minute, 5)
         {
             Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
             UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
@@ -22,7 +23,7 @@
             }
             else
             {
-                Logger.Instance.ILog("AutoUpdater: Watch Directory:: " + UpdateDirectory);
+                Logger.Instance.ILog("AutoUpdater: Watch Directory: " + UpdateDirectory);
             }
 
             WindowsServerExe = Assembly.GetExecutingAssembly()?.Location ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
@@ -68,6 +69,15 @@
             }
 
             Logger.Instance.ILog("AutoUpdater: Found update: " + update.Item1);
+
+            bool canUpdate = new WorkerController(null).GetAll()?.Any() != true;
+            if(canUpdate == false)
+            {
+                Logger.Instance.ILog("AutoUpdater: Currently processing files, cannot update");
+                return;
+            }
+
+            Logger.Instance.ILog("AutoUpdater: Currently not processing files, can update");
             RunUpdate(update.Item1, update.Item2);
         }
 
@@ -117,8 +127,7 @@
             sb.AppendLine(WindowsServerExe);
             File.WriteAllText(tempFile, sb.ToString());
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
-            Process.Start(tempFile);
-
+            Process.Start(tempFile, $"> \"{tempFile}.log\"");
             Environment.Exit(99);
         }
     }

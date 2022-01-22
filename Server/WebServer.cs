@@ -2,6 +2,7 @@
 using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
+using System.Runtime.InteropServices;
 
 namespace FileFlows.Server
 {
@@ -19,8 +20,6 @@ namespace FileFlows.Server
         public static void Start(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-
 
             Port = 5000;
 #if (DEBUG)
@@ -148,8 +147,13 @@ namespace FileFlows.Server
 
             // this will run the asp.net app and wait until it is killed
             Console.WriteLine("Running FileFlows Server");
-            app.Run($"http://0.0.0.0:{Port}/");
-            //app.Run();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                app.Run($"http://0.0.0.0:{Port}/"); // windows, bind to 0.0.0.0 so it listens on every address, docker doesnt like this, so linux probably the same
+            else
+                app.Run();
+                
+            
             Console.WriteLine("Finished running FileFlows Server");
 
             WorkerManager.StopWorkers();

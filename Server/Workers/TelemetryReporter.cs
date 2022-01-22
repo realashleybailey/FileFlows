@@ -25,7 +25,7 @@ namespace FileFlows.Server.Workers
 
             bool isDocker = Program.Docker;
             bool isMacOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             bool isWindows = !isDocker && !isMacOs && !isLinux;
 
             TelemetryData data = new TelemetryData();

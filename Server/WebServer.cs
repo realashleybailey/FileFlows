@@ -21,6 +21,7 @@ namespace FileFlows.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             Port = 5000;
 #if (DEBUG)
             Port = 6868;
@@ -138,7 +139,8 @@ namespace FileFlows.Server
                 new LibraryWorker(),
                 new FlowWorker(string.Empty, isServer: true),
                 new PluginUpdaterWorker(),
-                new TelemetryReporter()
+                new TelemetryReporter(),
+                isWindows ? new AutoUpdater() : null
             );
 
             app.MapHub<Hubs.FlowHub>("/flow");

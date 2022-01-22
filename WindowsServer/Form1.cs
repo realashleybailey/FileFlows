@@ -14,8 +14,6 @@ namespace FileFlows.WindowsServer
             this.Hide();
             this.WindowState = FormWindowState.Minimized;
             notifyIcon.Visible = true;
-
-            AutoUpdater.Init();
         }
 
         protected override void SetVisibleCore(bool value)

@@ -12,6 +12,8 @@ public class WorkerManager
             return; // workers already running
         foreach (var worker in workers)
         {
+            if (worker == null)
+                continue;
             Workers.Add(worker);
             worker.Start();
         }
@@ -19,7 +21,11 @@ public class WorkerManager
     public static void StopWorkers()
     {
         foreach (var worker in Workers)
+        {
+            if (worker == null)
+                continue;
             worker.Stop();
+        }
         Workers.Clear();
     }
 }

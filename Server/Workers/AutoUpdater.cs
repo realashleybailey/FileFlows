@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace FileFlows.WindowsServer
+﻿namespace FileFlows.Server.Workers
 {
-    internal class AutoUpdater
+    using FileFlows.ServerShared.Workers;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Text;
+    using System.Text.RegularExpressions;
+
+    public class AutoUpdater : Worker
     {
         private static string UpdateDirectory;
         private static string WindowsServerExe;
-        private static bool InitDone = false;
-        public static void Init()
-        {
-            if (InitDone)
-                return;
-            InitDone = true;
 
+        public AutoUpdater() : base(ScheduleType.Hourly, 1)
+        {
             UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
             if (Directory.Exists(UpdateDirectory) == false)
             {
-                Console.WriteLine("Creating updates directory: " + UpdateDirectory);
+                Logger.Instance.ILog("AutoUpdater: Creating updates directory: " + UpdateDirectory);
                 Directory.CreateDirectory(UpdateDirectory);
             }
 
@@ -42,12 +35,21 @@ namespace FileFlows.WindowsServer
             watcher.Renamed += Watcher_Changed;
             watcher.EnableRaisingEvents = true;
         }
-        private static void Watcher_Changed(object sender, FileSystemEventArgs e)
+
+        protected override void Execute()
         {
             CheckForUpdate();
         }
 
-        private static void CheckForUpdate()
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            if (e.FullPath.EndsWith(".msi") == false)
+                return;
+            Logger.Instance.ILog("AutoUpdater: File change detected: " + e.FullPath);
+            CheckForUpdate();
+        }
+
+        private void CheckForUpdate()
         {
             var update = GetUpdate();
             if (string.IsNullOrEmpty(update.Item1))
@@ -56,14 +58,14 @@ namespace FileFlows.WindowsServer
             RunUpdate(update.Item1, update.Item2);
         }
 
-        private static (string, string) GetUpdate()
+        private (string, string) GetUpdate()
         {
             var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
             var currentVersion = Version.Parse(Globals.Version);
-            foreach(var file in new DirectoryInfo(UpdateDirectory).GetFiles("*.msi"))
+            foreach (var file in new DirectoryInfo(UpdateDirectory).GetFiles("*.msi"))
             {
                 var match = rgxVersion.Match(file.Name);
-                if(match.Success == false)
+                if (match.Success == false)
                     continue;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
@@ -78,9 +80,9 @@ namespace FileFlows.WindowsServer
             return (string.Empty, string.Empty);
         }
 
-        public static void RunUpdate(string msi, string version)
+        public void RunUpdate(string msi, string version)
         {
-            Console.WriteLine($"Running update [{version}: {msi}");
+            Logger.Instance.ILog($"AutoUpdater: Running update [{version}: {msi}");
             string tempFile = Path.Combine(Path.GetTempPath(), $"FileFlowsUpdate_{version}.bat");
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("timeout /t 5 /nobreak");
@@ -91,9 +93,10 @@ namespace FileFlows.WindowsServer
             sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine(WindowsServerExe);
             File.WriteAllText(tempFile, sb.ToString());
-            Console.WriteLine("Starting bat file update: " + tempFile);
+            Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
             Process.Start(tempFile);
-            Form1.Instance?.QuitMe();
+
+            Environment.Exit(99);
         }
     }
 }

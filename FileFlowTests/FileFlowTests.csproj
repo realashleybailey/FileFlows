@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Client\App.razor.cs" Link="App.razor.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\Client\Components\Inputs\InputCode\InputCode.razor" Link="InputCode.razor" />
   </ItemGroup>
 

@@ -21,8 +21,11 @@ namespace FileFlows.WindowsServer
             InitDone = true;
 
             UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
-            if(Directory.Exists(UpdateDirectory) == false)
+            if (Directory.Exists(UpdateDirectory) == false)
+            {
+                Console.WriteLine("Creating updates directory: " + UpdateDirectory);
                 Directory.CreateDirectory(UpdateDirectory);
+            }
 
             WindowsServerExe = Assembly.GetExecutingAssembly()?.FullName ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
 

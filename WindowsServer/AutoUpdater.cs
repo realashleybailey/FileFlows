@@ -11,10 +11,15 @@ namespace FileFlows.WindowsServer
 {
     internal class AutoUpdater
     {
-        private readonly string UpdateDirectory;
-        private readonly string WindowsServerExe;
-        public AutoUpdater()
+        private static string UpdateDirectory;
+        private static string WindowsServerExe;
+        private static bool InitDone = false;
+        public static void Init()
         {
+            if (InitDone)
+                return;
+            InitDone = true;
+
             UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
             if(Directory.Exists(UpdateDirectory) == false)
                 Directory.CreateDirectory(UpdateDirectory);
@@ -34,12 +39,12 @@ namespace FileFlows.WindowsServer
             watcher.Renamed += Watcher_Changed;
             watcher.EnableRaisingEvents = true;
         }
-        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        private static void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             CheckForUpdate();
         }
 
-        private void CheckForUpdate()
+        private static void CheckForUpdate()
         {
             var update = GetUpdate();
             if (string.IsNullOrEmpty(update.Item1))
@@ -48,7 +53,7 @@ namespace FileFlows.WindowsServer
             RunUpdate(update.Item1, update.Item2);
         }
 
-        private (string, string) GetUpdate()
+        private static (string, string) GetUpdate()
         {
             var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
             var currentVersion = Version.Parse(Globals.Version);
@@ -70,7 +75,7 @@ namespace FileFlows.WindowsServer
             return (string.Empty, string.Empty);
         }
 
-        public void RunUpdate(string msi, string version)
+        public static void RunUpdate(string msi, string version)
         {
             Console.WriteLine($"Running update [{version}: {msi}");
             string tempFile = Path.Combine(Path.GetTempPath(), $"FileFlowsUpdate_{version}.bat");

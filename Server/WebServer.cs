@@ -148,11 +148,7 @@ namespace FileFlows.Server
             // this will run the asp.net app and wait until it is killed
             Console.WriteLine("Running FileFlows Server");
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                app.Run($"http://0.0.0.0:{Port}/"); // windows, bind to 0.0.0.0 so it listens on every address, docker doesnt like this, so linux probably the same
-            else
-                app.Run();
-                
+            app.Run($"http://0.0.0.0:{Port}/");                
             
             Console.WriteLine("Finished running FileFlows Server");
 

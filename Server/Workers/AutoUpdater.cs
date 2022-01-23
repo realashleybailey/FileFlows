@@ -231,9 +231,10 @@
             string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("timeout /t 20 /nobreak");
-            sb.AppendLine("taskkill /f /im FileFlows.exe");
+            sb.AppendLine("taskkill /f /im FileFlows.Server.exe");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
+            sb.AppendLine("taskkill /f /im FileFlows.exe");
             sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
             //sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
@@ -243,13 +244,6 @@
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
             Process.Start(tempFile, $">> \"{tempFile}.log\"");
-
-
-            foreach (var p in Process.GetProcessesByName("FileFlows"))
-            {
-                Logger.Instance.ILog("AutoUpdater: FileFlowsProcess: " + p.ProcessName);
-                p.Kill();
-            }
 
             Environment.Exit(99);
         }

@@ -244,6 +244,7 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
+
             RunUpgrade(tempFile);
 
             WorkerManager.StopWorkers();

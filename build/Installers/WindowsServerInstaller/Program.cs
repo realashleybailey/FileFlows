@@ -39,19 +39,11 @@ internal class Program
         {
             project = new Project("FileFlows",
                 dir, dirStartMenu,
-                //new ManagedAction("FileFlowsAction"),                
-                new ElevatedManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallValidate, Condition.Always)
+                new ElevatedManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallValidate, Condition.NOT_BeingRemoved)
                 {
-                    Execute = Execute.immediate
+                    Execute = Execute.immediate                    
                 },
-                new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)//,
-                //new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
-                //{
-                //    Timeout = 15
-                //}, new CloseApplication(new Id("fileflows.server"), "fileflows.server.exe", true, false)
-                //{
-                //    Timeout = 15
-                //}
+                new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)
             );
         }
         else

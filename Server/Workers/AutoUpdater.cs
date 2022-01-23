@@ -12,7 +12,7 @@
         private static string UpdateDirectory;
         private static string WindowsServerExe;
 
-        public AutoUpdater() : base(ScheduleType.Minute, 5)
+        public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
             Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
             UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
@@ -30,14 +30,15 @@
 
             FileSystemWatcher watcher = new FileSystemWatcher(UpdateDirectory);
             watcher.NotifyFilter =
-                             NotifyFilters.Security |
-                             NotifyFilters.Attributes |
-                             NotifyFilters.CreationTime |
-                             NotifyFilters.DirectoryName |
                              NotifyFilters.FileName |
+                             NotifyFilters.DirectoryName |
+                             NotifyFilters.Attributes |
+                             NotifyFilters.Size |
                              NotifyFilters.LastWrite |
-                             NotifyFilters.Size;
-            watcher.IncludeSubdirectories = true;
+                             NotifyFilters.LastAccess |
+                             NotifyFilters.CreationTime |
+                             NotifyFilters.Security;
+
             watcher.Changed += Watcher_Changed;
             watcher.Created += Watcher_Changed;
             watcher.Renamed += Watcher_Changed;

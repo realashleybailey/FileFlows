@@ -219,8 +219,10 @@
             sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());
+
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
+
             Process.Start(tempFile, $"> \"{tempFile}.log\"");
             Environment.Exit(99);
         }

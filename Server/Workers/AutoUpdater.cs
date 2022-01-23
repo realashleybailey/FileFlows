@@ -132,11 +132,14 @@
                     Logger.Instance.ILog("AutoUpdater: Update already downloaded: " + file);
                     return;
                 }
+                const string downloadUrl = "https://fileflows.com/downloads/server-msi";
 
-                using (var client = new HttpClient())
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
+                using (var client = new System.Net.WebClient())
                 {
-                    client.DownloadFile("https://fileflows.com/downloads/server-msi", file).Wait();
+                    client.DownloadFile(downloadUrl, file);
                 }
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
             }
             catch (Exception ex)
             {

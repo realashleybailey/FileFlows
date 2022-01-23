@@ -192,9 +192,10 @@
 
         private (bool greater, string version) IsGreaterThanCurrent(string filename)
         {
+            string shortName = new FileInfo(filename).Name;
             var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
             var currentVersion = Version.Parse(Globals.Version);
-            var match = rgxVersion.Match(filename);
+            var match = rgxVersion.Match(shortName);
             if (match.Success == false)
             {
                 Logger.Instance.ILog("AutoUpdater: File does not match version regex: " + filename);

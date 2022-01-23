@@ -41,7 +41,7 @@
             watcher.Changed += Watcher_Changed;
             watcher.Created += Watcher_Changed;
             watcher.Renamed += Watcher_Changed;
-            watcher.Filter = "*.msi";
+            
             watcher.EnableRaisingEvents = true;
 
             CheckForUpdate();
@@ -55,6 +55,8 @@
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             Logger.Instance.ILog("AutoUpdater: File change detected: " + e.FullPath);
+            if (e.FullPath.EndsWith(".msi") == false)
+                return;
             CheckForUpdate();
         }
 
@@ -70,7 +72,8 @@
 
             Logger.Instance.ILog("AutoUpdater: Found update: " + update.Item1);
 
-            bool canUpdate = new WorkerController(null).GetAll()?.Any() != true;
+            var workers = new WorkerController(null).GetAll();
+            bool canUpdate = workers?.Any() != true;
             if(canUpdate == false)
             {
                 Logger.Instance.ILog("AutoUpdater: Currently processing files, cannot update");

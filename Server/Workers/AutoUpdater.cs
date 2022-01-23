@@ -235,7 +235,7 @@
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"echo About to start {WindowsServerExe}");
-            sb.AppendLine($"start \"\" \"{WindowsServerExe}\" --upgraded");
+            sb.AppendLine($"cmd /c start \"\" \"{WindowsServerExe}\" --upgraded");
             //sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());

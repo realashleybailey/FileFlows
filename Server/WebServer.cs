@@ -122,6 +122,10 @@ namespace FileFlows.Server
             Logger.Instance.ILog("Starting File Flows " + Globals.Version);
             if(Program.Docker)
                 Logger.Instance?.ILog("Running inside docker container");
+            bool upgraded = args?.Any(x => x == "--upgraded") == true;
+            if (upgraded)
+                Logger.Instance?.ILog("Started after upgrade");
+
             Logger.Instance.ILog(new string('=', 50));
 
             // need to scan for plugins before initing the translater as that depends on the plugins directory

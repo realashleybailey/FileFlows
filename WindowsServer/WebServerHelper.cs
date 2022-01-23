@@ -13,7 +13,7 @@ namespace FileFlows.WindowsServer
         static bool Stopping = false;
         static DateTime LastStarted = DateTime.MinValue;
 
-        public static void Start()
+        public static void Start(bool upgraded = false)
         {
             WebServerHelper.process = new Process();
             // If you run bash-script on Linux it is possible that ExitCode can be 255.
@@ -27,7 +27,7 @@ namespace FileFlows.WindowsServer
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
 #endif
-            process.StartInfo.Arguments = "--windows --urls=http://[::]:5151";
+            process.StartInfo.Arguments = "--windows --urls=http://[::]:5151" + (upgraded ? " --upgraded" : "");
 
             process.Exited += Process_Exited;
 

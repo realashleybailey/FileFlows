@@ -37,7 +37,7 @@ namespace FileFlows.WindowsServer
                     timer.Elapsed += Timer_Elapsed;
                     timer.Start();
 
-                    WebServerHelper.Start();
+                    WebServerHelper.Start(upgraded);
                     ApplicationConfiguration.Initialize();
                     if(silent == false)
                         LaunchBrowser();

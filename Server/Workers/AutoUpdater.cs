@@ -230,7 +230,7 @@
             Logger.Instance.ILog($"AutoUpdater: Running update [{version}: {msi}");
             string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("timeout /t 5 /nobreak");
+            sb.AppendLine("timeout /t 20 /nobreak");
             sb.AppendLine("taskkill /f /im FileFlows.exe");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
@@ -242,14 +242,14 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
-            // kill fileflows, if we do this after process it can kill the installer
+            Process.Start(tempFile, $">> \"{tempFile}.log\"");
+
             foreach (var p in Process.GetProcessesByName("FileFlows"))
             {
                 Logger.Instance.ILog("AutoUpdater: FileFlowsProcess: " + p.ProcessName);
                 p.Kill();
             }
 
-            Process.Start(tempFile, $">> \"{tempFile}.log\"");
             Environment.Exit(99);
         }
 
@@ -262,7 +262,6 @@
                     if (file.EndsWith(".msi"))
                     {
                         continue;
-
                         // check if version greater than this
                         var isGreater = IsGreaterThanCurrent(file);
                         if (isGreater.greater)

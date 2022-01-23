@@ -9,6 +9,9 @@
     using System.Text;
     using System.Text.RegularExpressions;
 
+    /// <summary>
+    /// A worker that automatically updatees FileFlows
+    /// </summary>
     public class AutoUpdater : Worker
     {
         private readonly string UpdateDirectory;

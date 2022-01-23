@@ -2,6 +2,7 @@
 {
     using FileFlows.Server.Controllers;
     using FileFlows.ServerShared.Workers;
+    using FileFlows.Shared;
     using FileFlows.Shared.Helpers;
     using System.Diagnostics;
     using System.Reflection;
@@ -29,7 +30,7 @@
                 Logger.Instance.ILog("AutoUpdater: Watch Directory: " + UpdateDirectory);
             }
 
-            WindowsServerExe = Assembly.GetExecutingAssembly()?.Location ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
+            WindowsServerExe = Assembly.GetExecutingAssembly()?.Location?.EmptyAsNull() ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
 
             FileSystemWatcher watcher = new FileSystemWatcher(UpdateDirectory);
             watcher.NotifyFilter =
@@ -48,7 +49,7 @@
             
             watcher.EnableRaisingEvents = true;
 
-            CheckForUpdate();
+            Execute();
         }
 
         protected override void Execute()
@@ -175,7 +176,7 @@
         public void RunUpdate(string msi, string version)
         {
             Logger.Instance.ILog($"AutoUpdater: Running update [{version}: {msi}");
-            string tempFile = Path.Combine(Path.GetTempPath(), $"FileFlowsUpdate_{version}.bat");
+            string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");

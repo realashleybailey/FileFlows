@@ -40,7 +40,7 @@ internal class Program
             project = new Project("FileFlows",
                 dir, dirStartMenu,
                 //new ManagedAction("FileFlowsAction"),
-                new ManagedAction(CustonActions.StopProcesses, Return.ignore, When.After, Step.InstallInitialize, Condition.Always),
+                new ElevatedManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallFiles, Condition.Always),
                 new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)//,
                 //new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
                 //{

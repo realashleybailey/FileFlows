@@ -245,9 +245,18 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
-            Process.Start("cmd.exe", "/c start \"{tempFile}\" >> \"{tempFile}.log\"");
+            RunUpgrade(tempFile);
 
             Environment.Exit(99);
+        }
+
+        private void RunUpgrade(string batchFile)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = @"cmd";
+            psi.Arguments = $"/C start \"{batchFile}\" > \"{batchFile}.log\"";
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            Process.Start(psi);
         }
 
         private void CleanUpOldFiles(string dir)

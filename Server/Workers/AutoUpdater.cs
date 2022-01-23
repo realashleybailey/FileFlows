@@ -236,6 +236,7 @@
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine("taskkill /f /im FileFlows.exe");
             sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
+
             //sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());

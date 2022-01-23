@@ -235,6 +235,7 @@
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine("taskkill /f /im FileFlows.exe");
+            sb.AppendLine($"echo About to start {WindowsServerExe}");
             sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
             //sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
@@ -243,7 +244,7 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
-            Process.Start(tempFile, $">> \"{tempFile}.log\"");
+            Process.Start("cmd", "/c \"{tempFile}\" >> \"{tempFile}.log\"");
 
             Environment.Exit(99);
         }

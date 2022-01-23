@@ -262,6 +262,7 @@
                     if (file.EndsWith(".msi"))
                     {
                         continue;
+
                         // check if version greater than this
                         var isGreater = IsGreaterThanCurrent(file);
                         if (isGreater.greater)

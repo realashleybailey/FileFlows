@@ -34,11 +34,6 @@ namespace FileFlows.Server
         {
 
             string logfile = GetLogFile();
-            if (File.Exists(logfile))
-            {
-                File.Move(logfile, logfile.Replace(".log", ".old.log"), true);
-            }
-
             FileStream ostream;
             StreamWriter writer;
             TextWriter oldOut = Console.Out;

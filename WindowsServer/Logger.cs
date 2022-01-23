@@ -19,6 +19,15 @@ namespace FileFlows.WindowsServer
             Error, Warning, Info, Debug
         }
 
+        public static void MoveOldLog()
+        {
+            LogFile = GetLogFile();
+            if (File.Exists(LogFile))
+            {
+                File.Move(LogFile, LogFile.Replace(".log", ".old.log"), true);
+            }
+        }
+
         private static void Log(LogType type, params object[] args)
         {
             if (args == null || args.Length == 0)
@@ -28,7 +37,6 @@ namespace FileFlows.WindowsServer
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
-            Console.WriteLine(message);
 
             if (string.IsNullOrEmpty(LogFile))
                 LogFile = GetLogFile();

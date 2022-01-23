@@ -18,6 +18,8 @@ namespace FileFlows.WindowsServer
             bool upgraded = args?.FirstOrDefault() == "--upgraded";
             bool installer = args?.FirstOrDefault() == "--installer";
 
+            Logger.MoveOldLog();
+
             if (installer)
             {
                 Logger.ILog("Starting from installer");

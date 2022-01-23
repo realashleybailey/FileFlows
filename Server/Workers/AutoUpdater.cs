@@ -15,6 +15,7 @@
         private readonly string WindowsServerExe;
 
         private DateTime LastCheckedOnline = DateTime.MinValue;
+        private const int LastCheckedOnlineIntervalMinutes = 5; // 5 minute
 
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
@@ -58,7 +59,7 @@
             if (settings.AutoUpdate == false)
                 return;
 
-            if (LastCheckedOnline < DateTime.Now.AddHours(-1))
+            if (LastCheckedOnline < DateTime.Now.AddMinutes(-LastCheckedOnlineIntervalMinutes))
             {
                 CheckForUpdateOnline();
                 LastCheckedOnline = DateTime.Now;

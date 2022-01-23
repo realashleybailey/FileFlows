@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using System.Xml;
 using Microsoft.Win32;
 using WixSharp;
 using WixSharp.CommonTasks;
+using Microsoft.Deployment.WindowsInstaller;
 
 internal class Program
 {
@@ -40,13 +40,15 @@ internal class Program
             project = new Project("FileFlows",
                 dir, dirStartMenu,
                 //new ManagedAction("FileFlowsAction"),
-                new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
-                {
-                    Timeout = 15
-                }, new CloseApplication(new Id("fileflows.server"), "fileflows.server.exe", true, false)
-                {
-                    Timeout = 15
-                }
+                new ManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallFiles, Condition.Always),
+                new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.NOT_Installed)//,
+                //new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
+                //{
+                //    Timeout = 15
+                //}, new CloseApplication(new Id("fileflows.server"), "fileflows.server.exe", true, false)
+                //{
+                //    Timeout = 15
+                //}
             );
         }
         else
@@ -54,6 +56,7 @@ internal class Program
             project = new Project("FileFlows Node",
                 dir, dirStartMenu,
                 //new ManagedAction("FileFlowsNodeAction"),
+                new ManagedAction(CustonActions.StartFileFlowsNode, Return.ignore, When.After, Step.InstallFinalize, Condition.NOT_Installed),
                 new CloseApplication(new Id("fileflowsnode"), "fileflowsnode.exe", true, false)
                 {
                     Timeout = 15
@@ -111,6 +114,28 @@ internal class Program
         }
 
         return items;
+    }
+}
+
+public class CustonActions
+{
+    [CustomAction]
+    public static ActionResult StopProcesses(Session session)
+    {
+        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows*.exe");
+        return ActionResult.Success;
+    }
+    [CustomAction]
+    public static ActionResult StartFileFlowsServer(Session session)
+    {
+        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
+        return ActionResult.Success;
+    }
+    [CustomAction]
+    public static ActionResult StartFileFlowsNode(Session session)
+    {
+        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
+        return ActionResult.Success;
     }
 }
 

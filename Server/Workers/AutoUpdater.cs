@@ -181,10 +181,10 @@
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
-            sb.AppendLine($"del \"{tempFile}\"");
             sb.AppendLine(WindowsServerExe);
             sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine(WindowsServerExe);
+            sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);

@@ -32,6 +32,7 @@ namespace FileFlows.WindowsServer
             process.Exited += Process_Exited;
 
             LastStarted = DateTime.Now;
+            Logger.ILog("Starting FileFlows.Server: " + process.StartInfo.Arguments);
             process.Start();
             ChildProcessTracker.AddProcess(process);
         }
@@ -39,6 +40,7 @@ namespace FileFlows.WindowsServer
         private static void Process_Exited(object? sender, EventArgs e)
         {
             int exitCode = process.ExitCode;
+            Logger.ILog("FileFlows.Server processed exited: " + exitCode);
             if(exitCode == 99)
             {
                 // special code for upgrade
@@ -67,13 +69,13 @@ namespace FileFlows.WindowsServer
             {
                 if (process != null)
                 {
-                    Console.Write("Stopping WebServer");
+                    Logger.ILog("Stopping WebServer");
                     process.Kill();
                 }
                 else
                 {
 
-                    Console.Write("WebServer not running");
+                    Logger.ILog("WebServer not running");
                 }
 
 
@@ -83,7 +85,7 @@ namespace FileFlows.WindowsServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed stopping webserver: " + ex.Message);
+                Logger.WLog("Failed stopping webserver: " + ex.Message);
             }
             Stopping = false;
         }

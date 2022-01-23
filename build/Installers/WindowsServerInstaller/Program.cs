@@ -129,7 +129,7 @@ public class CustonActions
     public static ActionResult StartFileFlowsServer(Session session)
     {
         //System.Threading.Thread.Sleep(5_000);
-        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
+        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe", "--installer");
         return ActionResult.Success;
     }
 
@@ -137,7 +137,7 @@ public class CustonActions
     public static ActionResult StartFileFlowsNode(Session session)
     {
         //System.Threading.Thread.Sleep(5_000);
-        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
+        System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe", "--installer");
         return ActionResult.Success;
     }
 }

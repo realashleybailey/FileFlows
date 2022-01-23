@@ -6,6 +6,8 @@ namespace FileFlows.WindowsServer
     {
         internal static string Url = "http://localhost:5151/";
         const string appGuid = "f77f5093-4d04-48b5-9824-cb8cf91ffff1";
+        readonly static string LogFile;
+        
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -14,10 +16,17 @@ namespace FileFlows.WindowsServer
         {
             bool silent = args?.FirstOrDefault() == "--silent";
             bool upgraded = args?.FirstOrDefault() == "--upgraded";
+            bool installer = args?.FirstOrDefault() == "--installer";
+
+            if (installer)
+            {
+                Logger.ILog("Starting from installer");
+                Thread.Sleep(10_000);
+            }
 
             if (upgraded)
             {
-                Console.WriteLine("Starting FileFlows after upgrade");
+                Logger.ILog("Starting FileFlows after upgrade");
                 //KillOtherProcesses();
                 silent = true;
             }
@@ -39,8 +48,11 @@ namespace FileFlows.WindowsServer
 
                     WebServerHelper.Start(upgraded);
                     ApplicationConfiguration.Initialize();
-                    if(silent == false)
+                    if (silent == false)
+                    {
+                        Thread.Sleep(5_000);
                         LaunchBrowser();
+                    }
                     Application.Run(new Form1());
                     timer.Stop();
                     WebServerHelper.Stop();
@@ -63,7 +75,7 @@ namespace FileFlows.WindowsServer
                 if (pname.Contains("node"))
                     continue;
 
-                Console.WriteLine("Killing process: " + process.ProcessName);
+                Logger.ILog("Killing process: " + process.ProcessName);
                 process.Kill();
             }
         }
@@ -73,6 +85,7 @@ namespace FileFlows.WindowsServer
             var process = Process.GetProcessesByName("FileFlows.Server");
             if (process == null)
             {
+                Logger.ILog("FileFlows.Server is not running, restarting it");
                 // it stopped, restart it
                 WebServerHelper.Start();
             }

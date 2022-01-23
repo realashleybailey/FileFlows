@@ -122,10 +122,12 @@ public class CustonActions
     [CustomAction]
     public static ActionResult StopProcesses(Session session)
     {
+        System.Diagnostics.Process.Start("notepad.exe");
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.exe");
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Server.exe");
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlowsNode.exe");
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Node.exe");
+        System.Diagnostics.Process.Start("notepad.exe");
         return ActionResult.Success;
     }
 

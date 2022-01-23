@@ -18,7 +18,7 @@ namespace FileFlows.WindowsServer
             if (upgraded)
             {
                 Console.WriteLine("Starting FileFlows after upgrade");
-                KillOtherProcesses();
+                //KillOtherProcesses();
                 silent = true;
             }
 

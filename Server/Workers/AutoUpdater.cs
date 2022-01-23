@@ -248,6 +248,7 @@
             RunUpgrade(tempFile);
 
             WorkerManager.StopWorkers();
+            Environment.Exit(99);
         }
 
         private void RunUpgrade(string batchFile)

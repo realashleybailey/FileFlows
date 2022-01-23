@@ -244,7 +244,7 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
-            Process.Start("cmd.exe", "/c \"{tempFile}\" >> \"{tempFile}.log\"");
+            Process.Start("cmd.exe", "/c start \"{tempFile}\" >> \"{tempFile}.log\"");
 
             Environment.Exit(99);
         }

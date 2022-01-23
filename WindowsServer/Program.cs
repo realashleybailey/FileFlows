@@ -13,6 +13,15 @@ namespace FileFlows.WindowsServer
         static void Main(string[] args)
         {
             bool silent = args?.FirstOrDefault() == "--silent";
+            bool upgraded = args?.FirstOrDefault() == "--upgraded";
+
+            if (upgraded)
+            {
+                Console.WriteLine("Starting FileFlows after upgrade");
+                KillOtherProcesses();
+                silent = true;
+            }
+
             using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
             {
                 if (mutex.WaitOne(0, false) == false)
@@ -39,6 +48,23 @@ namespace FileFlows.WindowsServer
             }
         }
 
+        private static void KillOtherProcesses()
+        {
+            var current = Process.GetCurrentProcess();
+            foreach (var process in Process.GetProcesses())
+            {
+                if (process.Id == current.Id) 
+                    continue;
+                string pname = process.ProcessName?.ToLower() ?? string.Empty;
+                if (pname.Contains("fileflows") == false)
+                    continue;
+                if (pname.Contains("node"))
+                    continue;
+
+                Console.WriteLine("Killing process: " + process.ProcessName);
+                process.Kill();
+            }
+        }
 
         private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {

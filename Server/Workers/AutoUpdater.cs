@@ -234,9 +234,8 @@
             sb.AppendLine("taskkill /f /im FileFlows.Server.exe");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
-            sb.AppendLine("taskkill /f /im FileFlows.exe");
             sb.AppendLine($"echo About to start {WindowsServerExe}");
-            sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
+            sb.AppendLine($"start \"\" \"{WindowsServerExe}\" --upgraded");
             //sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());
@@ -246,14 +245,13 @@
 
             RunUpgrade(tempFile);
 
-            Environment.Exit(99);
+            WorkerManager.StopWorkers();
         }
 
         private void RunUpgrade(string batchFile)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = @"cmd";
-            psi.Arguments = $"/C start \"{batchFile}\" > \"{batchFile}.log\"";
+            psi.FileName = $"\"{batchFile}\" > \"{batchFile}.log\"";
             psi.WindowStyle = ProcessWindowStyle.Hidden;
             Process.Start(psi);
         }
@@ -276,7 +274,7 @@
                     }
                     try
                     {
-                        Logger.Instance.ILog("AutoUpdater: Removing upate file: " + file);
+                        Logger.Instance.ILog("AutoUpdater: Removing update file: " + file);
                         File.Delete(file);
                     }
                     catch (Exception ex) { }

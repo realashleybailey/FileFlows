@@ -235,9 +235,10 @@
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"echo About to start {WindowsServerExe}");
-            sb.AppendLine($"cmd /c start \"\" \"{WindowsServerExe}\" --upgraded");
+            //sb.AppendLine($"cmd /c start \"\" \"{WindowsServerExe}\" --upgraded");
+            sb.AppendLine($"\"{WindowsServerExe}\" --upgraded");
             //sb.AppendLine($"del \"{msi}\"");
-            sb.AppendLine($"del \"{tempFile}\"");
+            //sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());
 
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);

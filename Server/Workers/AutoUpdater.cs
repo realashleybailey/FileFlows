@@ -135,19 +135,25 @@
                     Logger.Instance.ILog("AutoUpdater: Update already downloaded: " + file);
                     return;
                 }
-                const string downloadUrl = "https://fileflows.com/downloads/server-msi";
 
-#pragma warning disable SYSLIB0014 // Type or member is obsolete
-                using (var client = new System.Net.WebClient())
-                {
-                    client.DownloadFile(downloadUrl, file);
-                }
-#pragma warning restore SYSLIB0014 // Type or member is obsolete
+                DownloadFile(file);
             }
             catch (Exception ex)
             {
                 Logger.Instance.ELog("AutoUpdater: Failed checking online version: " + ex.Message);
             }
+        }
+
+        private void DownloadFile(string file)
+        {
+            string downloadUrl = "https://fileflows.com/downloads/server-msi?ts=" + DateTime.Now.Ticks;
+
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
+            using (var client = new System.Net.WebClient())
+            {
+                client.DownloadFile(downloadUrl, file);
+            }
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
         }
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
@@ -229,7 +235,7 @@
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
-            sb.AppendLine($"del \"{msi}\"");
+            //sb.AppendLine($"del \"{msi}\"");
             sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());
 
@@ -247,6 +253,7 @@
 
         private void CleanUpOldFiles(string dir)
         {
+            return;
             try
             {
                 foreach(var file in Directory.GetFiles(dir))

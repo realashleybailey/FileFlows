@@ -140,7 +140,7 @@ public class CustonActions
     [CustomAction]
     public static ActionResult StartFileFlowsNode(Session session)
     {
-        System.Threading.Thread.Sleep(5_000);
+        //System.Threading.Thread.Sleep(5_000);
         System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
         return ActionResult.Success;
     }

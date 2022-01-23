@@ -54,14 +54,15 @@
         protected override void Execute()
         {
             var settings = new SettingsController().Get().Result;
-            if (settings.AutoUpdate)
+            if (settings.AutoUpdate == false)
+                return;
+
+            if (LastCheckedOnline < DateTime.Now.AddHours(-1))
             {
-                if (LastCheckedOnline < DateTime.Now.AddHours(-1))
-                {
-                    CheckForUpdateOnline();
-                    LastCheckedOnline = DateTime.Now;
-                }
+                CheckForUpdateOnline();
+                LastCheckedOnline = DateTime.Now;
             }
+
             CheckForUpdate();
         }
 

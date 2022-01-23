@@ -245,9 +245,12 @@
                         var isGreater = IsGreaterThanCurrent(file);
                         if (isGreater.greater)
                             continue; // dont delete
+                        else if (isGreater.version == Globals.Version)
+                            continue; // dont delete current
                     }
                     try
                     {
+                        Logger.Instance.ILog("AutoUpdater: Removing upate file: " + file);
                         File.Delete(file);
                     }
                     catch (Exception ex) { }

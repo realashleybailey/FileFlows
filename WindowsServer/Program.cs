@@ -23,12 +23,30 @@ namespace FileFlows.WindowsServer
                 }
                 else
                 {
+                    var timer = new System.Timers.Timer();
+                    timer.Interval = 30_000;
+                    timer.Elapsed += Timer_Elapsed;
+                    timer.Start();
+
                     WebServerHelper.Start();
                     ApplicationConfiguration.Initialize();
                     if(silent == false)
                         LaunchBrowser();
                     Application.Run(new Form1());
+                    timer.Stop();
+                    WebServerHelper.Stop();
                 }
+            }
+        }
+
+
+        private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            var process = Process.GetProcessesByName("FileFlows.Server");
+            if (process == null)
+            {
+                // it stopped, restart it
+                WebServerHelper.Start();
             }
         }
 

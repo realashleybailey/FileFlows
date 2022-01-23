@@ -75,6 +75,11 @@ namespace FileFlows.WindowsServer
 
                     Console.Write("WebServer not running");
                 }
+
+
+                var processes = Process.GetProcessesByName("FileFlows.Server");
+                foreach (var p in processes)
+                    p.Kill();
             }
             catch (Exception ex)
             {

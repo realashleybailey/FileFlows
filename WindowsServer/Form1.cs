@@ -1,10 +1,11 @@
 using System.Diagnostics;
-
 namespace FileFlows.WindowsServer
 {
     public partial class Form1 : Form
     {
-        internal static Form1 Instance { get;private set; } 
+        internal static Form1 Instance { get;private set; }
+
+        private System.Timers.Timer timer;
         public Form1()
         {
             InitializeComponent();

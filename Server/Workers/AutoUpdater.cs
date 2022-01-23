@@ -28,6 +28,7 @@
             }
             else
             {
+                CleanUpOldFiles(UpdateDirectory);
                 Logger.Instance.ILog("AutoUpdater: Watch Directory: " + UpdateDirectory);
             }
 
@@ -177,34 +178,38 @@
 
         private (string, string) GetUpdate()
         {
-            var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
-            var currentVersion = Version.Parse(Globals.Version);
             foreach (var file in new DirectoryInfo(UpdateDirectory).GetFiles("*.msi"))
             {
-                var match = rgxVersion.Match(file.Name);
-                if (match.Success == false)
-                {
-                    Logger.Instance.ILog("AutoUpdater: File does not match version regex: " + file.Name);
-                    continue;
-                }
-
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-                Version version;
-                if (Version.TryParse(match.Value, out version) == false)
-                {
-                    Logger.Instance.ILog("AutoUpdater: Failed to parse version: " + match.Value);
-                    continue;
-                }
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-
-                if (version > currentVersion)
-                    return (file.FullName, match.Value);
-                else
-                {
-                    Logger.Instance.ILog($"AutoUpdater: Version '{version} less than current '{currentVersion}'");
-                }
+                var isGreater = IsGreaterThanCurrent(file.FullName);
+                if (isGreater.greater == true)
+                    return (file.FullName, isGreater.version);
             }
             return (string.Empty, string.Empty);
+        }
+
+        private (bool greater, string version) IsGreaterThanCurrent(string filename)
+        {
+            var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
+            var currentVersion = Version.Parse(Globals.Version);
+            var match = rgxVersion.Match(filename);
+            if (match.Success == false)
+            {
+                Logger.Instance.ILog("AutoUpdater: File does not match version regex: " + filename);
+                return (false, string.Empty);
+            }
+
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+            Version version;
+            if (Version.TryParse(match.Value, out version) == false)
+            {
+                Logger.Instance.ILog("AutoUpdater: Failed to parse version: " + match.Value);
+                return (false, string.Empty); ;
+            }
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            if (version > currentVersion)
+                return (true, match.Value);
+            return (false, match.Value);
         }
 
         public void RunUpdate(string msi, string version)
@@ -213,6 +218,7 @@
             string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("timeout /t 5 /nobreak");
+            sb.AppendLine("taskkill /f /im FileFlows.exe");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
@@ -225,6 +231,29 @@
 
             Process.Start(tempFile, $"> \"{tempFile}.log\"");
             Environment.Exit(99);
+        }
+
+        private void CleanUpOldFiles(string dir)
+        {
+            try
+            {
+                foreach(var file in Directory.GetFiles(dir))
+                {
+                    if (file.EndsWith(".msi"))
+                    {
+                        // check if version greater than this
+                        var isGreater = IsGreaterThanCurrent(file);
+                        if (isGreater.greater)
+                            continue; // dont delete
+                    }
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex) { }
+                }
+            }
+            catch (Exception ex) { }
         }
     }
 }

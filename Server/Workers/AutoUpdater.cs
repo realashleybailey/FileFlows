@@ -242,25 +242,26 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
-
-            Process.Start(tempFile, $"> \"{tempFile}.log\"");
-            foreach(var p in Process.GetProcessesByName("FileFlows"))
+            // kill fileflows, if we do this after process it can kill the installer
+            foreach (var p in Process.GetProcessesByName("FileFlows"))
             {
                 Logger.Instance.ILog("AutoUpdater: FileFlowsProcess: " + p.ProcessName);
                 p.Kill();
             }
+
+            Process.Start(tempFile, $">> \"{tempFile}.log\"");
             Environment.Exit(99);
         }
 
         private void CleanUpOldFiles(string dir)
         {
-            return;
             try
             {
                 foreach(var file in Directory.GetFiles(dir))
                 {
                     if (file.EndsWith(".msi"))
                     {
+                        continue;
                         // check if version greater than this
                         var isGreater = IsGreaterThanCurrent(file);
                         if (isGreater.greater)

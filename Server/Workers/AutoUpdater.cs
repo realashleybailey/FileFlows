@@ -2,6 +2,7 @@
 {
     using FileFlows.Server.Controllers;
     using FileFlows.ServerShared.Workers;
+    using FileFlows.Shared.Helpers;
     using System.Diagnostics;
     using System.Reflection;
     using System.Text;
@@ -9,8 +10,10 @@
 
     public class AutoUpdater : Worker
     {
-        private static string UpdateDirectory;
-        private static string WindowsServerExe;
+        private readonly string UpdateDirectory;
+        private readonly string WindowsServerExe;
+
+        private DateTime LastCheckedOnline = DateTime.MinValue;
 
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
@@ -50,7 +53,58 @@
 
         protected override void Execute()
         {
+            var settings = new SettingsController().Get().Result;
+            if (settings.AutoUpdate)
+            {
+                if (LastCheckedOnline < DateTime.Now.AddHours(-1))
+                {
+                    CheckForUpdateOnline();
+                    LastCheckedOnline = DateTime.Now;
+                }
+            }
             CheckForUpdate();
+        }
+
+        private void CheckForUpdateOnline()
+        {
+            try
+            {
+                var result = HttpHelper.Get<string>("https://fileflows.com/api/telemetry/latest-version").Result;
+                if (result.Success == false)
+                {
+                    Logger.Instance.ILog("AutoUpdater: Failed to retrieve online version");
+                    return;
+                }
+
+                Version current = Version.Parse(Globals.Version);
+                Version onlineVersion;
+                if (Version.TryParse(result.Data, out onlineVersion) == false)
+                {
+                    Logger.Instance.ILog("AutoUpdater: Failed to parse online version: " + result.Data);
+                    return;
+                }
+                if (current >= onlineVersion)
+                {
+                    Logger.Instance.ILog($"AutoUpdater: Current version '{current}' newer or same as online version '{onlineVersion}'");
+                    return;
+                }
+
+                string file = Path.Combine(UpdateDirectory, $"FileFlows-{onlineVersion}.msi");
+                if (File.Exists(file))
+                {
+                    Logger.Instance.ILog("AutoUpdater: Update already downloaded: " + file);
+                    return;
+                }
+
+                using (var client = new System.Net.WebClient())
+                {
+                    client.DownloadFile("https://fileflows.com/downloads/server-msi", file);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("AutoUpdater: Failed checking online version: " + ex.Message);
+            }
         }
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)

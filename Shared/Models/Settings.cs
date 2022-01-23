@@ -13,9 +13,13 @@
 
         public bool AutoUpdatePlugins { get; set; }
 
+        public bool AutoUpdate { get; set; }
+
         public bool DisableTelemetry { get; set; }
 
         public string TimeZone { get; set; }
+
+        public bool IsWindows { get; set; }
 
         public string GetLogFile(System.Guid uid)
         {

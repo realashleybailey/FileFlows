@@ -3,6 +3,7 @@ namespace FileFlows.Server.Controllers
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Settings Controller
@@ -56,6 +57,7 @@ namespace FileFlows.Server.Controllers
 
                     InitTimeZone(Instance);
                 }
+                Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 return Instance;
             }
             finally
@@ -82,6 +84,7 @@ namespace FileFlows.Server.Controllers
             var settings = await Get() ?? model;
             model.Uid = settings.Uid;
             model.DateCreated = settings.DateCreated;
+            model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             Instance = model;
             InitTimeZone(Instance);
             

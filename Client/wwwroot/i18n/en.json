@@ -285,6 +285,8 @@
       "Fields": {
         "Telemetry": "Telemetry",
         "Telemetry-Help": "Telemetry is useful to help know what devices we need to support, what Flow parts are the most used and where we should focus on the development.",
+        "AutoUpdate": "Auto Update",
+        "AutoUpdate-Help": "When enabled FileFlows will routinely be checked for updates, and if an update is found, will automatically be downloaded and installed.",
         "AutoUpdatePlugins": "Auto Update Plugins",
         "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "LoggingPath": "Logging Directory",

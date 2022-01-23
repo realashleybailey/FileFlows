@@ -242,6 +242,7 @@
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
+
             Process.Start(tempFile, $"> \"{tempFile}.log\"");
             foreach(var p in Process.GetProcessesByName("FileFlows"))
             {

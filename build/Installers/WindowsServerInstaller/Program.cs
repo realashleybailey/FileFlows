@@ -40,7 +40,7 @@ internal class Program
             project = new Project("FileFlows",
                 dir, dirStartMenu,
                 //new ManagedAction("FileFlowsAction"),
-                new ManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallFiles, Condition.Always),
+                new ManagedAction(CustonActions.StopProcesses, Return.ignore, When.After, Step.InstallInitialize, Condition.Always),
                 new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)//,
                 //new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
                 //{
@@ -122,21 +122,23 @@ public class CustonActions
     [CustomAction]
     public static ActionResult StopProcesses(Session session)
     {
-        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows.exe");
-        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows.Server.exe");
-        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlowsNode.exe");
-        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows.Node.exe");
+        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.exe");
+        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Server.exe");
+        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlowsNode.exe");
+        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Node.exe");
         return ActionResult.Success;
     }
     [CustomAction]
     public static ActionResult StartFileFlowsServer(Session session)
     {
+        System.Threading.Thread.Sleep(5_000);
         System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
         return ActionResult.Success;
     }
     [CustomAction]
     public static ActionResult StartFileFlowsNode(Session session)
     {
+        System.Threading.Thread.Sleep(5_000);
         System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlowsNode.exe");
         return ActionResult.Success;
     }

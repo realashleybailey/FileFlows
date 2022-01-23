@@ -31,7 +31,7 @@
                 Logger.Instance.ILog("AutoUpdater: Watch Directory: " + UpdateDirectory);
             }
 
-            WindowsServerExe = Assembly.GetExecutingAssembly()?.Location?.EmptyAsNull() ?? Path.Combine(Directory.GetCurrentDirectory(), "FileFlows.exe");
+            WindowsServerExe = GetWindowsServerExeLocation();
 
             FileSystemWatcher watcher = new FileSystemWatcher(UpdateDirectory);
             watcher.NotifyFilter =
@@ -51,6 +51,20 @@
             watcher.EnableRaisingEvents = true;
 
             Execute();
+        }
+
+        private string GetWindowsServerExeLocation()
+        {
+            string dir = string.Empty;
+
+            string? path = Assembly.GetExecutingAssembly()?.Location;
+            if (string.IsNullOrEmpty(path) == false)
+                dir = new FileInfo(path).DirectoryName!;
+
+            if (string.IsNullOrEmpty(dir))
+                dir = Directory.GetCurrentDirectory();
+
+            return Path.Combine(dir, "FileFlows.exe");
         }
 
         protected override void Execute()
@@ -201,9 +215,8 @@
             sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");
-            sb.AppendLine(WindowsServerExe);
+            sb.AppendLine($"start \"\" \"{WindowsServerExe}\"");
             sb.AppendLine($"del \"{msi}\"");
-            sb.AppendLine(WindowsServerExe);
             sb.AppendLine($"del \"{tempFile}\"");
             File.WriteAllText(tempFile, sb.ToString());
             Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);

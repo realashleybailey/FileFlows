@@ -128,6 +128,7 @@ public class CustonActions
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Node.exe");
         return ActionResult.Success;
     }
+
     [CustomAction]
     public static ActionResult StartFileFlowsServer(Session session)
     {
@@ -135,6 +136,7 @@ public class CustonActions
         System.Diagnostics.Process.Start(session["INSTALLDIR"] + @"\FileFlows.exe");
         return ActionResult.Success;
     }
+
     [CustomAction]
     public static ActionResult StartFileFlowsNode(Session session)
     {

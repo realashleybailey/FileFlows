@@ -52,6 +52,7 @@ namespace FileFlows.WindowsServer
         {
             var current = Process.GetCurrentProcess();
 
+
             foreach (var process in Process.GetProcesses())
             {
                 if (process.Id == current.Id) 

@@ -122,7 +122,10 @@ public class CustonActions
     [CustomAction]
     public static ActionResult StopProcesses(Session session)
     {
-        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows*.exe");
+        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows.exe");
+        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows.Server.exe");
+        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlowsNode.exe");
+        System.Diagnostics.Process.Start("taskkill", "/f /im FileFlows.Node.exe");
         return ActionResult.Success;
     }
     [CustomAction]

@@ -230,7 +230,7 @@
             Logger.Instance.ILog($"AutoUpdater: Running update [{version}: {msi}");
             string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("timeout /t 20 /nobreak");
+            sb.AppendLine("timeout /t 5 /nobreak");
             sb.AppendLine("taskkill /f /im FileFlows.Server.exe");
             sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
             sb.AppendLine("timeout /t 5 /nobreak");

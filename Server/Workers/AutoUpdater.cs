@@ -230,6 +230,11 @@
             Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
             Process.Start(tempFile, $"> \"{tempFile}.log\"");
+            foreach(var p in Process.GetProcessesByName("FileFlows"))
+            {
+                Logger.Instance.ILog("AutoUpdater: FileFlowsProcess: " + p.ProcessName);
+                p.Kill();
+            }
             Environment.Exit(99);
         }
 

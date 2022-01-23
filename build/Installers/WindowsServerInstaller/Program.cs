@@ -40,7 +40,7 @@ internal class Program
             project = new Project("FileFlows",
                 dir, dirStartMenu,
                 //new ManagedAction("FileFlowsAction"),
-                new ElevatedManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallInitialize, Condition.Always),
+                new ElevatedManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallValidate, Condition.Always),
                 new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)//,
                 //new CloseApplication(new Id("fileflows"), "fileflows.exe", true, false)
                 //{
@@ -127,7 +127,6 @@ public class CustonActions
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Server.exe");
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlowsNode.exe");
         System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Node.exe");
-        System.Diagnostics.Process.Start("notepad.exe");
         return ActionResult.Success;
     }
 

@@ -4,6 +4,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Shared.Models;
     using FileFlows.Server.Helpers;
     using System.Runtime.InteropServices;
+    using FileFlows.Shared.Helpers;
 
     /// <summary>
     /// Settings Controller
@@ -37,6 +38,30 @@ namespace FileFlows.Server.Controllers
             if (flows)
                 return 1;
             return 0;
+        }
+
+        /// <summary>
+        /// Checks latest version from fileflows.com
+        /// </summary>
+        /// <returns>The latest version number if greater than current</returns>
+        [HttpGet("check-update-available")]
+        public async Task<string> CheckLatestVersion()
+        {
+            var settings = await new SettingsController().Get();
+            if (settings.IsWindows == true && settings.AutoUpdate == true)
+                return string.Empty; // we let the auto updater take care of this.
+            try
+            {
+                var result = Workers.AutoUpdater.GetLatestOnlineVersion();
+                if (result.updateAvailable == false)
+                    return string.Empty;
+                return result.onlineVersion.ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed checking latest version: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                return String.Empty;
+            }
         }
 
         /// <summary>

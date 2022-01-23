@@ -42,43 +42,33 @@
 
         private async Task Refresh()
         {
-#if (DEMO || DEBUG)
+#if (DEMO)
 #else
-
-            var result = await HttpHelper.Get<string>("https://fileflows.com/api/telemetry/latest-version");
-            if (result.Success)
+            var result = await HttpHelper.Get<string>("/api/settings/check-update-available");
+            if (result.Success && string.IsNullOrWhiteSpace(result.Data) == false)
             {
-                if (LatestVersion.ToString() == result.Data)
-                    return;
-
                 try
                 {
-                    Version newVersion;
-                    if (Version.TryParse(result.Data, out newVersion) == false)
-                        return;
-                    if (newVersion > LatestVersion)
-                    {
-                        // new version 
-                        LatestVersion = newVersion;
-                        Dismissed = false;
-                        UpdateAvailable = true;
+                    // new version 
+                    LatestVersion = new Version(result.Data);
+                    Dismissed = false;
+                    UpdateAvailable = true;
 
-                        string versionString = LatestVersion.ToString();
-                        string lbl = Translater.Instant("Labels.UpdateAvailable", new { version = versionString });
-                        int index = lbl.IndexOf(versionString);
-                        if (lbl.EndsWith(versionString))
-                        {
-                            lblUpdateAvailable = lbl.Substring(0, index);
-                            lblUpdateAvailableSuffix = String.Empty;
-                        } 
-                        else
-                        {
-                            this.lblUpdateAvailable = lbl.Substring(0, index);
-                            this.lblUpdateAvailableSuffix = lbl.Substring(index + versionString.Length);
-                        }
-                        this.StateHasChanged();
+                    string versionString = LatestVersion.ToString();
+                    string lbl = Translater.Instant("Labels.UpdateAvailable", new { version = versionString });
+                    int index = lbl.IndexOf(versionString);
+                    if (lbl.EndsWith(versionString))
+                    {
+                        lblUpdateAvailable = lbl.Substring(0, index);
+                        lblUpdateAvailableSuffix = String.Empty;
+                    } 
+                    else
+                    {
+                        this.lblUpdateAvailable = lbl.Substring(0, index);
+                        this.lblUpdateAvailableSuffix = lbl.Substring(index + versionString.Length);
                     }
-                }
+                    this.StateHasChanged();
+                }                
                 catch (Exception ex) { }
             }
 #endif

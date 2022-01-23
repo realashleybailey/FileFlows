@@ -68,7 +68,7 @@
             CheckForUpdate();
         }
 
-        private void CheckForUpdateOnline()
+        public static (bool updateAvailable, Version onlineVersion) GetLatestOnlineVersion()
         {
             try
             {
@@ -76,7 +76,7 @@
                 if (result.Success == false)
                 {
                     Logger.Instance.ILog("AutoUpdater: Failed to retrieve online version");
-                    return;
+                    return (false, new Version(0,0,0,0));
                 }
 
                 Version current = Version.Parse(Globals.Version);
@@ -84,13 +84,32 @@
                 if (Version.TryParse(result.Data, out onlineVersion) == false)
                 {
                     Logger.Instance.ILog("AutoUpdater: Failed to parse online version: " + result.Data);
-                    return;
+                    return (false, new Version(0, 0, 0, 0));
                 }
                 if (current >= onlineVersion)
                 {
                     Logger.Instance.ILog($"AutoUpdater: Current version '{current}' newer or same as online version '{onlineVersion}'");
-                    return;
+                    return (false, onlineVersion);
                 }
+                return (true, onlineVersion);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("AutoUpdater: Failed checking online version: " + ex.Message);
+                return (false, new Version(0, 0, 0, 0));
+            }
+
+        }
+
+        private void CheckForUpdateOnline()
+        {
+            try
+            {
+                var result = GetLatestOnlineVersion();
+                if (result.updateAvailable == false)
+                    return;
+
+                Version onlineVersion = result.onlineVersion;
 
                 string file = Path.Combine(UpdateDirectory, $"FileFlows-{onlineVersion}.msi");
                 if (File.Exists(file))
@@ -99,9 +118,9 @@
                     return;
                 }
 
-                using (var client = new System.Net.WebClient())
+                using (var client = new HttpClient())
                 {
-                    client.DownloadFile("https://fileflows.com/downloads/server-msi", file);
+                    client.DownloadFile("https://fileflows.com/downloads/server-msi", file).Wait();
                 }
             }
             catch (Exception ex)

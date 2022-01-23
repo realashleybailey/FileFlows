@@ -51,6 +51,7 @@ namespace FileFlows.WindowsServer
         private static void KillOtherProcesses()
         {
             var current = Process.GetCurrentProcess();
+
             foreach (var process in Process.GetProcesses())
             {
                 if (process.Id == current.Id) 

@@ -19,7 +19,6 @@ namespace FileFlows.Server
                 else
                 {
                     Console.WriteLine("Starting FileFlows Server...");
-                    StartupCleanup();
                     WebServer.Start(args);
                     Console.WriteLine("Exiting FileFlows Server...");
                 }
@@ -47,7 +46,6 @@ namespace FileFlows.Server
             Console.SetOut(writer);
 
             Console.WriteLine("Starting FileFlows Server...");
-            StartupCleanup();
             WebServer.Start(args);
             Console.WriteLine("Exiting FileFlows Server...");
 
@@ -102,37 +100,5 @@ namespace FileFlows.Server
             return Path.Combine(dir, "FileFlows.log");
         }
 
-        private static void StartupCleanup()
-        {
-            try
-            {
-                Workers.AutoUpdater.CleanUpOldFiles(60_000);
-
-                string source = Path.Combine(GetAppDirectory(), "Logs");
-                string dest = Path.Combine(source, "LibraryFiles");
-                if (Directory.Exists(dest) == false)
-                    Directory.CreateDirectory(dest);
-
-                foreach (var file in new DirectoryInfo(source).GetFiles("*.log"))
-                {
-                    if (file.Name.Contains("FileFlows"))
-                        continue;
-                    if (file.Name.Length != 40)
-                        continue; // not a guid name
-                    try
-                    {
-                        file.MoveTo(Path.Combine(dest, file.Name), true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Instance.ELog("Failed moving file: " + file.Name + " => " + ex.Message);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance?.ELog("Failed moving old log files: " + ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
     }
 }

@@ -247,14 +247,15 @@
 
         internal static void CleanUpOldFiles(int delayMilliseconds = 30_000)
         {
+            string dir = UpdateDirectory;
+            if (Directory.Exists(dir) == false)
+                return;
+
             _ = Task.Run(async () =>
             {
                 try
                 {
                     await Task.Delay(delayMilliseconds);
-                    string dir = UpdateDirectory;
-                    if (Directory.Exists(dir) == false)
-                        return;
 
                     foreach (var file in Directory.GetFiles(dir, "FileFlows-*.msi"))
                     {

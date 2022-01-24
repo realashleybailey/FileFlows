@@ -32,7 +32,7 @@ namespace FileFlows.WindowsServer
         {
             if (args == null || args.Length == 0)
                 return;
-            string message = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - " + type + " -> WindowsServer: " +
+            string message = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - " + type + " -> " +
                 string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :

@@ -15,26 +15,35 @@ namespace FileFlows.WindowsServer
 
         public static void Start(bool upgraded = false)
         {
-            WebServerHelper.process = new Process();
-            // If you run bash-script on Linux it is possible that ExitCode can be 255.
-            // To fix it you can try to add '#!/bin/bash' header to the script.
+            try
+            {
+                WebServerHelper.process = new Process();
+                // If you run bash-script on Linux it is possible that ExitCode can be 255.
+                // To fix it you can try to add '#!/bin/bash' header to the script.
 
 #if (DEBUG)
-            process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows\FileFlows.Server.exe";
-            process.StartInfo.WorkingDirectory = @"C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows";
+                process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows\FileFlows.Server.exe";
+                process.StartInfo.WorkingDirectory = @"C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows";
 #else
             process.StartInfo.FileName = "FileFlows.Server.exe";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.WorkingDirectory = Logger.GetAppDirectory();
 #endif
-            process.StartInfo.Arguments = "--windows --urls=http://[::]:5151" + (upgraded ? " --upgraded" : "");
+                process.StartInfo.Arguments = "--windows --urls=http://[::]:5151" + (upgraded ? " --upgraded" : "");
 
-            process.Exited += Process_Exited;
+                process.Exited += Process_Exited;
 
-            LastStarted = DateTime.Now;
-            Logger.ILog("Starting FileFlows.Server: " + process.StartInfo.Arguments);
-            process.Start();
-            ChildProcessTracker.AddProcess(process);
+                LastStarted = DateTime.Now;
+                Logger.ILog("Starting FileFlows.Server: " + process.StartInfo.Arguments);
+                process.Start();
+                ChildProcessTracker.AddProcess(process);
+            }
+            catch (Exception ex)
+            {
+                Logger.ELog("Failed starting FileFlowsServer: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                Application.Exit();
+            }
         }
 
         private static void Process_Exited(object? sender, EventArgs e)

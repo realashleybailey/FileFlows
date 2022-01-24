@@ -70,6 +70,7 @@ namespace FileFlows.Server.Controllers
                 }
                 catch (Exception) { }
             }
+
             lock (Executors)
             {
                 CompletedExecutors.Append(info.Uid);
@@ -77,6 +78,20 @@ namespace FileFlows.Server.Controllers
                     Executors.Remove(info.Uid);
                 else
                     Logger.Instance?.DLog("Could not remove as not in list of Executors: " + info.Uid);
+            }
+
+            if (info.LibraryFile != null)
+            {
+                var libfileController = new LibraryFileController();
+                var libfile = await libfileController.Get(info.LibraryFile.Uid);
+                if (libfile != null)
+                {
+                    if (libfile.FinalSize != info.LibraryFile.FinalSize)
+                    {
+                        libfile.FinalSize = info.LibraryFile.FinalSize;
+                        await libfileController.Update(libfile);
+                    }
+                }
             }
         }
 
@@ -96,8 +111,7 @@ namespace FileFlows.Server.Controllers
                     bool recentUpdate = existing.DateModified > DateTime.UtcNow.AddSeconds(-10);
                     if ((existing.Status == FileStatus.ProcessingFailed && info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
                     {
-                        existing = lfController.Update(info.LibraryFile).Result; // incase the status of the library file has changed
-                        
+                        existing = lfController.Update(info.LibraryFile).Result; // incase the status of the library file has changed                        
                     }
 
                     if (existing.Status == FileStatus.ProcessingFailed || existing.Status == FileStatus.Processed)

@@ -138,7 +138,6 @@
                 Logger.Instance.ELog("AutoUpdater: Failed checking online version: " + ex.Message);
                 return (false, new Version(0, 0, 0, 0));
             }
-
         }
 
         private void CheckForUpdateOnline()

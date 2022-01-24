@@ -26,7 +26,7 @@ namespace FileFlows.Server.Controllers
 
         private async Task<string> GetLogFileName(Guid libraryFileUid)
         {
-            var logFile = await new LibraryFileController().GetLog(libraryFileUid);
+            var logFile = (await new SettingsController().Get()).GetLogFile(libraryFileUid);
             return logFile;
         }
 
@@ -179,7 +179,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{uid}/log")]
         public async Task<string> Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
         {
-            var file = (await new SettingsController().Get())?.GetLogFile(uid);
+            var file = await GetLogFileName(uid);
             if (System.IO.File.Exists(file))
                 return System.IO.File.ReadAllText(file);
             return String.Empty;

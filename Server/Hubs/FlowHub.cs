@@ -10,7 +10,7 @@
         {
             try
             {
-                string filename = await new LibraryFileController().GetLog(libraryFileUid);
+                string filename = (await new SettingsController().Get()).GetLogFile(libraryFileUid);
                 var fi = new FileInfo(filename);
                 if(fi.Directory.Exists == false)
                     fi.Directory.Create();

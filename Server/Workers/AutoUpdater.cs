@@ -30,12 +30,17 @@
         private DateTime LastCheckedOnline = DateTime.MinValue;
         private int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
 
+        private static bool DevTest = false;
+
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
             Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
 
-            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "devtest")))
+            DevTest = File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "devtest"));
+            if (DevTest)
+            {
                 LastCheckedOnlineIntervalMinutes = 2;
+            }
 
             if (Directory.Exists(UpdateDirectory) == false)
             {
@@ -103,7 +108,11 @@
         {
             try
             {
-                var result = HttpHelper.Get<string>("https://fileflows.com/api/telemetry/latest-version").Result;
+
+                string url = "https://fileflows.com/api/telemetry/latest-version";
+                if (DevTest)
+                    url += "?devtest=1";
+                var result = HttpHelper.Get<string>(url, noLog: true).Result;
                 if (result.Success == false)
                 {
                     Logger.Instance.ILog("AutoUpdater: Failed to retrieve online version");
@@ -161,6 +170,8 @@
         private void DownloadFile(string file)
         {
             string downloadUrl = "https://fileflows.com/downloads/server-msi?ts=" + DateTime.Now.Ticks;
+            if (DevTest)
+                downloadUrl += "&devtest=1";
 
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
             using (var client = new System.Net.WebClient())

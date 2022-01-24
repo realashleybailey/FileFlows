@@ -18,9 +18,9 @@ namespace FileFlows.Shared.Helpers
         {
             return await MakeRequest<T>(HttpMethod.Get, url);
         }
-        public static async Task<RequestResult<T>> Get<T>(string url, int timeoutSeconds = 0)
+        public static async Task<RequestResult<T>> Get<T>(string url, int timeoutSeconds = 0, bool noLog = false)
         {
-            return await MakeRequest<T>(HttpMethod.Get, url, timeoutSeconds: timeoutSeconds);
+            return await MakeRequest<T>(HttpMethod.Get, url, timeoutSeconds: timeoutSeconds, noLog: noLog);
         }
 #if (!DEMO)
         public static async Task<RequestResult<string>> Post(string url, object data = null, bool noLog = false)

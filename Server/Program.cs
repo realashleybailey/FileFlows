@@ -115,7 +115,6 @@ namespace FileFlows.Server
                 {
                     if (file.Name.Contains("FileFlows"))
                         continue;
-                    Logger.Instance.ILog("Test log file to be moved: " + file.Name);
                     if (file.Name.Length != 40)
                         continue; // not a guid name
                     try

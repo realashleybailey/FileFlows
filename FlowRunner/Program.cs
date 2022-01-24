@@ -168,12 +168,29 @@ namespace FileFlows.FlowRunner
                 StartedAt = DateTime.UtcNow,
                 WorkingFile = workingFile,
                 IsDirectory = lib.Folders,
-                LibraryPath = lib.Path
+                LibraryPath = lib.Path, 
+                InitialSize = lib.Folders ? GetDirectorySize(workingFile) : new FileInfo(workingFile).Length
             };
+
+            Console.WriteLine("Initial Size: " + info.InitialSize);  
 
             var runner = new Runner(info, flow, node, workingDir);
             runner.Run();
         }
 
+
+        private static long GetDirectorySize(string path)
+        {
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(path);
+                return dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed retrieving directory size: " + ex.Message);
+                return 0;
+            }
+        }
     }
 }

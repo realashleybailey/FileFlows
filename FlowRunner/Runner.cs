@@ -136,6 +136,7 @@ public class Runner
         if(status == FileStatus.Processed)
         {
             Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
+            Logger.Instance?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
             Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }

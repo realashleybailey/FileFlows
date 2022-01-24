@@ -17,6 +17,8 @@ public class FlowExecutorInfo
     public ObjectReference Library { get; set; }
     public string LibraryPath { get; set; }
 
+    public long InitialSize { get; set; }
+
     public string WorkingFile { get; set; }
     public bool IsDirectory { get; set; }
 

@@ -95,7 +95,7 @@
             if (settings.AutoUpdate == false)
                 return;
 
-            if (LastCheckedOnline < DateTime.Now.AddMinutes(-LastCheckedOnlineIntervalMinutes))
+            if (LastCheckedOnline < DateTime.Now.AddMinutes(-LastCheckedOnlineIntervalMinutes).AddSeconds(5))
             {
                 CheckForUpdateOnline();
                 LastCheckedOnline = DateTime.Now;

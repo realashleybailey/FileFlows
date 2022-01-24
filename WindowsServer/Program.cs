@@ -39,7 +39,7 @@ namespace FileFlows.WindowsServer
                     timer.Elapsed += Timer_Elapsed;
                     timer.Start();
 
-                    WebServerHelper.Start(upgraded);
+                    WebServerHelper.Start();
                     ApplicationConfiguration.Initialize();
                     if (silent == false)
                     {

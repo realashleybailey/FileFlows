@@ -13,7 +13,7 @@ namespace FileFlows.WindowsServer
         static bool Stopping = false;
         static DateTime LastStarted = DateTime.MinValue;
 
-        public static void Start(bool upgraded = false)
+        public static void Start()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace FileFlows.WindowsServer
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.WorkingDirectory = Logger.GetAppDirectory();
 #endif
-                process.StartInfo.Arguments = "--windows --urls=http://[::]:5151" + (upgraded ? " --upgraded" : "");
+                process.StartInfo.Arguments = "--windows --urls=http://[::]:5151";
 
                 process.Exited += Process_Exited;
 

@@ -108,7 +108,6 @@
         {
             try
             {
-
                 string url = "https://fileflows.com/api/telemetry/latest-version";
                 if (DevTest)
                     url += "?devtest=true";

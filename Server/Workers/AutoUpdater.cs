@@ -111,7 +111,7 @@
 
                 string url = "https://fileflows.com/api/telemetry/latest-version";
                 if (DevTest)
-                    url += "?devtest=1";
+                    url += "?devtest=true";
                 var result = HttpHelper.Get<string>(url, noLog: true).Result;
                 if (result.Success == false)
                 {
@@ -170,7 +170,7 @@
         {
             string downloadUrl = "https://fileflows.com/downloads/server-msi?ts=" + DateTime.Now.Ticks;
             if (DevTest)
-                downloadUrl += "&devtest=1";
+                downloadUrl += "&devtest=true";
 
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
             using (var client = new System.Net.WebClient())

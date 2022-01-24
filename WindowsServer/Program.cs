@@ -6,8 +6,7 @@ namespace FileFlows.WindowsServer
     {
         internal static string Url = "http://localhost:5151/";
         const string appGuid = "f77f5093-4d04-48b5-9824-cb8cf91ffff1";
-        readonly static string LogFile;
-        
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -37,6 +36,7 @@ namespace FileFlows.WindowsServer
                     var timer = new System.Timers.Timer();
                     timer.Interval = 30_000;
                     timer.Elapsed += Timer_Elapsed;
+                    timer.AutoReset = true;
                     timer.Start();
 
                     WebServerHelper.Start();
@@ -55,12 +55,26 @@ namespace FileFlows.WindowsServer
 
         private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            var process = Process.GetProcessesByName("FileFlows.Server");
-            if (process == null)
+            try
             {
-                Logger.ILog("FileFlows.Server is not running, restarting it");
-                // it stopped, restart it
-                WebServerHelper.Start();
+                Logger.ILog("Checking to see if FileFlows.Server is running");
+                var process = Process.GetProcessesByName("FileFlows.Server")?.Where(x => x.HasExited == false)?.FirstOrDefault();
+                if (process == null)
+                {
+                    Thread.Sleep(10_000); // just incase this process is being killed
+
+                    Logger.ILog("FileFlows.Server is not running, restarting it");
+                    // it stopped, restart it
+                    WebServerHelper.Start();
+                }
+                else
+                {
+                    Logger.ILog("FileFlows.Server is running");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.ELog("Failed checking FileFlows.Server prcoess: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
 

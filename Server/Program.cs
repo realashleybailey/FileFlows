@@ -118,7 +118,14 @@ namespace FileFlows.Server
                     Logger.Instance.ILog("Test log file to be moved: " + file.Name);
                     if (file.Name.Length != 40)
                         continue; // not a guid name
-                    file.MoveTo(dest);
+                    try
+                    {
+                        file.MoveTo(dest, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Instance.ELog("Failed moving file: " + file.Name + " => " + ex.Message);
+                    }
                 }
             }
             catch (Exception ex)

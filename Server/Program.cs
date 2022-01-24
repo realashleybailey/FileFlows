@@ -106,7 +106,7 @@ namespace FileFlows.Server
         {
             try
             {
-                Workers.AutoUpdater.CleanUpOldFiles();
+                Workers.AutoUpdater.CleanUpOldFiles(60_000);
 
                 string source = Path.Combine(GetAppDirectory(), "Logs");
                 string dest = Path.Combine(source, "LibraryFiles");

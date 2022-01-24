@@ -238,20 +238,20 @@
 
         public void RunUpdate(string msi, string version)
         {
-            Logger.Instance.ILog($"AutoUpdater: Running update [{version}: {msi}");
+            Logger.Instance.ILog($"AutoUpdater: Running update [{version}]: {msi}");
             Process.Start("msiexec.exe", $"/i \"{msi}\" /quiet /qn");
 
             WorkerManager.StopWorkers();
             Environment.Exit(99);
         }
 
-        internal static void CleanUpOldFiles()
+        internal static void CleanUpOldFiles(int delayMilliseconds = 30_000)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
-                    await Task.Delay(10_000);
+                    await Task.Delay(delayMilliseconds);
                     string dir = UpdateDirectory;
                     if (Directory.Exists(dir) == false)
                         return;

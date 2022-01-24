@@ -146,6 +146,7 @@
                     return;
                 }
 
+                Logger.Instance.ILog("AutoUpdater: Downloading update: " + onlineVersion);
                 DownloadFile(file);
             }
             catch (Exception ex)

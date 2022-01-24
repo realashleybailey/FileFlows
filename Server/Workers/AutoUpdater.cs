@@ -28,11 +28,15 @@
         private readonly string WindowsServerExe;
 
         private DateTime LastCheckedOnline = DateTime.MinValue;
-        private const int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
+        private int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
 
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
             Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
+
+            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "devtest")))
+                LastCheckedOnlineIntervalMinutes = 2;
+
             if (Directory.Exists(UpdateDirectory) == false)
             {
                 Logger.Instance.ILog("AutoUpdater: Creating updates directory: " + UpdateDirectory);

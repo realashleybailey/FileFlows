@@ -120,7 +120,7 @@ namespace FileFlows.Server
                         continue; // not a guid name
                     try
                     {
-                        file.MoveTo(dest, true);
+                        file.MoveTo(Path.Combine(dest, file.Name), true);
                     }
                     catch (Exception ex)
                     {

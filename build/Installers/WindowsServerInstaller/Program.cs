@@ -117,10 +117,10 @@ public class CustonActions
     [CustomAction]
     public static ActionResult StopProcesses(Session session)
     {
-        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.exe");
-        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Server.exe");
-        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlowsNode.exe");
-        System.Diagnostics.Process.Start("taskkill.exe", "/f /im FileFlows.Node.exe");
+        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlows.exe") { CreateNoWindow = true, UseShellExecute = true });
+        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlows.Server.exe") { CreateNoWindow = true, UseShellExecute = true });
+        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlowsNode.exe") { CreateNoWindow = true, UseShellExecute = true });
+        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlows.Node.exe") { CreateNoWindow = true, UseShellExecute = true });
         return ActionResult.Success;
     }
 

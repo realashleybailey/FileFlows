@@ -18,7 +18,7 @@
         private readonly string WindowsServerExe;
 
         private DateTime LastCheckedOnline = DateTime.MinValue;
-        private const int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
+        private const int LastCheckedOnlineIntervalMinutes = 2; // 60 minutes
 
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {

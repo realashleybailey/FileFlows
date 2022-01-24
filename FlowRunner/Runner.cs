@@ -83,6 +83,7 @@ public class Runner
     private void CalculateFinalSize()
     {
         Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
+        Logger.Instance?.ILog("Original Size: " + Info.LibraryFile.OriginalSize);
         Logger.Instance?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
     }

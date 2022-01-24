@@ -14,7 +14,18 @@
     /// </summary>
     public class AutoUpdater : Worker
     {
-        private readonly string UpdateDirectory;
+        private static string _UpdateDirectory;
+        private static string UpdateDirectory
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_UpdateDirectory))
+                {
+                    _UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
+                }
+                return _UpdateDirectory;
+            }
+        }
         private readonly string WindowsServerExe;
 
         private DateTime LastCheckedOnline = DateTime.MinValue;
@@ -23,7 +34,6 @@
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
             Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
-            UpdateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "updates");
             if (Directory.Exists(UpdateDirectory) == false)
             {
                 Logger.Instance.ILog("AutoUpdater: Creating updates directory: " + UpdateDirectory);
@@ -31,7 +41,7 @@
             }
             else
             {
-                CleanUpOldFiles(UpdateDirectory);
+                CleanUpOldFiles();
                 Logger.Instance.ILog("AutoUpdater: Watch Directory: " + UpdateDirectory);
             }
 
@@ -199,7 +209,7 @@
             return (string.Empty, string.Empty);
         }
 
-        private (bool greater, string version) IsGreaterThanCurrent(string filename)
+        private static (bool greater, string version) IsGreaterThanCurrent(string filename)
         {
             string shortName = new FileInfo(filename).Name;
             var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
@@ -234,31 +244,34 @@
             Environment.Exit(99);
         }
 
-        private void CleanUpOldFiles(string dir)
+        internal static void CleanUpOldFiles()
         {
-            try
+            Task.Run(async () =>
             {
-                foreach(var file in Directory.GetFiles(dir))
+                try
                 {
-                    if (file.EndsWith(".msi"))
+                    await Task.Delay(10_000);
+                    string dir = UpdateDirectory;
+                    if (Directory.Exists(dir) == false)
+                        return;
+
+                    foreach (var file in Directory.GetFiles(dir, "FileFlows-*.msi"))
                     {
-                        continue;
                         // check if version greater than this
                         var isGreater = IsGreaterThanCurrent(file);
                         if (isGreater.greater)
                             continue; // dont delete
-                        else if (isGreater.version == Globals.Version)
-                            continue; // dont delete current
+                        try
+                        {
+                            // maybe locked
+                            File.Delete(file);
+                            Logger.Instance.ILog("AutoUpdater: Deleting old update file");
+                        }
+                        catch (Exception) { }
                     }
-                    try
-                    {
-                        Logger.Instance.ILog("AutoUpdater: Removing update file: " + file);
-                        File.Delete(file);
-                    }
-                    catch (Exception ex) { }
                 }
-            }
-            catch (Exception ex) { }
+                catch (Exception ex) { }
+            });
         }
     }
 }

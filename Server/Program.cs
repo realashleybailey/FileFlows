@@ -19,7 +19,7 @@ namespace FileFlows.Server
                 else
                 {
                     Console.WriteLine("Starting FileFlows Server...");
-                    MoveOldLogFiles();
+                    StartupCleanup();
                     WebServer.Start(args);
                     Console.WriteLine("Exiting FileFlows Server...");
                 }
@@ -47,7 +47,7 @@ namespace FileFlows.Server
             Console.SetOut(writer);
 
             Console.WriteLine("Starting FileFlows Server...");
-            MoveOldLogFiles();
+            StartupCleanup();
             WebServer.Start(args);
             Console.WriteLine("Exiting FileFlows Server...");
 
@@ -102,10 +102,12 @@ namespace FileFlows.Server
             return Path.Combine(dir, "FileFlows.log");
         }
 
-        private static void MoveOldLogFiles()
+        private static void StartupCleanup()
         {
             try
             {
+                Workers.AutoUpdater.CleanUpOldFiles();
+
                 string source = Path.Combine(GetAppDirectory(), "Logs");
                 string dest = Path.Combine(source, "LibraryFiles");
                 if (Directory.Exists(dest) == false)

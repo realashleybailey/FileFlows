@@ -26,8 +26,7 @@ namespace FileFlows.Server.Controllers
 
         private async Task<string> GetLogFileName(Guid libraryFileUid)
         {
-            var settings = await new SettingsController().Get();
-            string logFile = Path.Combine(settings.LoggingPath, libraryFileUid + ".log");
+            var logFile = await new LibraryFileController().GetLog(libraryFileUid);
             return logFile;
         }
 

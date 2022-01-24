@@ -8,11 +8,10 @@
 
         public async Task LogMessage(Guid runnerUid, Guid libraryFileUid, string message)
         {
-            var settings = await new SettingsController().Get();
-            //Console.Write(libraryFileUid + " => " + message);
             try
             {
-                var fi = new FileInfo(Path.Combine(settings.LoggingPath, libraryFileUid + ".log"));
+                string filename = await new LibraryFileController().GetLog(libraryFileUid);
+                var fi = new FileInfo(filename);
                 if(fi.Directory.Exists == false)
                     fi.Directory.Create();
                 await File.AppendAllTextAsync(fi.FullName, message + Environment.NewLine);

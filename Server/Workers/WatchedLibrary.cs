@@ -90,16 +90,23 @@ namespace FileFlows.Server.Workers
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (Library.Folders == false && Directory.Exists(e.FullPath))
+            try
             {
-                foreach (var file in Directory.GetFiles(e.FullPath, "*.*", SearchOption.AllDirectories))
+                if (Library.Folders == false && Directory.Exists(e.FullPath))
                 {
-                    FileChangeEvent(file);
+                    foreach (var file in Directory.GetFiles(e.FullPath, "*.*", SearchOption.AllDirectories))
+                    {
+                        FileChangeEvent(file);
+                    }
+                }
+                else
+                {
+                    FileChangeEvent(e.FullPath);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                FileChangeEvent(e.FullPath);
+                Logger.Instance?.ELog("WatchedLibrary.Watched Exception: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
 

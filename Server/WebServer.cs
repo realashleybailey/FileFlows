@@ -168,7 +168,10 @@ namespace FileFlows.Server
                 if(Program.Docker == false) 
                     Workers.AutoUpdater.CleanUpOldFiles(60_000);
 
-                string source = Path.Combine(Program.GetAppDirectory(), "Logs");
+                string? source = new Controllers.SettingsController().Get().Result?.LoggingPath;
+                if (string.IsNullOrEmpty(source))
+                    return;
+
                 string dest = Path.Combine(source, "LibraryFiles");
                 if (Directory.Exists(dest) == false)
                 {

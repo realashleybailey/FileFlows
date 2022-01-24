@@ -13,14 +13,13 @@ namespace FileFlows.Server
             {
                 Docker = args?.Any(x => x == "--docker") == true;
                 InitEncryptionKey();
-                MoveOldLogFiles();
 
                 if (args.FirstOrDefault() == "--windows")
                     StartWindows(args.Skip(1).ToArray());
                 else
                 {
                     Console.WriteLine("Starting FileFlows Server...");
-
+                    MoveOldLogFiles();
                     WebServer.Start(args);
                     Console.WriteLine("Exiting FileFlows Server...");
                 }
@@ -48,8 +47,10 @@ namespace FileFlows.Server
             Console.SetOut(writer);
 
             Console.WriteLine("Starting FileFlows Server...");
+            MoveOldLogFiles();
             WebServer.Start(args);
             Console.WriteLine("Exiting FileFlows Server...");
+
 
             Console.SetOut(oldOut);
             writer.Close();
@@ -112,6 +113,9 @@ namespace FileFlows.Server
 
                 foreach (var file in new DirectoryInfo(source).GetFiles("*.log"))
                 {
+                    if (file.Name.Contains("FileFlows"))
+                        continue;
+                    Logger.Instance.ILog("Test log file to be moved: " + file.Name);
                     if (file.Name.Length != 40)
                         continue; // not a guid name
                     file.MoveTo(dest);

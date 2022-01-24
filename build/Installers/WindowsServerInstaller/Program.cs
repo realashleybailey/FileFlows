@@ -43,26 +43,21 @@ internal class Program
                 {
                     Execute = Execute.immediate                    
                 },
-                new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)
+                new ManagedAction(CustonActions.StartFileFlowsServerSilent, Return.ignore, When.After, Step.InstallFinalize, Condition.Silent),
+                new ManagedAction(CustonActions.StartFileFlowsServer, Return.ignore, When.After, Step.InstallFinalize, Condition.NOT_Silent)
             );
         }
         else
         {
             project = new Project("FileFlows Node",
                 dir, dirStartMenu,
-                //new ManagedAction("FileFlowsNodeAction"),
-                new ManagedAction(CustonActions.StartFileFlowsNode, Return.ignore, When.After, Step.InstallFinalize, Condition.NOT_Installed),
-                new CloseApplication(new Id("fileflowsnode"), "fileflowsnode.exe", true, false)
+                new ElevatedManagedAction(CustonActions.StopProcesses, Return.ignore, When.Before, Step.InstallValidate, Condition.NOT_BeingRemoved)
                 {
-                    Timeout = 15
-                }
+                    Execute = Execute.immediate
+                },
+                new ManagedAction(CustonActions.StartFileFlowsNode, Return.ignore, When.After, Step.InstallFinalize, Condition.Always)
             );
         }
-
-        //project.Actions = new WixSharp.Action[]
-        //{
-        //    new ElevatedManagedAction(CustonActions.CheckVersion, "%this%")
-        //};
 
         project.ResolveWildCards().FindFile(f => f.Name.EndsWith("FileFlows" + (Node ? "Node" : "") + ".exe")).First()
             .Shortcuts = new[]{
@@ -126,8 +121,17 @@ public class CustonActions
 
     [CustomAction]
     public static ActionResult StartFileFlowsServer(Session session)
-    {
+    {        
         System.Diagnostics.Process.Start(new ProcessStartInfo(session["INSTALLDIR"] + @"\FileFlows.exe", "--installer")
+        {
+            WorkingDirectory = session["INSTALLDIR"]
+        });
+        return ActionResult.Success;
+    }
+    [CustomAction]
+    public static ActionResult StartFileFlowsServerSilent(Session session)
+    {
+        System.Diagnostics.Process.Start(new ProcessStartInfo(session["INSTALLDIR"] + @"\FileFlows.exe", "--installer --silent")
         {
             WorkingDirectory = session["INSTALLDIR"]
         });

@@ -14,22 +14,14 @@ namespace FileFlows.WindowsServer
         [STAThread]
         static void Main(string[] args)
         {
-            bool silent = args?.FirstOrDefault() == "--silent";
-            bool upgraded = args?.FirstOrDefault() == "--upgraded";
-            bool installer = args?.FirstOrDefault() == "--installer";
+            bool silent = args?.Any(x => x.ToLower() == "--silent") == true;
+            bool installer = args?.Any(x => x.ToLower() == "--installer") == true;
 
             Logger.MoveOldLog();
 
             if (installer)
             {
                 Logger.ILog("Starting from installer");
-            }
-
-            if (upgraded)
-            {
-                Logger.ILog("Starting FileFlows after upgrade");
-                //KillOtherProcesses();
-                silent = true;
             }
 
             using (Mutex mutex = new Mutex(false, "Global\\" + appGuid))
@@ -58,26 +50,6 @@ namespace FileFlows.WindowsServer
                     timer.Stop();
                     WebServerHelper.Stop();
                 }
-            }
-        }
-
-        private static void KillOtherProcesses()
-        {
-            var current = Process.GetCurrentProcess();
-
-
-            foreach (var process in Process.GetProcesses())
-            {
-                if (process.Id == current.Id) 
-                    continue;
-                string pname = process.ProcessName?.ToLower() ?? string.Empty;
-                if (pname.Contains("fileflows") == false)
-                    continue;
-                if (pname.Contains("node"))
-                    continue;
-
-                Logger.ILog("Killing process: " + process.ProcessName);
-                process.Kill();
             }
         }
 

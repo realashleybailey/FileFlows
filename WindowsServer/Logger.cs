@@ -21,10 +21,17 @@ namespace FileFlows.WindowsServer
 
         public static void MoveOldLog()
         {
-            LogFile = GetLogFile();
-            if (File.Exists(LogFile))
+            try
             {
-                File.Move(LogFile, LogFile.Replace(".log", ".old.log"), true);
+                LogFile = GetLogFile();
+
+                if (File.Exists(LogFile))
+                {
+                    File.Move(LogFile, LogFile.Replace(".log", ".old.log"), true);
+                }
+            }catch (Exception ex)
+            {
+
             }
         }
 

@@ -103,16 +103,23 @@ namespace FileFlows.Server
 
         private static void MoveOldLogFiles()
         {
-            string source = Path.Combine(GetAppDirectory(), "Logs");
-            string dest = Path.Combine(source, "LibraryFiles");
-            if (Directory.Exists(dest) == false)
-                Directory.CreateDirectory(dest);
-
-            foreach(var file in new DirectoryInfo(source).GetFiles("*.log"))
+            try
             {
-                if (file.Name.Length != 40)
-                    continue; // not a guid name
-                file.MoveTo(dest);
+                string source = Path.Combine(GetAppDirectory(), "Logs");
+                string dest = Path.Combine(source, "LibraryFiles");
+                if (Directory.Exists(dest) == false)
+                    Directory.CreateDirectory(dest);
+
+                foreach (var file in new DirectoryInfo(source).GetFiles("*.log"))
+                {
+                    if (file.Name.Length != 40)
+                        continue; // not a guid name
+                    file.MoveTo(dest);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog("Failed moving old log files: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
     }

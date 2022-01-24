@@ -83,6 +83,7 @@ namespace FileFlows.Server.Controllers
                     InitTimeZone(Instance);
                 }
                 Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                Instance.IsDocker = Program.Docker;
                 return Instance;
             }
             finally
@@ -110,6 +111,7 @@ namespace FileFlows.Server.Controllers
             model.Uid = settings.Uid;
             model.DateCreated = settings.DateCreated;
             model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            model.IsDocker = Program.Docker;
             Instance = model;
             InitTimeZone(Instance);
             

@@ -180,8 +180,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{uid}/log")]
         public async Task<string> Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
         {
-            var settings = await new SettingsController().Get();
-            string file = Path.Combine(settings.LoggingPath, "LibraryFiles", uid + ".log");
+            var file = (await new SettingsController().Get())?.GetLogFile(uid);
             if (System.IO.File.Exists(file))
                 return System.IO.File.ReadAllText(file);
             return String.Empty;

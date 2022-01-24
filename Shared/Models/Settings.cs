@@ -20,11 +20,16 @@
         public string TimeZone { get; set; }
 
         public bool IsWindows { get; set; }
+        public bool IsDocker { get; set; }
 
         public string GetLogFile(System.Guid uid)
         {
             if (string.IsNullOrEmpty(LoggingPath))
                 return string.Empty;
+            
+            if(IsDocker) // docker is in the base directory
+                return System.IO.Path.Combine(LoggingPath, uid + ".log");
+
             return System.IO.Path.Combine(LoggingPath, "LibraryFiles", uid + ".log");
         }
     }

@@ -164,9 +164,11 @@ namespace FileFlows.Server
         {
             try
             {
+                if (Program.Docker)
+                    return;
+
                 Logger.Instance.ILog("Startup cleanup");
-                if(Program.Docker == false) 
-                    Workers.AutoUpdater.CleanUpOldFiles(60_000);
+                Workers.AutoUpdater.CleanUpOldFiles(60_000);
 
                 string? source = new Controllers.SettingsController().Get().Result?.LoggingPath;
                 if (string.IsNullOrEmpty(source))
@@ -191,7 +193,6 @@ namespace FileFlows.Server
                     try
                     {
                         file.MoveTo(Path.Combine(dest, file.Name), true);
-                        Logger.Instance.ILog("Moved log file: " + file.Name);
                     }
                     catch (Exception ex)
                     {

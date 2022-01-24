@@ -33,6 +33,7 @@ export function InitChart(data, lblOverall, lblCurrent) {
                     },
                     dataLabels: {
                         total: {
+                            show: true,
                             label: lblOverall,
                             formatter: function (val) {
                                 return +(parseFloat(overall).toFixed(2)) + ' %';

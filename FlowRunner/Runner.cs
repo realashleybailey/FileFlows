@@ -75,12 +75,16 @@ public class Runner
         if (nodeParameters?.Logger is FlowLogger fl)
             Info.Log = fl.ToString();
 
-        Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
-        Logger.Instance?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
-        Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
 
         await Complete();
         OnFlowCompleted?.Invoke(this, Info.LibraryFile.Status == FileStatus.Processed);
+    }
+
+    private void CalculateFinalSize()
+    {
+        Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
+        Logger.Instance?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
+        Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
     }
 
     private async Task Complete()
@@ -90,6 +94,8 @@ public class Runner
         {
             try
             {
+                CalculateFinalSize();
+
                 var service = FlowRunnerService.Load();
                 await service.Complete(Info);
                 return;

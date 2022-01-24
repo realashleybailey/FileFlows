@@ -121,7 +121,7 @@ namespace FileFlows.Server
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting File Flows " + Globals.Version);
             if(Program.Docker)
-                Logger.Instance?.ILog("Running inside docker container");
+                Logger.Instance.ILog("Running inside docker container");
 
             Logger.Instance.ILog(new string('=', 50));
 
@@ -164,22 +164,31 @@ namespace FileFlows.Server
         {
             try
             {
-                Workers.AutoUpdater.CleanUpOldFiles(60_000);
+                Logger.Instance.ILog("Startup cleanup");
+                if(Program.Docker == false) 
+                    Workers.AutoUpdater.CleanUpOldFiles(60_000);
 
                 string source = Path.Combine(Program.GetAppDirectory(), "Logs");
                 string dest = Path.Combine(source, "LibraryFiles");
                 if (Directory.Exists(dest) == false)
+                {
+                    Logger.Instance.ILog("Creating LibraryFiles Logging: " + dest);
                     Directory.CreateDirectory(dest);
+                }
 
                 foreach (var file in new DirectoryInfo(source).GetFiles("*.log"))
                 {
                     if (file.Name.Contains("FileFlows"))
                         continue;
                     if (file.Name.Length != 40)
+                    {
+                        Logger.Instance.ILog("Not a library file: " + file.Name);
                         continue; // not a guid name
+                    }
                     try
                     {
                         file.MoveTo(Path.Combine(dest, file.Name), true);
+                        Logger.Instance.ILog("Moved log file: " + file.Name);
                     }
                     catch (Exception ex)
                     {

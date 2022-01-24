@@ -6,7 +6,6 @@
     using FileFlows.Shared.Helpers;
     using System.Diagnostics;
     using System.Reflection;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -247,33 +246,36 @@
 
         internal static void CleanUpOldFiles(int delayMilliseconds = 30_000)
         {
-            string dir = UpdateDirectory;
-            if (Directory.Exists(dir) == false)
-                return;
-
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    await Task.Delay(delayMilliseconds);
+                string dir = UpdateDirectory;
+                if (Directory.Exists(dir) == false)
+                    return;
 
-                    foreach (var file in Directory.GetFiles(dir, "FileFlows-*.msi"))
+                _ = Task.Run(async () =>
+                {
+                    try
                     {
+                        await Task.Delay(delayMilliseconds);
+
+                        foreach (var file in Directory.GetFiles(dir, "FileFlows-*.msi"))
+                        {
                         // check if version greater than this
                         var isGreater = IsGreaterThanCurrent(file);
-                        if (isGreater.greater)
-                            continue; // dont delete
+                            if (isGreater.greater)
+                                continue; // dont delete
                         try
-                        {
+                            {
                             // maybe locked
                             File.Delete(file);
-                            Logger.Instance.ILog("AutoUpdater: Deleting old update file");
+                                Logger.Instance.ILog("AutoUpdater: Deleting old update file");
+                            }
+                            catch (Exception) { }
                         }
-                        catch (Exception) { }
                     }
-                }
-                catch (Exception ex) { }
-            });
+                    catch (Exception ex) { }
+                });
+            }catch (Exception ex) { }   
         }
     }
 }

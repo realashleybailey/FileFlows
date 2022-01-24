@@ -54,7 +54,7 @@ namespace FileFlows.WindowsServer
             string dir = Path.Combine(GetAppDirectory(), "Logs");
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
-            return Path.Combine(dir, "FileFlows.log");
+            return Path.Combine(dir, "FileFlowsWindows.log");
         }
     }
 }

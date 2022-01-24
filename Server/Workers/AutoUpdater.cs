@@ -228,24 +228,25 @@
         public void RunUpdate(string msi, string version)
         {
             Logger.Instance.ILog($"AutoUpdater: Running update [{version}: {msi}");
-            string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("timeout /t 5 /nobreak");
-            sb.AppendLine("taskkill /f /im FileFlows.Server.exe");
-            sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
-            sb.AppendLine("timeout /t 5 /nobreak");
-            sb.AppendLine($"echo About to start {WindowsServerExe}");
+            //string tempFile = Path.Combine(UpdateDirectory, $"FileFlowsUpdate_{version}.bat");
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendLine("timeout /t 5 /nobreak");
+            //sb.AppendLine("taskkill /f /im FileFlows.Server.exe");
+            //sb.AppendLine($"msiexec /i \"{msi}\" /quiet /qn");
+            //sb.AppendLine("timeout /t 5 /nobreak");
+            //sb.AppendLine($"echo About to start {WindowsServerExe}");
             //sb.AppendLine($"cmd /c start \"\" \"{WindowsServerExe}\" --upgraded");
-            sb.AppendLine($"del \"{msi}\"");
-            sb.AppendLine($"\"{WindowsServerExe}\" --upgraded");
-            sb.AppendLine($"del \"{tempFile}\"");
-            File.WriteAllText(tempFile, sb.ToString());
+            //sb.AppendLine($"del \"{msi}\"");
+            //sb.AppendLine($"\"{WindowsServerExe}\" --upgraded");
+            //sb.AppendLine($"del \"{tempFile}\"");
+            //File.WriteAllText(tempFile, sb.ToString());
 
 
-            Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
-            Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
+            //Logger.Instance.ILog("AutoUpdater: Windows Server Exe: " + WindowsServerExe);
+            //Logger.Instance.ILog("AutoUpdater: Starting bat file update: " + tempFile);
 
-            RunUpgrade(tempFile);
+            //RunUpgrade(tempFile);
+            Process.Start("msiexec.exe", $"/i \"{msi}\" /quiet /qn");
 
             WorkerManager.StopWorkers();
             Environment.Exit(99);

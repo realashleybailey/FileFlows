@@ -23,7 +23,6 @@ namespace FileFlows.WindowsServer
             if (installer)
             {
                 Logger.ILog("Starting from installer");
-                Thread.Sleep(10_000);
             }
 
             if (upgraded)

@@ -181,7 +181,7 @@ namespace FileFlows.Server.Controllers
         public async Task<string> Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
         {
             var settings = await new SettingsController().Get();
-            string file = Path.Combine(settings.LoggingPath, uid + ".log");
+            string file = Path.Combine(settings.LoggingPath, "LibraryFiles", uid + ".log");
             if (System.IO.File.Exists(file))
                 return System.IO.File.ReadAllText(file);
             return String.Empty;

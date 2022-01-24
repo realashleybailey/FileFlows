@@ -13,6 +13,7 @@ namespace FileFlows.Server
             {
                 Docker = args?.Any(x => x == "--docker") == true;
                 InitEncryptionKey();
+                MoveOldLogFiles();
 
                 if (args.FirstOrDefault() == "--windows")
                     StartWindows(args.Skip(1).ToArray());
@@ -32,8 +33,12 @@ namespace FileFlows.Server
 
         public static void StartWindows(string[] args)
         {
-
             string logfile = GetLogFile();
+            if (File.Exists(logfile))
+            {
+                File.Move(logfile, logfile.Replace(".log", ".old.log"), true);
+            }
+
             FileStream ostream;
             StreamWriter writer;
             TextWriter oldOut = Console.Out;
@@ -94,6 +99,21 @@ namespace FileFlows.Server
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
             return Path.Combine(dir, "FileFlows.log");
+        }
+
+        private static void MoveOldLogFiles()
+        {
+            string source = Path.Combine(GetAppDirectory(), "Logs");
+            string dest = Path.Combine(source, "LibraryFiles");
+            if (Directory.Exists(dest) == false)
+                Directory.CreateDirectory(dest);
+
+            foreach(var file in new DirectoryInfo(source).GetFiles("*.log"))
+            {
+                if (file.Name.Length != 40)
+                    continue; // not a guid name
+                file.MoveTo(dest);
+            }
         }
     }
 }

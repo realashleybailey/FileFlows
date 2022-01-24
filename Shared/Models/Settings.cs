@@ -25,7 +25,7 @@
         {
             if (string.IsNullOrEmpty(LoggingPath))
                 return string.Empty;
-            return System.IO.Path.Combine(LoggingPath, uid + ".log");
+            return System.IO.Path.Combine(LoggingPath, "LibraryFiles", uid + ".log");
         }
     }
 

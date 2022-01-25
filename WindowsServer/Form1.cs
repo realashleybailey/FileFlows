@@ -87,6 +87,7 @@ namespace FileFlows.WindowsServer
                 notifyIcon.Visible = true;
             }
         }
+
         void Open()
         {
             Show();

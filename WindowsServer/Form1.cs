@@ -52,8 +52,7 @@ namespace FileFlows.WindowsServer
 
         private void ShutDown()
         {
-            //this.btnShutDown.Enabled = false;
-            Task.Run(async () =>
+            Task.Run(() =>
             {
                 try
                 {

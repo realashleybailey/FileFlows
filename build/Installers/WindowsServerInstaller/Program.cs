@@ -117,11 +117,13 @@ public class CustonActions
             // request stop
             Process.Start(new ProcessStartInfo("taskkill.exe", "/im " + name) { CreateNoWindow = true, UseShellExecute = false });
         }
+
         foreach (string name in new string[] { "FileFlows.exe", "FileFlowsNode.exe", "FileFlows.Server.exe", "FileFlows.Node.exe" })
         {
             // force stop
             Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im " + name) { CreateNoWindow = true, UseShellExecute = false });
         }
+
         return ActionResult.Success;
     }
 

@@ -112,10 +112,16 @@ public class CustonActions
     [CustomAction]
     public static ActionResult StopProcesses(Session session)
     {
-        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlows.exe") { CreateNoWindow = true, UseShellExecute = true });
-        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlows.Server.exe") { CreateNoWindow = true, UseShellExecute = true });
-        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlowsNode.exe") { CreateNoWindow = true, UseShellExecute = true });
-        Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im FileFlows.Node.exe") { CreateNoWindow = true, UseShellExecute = true });
+        foreach (string name in new string[] { "FileFlows.exe", "FileFlowsNode.exe" })
+        {
+            // request stop
+            Process.Start(new ProcessStartInfo("taskkill.exe", "/im " + name) { CreateNoWindow = true, UseShellExecute = false });
+        }
+        foreach (string name in new string[] { "FileFlows.exe", "FileFlowsNode.exe", "FileFlows.Server.exe", "FileFlows.Node.exe" })
+        {
+            // force stop
+            Process.Start(new ProcessStartInfo("taskkill.exe", "/f /im " + name) { CreateNoWindow = true, UseShellExecute = false });
+        }
         return ActionResult.Success;
     }
 

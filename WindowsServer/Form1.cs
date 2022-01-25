@@ -11,10 +11,18 @@ namespace FileFlows.WindowsServer
             InitializeComponent();
             Instance = this;
 
+            this.FormClosed += Form1_FormClosed;
+
             lnkOpen.Text = Program.Url;
             this.Hide();
             this.WindowState = FormWindowState.Minimized;
             notifyIcon.Visible = true;
+        }
+
+        private void Form1_FormClosed(object? sender, FormClosedEventArgs e)
+        {
+            if(notifyIcon != null)
+                notifyIcon.Visible = false;
         }
 
         protected override void SetVisibleCore(bool value)

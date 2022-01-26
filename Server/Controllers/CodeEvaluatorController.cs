@@ -12,6 +12,7 @@ namespace FileFlows.Server.Controllers
     using Jint.Native.Object;
     using Jint;
     using System.Text.RegularExpressions;
+    using System.Text.Json;
 
     [Route("/api/code-eval")]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -35,6 +36,18 @@ namespace FileFlows.Server.Controllers
                 // so Variables.file?.Orig.Name, will be replaced to Variables["file.Orig.Name"] 
                 // since its just a dictionary key value 
                 string keyRegex = @"Variables(\?)?\." + k.Replace(".", @"(\?)?\.");
+
+                // need to check if values are JsonElements and if they are get the actual values
+                object? value = model.Variables[k];
+                if(value is JsonElement jElement)
+                {
+                    if (jElement.ValueKind == JsonValueKind.String)
+                        value = jElement.GetString();
+                    if (jElement.ValueKind == JsonValueKind.Number)
+                        value = jElement.GetInt64();
+                }
+
+                model.Variables[k] = value; 
                 tcode = Regex.Replace(tcode, keyRegex, "Variables['" + k + "']");
             }
 
@@ -62,8 +75,10 @@ namespace FileFlows.Server.Controllers
             }
             catch (Exception ex)
             {
+                string exfullLog = logger.GetLog();
                 return ex.Message;
             }
+            string fullLog = logger.GetLog();
             return String.Empty;
         }
 
@@ -76,20 +91,34 @@ namespace FileFlows.Server.Controllers
 
         private class TestLogger : FileFlows.Plugin.ILogger
         {
-            public void DLog(params object[] args)
-            {
-            }
+            private StringBuilder log = new StringBuilder();
+            public void DLog(params object[] args) => Log(LogType.Debug, args);
+            public void ELog(params object[] args) => Log(LogType.Error, args);
+            public void ILog(params object[] args) => Log(LogType.Info, args);
+            public void WLog(params object[] args) => Log(LogType.Warning, args);
 
-            public void ELog(params object[] args)
-            {
-            }
+            public string GetLog() => log.ToString();
 
-            public void ILog(params object[] args)
+            private enum LogType { Error, Warning, Debug, Info }
+            private void Log(LogType type, object[] args)
             {
-            }
+                string prefix = type switch
+                {
+                    LogType.Info => "INFO", 
+                    LogType.Error => "ERRR",
+                    LogType.Warning => "WARN",
+                    LogType.Debug => "DBUG",
+                    _ => ""
+                };
 
-            public void WLog(params object[] args)
-            {
+                var now = Helpers.TimeHelper.UserNow();
+
+                string message = "[" + prefix + "] -> " + string.Join(", ", args.Select(x =>
+                    x == null ? "null" :
+                    x.GetType().IsPrimitive ? x.ToString() :
+                    x is string ? x.ToString() :
+                    System.Text.Json.JsonSerializer.Serialize(x)));
+                log.AppendLine(message);
             }
         }
     }

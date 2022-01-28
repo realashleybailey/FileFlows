@@ -42,7 +42,7 @@
 
         private async Task Refresh()
         {
-#if (DEMO)
+#if (DEMO || DEBUG)
 #else
             var result = await HttpHelper.Get<string>("/api/settings/check-update-available");
             if (result.Success && string.IsNullOrWhiteSpace(result.Data) == false)

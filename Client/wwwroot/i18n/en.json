@@ -280,7 +280,8 @@
     "Settings": {
       "Title": "Settings",
       "Labels": {
-        "General": "General"
+        "General": "General",
+        "InternalProcessingNode": "Internal Node"
       },
       "Fields": {
         "Telemetry": "Telemetry",
@@ -292,7 +293,18 @@
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
         "TimeZone": "Time Zone",
-        "TimeZone-Help": "The Time Zone of the system.  This is used to calculate the schedules for libraries etc."
+        "TimeZone-Help": "The Time Zone of the system.  This is used to calculate the schedules for libraries etc.",
+        "InternalProcessingNode": {
+          "Description": "Here you can configure the Internal Processing Node of FileFlows.   A Processing Node is what executes a Flow and processes Files.",
+          "Enabled": "Enabled",
+          "Enabled-Help": "When disabled no files will be processed by the Internal Processing Node.   You can disable this if you wish to pause the system.",
+          "TempPath": "Temp Directory",
+          "TempPath-Help": "This directory will be used by flows to create temporary files as the flow is processed, this directory will be regularly cleaned up so keep nothing important here.",
+          "FlowRunners": "Flow Runners",
+          "FlowRunners-Help": "The number of flow runner instances available to execute a flow.",
+          "Schedule": "Schedule",
+          "Schedule-Help": "This allows you to configure when files can begin processing.  No files will begin processing outside of this schedule."
+        }
       }
     },
     "Tools": {

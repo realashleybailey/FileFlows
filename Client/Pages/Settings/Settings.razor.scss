@@ -1,11 +1,41 @@
 .settings {
+    height: 100%;
+
     ::deep {
         .content {
-            margin:auto 1rem;
+            margin: auto 1rem;
         }
 
         .row + .row {
-            margin-top:1rem;
+            margin-top: 1rem;
+        }
+
+        .flow-tabs {
+            height: 100%;
+            p {
+                white-space:pre-wrap;
+            }
+            .row {
+                margin-right:0;
+                margin-left:0;
+            }
+            .flow-tabs-content {
+                position: relative;
+                height: 100%;
+            }
+
+            .flow-tab.active {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                right: 1rem;
+                left: 1rem;
+                overflow: auto;
+                padding-right:1rem;
+            }
+            hr {
+                margin:2rem 4rem 2rem 0;
+            }
         }
     }
 }

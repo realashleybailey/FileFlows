@@ -455,3 +455,6 @@ button .fas, button .far {
     margin-left: 0;
   }
 }
+hr {
+  border-top-color: var(--border-color);
+}

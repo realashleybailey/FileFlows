@@ -31,6 +31,11 @@ namespace FileFlows.WindowsNode
 
                 FileFlows.Shared.Logger.Instance = new ServerShared.FileLogger(logPath, "FileFlowsNode");
 
+                string message = "=    Starting FileFlows Node v" + Globals.Version + "    =";
+                FileFlows.Shared.Logger.Instance.ILog(new string('=', message.Length));
+                FileFlows.Shared.Logger.Instance.ILog(message);
+                FileFlows.Shared.Logger.Instance.ILog(new string('=', message.Length));
+
                 AppSettings.Init();
 
                 bool minimize = AppSettings.IsConfigured();

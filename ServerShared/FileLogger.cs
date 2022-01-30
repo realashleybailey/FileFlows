@@ -30,7 +30,16 @@ namespace FileFlows.ServerShared
                 SetLogFile();
             }
 
-            string message = type + " -> " + string.Join(", ", args.Select(x =>
+            string prefix = type switch
+            {
+                LogType.Info => "INFO",
+                LogType.Error => "ERRR",
+                LogType.Warning => "WARN",
+                LogType.Debug => "DBUG",
+                _ => ""
+            };
+
+            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " [" + prefix + "]-> "  + string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive ? x.ToString() :
                 x is string ? x.ToString() :
@@ -58,7 +67,7 @@ namespace FileFlows.ServerShared
         private void SetLogFile()
         {
             this.LogDate = DateOnly.FromDateTime(DateTime.Now);
-            this.logFile = Path.Combine(LoggingPath, LogPrefix + "-" + LogDate.ToString("mmmdd") + ".log");
+            this.logFile = Path.Combine(LoggingPath, LogPrefix + "-" + LogDate.ToDateTime(new TimeOnly()).ToString("MMMdd") + ".log");
         }
     }
 }

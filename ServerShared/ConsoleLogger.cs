@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace FileFlows.ServerShared
 {
-    public class FileLogger : FileFlows.Plugin.ILogger
+    public class ConsoleLogger : FileFlows.Plugin.ILogger
     {
-        private string logFile;
-        public FileLogger(string logFile)
-        {
-            this.logFile = logFile;
-        }
 
         private enum LogType { Error, Warning, Debug, Info }
         private void Log(LogType type, object[] args)
@@ -23,7 +18,6 @@ namespace FileFlows.ServerShared
                 x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
             Console.WriteLine(message);
-            System.IO.File.AppendAllText(logFile, message + Environment.NewLine);
         }
 
         public void ILog(params object[] args) => Log(LogType.Info, args);

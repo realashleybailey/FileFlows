@@ -25,10 +25,13 @@ namespace FileFlows.WindowsNode
 
                 HttpHelper.Client = new HttpClient();
 
-                FileFlows.Shared.Logger.Instance = new ServerShared.FileLogger(Application.ExecutablePath + ".log");
+                string logPath = Path.Combine(new FileInfo(Application.ExecutablePath).DirectoryName, "Logs");
+                if (Directory.Exists(logPath) == false)
+                    Directory.CreateDirectory(logPath);
+
+                FileFlows.Shared.Logger.Instance = new ServerShared.FileLogger(logPath, "FileFlowsNode");
 
                 AppSettings.Init();
-
 
                 bool minimize = AppSettings.IsConfigured();
                 ApplicationConfiguration.Initialize();

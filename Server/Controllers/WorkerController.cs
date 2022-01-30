@@ -5,6 +5,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Server.Workers;
     using Microsoft.AspNetCore.SignalR;
     using FileFlows.Server.Hubs;
+    using FileFlows.Shared;
 
     /// <summary>
     /// This controller will be responsible for knowing about the workers and the nodes
@@ -86,7 +87,9 @@ namespace FileFlows.Server.Controllers
                 var libfile = await libfileController.Get(info.LibraryFile.Uid);
                 if (libfile != null)
                 {
-                    if (libfile.FinalSize != info.LibraryFile.FinalSize)
+                    info.LibraryFile.OutputPath = info.LibraryFile.OutputPath?.EmptyAsNull() ?? libfile.OutputPath;
+
+                    if (libfile.FinalSize != info.LibraryFile.FinalSize || libfile.OutputPath != info.LibraryFile.OutputPath)
                     {
                         libfile.FinalSize = info.LibraryFile.FinalSize;
                         await libfileController.Update(libfile);

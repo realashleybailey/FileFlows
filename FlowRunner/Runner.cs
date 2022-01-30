@@ -85,6 +85,7 @@ public class Runner
         nodeParameters?.Logger?.ILog("Original Size: " + Info.LibraryFile.OriginalSize);
         nodeParameters?.Logger?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
+        nodeParameters?.Logger?.ILog("Output Path : " + Info.LibraryFile.OutputPath);
     }
 
     private async Task Complete()
@@ -148,6 +149,7 @@ public class Runner
             Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
             Logger.Instance?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
             Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
+            Logger.Instance?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
         else if(status == FileStatus.ProcessingFailed)

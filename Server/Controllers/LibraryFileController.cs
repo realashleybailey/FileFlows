@@ -206,6 +206,8 @@ namespace FileFlows.Server.Controllers
             existing.FinalSize = file.FinalSize;
             if(file.OriginalSize > 0)
                 existing.OriginalSize = file.OriginalSize;
+            if(string.IsNullOrEmpty(file.OutputPath))
+                existing.OutputPath = file.OutputPath;
             existing.Flow = file.Flow;
             existing.ProcessingEnded = file.ProcessingEnded;
             existing.ProcessingStarted = file.ProcessingStarted;

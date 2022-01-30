@@ -346,10 +346,17 @@ namespace FileFlows.Server.Workers
                 }
             }
 
+            int skip = Library.Path.Length;
+            // check if hte length is > 3 incase its jusst a directory, eg "Z:\"
+            // else its in a folder and we have to increase the skip by 1 to add the directory separator
+            if (Library.Path.Length > 3)
+                ++skip;
+
+            string relative = info.FullName.Substring(skip);
             var lf = new LibraryFile
             {
                 Name = info.FullName,
-                RelativePath = info.FullName.Substring(Library.Path.Length + 1),
+                RelativePath = relative,
                 Status = FileStatus.Unprocessed,
                 IsDirectory = info is DirectoryInfo,
                 Library = new ObjectReference

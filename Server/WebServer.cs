@@ -91,6 +91,7 @@ namespace FileFlows.Server
 
 
             Globals.IsDevelopment = app.Environment.IsDevelopment();
+            Globals.IsWindows = isWindows;
 
             if (Globals.IsDevelopment)
                 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

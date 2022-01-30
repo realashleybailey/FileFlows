@@ -22,6 +22,9 @@ namespace FileFlows.Server.Controllers
         [HttpGet("next-file")]
         public async Task<LibraryFile> GetNext([FromQuery] string nodeName, [FromQuery] Guid nodeUid, [FromQuery] Guid workerUid)
         {
+            if (Workers.AutoUpdater.UpdatePending)
+                return null; // if an update is pending, stop providing new files to process
+
             var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
             _mutex.WaitOne();
             try

@@ -32,6 +32,11 @@
 
         private static bool DevTest = false;
 
+        /// <summary>
+        /// Gets or sets if a updating is pending installation
+        /// </summary>
+        public static bool UpdatePending { get; private set; }
+
         public AutoUpdater() : base(ScheduleType.Minute, 1)
         {
             Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
@@ -198,6 +203,8 @@
             }
 
             Logger.Instance.ILog("AutoUpdater: Found update: " + update.Item1);
+
+            UpdatePending = true;
 
             var workers = new WorkerController(null).GetAll();
             bool canUpdate = workers?.Any() != true;

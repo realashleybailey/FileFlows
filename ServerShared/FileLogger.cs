@@ -18,9 +18,7 @@ namespace FileFlows.ServerShared
         public FileLogger(string loggingPath, string logPrefix)
         {
             this.LoggingPath = loggingPath;
-            this.LogPrefix = LogPrefix;
-
-
+            this.LogPrefix = logPrefix;
         }
 
         private enum LogType { Error, Warning, Debug, Info }
@@ -60,7 +58,7 @@ namespace FileFlows.ServerShared
         private void SetLogFile()
         {
             this.LogDate = DateOnly.FromDateTime(DateTime.Now);
-            this.logFile = Path.Combine(LoggingPath, LogPrefix + "_" + LogDate.ToString("mmmdd") + ".log");
+            this.logFile = Path.Combine(LoggingPath, LogPrefix + "-" + LogDate.ToString("mmmdd") + ".log");
         }
     }
 }

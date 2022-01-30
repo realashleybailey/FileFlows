@@ -85,7 +85,7 @@ public class Runner
         nodeParameters?.Logger?.ILog("Original Size: " + Info.LibraryFile.OriginalSize);
         nodeParameters?.Logger?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
-        nodeParameters?.Logger?.ILog("Output Path : " + Info.LibraryFile.OutputPath);
+        nodeParameters?.Logger?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
     }
 
     private async Task Complete()

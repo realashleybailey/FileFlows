@@ -92,6 +92,7 @@ namespace FileFlows.Server.Controllers
                     if (libfile.FinalSize != info.LibraryFile.FinalSize || libfile.OutputPath != info.LibraryFile.OutputPath)
                     {
                         libfile.FinalSize = info.LibraryFile.FinalSize;
+                        libfile.OutputPath = info.LibraryFile.OutputPath;
                         await libfileController.Update(libfile);
                     }
                 }

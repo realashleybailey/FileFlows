@@ -90,11 +90,19 @@
                 // If you run bash-script on Linux it is possible that ExitCode can be 255.
                 // To fix it you can try to add '#!/bin/bash' header to the script.
 
-                process.StartInfo.FileName = args.Command;
+                process.StartInfo.FileName = args.Command;                
                 if (args.ArgumentList?.Any() == true)
                 {
+                    args.Arguments = String.Empty;
                     foreach (var arg in args.ArgumentList)
+                    {
                         process.StartInfo.ArgumentList.Add(arg);
+                        if (arg.IndexOf(" ") > 0)
+                            args.Arguments += "\"" + arg + "\" ";
+                        else
+                            args.Arguments += arg + " ";
+                    }
+                    args.Arguments = args.Arguments.Trim();
                 }
                 else if (string.IsNullOrEmpty(args.Arguments) == false)
                 {

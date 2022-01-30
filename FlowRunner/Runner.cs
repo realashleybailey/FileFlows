@@ -454,8 +454,8 @@ public class Runner
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.ELog("Type: " + nt.Name + ", Property: " + k);
-                    Logger.Instance.ELog("Failed setting property: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    Logger.Instance?.ELog("Failed setting property: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    Logger.Instance?.ELog("Type: " + nt.Name + ", Property: " + k);
                 }
             }
         }

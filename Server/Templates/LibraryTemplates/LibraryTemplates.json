@@ -41,6 +41,15 @@
   },
 
   {
+    "name": "SABnzbd Music",
+    "group": "Download Clients",
+    "description": "Library to monitor a \"complete\" downloads directory from SABnzbd.\n\nThis library can then use a flow to convert music into a target format, and place those music files in destination folder e.g. \"converted\".\n\nThe application that instructed SABnzbd to do the download can monitor the \"converted\" folder for completed files.",
+    "filter": "^((?!_UNPACK|sample).)*\\.(aac|ogg|flac|mp3|wav)$",
+    "path": "/media/downloads/complete",
+    "scanInterval": 60,
+    "fileSizeDetectionInterval": 5
+  },
+  {
     "name": "Samples/Trailers/Previews",
     "group": "Download Clients",
     "description": "Finds any sample, trailers, or preview video files in a directory so you can delete them if necassary.\nUseful for a matching 'SABnzbd Videos' library so the folder can be cleanly deleted after the main file is processed.",

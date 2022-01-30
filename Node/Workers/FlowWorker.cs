@@ -56,13 +56,13 @@
 
             if (node?.Enabled != true)
             {
-                Logger.Instance?.DLog("Flow executor not enabled");
+                Logger.Instance?.DLog($"Flow executor '{(node?.Name ?? "null")}' not enabled");
                 return;
             }
 
             if (node.FlowRunners <= ExecutingRunners.Count)
             {
-                Logger.Instance?.DLog("At limit of running executors: " + node.FlowRunners);
+                Logger.Instance?.DLog($"At limit of running executors on '{node.Name}': " + node.FlowRunners);
                 return; // already maximum executors running
             }
 

@@ -1,7 +1,7 @@
 [
   {
-    "name": "Convert Music and Move",
-    "description": "Will convert music to the specified format and move them to a different destination directory.\n\nThis is useful to use as a go between for a download client like SABnzbd and a program such as Lidarr or Headphones.\n\nThe file will not be re-encoded as it's already in the target codec.\n\nThe file will be moved to a different directory, regardless if it needed to be encoded or not.",
+    "name": "Convert Music and Copy",
+    "description": "Will convert music files to the specified format and copies it to a new location.\n\nIf the original file is already in the target format the file will not be re-encoded but it will still be copied.",
     "group": "Music",
     "save": true,
     "parts": [
@@ -9,7 +9,7 @@
         "node": "MusicFile",
         "uid": "00000000-0000-0000-0000-000000000001",
         "xPos": 375,
-        "yPos": 30,
+        "yPos": 50,
         "connections": [
           {
             "input": 1,
@@ -23,7 +23,7 @@
         "node": "ConvertAudio",
         "uid": "00000000-0000-0000-0000-000000000002",
         "xPos": 375,
-        "yPos": 180,
+        "yPos": 220,
         "connections": [
           {
             "input": 1,
@@ -37,56 +37,15 @@
           }
         ],
         "model": {
-          "Outputs": 1,
           "SkipIfCodecMatches": true
         }
       },
 
       {
-        "node": "MoveFile",
+        "node": "CopyFile",
         "uid": "00000000-0000-0000-0000-000000000003",
         "xPos": 375,
-        "yPos": 350,
-        "connections": [
-          {
-            "output": 1,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000004"
-          }
-        ],
-        "model": {
-          "MoveFolder": true,
-          "DeleteOriginal": true,
-          "DestinationPath": "/media"
-        }
-      },
-      {
-        "node": "Function",
-        "name": "Delete Dir?",
-        "uid": "00000000-0000-0000-0000-000000000004",
-        "xPos": 375,
-        "yPos": 480,
-        "outputs": 2,
-        "connections": [
-          {
-            "input": 1,
-            "output": 1,
-            "node": "00000000-0000-0000-0000-000000000005"
-          }
-        ],
-        "model": {
-          "Outputs": 2
-        }
-      },
-      {
-        "node": "DeleteSourceDirectory",
-        "uid": "00000000-0000-0000-0000-000000000005",
-        "xPos": 200,
-        "yPos": 620,
-        "model": {
-          "IfEmpty": true,
-          "IncludePatterns": [ "mp3", "aac", "ogg", "flac", "wav" ]
-        }
+        "yPos": 420
       }
     ],
 
@@ -174,19 +133,6 @@
         "help": "The destination directory where the final file should be saved to",
         "name": "DestinationPath",
         "default": "/media"
-      },
-
-      {
-        "uid": "00000000-0000-0000-0000-000000000004",
-        "type": "Switch",
-        "name": "Code",
-        "default": true,
-        "label": "Delete Source Directory",
-        "help": "If the source directory should be deleted.  This will only be deleted if there are no other music files found in this directory",
-        "value": {
-          "true": "/* return 1 here to delete the source directory */\nreturn 1;",
-          "false": "/* return 2 here to NOT delete the source directory */\nreturn 2;"
-        }
       }
     ]
   }

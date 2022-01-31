@@ -1,7 +1,7 @@
 [
   {
     "name": "Convert Video and Copy",
-    "description": "Will convert videos to the specified format.   The original file will be replaced.\n\nIf the original file is already format the file will not be re-encoded.",
+    "description": "Will convert videos to the specified format and copies it to a new location.\n\nIf the original file is already in the target format the file will not be re-encoded but it will still be copied.",
     "group": "Video",
     "save": true,
     "parts": [

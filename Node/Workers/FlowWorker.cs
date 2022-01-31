@@ -54,15 +54,17 @@
                 nodeService.ClearWorkers(node.Uid);
             }
 
+            string nodeName = node?.Name == "FileFlowsServer" ? "Internal Processing Node" : (node?.Name ?? "Unknown");
+
             if (node?.Enabled != true)
             {
-                Logger.Instance?.DLog($"Flow executor '{(node?.Name ?? "null")}' not enabled");
+                Logger.Instance?.DLog($"Flow executor '{nodeName}' not enabled");
                 return;
             }
 
             if (node.FlowRunners <= ExecutingRunners.Count)
             {
-                Logger.Instance?.DLog($"At limit of running executors on '{node.Name}': " + node.FlowRunners);
+                Logger.Instance?.DLog($"At limit of running executors on '{nodeName}': " + node.FlowRunners);
                 return; // already maximum executors running
             }
 
@@ -70,7 +72,7 @@
             string tempPath = node.TempPath;
             if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
             {
-                Logger.Instance?.ELog("Temp Path not set, cannot process");
+                Logger.Instance?.ELog($"Temp Path not set on node '{nodeName}, cannot process");
                 return;
             }
             var libFileService = LibraryFileService.Load();

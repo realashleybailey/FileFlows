@@ -309,8 +309,9 @@ namespace FileFlows.Plugin
         /// <param name="input">the input string</param>
         /// <param name="variables">the variables used to replace</param>
         /// <param name="stripMissing">if missing variables shouild be removed</param>
+        /// <param name="cleanSpecialCharacters">if special characters (eg directory path separator) should be replaced</param>
         /// <returns>the string with the variables replaced</returns>
-        public string ReplaceVariables(string input, bool stripMissing = false) => VariablesHelper.ReplaceVariables(input, Variables, stripMissing);
+        public string ReplaceVariables(string input, bool stripMissing = false, bool cleanSpecialCharacters = false) => VariablesHelper.ReplaceVariables(input, Variables, stripMissing, cleanSpecialCharacters);
 
 
         /// <summary>

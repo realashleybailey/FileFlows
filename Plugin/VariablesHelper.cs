@@ -10,8 +10,9 @@
         /// <param name="input">the input string</param>
         /// <param name="variables">the variables used to replace</param>
         /// <param name="stripMissing">if missing variables shouild be removed</param>
+        /// <param name="cleanSpecialCharacters">if special characters (eg directory path separator) should be replaced</param>
         /// <returns>the string with the variables replaced</returns>
-        public static string ReplaceVariables(string input, Dictionary<string, object> variables, bool stripMissing = false)
+        public static string ReplaceVariables(string input, Dictionary<string, object> variables, bool stripMissing = false, bool cleanSpecialCharacters = false)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
@@ -21,6 +22,14 @@
                 foreach (string variable in variables.Keys)
                 {
                     string strValue = variables[variable]?.ToString() ?? "";
+                    if (cleanSpecialCharacters && variable.Contains(".") && variable.StartsWith("file.") == false && variable.StartsWith("folder.") == false)
+                    {
+                        // we dont want to replace user variables they set themselves, eg they may have set "DestPath" or something in the Function node
+                        // so we dont want to replace that, or any of the file/folder variables
+                        // but other nodes generate variables based on metadata, and that metadata may contain a / or \ which would break a filename
+                        strValue = strValue.Replace("/", "-");
+                        strValue = strValue.Replace("\\", "-");
+                    }
                     input = ReplaceVariable(input, variable, strValue);
                 }
             }

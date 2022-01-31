@@ -123,7 +123,6 @@ namespace FileFlows.Server.Workers
             // new file we can process
             if (KnownFile(fullPath))
             {
-                //Logger.Instance.ILog("WatchedLibrary: Known file: " + fullPath);
                 return;
             }
 
@@ -238,15 +237,17 @@ namespace FileFlows.Server.Workers
             // refresh list of library files
             RefreshLibraryFiles();
 
+            bool complete = true;
             int count = LibraryFiles.Count;
             if (Library.Folders)
                 ScanForDirs(Library);
             else
-                ScanForFiles(Library);
-
+                complete = ScanForFiles(Library);
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
 
-            ScanComplete = Library.Folders == false; // only count a full scan against files
+            if(complete)
+                ScanComplete = Library.Folders == false; // only count a full scan against files
+
             return count < LibraryFiles.Count;
         }
 
@@ -278,7 +279,7 @@ namespace FileFlows.Server.Workers
 
             new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
         }
-        private void ScanForFiles(Library library)
+        private bool ScanForFiles(Library library)
         {
             var files = GetFiles(new DirectoryInfo(library.Path));
             List<string> known = new();
@@ -293,6 +294,7 @@ namespace FileFlows.Server.Workers
                 if (string.IsNullOrEmpty(libFile.OutputPath) == false && known.Contains(libFile.OutputPath.ToLower()) == false)
                     known.Add(libFile.OutputPath.ToLower());
             }
+            bool incomplete = false;
             var tasks = new List<Task<LibraryFile>>();
             foreach (var file in files)
             {
@@ -302,12 +304,20 @@ namespace FileFlows.Server.Workers
                 if (known.Contains(file.FullName.ToLower()))
                     continue; // already known
 
+                if (tasks.Count() > 250)
+                {
+                    incomplete = true;
+                    break; // bucket how many are scanned at once
+                }
+
                 Logger.Instance.DLog("New unknown file: " + file.FullName);
                 tasks.Add(GetLibraryFile(file));
             }
             Task.WaitAll(tasks.ToArray());
 
             new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
+
+            return incomplete == false;
         }
 
         private async Task AddLibraryFile(string filename)

@@ -1,6 +1,7 @@
 namespace FileFlows.Plugin
 {
     using System.Collections.Generic;
+    using System.Runtime.InteropServices;
     using System.Text;
     using System.Text.Json;
 
@@ -211,14 +212,37 @@ namespace FileFlows.Plugin
         public bool MoveFile(string destination)
         {
             if (Fake) return true;
-            bool moved = false;
+
             Logger?.ILog("About to move file to: " + destination);
             destination = MapPath(destination);
+
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (isWindows)
+            {
+                if (destination.ToLower() == WorkingFile?.ToLower())
+                {
+                    Logger?.ILog("Source and destination are the same, skipping move");
+                    return true;
+                }
+            }
+            else
+            {
+                // linux, is case sensitive
+                if(destination == WorkingFile)
+                {
+                    Logger?.ILog("Source and destination are the same, skipping move");
+                    return true;
+                }
+            }
+
+
+            bool moved = false;
             long fileSize = new FileInfo(WorkingFile).Length;
             Task task = Task.Run(() =>
             {
                 try
                 {
+
                     var fileInfo = new FileInfo(destination);
                     if (fileInfo.Exists)
                         fileInfo.Delete();

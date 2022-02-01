@@ -30,7 +30,7 @@
                         strValue = strValue.Replace("/", "-");
                         strValue = strValue.Replace("\\", "-");
                     }
-                    input = ReplaceVariable(input, variable, strValue);
+                    input = ReplaceVariable(input, variable, strValue, variables[variable]);
                 }
             }
 
@@ -40,13 +40,28 @@
             return input;
         }
 
-        private static string ReplaceVariable(string input, string variable, string value)
+        private static string ReplaceVariable(string input, string variable, string value, object actualValue)
         {
             string result = input;
             if(Regex.IsMatch(result, @"{" + Regex.Escape(variable) + @"}"))
                 result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @"}", value, RegexOptions.IgnoreCase);
             if (Regex.IsMatch(result, @"{" + Regex.Escape(variable) + @"!}"))
                 result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @"!}", value.ToUpper(), RegexOptions.IgnoreCase);
+            if (Regex.IsMatch(result, @"{" + Regex.Escape(variable) + @":[0#]+}"))
+            {
+                var match = Regex.Match(result, @"{" + Regex.Escape(variable) + @":[0#]+}").Value;
+                match = match.Substring(match.LastIndexOf(":") + 1);
+                int digits = match.Length - 1;
+                if (actualValue is int iValue)
+                    value = iValue.ToString(new string('0', digits));
+                else if(actualValue is double dValue)
+                    value = dValue.ToString(new string('0', digits));
+                else if (actualValue is Int64 i64Value)
+                    value = i64Value.ToString(new string('0', digits));
+
+                result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @":[0#]+}", value, RegexOptions.IgnoreCase);
+            }
+
             return result;
         }
 

@@ -85,7 +85,7 @@
         "yPos": 620,
         "model": {
           "IfEmpty": true,
-          "IncludePatterns": [ "mp3", "aac", "ogg", "flac", "wav" ]
+          "IncludePatterns": [ "mp3", "aac", "ogg", "flac", "wav", "m4a" ]
         }
       }
     ],

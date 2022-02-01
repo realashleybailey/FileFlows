@@ -244,8 +244,16 @@ namespace FileFlows.Server.Controllers
         {
             try
             {
-                FlowExecutorInfo flowinfo;
+                FlowExecutorInfo? flowinfo;
                 Executors.TryGetValue(uid, out flowinfo);
+                if(flowinfo == null)
+                {
+                    flowinfo = Executors.Values.Where(x => x.LibraryFile?.Uid == uid || x.Uid == uid || x.NodeUid == uid).FirstOrDefault();
+                }
+                if(flowinfo == null)
+                {
+                    Logger.Instance?.WLog("Unable to find executor matching: " + uid);
+                }
 
                 Logger.Instance?.ILog("Sending AbortFlow " + uid);
                 await this.Context.Clients.All.SendAsync("AbortFlow", uid);
@@ -273,9 +281,9 @@ namespace FileFlows.Server.Controllers
                     await Task.Delay(10_000);
                     lock (Executors)
                     {
-                        if (Executors.TryGetValue(uid, out FlowExecutorInfo info))
+                        if (Executors.TryGetValue(uid, out FlowExecutorInfo? info))
                         {
-                            if (info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
+                            if (info == null || info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
                             {
                                 // its gone quiet, kill it
                                 Executors.Remove(uid);

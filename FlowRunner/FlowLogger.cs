@@ -29,7 +29,16 @@ namespace FileFlows.FlowRunner
         {
             if (args == null || args.Length == 0)
                 return;
-            string message = TimeHelper.UserNow().ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - " + type + " -> " +
+            string prefix = type switch
+            {
+                LogType.Info => "INFO",
+                LogType.Error => "ERRR",
+                LogType.Warning => "WARN",
+                LogType.Debug => "DBUG",
+                _ => ""
+            };
+
+            string message = TimeHelper.UserNow().ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - " + prefix + " -> " +
                 string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :

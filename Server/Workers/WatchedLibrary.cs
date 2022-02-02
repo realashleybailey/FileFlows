@@ -327,10 +327,8 @@ namespace FileFlows.Server.Workers
                     break; // bucket how many are scanned at once
                 }
 
-                string fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(file.FullName) ?? string.Empty;
-
                 Logger.Instance.DLog("New unknown file: " + file.FullName);
-                tasks.Add(GetLibraryFile(file, fingerprint));
+                tasks.Add(GetLibraryFile(file, null));
             }
             Task.WaitAll(tasks.ToArray());
 
@@ -381,6 +379,11 @@ namespace FileFlows.Server.Workers
             // else its in a folder and we have to increase the skip by 1 to add the directory separator
             if (Globals.IsWindows == false || Library.Path.Length != 3)
                 ++skip;
+
+            if(fingerprint == null && Library.UseFingerprinting)
+            {
+                fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(info.FullName);
+            }
 
             string relative = info.FullName.Substring(skip);
             var lf = new LibraryFile

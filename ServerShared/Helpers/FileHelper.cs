@@ -31,10 +31,26 @@ namespace FileFlows.ServerShared.Helpers
         {
             try
             {
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.Exists == false)
+                    return String.Empty;
+
                 using var hasher = System.Security.Cryptography.SHA256.Create();
                 DateTime start = DateTime.Now;
-                using var stream = File.OpenRead(file);
-                var hash = hasher.ComputeHash(stream);
+                byte[] hash;
+                if (fileInfo.Length > 100_000_000)
+                {
+                    // compute hash on first 100MB to speed it update
+                    var bytes = new byte[100_000_000];                    
+                    using var stream = new FileStream(file, FileMode.Open);
+                    int realLength = stream.Read(bytes, 0, bytes.Length);                                        
+                    hash = hasher.ComputeHash(bytes, 0, realLength);
+                }
+                else
+                {
+                    using var stream = File.OpenRead(file);
+                    hash = hasher.ComputeHash(stream);
+                }
                 string hashStr = BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
                 return hashStr;
             }

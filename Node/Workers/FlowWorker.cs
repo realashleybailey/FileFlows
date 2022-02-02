@@ -4,6 +4,7 @@
     using FileFlows.ServerShared.Workers;
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
+    using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Text;
@@ -13,7 +14,8 @@
     {
         public readonly Guid Uid = Guid.NewGuid();
 
-        private readonly List<Guid> ExecutingRunners = new List<Guid>();
+        private Mutex mutex = new Mutex();
+        private readonly List<Guid> ExecutingRunners = new ();
 
         private readonly bool isServer;
 
@@ -82,10 +84,7 @@
 
             bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             Guid processUid = Guid.NewGuid();
-            lock (ExecutingRunners)
-            {
-                ExecutingRunners.Add(processUid);
-            }
+            AddExecutingRunner(processUid);
             Task.Run(() =>
             {
                 try
@@ -184,9 +183,11 @@
                         }
                     }
 #endif
-                        }
+                }
                 finally
                 {
+                    RemoveExecutingRunner(processUid);
+
                     try
                     {
                         string dir = Path.Combine(tempPath, "Runner-" + processUid.ToString());
@@ -197,14 +198,47 @@
                     {
                         Logger.Instance?.WLog("Failed to clean up runner directory: " + ex.Message);
                     }
-                    lock (ExecutingRunners)
-                    {
-                        if (ExecutingRunners.Contains(processUid))
-                            ExecutingRunners.Remove(processUid);
-                    }
+
                     Trigger();
                 }
             });
+        }
+
+
+        private void AddExecutingRunner(Guid uid)
+        {
+            mutex.WaitOne();
+            try
+            {
+                ExecutingRunners.Add(uid);
+            }
+            finally
+            {
+                mutex.ReleaseMutex();   
+            }
+        }
+
+        private void RemoveExecutingRunner(Guid uid)
+        {
+            Logger.Instance?.ILog("Removing executing runner: " + uid);
+            mutex.WaitOne();
+            try
+            {
+                if (ExecutingRunners.Contains(uid))
+                    ExecutingRunners.Remove(uid);
+                else
+                {
+                    Logger.Instance?.ILog("Exeucting runner not in list: " + uid +" => " + String.Join(",", ExecutingRunners.Select(x => x.ToString())));
+                }
+            }
+            catch(Exception ex)
+            {
+                Logger.Instance?.ELog("Failed to remove executing runner: " + ex.Message + Environment.NewLine + ex.StackTrace);    
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
         }
 
         private void SaveLog(LibraryFile libFile, string log)

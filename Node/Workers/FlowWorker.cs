@@ -220,7 +220,7 @@
 
         private void RemoveExecutingRunner(Guid uid)
         {
-            Logger.Instance?.ILog("Removing executing runner: " + uid);
+            Logger.Instance?.ILog($"Removing executing runner[{ExecutingRunners.Count}]: {uid}");
             mutex.WaitOne();
             try
             {
@@ -230,6 +230,7 @@
                 {
                     Logger.Instance?.ILog("Exeucting runner not in list: " + uid +" => " + String.Join(",", ExecutingRunners.Select(x => x.ToString())));
                 }
+                Logger.Instance?.ILog("Runner count: " + ExecutingRunners.Count);
             }
             catch(Exception ex)
             {

@@ -18,6 +18,11 @@ namespace FileFlows.Shared.Models
         /// </summary>
         public bool Folders { get; set; }
 
+        /// <summary>
+        /// Gets or sets if this library will use fingerprinting to determine if a file already is known
+        /// </summary>
+        public bool UseFingerprinting { get; set; }
+
         public string Schedule { get; set; }
 
         /// <summary>

@@ -15,7 +15,9 @@ namespace FileFlows.Shared.Models
 
         public long OriginalSize { get; set; }
         public long FinalSize { get; set; }
+        public string Fingerprint { get; set; }
         public ObjectReference Node { get; set; }
+
         public Guid WorkerUid { get; set; }
 
         public DateTime ProcessingStarted { get; set; }

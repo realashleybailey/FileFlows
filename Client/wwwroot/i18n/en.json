@@ -197,6 +197,8 @@
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
         "Filter-Help": "An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
+        "UseFingerprinting": "Use Fingerprinting",
+        "UseFingerprinting-Help": "When enabled, files will have a checksum run against them when being imported and after a flow is completed.  Any matching checksum files will be skipped from future library imports.",
         "ScanInterval": "Scan Interval",
         "ScanInterval-Suffix": "Seconds",
         "ScanInterval-Help": "The shortest possible time in seconds between scans.  It is not guaranteed to scan at this interval each time, as another scan might be in progress.",
@@ -207,7 +209,7 @@
         "Schedule-Help": "This schedule runs in the timezone configured under settings.",
         "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any library files be processed outside of the schedule.\n",
         "Scan": "Scan",
-        "Scan-Help":  "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected."
+        "Scan-Help": "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected."
       }
     },
     "LibraryFile": {

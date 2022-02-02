@@ -178,8 +178,8 @@
                 }
             });
             return fields;
-
         }
+
         private List<ElementField> TabAdvanced(Library library)
         {
             List<ElementField> fields = new List<ElementField>();
@@ -187,6 +187,11 @@
             {
                 InputType = FormInputType.Text,
                 Name = nameof(library.Filter)
+            });
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Switch,
+                Name = nameof(library.UseFingerprinting)
             });
             var fieldScan = new ElementField
             {

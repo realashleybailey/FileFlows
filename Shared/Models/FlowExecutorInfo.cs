@@ -16,6 +16,7 @@ public class FlowExecutorInfo
 
     public ObjectReference Library { get; set; }
     public string LibraryPath { get; set; }
+    public bool Fingerprint { get; set; }
 
     public long InitialSize { get; set; }
 

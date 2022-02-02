@@ -21,5 +21,28 @@ namespace FileFlows.ServerShared.Helpers
                 input = input.Replace(c.ToString(), string.Empty);
             return input;
         }
+
+        /// <summary>
+        /// Calculates a fingerprint for a file
+        /// </summary>
+        /// <param name="file">The filename</param>
+        /// <returns>The fingerprint</returns>
+        public static string CalculateFingerprint(string file)
+        {
+            try
+            {
+                using var hasher = System.Security.Cryptography.SHA256.Create();
+                DateTime start = DateTime.Now;
+                using var stream = File.OpenRead(file);
+                var hash = hasher.ComputeHash(stream);
+                string hashStr = BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
+                return hashStr;
+            }
+            catch(Exception ex)
+            {
+                Logger.Instance?.ELog($"Failed to calculate fingerprint for file '{file}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                return string.Empty;
+            }
+        }
     }
 }

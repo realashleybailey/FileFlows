@@ -121,7 +121,8 @@ namespace FileFlows.Server.Workers
             }
 
             // new file we can process
-            if (KnownFile(fullPath))
+            var known = KnownFile(fullPath);
+            if (known.known)
             {
                 return;
             }
@@ -131,7 +132,7 @@ namespace FileFlows.Server.Workers
             if (IsFileLocked(fullPath) == false)
             {
                 Logger.Instance.ILog("WatchedLibrary: Detected new file: " + fullPath);
-                _ = AddLibraryFile(fullPath);
+                _ = AddLibraryFile(fullPath, known.fingerprint);
             }
             else
             {
@@ -170,10 +171,26 @@ namespace FileFlows.Server.Workers
         }
 
 
-        private bool KnownFile(string file)
+        private (bool known, string fingerprint) KnownFile(string file)
         {
             file = file.ToLower();
-            return LibraryFiles.Any(x => x.Name.ToLower() == file);
+            var libFile = LibraryFiles.Where(x => x.Name.ToLower() == file).FirstOrDefault();
+            if (libFile != null)
+                return (true, libFile.Fingerprint ?? string.Empty);
+
+            if (Library.UseFingerprinting)
+            {
+                string fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(file);
+                if(string.IsNullOrEmpty(fingerprint) == false)
+                {
+                    bool exists = LibraryFiles.Any(x => x.Fingerprint == fingerprint);
+                    if (exists == true)
+                        return (true, fingerprint);
+                }
+                return (false, fingerprint);
+            }
+
+            return (false, string.Empty);
         }
 
         private bool IsFileLocked(string file)
@@ -273,7 +290,7 @@ namespace FileFlows.Server.Workers
                 if (known.Contains(dir.FullName.ToLower()))
                     continue; // already known
 
-                tasks.Add(GetLibraryFile(dir));
+                tasks.Add(GetLibraryFile(dir, string.Empty));
             }
             Task.WaitAll(tasks.ToArray());
 
@@ -310,8 +327,10 @@ namespace FileFlows.Server.Workers
                     break; // bucket how many are scanned at once
                 }
 
+                string fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(file.FullName) ?? string.Empty;
+
                 Logger.Instance.DLog("New unknown file: " + file.FullName);
-                tasks.Add(GetLibraryFile(file));
+                tasks.Add(GetLibraryFile(file, fingerprint));
             }
             Task.WaitAll(tasks.ToArray());
 
@@ -320,7 +339,7 @@ namespace FileFlows.Server.Workers
             return incomplete == false;
         }
 
-        private async Task AddLibraryFile(string filename)
+        private async Task AddLibraryFile(string filename, string fingerprint)
         {
             //var flow = GetFlow();
             //if (flow == null) 
@@ -329,7 +348,7 @@ namespace FileFlows.Server.Workers
             //    return;
             //}
 
-            var result = await GetLibraryFile(new FileInfo(filename));
+            var result = await GetLibraryFile(new FileInfo(filename), fingerprint);
             if(result != null)
                 await new LibraryFileController().AddMany(new[] { result });
         }
@@ -345,7 +364,7 @@ namespace FileFlows.Server.Workers
             return flow;
         }
 
-        private async Task<LibraryFile> GetLibraryFile(FileSystemInfo info)
+        private async Task<LibraryFile> GetLibraryFile(FileSystemInfo info, string fingerprint)
         {
             if (info is FileInfo fileInfo)
             {
@@ -370,6 +389,7 @@ namespace FileFlows.Server.Workers
                 RelativePath = relative,
                 Status = FileStatus.Unprocessed,
                 IsDirectory = info is DirectoryInfo,
+                Fingerprint = fingerprint ?? string.Empty,
                 Library = new ObjectReference
                 {
                     Name = Library.Name,

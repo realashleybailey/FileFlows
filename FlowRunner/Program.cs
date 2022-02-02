@@ -169,6 +169,7 @@ namespace FileFlows.FlowRunner
                 WorkingFile = workingFile,
                 IsDirectory = lib.Folders,
                 LibraryPath = lib.Path, 
+                Fingerprint = lib.UseFingerprinting,
                 InitialSize = lib.Folders ? GetDirectorySize(workingFile) : new FileInfo(workingFile).Length
             };
 

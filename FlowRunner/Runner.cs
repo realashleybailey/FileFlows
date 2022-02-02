@@ -86,6 +86,16 @@ public class Runner
         nodeParameters?.Logger?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
         nodeParameters?.Logger?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
+
+        if (Info.Fingerprint)
+        {
+            Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
+            nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
+        }
+        else
+        {
+            Info.LibraryFile.Fingerprint = string.Empty;
+        }
     }
 
     private async Task Complete()

@@ -87,14 +87,21 @@ public class Runner
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
         nodeParameters?.Logger?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
 
-        if (Info.Fingerprint)
+        try
         {
-            Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
-            nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
+            if (Info.Fingerprint)
+            {
+                Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
+                nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
+            }
+            else
+            {
+                Info.LibraryFile.Fingerprint = string.Empty;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Info.LibraryFile.Fingerprint = string.Empty;
+            nodeParameters?.Logger?.ILog("Error with fingerpriting: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
     }
 

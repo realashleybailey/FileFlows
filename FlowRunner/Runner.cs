@@ -81,28 +81,43 @@ public class Runner
 
     private void CalculateFinalSize()
     {
-        Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : new FileInfo(nodeParameters.WorkingFile).Length;
+        if (nodeParameters.IsDirectory)
+            Info.LibraryFile.FinalSize = nodeParameters.GetDirectorySize(nodeParameters.WorkingFile);
+        else
+        {
+            var fileInfo = new FileInfo(nodeParameters.WorkingFile);
+            if (fileInfo.Exists == false)
+            {
+                nodeParameters.Logger?.WLog("Final final does not exist: " + fileInfo.FullName);
+                Info.LibraryFile.FinalSize = 0;
+            }
+            else
+            {
+                Info.LibraryFile.FinalSize = fileInfo.Length;
+
+                try
+                {
+                    if (Info.Fingerprint)
+                    {
+                        Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
+                        nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
+                    }
+                    else
+                    {
+                        Info.LibraryFile.Fingerprint = string.Empty;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    nodeParameters?.Logger?.ILog("Error with fingerprinting: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                }
+            }
+        }
         nodeParameters?.Logger?.ILog("Original Size: " + Info.LibraryFile.OriginalSize);
         nodeParameters?.Logger?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
         nodeParameters?.Logger?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
 
-        try
-        {
-            if (Info.Fingerprint)
-            {
-                Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
-                nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
-            }
-            else
-            {
-                Info.LibraryFile.Fingerprint = string.Empty;
-            }
-        }
-        catch (Exception ex)
-        {
-            nodeParameters?.Logger?.ILog("Error with fingerpriting: " + ex.Message + Environment.NewLine + ex.StackTrace);
-        }
     }
 
     private async Task Complete()
@@ -159,45 +174,32 @@ public class Runner
 
     private void SetStatus(FileStatus status)
     {
-        nodeParameters.Logger?.DLog("Setting status 1: " + status);
         DateTime start = DateTime.Now;
         Info.LibraryFile.Status = status;
-        nodeParameters.Logger?.DLog("Setting status 2: " + status);
         if (status == FileStatus.Processed)
         {
-            nodeParameters.Logger?.DLog("Setting status 3: " + status);
             CalculateFinalSize();
-            nodeParameters.Logger?.DLog("Setting status 4: " + status);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
         else if(status == FileStatus.ProcessingFailed)
         {
-            nodeParameters.Logger?.DLog("Setting status 5: " + status);
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
         do
         {
-            nodeParameters.Logger?.DLog("Setting status 6: " + status);
             try
             {
-                nodeParameters.Logger?.DLog("Setting status 7: " + status);
                 var service = FlowRunnerService.Load();
-                nodeParameters.Logger?.DLog("Setting status 8: " + status);
                 service.Update(Info);
-                nodeParameters.Logger?.DLog("Setting status 9: " + status);
                 return;
             }
             catch (Exception ex)
             {
                 // this is more of a problem, its not ideal, so we do try again
-                nodeParameters.Logger?.DLog("Setting status 10: " + status);
                 Logger.Instance?.WLog("Failed to set status on server: " + ex.Message);
             }
-            nodeParameters.Logger?.DLog("Setting status 11: " + status);
             Thread.Sleep(5_000);
-            nodeParameters.Logger?.DLog("Setting status 12: " + status);
         } while (DateTime.Now.Subtract(start) < new TimeSpan(0, 3, 0));
-        nodeParameters.Logger?.DLog("Setting status 13: " + status);
     }
 
     private void RunActual(IFlowRunnerCommunicator communicator)

@@ -633,7 +633,7 @@ if(!bitrate)
 	if(!overall)
 		return 0; // couldn't get overall bitrate either
 
-	// overall bitrate includes all audio streams, so we try and subtrack those
+	// overall bitrate includes all audio streams, so we try and subtract those
 	let calculated = overall;
 	if(vi.AudioStreams?.length) // check there are audio streams
 	{

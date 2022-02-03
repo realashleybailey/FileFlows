@@ -41,8 +41,10 @@ namespace FileFlows.ServerShared.Helpers
                 if (fileInfo.Length > 100_000_000)
                 {
                     // compute hash on first 100MB to speed it update
-                    using var stream = new BufferedStream(File.OpenRead(file), 100_000_000);
-                    hash = hasher.ComputeHash(stream);
+                    var bytes = new byte[100_000_000];                    
+                    using var stream = new FileStream(file, FileMode.Open);
+                    int realLength = stream.Read(bytes, 0, bytes.Length);                                        
+                    hash = hasher.ComputeHash(bytes, 0, realLength);
                 }
                 else
                 {

@@ -257,7 +257,7 @@ namespace FileFlows.Plugin
                         CreateDirectoryIfNotExists(fileInfo?.DirectoryName);
 
                     Logger?.ILog($"Moving file: \"{WorkingFile}\" to \"{destination}\"");                    
-                    System.IO.File.Move(WorkingFile, destination, true);
+                    File.Move(WorkingFile, destination, true);
                     Logger?.ILog("File moved successfully");
 
                     this.WorkingFile = destination;
@@ -267,7 +267,7 @@ namespace FileFlows.Plugin
                         Logger?.ILog("Initing new moved file");
                         InitFile(destination);
                     }
-                    catch (Exception ex) { }
+                    catch (Exception) { }
 
                     moved = true;
                 }

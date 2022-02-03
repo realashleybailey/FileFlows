@@ -619,11 +619,11 @@ return 2;
 let MAX_BITRATE = 3_000_000; // bitrate is 3,000 KBps
 
 let vi = Variables.vi?.VideoInfo;
-if(!vi)
+if(!vi || !vi.VideoStreams || !vi.VideoStreams[0])
 	return -1; // no video information found
 
 // get the video stream
-let bitrate = vi.VideoStreams[0]?.Bitrate;
+let bitrate = vi.VideoStreams[0].Bitrate;
 
 if(!bitrate)
 {

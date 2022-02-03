@@ -163,10 +163,7 @@ public class Runner
         Info.LibraryFile.Status = status;
         if(status == FileStatus.Processed)
         {
-            Info.LibraryFile.FinalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : nodeParameters.WorkingFileSize;
-            Logger.Instance?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
-            Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
-            Logger.Instance?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
+            CalculateFinalSize();
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
         else if(status == FileStatus.ProcessingFailed)
@@ -324,6 +321,7 @@ public class Runner
                         // flow has completed
                         nodeParameters.Result = NodeResult.Success;
                         SetStatus(FileStatus.Processed);
+                        nodeParameters.Logger?.DLog("flow status set to processed");
                         return;
                     }
 
@@ -341,6 +339,7 @@ public class Runner
             {
                 nodeParameters.Result = NodeResult.Failure;
                 nodeParameters.Logger?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                Logger.Instance?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 SetStatus(FileStatus.ProcessingFailed);
                 return;
             }

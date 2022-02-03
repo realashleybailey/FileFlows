@@ -178,7 +178,6 @@ public class Runner
         Info.LibraryFile.Status = status;
         if (status == FileStatus.Processed)
         {
-            CalculateFinalSize();
             Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
         }
         else if(status == FileStatus.ProcessingFailed)

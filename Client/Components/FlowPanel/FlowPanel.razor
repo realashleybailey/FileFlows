@@ -135,10 +135,20 @@
             break;
         case FormInputType.TextLabel:
             {
-                    var value = GetValue<object>(field.Name).ToString();
-                    var pre = GetParameter<bool>(field, nameof(InputTextLabel.Pre));
-                    var link = GetParameter<bool>(field, nameof(InputTextLabel.Link));
-                    <InputTextLabel Field=@field Label="@label" Value="@value" HideLabel=@hideLabel Pre=@pre Link=@link />
+                object oValue = GetValue<object>(field.Name);
+                string sValue = string.Empty;
+                if (oValue != null)
+                {
+                    if (oValue is long longValue)
+                        sValue = String.Format("{0:n0}", longValue);
+                    else if (oValue is int intValue)
+                        sValue = String.Format("{0:n0}", intValue);
+                    else
+                        sValue = oValue.ToString();
+                }
+                var pre = GetParameter<bool>(field, nameof(InputTextLabel.Pre));
+                var link = GetParameter<bool>(field, nameof(InputTextLabel.Link));
+                <InputTextLabel Field=@field Label="@label" Value="@sValue" HideLabel=@hideLabel Pre=@pre Link=@link />
             }
             break;
         case FormInputType.Label:

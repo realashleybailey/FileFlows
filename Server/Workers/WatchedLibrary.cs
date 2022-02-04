@@ -376,6 +376,7 @@ namespace FileFlows.Server.Workers
 
         private async Task<LibraryFile> GetLibraryFile(FileSystemInfo info, string fingerprint)
         {
+            long size = 0;
             if (info is FileInfo fileInfo)
             {
                 if (await CanAccess(fileInfo, Library.FileSizeDetectionInterval) == false)
@@ -383,6 +384,7 @@ namespace FileFlows.Server.Workers
                     Logger.Instance.DLog("Cannot access file: " + info.FullName);
                     return null; // this can happen if the file is currently being written to, next scan will retest it
                 }
+                size = fileInfo.Length;
             }
 
             int skip = Library.Path.Length;
@@ -425,6 +427,7 @@ namespace FileFlows.Server.Workers
                 IsDirectory = info is DirectoryInfo,
                 Fingerprint = fingerprint ?? string.Empty,
                 Duplicate = duplicate,
+                OriginalSize = size,
                 Library = new ObjectReference
                 {
                     Name = Library.Name,

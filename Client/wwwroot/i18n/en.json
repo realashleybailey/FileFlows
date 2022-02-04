@@ -215,7 +215,18 @@
     },
     "LibraryFile": {
       "Fields": {
-        "Log": "Log"
+        "Name": "Original File",
+        "Log": "Log",
+        "OriginalSize": "Original Size",
+        "OriginalSizeSuffix": "Bytes",
+        "FinalSize": "Final Size",
+        "FinalSizeSuffix": "Bytes",
+        "Fingerprint": "Fingerprint",
+        "Library": "Library",
+        "Status": "Status",
+        "Flow": "Flow",
+        "ProcessingTime": "Processing Time",
+        "OutputPath": "Output Path"
       }
     },
     "LibraryFiles": {

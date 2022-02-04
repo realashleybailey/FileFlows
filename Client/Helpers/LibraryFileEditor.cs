@@ -1,8 +1,11 @@
 namespace FileFlows.Client.Helpers
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using FileFlows.Client.Components;
+    using FileFlows.Client.Components.Common;
+    using FileFlows.Plugin;
     using FileFlows.Shared;
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared.Models;
@@ -60,20 +63,113 @@ namespace FileFlows.Client.Helpers
                 blocker.Hide();
             }
 
+
+            if(item.Status == FileStatus.ProcessingFailed || item.Status == FileStatus.Processing || item.Status == FileStatus.Processed)
+            {
+                // show tabs
+                var tabs = new Dictionary<string, List<ElementField>>();
+
+                tabs.Add("Info", GetInfoTab(item));
+
+                tabs.Add("Log", new List<ElementField>
+                {
+                    new ElementField
+                    {
+                        InputType = FileFlows.Plugin.FormInputType.LogView,
+                        Name = "Log",
+                        Parameters = item.Status == FileStatus.Processing ? new Dictionary<string, object> {
+                            { nameof(Components.Inputs.InputLogView.RefreshUrl), logUrl },
+                            { nameof(Components.Inputs.InputLogView.RefreshSeconds), 5 },
+                        } : null
+                    }
+                });
+
+                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true);
+            }
+            else
+            {
+                // just show basic info
+                await editor.Open("Pages.LibraryFile", model.RelativePath, GetInfoTab(item), model, large: true, readOnly: true);
+            }
+        }
+
+        private static List<ElementField> GetInfoTab(LibraryFile item)
+        {
             List<ElementField> fields = new List<ElementField>();
 
-            bool processing = model.Status == FileStatus.Processing;
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.LogView,
-                Name = "Log",
-                Parameters = processing ? new Dictionary<string, object> {
-                    { nameof(Components.Inputs.InputLogView.RefreshUrl), logUrl },
-                    { nameof(Components.Inputs.InputLogView.RefreshSeconds), 5 },
-                } : null
+                InputType = FormInputType.TextLabel,
+                Name = nameof(item.Name)
             });
 
-            await editor.Open("Pages.LibraryFile", model.Name, fields, model, large: true, readOnly: true);
+            if (item.Name != item.OutputPath && string.IsNullOrEmpty(item.OutputPath) == false)
+            {
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.OutputPath)
+                });
+            }
+
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.TextLabel,
+                Name = nameof(item.OriginalSize)
+            });
+
+            if (item.Status == FileStatus.Processed)
+            {
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.FinalSize)
+                });
+            }
+
+            if (string.IsNullOrEmpty(item.Fingerprint) == false)
+            {
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.Fingerprint)
+                });
+            }
+
+            if (string.IsNullOrEmpty(item.Flow?.Name) == false)
+            {
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.Flow)
+                });
+            }
+
+            if (string.IsNullOrEmpty(item.Library?.Name) == false)
+            {
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.Library)
+                });
+            }
+
+            if (item.ProcessingTime.TotalMilliseconds > 0)
+            {
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.ProcessingTime)
+                });
+            }
+
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.TextLabel,
+                Name = nameof(item.Status)
+            });
+
+            return fields;
         }
     }
 

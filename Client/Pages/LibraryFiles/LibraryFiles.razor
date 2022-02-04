@@ -55,7 +55,7 @@
         <FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple"
             DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
             <ToolBar>                    
-                <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.Log" />
+                <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
                 @if(SelectedStatus == FileStatus.Duplicate)
                 {                    
                     <FlowTableButton TItem="LibraryFile" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />           

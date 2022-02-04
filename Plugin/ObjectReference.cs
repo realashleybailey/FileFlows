@@ -7,5 +7,7 @@
         public string Name { get; set; }
         public Guid Uid { get; set; }
         public string Type { get; set; }
+
+        public override string ToString() => Name ?? string.Empty;
     }
 }

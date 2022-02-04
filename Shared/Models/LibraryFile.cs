@@ -12,6 +12,7 @@ namespace FileFlows.Shared.Models
         public ObjectReference Flow { get; set; }
 
         public ObjectReference Library { get; set; }
+        public ObjectReference Duplicate { get; set; }
 
         public long OriginalSize { get; set; }
         public long FinalSize { get; set; }
@@ -51,5 +52,6 @@ namespace FileFlows.Shared.Models
         Processing = 2,
         FlowNotFound = 3,
         ProcessingFailed = 4,
+        Duplicate = 5
     }
 }

@@ -95,6 +95,8 @@ namespace FileFlows.Plugin
             return PathMapper(path);
         }
 
+
+        private bool initDone = false;
         private void InitFile(string filename)
         {
             if (Fake) return;
@@ -103,51 +105,64 @@ namespace FileFlows.Plugin
                 if (IsDirectory)
                 {
                     var di = new DirectoryInfo(filename);
-                    var diOriginal = new DirectoryInfo(FileName);
                     UpdateVariables(new Dictionary<string, object> {
                         { "folder.Name", di.Name ?? "" },
-                        { "folder.FullName", di.FullName ?? "" },
-
-                        { "folder.Date", diOriginal.CreationTime },
-                        { "folder.Date.Year", diOriginal.CreationTime.Year },
-                        { "folder.Date.Month", diOriginal.CreationTime.Month },
-                        { "folder.Date.Day", diOriginal.CreationTime.Day},
-
-                        { "folder.Orig.Name", diOriginal.Name ?? "" },
-                        { "folder.Orig.FullName", diOriginal.FullName ?? "" },
+                        { "folder.FullName", di.FullName ?? "" }
                     });
+                    if(initDone == false)
+                    {
+                        initDone = true;
+                        var diOriginal = new DirectoryInfo(this.FileName);
+                        UpdateVariables(new Dictionary<string, object> {
+                            { "folder.Date", diOriginal.CreationTime },
+                            { "folder.Date.Year", diOriginal.CreationTime.Year },
+                            { "folder.Date.Month", diOriginal.CreationTime.Month },
+                            { "folder.Date.Day", diOriginal.CreationTime.Day},
+
+                            { "folder.Orig.Name", diOriginal.Name ?? "" },
+                            { "folder.Orig.FullName", diOriginal.FullName ?? "" },
+                        });
+
+                    }
                 }
                 else
                 {
                     var fi = new FileInfo(filename);
-                    var fiOriginal = new FileInfo(FileName);
                     UpdateVariables(new Dictionary<string, object> {
                         { "ext", fi.Extension ?? "" },
                         { "file.Name", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
                         { "file.FullName", fi.FullName ?? "" },
                         { "file.Extension", fi.Extension ?? "" },
                         { "file.Size", fi.Exists ? fi.Length : 0 },
-                        { "file.Create", fiOriginal.CreationTime },
-                        { "file.Create.Year", fiOriginal.CreationTime.Year },
-                        { "file.Create.Month", fiOriginal.CreationTime.Month },
-                        { "file.Create.Day", fiOriginal.CreationTime.Day },
-
-                        { "file.Modified", fiOriginal.LastWriteTime },
-                        { "file.Modified.Year", fiOriginal.LastWriteTime.Year },
-                        { "file.Modified.Month", fiOriginal.LastWriteTime.Month },
-                        { "file.Modified.Day", fiOriginal.LastWriteTime.Day },
-
-                        { "file.Orig.Extension", fiOriginal.Extension ?? "" },
-                        { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
-                        { "file.Orig.FullName", fiOriginal.FullName ?? "" },
-                        { "file.Orig.Size", fiOriginal.Exists ? fiOriginal.Length : 0 },
 
                         { "folder.Name", fi.Directory?.Name ?? "" },
                         { "folder.FullName", fi.DirectoryName ?? "" },
-
-                        { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
-                        { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" },
                     });
+
+                    if(initDone == false)
+                    {
+                        initDone = true;
+                        var fiOriginal = new FileInfo(this.FileName);
+                        UpdateVariables(new Dictionary<string, object> {
+                            { "file.Create", fiOriginal.CreationTime },
+                            { "file.Create.Year", fiOriginal.CreationTime.Year },
+                            { "file.Create.Month", fiOriginal.CreationTime.Month },
+                            { "file.Create.Day", fiOriginal.CreationTime.Day },
+
+                            { "file.Modified", fiOriginal.LastWriteTime },
+                            { "file.Modified.Year", fiOriginal.LastWriteTime.Year },
+                            { "file.Modified.Month", fiOriginal.LastWriteTime.Month },
+                            { "file.Modified.Day", fiOriginal.LastWriteTime.Day },
+
+                            { "file.Orig.Extension", fiOriginal.Extension ?? "" },
+                            { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
+                            { "file.Orig.FullName", fiOriginal.FullName ?? "" },
+                            { "file.Orig.Size", fiOriginal.Exists? fiOriginal.Length: 0 },
+
+                            { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
+                            { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" }
+                        });
+                    }
                 }
             }
             catch (Exception) { }
@@ -164,10 +179,14 @@ namespace FileFlows.Plugin
         {
             if (Fake) return;
             if (this.WorkingFile == filename)
+            {
+                Logger?.ILog("Working file same as new filename: " + filename);
                 return;
+            }
             if (this.WorkingFile != this.FileName)
             {
                 this.WorkingFileSize = new FileInfo(filename).Length;
+                Logger?.ILog("New working file size: " + this.WorkingFileSize);
                 string fileToDelete = this.WorkingFile;
                 if (dontDelete == false)
                 {

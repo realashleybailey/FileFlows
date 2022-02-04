@@ -40,6 +40,9 @@
                         case FileStatus.OutOfSchedule:
                             <span class="icon far fa-calendar-times"></span>
                             break;
+                        case FileStatus.Duplicate:
+                            <span class="icon far fa-copy"></span>
+                            break;
 
                     }
 
@@ -53,6 +56,10 @@
             DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
             <ToolBar>                    
                 <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.Log" />
+                @if(SelectedStatus == FileStatus.Duplicate)
+                {                    
+                    <FlowTableButton TItem="LibraryFile" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />           
+                }
                 @if (SelectedStatus == FileStatus.Processing)
                 {
                     <FlowTableButton TItem="LibraryFile" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
@@ -74,7 +81,7 @@
             </ToolBar>
 
             <Columns>
-                <FlowTableColumn TItem="LibraryFile">
+                <FlowTableColumn TItem="LibraryFile" Hidden="(SelectedStatus == FileStatus.Duplicate)">
                     <Header>
                         @Globals.lblName
                     </Header>
@@ -82,7 +89,14 @@
                         <span>@item.RelativePath</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1)">
+                <FlowTableColumn TItem="LibraryFile" Hidden="(SelectedStatus != FileStatus.Duplicate)" Pre="true">
+                    <Header>
+                        @Globals.lblName
+                    </Header>
+                    <Cell Context="item">@item.Name
+@item.Duplicate?.Name</Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
                     <Header>
                         Flow
                     </Header>
@@ -114,7 +128,7 @@
                             
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed)" MobileWidth="5rem">
+                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Duplicate)" MobileWidth="5rem">
                     <Header>
                         Time
                     </Header>

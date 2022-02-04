@@ -81,7 +81,8 @@
       "Processing": "Processing",
       "Unprocessed": "Unprocessed",
       "FlowNotFound": "Flow Not Found",
-      "ProcessingFailed": "Processing Failed"
+      "ProcessingFailed": "Processing Failed",
+      "Duplicate": "Duplicate"
     },
     "ProcessingPriority": {
       "Lowest": "Lowest",

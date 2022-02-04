@@ -122,9 +122,11 @@ namespace FileFlows.Server.Workers
 
             // new file we can process
             var known = KnownFile(fullPath);
-            if (known.known)
+            if (known.libFile != null)
             {
-                return;
+                if(known.libFile.Name == fullPath)
+                    return; // complete duplciate
+                // duplicate file or file was moved, we treat this as a new entry to avoid scanning it again and again
             }
 
             Logger.Instance.ILog("WatchedLibrary: Changed event detected on file: " + fullPath);
@@ -132,7 +134,7 @@ namespace FileFlows.Server.Workers
             if (IsFileLocked(fullPath) == false)
             {
                 Logger.Instance.ILog("WatchedLibrary: Detected new file: " + fullPath);
-                _ = AddLibraryFile(fullPath, known.fingerprint);
+                _ = AddLibraryFile(fullPath, known.fingerprint, known.libFile);
             }
             else
             {
@@ -171,26 +173,26 @@ namespace FileFlows.Server.Workers
         }
 
 
-        private (bool known, string fingerprint) KnownFile(string file)
+        private (LibraryFile? libFile, string fingerprint) KnownFile(string file)
         {
             file = file.ToLower();
             var libFile = LibraryFiles.Where(x => x.Name.ToLower() == file).FirstOrDefault();
             if (libFile != null)
-                return (true, libFile.Fingerprint ?? string.Empty);
+                return (libFile, libFile.Fingerprint ?? string.Empty);
 
             if (Library.UseFingerprinting)
             {
                 string fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(file);
                 if(string.IsNullOrEmpty(fingerprint) == false)
                 {
-                    bool exists = LibraryFiles.Any(x => x.Fingerprint == fingerprint);
-                    if (exists == true)
-                        return (true, fingerprint);
+                    var existing = LibraryFiles.Where(x => x.Fingerprint == fingerprint).OrderBy(x => x.Status).FirstOrDefault();
+                    if (existing != null)
+                        return (existing, fingerprint);
                 }
-                return (false, fingerprint);
+                return (null, fingerprint);
             }
 
-            return (false, string.Empty);
+            return (null, string.Empty);
         }
 
         private bool IsFileLocked(string file)
@@ -337,7 +339,7 @@ namespace FileFlows.Server.Workers
             return incomplete == false;
         }
 
-        private async Task AddLibraryFile(string filename, string fingerprint)
+        private async Task AddLibraryFile(string filename, string fingerprint, LibraryFile duplicate)
         {
             //var flow = GetFlow();
             //if (flow == null) 
@@ -347,6 +349,16 @@ namespace FileFlows.Server.Workers
             //}
 
             var result = await GetLibraryFile(new FileInfo(filename), fingerprint);
+            if (duplicate != null)
+            {
+                result.Status  = FileStatus.Duplicate;
+                result.Duplicate = new ObjectReference
+                {
+                    Name = duplicate.Name,
+                    Uid = duplicate.Uid,
+                    Type = duplicate.GetType().FullName
+                };
+            }
             if(result != null)
                 await new LibraryFileController().AddMany(new[] { result });
         }
@@ -380,9 +392,28 @@ namespace FileFlows.Server.Workers
             if (Globals.IsWindows == false || Library.Path.Length != 3)
                 ++skip;
 
-            if(fingerprint == null && Library.UseFingerprinting)
+            var status = FileStatus.Unprocessed;
+            ObjectReference duplicate = new ObjectReference();
+            if (fingerprint == null && Library.UseFingerprinting)
             {
                 fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(info.FullName);
+                if (string.IsNullOrWhiteSpace(fingerprint) == false)
+                {
+                    // check if the fingerprint already exists
+                    var existing = (await new LibraryFileController().GetDataList()).Where(x => x.Fingerprint == fingerprint).FirstOrDefault();
+                    if(existing != null)
+                    {
+                        Logger.Instance.ILog("Duplicate library file found: " + existing.Name);
+                        status = FileStatus.Duplicate;
+                        duplicate = new ObjectReference
+                        {
+                            Name = existing.Name,
+                            Uid = existing.Uid,
+                            Type = existing.GetType().FullName
+                        };
+                    }
+                }
+                
             }
 
             string relative = info.FullName.Substring(skip);
@@ -390,9 +421,10 @@ namespace FileFlows.Server.Workers
             {
                 Name = info.FullName,
                 RelativePath = relative,
-                Status = FileStatus.Unprocessed,
+                Status = status,
                 IsDirectory = info is DirectoryInfo,
                 Fingerprint = fingerprint ?? string.Empty,
+                Duplicate = duplicate,
                 Library = new ObjectReference
                 {
                     Name = Library.Name,

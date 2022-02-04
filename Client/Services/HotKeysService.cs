@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System;
 
-namespace FileFlows.Client
+namespace FileFlows.Client.Services
 {
     public interface IHotKeysService
     {
@@ -16,8 +16,19 @@ namespace FileFlows.Client
     {
         private static readonly List<HotKey> RegisteredHotKeys = new List<HotKey>();
 
-        public static IJSRuntime jsRuntime { get; set; }
+        private IJSRuntime JsRuntime { get; set; }
 
+        public HotKeysService(IJSRuntime jsRuntime)
+        {
+            this.JsRuntime = jsRuntime;
+            jsRuntime.InvokeVoidAsync("eval", "window.addEventListener('keydown', (event) => { " +
+                "let tag = document.activeElement && document.activeElement.tagName ? document.activeElement.tagName.toLowerCase() : '';" +
+                "if(tag === 'input' || tag === 'textarea' || tag === 'select') return;" +
+                "let args = { Key: event.key, Shift: event.shiftKey, Ctrl: event.ctrlKey, Alt: event.altKey};" +
+                "console.log('hotkey:' , args);" +
+                "setTimeout(() => { DotNet.invokeMethodAsync('Client', 'HotkeysKeyDown', args)}, 1);" + // timeout here so we dont take the key
+                "})");
+        }
 
         public void RegisterHotkey(string name, string key, bool ctrl = false, bool alt = false, bool? shift = null, Action callback = null)
         {
@@ -61,17 +72,6 @@ namespace FileFlows.Client
             }
         }
 
-        internal static void Init(IJSRuntime jsRuntime)
-        {
-            HotKeysService.jsRuntime = jsRuntime;
-            jsRuntime.InvokeVoidAsync("eval", "window.addEventListener('keydown', (event) => { " +
-                "let tag = document.activeElement && document.activeElement.tagName ? document.activeElement.tagName.toLowerCase() : '';" +
-                "if(tag === 'input' || tag === 'textarea' || tag === 'select') return;" +
-                "let args = { Key: event.key, Shift: event.shiftKey, Ctrl: event.ctrlKey, Alt: event.altKey};" +
-                "console.log('hotkey:' , args);" + 
-                "setTimeout(() => { DotNet.invokeMethodAsync('Client', 'HotkeysKeyDown', args)}, 1);" + // timeout here so we dont take the key
-                "})");
-        }
     }
 
 

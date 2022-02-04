@@ -46,7 +46,9 @@
     "Output": "Output",
     "Input": "Input",
     "Node": "Node",
-    "BaseCodeOn": "Use Code Template"
+    "BaseCodeOn": "Use Code Template",
+    "CopyToClipboard": "Copy to clipboard",
+    "CopiedToClipboard": "Copied ''{text}'' to clipboard."
   },
   "Dialogs":{
     "FileBrowser": {

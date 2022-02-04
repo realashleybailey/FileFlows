@@ -13,6 +13,7 @@
     color: var(--accent);
     background:var(--base);
     position:relative;
+    word-break:break-all;
 }
 .flow-toast-error {
     color: var(--error);

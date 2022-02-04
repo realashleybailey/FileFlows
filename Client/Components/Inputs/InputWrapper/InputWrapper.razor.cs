@@ -7,11 +7,11 @@ namespace FileFlows.Client.Components.Inputs
 
     public partial class InputWrapper : ComponentBase
     {
-        [Parameter]
-        public IInput Input { get; set; }
+        [Parameter] public IInput Input { get; set; }
 
-        [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        [Parameter] public bool NoSpacing { get; set;}
+
+        [Parameter] public RenderFragment ChildContent { get; set; }
 
         private string HelpHtml = string.Empty;
         protected override void OnInitialized()

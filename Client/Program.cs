@@ -13,8 +13,9 @@ namespace FileFlows.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
-            builder.Services.AddSingleton<IHotKeysService>(new HotKeysService());
-            builder.Services.AddSingleton<INavigationService>(new NavigationService());
+            builder.Services.AddSingleton<IHotKeysService, HotKeysService>();
+            builder.Services.AddSingleton<INavigationService, NavigationService>();
+            builder.Services.AddSingleton<IClipboardService, ClipboardService>();
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

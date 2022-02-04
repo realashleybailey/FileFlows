@@ -5,6 +5,7 @@ namespace FileFlows.Client.Helpers
     using System.Threading.Tasks;
     using FileFlows.Client.Components;
     using FileFlows.Client.Components.Common;
+    using FileFlows.Client.Components.Inputs;
     using FileFlows.Plugin;
     using FileFlows.Shared;
     using FileFlows.Shared.Helpers;
@@ -115,7 +116,11 @@ namespace FileFlows.Client.Helpers
             fields.Add(new ElementField
             {
                 InputType = FormInputType.TextLabel,
-                Name = nameof(item.OriginalSize)
+                Name = nameof(item.OriginalSize),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputTextLabel.Formatter), nameof(FileSizeFormatter)  }
+                }
             });
 
             if (item.Status == FileStatus.Processed)
@@ -123,7 +128,11 @@ namespace FileFlows.Client.Helpers
                 fields.Add(new ElementField
                 {
                     InputType = FormInputType.TextLabel,
-                    Name = nameof(item.FinalSize)
+                    Name = nameof(item.FinalSize),
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputTextLabel.Formatter), nameof(FileSizeFormatter) }
+                    }
                 });
             }
 

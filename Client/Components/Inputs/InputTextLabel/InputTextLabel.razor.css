@@ -3,6 +3,14 @@
   margin: 0.4rem auto auto;
   color: rgba(var(--color-rgb), 0.7);
 }
+a:not(:hover) .fa-clipboard, span:not(:hover) .fa-clipboard {
+  display: none;
+}
+a .fa-clipboard, span .fa-clipboard {
+  color: var(--info);
+  padding-left: 0.25rem;
+  cursor: pointer;
+}
 
 .pre-text {
   white-space: pre-wrap;

@@ -1,1 +1,1 @@
-﻿a,span{display:block;margin:.4rem auto auto;color:rgba(var(--color-rgb),.7);}.pre-text{white-space:pre-wrap;}
+﻿a,span{display:block;margin:.4rem auto auto;color:rgba(var(--color-rgb),.7);}a:not(:hover) .fa-clipboard,span:not(:hover) .fa-clipboard{display:none;}a .fa-clipboard,span .fa-clipboard{color:var(--info);padding-left:.25rem;cursor:pointer;}.pre-text{white-space:pre-wrap;}

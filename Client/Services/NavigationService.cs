@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System;
 
-namespace FileFlows.Client
+namespace FileFlows.Client.Services
 {
     public interface INavigationService
     {
@@ -16,7 +16,12 @@ namespace FileFlows.Client
 
     public class NavigationService : INavigationService
     {
-        public static NavigationManager NavigationManager { get; set; }
+        private NavigationManager NavigationManager { get; set; }
+
+        public NavigationService(NavigationManager navigationManager)
+        {
+            this.NavigationManager = navigationManager;
+        }
 
         private readonly List<Func<Task<bool>>> _Callbacks = new List<Func<Task<bool>>>();
 

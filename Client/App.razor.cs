@@ -52,9 +52,6 @@ namespace FileFlows.Client
             DisplayWidth = dimensions.width;
             DisplayHeight = dimensions.height;
 
-            HotKeysService.Init(jsRuntime);
-            NavigationService.NavigationManager = NavigationManager;
-
 #if (DEMO)
             Settings = new FileFlows.Shared.Models.Settings
             {

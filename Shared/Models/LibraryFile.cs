@@ -2,6 +2,7 @@ namespace FileFlows.Shared.Models
 {
     using FileFlows.Plugin;
     using System;
+    using System.Collections.Generic;
 
     public class LibraryFile : FileFlowObject
     {
@@ -10,6 +11,11 @@ namespace FileFlows.Shared.Models
         public string OutputPath { get; set; }
 
         public ObjectReference Flow { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of nodes that were executed against this library file
+        /// </summary>
+        public List<ExecutedNode> ExecutedNodes { get; set; }
 
         public ObjectReference Library { get; set; }
         public ObjectReference Duplicate { get; set; }
@@ -53,5 +59,13 @@ namespace FileFlows.Shared.Models
         FlowNotFound = 3,
         ProcessingFailed = 4,
         Duplicate = 5
+    }
+
+    public class ExecutedNode
+    {
+        public string NodeName { get; set; }
+        public string NodeUid { get; set; }
+        public TimeSpan ProcessingTime { get; set; }
+        public int Output { get; set; }
     }
 }

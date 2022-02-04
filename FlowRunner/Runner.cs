@@ -27,7 +27,23 @@ public class Runner
     public delegate void FlowCompleted(Runner sender, bool success);
     public event FlowCompleted OnFlowCompleted;
     private NodeParameters nodeParameters;
-    private Node currentNode;
+
+    private Node CurrentNode;
+
+    private void RecordNodeExecution(string nodeName, string nodeUid, int output, TimeSpan duration)
+    {
+        if (Info.LibraryFile == null)
+            return;
+
+        Info.LibraryFile.ExecutedNodes ??= new List<ExecutedNode>();
+        Info.LibraryFile.ExecutedNodes.Add(new ExecutedNode
+        {
+            NodeName = nodeName,
+            NodeUid = nodeUid,
+            Output = output,
+            ProcessingTime = duration,
+        });
+    }
 
     public void Run()
     {
@@ -66,8 +82,8 @@ public class Runner
         nodeParameters?.Logger?.ILog("##### CANCELING FLOW!");
         CancellationToken.Cancel();
         Canceled = true;
-        if (currentNode != null)
-            currentNode.Cancel().Wait();
+        if (CurrentNode != null)
+            CurrentNode.Cancel().Wait();
     }
 
     public async Task Finish()
@@ -253,6 +269,9 @@ public class Runner
         StepChanged(step, part.Name);
         var pluginLoader = PluginService.Load();
 
+        // need to clear this incase the file is being reprocessed
+        Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
+
         while (count++ < 50)
         {
             if (CancellationToken.IsCancellationRequested || Canceled)
@@ -274,9 +293,9 @@ public class Runner
             {
 
                 nodeParameters.Logger?.DLog("Executing part:" + (part!.Name?.EmptyAsNull() ?? part!.GetType().FullName ?? "unknown"));
-                currentNode = LoadNode(part!);
+                CurrentNode = LoadNode(part!);
 
-                if (currentNode == null)
+                if (CurrentNode == null)
                 {
                     // happens when canceled    
                     nodeParameters.Logger?.ELog("Failed to load node: " + part.Name);
@@ -285,11 +304,27 @@ public class Runner
                     return;
                 }
                 ++step;
-                StepChanged(step, currentNode.Name);
+                StepChanged(step, CurrentNode.Name);
 
-                nodeParameters.Logger?.DLog("node: " + currentNode.Name);
+                nodeParameters.Logger?.DLog("node: " + CurrentNode.Name);
                 gotoFlow = null; // clear it, incase this node requests going to a different flow
-                int output = currentNode.Execute(nodeParameters);
+                
+                DateTime nodeStartTime = DateTime.Now;
+                int output = 0;
+                try
+                {
+                    output = CurrentNode.Execute(nodeParameters);
+                }
+                catch(Exception ex)
+                {
+                    output = -1;
+                    throw;
+                }
+                finally
+                {
+                    TimeSpan executionTime = DateTime.Now.Subtract(nodeStartTime);
+                    RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime);
+                }
 
                 if (gotoFlow != null)
                 {
@@ -323,7 +358,7 @@ public class Runner
                     if (output == -1)
                     {
                         // the execution failed                     
-                        nodeParameters.Logger?.ELog("node returned error code:", currentNode!.Name);
+                        nodeParameters.Logger?.ELog("node returned error code:", CurrentNode!.Name);
                         nodeParameters.Result = NodeResult.Failure;
                         SetStatus(FileStatus.ProcessingFailed);
                         return;

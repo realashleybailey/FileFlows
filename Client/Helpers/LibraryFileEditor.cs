@@ -76,11 +76,11 @@ namespace FileFlows.Client.Helpers
                 {
                     new ElementField
                     {
-                        InputType = FileFlows.Plugin.FormInputType.LogView,
+                        InputType = FormInputType.LogView,
                         Name = "Log",
                         Parameters = item.Status == FileStatus.Processing ? new Dictionary<string, object> {
-                            { nameof(Components.Inputs.InputLogView.RefreshUrl), logUrl },
-                            { nameof(Components.Inputs.InputLogView.RefreshSeconds), 5 },
+                            { nameof(InputLogView.RefreshUrl), logUrl },
+                            { nameof(InputLogView.RefreshSeconds), 5 },
                         } : null
                     }
                 });
@@ -177,6 +177,20 @@ namespace FileFlows.Client.Helpers
                 InputType = FormInputType.TextLabel,
                 Name = nameof(item.Status)
             });
+
+            if(item.ExecutedNodes?.Any() == true)
+            {
+
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.ExecutedNodes,
+                    Name = nameof(item.ExecutedNodes),
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputExecutedNodes.HideLabel), true }
+                    }
+                });
+            }
 
             return fields;
         }

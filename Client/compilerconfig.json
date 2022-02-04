@@ -186,5 +186,9 @@
   {
     "outputFile": "Shared/MainLayout/MainLayout.razor.css",
     "inputFile": "Shared/MainLayout/MainLayout.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputExecutedNodes/InputExecutedNodes.razor.css",
+    "inputFile": "Components/Inputs/InputExecutedNodes/InputExecutedNodes.razor.scss"
   }
 ]

@@ -31,7 +31,8 @@ namespace FileFlows.Plugin
         Slider = 18,
         Checklist = 19,
         TextLabel = 20,
-        Password = 21
+        Password = 21,
+        ExecutedNodes = 22
     }
 
 

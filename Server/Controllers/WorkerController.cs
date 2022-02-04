@@ -89,13 +89,11 @@ namespace FileFlows.Server.Controllers
                 {
                     info.LibraryFile.OutputPath = info.LibraryFile.OutputPath?.EmptyAsNull() ?? libfile.OutputPath;
 
-                    if (libfile.Fingerprint != info.LibraryFile.Fingerprint || libfile.FinalSize != info.LibraryFile.FinalSize || libfile.OutputPath != info.LibraryFile.OutputPath)
-                    {
-                        libfile.FinalSize = info.LibraryFile.FinalSize;
-                        libfile.OutputPath = info.LibraryFile.OutputPath;
-                        libfile.Fingerprint = info.LibraryFile.Fingerprint;
-                        await libfileController.Update(libfile);
-                    }
+                    libfile.FinalSize = info.LibraryFile.FinalSize;
+                    libfile.OutputPath = info.LibraryFile.OutputPath;
+                    libfile.Fingerprint = info.LibraryFile.Fingerprint;
+                    libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
+                    await libfileController.Update(libfile);
                 }
             }
         }

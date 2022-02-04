@@ -142,6 +142,12 @@
                 <InputTextLabel Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel Pre=@pre Link=@link Formatter="@formatter" />
             }
             break;
+        case FormInputType.ExecutedNodes:
+            {
+                var oValue = GetValue<List<ExecutedNode>>(field.Name);
+                <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel />
+            }
+            break;
         case FormInputType.Label:
             {
                 <div class="input-label">

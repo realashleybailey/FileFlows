@@ -1,0 +1,31 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<IEnumerable<ExecutedNode>>
+
+<InputWrapper Input="@this">
+
+    @if(Value?.Any() == true)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="name">Name</th>
+                    <th class="ndoe">Node</th>
+                    <th class="time">Time</th>
+                    <th class="output">Output</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in Value)
+                {
+                    <tr class="@(item.Output == -1 ? "output-error" : item.Output == 0 ? "output-exit" : "")">
+                        <td class="name">@item.NodeName</td>
+                        <td class="node">@FlowElement.FormatName(item.NodeUid)</td>
+                        <td class="time">@item.ProcessingTime</td>
+                        <td class="output">@item.Output</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</InputWrapper>

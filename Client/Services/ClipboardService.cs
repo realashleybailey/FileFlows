@@ -23,7 +23,7 @@ namespace FileFlows.Client.Services
 
         public async Task CopyToClipboard(string text)
         {
-            await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            await JsRuntime.InvokeVoidAsync("ff.copyToClipboard", text);
             Toast.ShowInfo(Translater.Instant("Labels.CopiedToClipboard", new { text }));
         }
     }

@@ -310,6 +310,7 @@ namespace FileFlows.Server.Workers
         }
         private bool ScanForFiles(Library library)
         {
+            Logger.Instance.DLog("Started searching directory for files: " + library.Path);
             var files = GetFiles(new DirectoryInfo(library.Path));
             List<string> known = new();
 

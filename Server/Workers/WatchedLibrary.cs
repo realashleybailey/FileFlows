@@ -101,6 +101,15 @@ namespace FileFlows.Server.Workers
                 }
                 else
                 {
+                    var file = new FileInfo(e.FullPath);
+                    if (file.Exists == false)
+                        return;
+                                        
+                    long size = file.Length;
+                    Thread.Sleep(5_000);
+                    if (size < file.Length)
+                        return; // if the file is being copied, we need to wait for that to finish, which will fire a new event
+
                     FileChangeEvent(e.FullPath);
                 }
             }
@@ -116,7 +125,6 @@ namespace FileFlows.Server.Workers
             {
                 if (fullPath.Contains("_UNPACK_"))
                     return; // dont log this, too many
-                //Logger.Instance.DLog("WatchedLibrary: File does not match library pattern: " + fullPath);
                 return;
             }
 
@@ -343,13 +351,6 @@ namespace FileFlows.Server.Workers
 
         private async Task AddLibraryFile(string filename, string fingerprint, LibraryFile duplicate)
         {
-            //var flow = GetFlow();
-            //if (flow == null) 
-            //{
-            //    ScanComplete = false; // was bad cant process this file cos no flow
-            //    return;
-            //}
-
             var result = await GetLibraryFile(new FileInfo(filename), fingerprint);
             if (duplicate != null)
             {
@@ -436,12 +437,6 @@ namespace FileFlows.Server.Workers
                     Uid = Library.Uid,
                     Type = Library.GetType()?.FullName ?? string.Empty
                 },
-                //Flow = new ObjectReference
-                //{
-                //    Name = flow.Name,
-                //    Uid = flow.Uid,
-                //    Type = flow.GetType()?.FullName ?? string.Empty
-                //},
                 Order = -1
             };
 

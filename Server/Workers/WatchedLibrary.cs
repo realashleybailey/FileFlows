@@ -68,7 +68,7 @@ namespace FileFlows.Server.Workers
                     if (dtKnownAge < DateTime.Now.AddSeconds(-30))
                     {
                         var libFiles = new LibraryFileController().GetData().Result;
-                        knownFiles = libFiles.ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
+                        knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
                         knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
                                                     .DistinctBy(x => x.Value.Fingerprint)
                                                     .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });

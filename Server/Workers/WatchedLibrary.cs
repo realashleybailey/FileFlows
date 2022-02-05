@@ -64,8 +64,11 @@ namespace FileFlows.Server.Workers
                     if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
                         continue;
 
-                    if (fullpath.ToLower().StartsWith(Library.Path.ToLower()))
+                    if (fullpath.ToLower().StartsWith(Library.Path.ToLower()) == false)
+                    {
+                        Logger.Instance?.ILog($"Library file \"{fullpath}\" no longer belongs to library \"{Library.Path}\"");
                         continue; // library was changed
+                    }
 
                     DateTime dtTotal = DateTime.Now;
 

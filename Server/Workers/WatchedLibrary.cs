@@ -341,8 +341,7 @@ namespace FileFlows.Server.Workers
                 }
 
                 Logger.Instance.DLog("New unknown file: " + file.FullName);
-                var task = Task.Run(async () => await GetLibraryFile(file, null));
-                tasks.Add(task);
+                tasks.Add(GetLibraryFile(file, null));
             }
             Task.WaitAll(tasks.ToArray());
 

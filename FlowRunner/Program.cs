@@ -1,5 +1,6 @@
 ﻿using FileFlows.Plugin;
 using FileFlows.ServerShared.Services;
+using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -31,13 +32,14 @@ namespace FileFlows.FlowRunner
                 string baseUrl = GetArgument(args, "--baseUrl");
                 if (string.IsNullOrEmpty(baseUrl))
                     throw new Exception("baseUrl not set");
-                Console.WriteLine("Base URL: " + baseUrl);
+                LogInfo("Base URL: " + baseUrl);
                 Service.ServiceBaseUrl = baseUrl;
 
 
                 string hostname = GetArgument(args, "--hostname");
                 if(string.IsNullOrWhiteSpace(hostname))
                     hostname = Environment.MachineName;
+
 
                 string workingDir = Path.Combine(tempPath, "Runner-" + uid);
                 Directory.CreateDirectory(workingDir);
@@ -49,17 +51,17 @@ namespace FileFlows.FlowRunner
             catch (Exception ex)
             {
                 exitCode = 1;
-                Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                LogInfo("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 while(ex.InnerException != null)
                 {
-                    Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    LogInfo("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                     ex = ex.InnerException;
                 }
                 return;
             }
             finally
             {
-                Console.WriteLine("Exit Code: " + exitCode);
+                LogInfo("Exit Code: " + exitCode);
                 Environment.ExitCode = exitCode;
             }
         }
@@ -82,19 +84,19 @@ namespace FileFlows.FlowRunner
             try
             {
                 string address = isServer ? "INTERNAL_NODE" : hostname;
-                Console.WriteLine("Address: "+ address);
+                LogInfo("Address: "+ address);
                 var nodeTask = nodeService.GetByAddress(address);
-                Console.WriteLine("Waiting on node task");
+                LogInfo("Waiting on node task");
                 nodeTask.Wait();
-                Console.WriteLine("Completed node task");
+                LogInfo("Completed node task");
                 node = nodeTask.Result;
                 if (node == null)
                     throw new Exception("Failed to load node!!!!");
-                Console.WriteLine("Node SignalrUrl: " + node.SignalrUrl);
+                LogInfo("Node SignalrUrl: " + node.SignalrUrl);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to register node: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                LogInfo("Failed to register node: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 throw;
             }
 
@@ -104,7 +106,7 @@ namespace FileFlows.FlowRunner
             var libFile = libFileService.Get(libfileUid).Result;
             if (libFile == null)
             {
-                Console.WriteLine("Library file not found, must have been deleted from the library files.  Nothing to process");
+                LogInfo("Library file not found, must have been deleted from the library files.  Nothing to process");
                 return; // nothing to process
             }
 
@@ -115,7 +117,7 @@ namespace FileFlows.FlowRunner
             var lib = libService.Get(libFile.Library.Uid).Result;
             if (lib == null)
             {
-                Console.WriteLine("Library was null, deleting library file");
+                LogInfo("Library was null, deleting library file");
                 libfileService.Delete(libFile.Uid).Wait();
                 return;
             }
@@ -124,7 +126,7 @@ namespace FileFlows.FlowRunner
             FileSystemInfo file = lib.Folders ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
             if (file.Exists == false)
             {
-                Console.WriteLine("Library file does not exist, deleting from library files: " + file.FullName);
+                LogInfo("Library file does not exist, deleting from library files: " + file.FullName);
                 libfileService.Delete(libFile.Uid).Wait();
                 return;
             }
@@ -132,7 +134,7 @@ namespace FileFlows.FlowRunner
             var flow = flowService.Get(lib.Flow?.Uid ?? Guid.Empty).Result;
             if (flow == null || flow.Uid == Guid.Empty)
             {
-                Console.WriteLine("Flow not found, cannot process file: " + file.FullName);
+                LogInfo("Flow not found, cannot process file: " + file.FullName);
                 libFile.Status = FileStatus.FlowNotFound;
                 libfileService.Update(libFile).Wait();
                 return;
@@ -173,7 +175,7 @@ namespace FileFlows.FlowRunner
                 InitialSize = lib.Folders ? GetDirectorySize(workingFile) : new FileInfo(workingFile).Length
             };
 
-            Console.WriteLine("Initial Size: " + info.InitialSize);  
+            LogInfo("Initial Size: " + info.InitialSize);  
 
             var runner = new Runner(info, flow, node, workingDir);
             runner.Run();
@@ -189,9 +191,15 @@ namespace FileFlows.FlowRunner
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed retrieving directory size: " + ex.Message);
+                LogInfo("Failed retrieving directory size: " + ex.Message);
                 return 0;
             }
+        }
+
+
+        internal static void LogInfo(string message)
+        {
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - INFO -> " + message);
         }
     }
 }

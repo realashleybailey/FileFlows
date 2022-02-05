@@ -455,9 +455,9 @@ public class Runner
                         try
                         {
 
-                            nodeParameters.Logger?.ILog("Trying to move file: " + dll.FullName + " to " + destDir);
+                            nodeParameters.Logger?.ILog("Trying to move file: \"" + dll.FullName + "\" to \"" + destDir + "\"");
                             dll.MoveTo(Path.Combine(destDir, dll.Name));
-                            nodeParameters.Logger?.ILog("Moved file: " + dll.FullName + " to " + destDir);
+                            nodeParameters.Logger?.ILog("Moved file: \"" + dll.FullName + "\" to \"" + destDir + "\"");
                         }
                         catch (Exception ex)
                         {

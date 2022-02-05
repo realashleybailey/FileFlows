@@ -1,8 +1,69 @@
-div {
+div.row {
     flex-grow:1;
+    flex-direction:column;
 }
 pre {
     height:100%;
     color:var(--color);
     overflow: visible;
+}
+
+::deep {
+    .line {
+        display: block;
+        white-space: pre;
+        font-family: monospace;
+
+        * {
+            white-space: pre;
+        }
+    }
+
+    .key {
+        color: var(--pink);
+    }
+
+    .value {
+        color:rgba(var(--color-rgb), 0.6);
+    }
+
+    .http-method {
+        color: var(--yellow);
+    }
+
+    .heading {
+        color: var(--info);
+    }
+
+    .date {
+        color: var(--info);
+    }
+    .logtype-INFO {
+        color: var(--success);
+    }
+    .logtype-ERRR {
+        color: var(--error);
+    }
+    .logtype-WARN {
+        color: var(--warning);
+    }
+    .logtype-DBUG{
+        color: var(--debug);
+    }
+    .url {
+        color:var(--blue);
+        text-decoration:underline;
+    }
+    .file {
+        color:var(--blue);
+    }
+    .time {
+        color:var(--yellow);
+    }
+
+
+
+    .arrow {
+        font-weight: bold;
+    }
 }

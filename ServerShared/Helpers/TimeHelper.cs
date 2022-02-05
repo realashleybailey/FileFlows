@@ -29,6 +29,7 @@
             //return TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserTimeZone);
         }
 
+
         public static bool InSchedule(string schedule)
         {
             if (string.IsNullOrEmpty(schedule) || schedule.Length != 672)

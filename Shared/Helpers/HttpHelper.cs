@@ -49,10 +49,10 @@ namespace FileFlows.Shared.Helpers
         private static void Log(string message)
         {
             var logger = Logger ?? Shared.Logger.Instance;
-            if(logger != null)
+            if (logger != null)
                 logger.ILog(message);
             else
-                Console.WriteLine(message);
+                Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - INFO -> " + message);
         }
 
         private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null, int timeoutSeconds = 0, bool noLog = false)

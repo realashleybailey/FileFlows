@@ -89,7 +89,6 @@
             {
                 try
                 {
-
 #pragma warning disable CS8601 // Possible null reference assignment.
                     var parameters = new string[]
                     {

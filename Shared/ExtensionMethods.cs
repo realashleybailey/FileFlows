@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace FileFlows.Shared
 {
     public static class ExtensionMethods
@@ -12,6 +14,12 @@ namespace FileFlows.Shared
         public static string? EmptyAsNull(this string str)
         {
             return str == string.Empty ? null : str;
+        }
+
+        public static bool TryMatch(this Regex regex, string input, out Match match)
+        {
+            match = regex.Match(input ?? string.Empty);
+            return match.Success;
         }
     }
 }

@@ -190,5 +190,9 @@
   {
     "outputFile": "Components/Inputs/InputExecutedNodes/InputExecutedNodes.razor.css",
     "inputFile": "Components/Inputs/InputExecutedNodes/InputExecutedNodes.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputLogView/InputLogView.razor.css",
+    "inputFile": "Components/Inputs/InputLogView/InputLogView.razor.scss"
   }
 ]

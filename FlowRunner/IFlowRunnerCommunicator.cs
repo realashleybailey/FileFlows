@@ -19,7 +19,7 @@ namespace FileFlows.FlowRunner
         public FlowRunnerCommunicator(Guid libraryFileUid)
         {
             this.LibraryFileUid = libraryFileUid;
-            Console.WriteLine("SignalrUrl:" + SignalrUrl);
+            Program.LogInfo("SignalrUrl: " + SignalrUrl);
             connection = new HubConnectionBuilder()
                                 .WithUrl(new Uri(SignalrUrl))
                                 .WithAutomaticReconnect()
@@ -47,13 +47,13 @@ namespace FileFlows.FlowRunner
 
         private Task Connection_Closed(Exception? arg)
         {
-            Console.WriteLine("Connection_Closed");
+            Program.LogInfo("Connection_Closed");
             return Task.CompletedTask;
         }
 
         private void Connection_Received(string obj)
         {
-            Console.WriteLine("Connection_Received", obj);
+            Program.LogInfo("Connection_Received");
         }
 
         public async Task LogMessage(Guid runnerUid, string message)

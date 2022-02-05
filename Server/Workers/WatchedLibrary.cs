@@ -325,7 +325,8 @@ namespace FileFlows.Server.Workers
                     known.Add(libFile.OutputPath.ToLower());
             }
             bool incomplete = false;
-            var tasks = new List<Task<LibraryFile>>();
+            var tasks = new List<Task>();
+            Random random = new Random(DateTime.Now.Millisecond);
             foreach (var file in files)
             {
                 if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
@@ -341,11 +342,17 @@ namespace FileFlows.Server.Workers
                 }
 
                 Logger.Instance.DLog("New unknown file: " + file.FullName);
-                tasks.Add(GetLibraryFile(file, null));
+                tasks.Add(Task.Run(async () => {
+                    var result = await GetLibraryFile(file, null);
+                    if (result == null)
+                        return;
+                    await Task.Delay(random.Next(10, 3_000)); // just so we dont hammer it
+                    await new LibraryFileController().Update(result);
+                }));
             }
             Task.WaitAll(tasks.ToArray());
 
-            new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
+            //new LibraryFileController().AddMany(tasks.Where(x => x.Result != null).Select(x => x.Result).ToArray()).Wait();
 
             return incomplete == false;
         }

@@ -246,7 +246,7 @@ namespace FileFlows.Server.Workers
             if (fullScan == false)
                 fullScan = Library.LastScanned < DateTime.Now.AddHours(-1); // do a full scan every hour just incase we missed something
 
-            if (Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
+            if (fullScan == false && Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
                 return false;
 
             if (UseScanner == false && ScanComplete && fullScan == false)

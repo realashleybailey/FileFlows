@@ -60,8 +60,12 @@ namespace FileFlows.Server.Workers
                         continue;
                     }
 
+
                     if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
                         continue;
+
+                    if (fullpath.ToLower().StartsWith(Library.Path.ToLower()))
+                        continue; // library was changed
 
                     DateTime dtTotal = DateTime.Now;
 

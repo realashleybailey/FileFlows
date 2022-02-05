@@ -462,8 +462,19 @@ namespace FileFlows.Server.Workers
                         return false; // file size has changed, could still be being written too
                     }
                 }
-                using (var fs = File.Open(file.FullName, FileMode.Open, FileAccess.ReadWrite))
+
+                using (var fs = File.Open(file.FullName, FileMode.Open))
                 {
+                    if(fs.CanRead)
+                    {
+                        Logger.Instance.ILog("Cannot read file: " + file.FullName);
+                        return false;
+                    }
+                    if (fs.CanWrite)
+                    {
+                        Logger.Instance.ILog("Cannot write file: " + file.FullName);
+                        return false;
+                    }
                 }
 
                 return true;

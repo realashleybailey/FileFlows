@@ -292,7 +292,6 @@ public class Runner
             try
             {
 
-                nodeParameters.Logger?.DLog("Executing part:" + (part!.Name?.EmptyAsNull() ?? part!.GetType().FullName ?? "unknown"));
                 CurrentNode = LoadNode(part!);
 
                 if (CurrentNode == null)
@@ -306,7 +305,10 @@ public class Runner
                 ++step;
                 StepChanged(step, CurrentNode.Name);
 
-                nodeParameters.Logger?.DLog("node: " + CurrentNode.Name);
+                nodeParameters.Logger?.ILog(new string('=', 70));
+                nodeParameters.Logger?.ILog($"Executing Node {(Info.LibraryFile.ExecutedNodes.Count + 1)}: {part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name}");
+                nodeParameters.Logger?.ILog(new string('=', 70));
+
                 gotoFlow = null; // clear it, incase this node requests going to a different flow
                 
                 DateTime nodeStartTime = DateTime.Now;

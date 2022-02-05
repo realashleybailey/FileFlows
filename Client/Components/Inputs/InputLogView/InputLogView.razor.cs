@@ -75,15 +75,11 @@ namespace FileFlows.Client.Components.Inputs
             StringBuilder colorized = new StringBuilder();
             if (string.IsNullOrWhiteSpace(PreviousValue) == false && log.StartsWith(PreviousValue))
             {
-                PreviousValue = log;
                 // this avoid us from redoing stuff we've already done
-                colorized.Append(this.Value);
+                colorized.Append(this.Colorized);
                 log = log.Substring(PreviousValue.Length).TrimStart();
             }
-            else
-            {
-                PreviousValue = log;
-            }
+            PreviousValue = log;
 
 
             foreach (var line in log.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
@@ -104,7 +100,7 @@ namespace FileFlows.Client.Components.Inputs
         }
 
         Regex regTime = new Regex(@"[\d]{2}:[\d]{2}:[\d]{2}\.[\d]+");
-        Regex regKeyValue = new Regex(@"^([^\s][^:]+[^\s]):([\s].*?$)?$");
+        Regex regKeyValue = new Regex(@"^([^\s\[][^:]+[^\s]):([\s].*?$)?$");
         Regex regDatedLine = new Regex(@"^([\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}\.[\d]{4}) - (INFO|WARN|DBUG|ERRR) -> (.*?$)");
         Regex regHttpMethods = new Regex(@"\[(GET|POST|PUT|DELETE)\]");
         Regex regUrl = new Regex(@"(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?");
@@ -135,6 +131,7 @@ namespace FileFlows.Client.Components.Inputs
                 string value = kvMatch.Groups[2].Value;
                 section = "<span class=\"key\">" + ColorizeSection(key) + ":</span>" +
                           "<span class=\"value\">" + ColorizeSection(value) + "</span>";
+                return section;
             }
             else
             {
@@ -152,6 +149,7 @@ namespace FileFlows.Client.Components.Inputs
         private string HtmlEncode(string input)
         {
             input = HttpUtility.HtmlEncode(input);
+            input = input.Replace("&quot;", "\""); // dont need to encode this, make matching regexes harder
             return input;
 
         }

@@ -38,7 +38,7 @@ namespace FileFlows.FlowRunner
                 _ => ""
             };
 
-            string message = TimeHelper.UserNow().ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - " + prefix + " -> " +
+            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + prefix + " -> " +
                 string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :

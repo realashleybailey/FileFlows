@@ -2,9 +2,7 @@ namespace FileFlows.Server.Workers
 {
     using System;
     using System.Linq;
-    using System.Text;
     using FileFlows.Plugin;
-    using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
 
     public class FlowLogger : ILogger
@@ -26,7 +24,7 @@ namespace FileFlows.Server.Workers
         {
             if (args == null || args.Length == 0)
                 return;
-            string message = TimeHelper.UserNow().ToString("yyyy-MM-dd hh:mm:ss.ffff") + " - " + type + " -> " +
+            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + type + " -> " +
                 string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive || x is string ? x.ToString() :

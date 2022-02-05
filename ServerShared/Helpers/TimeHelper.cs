@@ -1,13 +1,10 @@
 ﻿namespace FileFlows.ServerShared.Helpers
 {
-    using NodaTime;
     public class TimeHelper
     {
-        public static string UserTimeZone { get; set; }
-
         public static int GetCurrentQuarter()
         {
-            DateTime date = UserNow();
+            DateTime date = DateTime.Now;
 
             int quarter = (((int)date.DayOfWeek) * 96) + (date.Hour * 4);
             if (date.Minute >= 45)
@@ -17,16 +14,6 @@
             else if (date.Minute >= 15)
                 quarter += 1;
             return quarter;
-        }
-
-        public static DateTime UserNow()
-        {
-            if (UserTimeZone == null)
-                return DateTime.UtcNow;
-
-            var instant = Instant.FromDateTimeUtc(DateTime.UtcNow);
-            return instant.InZone(DateTimeZoneProviders.Tzdb[UserTimeZone]).ToDateTimeUnspecified();
-            //return TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserTimeZone);
         }
 
 

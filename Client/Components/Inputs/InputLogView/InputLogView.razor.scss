@@ -47,15 +47,15 @@ pre {
     .logtype-WARN {
         color: var(--warning);
     }
-    .logtype-DBUG{
-        color: var(--debug);
+    .logtype-DBUG {
+        color: var(--blue);
     }
     .url {
         color:var(--blue);
         text-decoration:underline;
     }
     .file {
-        color:var(--blue);
+        color:var(--teal);
     }
     .time {
         color:var(--yellow);

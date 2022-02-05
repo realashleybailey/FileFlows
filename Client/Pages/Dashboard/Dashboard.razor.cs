@@ -45,7 +45,7 @@ namespace FileFlows.Client.Pages
 #if (DEMO)
             ConfiguredStatus = 2;
 #else
-            ConfiguredStatus = (await HttpHelper.Get<int>("/api/settings/is-configured?tz=" + TimeZoneInfo.Local.Id)).Data;
+            ConfiguredStatus = (await HttpHelper.Get<int>("/api/settings/is-configured")).Data;
 #endif
             lblLog = Translater.Instant("Labels.Log");
             lblCancel = Translater.Instant("Labels.Cancel");

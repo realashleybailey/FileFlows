@@ -42,14 +42,14 @@ pre {
   color: var(--warning);
 }
 ::deep .logtype-DBUG {
-  color: var(--debug);
+  color: var(--blue);
 }
 ::deep .url {
   color: var(--blue);
   text-decoration: underline;
 }
 ::deep .file {
-  color: var(--blue);
+  color: var(--teal);
 }
 ::deep .time {
   color: var(--yellow);

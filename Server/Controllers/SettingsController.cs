@@ -18,18 +18,12 @@ namespace FileFlows.Server.Controllers
         /// <summary>
         /// Whether or not the system is configured
         /// </summary>
-        /// <param name="timeZoneId">The string timezone ID of the system</param>
         /// <returns>return 2 if everything is configured, 1 if partially configured, 0 if not configured</returns>
         [HttpGet("is-configured")]
-        public async Task<int> IsConfigured([FromQuery(Name = "tz")] string timeZoneId)
+        public async Task<int> IsConfigured()
         {
             // this updates the TZ with the TZ from the client if not set
             var settings = await Get();
-            if (string.IsNullOrEmpty(settings.TimeZone))
-            {
-                settings.TimeZone = timeZoneId;
-                await Save(settings);
-            }
 
             var libs = new LibraryController().GetData().Result?.Any() == true;
             var flows = new FlowController().GetData().Result?.Any() == true;
@@ -80,7 +74,6 @@ namespace FileFlows.Server.Controllers
                 {
                     Instance = await DbManager.Single<Settings>();
 
-                    InitTimeZone(Instance);
                 }
                 Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 Instance.IsDocker = Program.Docker;
@@ -90,11 +83,6 @@ namespace FileFlows.Server.Controllers
             {
                 _mutex.ReleaseMutex();
             }
-        }
-
-        private void InitTimeZone(Settings settings)
-        {
-            TimeHelper.UserTimeZone = settings.TimeZone;
         }
 
         /// <summary>
@@ -113,7 +101,6 @@ namespace FileFlows.Server.Controllers
             model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             model.IsDocker = Program.Docker;
             Instance = model;
-            InitTimeZone(Instance);
             
             return await DbManager.Update(model);
         }

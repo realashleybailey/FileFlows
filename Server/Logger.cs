@@ -21,7 +21,7 @@ namespace FileFlows.Server
                 _ => ""
             };
 
-            var now = Helpers.TimeHelper.UserNow();
+            var now = DateTime.Now;
 
             string message = now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " [" + prefix + "] -> " + string.Join(", ", args.Select(x =>
                 x == null ? "null" :

@@ -111,7 +111,7 @@ namespace FileFlows.Server.Controllers
                     _ => ""
                 };
 
-                var now = Helpers.TimeHelper.UserNow();
+                var now = DateTime.Now;
 
                 string message = "[" + prefix + "] -> " + string.Join(", ", args.Select(x =>
                     x == null ? "null" :

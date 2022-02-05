@@ -479,9 +479,8 @@ namespace FileFlows.Server.Workers
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Logger.Instance.ILog("Error when trying to check file could be accessed: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return false;
             }
         }

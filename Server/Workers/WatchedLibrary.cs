@@ -106,7 +106,7 @@ namespace FileFlows.Server.Workers
                         return;
                                         
                     long size = file.Length;
-                    Thread.Sleep(5_000);
+                    Thread.Sleep(20_000);
                     if (size < file.Length)
                         return; // if the file is being copied, we need to wait for that to finish, which will fire a new event
 

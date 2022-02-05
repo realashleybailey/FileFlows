@@ -342,7 +342,7 @@ namespace FileFlows.Server.Controllers
             }
         }
 
-        internal Task<LibraryFile> Add(LibraryFile libraryFile) => DbHelper.Update(libraryFile);
+        internal Task<LibraryFile> Add(LibraryFile libraryFile) => base.Update(libraryFile);
 
         internal async Task AddMany(LibraryFile[] libraryFiles)
         {

@@ -134,9 +134,8 @@ namespace FileFlows.Server.Workers
                         }
                     }
 
-                    Logger.Instance.DLog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to get new library file: \"{fullpath}\"");
-
                     var result = new LibraryFileController().Add(lf).Result;
+
                     if(result != null && result.Uid != Guid.Empty)
                     {
                         knownFiles.Add(fullpath.ToLower(), result.Uid);
@@ -149,6 +148,12 @@ namespace FileFlows.Server.Workers
                                 Type = result.GetType()?.FullName ?? string.Empty
                             });
                         }
+                        Logger.Instance.DLog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to successfully add new library file: \"{fullpath}\"");
+                    }
+                    else
+                    {
+                        Logger.Instance.ELog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to fail to add new library file: \"{fullpath}\"");
+
                     }
                 }
                 catch (Exception ex)

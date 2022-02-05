@@ -1,6 +1,6 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
-@inherits ListPage<LibraryFile>
+@inherits ListPage<LibaryFileListModel>
 
 @page "/library-files"
 
@@ -52,36 +52,36 @@
             }
         </div>
 
-        <FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple"
+        <FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
             DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
             <ToolBar>                    
-                <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
+                <FlowTableButton TItem="LibaryFileListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
                 @if(SelectedStatus == FileStatus.Duplicate)
                 {                    
-                    <FlowTableButton TItem="LibraryFile" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />           
+                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />           
                 }
                 @if (SelectedStatus == FileStatus.Processing)
                 {
-                    <FlowTableButton TItem="LibraryFile" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
+                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
                 }
                 else
                 {
-                    <FlowTableButton TItem="LibraryFile" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
                 }
                 
                 @if (SelectedStatus == FileStatus.Unprocessed)
                 {
-                    <FlowTableButton TItem="LibraryFile" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
+                    <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
                 }
                 else if(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed)
                 {
-                    <FlowTableButton TItem="LibraryFile" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
+                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
                 }
-                <FlowTableHelpButton TItem="LibraryFile" HelpUrl="Library-Files" />
+                <FlowTableHelpButton TItem="LibaryFileListModel" HelpUrl="Library-Files" />
             </ToolBar>
 
             <Columns>
-                <FlowTableColumn TItem="LibraryFile" Hidden="(SelectedStatus == FileStatus.Duplicate)">
+                <FlowTableColumn TItem="LibaryFileListModel" Hidden="(SelectedStatus == FileStatus.Duplicate)">
                     <Header>
                         @Globals.lblName
                     </Header>
@@ -89,46 +89,46 @@
                         <span>@item.RelativePath</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Hidden="(SelectedStatus != FileStatus.Duplicate)" Pre="true">
+                <FlowTableColumn TItem="LibaryFileListModel" Hidden="(SelectedStatus != FileStatus.Duplicate)" Pre="true">
                     <Header>
                         @Globals.lblName
                     </Header>
                     <Cell Context="item">@item.Name
-@item.Duplicate?.Name</Cell>
+@item.Duplicate</Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
                     <Header>
                         Flow
                     </Header>
                     <Cell Context="item">
-                        <span>@item.Flow?.Name</span>
+                        <span>@item.Flow</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing)">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing)">
                     <Header>
                         Library
                     </Header>
                     <Cell Context="item">
-                        <span>@item.Library.Name</span>
+                        <span>@item.Library</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus != FileStatus.Processing)">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus != FileStatus.Processing)">
                     <Header>
                         Node
                     </Header>
                     <Cell Context="item">
-                        @if(item.Node?.Name == "FileFlowsServer")
+                        @if(item.Node == "FileFlowsServer")
                         {
                             <span>@lblFileFlowsServer</span>
                         }
                         else
                         {
-                            <span>@item.Node?.Name</span>
+                            <span>@item.Node</span>
                         }
                             
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Duplicate)" MobileWidth="5rem">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Duplicate)" MobileWidth="5rem">
                     <Header>
                         Time
                     </Header>
@@ -136,14 +136,14 @@
                         <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibraryFile" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
                     <Header>
                         Size
                     </Header>
                     <Cell Context="item">
                         @{
-                            long fs = item.FinalSize;
-                            long os = item.OriginalSize;
+                            long fs = item.FinalSize ?? 0;
+                            long os = item.OriginalSize ?? 0;
                             int width = (int)((((double)fs) / os) * 100);
                             bool bigger = width > 100;
                             if (width > 100)

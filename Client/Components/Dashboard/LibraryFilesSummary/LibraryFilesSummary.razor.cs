@@ -108,7 +108,7 @@
         }
         private async Task ShowFileInfo(LibraryFile file)
         {
-            await Helpers.LibraryFileEditor.Open(Dashboard.Blocker, Editor, file);
+            await Helpers.LibraryFileEditor.Open(Dashboard.Blocker, Editor, file.Uid);
 
         }
     }

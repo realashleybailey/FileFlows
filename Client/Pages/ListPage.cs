@@ -12,7 +12,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Client.Components.Common;
     using System;
 
-    public abstract class ListPage<T> : ComponentBase where T : FileFlowObject
+    public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
     {
         protected FlowTable<T> Table { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }
@@ -119,7 +119,10 @@ namespace FileFlows.Client.Pages
 
         public async Task Edit()
         {
-            var selected = Table.GetSelected()?.FirstOrDefault();
+            var items = Table.GetSelected();
+            if (items?.Any() != true)
+                return;
+            var selected = items.First();
             if (selected == null)
                 return;
             var changed = await Edit(selected);

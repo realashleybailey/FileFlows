@@ -51,6 +51,44 @@ namespace FileFlows.Server.Controllers
         }
 
         /// <summary>
+        /// Lists all of the library files, only intended for the UI
+        /// </summary>
+        /// <param name="status">The status to list</param>
+        /// <returns>a slimmed down list of files with only needed information</returns>
+        [HttpGet("list-all")]
+        public async Task<IEnumerable<LibaryFileListModel>> ListAll(FileStatus status)
+        {
+            var files = await GetAll(status);
+            return files.Select(x =>
+            {
+                var item = new LibaryFileListModel
+                {
+                    Uid = x.Uid,
+                    Flow = x.Flow?.Name,
+                    Library = x.Library?.Name,
+                    RelativePath = x.RelativePath,
+                    Name = x.Name
+                };
+
+                if (status == FileStatus.Processing)
+                    item.Node = x.Node?.Name;
+
+                if (status == FileStatus.Duplicate)
+                    item.Duplicate = x.Duplicate?.Name;
+
+                if (status == FileStatus.Processed)
+                {
+                    item.FinalSize = x.FinalSize;
+                    item.OriginalSize = x.OriginalSize;
+                    item.OutputPath = x.OutputPath;
+                    item.ProcessingTime = x.ProcessingTime;
+
+                }
+                return item;
+            });
+        }
+
+        /// <summary>
         /// Gets all library files in the system
         /// </summary>
         /// <param name="status">The status to get, if missing will return all library files</param>
@@ -108,7 +146,6 @@ namespace FileFlows.Server.Controllers
                 results = results.Skip(skip);
             if(top > 0)
                 results = results.Take(top);
-
 
 
             return results;

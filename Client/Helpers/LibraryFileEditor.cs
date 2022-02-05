@@ -36,14 +36,14 @@ namespace FileFlows.Client.Helpers
 #endif
         }
 
-        public static async Task Open(Blocker blocker, Editor editor, LibraryFile item)
+        public static async Task Open(Blocker blocker, Editor editor, Guid libraryItemUid)
         {
             LibraryFileModel model = null;
-            string logUrl = ApIUrl + "/" + item.Uid + "/log";
+            string logUrl = ApIUrl + "/" + libraryItemUid+ "/log";
             blocker.Show();
             try
             {
-                var result = await GetLibraryFile(ApIUrl + "/" + item.Uid);
+                var result = await GetLibraryFile(ApIUrl + "/" + libraryItemUid);
                 if (result.Success == false)
                 {
                     Toast.ShowError(
@@ -65,12 +65,12 @@ namespace FileFlows.Client.Helpers
             }
 
 
-            if(item.Status == FileStatus.ProcessingFailed || item.Status == FileStatus.Processing || item.Status == FileStatus.Processed)
+            if(model.Status == FileStatus.ProcessingFailed || model.Status == FileStatus.Processing || model.Status == FileStatus.Processed)
             {
                 // show tabs
                 var tabs = new Dictionary<string, List<ElementField>>();
 
-                tabs.Add("Info", GetInfoTab(item));
+                tabs.Add("Info", GetInfoTab(model));
 
                 tabs.Add("Log", new List<ElementField>
                 {
@@ -78,7 +78,7 @@ namespace FileFlows.Client.Helpers
                     {
                         InputType = FormInputType.LogView,
                         Name = "Log",
-                        Parameters = item.Status == FileStatus.Processing ? new Dictionary<string, object> {
+                        Parameters = model.Status == FileStatus.Processing ? new Dictionary<string, object> {
                             { nameof(InputLogView.RefreshUrl), logUrl },
                             { nameof(InputLogView.RefreshSeconds), 5 },
                         } : null
@@ -90,7 +90,7 @@ namespace FileFlows.Client.Helpers
             else
             {
                 // just show basic info
-                await editor.Open("Pages.LibraryFile", model.RelativePath, GetInfoTab(item), model, large: true, readOnly: true);
+                await editor.Open("Pages.LibraryFile", model.RelativePath, GetInfoTab(model), model, large: true, readOnly: true);
             }
         }
 

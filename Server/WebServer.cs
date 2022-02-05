@@ -38,6 +38,11 @@ namespace FileFlows.Server
             builder.Services.AddControllersWithViews();
             builder.Services.AddSignalR();
             builder.Services.AddResponseCompression();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault | System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+            });
 
             builder.Services.AddMvc();
             builder.Services.AddSwaggerGen(c =>

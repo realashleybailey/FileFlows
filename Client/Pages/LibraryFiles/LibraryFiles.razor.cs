@@ -11,7 +11,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Client.Components.Dialogs;
     using FileFlows.Plugin;
 
-    public partial class LibraryFiles : ListPage<LibraryFile>
+    public partial class LibraryFiles : ListPage<LibaryFileListModel>
     {
         public override string ApiUrl => "/api/library-file";
 
@@ -67,7 +67,7 @@ namespace FileFlows.Client.Pages
         }
 #endif
 
-        public override string FetchUrl => ApiUrl + "?status=" + SelectedStatus;
+        public override string FetchUrl => ApiUrl + "/list-all?status=" + SelectedStatus;
 
         private string NameMinWidth = "20ch";
 
@@ -131,9 +131,9 @@ namespace FileFlows.Client.Pages
             }
         }
 
-        public override async Task<bool> Edit(LibraryFile item)
+        public override async Task<bool> Edit(LibaryFileListModel item)
         {
-            await Helpers.LibraryFileEditor.Open(Blocker, Editor, item);
+            await Helpers.LibraryFileEditor.Open(Blocker, Editor, item.Uid);
             return false;
         }
 
@@ -146,7 +146,7 @@ namespace FileFlows.Client.Pages
             var selected = Table.GetSelected();
             var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
             if (uids.Length == 0)
-                return; // nothing to delete
+                return; // nothing to move
 
             Blocker.Show();
             try

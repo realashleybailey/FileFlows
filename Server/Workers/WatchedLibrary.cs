@@ -264,6 +264,8 @@ namespace FileFlows.Server.Workers
                 complete = ScanForFiles(Library);
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
 
+            Library.LastScanned = DateTime.Now;
+
             if(complete)
                 ScanComplete = Library.Folders == false; // only count a full scan against files
 

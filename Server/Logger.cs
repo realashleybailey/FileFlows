@@ -9,6 +9,8 @@ namespace FileFlows.Server
             return string.Join(Environment.NewLine , LogTail.ToArray());    
         }
 
+        private Mutex mutex = new Mutex();
+
         private enum LogType { Error, Warning, Debug, Info }
         private void Log(LogType type, object[] args)
         {
@@ -28,8 +30,20 @@ namespace FileFlows.Server
                 x.GetType().IsPrimitive ? x.ToString() :
                 x is string ? x.ToString() :
                 System.Text.Json.JsonSerializer.Serialize(x)));
-            Console.WriteLine(message);
-            LogTail.Enqueue(message);
+
+            mutex.WaitOne();
+            try
+            {
+#if (DEBUG)
+                File.AppendAllText("FileFlows.log", message + Environment.NewLine);
+#endif
+                Console.WriteLine(message);
+                LogTail.Enqueue(message);
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
         }
 
         public void ILog(params object[] args) => Log(LogType.Info, args);

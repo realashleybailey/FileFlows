@@ -63,7 +63,8 @@ namespace FileFlows.Server.Workers
                 var library = libraries.Where(x => libwatcher.Library.Uid == x.Uid).FirstOrDefault();
                 if (library != null)
                     libwatcher.UpdateLibrary(library);
-                scannedAny |= libwatcher.Scan();
+                //scannedAny |= libwatcher.Scan();
+                libwatcher.Scan();
             }
             if(scannedAny)
                 Logger.Instance.DLog("Finished scanning libraries");

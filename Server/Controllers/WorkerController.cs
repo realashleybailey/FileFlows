@@ -49,7 +49,7 @@ namespace FileFlows.Server.Controllers
             catch (Exception) { }
 
             info.Uid = Guid.NewGuid();
-            info.LastUpdate = DateTime.UtcNow;
+            info.LastUpdate = DateTime.Now;
             Executors.Add(info.Uid, info);
             return info;
         }
@@ -111,7 +111,7 @@ namespace FileFlows.Server.Controllers
                 var existing = lfController.Get(info.LibraryFile.Uid).Result;
                 if (existing != null)
                 {
-                    bool recentUpdate = existing.DateModified > DateTime.UtcNow.AddSeconds(-10);
+                    bool recentUpdate = existing.DateModified > DateTime.Now.AddSeconds(-10);
                     if ((existing.Status == FileStatus.ProcessingFailed && info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
                     {
                         existing = lfController.Update(info.LibraryFile).Result; // incase the status of the library file has changed                        
@@ -130,7 +130,7 @@ namespace FileFlows.Server.Controllers
                 }
             }
 
-            info.LastUpdate = DateTime.UtcNow;
+            info.LastUpdate = DateTime.Now;
             lock (Executors)
             {
                 if (CompletedExecutors.Contains(info.Uid))
@@ -282,7 +282,7 @@ namespace FileFlows.Server.Controllers
                     {
                         if (Executors.TryGetValue(uid, out FlowExecutorInfo? info))
                         {
-                            if (info == null || info.LastUpdate < DateTime.UtcNow.AddMinutes(-1))
+                            if (info == null || info.LastUpdate < DateTime.Now.AddMinutes(-1))
                             {
                                 // its gone quiet, kill it
                                 Executors.Remove(uid);

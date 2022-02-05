@@ -34,7 +34,7 @@ namespace FileFlows.Server.Helpers
         public static string Encrypt(string text)
         {
             byte[] clearBytes = Encoding.Unicode.GetBytes(text);
-            Random rand= new Random(DateTime.UtcNow.Millisecond);
+            Random rand= new Random(DateTime.Now.Millisecond);
             using (Aes encryptor = Aes.Create())
             {
                 byte[] IV = new byte[15];

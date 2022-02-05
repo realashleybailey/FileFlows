@@ -71,7 +71,7 @@ namespace FileFlows.Server.Helpers
                     installed.Add(pi.Name);
                     plugin.PackageName = pi.PackageName;
                     plugin.Version = pi.Version;
-                    plugin.DateModified = DateTime.UtcNow;
+                    plugin.DateModified = DateTime.Now;
                     plugin.Deleted = false;
                     plugin.Elements = pi.Elements;
                     plugin.Authors = pi.Authors;
@@ -96,8 +96,8 @@ namespace FileFlows.Server.Helpers
                         // new dll
                         Logger.Instance.ILog("Adding new plugin: " + pi.Name);
                         plugin.Name = pi.Name;
-                        plugin.DateCreated = DateTime.UtcNow;
-                        plugin.DateModified = DateTime.UtcNow;
+                        plugin.DateCreated = DateTime.Now;
+                        plugin.DateModified = DateTime.Now;
                         plugin.Enabled = true;
                         plugin.Uid = Guid.NewGuid();
                         controller.Update(plugin).Wait();
@@ -122,7 +122,7 @@ namespace FileFlows.Server.Helpers
                     Logger.Instance.DLog("Missing plugin: " + plugin.Name);
                     // mark as deleted.
                     plugin.Deleted = true;
-                    plugin.DateModified = DateTime.UtcNow;
+                    plugin.DateModified = DateTime.Now;
                     controller.Update(plugin).Wait();
                 }
             }

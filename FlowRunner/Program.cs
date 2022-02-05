@@ -152,7 +152,7 @@ namespace FileFlows.FlowRunner
                 libfileService.Update(libFile).Wait();
             }
 
-            libFile.ProcessingStarted = DateTime.UtcNow;
+            libFile.ProcessingStarted = DateTime.Now;
             libfileService.Update(libFile).Wait();
 
             var info = new FlowExecutorInfo
@@ -167,7 +167,7 @@ namespace FileFlows.FlowRunner
                 CurrentPart = 0,
                 CurrentPartPercent = 0,
                 CurrentPartName = string.Empty,
-                StartedAt = DateTime.UtcNow,
+                StartedAt = DateTime.Now,
                 WorkingFile = workingFile,
                 IsDirectory = lib.Folders,
                 LibraryPath = lib.Path, 

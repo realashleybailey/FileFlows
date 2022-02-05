@@ -34,6 +34,6 @@ public class FlowExecutorInfo
 
     public DateTime StartedAt { get; set; }
 
-    public TimeSpan ProcessingTime => StartedAt > new DateTime(2000, 1, 1) ? DateTime.UtcNow.Subtract(StartedAt) : new TimeSpan();
+    public TimeSpan ProcessingTime => StartedAt > new DateTime(2000, 1, 1) ? DateTime.Now.Subtract(StartedAt) : new TimeSpan();
 }
 

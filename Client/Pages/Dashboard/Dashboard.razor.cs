@@ -160,7 +160,7 @@ namespace FileFlows.Client.Pages
                         CurrentPart = 1,
                         CurrentPartName = "Curren Flow Part",
                         CurrentPartPercent = 50,
-                        LastUpdate = DateTime.UtcNow,
+                        LastUpdate = DateTime.Now,
                         Log = "Test Log",
                         NodeName = "Remote Processing Node",
                         NodeUid = Guid.NewGuid(),

@@ -37,7 +37,7 @@ namespace FileFlows.Server.Controllers
                         data[i].Status = FileStatus.Processing;
                         data[i].Node = new ObjectReference { Uid = nodeUid, Name = nodeName };
                         data[i].WorkerUid = workerUid;
-                        data[i].ProcessingStarted = DateTime.UtcNow;
+                        data[i].ProcessingStarted = DateTime.Now;
                         data[i] = await DbManager.Update(data[i]);
                         return data[i];
                     }

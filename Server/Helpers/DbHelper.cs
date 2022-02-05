@@ -112,7 +112,7 @@ namespace FileFlows.Server.Helpers
         {
             using (var db = GetDb())
             {
-                await db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.UtcNow, uid);
+                await db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
             }
         }
 
@@ -143,7 +143,7 @@ namespace FileFlows.Server.Helpers
                     var type = obj.GetType();
                     obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
                     obj.Uid = Guid.NewGuid();
-                    obj.DateCreated = DateTime.UtcNow;
+                    obj.DateCreated = DateTime.Now;
                     obj.DateModified = obj.DateCreated;
 
                     sql.AppendLine($"insert into {nameof(DbObject)} (Uid, Name, Type, Data) values (" +
@@ -224,7 +224,7 @@ namespace FileFlows.Server.Helpers
             if (dbObject == null)
             {
                 obj.Uid = Guid.NewGuid();
-                obj.DateCreated = DateTime.UtcNow;
+                obj.DateCreated = DateTime.Now;
                 obj.DateModified = obj.DateCreated;
                 // create new 
                 dbObject = new DbObject
@@ -241,7 +241,7 @@ namespace FileFlows.Server.Helpers
             }
             else
             {
-                obj.DateModified = DateTime.UtcNow;
+                obj.DateModified = DateTime.Now;
                 dbObject.Name = obj.Name;
                 dbObject.DateModified = obj.DateModified;
                 dbObject.Data = json;
@@ -337,8 +337,8 @@ namespace FileFlows.Server.Helpers
             {
                 Name = "FFMpeg",
                 Path = windows ? Path.Combine(Program.GetAppDirectory(), @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
-                DateCreated = DateTime.UtcNow,
-                DateModified = DateTime.UtcNow
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now
             });
 
             await AddOrUpdateObject(db, new Settings
@@ -346,8 +346,8 @@ namespace FileFlows.Server.Helpers
                 Name = "Settings",
                 AutoUpdatePlugins = true,
                 LoggingPath = windows ? Path.Combine(Program.GetAppDirectory(), "Logs") : "/app/Logs",
-                DateCreated = DateTime.UtcNow,
-                DateModified = DateTime.UtcNow
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now
             });
 
             string tempPath = windows ? @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FileFlows\\Temp") : "/temp";

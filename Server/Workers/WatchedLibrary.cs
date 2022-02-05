@@ -236,9 +236,9 @@ namespace FileFlows.Server.Workers
                 return false;
 
             if (fullScan == false)
-                fullScan = Library.LastScanned < DateTime.UtcNow.AddHours(-1); // do a full scan every hour just incase we missed something
+                fullScan = Library.LastScanned < DateTime.Now.AddHours(-1); // do a full scan every hour just incase we missed something
 
-            if (Library.LastScanned > DateTime.UtcNow.AddSeconds(-Library.ScanInterval))
+            if (Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
                 return false;
 
             if (UseScanner == false && ScanComplete && fullScan == false)
@@ -454,7 +454,7 @@ namespace FileFlows.Server.Workers
         {
             try
             {
-                if (file.LastAccessTimeUtc < DateTime.UtcNow.AddSeconds(-10))
+                if (file.LastAccessTime < DateTime.Now.AddSeconds(-10))
                 {
                     // check if the file size changes
                     long fs = file.Length;

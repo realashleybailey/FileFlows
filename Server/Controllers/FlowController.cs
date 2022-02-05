@@ -70,8 +70,8 @@ namespace FileFlows.Server.Controllers
             // reparse with new UIDs
             flow = JsonSerializer.Deserialize<Flow>(json);
             flow.Uid = Guid.Empty;
-            flow.DateModified = DateTime.UtcNow;
-            flow.DateCreated = DateTime.UtcNow;
+            flow.DateModified = DateTime.Now;
+            flow.DateCreated = DateTime.Now;
             flow.Name = await GetNewUniqueName(flow.Name);
             return await Update(flow);
         }

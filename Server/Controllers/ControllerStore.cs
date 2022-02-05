@@ -125,7 +125,7 @@
             var item = await GetByUid(uid);
             if (item == null)
                 return;
-            item.DateModified = DateTime.UtcNow;
+            item.DateModified = DateTime.Now;
             await DbManager.UpdateDateModified(item.Uid, item.DateModified);
         }
     }

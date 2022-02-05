@@ -194,11 +194,11 @@ public class Runner
         Info.LibraryFile.Status = status;
         if (status == FileStatus.Processed)
         {
-            Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
+            Info.LibraryFile.ProcessingEnded = DateTime.Now;
         }
         else if(status == FileStatus.ProcessingFailed)
         {
-            Info.LibraryFile.ProcessingEnded = DateTime.UtcNow;
+            Info.LibraryFile.ProcessingEnded = DateTime.Now;
         }
         do
         {

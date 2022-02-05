@@ -118,7 +118,7 @@ namespace FileFlows.Server.Controllers
             var lib = await GetByUid(uid);
             if (lib == null)
                 return;
-            lib.LastScanned = DateTime.UtcNow;
+            lib.LastScanned = DateTime.Now;
             await Update(lib);
         }
 

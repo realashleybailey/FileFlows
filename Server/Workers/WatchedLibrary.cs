@@ -294,6 +294,7 @@ namespace FileFlows.Server.Workers
         {
             if (ScanMutex.WaitOne(1) == false)
                 return;
+            Logger.Instance?.ILog($"Library '{Library.Name}' scan");
             try
             {
                 if (Library.ScanInterval < 10)
@@ -301,18 +302,25 @@ namespace FileFlows.Server.Workers
 
                 if (Library.Enabled == false)
                     return;
+
                 if (TimeHelper.InSchedule(Library.Schedule) == false)
+                {
+                    Logger.Instance?.ILog($"Library '{Library.Name}' outside of schedule, scanning skipped.");
                     return;
+                }
 
                 if (fullScan == false)
                     fullScan = Library.LastScanned < DateTime.Now.AddHours(-1); // do a full scan every hour just incase we missed something
 
                 if (fullScan == false && Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
+                {
+                    Logger.Instance?.ILog($"Library '{Library.Name}' need to wait until '{(Library.LastScanned.AddSeconds(Library.ScanInterval))}' before scanning again");
                     return;
+                }
 
                 if (UseScanner == false && ScanComplete && fullScan == false)
                 {
-                    //Logger.Instance?.ILog($"Library '{Library.Name}' has full scan, using FileWatcherEvents now to watch for new files");
+                    Logger.Instance?.ILog($"Library '{Library.Name}' has full scan, using FileWatcherEvents now to watch for new files");
                     return; // we can use the filesystem watchers for any more files
                 }
 
@@ -322,13 +330,17 @@ namespace FileFlows.Server.Workers
                     return;
                 }
 
+                Logger.Instance.DLog($"Scan started on '{Library.Name}': {Library.Path}");
+                int count = 0;
                 if (Library.Folders)
                 {
                     var dirs = new DirectoryInfo(Library.Path).GetDirectories();
                     foreach (var dir in dirs)
                     {
-                        if (QueuedFiles.Contains(dir.FullName) == false)
+                        if (QueuedFiles.Contains(dir.FullName) == false) {
                             QueuedFiles.Enqueue(dir.FullName);
+                            ++count;
+                        }
                     }
                 }
                 else 
@@ -337,10 +349,14 @@ namespace FileFlows.Server.Workers
                     foreach (var file in files)
                     {
                         if (QueuedFiles.Contains(file.FullName) == false)
+                        {
                             QueuedFiles.Enqueue(file.FullName);
+                            ++count;
+                        }
                     }
                 }
 
+                Logger.Instance.DLog($"Files queued for '{Library.Name}': {count} / {QueuedFiles.Count}");
                 new LibraryController().UpdateLastScanned(Library.Uid).Wait();
             }
             catch(Exception ex)

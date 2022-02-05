@@ -111,9 +111,13 @@ namespace FileFlows.Client.Components.Inputs
         {
             if(string.IsNullOrWhiteSpace(section))
                 return section ?? string.Empty;
-            if (section.StartsWith("==="))
+            if (section.StartsWith("===="))
             {
                 return "<span class=\"heading\">" + HtmlEncode(section) + "</span>";
+            }
+            else if(section.StartsWith("=== ") && section.EndsWith(" ==="))
+            {
+                return "<span class=\"heading\">=== <span class=\"inner\">" + HtmlEncode(section[4..^4]) + "</span> ===</span>";
             }
             else if (regDatedLine.TryMatch(section, out Match dlMatch))
             {

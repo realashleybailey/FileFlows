@@ -29,6 +29,9 @@ pre {
 ::deep .heading {
   color: var(--info);
 }
+::deep .heading .inner {
+  color: var(--yellow);
+}
 ::deep .date {
   color: var(--info);
 }

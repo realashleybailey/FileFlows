@@ -340,7 +340,8 @@ namespace FileFlows.Server.Workers
                 }
 
                 Logger.Instance.DLog("New unknown file: " + file.FullName);
-                tasks.Add(GetLibraryFile(file, null));
+                var task = Task.Run(async () => await GetLibraryFile(file, null));
+                tasks.Add(task);
             }
             Task.WaitAll(tasks.ToArray());
 
@@ -442,6 +443,7 @@ namespace FileFlows.Server.Workers
 
             LibraryFiles.Add(lf);
             return lf;
+
         }
 
 

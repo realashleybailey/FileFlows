@@ -121,6 +121,9 @@ namespace FileFlows.Server
             Helpers.DbHelper.CreateDatabase().Wait();
 
 
+            new Controllers.LibraryFileController().FixWindows();
+            return;
+
             // do this so the settings object is loaded, and the time zone is set
             new Controllers.SettingsController().Get().Wait();
 

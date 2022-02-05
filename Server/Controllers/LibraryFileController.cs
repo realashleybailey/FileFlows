@@ -151,6 +151,20 @@ namespace FileFlows.Server.Controllers
             return results;
         }
 
+        internal void FixWindows()
+        {
+            var libFiles = GetDataList().Result;
+            foreach(var lib in libFiles)
+            {
+                if(lib.Name.ToUpper().StartsWith("T:"))
+                {
+                    lib.Name = lib.Name.Replace("T:", "V:").Replace("t:", "v:");
+                    lib.OutputPath = lib.OutputPath.Replace("T:", "V:").Replace("t:", "v:");
+                    DbHelper.Update(lib).Wait();
+                }
+            }
+        }
+
         /// <summary>
         /// Get next 10 upcoming files to process
         /// </summary>

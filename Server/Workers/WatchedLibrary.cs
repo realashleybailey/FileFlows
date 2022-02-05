@@ -173,7 +173,7 @@ namespace FileFlows.Server.Workers
                 SetupWatcher(); 
             }
 
-            if (library.LastScanned < new DateTime(2020, 1, 1))
+            if (library.Enabled && library.LastScanned < new DateTime(2020, 1, 1))
             {
                 ScanComplete = false; // this could happen if they click "Rescan" on the library page, this will force a full new scan
                 Logger.Instance?.ILog($"WatchedLibrary: Library '{library.Name}' marked for full scan");
@@ -270,12 +270,12 @@ namespace FileFlows.Server.Workers
                 ScanForDirs(Library);
             else
                 complete = ScanForFiles(Library);
-            new LibraryController().UpdateLastScanned(Library.Uid).Wait();
-
-            Library.LastScanned = DateTime.Now;
 
             if(complete)
                 ScanComplete = Library.Folders == false; // only count a full scan against files
+
+            if (ScanComplete)
+                new LibraryController().UpdateLastScanned(Library.Uid).Wait();
 
             return count < LibraryFiles.Count;
         }
@@ -479,8 +479,9 @@ namespace FileFlows.Server.Workers
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Instance.ILog("Error when trying to check file could be accessed: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 return false;
             }
         }

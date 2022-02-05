@@ -465,12 +465,12 @@ namespace FileFlows.Server.Workers
 
                 using (var fs = File.Open(file.FullName, FileMode.Open))
                 {
-                    if(fs.CanRead)
+                    if(fs.CanRead == false)
                     {
                         Logger.Instance.ILog("Cannot read file: " + file.FullName);
                         return false;
                     }
-                    if (fs.CanWrite)
+                    if (fs.CanWrite == false)
                     {
                         Logger.Instance.ILog("Cannot write file: " + file.FullName);
                         return false;

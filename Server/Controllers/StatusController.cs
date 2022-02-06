@@ -22,22 +22,22 @@
         {
             var status = new StatusModel();
             var lfController = new LibraryFileController();
-            status.Queue = (await lfController.GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
-            status.Processed = (await lfController.GetAll(FileStatus.Processed))?.Count() ?? 0;
+            status.queue = (await lfController.GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
+            status.processed = (await lfController.GetAll(FileStatus.Processed))?.Count() ?? 0;
             var workerController = new WorkerController(null);
             var executors = workerController.GetAll()?.ToList() ?? new List<FlowExecutorInfo>();
-            status.Processing = executors.Count;
+            status.processing = executors.Count;
             if (executors.Any())
             {
                 var time = executors.OrderByDescending(x => x.ProcessingTime).First().ProcessingTime;
                 if (time.Hours > 0)
-                    status.Time = time.ToString(@"h\:mm\:ss");
+                    status.time = time.ToString(@"h\:mm\:ss");
                 else
-                    status.Time = time.ToString(@"m\:ss");
+                    status.time = time.ToString(@"m\:ss");
             }
             else
             {
-                status.Time = string.Empty;
+                status.time = string.Empty;
             }
 
             return status;
@@ -51,19 +51,19 @@
             /// <summary>
             /// Gets the number of items in the queue
             /// </summary>
-            public int Queue { get; set; }
+            public int queue { get; set; }
             /// <summary>
             /// Gets the number of files being processed
             /// </summary>
-            public int Processing { get; set; }
+            public int processing { get; set; }
             /// <summary>
             /// Gets the number of files that have been processed
             /// </summary>
-            public int Processed { get; set; }
+            public int processed { get; set; }
             /// <summary>
             /// Gets the processing time of the longest running item in the queue
             /// </summary>
-            public string Time { get; set; }
+            public string time { get; set; }
         }
     }
 }

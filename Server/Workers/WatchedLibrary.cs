@@ -44,12 +44,9 @@ namespace FileFlows.Server.Workers
             worker.DoWork += Worker_DoWork;
             worker.RunWorkerAsync();
         }
-
+        
         private void Worker_DoWork(object? sender, DoWorkEventArgs e)
         {
-            DateTime dtKnownAge = DateTime.MinValue;
-            Dictionary<string, Guid> knownFiles = new ();
-            Dictionary<string, ObjectReference> knownFingerprints = new ();
             while (Disposed == false)
             {
                 try
@@ -74,16 +71,12 @@ namespace FileFlows.Server.Workers
                     StringBuilder scanLog = new StringBuilder(); 
                     DateTime dtTotal = DateTime.Now;
 
-                    //if (dtKnownAge < DateTime.Now.AddSeconds(-2))
-                    {
-                        var libFiles = new LibraryFileController().GetData().Result;
-                        knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
-                        knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
-                                                    .DistinctBy(x => x.Value.Fingerprint)
-                                                    .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
-                        dtKnownAge = DateTime.Now;
-                    }
-
+                    var libFiles = new LibraryFileController().GetData().Result;
+                    var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
+                    var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
+                                                .DistinctBy(x => x.Value.Fingerprint)
+                                                .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
+                    
                     if (knownFiles.ContainsKey(fullpath.ToLower()))
                         continue;
 
@@ -106,8 +99,6 @@ namespace FileFlows.Server.Workers
                     if (Globals.IsWindows == false || Library.Path.Length != 3)
                         ++skip;
 
-                    var status = FileStatus.Unprocessed;
-
                     long size = Library.Folders ? 0 : ((FileInfo)fsInfo).Length;
 
                     string relative = fullpath.Substring(skip);
@@ -115,7 +106,7 @@ namespace FileFlows.Server.Workers
                     {
                         Name = fullpath,
                         RelativePath = relative,
-                        Status = status,
+                        Status = FileStatus.Unprocessed,
                         IsDirectory = fsInfo is DirectoryInfo,
                         Fingerprint = string.Empty,
                         OriginalSize = size,
@@ -137,7 +128,7 @@ namespace FileFlows.Server.Workers
                             lf.Fingerprint = fingerprint;   
                             if (knownFingerprints.ContainsKey(fingerprint))
                             {
-                                status = FileStatus.Duplicate;
+                                lf.Status = FileStatus.Duplicate;
                                 lf.Duplicate = knownFingerprints[fingerprint];
                             }
                         }

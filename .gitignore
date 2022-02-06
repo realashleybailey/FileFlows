@@ -30,3 +30,4 @@ docker.xml
 *.plugininfo
 /Server/encryptionkey.txt
 /Server/updates
+/Server/FileFlows.log

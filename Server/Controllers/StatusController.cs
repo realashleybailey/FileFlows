@@ -19,7 +19,6 @@
         /// </summary>
         /// <returns>the current status</returns>
         [HttpGet]
-        [DisableCors]
         public async Task<StatusModel> Get()
         {
             var status = new StatusModel();

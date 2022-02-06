@@ -6,6 +6,7 @@
     using FileFlows.Plugin;
     using Microsoft.AspNetCore.SignalR;
     using FileFlows.Server.Hubs;
+    using Microsoft.AspNetCore.Cors;
 
     /// <summary>
     /// Status controller
@@ -18,6 +19,7 @@
         /// </summary>
         /// <returns>the current status</returns>
         [HttpGet]
+        [DisableCors]
         public async Task<StatusModel> Get()
         {
             var status = new StatusModel();

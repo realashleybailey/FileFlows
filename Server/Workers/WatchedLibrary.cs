@@ -3,6 +3,7 @@ using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using System.ComponentModel;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace FileFlows.Server.Workers
@@ -70,9 +71,10 @@ namespace FileFlows.Server.Workers
                         continue; // library was changed
                     }
 
+                    StringBuilder scanLog = new StringBuilder(); 
                     DateTime dtTotal = DateTime.Now;
 
-                    if (dtKnownAge < DateTime.Now.AddSeconds(-30))
+                    //if (dtKnownAge < DateTime.Now.AddSeconds(-2))
                     {
                         var libFiles = new LibraryFileController().GetData().Result;
                         knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
@@ -160,7 +162,6 @@ namespace FileFlows.Server.Workers
                     else
                     {
                         Logger.Instance.ELog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to fail to add new library file: \"{fullpath}\"");
-
                     }
                 }
                 catch (Exception ex)

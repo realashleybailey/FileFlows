@@ -1,4 +1,4 @@
-﻿.input-slider-wrapper {
+﻿.slider-wrapper {
   display: flex;
   flex-direction: row;
 }
@@ -6,6 +6,10 @@
 .range {
   max-width: min(15rem, 60vw);
   width: 15rem;
+}
+
+.prefix {
+  margin-right: 0.5rem;
 }
 
 .value {

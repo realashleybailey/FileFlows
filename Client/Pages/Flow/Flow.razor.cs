@@ -33,6 +33,21 @@ namespace FileFlows.Client.Pages
         private ffElement[] Filtered { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
 
+
+        private int _Zoom = 100;
+        private int Zoom
+        {
+            get => _Zoom;
+            set
+            {
+                if(_Zoom != value)
+                {
+                    _Zoom = value;
+                    _ = ZoomChanged(value);
+                }
+            }
+        }
+
         private ElementReference eleFilter { get; set; }
 
         public ffPart SelectedPart { get; set; }
@@ -266,6 +281,11 @@ namespace FileFlows.Client.Pages
             if (Regex.IsMatch(key, "^[\\d]+$"))
                 return string.Empty;
             return prefix + translated;
+        }
+
+        private async Task ZoomChanged(int zoom)
+        {
+            await jsRuntime.InvokeVoidAsync("ffFlow.zoom", new object[] { zoom });
         }
 
         private async Task Save()

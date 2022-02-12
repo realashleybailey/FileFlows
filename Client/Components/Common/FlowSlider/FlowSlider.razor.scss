@@ -1,11 +1,14 @@
-.input-slider-wrapper{
-    display:flex;
-    flex-direction:row;
-
+﻿.slider-wrapper {
+    display: flex;
+    flex-direction: row;
 }
+
 .range {
     max-width: min(15rem, 60vw);
-    width:15rem;
+    width: 15rem;
+}
+.prefix {
+    margin-right:0.5rem;
 }
 .value {
     margin-left: 1rem;
@@ -29,11 +32,11 @@ input:hover {
 
 input::-webkit-slider-thumb {
     appearance: none;
-    width: 25px; 
+    width: 25px;
     height: 25px;
     border-radius: 50%;
     background: var(--accent);
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 input::-moz-range-thumb {

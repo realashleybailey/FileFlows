@@ -34,7 +34,6 @@ class ffFlowMouse {
             this.initialY = e.clientY;// - this.yOffset;
         }
 
-
         if (e.target.classList.contains('draggable') === true) {
             this.currentX = 0;
             this.currentY = 0;
@@ -49,8 +48,8 @@ class ffFlowMouse {
         this.initialY = this.currentY;
         if (ffFlow.active && this.dragItem) {
             this.dragItem.style.transform = '';
-            let xPos = parseInt(this.dragItem.style.left, 10) + this.currentX;
-            let yPos = parseInt(this.dragItem.style.top, 10) + this.currentY;
+            let xPos = parseInt(this.dragItem.style.left, 10) + ffFlow.translateCoord(this.currentX);
+            let yPos = parseInt(this.dragItem.style.top, 10) + ffFlow.translateCoord(this.currentY);
             this.dragItem.style.left = xPos + 'px';
             this.dragItem.style.top = yPos + 'px';
 
@@ -83,6 +82,8 @@ class ffFlowMouse {
     }
 
     setTranslate(xPos, yPos, el) {
+        xPos = ffFlow.translateCoord(xPos);
+        yPos = ffFlow.translateCoord(yPos);
         el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
     }
 }

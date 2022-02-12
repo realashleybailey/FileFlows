@@ -194,5 +194,9 @@
   {
     "outputFile": "Components/Inputs/InputLogView/InputLogView.razor.css",
     "inputFile": "Components/Inputs/InputLogView/InputLogView.razor.scss"
+  },
+  {
+    "outputFile": "Components/Common/FlowSlider/FlowSlider.razor.css",
+    "inputFile": "Components/Common/FlowSlider/FlowSlider.razor.scss"
   }
 ]

@@ -10,12 +10,22 @@ window.ffFlow = {
     Vertical: true,
     lblDelete: 'Delete',
     lblNode: 'Node',
+    Zoom:100,
 
     reset: function () {
         ffFlow.active = false;
         ffFlowPart.reset();
         this.FlowLines.reset();
         this.Mouse.reset();
+    },
+
+    eleFlowParts: null,
+    zoom: function (percent) {
+        if (ffFlow.eleFlowParts == null) {
+            ffFlow.eleFlowParts = document.querySelector('.flow-parts');
+        }
+        ffFlow.Zoom = percent;
+        ffFlow.eleFlowParts.style.zoom = percent / 100;
     },
 
     unSelect: function () {
@@ -120,12 +130,13 @@ window.ffFlow = {
                 return;
             let bounds = event.target.getBoundingClientRect();
 
-            xPos = event.clientX - bounds.left - 20;
-            yPos = event.clientY - bounds.top - 20;
+            xPos = ffFlow.translateCoord(event.clientX) - bounds.left - 20;
+            yPos = ffFlow.translateCoord(event.clientY) - bounds.top - 20;
         } else {
         }
         if (!uid)
             uid = ffFlow.Mouse.draggingElementUid;
+
 
         ffFlow.csharp.invokeMethodAsync("AddElement", uid).then(result => {
             let element = result.element;
@@ -157,6 +168,13 @@ window.ffFlow = {
                 ffFlowPart.editFlowPart(part.uid, true);
             }
         });
+    },
+
+    translateCoord: function(value) {
+        let zoom = ffFlow.Zoom / 100;
+        if (!zoom || zoom === 1)
+            return value;
+        return value / zoom;
     },
 
     getModel: function () {

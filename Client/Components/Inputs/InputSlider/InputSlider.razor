@@ -2,13 +2,5 @@
 @inherits Input<int>
 
 <InputWrapper Input="@this">
-    <div class="input-slider-wrapper">
-        <div class="range">
-            <input id=@Uid type="range" @bind-value="Value" @bind-value:event="oninput" placeholder="@Placeholder" min="@Min" max="@Max" />
-        </div>
-
-        <div class="value">
-            @Value
-        </div>
-    </div>
+    <FlowSlider Min=@Min Max=@Max @bind-Value=@Value />
 </InputWrapper>

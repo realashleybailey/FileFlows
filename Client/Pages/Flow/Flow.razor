@@ -53,6 +53,9 @@
             <div class="flow-parts" id="flow-parts">
                 <canvas width="8000" height="4000" tabindex="1"></canvas>
             </div>
+            <div id="flow-zoomer">
+                <FlowSlider Min="50" Max="100" Prefix="Zoom:" Suffix="%" @bind-Value="@Zoom" />
+            </div>
         </div>
     </Body>
 </PageView>

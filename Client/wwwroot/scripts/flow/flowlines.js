@@ -58,11 +58,12 @@ class ffFlowLines {
         if (!this.ioNode)
             return;
 
-        let destX = event.clientX - this.ioCanvasBounds.left;
-        let destY = event.clientY - this.ioCanvasBounds.top;
+        let destX = ffFlow.translateCoord(event.clientX) - this.ioCanvasBounds.left;
+        let destY = ffFlow.translateCoord(event.clientY) - this.ioCanvasBounds.top;
         this.redrawLines();
         this.drawLineToPoint(this.ioSourceBounds.left, this.ioSourceBounds.top, destX, destY);
     };
+
 
     ioMouseUp(event) {
         if (!this.ioNode)

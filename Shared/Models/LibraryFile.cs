@@ -52,6 +52,7 @@ namespace FileFlows.Shared.Models
 
     public enum FileStatus
     {
+        Disabled = -2,
         OutOfSchedule = -1,
         Unprocessed = 0,
         Processed = 1,

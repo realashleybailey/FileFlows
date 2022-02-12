@@ -78,6 +78,7 @@
       "Sun": "Sun"
     },
     "FileStatus": {
+      "Disabled": "Disabled",
       "OutOfSchedule": "Out Of Schedule",
       "Processed": "Processed",
       "Processing": "Processing",

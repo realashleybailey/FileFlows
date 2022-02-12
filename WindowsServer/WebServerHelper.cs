@@ -12,9 +12,18 @@ namespace FileFlows.WindowsServer
         static Process process;
         static bool Stopping = false;
         static DateTime LastStarted = DateTime.MinValue;
+        static System.Timers.Timer timer;
 
         public static void Start()
         {
+            if (timer == null)
+            {
+                timer = new System.Timers.Timer();
+                timer.Interval = 10_000;
+                timer.Elapsed += Timer_Elapsed;
+                timer.AutoReset = true;
+            }
+            timer.Start();
             try
             {
                 WebServerHelper.process = new Process();
@@ -22,8 +31,8 @@ namespace FileFlows.WindowsServer
                 // To fix it you can try to add '#!/bin/bash' header to the script.
 
 #if (DEBUG)
-                process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows\FileFlows.Server.exe";
-                process.StartInfo.WorkingDirectory = @"C:\Users\john\src\FileFlows\FileFlows\deploy\FileFlows-Windows";
+                process.StartInfo.FileName = @"D:\src\FileFlows\FileFlows\Server\bin\Release\net6.0\win-x64\FileFlows.Server.exe";
+                process.StartInfo.WorkingDirectory = @"D:\src\FileFlows\FileFlows\Server\bin\Release\net6.0\win-x64";
 #else
             process.StartInfo.FileName = "FileFlows.Server.exe";
             process.StartInfo.UseShellExecute = false;
@@ -31,7 +40,7 @@ namespace FileFlows.WindowsServer
             process.StartInfo.WorkingDirectory = Logger.GetAppDirectory();
 #endif
                 process.StartInfo.Arguments = "--windows --urls=http://[::]:5151";
-
+                process.EnableRaisingEvents = true;
                 process.Exited += Process_Exited;
 
                 LastStarted = DateTime.Now;
@@ -43,6 +52,17 @@ namespace FileFlows.WindowsServer
             {
                 Logger.ELog("Failed starting FileFlowsServer: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 Application.Exit();
+            }
+        }
+
+        private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (Stopping)
+                return;
+            // check if process is running
+           // if(process != null && process.HasExited == false && process.
+            {
+                // 
             }
         }
 
@@ -58,8 +78,8 @@ namespace FileFlows.WindowsServer
             else if(Stopping == false)
             {
                 // process exited unexpectably, restart it
-                // but only if it last started more than 30 seconds ago, otherwise we could be in a crash loop
-                if (LastStarted < DateTime.Now.AddSeconds(-30))
+                // but only if it last started more than 20 seconds ago, otherwise we could be in a crash loop
+                if (LastStarted < DateTime.Now.AddSeconds(-20))
                 {
                     Start();
                 }
@@ -76,6 +96,12 @@ namespace FileFlows.WindowsServer
             Stopping = true;
             try
             {
+                if(timer != null)
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                    timer = null;
+                }
                 if (process != null)
                 {
                     Logger.ILog("Stopping WebServer");

@@ -39,12 +39,14 @@ namespace FileFlows.Server.Controllers
 
                 // need to check if values are JsonElements and if they are get the actual values
                 object? value = model.Variables[k];
-                if(value is JsonElement jElement)
+                if (value is JsonElement jElement)
                 {
                     if (jElement.ValueKind == JsonValueKind.String)
                         value = jElement.GetString();
-                    if (jElement.ValueKind == JsonValueKind.Number)
+                    else if (jElement.ValueKind == JsonValueKind.Number)
                         value = jElement.GetInt64();
+                    else if (jElement.ValueKind == JsonValueKind.Object)
+                        value = jElement.Deserialize<Dictionary<string, object>>();
                 }
 
                 model.Variables[k] = value; 

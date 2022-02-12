@@ -14,7 +14,7 @@
         <div class="status-picker">
             @foreach (var status in Statuses)
             {
-                if((status.Status == FileStatus.OutOfSchedule || status.Status == FileStatus.ProcessingFailed || status.Status == FileStatus.Duplicate) && status.Count == 0)
+                if((status.Status == FileStatus.Disabled || status.Status == FileStatus.OutOfSchedule || status.Status == FileStatus.ProcessingFailed || status.Status == FileStatus.Duplicate) && status.Count == 0)
                 {
                     if(SelectedStatus == status.Status)
                         SelectUnprocessed();
@@ -26,6 +26,9 @@
                     {
                         case FileStatus.Unprocessed:
                             <span class=" icon far fa-hourglass"></span>
+                            break;
+                        case FileStatus.Disabled:
+                            <span class=" icon fas fa-toggle-off"></span>
                             break;
                         case FileStatus.Processed:
                             <span class="icon far fa-check-circle"></span>

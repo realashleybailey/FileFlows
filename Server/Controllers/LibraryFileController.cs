@@ -102,7 +102,7 @@ namespace FileFlows.Server.Controllers
 
             if (status != null)
             {
-                FileStatus searchStatus = status.Value == FileStatus.OutOfSchedule ? FileStatus.Unprocessed : status.Value;
+                FileStatus searchStatus = (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled) ? FileStatus.Unprocessed : status.Value;
                 libraryFiles = libraryFiles.Where(x => x.Status == searchStatus).ToList();
             }
 
@@ -135,6 +135,19 @@ namespace FileFlows.Server.Controllers
                                   return (int)ProcessingPriority.Normal;
                               })
                               .ThenBy(x => x.DateCreated);
+            }
+
+            if(status == FileStatus.Disabled)
+            {
+                return libraryFiles
+                              .Where(x =>
+                              {
+                                  // unprocessed just show the enabled libraries
+                                  if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
+                                      return false;
+                                  var lib = libraries[x.Library.Uid];
+                                  return lib.Enabled == false;
+                              });
             }
 
             if (status == FileStatus.Processing)
@@ -203,7 +216,7 @@ namespace FileFlows.Server.Controllers
 
                 var lib = libraries[x.Library.Uid];
                 if (lib.Enabled == false)
-                    return (FileStatus)(-99);
+                    return FileStatus.Disabled;
                 if (TimeHelper.InSchedule(lib.Schedule) == false)
                     return FileStatus.OutOfSchedule;
                 return FileStatus.Unprocessed;
@@ -400,7 +413,7 @@ namespace FileFlows.Server.Controllers
                     if (libraryFiles.ContainsKey(uid) == false)
                         continue;
                     item = libraryFiles[uid];
-                    if (item.Status != FileStatus.ProcessingFailed && item.Status != FileStatus.Processed)
+                    if (item.Status != FileStatus.ProcessingFailed && item.Status != FileStatus.Processed && item.Status != FileStatus.Duplicate)
                         continue;
                     item.Status = FileStatus.Unprocessed;
                 }

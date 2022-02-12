@@ -172,7 +172,7 @@ namespace FileFlows.Plugin
         public void ResetWorkingFile()
         {
             if (Fake) return;
-            SetWorkingFile(this.FileName, dontDelete: true);
+            SetWorkingFile(this.FileName);
         }
 
         public void SetWorkingFile(string filename, bool dontDelete = false)

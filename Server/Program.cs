@@ -25,6 +25,11 @@ namespace FileFlows.Server
             }
             catch (Exception ex)
             {
+                try
+                {
+                    Logger.Instance.ELog("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                }
+                catch (Exception) { }
                 Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }

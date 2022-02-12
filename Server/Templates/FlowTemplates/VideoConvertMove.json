@@ -67,58 +67,34 @@
       },
 
       {
-        "node": "Function",
-        "name": "Set Video Codec",
+        "node": "VideoEncode",
         "uid": "00000000-0000-0000-0000-000000000004",
         "xPos": 575,
         "yPos": 400,
-        "outputs": 1,
         "connections": [
           {
-            "input": 1,
             "output": 1,
+            "input": 1,
             "node": "00000000-0000-0000-0000-000000000005"
-          }
-        ],
-        "model": {
-          "Outputs": 1
-        }
-      },
-
-      {
-        "node": "VideoEncode",
-        "uid": "00000000-0000-0000-0000-000000000005",
-        "xPos": 575,
-        "yPos": 500,
-        "connections": [
-          {
-            "output": 1,
-            "input": 1,
-            "node": "00000000-0000-0000-0000-000000000006"
           },
           {
             "output": 2,
             "input": 1,
-            "node": "00000000-0000-0000-0000-000000000006"
+            "node": "00000000-0000-0000-0000-000000000005"
           }
-        ],
-        "model": {
-          "VideoCodec": "{VideoCodec}",
-          "VideoCodecParameters": "{VideoCodecParameters}",
-          "Extension": "{Extension}"
-        }
+        ]
       },
 
       {
         "node": "MoveFile",
-        "uid": "00000000-0000-0000-0000-000000000006",
+        "uid": "00000000-0000-0000-0000-000000000005",
         "xPos": 575,
-        "yPos": 650,
+        "yPos": 540,
         "connections": [
           {
             "output": 1,
             "input": 1,
-            "node": "00000000-0000-0000-0000-000000000007"
+            "node": "00000000-0000-0000-0000-000000000006"
           }
         ],
         "model": {
@@ -130,15 +106,15 @@
       {
         "node": "Function",
         "name": "Delete Dir?",
-        "uid": "00000000-0000-0000-0000-000000000007",
+        "uid": "00000000-0000-0000-0000-000000000006",
         "xPos": 575,
-        "yPos": 780,
+        "yPos": 650,
         "outputs": 2,
         "connections": [
           {
             "input": 1,
             "output": 1,
-            "node": "00000000-0000-0000-0000-000000000008"
+            "node": "00000000-0000-0000-0000-000000000007"
           }
         ],
         "model": {
@@ -147,9 +123,9 @@
       },
       {
         "node": "DeleteSourceDirectory",
-        "uid": "00000000-0000-0000-0000-000000000008",
+        "uid": "00000000-0000-0000-0000-000000000007",
         "xPos": 350,
-        "yPos": 910,
+        "yPos": 780,
         "model": {
           "IfEmpty": true,
           "IncludePatterns": [ "avi", "divx", "mkv", "mov", "mp4", "mpg", "mpeg" ]
@@ -162,14 +138,17 @@
       {
         "uid": "00000000-0000-0000-0000-000000000004",
         "type": "Select",
-        "name": "Code",
         "label": "Video Codec",
         "help": "The video codec to use for encoding",
         "parameters": {
           "options": [
             {
               "label": "Copy Video",
-              "value": "Variables.VideoCodec = '';\nVariables.VideoCodecParameters = '';\nVariables.Extension = '';\nreturn 1;"
+              "value": {
+                "VideoCodec": "",
+                "VideoCodecParameters": "",
+                "Extension": ""
+              }
             },
             {
               "label": "Automatic",
@@ -177,11 +156,19 @@
             },
             {
               "label": "H264",
-              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h264",
+                "VideoCodecParameters": "h264",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "H265",
-              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'h265';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h265",
+                "VideoCodecParameters": "h265",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "CPU Encoding",
@@ -189,15 +176,27 @@
             },
             {
               "label": "H264 (CPU)",
-              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'libx264';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h264",
+                "VideoCodecParameters": "libx264",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "H265 (CPU)",
-              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'libx265';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h265",
+                "VideoCodecParameters": "libx265",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "MPEG4",
-              "value": "Variables.VideoCodec = 'mpeg4';\nVariables.VideoCodecParameters = 'libxvid';\nVariables.Extension = 'mp4';\nreturn 1;"
+              "value": {
+                "VideoCodec": "mpeg4",
+                "VideoCodecParameters": "libxvid",
+                "Extension": "mp4"
+              }
             },
             {
               "label": "NVIDIA Hardware Encoding",
@@ -205,11 +204,19 @@
             },
             {
               "label": "H264 (NVIDIA)",
-              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264_nvenc';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h264",
+                "VideoCodecParameters": "h264_nvenc",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "H265 (NVIDIA)",
-              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_nvenc -preset hq';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h265",
+                "VideoCodecParameters": "hevc_nvenc -preset hq",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "Intel Hardware Encoding",
@@ -217,17 +224,25 @@
             },
             {
               "label": "H264 (Intel)",
-              "value": "Variables.VideoCodec = 'h264';\nVariables.VideoCodecParameters = 'h264_qsv';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h265",
+                "VideoCodecParameters": "h264_qsv",
+                "Extension": "mkv"
+              }
             },
             {
               "label": "H265 (Intel)",
-              "value": "Variables.VideoCodec = 'h265';\nVariables.VideoCodecParameters = 'hevc_qsv -load_plugin hevc_hw';\nVariables.Extension = 'mkv';\nreturn 1;"
+              "value": {
+                "VideoCodec": "h265",
+                "VideoCodecParameters": "hevc_qsv -load_plugin hevc_hw",
+                "Extension": "mkv"
+              }
             }
           ]
         }
       },
       {
-        "uid": "00000000-0000-0000-0000-000000000005",
+        "uid": "00000000-0000-0000-0000-000000000004",
         "type": "Select",
         "name": "AudioCodec",
         "label": "Audio Codec",
@@ -259,7 +274,7 @@
       },
 
       {
-        "uid": "00000000-0000-0000-0000-000000000006",
+        "uid": "00000000-0000-0000-0000-000000000005",
         "type": "Directory",
         "required": true,
         "label": "Destination",
@@ -269,7 +284,7 @@
       },
 
       {
-        "uid": "00000000-0000-0000-0000-000000000007",
+        "uid": "00000000-0000-0000-0000-000000000006",
         "type": "Switch",
         "name": "Code",
         "default": true,

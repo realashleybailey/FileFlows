@@ -17,6 +17,7 @@ namespace FileFlows.Client.Pages
     using System.Text.RegularExpressions;
     using FileFlows.Plugin;
     using Microsoft.JSInterop;
+    using System.Text.Json;
 
     public partial class Flows : ListPage<ffFlow>
     {
@@ -184,10 +185,24 @@ namespace FileFlows.Client.Pages
                         var pmDict = part.Model as IDictionary<string, object>;
                         if (pmDict != null)
                         {
-                            if (pmDict.ContainsKey(fieldName))
-                                pmDict[fieldName] = dict[k];
+                            if (string.IsNullOrEmpty(fieldName) && dict[k] is IDictionary<string, object> pv)
+                            {
+                                // complex template type, eg we are setting more than one value to a node
+                                foreach(var pvk in pv.Keys)
+                                {
+                                    if (pmDict.ContainsKey(pvk))
+                                        pmDict[pvk] = pv[pvk];
+                                    else
+                                        pmDict.Add(pvk, pv[pvk]);
+                                }
+                            }
                             else
-                                pmDict.Add(fieldName, dict[k]);
+                            {
+                                if (pmDict.ContainsKey(fieldName))
+                                    pmDict[fieldName] = dict[k];
+                                else
+                                    pmDict.Add(fieldName, dict[k]);
+                            }
                         }
                     }
                 }
@@ -297,6 +312,47 @@ namespace FileFlows.Client.Pages
             if (em == null)
                 return;
             string key = GetFieldName(flowTemplate, field);
+
+            if(value is JsonElement jElement)
+            {
+                if(jElement.ValueKind == JsonValueKind.Object)
+                {
+                    var tv = jElement.Deserialize<Dictionary<string, object>>();
+                    if ((tv.ContainsKey("true") == false && tv.ContainsKey("false")) == false)
+                    {
+                        // true/false are special cases for the swtich types 
+                        // complex object, meaning we are setting properties
+                        IDictionary<string, object> dict;
+                        if (em.ContainsKey(key) == false)
+                        {
+                            em.Add(key, new ExpandoObject());
+                        }
+                        else if (em[key] is IDictionary<string, object> == false)
+                        {
+                            em[key] = new ExpandoObject();
+                        }
+                        dict = em[key] as IDictionary<string, object>;
+                        
+                        foreach (var kv in tv.Keys)
+                        {
+                            if (dict.ContainsKey(kv))
+                                dict[kv] = tv[kv];
+                            else
+                                dict.Add(kv, tv[kv]);
+                        }
+                        return;
+                    }
+                }
+                else if(jElement.ValueKind == JsonValueKind.String)
+                {
+                    value = jElement.GetString();
+                }
+                else if (jElement.ValueKind == JsonValueKind.Number)
+                {
+                    value = jElement.GetDouble();
+                }
+            }
+
             if (em.ContainsKey(key))
                 em[key] = value;
             else
@@ -335,15 +391,15 @@ namespace FileFlows.Client.Pages
             builder.OpenComponent<InputSwitch>(++count);
             builder.AddAttribute(++fieldCount, nameof(InputSwitch.Help), Translater.TranslateIfNeeded(field.Help));
             builder.AddAttribute(++fieldCount, nameof(InputSwitch.Label), field.Label);
-            bool @default = ((System.Text.Json.JsonElement)field.Default).GetBoolean();
+            bool @default = ((JsonElement)field.Default).GetBoolean();
 
             object trueValue = true;
             object falseValue = false;
             if (field.Value != null)
             {
-                if (field.Value is System.Text.Json.JsonElement je)
+                if (field.Value is JsonElement je)
                 {
-                    Dictionary<string, object> jeValue = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(je.ToJson());
+                    Dictionary<string, object> jeValue = JsonSerializer.Deserialize<Dictionary<string, object>>(je.ToJson());
                     if (jeValue != null)
                     {
                         if (jeValue.ContainsKey("true"))

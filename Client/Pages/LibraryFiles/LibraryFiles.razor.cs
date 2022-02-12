@@ -26,6 +26,16 @@ namespace FileFlows.Client.Pages
         private string Title;
         private string lblLibraryFiles, lblFileFlowsServer;
 
+        private void SelectUnprocessed()
+        {
+            if (this.SelectedStatus == FileStatus.Unprocessed)
+                return;
+            var status = this.Statuses.Where(x => x.Status == FileStatus.Unprocessed).FirstOrDefault();
+            SelectedStatus = FileStatus.Unprocessed;
+            Title = lblLibraryFiles + ": " + status?.Name;
+            _ = this.Refresh();
+        }
+
         private void SetSelected(LibraryStatus status)
         {
             SelectedStatus = status.Status;

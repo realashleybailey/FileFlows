@@ -118,7 +118,7 @@
                             if (windows)
                             {
 #if (DEBUG)
-                                process.StartInfo.FileName = @"C:\Users\john\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
+                                process.StartInfo.FileName = @"D:\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
 #else
                                 string flowRunner = Path.Combine(dir, "FileFlows.FlowRunner" + (windows ? ".exe" : ".dll"));
                                 process.StartInfo.FileName = flowRunner;

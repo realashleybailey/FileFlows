@@ -14,8 +14,10 @@
         <div class="status-picker">
             @foreach (var status in Statuses)
             {
-                if(status.Status == FileStatus.OutOfSchedule && status.Count == 0)
+                if((status.Status == FileStatus.OutOfSchedule || status.Status == FileStatus.ProcessingFailed || status.Status == FileStatus.Duplicate) && status.Count == 0)
                 {
+                    if(SelectedStatus == status.Status)
+                        SelectUnprocessed();
                     continue;
                 }
                 <div class="status @status.Status @(status.Status == SelectedStatus ? "active" : "")"

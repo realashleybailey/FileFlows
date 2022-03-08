@@ -374,8 +374,8 @@ namespace FileFlows.Server.Controllers
                     {
                         results.Add(p);
 
-                        results.AddRange(FindParts(p));
                         checkedParts.Add(p);
+                        results.AddRange(FindParts(p));
                     }
                 }
                 return results;

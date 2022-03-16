@@ -73,11 +73,14 @@ namespace FileFlows.Server.Workers
 
                     var libFiles = new LibraryFileController().GetData().Result;
                     var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
+                    var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
                     var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
                                                 .DistinctBy(x => x.Value.Fingerprint)
                                                 .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
                     
                     if (knownFiles.ContainsKey(fullpath.ToLower()))
+                        continue;
+                    if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
                         continue;
 
                     string type = Library.Folders ? "folder" : "file";

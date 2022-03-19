@@ -119,6 +119,9 @@ namespace FileFlows.Server
             //if (FileFlows.Server.Globals.IsDevelopment == false)
             //    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
             Helpers.DbHelper.CreateDatabase().Wait();
+#if(DEBUG)
+            Helpers.DbHelper.CleanDatabase().Wait();
+#endif
 
             // do this so the settings object is loaded, and the time zone is set
             new Controllers.SettingsController().Get().Wait();

@@ -81,6 +81,7 @@ public class Runner
     {
         nodeParameters?.Logger?.ILog("##### CANCELING FLOW!");
         CancellationToken.Cancel();
+        nodeParameters?.Cancel();
         Canceled = true;
         if (CurrentNode != null)
             CurrentNode.Cancel().Wait();

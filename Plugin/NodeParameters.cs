@@ -175,6 +175,15 @@ namespace FileFlows.Plugin
             SetWorkingFile(this.FileName);
         }
 
+        public bool FileExists(string filename)
+        {
+            try
+            {
+                return File.Exists(filename);
+            }
+            catch (Exception) { return false; } 
+        }
+
         public void SetWorkingFile(string filename, bool dontDelete = false)
         {
             if (Fake) return;
@@ -316,6 +325,11 @@ namespace FileFlows.Plugin
             return true;
         }
 
+        public void Cancel()
+        {
+            this.Process?.Cancel();
+        }
+
         public void UpdateVariables(Dictionary<string, object> updates)
         {
             if (updates == null)
@@ -399,24 +413,6 @@ namespace FileFlows.Plugin
             return result;
         }
 
-        /// <summary>
-        /// Executes a cmd and returns the result
-        /// </summary>
-        /// <param name="args">The execution parameters</param>
-        /// <returns>The result of the command</returns>
-        public ProcessResult Execute(string command = "", string arguments = "", string[] argumentList = null, int timeout = 0, string workingDirectory = "")
-        {
-            if (Fake) return new ProcessResult { ExitCode = 0, Completed = true };
-            var result = Process.ExecuteShellCommand(new ExecuteArgs
-            {
-                ArgumentList = argumentList,
-                Arguments = arguments,
-                Command = command,
-                Timeout = timeout,
-                WorkingDirectory = workingDirectory
-            }).Result;
-            return result;
-        }
 
         /// <summary>
         /// Gets a new guid as a string

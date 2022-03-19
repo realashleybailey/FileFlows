@@ -355,7 +355,7 @@ namespace FileFlows.Server.Controllers
 
             List<FlowPart> FindParts(FlowPart part)
             {
-                List<FlowPart> results = new List<FlowPart>();
+                                                                                                                                                                                             List<FlowPart> results = new List<FlowPart>();
                 if (checkedParts.Contains(part))
                     return results;
 

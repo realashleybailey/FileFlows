@@ -276,6 +276,27 @@ namespace FileFlows.Server.Helpers
             }
         }
 
+#if (DEBUG)
+        /// <summary>
+        /// Clean the database and purge old data
+        /// </summary>
+        /// <returns>True if successful</returns>
+        public static async Task<bool> CleanDatabase()
+        {
+            try
+            {
+                var db = GetDb();
+                await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type = @0", typeof(LibraryFile).FullName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed cleaning database: " + ex.Message);
+                return false;
+            }
+        }
+#endif
+
         private static string GetDbFilename()
         {
             string dir = Program.GetAppDirectory();

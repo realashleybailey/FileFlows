@@ -71,7 +71,10 @@ namespace FileFlows.Server.Controllers
                 };
 
                 if (status == FileStatus.Processing)
+                {
                     item.Node = x.Node?.Name;
+                    item.ProcessingTime = x.ProcessingTime;
+                }
 
                 if (status == FileStatus.Duplicate)
                     item.Duplicate = x.Duplicate?.Name;

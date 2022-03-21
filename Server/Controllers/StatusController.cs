@@ -1,12 +1,7 @@
 ﻿namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
-    using FileFlows.Plugin;
-    using Microsoft.AspNetCore.SignalR;
-    using FileFlows.Server.Hubs;
-    using Microsoft.AspNetCore.Cors;
 
     /// <summary>
     /// Status controller

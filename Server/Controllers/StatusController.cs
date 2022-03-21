@@ -15,6 +15,17 @@
     public class StatusController : Controller
     {
         /// <summary>
+        /// Gets if an update is available
+        /// </summary>
+        /// <returns>True if there is an update</returns>
+        [HttpGet("update-available")]
+        public async Task<object> UpdateAvailable()
+        {
+            var result = Workers.AutoUpdater.GetLatestOnlineVersion();
+            return new { UpdateAvailable = result.updateAvailable };
+        }
+
+        /// <summary>
         /// Get the current status
         /// </summary>
         /// <returns>the current status</returns>

@@ -18,174 +18,188 @@ namespace FileFlows.Plugin.Helpers
             if (di.Exists)
                 return true;
 
-            //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            di.Create();
-            // else
-            //     CreateLinuxDir(logger, di);
-            //if (Chmod(directory))
-            //    Logger?.ILog("Succesfully set permissions on directory");
-            //else
-            //    Logger?.ILog("Failed to set permissions on directory");
+            if (IsWindows)
+                di.Create();
+            else
+                CreateLinuxDir(logger, di);
+
             return di.Exists;
         }
 
-        // public static bool CreateLinuxDir(ILogger logger, DirectoryInfo di)
-        // {
-        //     if (di.Exists)
-        //         return true;
-        //     if (di.Parent != null && di.Parent.Exists == false)
-        //     {
-        //         if (CreateLinuxDir(logger, di.Parent) == false)
-        //             return false;
-        //     }
-        //     logger?.ILog("Creating folder: " + di.FullName);
+        private static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-        //     string cmd = $"mkdir {EscapePathForLinux(di.FullName)}";
+        public static bool CreateLinuxDir(ILogger logger, DirectoryInfo di)
+        {
+            if (di.Exists)
+                return true;
+            if (di.Parent != null && di.Parent.Exists == false)
+            {
+                if (CreateLinuxDir(logger, di.Parent) == false)
+                    return false;
+            }
+            logger?.ILog("Creating folder: " + di.FullName);
 
-        //     try
-        //     {
-        //         using (var process = new System.Diagnostics.Process())
-        //         {
-        //             process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
-        //             process.StartInfo.UseShellExecute = false;
-        //             process.StartInfo.RedirectStandardOutput = true;
-        //             process.StartInfo.RedirectStandardError = true;
-        //             process.StartInfo.CreateNoWindow = true;
+            string cmd = $"mkdir {EscapePathForLinux(di.FullName)}";
 
-        //             process.Start();
-        //             string output = process.StandardError.ReadToEnd();
-        //             Console.WriteLine(output);
-        //             string error = process.StandardError.ReadToEnd();
-        //             process.WaitForExit();
+            try
+            {
+                using (var process = new System.Diagnostics.Process())
+                {
+                    process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
 
-        //             if (process.ExitCode == 0)
-        //             {
-        //                 return ChangeOwner(logger, di.FullName);
-        //             }
-        //             logger?.ELog("Failed creating directory:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
-        //             if (string.IsNullOrWhiteSpace(error) == false)
-        //                 logger?.ELog("Error output:" + output);
-        //             return false;
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         logger?.ELog("Failed creating directory: " + di.FullName + " -> " + ex.Message);
-        //         return false;
-        //     }
-        // }
+                    process.Start();
+                    string output = process.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
 
-
-
-        // public static bool ChangeOwner(ILogger logger, string filePath, bool recursive = true, bool file = false)
-        // {
-        //     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        //         return true; // its windows, lets just pretend we did this
-
-        //     if (file == false)
-        //     {
-        //         if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
-        //             filePath += Path.DirectorySeparatorChar;
-
-        //         logger?.ILog("Changing owner on folder: " + filePath);
-        //     }
-        //     else
-        //     {
-        //         logger?.ILog("Changing owner on file: " + filePath);
-        //         recursive = false;
-        //     }
-
-
-        //     string cmd = $"chown{(recursive ? " -R" : "")} nobody:users {EscapePathForLinux(filePath)}";
-
-        //     try
-        //     {
-        //         using (var process = new System.Diagnostics.Process())
-        //         {
-        //             process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
-        //             process.StartInfo.UseShellExecute = false;
-        //             process.StartInfo.RedirectStandardOutput = true;
-        //             process.StartInfo.RedirectStandardError = true;
-        //             process.StartInfo.CreateNoWindow = true;
-
-        //             process.Start();
-        //             string output = process.StandardError.ReadToEnd();
-        //             Console.WriteLine(output);
-        //             string error = process.StandardError.ReadToEnd();
-        //             process.WaitForExit();
-
-        //             if (process.ExitCode == 0)
-        //                 return SetPermissions(logger, filePath);
-        //             logger?.ELog("Failed changing owner:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
-        //             if (string.IsNullOrWhiteSpace(error) == false)
-        //                 logger?.ELog("Error output:" + output);
-        //             return false;
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         logger?.ELog("Failed changing owner: " + filePath + " => " + ex.Message);
-        //         return false;
-        //     }
-        // }
-
-
-        // public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true, bool file = false)
-        // {
-        //     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        //         return true; // its windows, lets just pretend we did this
-
-        //     if (file == false)
-        //     {
-        //         if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
-        //             filePath += Path.DirectorySeparatorChar;
-        //         logger?.ILog("Setting permissions on folder: " + filePath);
-        //     }
-        //     else
-        //     {
-        //         logger?.ILog("Setting permissions on file: " + filePath);
-        //         recursive = false;
-        //     }
+                    if (process.ExitCode == 0)
+                    {
+                        return ChangeOwner(logger, di.FullName);
+                    }
+                    logger?.ELog("Failed creating directory:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
+                    if (string.IsNullOrWhiteSpace(error) == false)
+                        logger?.ELog("Error output:" + output);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.ELog("Failed creating directory: " + di.FullName + " -> " + ex.Message);
+                return false;
+            }
+        }
 
 
 
-        //     string cmd = $"chmod{(recursive ? " -R" : "")} 777 {EscapePathForLinux(filePath)}";
+        public static bool ChangeOwner(ILogger logger, string filePath, bool recursive = true, bool file = false)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return true; // its windows, lets just pretend we did this
 
-        //     try
-        //     {
-        //         using (var process = new System.Diagnostics.Process())
-        //         {
-        //             process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
-        //             process.StartInfo.UseShellExecute = false;
-        //             process.StartInfo.RedirectStandardOutput = true;
-        //             process.StartInfo.RedirectStandardError = true;
-        //             process.StartInfo.CreateNoWindow = true;
+            if (file == false)
+            {
+                if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
+                    filePath += Path.DirectorySeparatorChar;
 
-        //             process.Start();
-        //             string output = process.StandardError.ReadToEnd();
-        //             Console.WriteLine(output);
-        //             string error = process.StandardError.ReadToEnd();
-        //             process.WaitForExit();
+                logger?.ILog("Changing owner on folder: " + filePath);
+            }
+            else
+            {
+                logger?.ILog("Changing owner on file: " + filePath);
+                recursive = false;
+            }
 
-        //             if (process.ExitCode == 0)
-        //                 return true;
-        //             logger?.ELog("Failed setting permissions:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
-        //             if (string.IsNullOrWhiteSpace(error) == false)
-        //                 logger?.ELog("Error output:" + output);
-        //             return false;
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         logger?.ELog("Failed setting permissions: " + filePath + " => " + ex.Message);
-        //         return false;
-        //     }
-        // }
 
-        // private static string EscapePathForLinux(string path)
-        // {
-        //     path = Regex.Replace(path, "([\\'\"\\$\\?\\*()\\s])", "\\$1");
-        //     return path;
-        // }
+            string cmd = $"chown{(recursive ? " -R" : "")} nobody:users {EscapePathForLinux(filePath)}";
+
+            try
+            {
+                using (var process = new System.Diagnostics.Process())
+                {
+                    process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
+
+                    process.Start();
+                    string output = process.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                        return SetPermissions(logger, filePath);
+                    logger?.ELog("Failed changing owner:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
+                    if (string.IsNullOrWhiteSpace(error) == false)
+                        logger?.ELog("Error output:" + output);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.ELog("Failed changing owner: " + filePath + " => " + ex.Message);
+                return false;
+            }
+        }
+
+
+        public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true, bool file = false)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return true; // its windows, lets just pretend we did this
+
+            if (file == false)
+            {
+                if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
+                    filePath += Path.DirectorySeparatorChar;
+                logger?.ILog("Setting permissions on folder: " + filePath);
+            }
+            else
+            {
+                logger?.ILog("Setting permissions on file: " + filePath);
+                recursive = false;
+            }
+
+
+
+            string cmd = $"chmod{(recursive ? " -R" : "")} 777 {EscapePathForLinux(filePath)}";
+
+            try
+            {
+                using (var process = new System.Diagnostics.Process())
+                {
+                    process.StartInfo = new System.Diagnostics.ProcessStartInfo("/bin/bash", $"-c \"{cmd}\"");
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
+
+                    process.Start();
+                    string output = process.StandardError.ReadToEnd();
+                    Console.WriteLine(output);
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                        return true;
+                    logger?.ELog("Failed setting permissions:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
+                    if (string.IsNullOrWhiteSpace(error) == false)
+                        logger?.ELog("Error output:" + output);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.ELog("Failed setting permissions: " + filePath + " => " + ex.Message);
+                return false;
+            }
+        }
+
+        private static string EscapePathForLinux(string path)
+        {
+            path = Regex.Replace(path, "([\\'\"\\$\\?\\*()\\s])", "\\$1");
+            return path;
+        }
+
+        public static void SaveFile(ILogger logger, string file, byte[] data)
+        {
+            File.WriteAllBytes(file, data);
+            if (IsWindows)
+                return;
+            ChangeOwner(logger, file, file:true);
+        }
+        public static void ExtractFile(ILogger logger, string file, string destination)
+        {
+            System.IO.Compression.ZipFile.ExtractToDirectory(file, destination);
+            if (IsWindows)
+                return;
+            ChangeOwner(logger,destination);
+        }
     }
 }

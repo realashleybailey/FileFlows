@@ -5,6 +5,8 @@
 
 FileFlows is a docker application that lets you configure a "Flow" that can be processed on a file.
 
+More information available on [fileflows.com](https://fileflows.com)
+
 It allows you to monitor directories, and then process files matching certain criteria for processing
 
 It is a plugin based system written in .net and comes with some plugins out of the box.

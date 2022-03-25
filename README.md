@@ -19,7 +19,23 @@ The Video plugin lets you process video files to ensure they are in the format y
 
 ![image](https://user-images.githubusercontent.com/958400/142720537-df9341ea-c11d-432e-bd1c-07ae4ef3b43d.png)
 
+
+![image](https://user-images.githubusercontent.com/958400/160212493-05f15d86-20fa-40e4-ac2d-b5e373e01d75.png)
+
+![image](https://user-images.githubusercontent.com/958400/160212767-01dccf20-6816-49cc-a289-16f0c1c4c731.png)
+
+Colour coded process log
+![image](https://user-images.githubusercontent.com/958400/160212825-e16a66ad-b1ad-409e-87a7-6ebdc83fe2eb.png)
+
+
 ---
+
+## API 
+Available on /api/help
+![image](https://user-images.githubusercontent.com/958400/160212640-a2328ae3-3efe-4900-8937-65b1804bee74.png)
+
+
+--- 
 
 ## License and Contribution
 Copyright (C) John Andrews - All Rights Reserved

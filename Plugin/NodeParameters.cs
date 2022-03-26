@@ -187,6 +187,12 @@ namespace FileFlows.Plugin
         public void SetWorkingFile(string filename, bool dontDelete = false)
         {
             if (Fake) return;
+
+            if(filename?.ToLower().StartsWith(TempPath.ToLower()) == true)
+            {
+                Plugin.Helpers.FileHelper.ChangeOwner(Logger, filename, file: true);
+            }
+
             if (this.WorkingFile == filename)
             {
                 Logger?.ILog("Working file same as new filename: " + filename);

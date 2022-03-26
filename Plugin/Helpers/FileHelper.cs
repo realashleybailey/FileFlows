@@ -94,8 +94,10 @@ namespace FileFlows.Plugin.Helpers
                 recursive = false;
             }
 
+            string puid = Environment.GetEnvironmentVariable("PUID") ?? "nobody";
+            string pgid = Environment.GetEnvironmentVariable("PGID") ?? "users";
 
-            string cmd = $"chown{(recursive ? " -R" : "")} nobody:users {EscapePathForLinux(filePath)}";
+            string cmd = $"chown{(recursive ? " -R" : "")} {puid}:{pgid} {EscapePathForLinux(filePath)}";
 
             try
             {

@@ -192,7 +192,8 @@ namespace FileFlows.Plugin
             {
                 Logger.ILog("Changing owner on working file: " + filename);
                 Plugin.Helpers.FileHelper.ChangeOwner(Logger, filename, file: true);
-            }else
+            }
+            else
             {
                 Logger.ILog("NOT changing owner on working file: " + filename + ", temp path: " + TempPath);
             }
@@ -294,9 +295,14 @@ namespace FileFlows.Plugin
                     else
                         CreateDirectoryIfNotExists(fileInfo?.DirectoryName);
 
+                    bool isTempFile = this.WorkingFile.ToLower().StartsWith(this.TempPath.ToLower()) == true;
+
                     Logger?.ILog($"Moving file: \"{WorkingFile}\" to \"{destination}\"");                    
                     File.Move(WorkingFile, destination, true);
                     Logger?.ILog("File moved successfully");
+
+                    if (isWindows == false && isTempFile)
+                        Helpers.FileHelper.ChangeOwner(Logger, destination, file: true);
 
                     this.WorkingFile = destination;
                     try
@@ -328,6 +334,100 @@ namespace FileFlows.Plugin
             }
 
             if (moved == false)
+                return false;
+
+            if (PartPercentageUpdate != null)
+                PartPercentageUpdate(100);
+            return true;
+        }
+
+
+        public bool CopyFile(string destination)
+        {
+            if (Fake) return true;
+
+            FileInfo file = new FileInfo(destination);
+            if (string.IsNullOrEmpty(file.Extension) == false)
+            {
+                // just ensures extensions are lowercased
+                destination = new FileInfo(file.FullName.Substring(0, file.FullName.LastIndexOf(file.Extension)) + file.Extension.ToLower()).FullName;
+            }
+
+            Logger?.ILog($"Copying file '{WorkingFile}' to '{destination}");
+            destination = MapPath(destination);
+
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (isWindows)
+            {
+                if (destination.ToLower() == WorkingFile?.ToLower())
+                {
+                    Logger?.ILog("Source and destination are the same, skipping move");
+                    return true;
+                }
+            }
+            else
+            {
+                // linux, is case sensitive
+                if (destination == WorkingFile)
+                {
+                    Logger?.ILog("Source and destination are the same, skipping move");
+                    return true;
+                }
+            }
+
+
+            bool copied = false;
+            long fileSize = new FileInfo(WorkingFile).Length;
+            Task task = Task.Run(() =>
+            {
+                try
+                {
+
+                    var fileInfo = new FileInfo(destination);
+                    if (fileInfo.Exists)
+                        fileInfo.Delete();
+                    else
+                        CreateDirectoryIfNotExists(fileInfo?.DirectoryName);
+
+                    bool isTempFile = this.WorkingFile.ToLower().StartsWith(this.TempPath.ToLower()) == true;
+
+                    Logger?.ILog($"Copying file: \"{WorkingFile}\" to \"{destination}\"");
+                    File.Copy(WorkingFile, destination, true);
+                    Logger?.ILog("File copied successfully");
+
+                    if (isWindows == false && isTempFile)
+                        Helpers.FileHelper.ChangeOwner(Logger, destination, file: true);
+
+                    this.WorkingFile = destination;
+                    try
+                    {
+                        // this can fail if the file is then moved really quickly by another process, radarr/sonarr etc
+                        Logger?.ILog("Initing new copied file");
+                        InitFile(destination);
+                    }
+                    catch (Exception) { }
+
+                    copied = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger?.ELog("Failed to move file: " + ex.Message);
+                }
+            });
+
+            while (task.IsCompleted == false)
+            {
+                long currentSize = 0;
+                var destFileInfo = new FileInfo(destination);
+                if (destFileInfo.Exists)
+                    currentSize = destFileInfo.Length;
+
+                if (PartPercentageUpdate != null)
+                    PartPercentageUpdate(currentSize / fileSize * 100);
+                Thread.Sleep(50);
+            }
+
+            if (copied == false)
                 return false;
 
             if (PartPercentageUpdate != null)

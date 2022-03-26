@@ -81,16 +81,20 @@ namespace FileFlows.Plugin.Helpers
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
+            bool log = filePath.Contains("Runner-") == false;
+
             if (file == false)
             {
                 if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
                     filePath += Path.DirectorySeparatorChar;
 
-                logger?.ILog("Changing owner on folder: " + filePath);
+                if(log)
+                    logger?.ILog("Changing owner on folder: " + filePath);
             }
             else
             {
-                logger?.ILog("Changing owner on file: " + filePath);
+                if (log)
+                    logger?.ILog("Changing owner on file: " + filePath);
                 recursive = false;
             }
 
@@ -98,7 +102,8 @@ namespace FileFlows.Plugin.Helpers
             string pgid = Environment.GetEnvironmentVariable("PGID")?.EmptyAsNull() ?? "users";
 
             string cmd = $"chown{(recursive ? " -R" : "")} {puid}:{pgid} {EscapePathForLinux(filePath)}";
-            logger.ILog("Change owner command: " + cmd);
+            if (log)
+                logger.ILog("Change owner command: " + cmd);
 
             try
             {
@@ -137,15 +142,19 @@ namespace FileFlows.Plugin.Helpers
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
+            bool log = filePath.Contains("Runner-") == false;
+
             if (file == false)
             {
                 if (filePath.EndsWith(Path.DirectorySeparatorChar) == false)
                     filePath += Path.DirectorySeparatorChar;
-                logger?.ILog("Setting permissions on folder: " + filePath);
+                if(log)
+                    logger?.ILog("Setting permissions on folder: " + filePath);
             }
             else
             {
-                logger?.ILog("Setting permissions on file: " + filePath);
+                if (log)
+                    logger?.ILog("Setting permissions on file: " + filePath);
                 recursive = false;
             }
 

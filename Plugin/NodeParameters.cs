@@ -353,7 +353,6 @@ namespace FileFlows.Plugin
                 destination = new FileInfo(file.FullName.Substring(0, file.FullName.LastIndexOf(file.Extension)) + file.Extension.ToLower()).FullName;
             }
 
-            Logger?.ILog($"Copying file '{WorkingFile}' to '{destination}");
             destination = MapPath(destination);
 
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

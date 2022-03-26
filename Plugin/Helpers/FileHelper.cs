@@ -94,10 +94,11 @@ namespace FileFlows.Plugin.Helpers
                 recursive = false;
             }
 
-            string puid = Environment.GetEnvironmentVariable("PUID") ?? "nobody";
-            string pgid = Environment.GetEnvironmentVariable("PGID") ?? "users";
+            string puid = Environment.GetEnvironmentVariable("PUID")?.EmptyAsNull() ?? "nobody";
+            string pgid = Environment.GetEnvironmentVariable("PGID")?.EmptyAsNull() ?? "users";
 
             string cmd = $"chown{(recursive ? " -R" : "")} {puid}:{pgid} {EscapePathForLinux(filePath)}";
+            logger.ILog("Change owner command: " + cmd);
 
             try
             {
@@ -116,7 +117,7 @@ namespace FileFlows.Plugin.Helpers
                     process.WaitForExit();
 
                     if (process.ExitCode == 0)
-                        return SetPermissions(logger, filePath);
+                        return SetPermissions(logger, filePath, file: file);
                     logger?.ELog("Failed changing owner:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
                     if (string.IsNullOrWhiteSpace(error) == false)
                         logger?.ELog("Error output:" + output);

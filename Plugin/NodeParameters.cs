@@ -190,7 +190,11 @@ namespace FileFlows.Plugin
 
             if(filename?.ToLower().StartsWith(TempPath.ToLower()) == true)
             {
+                Logger.ILog("Changing owner on working file: " + filename);
                 Plugin.Helpers.FileHelper.ChangeOwner(Logger, filename, file: true);
+            }else
+            {
+                Logger.ILog("NOT changing owner on working file: " + filename + ", temp path: " + TempPath);
             }
 
             if (this.WorkingFile == filename)

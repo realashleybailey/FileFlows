@@ -188,14 +188,17 @@ namespace FileFlows.Plugin
         {
             if (Fake) return;
 
-            if(filename?.ToLower().StartsWith(TempPath.ToLower()) == true)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
             {
-                Logger.ILog("Changing owner on working file: " + filename);
-                Plugin.Helpers.FileHelper.ChangeOwner(Logger, filename, file: true);
-            }
-            else
-            {
-                Logger.ILog("NOT changing owner on working file: " + filename + ", temp path: " + TempPath);
+                if (filename?.ToLower().StartsWith(TempPath.ToLower()) == true)
+                {
+                    Logger.ILog("Changing owner on working file: " + filename);
+                    Helpers.FileHelper.ChangeOwner(Logger, filename, file: true);
+                }
+                else
+                {
+                    Logger.ILog("NOT changing owner on working file: " + filename + ", temp path: " + TempPath);
+                }
             }
 
             if (this.WorkingFile == filename)

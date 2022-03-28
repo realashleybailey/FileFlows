@@ -318,7 +318,6 @@ namespace FileFlows.Server.Workers
         {
             if (ScanMutex.WaitOne(1) == false)
                 return;
-            Logger.Instance?.ILog($"Library '{Library.Name}' scan");
             try
             {
                 if (Library.ScanInterval < 10)
@@ -338,7 +337,8 @@ namespace FileFlows.Server.Workers
 
                 if (fullScan == false && Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
                 {
-                    Logger.Instance?.ILog($"Library '{Library.Name}' need to wait until '{(Library.LastScanned.AddSeconds(Library.ScanInterval))}' before scanning again");
+                    if(Library.Scan) // only log this if set to scan mode
+                        Logger.Instance?.ILog($"Library '{Library.Name}' need to wait until '{(Library.LastScanned.AddSeconds(Library.ScanInterval))}' before scanning again");
                     return;
                 }
 

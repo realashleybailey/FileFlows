@@ -284,8 +284,8 @@
         "DontSetPermissions": "Set Permissions",
         "DontSetPermissions-Help": "When checked file permissions will be set on any newly created files",
         "Permissions": "Permissions",
-        "Permissions-Placeholder": "666",
-        "Permissions-Help": "The file permissions to set on any newly created files.  If blank the default permissions of 666 will be used."
+        "Permissions-Placeholder": "777",
+        "Permissions-Help": "The file permissions to set on any newly created files.  If blank the default permissions of 777 will be used."
       }
     },
     "Plugins": {

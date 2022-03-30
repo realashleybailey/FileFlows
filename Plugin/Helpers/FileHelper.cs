@@ -80,7 +80,7 @@ namespace FileFlows.Plugin.Helpers
 
 
 
-        public static bool ChangeOwner(ILogger logger, string filePath, bool recursive = true, bool file = false, bool execute = false)
+        public static bool ChangeOwner(ILogger logger, string filePath, bool recursive = true, bool file = false)
         {
             if (DontChangeOwner)
             {
@@ -132,7 +132,7 @@ namespace FileFlows.Plugin.Helpers
                     process.WaitForExit();
 
                     if (process.ExitCode == 0)
-                        return SetPermissions(logger, filePath, file: file, execute: execute);
+                        return SetPermissions(logger, filePath, file: file);
                     logger?.ELog("Failed changing owner:" + process.StartInfo.FileName, process.StartInfo.Arguments + Environment.NewLine + output);
                     if (string.IsNullOrWhiteSpace(error) == false)
                         logger?.ELog("Error output:" + output);
@@ -147,7 +147,7 @@ namespace FileFlows.Plugin.Helpers
         }
 
 
-        public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true, bool file = false, bool execute = false)
+        public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true, bool file = false)
         {
             if (DontSetPermissions)
             {
@@ -174,11 +174,7 @@ namespace FileFlows.Plugin.Helpers
                 recursive = false;
             }
 
-            string strPermissions = (execute ? 777 : 666).ToString();
-            if (string.IsNullOrEmpty(Permissions) == false)
-                strPermissions = Permissions;
-
-            string cmd = $"chmod{(recursive ? " -R" : "")} {strPermissions} {EscapePathForLinux(filePath)}";
+            string cmd = $"chmod{(recursive ? " -R" : "")} {Permissions?.EmptyAsNull() ?? "777"} {EscapePathForLinux(filePath)}";
 
             try
             {
@@ -229,7 +225,7 @@ namespace FileFlows.Plugin.Helpers
             System.IO.Compression.ZipFile.ExtractToDirectory(file, destination);
             if (IsWindows)
                 return;
-            ChangeOwner(logger,destination, execute: true);
+            ChangeOwner(logger,destination);
         }
     }
 }

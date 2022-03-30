@@ -1,6 +1,10 @@
 @namespace FileFlows.Client.Components.Inputs
 @inherits Input<string>
 
+@if (this.Visible == false) {
+    return;
+}
+
 <div class="input-text-variables">
     <InputWrapper Input="@this">
         <VariableInput Uid="@Uid" Variables=@Variables @bind-Value="Value" Placeholder=@Placeholder SubmitEvent="OnSubmit" CloseEvent="OnClose" />

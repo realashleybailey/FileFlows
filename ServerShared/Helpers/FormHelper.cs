@@ -14,86 +14,100 @@
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 var attribute = prop.GetCustomAttributes(typeof(FormInputAttribute), false).FirstOrDefault() as FormInputAttribute;
-                if (attribute != null)
+                if (attribute == null)
+                    continue;
+
+                var ef = new ElementField
                 {
-                    var ef = new ElementField
-                    {
-                        Name = prop.Name,
-                        Order = attribute.Order,
-                        InputType = attribute.InputType,
-                        Type = prop.PropertyType.FullName,
-                        Parameters = new Dictionary<string, object>(),
-                        Validators = new List<Shared.Validators.Validator>()
-                    };
+                    Name = prop.Name,
+                    Order = attribute.Order,
+                    InputType = attribute.InputType,
+                    Type = prop.PropertyType.FullName,
+                    Parameters = new Dictionary<string, object>(),
+                    Validators = new List<Shared.Validators.Validator>()
+                };
 
-                    fields.Add(ef);
+                fields.Add(ef);
 
-                    var parameters = new Dictionary<string, object>();
+                var parameters = new Dictionary<string, object>();
 
-                    foreach (var attProp in attribute.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                    {
-                        if (new string[] { nameof(FormInputAttribute.Order), nameof(FormInputAttribute.InputType), "TypeId" }.Contains(attProp.Name))
-                            continue;
+                foreach (var attProp in attribute.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (new string[] { nameof(FormInputAttribute.Order), nameof(FormInputAttribute.InputType), "TypeId" }.Contains(attProp.Name))
+                        continue;
 
-                        object value = attProp.GetValue(attribute);
-                        Logger.Instance.DLog(attProp.Name, value);
-                        ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
+                    object value = attProp.GetValue(attribute);
+                    Logger.Instance.DLog(attProp.Name, value);
+                    ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
 
-                    }
-
-                    if(attribute is ChecklistAttribute chk)
-                    {
-                        // get the options
-                        if(string.IsNullOrWhiteSpace(chk.OptionsProperty) == false)
-                        {
-                            var chkProperty = type.GetProperty(chk.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
-                            if(chkProperty != null)
-                            {
-                                try
-                                {
-                                    ef.Parameters ??= new Dictionary<string, object>();
-                                    var options = chkProperty.GetValue(null) as List<Plugin.ListOption>;
-                                    if(ef.Parameters.ContainsKey("Options") == false && options != null)
-                                        ef.Parameters.Add("Options", options);
-                                }                                
-                                catch (Exception){}
-                            }
-                        }
-                    }
-                    if (attribute is SelectAttribute sel)
-                    {
-                        // get the options
-                        if (string.IsNullOrWhiteSpace(sel.OptionsProperty) == false)
-                        {
-                            var selProperty = type.GetProperty(sel.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
-                            if (selProperty != null)
-                            {
-                                try
-                                {
-                                    ef.Parameters ??= new Dictionary<string, object>();
-                                    var options = selProperty.GetValue(null) as List<Plugin.ListOption>;
-                                    if (ef.Parameters.ContainsKey("Options") == false && options != null)
-                                        ef.Parameters.Add("Options", options);
-                                }
-                                catch (Exception) { }
-                            }
-                        }
-                    }
-
-                    if (model.ContainsKey(prop.Name) == false)
-                    {
-                        var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
-                        model.Add(prop.Name, dValue != null ? dValue.Value : prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
-                    }
-
-
-                    if (prop.GetCustomAttributes(typeof(RequiredAttribute), false).FirstOrDefault() != null)
-                        ef.Validators.Add(new Shared.Validators.Required());
-                    if (prop.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() is RangeAttribute range)
-                        ef.Validators.Add(new Shared.Validators.Range { Minimum = (int)range.Minimum, Maximum = (int)range.Maximum });
-                    if (prop.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RegularExpressionAttribute), false).FirstOrDefault() is System.ComponentModel.DataAnnotations.RegularExpressionAttribute exp)
-                        ef.Validators.Add(new Shared.Validators.Pattern { Expression = exp.Pattern });
                 }
+
+                if(attribute is ChecklistAttribute chk)
+                {
+                    // get the options
+                    if(string.IsNullOrWhiteSpace(chk.OptionsProperty) == false)
+                    {
+                        var chkProperty = type.GetProperty(chk.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
+                        if(chkProperty != null)
+                        {
+                            try
+                            {
+                                ef.Parameters ??= new Dictionary<string, object>();
+                                var options = chkProperty.GetValue(null) as List<Plugin.ListOption>;
+                                if(ef.Parameters.ContainsKey("Options") == false && options != null)
+                                    ef.Parameters.Add("Options", options);
+                            }                                
+                            catch (Exception){}
+                        }
+                    }
+                }
+                if (attribute is SelectAttribute sel)
+                {
+                    // get the options
+                    if (string.IsNullOrWhiteSpace(sel.OptionsProperty) == false)
+                    {
+                        var selProperty = type.GetProperty(sel.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
+                        if (selProperty != null)
+                        {
+                            try
+                            {
+                                ef.Parameters ??= new Dictionary<string, object>();
+                                var options = selProperty.GetValue(null) as List<Plugin.ListOption>;
+                                if (ef.Parameters.ContainsKey("Options") == false && options != null)
+                                    ef.Parameters.Add("Options", options);
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                }
+
+                if (model.ContainsKey(prop.Name) == false)
+                {
+                    var dValue = prop.GetCustomAttributes(typeof(DefaultValueAttribute), false).FirstOrDefault() as DefaultValueAttribute;
+                    model.Add(prop.Name, dValue != null ? dValue.Value : prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null);
+                }
+
+
+                if (prop.GetCustomAttributes(typeof(RequiredAttribute), false).FirstOrDefault() != null)
+                    ef.Validators.Add(new Shared.Validators.Required());
+                if (prop.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() is RangeAttribute range)
+                    ef.Validators.Add(new Shared.Validators.Range { Minimum = (int)range.Minimum, Maximum = (int)range.Maximum });
+                if (prop.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RegularExpressionAttribute), false).FirstOrDefault() is System.ComponentModel.DataAnnotations.RegularExpressionAttribute exp)
+                    ef.Validators.Add(new Shared.Validators.Pattern { Expression = exp.Pattern });
+
+
+                ConditionEqualsAttribute conditionEquals = prop.GetCustomAttributes(typeof(ConditionEqualsAttribute), false).FirstOrDefault() as ConditionEqualsAttribute;
+                if (conditionEquals != null)
+                {
+                    ef.Conditions ??= new List<Condition>();
+                    ef.Conditions.Add(new Condition()
+                    {
+                        Property = conditionEquals.Property,
+                        Value = conditionEquals.Value,
+                        IsNot = conditionEquals.Inverse
+                    });
+                }
+
             }
             return fields;
         }

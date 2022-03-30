@@ -3,6 +3,8 @@ namespace FileFlows.Shared.Models
     using System.Collections;
     using System.Collections.Generic;
     using System.Dynamic;
+    using System.Linq;
+    using System.Text.Json.Serialization;
     using FileFlows.Plugin;
     public class ElementField
     {
@@ -29,6 +31,9 @@ namespace FileFlows.Shared.Models
         public delegate void DisabledChangeEvent(bool state);
         public event DisabledChangeEvent DisabledChange;
 
+        public delegate void ConditionsChangeEvent(bool state);
+        public event ConditionsChangeEvent ConditionsChange;
+
         public void InvokeValueChanged(object sender, object value) => this.ValueChanged?.Invoke(sender, value);
 
         private List<Condition> _DisabledConditions;
@@ -43,23 +48,52 @@ namespace FileFlows.Shared.Models
             }
         }
 
-        internal void InvokeDisableChange(bool state)
+        private List<Condition> _Conditions;
+        public List<Condition> Conditions
         {
-            this.DisabledChange?.Invoke(state);
+            get => _Conditions;
+            set
+            {
+                _Conditions = value ?? new List<Condition>();
+                foreach (var condition in _Conditions)
+                    condition.Owner = this;
+            }
+        }
+
+        internal void InvokeChange(Condition condition, bool state)
+        {
+            if(this.DisabledConditions?.Any(x => x == condition) == true)
+                this.DisabledChange?.Invoke(state);
+            if (this.Conditions?.Any(x => x == condition) == true)
+                this.ConditionsChange?.Invoke(state == false); // state is the "disabled" state, for conditions we want the inverse
         }
     }
 
     public class Condition
     {
-        public ElementField Field{ get; private set; }
+        [JsonIgnore]
+        public ElementField Field { get; private set; }
+        public string Property { get; set; }
         public object Value { get; set; }
         public bool IsNot { get; set; }
 
         public bool IsMatch { get; set; }
 
+        [JsonIgnore]
         public ElementField Owner { get; set; }
 
+        public Condition()
+        {
+
+        }
+
         public Condition(ElementField field, object initialValue)
+        {
+            this.Property = field.Name;
+            this.SetField(field, initialValue);
+        }
+
+        public void SetField(ElementField field, object initialValue)
         {
             this.Field = field;
             this.Field.ValueChanged += Field_ValueChanged;
@@ -71,7 +105,7 @@ namespace FileFlows.Shared.Models
             bool matches = this.Matches(value);
             matches = !matches; // reverse this as we matches mean enabled, so we want disabled
             this.IsMatch = matches;
-            this.Owner?.InvokeDisableChange(matches);
+            this.Owner?.InvokeChange(this, matches);
         }
 
         public virtual bool Matches(object value)

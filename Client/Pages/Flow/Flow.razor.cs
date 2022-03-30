@@ -408,11 +408,36 @@ namespace FileFlows.Client.Pages
             }
 
 
+            var model = part.Model ?? new ExpandoObject();
+            // add the name to the model, since this is actually bound on the part not model, but we need this 
+            // so the user can update the name
+            if (model is IDictionary<string, object> dict)
+            {
+                dict["Name"] = part.Name ?? string.Empty;
+            }
+
             List<ListOption> flowOptions = null;
 
             foreach (var field in fields)
             {
                 field.Variables = variables;
+                if(field.Conditions?.Any() == true)
+                {
+                    foreach(var condition in field.Conditions)
+                    {
+                        if (condition.Owner == null)
+                            condition.Owner = field;
+                        if (condition.Field == null && string.IsNullOrWhiteSpace(condition.Property) == false)
+                        {
+                            var other = fields.Where(x => x.Name == condition.Property).FirstOrDefault();
+                            if (other != null && model is IDictionary<string, object> mdict) 
+                            {
+                                object otherValue = mdict.ContainsKey(other.Name) ? mdict[other.Name] : null;
+                                condition.SetField(other, otherValue);
+                            }
+                        }
+                    }
+                }
                 // special case, load "Flow" into FLOW_LIST
                 // this lets a plugin request the list of flows to be shown
                 if (field.Parameters?.Any() == true)
@@ -452,14 +477,6 @@ namespace FileFlows.Client.Pages
                         }
                     }
                 }
-            }
-
-            var model = part.Model ?? new ExpandoObject();
-            // add the name to the model, since this is actually bound on the part not model, but we need this 
-            // so the user can update the name
-            if (model is IDictionary<string, object> dict)
-            {
-                dict["Name"] = part.Name ?? string.Empty;
             }
 
 

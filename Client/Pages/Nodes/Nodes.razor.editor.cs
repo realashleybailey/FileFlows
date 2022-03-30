@@ -18,7 +18,9 @@ namespace FileFlows.Client.Pages
             tabs.Add("General", TabGeneral(node, isServerProcessingNode));
             tabs.Add("Schedule", TabSchedule(node, isServerProcessingNode));
             if(isServerProcessingNode == false)
-                tabs.Add("Advanced", TabMappings(node));
+                tabs.Add("Mappings", TabMappings(node));
+            if (node.OperatingSystem == OperatingSystemType.Linux || node.OperatingSystem == OperatingSystemType.Unknown)
+                tabs.Add("Advanced", TabAdvanced(node));
 
 
             var result = await Editor.Open("Pages.ProcessingNode", "Pages.ProcessingNode.Title", null, node, tabs: tabs, large: true,
@@ -127,6 +129,44 @@ namespace FileFlows.Client.Pages
                 {
                     { "HideLabel", true }
                 }
+            });
+            return fields;
+        }
+
+        private List<ElementField> TabAdvanced(ProcessingNode node)
+        {
+            List<ElementField> fields = new List<ElementField>();
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Switch,
+                Name = nameof(node.DontChangeOwner),
+                Parameters = new()
+                {
+                    { "Inverse", true }
+                }
+            });
+            var efDontSetPermissions = new ElementField
+            {
+                InputType = FormInputType.Switch,
+                Name = nameof(node.DontSetPermissions),
+                Parameters = new()
+                {
+                    { "Inverse", true }
+                }
+            };
+            fields.Add(efDontSetPermissions);
+
+            var condition = new Condition()
+            {
+                Value = false
+            };
+            condition.SetField(efDontSetPermissions, node.DontSetPermissions);
+
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Text,
+                Name = nameof(node.Permissions),
+                DisabledConditions = new List<Condition> { condition }
             });
             return fields;
         }

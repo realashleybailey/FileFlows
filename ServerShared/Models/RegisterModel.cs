@@ -1,4 +1,6 @@
-﻿namespace FileFlows.ServerShared.Models
+﻿using FileFlows.Shared;
+
+namespace FileFlows.ServerShared.Models
 {
     public class RegisterModel
     {
@@ -7,6 +9,7 @@
         public int FlowRunners { get; set; }
         public bool Enabled { get; set; }
         public List<RegisterModelMapping> Mappings { get; set; }
+        public OperatingSystemType OperatingSystem { get; set; }
     }
 
     public class RegisterModelMapping

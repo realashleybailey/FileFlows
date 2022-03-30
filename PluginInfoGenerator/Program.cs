@@ -16,7 +16,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
         public static void Main(string[] args)
         {
 #if (DEBUG)
-            //args = new[] { @"C:\Users\john\src\FileFlows\FileFlowsPlugins\EmailNodes\bin\Debug\net6.0\EmailNodes.dll", @"C:\Users\john\src\FileFlows\FileFlowsPlugins\EmailNodes\EmailNodes.csproj" };
+            args = new[] { @"D:\src\FileFlows\FileFlowsPlugins\VideoNodes\bin\Debug\net6.0\VideoNodes.dll", @"D:\src\FileFlows\FileFlowsPlugins\VideoNodes\VideoNodes.csproj" };
 #endif
             if(args.Length != 2)
             {

@@ -1,6 +1,7 @@
 ﻿namespace FileFlows.FlowRunner;
 
 using FileFlows.Plugin;
+using FileFlows.Plugin.Helpers;
 using FileFlows.ServerShared.Services;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
@@ -222,6 +223,11 @@ public class Runner
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
+
+        FileHelper.DontChangeOwner = Node.DontChangeOwner;
+        FileHelper.DontSetPermissions = Node.DontSetPermissions;
+        FileHelper.Permissions = Node.Permissions;
+
         List<Guid> runFlows = new List<Guid>();
         runFlows.Add(Flow.Uid);
 

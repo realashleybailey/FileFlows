@@ -5,6 +5,11 @@
 @foreach (var field in Fields.OrderBy(x => x.Order))
 {
     string label = TypeName + ".Fields." + field.Name;
+    if (string.IsNullOrWhiteSpace(field.Placeholder))
+    {
+        field.Placeholder = Translater.Instant(label + "-Placeholder").EmptyAsNull() ?? string.Empty;
+    }
+
     bool readOnly = GetParameter<bool>(field, "ReadOnly");
     bool hideLabel = GetParameter<bool>(field, "HideLabel");
     switch (field.InputType)
@@ -76,7 +81,8 @@
         case FormInputType.Switch:
             {
                 var value = GetValue<bool>(field.Name);
-                <InputSwitch Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
+                bool inverse = GetParameter<bool>(field, nameof(Components.Inputs.InputSwitch.Inverse));
+                <InputSwitch Field=@field Label="@label" Value="@value" Inverse=@inverse ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
     Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;

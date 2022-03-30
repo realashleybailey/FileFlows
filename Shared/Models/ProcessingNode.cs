@@ -11,11 +11,16 @@ namespace FileFlows.Shared.Models
 
         public bool Enabled { get; set; }
 
+        public OperatingSystemType OperatingSystem { get; set; }
+
         public int FlowRunners { get; set; }
 
         public string SignalrUrl { get; set; }
         public List<KeyValuePair<string, string>> Mappings { get; set; }
         public string Schedule { get; set; }
+        public bool DontChangeOwner { get; set; }
+        public bool DontSetPermissions { get; set; }
+        public string Permissions { get; set; }
 
         public string Map(string path)
         {

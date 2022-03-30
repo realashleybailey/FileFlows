@@ -89,13 +89,23 @@
             if(serverUrl.EndsWith("/"))
                 serverUrl = serverUrl.Substring(0, serverUrl.Length - 1);
 
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool isMacOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+                isLinux = true;
+
             var result = await HttpHelper.Post<ProcessingNode>(serverUrl + "/api/node/register", new RegisterModel
             {
                 Address = address,
                 TempPath = tempPath,
                 FlowRunners = runners,
                 Enabled = enabled,
-                Mappings = mappings
+                Mappings = mappings,
+                OperatingSystem = isWindows ? Shared.OperatingSystemType.Windows : 
+                     isLinux ? Shared.OperatingSystemType.Linux :       
+                     isMacOs ? Shared.OperatingSystemType.Mac :
+                     Shared.OperatingSystemType.Unknown
             }, timeoutSeconds: 15);
 
             if (result.Success == false)

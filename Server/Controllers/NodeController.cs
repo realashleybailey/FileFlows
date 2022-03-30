@@ -17,7 +17,33 @@ namespace FileFlows.Server.Controllers
         /// </summary>
         /// <returns>a list of processing node</returns>
         [HttpGet]
-        public async Task<IEnumerable<ProcessingNode>> GetAll() => (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);
+        public async Task<IEnumerable<ProcessingNode>> GetAll()
+        {
+            var nodes = (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);
+            var internalNode = nodes.Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();
+            if(internalNode != null && internalNode.OperatingSystem == Shared.OperatingSystemType.Unknown)
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    internalNode.OperatingSystem = Shared.OperatingSystemType.Windows;
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    internalNode.OperatingSystem = Shared.OperatingSystemType.Mac;
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+                    internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
+
+                if(internalNode.OperatingSystem != Shared.OperatingSystemType.Unknown)
+                {
+                    await Update(internalNode);
+                }
+            }
+#if (DEBUG)
+            // set this to linux so we can test the full UI
+            if (internalNode != null)
+                internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
+#endif
+            return nodes;
+        }
 
         /// <summary>
         /// Get processing node
@@ -45,6 +71,9 @@ namespace FileFlows.Server.Controllers
                     internalNode.FlowRunners = node.FlowRunners;
                     internalNode.Enabled = node.Enabled;
                     internalNode.TempPath = node.TempPath;
+                    internalNode.DontChangeOwner = node.DontChangeOwner;
+                    internalNode.DontSetPermissions = node.DontSetPermissions;
+                    internalNode.Permissions = node.Permissions;
                     return await Update(internalNode, checkDuplicateName: true);
                 }
                 else
@@ -175,6 +204,7 @@ namespace FileFlows.Server.Controllers
                     existing.FlowRunners = model.FlowRunners;
                     existing.TempPath = model.TempPath;
                     existing.Enabled = model.Enabled;
+                    existing.OperatingSystem = model.OperatingSystem;
                     await Update(existing);
                 }
                 existing.SignalrUrl = "flow";
@@ -205,6 +235,7 @@ namespace FileFlows.Server.Controllers
                 Enabled = model.Enabled,
                 FlowRunners = model.FlowRunners,
                 TempPath = model.TempPath,
+                OperatingSystem = model.OperatingSystem,
                 Schedule = new string('1', 672),
                 Mappings = model.Mappings?.Select(x => new KeyValuePair<string, string>(x.Server, x.Local))?.ToList() ?? tools?.Select(x => new
                    KeyValuePair<string, string>(x.Path, "")

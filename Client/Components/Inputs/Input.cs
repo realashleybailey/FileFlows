@@ -17,6 +17,7 @@ namespace FileFlows.Client.Components.Inputs
         string ErrorMessage { get; set; }
         bool HideLabel { get; set; }
         bool Disabled { get; set; }
+        bool Visible { get; set; }
 
         EventCallback OnSubmit { get; set; }
 
@@ -80,9 +81,10 @@ namespace FileFlows.Client.Components.Inputs
         public bool ReadOnly { get; set; }
 
         public bool Disabled { get; set; }
+        public bool Visible { get; set; }
 
         [Parameter]
-        public FileFlows.Shared.Models.ElementField Field { get; set; }
+        public ElementField Field { get; set; }
 
         [Parameter]
         public string Help { get => _Help; set { if (string.IsNullOrEmpty(value) == false) _Help = value; } }
@@ -142,6 +144,7 @@ namespace FileFlows.Client.Components.Inputs
         {
             base.OnInitialized();
             Editor.RegisterInput(this);
+            this.Visible = true;
 
             if (this.Field != null)
             {
@@ -153,6 +156,15 @@ namespace FileFlows.Client.Components.Inputs
                     foreach (var condition in this.Field.DisabledConditions)
                         disabled |= condition.IsMatch;
                     this.Disabled = disabled;
+                }
+
+                this.Field.ConditionsChange += Field_ConditionsChange;
+                if (this.Field.Conditions?.Any() == true)
+                {
+                    bool visible = true;
+                    foreach (var condition in this.Field.Conditions)
+                        visible &= condition.IsMatch == false; // conditions IsMatch stores the inverse for Disabled states, for condtions we want the inverse
+                    this.Visible = visible;
                 }
             }
         }
@@ -166,12 +178,24 @@ namespace FileFlows.Client.Components.Inputs
             }
         }
 
+        private void Field_ConditionsChange(bool state)
+        {
+            if(this.Visible != state)
+            {
+                this.Visible = state;
+                this.StateHasChanged();
+            }
+        }
+
         protected void ClearError() => this.ErrorMessage = "";
 
         public virtual async Task<bool> Validate()
         {
             if (this.Validators?.Any() != true)
                 return true;
+            if (this.Visible == false)
+                return true;
+
             bool isValid = string.IsNullOrEmpty(ErrorMessage);
             foreach (var val in this.Validators)
             {

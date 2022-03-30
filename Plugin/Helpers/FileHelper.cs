@@ -10,6 +10,10 @@ namespace FileFlows.Plugin.Helpers
 {
     public class FileHelper
     {
+        public static bool DontChangeOwner { get; set; }
+        public static bool DontSetPermissions { get; set; }
+        public static string Permissions { get; set; }
+
         public static bool CreateDirectoryIfNotExists(ILogger logger, string directory)
         {
             if (string.IsNullOrEmpty(directory))
@@ -78,6 +82,12 @@ namespace FileFlows.Plugin.Helpers
 
         public static bool ChangeOwner(ILogger logger, string filePath, bool recursive = true, bool file = false, bool execute = false)
         {
+            if (DontChangeOwner)
+            {
+                logger?.ILog("ChangeOwner is turned off, skipping");
+                return true;
+            }
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
@@ -139,6 +149,12 @@ namespace FileFlows.Plugin.Helpers
 
         public static bool SetPermissions(ILogger logger, string filePath, bool recursive = true, bool file = false, bool execute = false)
         {
+            if (DontSetPermissions)
+            {
+                logger?.ILog("SetPermissions is turned off, skipping");
+                return true;
+            }
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
@@ -158,9 +174,11 @@ namespace FileFlows.Plugin.Helpers
                 recursive = false;
             }
 
+            string strPermissions = (execute ? 777 : 666).ToString();
+            if (string.IsNullOrEmpty(Permissions) == false)
+                strPermissions = Permissions;
 
-
-            string cmd = $"chmod{(recursive ? " -R" : "")} {(execute ? 777 : 666)} {EscapePathForLinux(filePath)}";
+            string cmd = $"chmod{(recursive ? " -R" : "")} {strPermissions} {EscapePathForLinux(filePath)}";
 
             try
             {

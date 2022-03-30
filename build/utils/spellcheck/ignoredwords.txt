@@ -50,3 +50,5 @@ rescaled
 hostname
 usr
 Node'CUtilsffmpegffmpeg
+PUID
+PGID

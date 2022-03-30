@@ -280,7 +280,7 @@
         "Schedule-Help": "This schedule runs in the Time Zone of the node",
         "ScheduleDescription": "This allows you to configure when this node will be active.\n\nThe node will not process any files outside of this configured schedule.\n",
         "DontChangeOwner": "Change Owner",
-        "DontChangeOwner-Help": "When checked the node will set permissions of any newly created files to the PGID and PUID defined in the environmental values",
+        "DontChangeOwner-Help": "When checked the node will change the owner of any newly created files to the PGID and PUID defined in the environmental values.\nIf these environmental variables are not set the owner will be changed to ''users:nobody''.",
         "DontSetPermissions": "Set Permissions",
         "DontSetPermissions-Help": "When checked file permissions will be set on any newly created files",
         "Permissions": "Permissions",

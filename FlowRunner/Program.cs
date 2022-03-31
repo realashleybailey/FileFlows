@@ -35,11 +35,9 @@ namespace FileFlows.FlowRunner
                 LogInfo("Base URL: " + baseUrl);
                 Service.ServiceBaseUrl = baseUrl;
 
-
                 string hostname = GetArgument(args, "--hostname");
                 if(string.IsNullOrWhiteSpace(hostname))
                     hostname = Environment.MachineName;
-
 
                 string workingDir = Path.Combine(tempPath, "Runner-" + uid);
                 Directory.CreateDirectory(workingDir);

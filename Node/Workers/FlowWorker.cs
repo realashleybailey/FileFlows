@@ -1,5 +1,6 @@
 ﻿namespace FileFlows.Node.Workers
 {
+    using FileFlows.ServerShared.Helpers;
     using FileFlows.ServerShared.Services;
     using FileFlows.ServerShared.Workers;
     using FileFlows.Shared;
@@ -56,11 +57,23 @@
                 nodeService.ClearWorkers(node.Uid);
             }
 
+            if (node == null)
+            {
+                Logger.Instance?.DLog($"Node not found");
+                return;
+            }
+
             string nodeName = node?.Name == "FileFlowsServer" ? "Internal Processing Node" : (node?.Name ?? "Unknown");
 
             if (node?.Enabled != true)
             {
-                Logger.Instance?.DLog($"Flow executor '{nodeName}' not enabled");
+                Logger.Instance?.DLog($"Node '{nodeName}' is not enabled");
+                return;
+            }
+
+            if(string.IsNullOrEmpty(node?.Schedule) == false && TimeHelper.InSchedule(node.Schedule) == false)
+            {
+                Logger.Instance?.DLog($"Node '{nodeName}' is out of schedule");
                 return;
             }
 

@@ -67,6 +67,11 @@ namespace FileFlows.Server.Controllers
                 try
                 {
                     string logfile = await GetLogFileName(info.LibraryFile.Uid);
+                    string log = info.Log;
+                    if(info.LibraryFile != null)
+                    {
+                        log += Environment.NewLine + $"Final size: {info.LibraryFile.FinalSize}";
+                    }
                     System.IO.File.WriteAllText(logfile, info.Log);
                 }
                 catch (Exception) { }
@@ -88,8 +93,10 @@ namespace FileFlows.Server.Controllers
                 if (libfile != null)
                 {
                     info.LibraryFile.OutputPath = info.LibraryFile.OutputPath?.EmptyAsNull() ?? libfile.OutputPath;
+                    Logger.Instance.ILog($"Recording final size for '{info.LibraryFile.FinalSize}' for '{info.LibraryFile.Name}'");
+                    if(info.LibraryFile.FinalSize > 0)
+                        libfile.FinalSize = info.LibraryFile.FinalSize;
 
-                    libfile.FinalSize = info.LibraryFile.FinalSize;
                     libfile.OutputPath = info.LibraryFile.OutputPath;
                     libfile.Fingerprint = info.LibraryFile.Fingerprint;
                     libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();

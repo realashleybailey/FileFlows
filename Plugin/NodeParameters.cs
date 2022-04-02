@@ -448,9 +448,15 @@ namespace FileFlows.Plugin
                 return;
             foreach (var key in updates.Keys)
             {
+                var value = updates[key];
                 if (Variables.ContainsKey(key))
-                    Variables[key] = updates[key];
-                else
+                {
+                    if (value == null)
+                        Variables.Remove(key);
+                    else
+                        Variables[key] = value;
+                }
+                else if(value != null)
                     Variables.Add(key, updates[key]);
             }
         }

@@ -9,10 +9,7 @@ namespace FileFlows.Server
             return string.Join(Environment.NewLine , LogTail.ToArray());    
         }
 
-        private Mutex mutex = new Mutex();
-
-        private enum LogType { Error, Warning, Debug, Info }
-        private void Log(LogType type, object[] args)
+        internal static string GetPrefix(LogType type)
         {
             string prefix = type switch
             {
@@ -25,7 +22,17 @@ namespace FileFlows.Server
 
             var now = DateTime.Now;
 
-            string message = now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " [" + prefix + "] -> " + string.Join(", ", args.Select(x =>
+            return now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + prefix + " -> ";
+        }
+
+        private Mutex mutex = new Mutex();
+
+        internal enum LogType { Error, Warning, Debug, Info }
+        private void Log(LogType type, object[] args)
+        {
+            string prefix = GetPrefix(type);
+
+            string message = prefix + string.Join(", ", args.Select(x =>
                 x == null ? "null" :
                 x.GetType().IsPrimitive ? x.ToString() :
                 x is string ? x.ToString() :

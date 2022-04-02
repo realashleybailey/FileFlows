@@ -256,7 +256,8 @@ namespace FileFlows.Server.Controllers
                 throw new Exception("Not found");
             existing.Status = file.Status;
             existing.Node = file.Node;
-            existing.FinalSize = file.FinalSize;
+            if(existing.FinalSize == 0 || file.FinalSize > 0)
+                existing.FinalSize = file.FinalSize;
             if(file.OriginalSize > 0)
                 existing.OriginalSize = file.OriginalSize;
             if(string.IsNullOrEmpty(file.OutputPath))

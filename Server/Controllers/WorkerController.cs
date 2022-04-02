@@ -67,11 +67,6 @@ namespace FileFlows.Server.Controllers
                 try
                 {
                     string logfile = await GetLogFileName(info.LibraryFile.Uid);
-                    string log = info.Log;
-                    if(info.LibraryFile != null)
-                    {
-                        log += Environment.NewLine + $"Final size: {info.LibraryFile.FinalSize}";
-                    }
                     System.IO.File.WriteAllText(logfile, info.Log);
                 }
                 catch (Exception) { }

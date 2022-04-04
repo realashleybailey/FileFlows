@@ -91,9 +91,37 @@ namespace FileFlows.Server.Workers
 
                     string type = Library.Folders ? "folder" : "file";
 
-                    Logger.Instance.DLog($"New unknown {type}: {fullpath}");
 
                     FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
+
+                    if (Library.Folders && Library.WaitTimeSeconds > 0)
+                    {
+                        DirectoryInfo di = (DirectoryInfo)fsInfo;
+                        try 
+                        {
+                            var files = di.GetFiles("*.*", SearchOption.AllDirectories);
+                            if (files.Any())
+                            {
+                                var lastWriteTime = files.Select(x => x.LastWriteTime).Max();
+                                if (lastWriteTime > DateTime.Now.AddSeconds(-Library.WaitTimeSeconds))
+                                {
+                                    Logger.Instance.ILog($"Changes recently written to folder '{di.FullName}' cannot add to library yet");
+                                    Thread.Sleep(2000);
+                                    QueuedFiles.Enqueue(fullpath);
+                                    continue;
+                                }
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            Logger.Instance.ILog($"Error reading folder '{di.FullName}' cannot add to library yet, will try again: " + ex.Message);
+                            Thread.Sleep(2000);
+                            QueuedFiles.Enqueue(fullpath);
+                            continue;
+                        }
+                    }
+
+                    Logger.Instance.DLog($"New unknown {type}: {fullpath}");
 
                     if (Library.Folders == false && CanAccess((FileInfo)fsInfo, Library.FileSizeDetectionInterval).Result == false)
                     {

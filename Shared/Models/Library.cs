@@ -22,6 +22,10 @@ namespace FileFlows.Shared.Models
         /// Gets or sets if this library will use fingerprinting to determine if a file already is known
         /// </summary>
         public bool UseFingerprinting { get; set; }
+        /// <summary>
+        /// Gets or sets the number of seconds that have to pass between changes to the folder for it to be scanned into the library
+        /// </summary>
+        public int WaitTimeSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets if hidden files and folders should be excluded from the library

@@ -30,9 +30,11 @@
             efTemplate = null;
 
             var tabs = new Dictionary<string, List<ElementField>>();
-            tabs.Add("General", await TabGeneral(library, flowOptions));
+            var tabGeneral = await TabGeneral(library, flowOptions);
+            var efFolders = tabGeneral.Where(x => x.Name == nameof(Library.Folders)).First();
+            tabs.Add("General", tabGeneral);
             tabs.Add("Schedule", TabSchedule(library));
-            tabs.Add("Advanced", TabAdvanced(library));
+            tabs.Add("Advanced", TabAdvanced(library, efFolders));
             var result = await Editor.Open("Pages.Library", "Pages.Library.Title", null, library, saveCallback: Save, tabs: tabs);
             if (efTemplate != null)
             {
@@ -180,7 +182,7 @@
             return fields;
         }
 
-        private List<ElementField> TabAdvanced(Library library)
+        private List<ElementField> TabAdvanced(Library library, ElementField efFolders)
         {
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
@@ -196,7 +198,26 @@
             fields.Add(new ElementField
             {
                 InputType = FormInputType.Switch,
-                Name = nameof(library.UseFingerprinting)
+                Name = nameof(library.UseFingerprinting),
+                Conditions = new List<Condition>
+                {
+                    new Condition(efFolders, library.Folders)
+                    {
+                        Value = false
+                    }
+                }
+            });
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Int,
+                Name = nameof(library.WaitTimeSeconds),
+                Conditions = new List<Condition>
+                {
+                    new Condition(efFolders, library.Folders)
+                    {
+                        Value = true
+                    }
+                }
             });
             var fieldScan = new ElementField
             {

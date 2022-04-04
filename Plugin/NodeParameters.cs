@@ -188,12 +188,14 @@ namespace FileFlows.Plugin
         {
             if (Fake) return;
 
+            bool isDirectory = Directory.Exists(filename);
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
             {
                 if (filename?.ToLower().StartsWith(TempPath.ToLower()) == true)
                 {
                     Logger.ILog("Changing owner on working file: " + filename);
-                    Helpers.FileHelper.ChangeOwner(Logger, filename, file: true);
+                    Helpers.FileHelper.ChangeOwner(Logger, filename, file: isDirectory == false);
                 }
                 else
                 {
@@ -206,7 +208,8 @@ namespace FileFlows.Plugin
                 Logger?.ILog("Working file same as new filename: " + filename);
                 return;
             }
-            if (this.WorkingFile != this.FileName)
+
+            if (isDirectory == false && this.WorkingFile != this.FileName)
             {
                 this.WorkingFileSize = new FileInfo(filename).Length;
                 Logger?.ILog("New working file size: " + this.WorkingFileSize);
@@ -228,6 +231,7 @@ namespace FileFlows.Plugin
                     });
                 }
             }
+            this.IsDirectory = IsDirectory;
             this.WorkingFile = filename;
             InitFile(filename);
         }

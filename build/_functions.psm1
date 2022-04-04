@@ -5,7 +5,7 @@ function Compress
         [string] $destination
     )
     
-    if($IsWindows)
+    if(Test-Path env:ProgramFiles)
     {        
         $zip = "$destination.zip"        
 

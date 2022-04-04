@@ -3,7 +3,9 @@ $version = "0.4.4.$revision"
 $year = (Get-Date).year
 $copyright = "Copyright $year - John Andrews"
 
-if ($IsWindows) {
+$osWindows = Test-Path env:ProgramFiles
+
+if ($osWindows) {
     $dotnet_cmd= "dotnet.exe"
 } else {
     $dotnet_cmd= "dotnet"

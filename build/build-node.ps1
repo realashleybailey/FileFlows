@@ -27,7 +27,7 @@ if($IsWindows)
     .\build-installer.ps1 .
 }
 
-Compress "..\deploy\FileFlows-Node" ".\deploy\FileFlows-Node-$version"
+Compress "..\deploy\FileFlows-Node" "..\deploy\FileFlows-Node-$version"
 
 Remove-Item ..\deploy\FileFlows-Node -Recurse -ErrorAction SilentlyContinue 
 

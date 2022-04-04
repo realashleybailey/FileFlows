@@ -2,7 +2,8 @@ Write-Output "#################################"
 Write-Output "###       Building Demo       ###"
 Write-Output "#################################"
 
-. .\build-variables.ps1
+. .\_variables.ps1
+Import-Module .\_functions
 
 $csVersion = "string Version = ""$version"""
 
@@ -15,7 +16,7 @@ Push-Location ..\
 (Get-Content Client\Client.csproj) -replace '<ProductVersion>[^<]+</ProductVersion>', "<ProductVersion>$version</ProductVersion>" | Out-File Client\Client.csproj
 (Get-Content Client\Client.csproj) -replace '<Copyright>[^<]+</Copyright>', "<Copyright>$copyright</Copyright>" | Out-File Client\Client.csproj
 
-dotnet.exe publish Client\Client.csproj --configuration Release --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /p=DefineConstants=DEMO
+& $dotnet_cmd publish Client\Client.csproj --configuration Release --output $outdir /p:AssemblyVersion=$version /p:Version=$version /p:CopyRight=$copyright /p=DefineConstants=DEMO
 
 if ($LASTEXITCODE -ne 0 ) 
 {
@@ -31,14 +32,9 @@ else
 
     Remove-Item $outdir\web.config -Recurse -ErrorAction SilentlyContinue 
     Copy-Item Build\demo.web.config $outdir\web.config
+    
+    Compress $outdir $outdir
 
-    $zip = "$outdir.zip"
-
-    if ([System.IO.File]::Exists($zip)) {
-        Remove-Item $zip
-    }
-
-    Compress-Archive -Path "$outdir\*" $zip
     Remove-Item $outdir -Recurse -ErrorAction SilentlyContinue 
 }
 

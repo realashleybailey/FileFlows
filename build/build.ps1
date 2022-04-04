@@ -1,12 +1,10 @@
-. .\build-variables.ps1
-
 Remove-Item ../deploy/* -Recurse -Force -Exclude *.ffplugin -ErrorAction SilentlyContinue 
 
 
 $dev = $args[0] -eq '--dev'
 
 if ($dev -eq $false) {
-    if ([System.IO.Directory]::Exists("../deploy/Plugins") -eq $false) {
+    if ([System.IO.Directory]::Exists("../deploy/Plugins") -eq $false) {        
         Write-Error "ERROR: No plugins directory found"
         return
     }

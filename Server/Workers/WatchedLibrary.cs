@@ -13,8 +13,6 @@ namespace FileFlows.Server.Workers
         private FileSystemWatcher Watcher;
         public Library Library { get;private set; } 
 
-        private Regex? Filter;
-
         private bool ScanComplete = false;
         private bool UseScanner = false;
         private bool Disposed = false;
@@ -29,14 +27,6 @@ namespace FileFlows.Server.Workers
         {
             this.Library = library;
             this.UseScanner = library.Scan;
-            if(string.IsNullOrEmpty(library.Filter) == false)
-            {
-                try
-                {
-                    Filter = new Regex(library.Filter, RegexOptions.IgnoreCase);
-                }
-                catch (Exception) { }
-            }
             if(UseScanner == false)
                 SetupWatcher();
 
@@ -263,9 +253,16 @@ namespace FileFlows.Server.Workers
 
         private bool IsMatch(string input)
         {
-            if (Filter == null)
-                return true;
-            return Filter.IsMatch(input);
+            if (string.IsNullOrEmpty(Library.Filter) == false)
+            {
+                try
+                {
+                    return new Regex(Library.Filter, RegexOptions.IgnoreCase).IsMatch(input);
+                }
+                catch (Exception) { }
+            }
+            // default to true
+            return true;
         }
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)

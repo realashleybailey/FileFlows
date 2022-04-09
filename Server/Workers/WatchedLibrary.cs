@@ -48,6 +48,10 @@ namespace FileFlows.Server.Workers
                         continue;
                     }
 
+                    if (CheckExists(fullpath) == false)
+                        continue;
+
+
                     if (this.Library.ExcludeHidden)
                     {
                         if (FileIsHidden(fullpath))
@@ -189,11 +193,32 @@ namespace FileFlows.Server.Workers
             }
         }
 
+        private bool CheckExists(string fullpath)
+        {
+            try
+            {
+                if (Library.Folders)
+                    return Directory.Exists(fullpath);
+                return File.Exists(fullpath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         private bool FileIsHidden(string fullpath)
         {
-            FileAttributes attributes = File.GetAttributes(fullpath);
-            if ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                return true;
+            try
+            {
+                FileAttributes attributes = File.GetAttributes(fullpath);
+                if ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
             // recursively search the directories to see if its hidden
             var dir = new FileInfo(fullpath).Directory;

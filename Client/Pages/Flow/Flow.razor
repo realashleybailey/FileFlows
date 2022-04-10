@@ -43,7 +43,7 @@
                                 <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"
                         ondragstart="ffFlow.Mouse.dragElementStart(event)">
                                     <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
-                                    @ele.DisplayName
+                                    @ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1)
                                 </li>
                             }
                         }

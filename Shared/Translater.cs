@@ -27,6 +27,8 @@ namespace FileFlows.Shared
             return Instant(value);
         }
 
+        public static bool InitDone => Formatter != null;
+
         public static bool NeedsTranslating(string label) => rgxNeedsTranslating.IsMatch(label ?? "");
         public static void Init(params string[] jsonFiles)
         {

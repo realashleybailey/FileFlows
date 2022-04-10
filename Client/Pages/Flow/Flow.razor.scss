@@ -88,6 +88,15 @@ canvas {
     &.Process {
         border-color:var(--flow-process);
     }
+    &.BuildPart {
+        border-color:var(--flow-build-part);
+    }
+    &.BuildStart {
+        border-color:var(--flow-build-start);
+    }
+    &.BuildEnd {
+        border-color:var(--flow-build-end);
+    }
 }
 .flow-element {
     padding: 0.25rem 0.25rem;
@@ -128,6 +137,15 @@ canvas {
 
     &.Process .icon-wrapper {
         border-color: var(--flow-process);
+    }
+    &.BuildEnd .icon-wrapper {
+        border-color: var(--flow-build-end);
+    }
+    &.BuildStart .icon-wrapper {
+        border-color: var(--flow-build-start);
+    }
+    &.BuildPart .icon-wrapper {
+        border-color: var(--flow-build-part);
     }
 
     .label {
@@ -252,6 +270,36 @@ canvas {
 
         .connected > div {
             background-color: var(--flow-process) !important;
+        }
+    }
+
+    &.BuildStart:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-build-start) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-build-start) !important;
+        }
+    }
+
+    &.BuildEnd:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-build-end) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-build-end) !important;
+        }
+    }
+
+    &.BuildPart:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-build-part) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-build-part) !important;
         }
     }
 

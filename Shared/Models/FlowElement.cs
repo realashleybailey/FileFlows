@@ -12,10 +12,24 @@ namespace FileFlows.Shared.Models
 
         static readonly Regex rgxFormatLabel = new Regex("(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])");
 
-        public string DisplayName => FormatName(Name);
+        private string _DisplayName;
+        public string DisplayName
+        {
+            get {
+                if (_DisplayName == null && Translater.InitDone)
+                {
+                    _DisplayName = FormatName(this.Name);
+                }
+                return _DisplayName;
+            }
+        }
 
         public static string FormatName(string name)
         {
+            string translated = Translater.Instant($"Flow.Parts.{name}.Label", supressWarnings: true);
+            if (string.IsNullOrEmpty(translated) == false && translated != "Label")
+                return translated;
+
             name = name[(name.LastIndexOf(".") + 1)..];
             string dn = name.Replace("_", " ");
             dn = rgxFormatLabel.Replace(dn, " ");

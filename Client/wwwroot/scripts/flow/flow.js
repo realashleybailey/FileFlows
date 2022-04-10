@@ -157,6 +157,7 @@ window.ffFlow = {
                 icon: element.icon,
                 model: element.model
             };
+
             if (part.model?.outputs)
                 part.Outputs = part.model?.outputs;
 

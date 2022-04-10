@@ -84,6 +84,15 @@ canvas {
 ::deep .flow-part.Process, .flow-element.Process {
   border-color: var(--flow-process);
 }
+::deep .flow-part.BuildPart, .flow-element.BuildPart {
+  border-color: var(--flow-build-part);
+}
+::deep .flow-part.BuildStart, .flow-element.BuildStart {
+  border-color: var(--flow-build-start);
+}
+::deep .flow-part.BuildEnd, .flow-element.BuildEnd {
+  border-color: var(--flow-build-end);
+}
 
 .flow-element {
   padding: 0.25rem 0.25rem;
@@ -120,6 +129,15 @@ canvas {
 }
 .flow-element.Process .icon-wrapper {
   border-color: var(--flow-process);
+}
+.flow-element.BuildEnd .icon-wrapper {
+  border-color: var(--flow-build-end);
+}
+.flow-element.BuildStart .icon-wrapper {
+  border-color: var(--flow-build-start);
+}
+.flow-element.BuildPart .icon-wrapper {
+  border-color: var(--flow-build-part);
 }
 .flow-element .label {
   flex-grow: 1;
@@ -313,6 +331,24 @@ canvas {
 }
 ::deep .flow-part.Process:not(.selected) .connected > div {
   background-color: var(--flow-process) !important;
+}
+::deep .flow-part.BuildStart:not(.selected) .icon-wrapper, ::deep .flow-part.BuildStart:not(.selected) .input > div, ::deep .flow-part.BuildStart:not(.selected) .output > div {
+  border-color: var(--flow-build-start) !important;
+}
+::deep .flow-part.BuildStart:not(.selected) .connected > div {
+  background-color: var(--flow-build-start) !important;
+}
+::deep .flow-part.BuildEnd:not(.selected) .icon-wrapper, ::deep .flow-part.BuildEnd:not(.selected) .input > div, ::deep .flow-part.BuildEnd:not(.selected) .output > div {
+  border-color: var(--flow-build-end) !important;
+}
+::deep .flow-part.BuildEnd:not(.selected) .connected > div {
+  background-color: var(--flow-build-end) !important;
+}
+::deep .flow-part.BuildPart:not(.selected) .icon-wrapper, ::deep .flow-part.BuildPart:not(.selected) .input > div, ::deep .flow-part.BuildPart:not(.selected) .output > div {
+  border-color: var(--flow-build-part) !important;
+}
+::deep .flow-part.BuildPart:not(.selected) .connected > div {
+  background-color: var(--flow-build-part) !important;
 }
 ::deep .flow-part.selected .icon-wrapper, ::deep .flow-part.selected .input > div, ::deep .flow-part.selected .output > div {
   border-color: var(--accent) !important;

@@ -6,7 +6,10 @@ namespace FileFlows.Plugin
         Input,
         Output,
         Process,
-        Logic
+        Logic,
+        BuildStart,
+        BuildEnd,
+        BuildPart
     }
 
     public enum FormInputType

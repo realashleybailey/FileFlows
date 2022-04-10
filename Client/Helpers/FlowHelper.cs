@@ -12,7 +12,7 @@ namespace FileFlows.Client.Helpers
 
         public static string FormatLabel(string name)
         {
-            return Regex.Replace(name.Replace("_", " "), "(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])", " ");
+            return Regex.Replace(name.Replace("_", " "), "(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])", " ").Replace("Ffmpeg", "FFMPEG");
         }
     }
 }

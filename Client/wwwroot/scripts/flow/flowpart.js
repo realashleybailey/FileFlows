@@ -36,6 +36,12 @@ window.ffFlowPart = {
                 div.classList.add('Process');
             else if (part.type == 3)
                 div.classList.add('Logic');
+            else if (part.type == 4)
+                div.classList.add('BuildStart');
+            else if (part.type == 5)
+                div.classList.add('BuildEnd');
+            else if (part.type == 6)
+                div.classList.add('BuildPart');
         }
 
         div.classList.add('size-' + Math.max(part.inputs, part.outputs));

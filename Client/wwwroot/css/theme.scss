@@ -29,4 +29,7 @@ body {
     --flow-input: var(--indigo);
     --flow-output: var(--green);
     --flow-process: var(--cyan);
+    --flow-build-start: var(--teal);
+    --flow-build-end: var(--teal);
+    --flow-build-part: var(--blue);
 }

@@ -48,7 +48,7 @@ namespace FileFlows.Server.Controllers
                     Description = plugin.Description,   
                     Elements = includeElements ? plugin.Elements : null
                 };
-                var package = packages.FirstOrDefault(x => x.Name.ToLower().Replace(" ", "") == x.Name.ToLower().Replace(" ", ""));
+                var package = packages.FirstOrDefault(x => x.Name.ToLower().Replace(" ", "") == plugin.Name.ToLower().Replace(" ", ""));
                 pim.LatestVersion = package?.Version ?? "";
                 pims.Add(pim);
             }

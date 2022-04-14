@@ -3,7 +3,7 @@
     "name": "Video Library",
     "group": "Generic",
     "description": "Generic video library that searches for common video file extensions",
-    "filter": "\\.(ts|mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|h(\\.)?26[45])$",
+    "filter": "\\.(ts|mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|m2ts|h(\\.)?26[45])$",
     "path": "/media/videos",
     "scanInterval": 60,
     "fileSizeDetectionInterval": 5
@@ -34,7 +34,7 @@
     "name": "SABnzbd Videos",
     "group": "Download Clients",
     "description": "Library to monitor a \"complete\" downloads directory from SABnzbd.\n\nThis library can then use a flow to convert videos into a target format, and place those videos in destination folder e.g. \"converted\".\n\nThe application that instructed SABnzbd to do the download can monitor the \"converted\" folder for completed files.",
-    "filter": "^((?!(_UNPACK|_FAILED)|sample).)*\\.(ts|mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|h(\\.)?26[45])$",
+    "filter": "^((?!(_UNPACK|_FAILED)|sample).)*\\.(ts|mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|m2ts|h(\\.)?26[45])$",
     "path": "/media/downloads/complete",
     "scanInterval": 60,
     "fileSizeDetectionInterval": 5
@@ -53,7 +53,7 @@
     "name": "Samples/Trailers/Previews",
     "group": "Download Clients",
     "description": "Finds any sample, trailers, or preview video files in a directory so you can delete them if necassary.\nUseful for a matching 'SABnzbd Videos' library so the folder can be cleanly deleted after the main file is processed.",
-    "filter": "^((?!(_UNPACK|_FAILED)).)*(sample|trailer|preview)(.*?)\\.(mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|h(\\.)?26[45])$",
+    "filter": "^((?!(_UNPACK|_FAILED)).)*(sample|trailer|preview)(.*?)\\.(mp4|mkv|avi|mpe|mpg|mov|mpv|flv|wmv|webm|avchd|m2ts|h(\\.)?26[45])$",
     "path": "/media/downloads/complete",
     "scanInterval": 60,
     "fileSizeDetectionInterval": 5,

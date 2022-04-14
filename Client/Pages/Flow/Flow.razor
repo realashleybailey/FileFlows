@@ -38,10 +38,9 @@
                         @foreach (var grp in Filtered.GroupBy(x => x.Group))
                         {
                             <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
-                            foreach (var ele in grp)
+                            foreach (var ele in grp.OrderBy(x => x.Type).ThenBy(x => x.DisplayName.Substring(x.DisplayName.IndexOf(":") + 1)))
                             {
-                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type"
-                        ondragstart="ffFlow.Mouse.dragElementStart(event)">
+                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ffFlow.Mouse.dragElementStart(event)">
                                     <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
                                     @ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1)
                                 </li>

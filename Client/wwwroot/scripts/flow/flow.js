@@ -37,6 +37,7 @@ window.ffFlow = {
         ffFlow.csharp = csharp;
         ffFlow.parts = parts;
         ffFlow.elements = elements;
+        ffFlow.infobox = null;
 
 
         ffFlow.csharp.invokeMethodAsync("Translate", `Labels.Delete`, null).then(result => {

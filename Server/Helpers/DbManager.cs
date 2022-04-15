@@ -1,6 +1,5 @@
 ﻿using FileFlows.Server.Models;
 using FileFlows.Shared.Models;
-using System.Text;
 
 namespace FileFlows.Server.Helpers
 {

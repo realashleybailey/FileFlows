@@ -97,6 +97,7 @@ namespace FileFlows.Server.Controllers
                     libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
                     await libfileController.Update(libfile);
                 }
+                _ = new StatisticsController().RecordStatistics(info.LibraryFile);
             }
         }
 

@@ -1,0 +1,50 @@
+﻿@namespace FileFlows.Client.Pages
+
+@page "/statistics"
+
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <div class="statistics">
+
+            @if(TelemetryDisabled)
+            {
+                <p>Telemetry is currently disabled.   To enable this page you must first enable telemetry.</p>
+            }
+            else if(Model?.ExecutedNodes?.Any() != true)
+            {
+                <div>No statistics to show</div>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Node</th>
+                            <th>Output</th>
+                            <th>Total</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var node in NodeData.OrderBy(x => x.Name))
+                        {
+                            <tr>
+                                <td>@node.Name</td>
+                                <td>@node.Output</td>
+                                <td>@node.Total</td>
+                                <td>@node.Duration</td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            }
+        </div>
+    </Body>
+
+</PageView>

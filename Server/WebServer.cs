@@ -120,11 +120,14 @@ namespace FileFlows.Server
             //    FileFlows.Server.Helpers.DbHelper.StartMySqlServer();
             Helpers.DbHelper.CreateDatabase().Wait();
 #if(DEBUG)
-            Helpers.DbHelper.CleanDatabase().Wait();
+            //Helpers.DbHelper.CleanDatabase().Wait();
 #endif
 
-            // do this so the settings object is loaded, and the time zone is set
-            new Controllers.SettingsController().Get().Wait();
+            // do this so the settings object is loaded
+            var settings = new Controllers.SettingsController().Get().Result;
+
+            // run any upgrade code that may need to be run
+            new Upgrade.Upgrader().Run(settings);
 
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting File Flows " + Globals.Version);

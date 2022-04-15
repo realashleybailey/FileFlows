@@ -198,5 +198,9 @@
   {
     "outputFile": "Components/Common/FlowSlider/FlowSlider.razor.css",
     "inputFile": "Components/Common/FlowSlider/FlowSlider.razor.scss"
+  },
+  {
+    "outputFile": "Pages/Statistics/StatisticsPage.razor.css",
+    "inputFile": "Pages/Statistics/StatisticsPage.razor.scss"
   }
 ]

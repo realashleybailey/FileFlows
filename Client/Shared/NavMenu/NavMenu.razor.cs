@@ -63,11 +63,12 @@ namespace FileFlows.Client.Shared
 
             MenuItems.Add(new NavMenuGroup
             {
-                Name = "Help",
+                Name = "Information",
                 Icon = "fas fa-question-circle",
                 Items = new List<NavMenuItem>
                 {
-                    new NavMenuItem("Pages.Log.Title", "fas fa-file-alt", "log")
+                    new NavMenuItem("Pages.Log.Title", "fas fa-file-alt", "log"),
+                    new NavMenuItem("Pages.Statistics.Title", "fas fa-chart-line", "statistics")
                 }
             });
 

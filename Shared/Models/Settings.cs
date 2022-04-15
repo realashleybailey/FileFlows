@@ -20,6 +20,8 @@
         public bool IsWindows { get; set; }
         public bool IsDocker { get; set; }
 
+        public string Version { get; set; }
+
         public string GetLogFile(System.Guid uid)
         {
             if (string.IsNullOrEmpty(LoggingPath))

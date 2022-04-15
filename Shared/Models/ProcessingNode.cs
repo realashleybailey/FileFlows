@@ -22,6 +22,8 @@ namespace FileFlows.Shared.Models
         public bool DontSetPermissions { get; set; }
         public string Permissions { get; set; }
 
+        public char DirectorySeperatorChar = System.IO.Path.DirectorySeparatorChar;
+
         public string Map(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -34,11 +36,13 @@ namespace FileFlows.Shared.Models
                 {
                     if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
                         continue;
-                    path = Regex.Replace(path, Regex.Escape(mapping.Key.Replace("\\", "/")), mapping.Value.Replace("\\", "/"), RegexOptions.IgnoreCase);
+                    string pattern = Regex.Escape(mapping.Key.Replace("\\", "/"));
+                    string replacement = mapping.Value.Replace("\\", "/");
+                    path = Regex.Replace(path, "^" + pattern, replacement, RegexOptions.IgnoreCase);
                 }
                 // now convert / to path charcter
-                if (System.IO.Path.DirectorySeparatorChar != '/')
-                    path = path.Replace('/', System.IO.Path.DirectorySeparatorChar);
+                if (DirectorySeperatorChar != '/')
+                    path = path.Replace('/', DirectorySeperatorChar);
             }
             return path;
         }
@@ -52,9 +56,9 @@ namespace FileFlows.Shared.Models
                 {
                     if (string.IsNullOrEmpty(mapping.Value) || string.IsNullOrEmpty(mapping.Key))
                         continue;
-                    path = Regex.Replace(path, Regex.Escape(mapping.Value), mapping.Key, RegexOptions.IgnoreCase);
-                    path = Regex.Replace(path, Regex.Escape(mapping.Value.Replace("\\", "/")), mapping.Key, RegexOptions.IgnoreCase);
-                    path = Regex.Replace(path, Regex.Escape(mapping.Value.Replace("/", "\\")), mapping.Key, RegexOptions.IgnoreCase);
+                    path = Regex.Replace(path, "^" + Regex.Escape(mapping.Value), mapping.Key, RegexOptions.IgnoreCase);
+                    path = Regex.Replace(path, "^" + Regex.Escape(mapping.Value.Replace("\\", "/")), mapping.Key, RegexOptions.IgnoreCase);
+                    path = Regex.Replace(path, "^" + Regex.Escape(mapping.Value.Replace("/", "\\")), mapping.Key, RegexOptions.IgnoreCase);
                 }
             }
             return path;

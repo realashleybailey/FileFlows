@@ -9,6 +9,7 @@ namespace FileFlows.Plugin
     {
         /// <summary>
         /// The original filename of the file
+        /// Note: This maybe a mapped filename if executed on a external processing node
         /// </summary>
         public string FileName { get; init; }
         /// <summary>
@@ -268,6 +269,7 @@ namespace FileFlows.Plugin
 
             Logger?.ILog("About to move file to: " + destination);
             destination = MapPath(destination);
+            Logger?.ILog("Mapped destination path: " + destination);
 
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (isWindows)

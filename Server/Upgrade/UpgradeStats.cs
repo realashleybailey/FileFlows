@@ -14,7 +14,7 @@ public class UpgradeStats
         int count = 0;
         foreach(var lf in libraryFiles)
         {
-            if (lf?.ExecutedNodes?.Any() == false)
+            if (lf?.ExecutedNodes?.Any() != true)
                 continue;
             foreach(var node in lf.ExecutedNodes)
             {

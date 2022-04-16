@@ -52,7 +52,7 @@ namespace FileFlows.Server.Controllers
                 pim.LatestVersion = package?.Version ?? "";
                 pims.Add(pim);
             }
-            return pims;
+            return pims.OrderBy(x => x.Name);
         }
 
         /// <summary>

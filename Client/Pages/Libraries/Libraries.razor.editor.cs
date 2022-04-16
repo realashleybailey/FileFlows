@@ -201,10 +201,7 @@
                 Name = nameof(library.UseFingerprinting),
                 Conditions = new List<Condition>
                 {
-                    new Condition(efFolders, library.Folders)
-                    {
-                        Value = false
-                    }
+                    new Condition(efFolders, library.Folders, value: false)
                 }
             });
             fields.Add(new ElementField
@@ -213,10 +210,7 @@
                 Name = nameof(library.WaitTimeSeconds),
                 Conditions = new List<Condition>
                 {
-                    new Condition(efFolders, library.Folders)
-                    {
-                        Value = true
-                    }
+                    new Condition(efFolders, library.Folders, value: true)                    
                 }
             });
             var fieldScan = new ElementField

@@ -87,9 +87,11 @@ namespace FileFlows.Shared.Models
 
         }
 
-        public Condition(ElementField field, object initialValue)
+        public Condition(ElementField field, object initialValue, object value = null, bool isNot = false)
         {
             this.Property = field.Name;
+            this.Value = value;
+            this.IsNot = isNot;
             this.SetField(field, initialValue);
         }
 

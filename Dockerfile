@@ -1,66 +1,59 @@
-FROM lsiobase/ubuntu:focal
+FROM lsiobase/ubuntu:jammy AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV PATH=$PATH:/root/.dotnet:/root/.dotnet/tools
 ENV DOTNET_ROOT=/root/.dotnet
-#FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 
-############################################################ 
-### Prepare the docker with ffmpeg and hardware encoders ###
-############################################################
-
+# Add intel hardware encoding support
 ENV LIBVA_DRIVERS_PATH="/usr/lib/x86_64-linux-gnu/dri" \
     LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu" \
     NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
     NVIDIA_VISIBLE_DEVICES="all" \
     DOTNET_CLI_TELEMETRY_OPTOUT=true
 
-# ffmpeg from jellyfin, a little older but precompiled for us
+ARG DEPS="git wget dos2unix libssl-dev comskip mkvtoolnix aom-tools svt-av1 x265 x264"
+ARG VAAPI_DEPS="vainfo intel-media-va-driver-non-free libva-dev libmfx-dev intel-media-va-driver-non-free intel-media-va-driver-non-free i965-va-driver-shaders mesa-va-drivers"
 RUN apt-get update && \
-    apt install -y wget && \
-    wget https://repo.jellyfin.org/releases/server/ubuntu/versions/jellyfin-ffmpeg/4.3.2-1/jellyfin-ffmpeg_4.3.2-1-focal_amd64.deb && \
-    apt install -y \
-    ./jellyfin-ffmpeg_4.3.2-1-focal_amd64.deb && \
-    # link to /user/local/bin to make it available globally
-    ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg
-
-#  add support for intel hardware enconding
-RUN curl -s https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-    # add the intel repo to the sources
-    echo 'deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main' > /etc/apt/sources.list.d/intel-graphics.list && \
-    # update the apt-get repo
+    apt-get install -y software-properties-common && \
+    add-apt-repository universe && \
     apt-get update && \
-    apt-get install -y --no-install-recommends \
-    # do the actual intel install
-    intel-media-va-driver-non-free vainfo mesa-va-drivers
+    ARCH=$(dpkg --print-architecture) && \
+    if [ $ARCH -eq 'amd64' ]; \
+    then apt-get install -y ${DEPS} ${VAAPI_DEPS}; \
+    else apt-get install -y ${DEPS}; \
+    fi && \
+    rm -rf /var/lib/apt/lists/*
 
-# install comskip
-RUN apt-get update \
-    && apt-get install -y comskip
-
-# install libssl-dev, needed for the asp.net application to run
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get dist-upgrade -y \
-    && apt-get install -fy \
-    libssl-dev
-
-RUN wget https://dot.net/v1/dotnet-install.sh \
-    && bash dotnet-install.sh -c Current
-
+# Install ffmpeg from jellyfin
+ARG FFMPEG_URL="https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v4.4.1-4/jellyfin-ffmpeg_4.4.1-4-jammy"
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget "${FFMPEG_URL}_${ARCH}.deb" && \
+    apt-get update && \
+    apt-get install -y ./jellyfin-ffmpeg*.deb && \
+    rm -rf ./jellyfin-ffmpeg*.deb && \
+    ln /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg && \
+    rm -rf /var/lib/apt/lists/* && \
+    ffmpeg --help
 
 ##########################################
 ### actual FileFlows stuff happens now ###
 ##########################################
+FROM base
 
-# expose the ports we need
-EXPOSE 5000
+# Install dotnet SDK
+RUN wget https://dot.net/v1/dotnet-install.sh  && \
+    bash dotnet-install.sh -c Current && \
+    rm -f dotnet-install.sh
 
 # copy the deploy file into the app directory
 COPY /deploy /app
 COPY /docker-entrypoint.sh /app/docker-entrypoint.sh
 
-RUN chmod +x /app/docker-entrypoint.sh
+# expose the ports we need
+EXPOSE 5000
+
+RUN dos2unix /app/docker-entrypoint.sh && \
+    chmod +x /app/docker-entrypoint.sh
 
 # set the working directory
 WORKDIR /app

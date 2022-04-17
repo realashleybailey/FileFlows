@@ -9,6 +9,8 @@ if ($dev -eq $false) {
         return
     }
 }
+. .\_variables.ps1
+echo $version > deploy/version.txt
 
 .\build-spellcheck.ps1
 .\build-flowrunner.ps1

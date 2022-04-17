@@ -10,12 +10,13 @@ if ($dev -eq $false) {
     }
 }
 . .\_variables.ps1
-echo $version > deploy/version.txt
 
 .\build-spellcheck.ps1
 .\build-flowrunner.ps1
 .\build-server.ps1
 .\build-node.ps1
+
+echo $version > ../deploy/version.txt
 
 # no longer need plugins or flowrunner, delete them
 Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 

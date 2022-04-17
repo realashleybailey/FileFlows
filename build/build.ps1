@@ -16,7 +16,8 @@ if ($dev -eq $false) {
 .\build-server.ps1
 .\build-node.ps1
 
-echo $version > ../deploy/version.txt
+echo $version.Trim() > ../deploy/version.txt
+echo $versionThree.Trim() > ../deploy/version3.txt
 
 # no longer need plugins or flowrunner, delete them
 Remove-Item ..\deploy\Plugins -Recurse -ErrorAction SilentlyContinue 

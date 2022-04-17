@@ -355,7 +355,7 @@ namespace FileFlows.Server.Controllers
 
             List<FlowPart> checkedParts = new List<FlowPart>();
 
-            var parentParts = FindParts(part);
+            var parentParts = FindParts(part, 0);
             if (parentParts.Any() == false)
                 return variables;
 
@@ -374,12 +374,11 @@ namespace FileFlows.Server.Controllers
 
             return variables;
 
-            List<FlowPart> FindParts(FlowPart part)
-            {
-                                                                                                                                                                                             List<FlowPart> results = new List<FlowPart>();
-                if (checkedParts.Contains(part))
-                    return results;
-
+            List<FlowPart> FindParts(FlowPart part, int depth)
+            {                                                                                                                                                                                            
+                List<FlowPart> results = new List<FlowPart>();
+                if (depth > 30)
+                    return results; // prevent infinite recursion
 
                 foreach (var p in flowParts ?? new List<FlowPart>())
                 {
@@ -394,9 +393,10 @@ namespace FileFlows.Server.Controllers
                     if (p.OutputConnections.Any(x => x.InputNode == part.Uid)) 
                     {
                         results.Add(p);
-
+                        if(checkedParts.Contains(p))
+                            continue;
                         checkedParts.Add(p);
-                        results.AddRange(FindParts(p));
+                        results.AddRange(FindParts(p, ++depth));
                     }
                 }
                 return results;

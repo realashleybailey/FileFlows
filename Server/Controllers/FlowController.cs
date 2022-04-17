@@ -410,12 +410,12 @@ namespace FileFlows.Server.Controllers
         /// </summary>
         /// <returns>A list of flow templates</returns>
         [HttpGet("templates")]
-        public async Task<Dictionary<string, List<FlowTemplateModel>>> GetTemplates()
+        public async Task<IDictionary<string, List<FlowTemplateModel>>> GetTemplates()
         {
-            var elements = await GetElements();
+            var elements = await GetElements((FlowType)(-1)); // special case to load all template typs
             var parts = elements.ToDictionary(x => x.Uid.Substring(x.Uid.LastIndexOf(".") + 1), x => x);
 
-            Dictionary<string, List<FlowTemplateModel>> templates = new ();
+            SortedDictionary<string, List<FlowTemplateModel>> templates = new ();
             string group = string.Empty;
             templates.Add(group, new List<FlowTemplateModel>());
             foreach (var tf in GetTemplateFiles())

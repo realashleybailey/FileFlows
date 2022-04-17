@@ -42,6 +42,10 @@ window.ffFlowPart = {
                 div.classList.add('BuildEnd');
             else if (part.type == 6)
                 div.classList.add('BuildPart');
+            else if (part.type == 7)
+                div.classList.add('Failure');
+            else if (part.type == 8)
+                div.classList.add('Communication');
         }
 
         div.classList.add('size-' + Math.max(part.inputs, part.outputs));

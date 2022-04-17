@@ -28,6 +28,13 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name.ToLower());
 
+        [HttpGet("failure-flow/by-library/{libraryUid}")]
+        public async Task<Flow> GetFailureFlow([FromRoute] Guid libraryUid)
+        {
+            var flow = (await GetDataList())?.Where(x => x.Type == FlowType.Failure && x.Enabled)?.FirstOrDefault();
+            return flow;
+        }
+
         /// <summary>
         /// Exports a specific flow
         /// </summary>
@@ -178,10 +185,24 @@ namespace FileFlows.Server.Controllers
         /// </summary>
         /// <returns>Returns a list of all the nodes in the system</returns>
         [HttpGet("elements")]
-        public async Task<FlowElement[]> GetElements()
+        public async Task<FlowElement[]> GetElements(FlowType type = FlowType.Standard)
         {
             var plugins = await new PluginController().GetAll(includeElements: true);
-            var results = plugins.Where(x => x.Elements != null).SelectMany(x => x.Elements)?.ToArray();
+            var results = plugins.Where(x => x.Elements != null).SelectMany(x => x.Elements)?.Where(x =>
+            {
+                if ((int)type == -1) // special case used by get variables, we want everything
+                    return true;
+                if (type == FlowType.Failure)
+                {
+                    if (x.FailureNode == false)
+                        return false;
+                }
+                else if (x.Type == FlowElementType.Failure)
+                {
+                    return false;
+                }
+                return true;
+            })?.ToArray();
             return results ?? new FlowElement[] { };
         }
 
@@ -215,7 +236,7 @@ namespace FileFlows.Server.Controllers
             if (model.Parts?.Any() != true)
                 throw new Exception("Flow.ErrorMessages.NoParts");
 
-            int inputNodes = model.Parts.Where(x => x.Type == FlowElementType.Input).Count();
+            int inputNodes = model.Parts.Where(x => x.Type == FlowElementType.Input || x.Type == FlowElementType.Failure).Count();
             if (inputNodes == 0)
                 throw new Exception("Flow.ErrorMessages.NoInput");
             else if (inputNodes > 1)
@@ -306,7 +327,7 @@ namespace FileFlows.Server.Controllers
             }
 
             //p.FlowElementUid == FileFlows.VideoNodes.DetectBlackBars
-            var flowElements = await GetElements();
+            var flowElements = await GetElements((FlowType)(-1));
             flowElements ??= new FlowElement[] { };
             var dictFlowElements = flowElements.ToDictionary(x => x.Uid, x => x);
 
@@ -403,7 +424,7 @@ namespace FileFlows.Server.Controllers
                 {
                     string json = System.IO.File.ReadAllText(tf.FullName);
                     json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
-                    var jsTemplates = System.Text.Json.JsonSerializer.Deserialize<FlowTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
+                    var jsTemplates = JsonSerializer.Deserialize<FlowTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
                     {
                         AllowTrailingCommas = true,
                         PropertyNameCaseInsensitive = true
@@ -412,7 +433,7 @@ namespace FileFlows.Server.Controllers
                     {
                         try
                         {
-                            var jstJson = System.Text.Json.JsonSerializer.Serialize(_jst);
+                            var jstJson = JsonSerializer.Serialize(_jst);
                             List<TemplateField> fields = _jst.Fields ?? new List<TemplateField>();
                             // replace all the guids with unique guides
                             for(int i = 1; i < 50; i++)
@@ -426,7 +447,7 @@ namespace FileFlows.Server.Controllers
                                 }
                                 jstJson = jstJson.Replace(oldUid.ToString(), newUid.ToString());
                             }
-                            var jst = System.Text.Json.JsonSerializer.Deserialize<FlowTemplate>(jstJson);
+                            var jst = JsonSerializer.Deserialize<FlowTemplate>(jstJson);
 
                             List<FlowPart> flowParts = new List<FlowPart>();
                             int y = DEFAULT_YPOS;
@@ -464,6 +485,7 @@ namespace FileFlows.Server.Controllers
                                 Fields = fields,
                                 Order = _jst.Order,
                                 Save = jst.Save,
+                                Type = jst.Type,
                                 Flow = new Flow
                                 {
                                     Name = jst.Name,

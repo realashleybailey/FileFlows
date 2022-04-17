@@ -1,58 +1,67 @@
-namespace FileFlows.FlowRunner
+namespace FileFlows.FlowRunner;
+
+using System;
+using System.Linq;
+using FileFlows.Plugin;
+using FileFlows.Shared.Models;
+
+public class FlowLogger : ILogger
 {
-    using System;
-    using System.Linq;
-    using FileFlows.Plugin;
-    using FileFlows.ServerShared.Helpers;
-    using FileFlows.Shared.Models;
+    List<string> log = new List<string>();
+    public void DLog(params object[] args) => Log(LogType.Debug, args);
+    public void ELog(params object[] args) => Log(LogType.Error, args);
+    public void ILog(params object[] args) => Log(LogType.Info, args);
+    public void WLog(params object[] args) => Log(LogType.Warning, args);
 
-    public class FlowLogger : ILogger
+    public LibraryFile File { get; set; }
+    private enum LogType
     {
-        List<string> log = new List<string>();
-        public void DLog(params object[] args) => Log(LogType.Debug, args);
-        public void ELog(params object[] args) => Log(LogType.Error, args);
-        public void ILog(params object[] args) => Log(LogType.Info, args);
-        public void WLog(params object[] args) => Log(LogType.Warning, args);
+        Error, Warning, Info, Debug
+    }
+    IFlowRunnerCommunicator Communicator;
+    public FlowLogger(IFlowRunnerCommunicator communicator)
+    {
+        this.Communicator = communicator;
+    }
 
-        public LibraryFile File { get; set; }
-        private enum LogType
+    private void Log(LogType type, params object[] args)
+    {
+        if (args == null || args.Length == 0)
+            return;
+        string prefix = type switch
         {
-            Error, Warning, Info, Debug
-        }
-        IFlowRunnerCommunicator Communicator;
-        public FlowLogger(IFlowRunnerCommunicator communicator)
+            LogType.Info => "INFO",
+            LogType.Error => "ERRR",
+            LogType.Warning => "WARN",
+            LogType.Debug => "DBUG",
+            _ => ""
+        };
+
+        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + prefix + " -> " +
+            string.Join(", ", args.Select(x =>
+            x == null ? "null" :
+            x.GetType().IsPrimitive || x is string ? x.ToString() :
+            System.Text.Json.JsonSerializer.Serialize(x)));
+        log.Add(message);
+        if(type != LogType.Debug)
+            Console.WriteLine(message);
+        try
         {
-            this.Communicator = communicator;
+            Communicator.LogMessage(Program.Uid, message).Wait();
         }
+        catch (Exception ex) { }
+    }
 
-        private void Log(LogType type, params object[] args)
-        {
-            if (args == null || args.Length == 0)
-                return;
-            string prefix = type switch
-            {
-                LogType.Info => "INFO",
-                LogType.Error => "ERRR",
-                LogType.Warning => "WARN",
-                LogType.Debug => "DBUG",
-                _ => ""
-            };
+    public override string ToString() => String.Join(Environment.NewLine, log);
 
-            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + prefix + " -> " +
-                string.Join(", ", args.Select(x =>
-                x == null ? "null" :
-                x.GetType().IsPrimitive || x is string ? x.ToString() :
-                System.Text.Json.JsonSerializer.Serialize(x)));
-            log.Add(message);
-            if(type != LogType.Debug)
-                Console.WriteLine(message);
-            try
-            {
-                Communicator.LogMessage(Program.Uid, message).Wait();
-            }
-            catch (Exception ex) { }
-        }
+    public string GetTail(int length = 50)
+    {
+        if (length <= 0)
+            length = 50;
 
-        public override string ToString() => String.Join(Environment.NewLine, log);
+        var noLines = log.Where(x => x.Contains("======================================================================") == false);
+        if (noLines.Count() <= length)
+            return String.Join(Environment.NewLine, noLines);
+        return String.Join(Environment.NewLine, noLines.Skip(noLines.Count() - length));
     }
 }

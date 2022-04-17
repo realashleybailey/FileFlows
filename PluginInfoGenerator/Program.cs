@@ -140,6 +140,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
                 element.Outputs = instance.Outputs;
                 element.Type = instance.Type;
                 element.Icon = instance.Icon;
+                element.FailureNode = instance.FailureNode;
                 element.Variables = instance.Variables;
                 element.HelpUrl = instance.HelpUrl;
 

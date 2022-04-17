@@ -231,13 +231,6 @@ public class Runner
         List<Guid> runFlows = new List<Guid>();
         runFlows.Add(Flow.Uid);
 
-        ObjectReference gotoFlow = null;
-        nodeParameters.GotoFlow = (flow) =>
-        {
-            if (runFlows.Contains(flow.Uid))
-                throw new Exception($"Flow '{flow.Uid}' ['{flow.Name}'] has already been executed, cannot link to existing flow as this could cause an infinite loop.");
-            gotoFlow = flow;
-        };
         Info.LibraryFile.OriginalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : new FileInfo(nodeParameters.WorkingFile).Length;
         nodeParameters.TempPath = WorkingDir;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
@@ -261,20 +254,47 @@ public class Runner
             return pluginService.GetSettingsJson(pluginSettingsType).Result;
         };
 
+        var pluginLoader = PluginService.Load();
+        var status = ExecuteFlow(Flow, pluginLoader, runFlows);
+        SetStatus(status);
+        if(status == FileStatus.ProcessingFailed)
+        {
+            // try run FailureFlow
+            var fs = new FlowService();
+            var failureFlow = fs.GetFailureFlow(Info.Library.Uid).Result;
+            if (failureFlow != null)
+            {
+                nodeParameters.UpdateVariables(new Dictionary<string, object>
+                {
+                    { "FailedNode", CurrentNode?.Name },
+                    { "FlowName", Flow.Name }
+                });
+                ExecuteFlow(failureFlow, pluginLoader, runFlows);
+            }
+        }
+    }
+
+    private FileStatus ExecuteFlow(Flow flow, IPluginService pluginLoader, List<Guid> runFlows)
+    { 
         int count = 0;
+        ObjectReference gotoFlow = null;
+        nodeParameters.GotoFlow = (flow) =>
+        {
+            if (runFlows.Contains(flow.Uid))
+                throw new Exception($"Flow '{flow.Uid}' ['{flow.Name}'] has already been executed, cannot link to existing flow as this could cause an infinite loop.");
+            gotoFlow = flow;
+        };
 
         // find the first node
-        var part = Flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
+        var part = flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
         if (part == null)
         {
             nodeParameters.Logger!.ELog("Failed to find Input node");
-            SetStatus(FileStatus.ProcessingFailed);
-            return;
+            return FileStatus.ProcessingFailed;
         }
 
         int step = 0;
         StepChanged(step, part.Name);
-        var pluginLoader = PluginService.Load();
 
         // need to clear this incase the file is being reprocessed
         Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
@@ -285,15 +305,13 @@ public class Runner
             {
                 nodeParameters.Logger?.WLog("Flow was canceled");
                 nodeParameters.Result = NodeResult.Failure;
-                SetStatus(FileStatus.ProcessingFailed);
-                return;
+                return FileStatus.ProcessingFailed;
             }
             if (part == null)
             {
                 nodeParameters.Logger?.WLog("Flow part was null");
                 nodeParameters.Result = NodeResult.Failure;
-                SetStatus(FileStatus.ProcessingFailed);
-                return;
+                return FileStatus.ProcessingFailed;
             }
 
             try
@@ -304,10 +322,9 @@ public class Runner
                 if (CurrentNode == null)
                 {
                     // happens when canceled    
-                    nodeParameters.Logger?.ELog("Failed to load node: " + part.Name);
-                    SetStatus(FileStatus.ProcessingFailed);
+                    nodeParameters.Logger?.ELog("Failed to load node: " + part.Name);                    
                     nodeParameters.Result = NodeResult.Failure;
-                    return;
+                    return FileStatus.ProcessingFailed;
                 }
                 ++step;
                 StepChanged(step, CurrentNode.Name);
@@ -343,22 +360,20 @@ public class Runner
                     {
                         nodeParameters.Logger?.ELog("Unable goto flow with UID:" + gotoFlow.Uid + " (" + gotoFlow.Name + ")");
                         nodeParameters.Result = NodeResult.Failure;
-                        SetStatus(FileStatus.ProcessingFailed);
-                        return;
+                        return FileStatus.ProcessingFailed;
                     }
 
                     nodeParameters.Logger?.ILog("Changing flows to: " + newFlow.Name);
                     this.Flow = newFlow;
 
                     // find the first node
-                    part = Flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
+                    part = flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
                     if (part == null)
                     {
                         nodeParameters.Logger!.ELog("Failed to find Input node");
-                        SetStatus(FileStatus.ProcessingFailed);
-                        return;
+                        return FileStatus.ProcessingFailed;
                     }
-                    Info.TotalParts = Flow.Parts.Count;
+                    Info.TotalParts = flow.Parts.Count;
                     step = 0;
                 }
                 else
@@ -369,8 +384,7 @@ public class Runner
                         // the execution failed                     
                         nodeParameters.Logger?.ELog("node returned error code:", CurrentNode!.Name);
                         nodeParameters.Result = NodeResult.Failure;
-                        SetStatus(FileStatus.ProcessingFailed);
-                        return;
+                        return FileStatus.ProcessingFailed;
                     }
                     var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
                     if (outputNode == null)
@@ -379,18 +393,16 @@ public class Runner
                         // flow has completed
                         nodeParameters.Result = NodeResult.Success;
                         nodeParameters.Logger?.DLog("flow completed 1");
-                        SetStatus(FileStatus.Processed);
                         nodeParameters.Logger?.DLog("flow status set to processed");
-                        return;
+                        return FileStatus.Processed;
                     }
 
-                    part = outputNode == null ? null : Flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
+                    part = outputNode == null ? null : flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
                     if (part == null)
                     {
                         // couldnt find the connection, maybe bad data, but flow has now finished
                         nodeParameters.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
-                        SetStatus(FileStatus.Processed);
-                        return;
+                        return FileStatus.Processed;
                     }
                 }
             }
@@ -399,10 +411,11 @@ public class Runner
                 nodeParameters.Result = NodeResult.Failure;
                 nodeParameters.Logger?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 Logger.Instance?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
-                SetStatus(FileStatus.ProcessingFailed);
-                return;
+                return FileStatus.ProcessingFailed;
             }
         }
+        nodeParameters.Logger?.ELog("Too many nodes in flow, processing aborted");
+        return FileStatus.ProcessingFailed;
     }
 
     private void DownloadPlugins()

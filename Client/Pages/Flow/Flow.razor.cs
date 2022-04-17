@@ -141,12 +141,6 @@ namespace FileFlows.Client.Pages
             this.StateHasChanged();
             try
             {
-                var elementsResult = await GetElements(API_URL + "/elements");
-                if (elementsResult.Success)
-                {
-                    Available = elementsResult.Data;
-                    this.txtFilter = string.Empty;
-                }
                 FileFlows.Shared.Models.Flow flow;
                 if (Uid == Guid.Empty && App.Instance.NewFlowTemplate != null)
                 {
@@ -157,6 +151,13 @@ namespace FileFlows.Client.Pages
                 {
                     var modelResult = await GetModel(API_URL + "/" + Uid.ToString());
                     flow = (modelResult.Success ? modelResult.Data : null) ?? new ff() { Parts = new List<ffPart>() };
+                }
+
+                var elementsResult = await GetElements(API_URL + "/elements?type=" + (int)flow.Type);
+                if (elementsResult.Success)
+                {
+                    Available = elementsResult.Data;
+                    this.txtFilter = string.Empty;
                 }
                 await InitModel(flow);
 
@@ -456,7 +457,7 @@ namespace FileFlows.Client.Pages
                                     var flowsResult = await HttpHelper.Get<ff[]>($"/api/flow");
                                     if (flowsResult.Success)
                                     {
-                                        flowOptions = flowsResult.Data?.Where(x => x.Uid != Model?.Uid)?.OrderBy(x => x.Name)?.Select(x => new ListOption
+                                        flowOptions = flowsResult.Data?.Where(x => x.Uid != Model?.Uid && x.Type != FlowType.Failure)?.OrderBy(x => x.Name)?.Select(x => new ListOption
                                         {
                                             Label = x.Name,
                                             Value = new ObjectReference

@@ -1,4 +1,5 @@
-﻿using System.Dynamic;
+﻿using FileFlows.Shared;
+using System.Dynamic;
 
 namespace FileFlows.Server.Models
 {
@@ -11,6 +12,7 @@ namespace FileFlows.Server.Models
         public List<Shared.Models.TemplateField> Fields { get; set; }
         public int? Order { get; set; }
         public bool Save { get; set; }
+        public FlowType Type{ get; set; }
     }
 
     class FlowTemplatePart

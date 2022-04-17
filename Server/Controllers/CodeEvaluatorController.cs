@@ -122,6 +122,8 @@ namespace FileFlows.Server.Controllers
                     System.Text.Json.JsonSerializer.Serialize(x)));
                 log.AppendLine(message);
             }
+
+            public string GetTail(int length = 50) => "Not implemented";
         }
     }
 

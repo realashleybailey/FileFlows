@@ -44,6 +44,8 @@ namespace FileFlows.Shared.Models
         public string HelpUrl { get; set; }
         public FlowElementType Type { get; set; }
 
+        public bool FailureNode { get; set; }
+
         public string Group { get; set; }
 
         public List<string> OutputLabels { get; set; }

@@ -97,6 +97,12 @@ canvas {
     &.BuildEnd {
         border-color:var(--flow-build-end);
     }
+    &.Communication {
+        border-color:var(--flow-communication);
+    }
+    &.Failure {
+        border-color:var(--flow-failure);
+    }
 }
 .flow-element {
     padding: 0.25rem 0.25rem;
@@ -146,6 +152,12 @@ canvas {
     }
     &.BuildPart .icon-wrapper {
         border-color: var(--flow-build-part);
+    }
+    &.Communication .icon-wrapper {
+        border-color: var(--flow-communication);
+    }
+    &.Failure .icon-wrapper {
+        border-color: var(--flow-failure);
     }
 
     .label {
@@ -300,6 +312,26 @@ canvas {
 
         .connected > div {
             background-color: var(--flow-build-part) !important;
+        }
+    }
+
+    &.Communication:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-communication) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-communication) !important;
+        }
+    }
+
+    &.Failure:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-failure) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-failure) !important;
         }
     }
 

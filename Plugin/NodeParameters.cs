@@ -566,6 +566,18 @@ namespace FileFlows.Plugin
             if (Fake || GetToolPathActual == null) return string.Empty;
             return GetToolPathActual(tool);
         }
+
+        /// <summary>
+        /// Gets a variable from the variable list if exists
+        /// </summary>
+        /// <param name="name">the name of the variable</param>
+        /// <returns>the value of the variable, else null if not found</returns>
+        public object? GetVariable(string name)
+        {
+            if(this.Variables?.ContainsKey(name) == true)
+                return this.Variables[name];
+            return null;
+        }
     }
 
 

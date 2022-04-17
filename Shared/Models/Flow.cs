@@ -8,6 +8,8 @@ namespace FileFlows.Shared.Models
         public bool Enabled { get; set; }
         public string Description { get; set; }
 
+        public FlowType Type { get; set; }
+
         public string Template { get; set; }
         public List<FlowPart> Parts { get; set; }
     }
@@ -18,6 +20,7 @@ namespace FileFlows.Shared.Models
         public List<TemplateField> Fields { get; set; }
         public int? Order { get; set; }
         public bool Save { get; set; }
+        public FlowType Type { get; set; }
     }
 
     public class TemplateField

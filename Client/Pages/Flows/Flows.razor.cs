@@ -209,6 +209,7 @@ namespace FileFlows.Client.Pages
             }
 
             newFlowTemplate.Name = name;
+            newFlowTemplate.Type = newTemplate.Type;
 
             if (newTemplate?.Save == true)
             {

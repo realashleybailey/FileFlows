@@ -1,12 +1,12 @@
 [
   {
-    "name": "Blank Music Template",
-    "group": "Music",
+    "name": "Video File",
+    "group": "Video",
     "order": 1,
-    "description": "A blank Music template with a single \"Music File\" input node.",
+    "description": "A blank Video template with a single \"Video File\" input node.",
     "parts": [
       {
-        "node": "MusicFile",
+        "node": "VideoFile",
         "uid": "00000000-0000-0000-0000-000000000001"
       }
     ]

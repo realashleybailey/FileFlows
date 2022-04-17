@@ -7,4 +7,10 @@
         Linux = 2,
         Mac = 3
     }
+
+    public enum FlowType
+    {
+        Standard = 0,
+        Failure = 1
+    }
 }

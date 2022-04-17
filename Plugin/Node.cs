@@ -25,6 +25,11 @@ namespace FileFlows.Plugin
         public string Name => base.GetType().Name;
 
         /// <summary>
+        /// Gets if this node can be used in a failure node
+        /// </summary>
+        public virtual bool FailureNode => false;
+
+        /// <summary>
         /// Get the help URL for this node, will show a help button if set
         /// </summary>
         public virtual string HelpUrl => string.Empty;

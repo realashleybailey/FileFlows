@@ -9,7 +9,9 @@ namespace FileFlows.Plugin
         Logic,
         BuildStart,
         BuildEnd,
-        BuildPart
+        BuildPart,
+        Failure,
+        Communication
     }
 
     public enum FormInputType

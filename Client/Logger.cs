@@ -28,5 +28,7 @@ namespace FileFlows.Client
         {
             _ = jsRuntime.InvokeVoidAsync("ff.log", new object[] { level, args });
         }
+
+        public string GetTail(int length = 50) => "Not implemented";
     }
 }

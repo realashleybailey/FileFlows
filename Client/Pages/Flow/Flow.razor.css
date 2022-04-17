@@ -93,6 +93,12 @@ canvas {
 ::deep .flow-part.BuildEnd, .flow-element.BuildEnd {
   border-color: var(--flow-build-end);
 }
+::deep .flow-part.Communication, .flow-element.Communication {
+  border-color: var(--flow-communication);
+}
+::deep .flow-part.Failure, .flow-element.Failure {
+  border-color: var(--flow-failure);
+}
 
 .flow-element {
   padding: 0.25rem 0.25rem;
@@ -138,6 +144,12 @@ canvas {
 }
 .flow-element.BuildPart .icon-wrapper {
   border-color: var(--flow-build-part);
+}
+.flow-element.Communication .icon-wrapper {
+  border-color: var(--flow-communication);
+}
+.flow-element.Failure .icon-wrapper {
+  border-color: var(--flow-failure);
 }
 .flow-element .label {
   flex-grow: 1;
@@ -349,6 +361,18 @@ canvas {
 }
 ::deep .flow-part.BuildPart:not(.selected) .connected > div {
   background-color: var(--flow-build-part) !important;
+}
+::deep .flow-part.Communication:not(.selected) .icon-wrapper, ::deep .flow-part.Communication:not(.selected) .input > div, ::deep .flow-part.Communication:not(.selected) .output > div {
+  border-color: var(--flow-communication) !important;
+}
+::deep .flow-part.Communication:not(.selected) .connected > div {
+  background-color: var(--flow-communication) !important;
+}
+::deep .flow-part.Failure:not(.selected) .icon-wrapper, ::deep .flow-part.Failure:not(.selected) .input > div, ::deep .flow-part.Failure:not(.selected) .output > div {
+  border-color: var(--flow-failure) !important;
+}
+::deep .flow-part.Failure:not(.selected) .connected > div {
+  background-color: var(--flow-failure) !important;
 }
 ::deep .flow-part.selected .icon-wrapper, ::deep .flow-part.selected .input > div, ::deep .flow-part.selected .output > div {
   border-color: var(--accent) !important;

@@ -1,6 +1,7 @@
 [
   {
-    "name": "Blank File Template",
+    "name": "File",
+    "group": "Basic",
     "order": 1,
     "description": "A blank file template with a single \"Input File\" input node.",
     "parts": [
@@ -11,12 +12,26 @@
     ]
   },
   {
-    "name": "Blank Folder Template",
+    "name": "Folder",
+    "group": "Basic",
     "order": 2,
     "description": "A blank folder template with a single \"Input Folder\" input node.",
     "parts": [
       {
         "node": "InputFolder",
+        "uid": "00000000-0000-0000-0000-000000000001"
+      }
+    ]
+  },
+  {
+    "name": "Flow Failure",
+    "group": "Basic",
+    "order": 3,
+    "type": 1,
+    "description": "A flow that will be executed when a Flow fails unexpectedly.",
+    "parts": [
+      {
+        "node": "FlowFailure",
         "uid": "00000000-0000-0000-0000-000000000001"
       }
     ]

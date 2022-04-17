@@ -6,6 +6,8 @@ namespace FileFlows.Plugin
         void DLog(params object[] args);
         void WLog(params object[] args);
         void ELog(params object[] args);
+
+        string GetTail(int length = 50);
     }
     public enum LogType
     {

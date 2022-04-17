@@ -56,6 +56,10 @@ EXPOSE 5000
 COPY /deploy /app
 COPY /docker-entrypoint.sh /app/docker-entrypoint.sh
 
+# dos2unix to remove invalid linux characters from the script
+RUN dos2unix /app/docker-entrypoint.sh && \
+    chmod +x /app/docker-entrypoint.sh
+
 # set the working directory
 WORKDIR /app
 

@@ -1,6 +1,8 @@
 FROM lsiobase/ubuntu:jammy AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
+ENV PATH=$PATH:/root/.dotnet:/root/.dotnet/tools
+ENV DOTNET_ROOT=/root/.dotnet
 
 # Add intel hardware encoding support
 ENV LIBVA_DRIVERS_PATH="/usr/lib/x86_64-linux-gnu/dri" \
@@ -37,8 +39,6 @@ RUN ARCH=$(dpkg --print-architecture) && \
 ### actual FileFlows stuff happens now ###
 ##########################################
 FROM base
-ENV PATH=$PATH:/root/.dotnet:/root/.dotnet/tools
-ENV DOTNET_ROOT=/root/.dotnet
 
 # Install dotnet SDK
 RUN wget https://dot.net/v1/dotnet-install.sh  && \

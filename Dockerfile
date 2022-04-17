@@ -1,4 +1,8 @@
 FROM lsiobase/ubuntu:focal
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV PATH=$PATH:/root/.dotnet:/root/.dotnet/tools
+ENV DOTNET_ROOT=/root/.dotnet
 #FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 
 ############################################################ 
@@ -61,4 +65,4 @@ RUN chmod +x /app/docker-entrypoint.sh
 # set the working directory
 WORKDIR /app
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-if [ "$1" = '--node' ]; then
+if [ "$FFNODE" = 'true' ] || [ "$1" = '--node' ] then   
     printf "Launching node\n"
     exec dotnet /app/FileFlows.Node.dll
 else then

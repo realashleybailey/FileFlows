@@ -59,4 +59,4 @@ COPY /docker-entrypoint.sh /app/docker-entrypoint.sh
 # set the working directory
 WORKDIR /app
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]

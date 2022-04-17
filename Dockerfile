@@ -54,7 +54,7 @@ EXPOSE 5000
 
 # copy the deploy file into the app directory
 COPY /deploy /app
-COPY /docker-entrypoint.sh /app
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # set the working directory
 WORKDIR /app

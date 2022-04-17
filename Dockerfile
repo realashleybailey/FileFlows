@@ -54,9 +54,9 @@ EXPOSE 5000
 
 # copy the deploy file into the app directory
 COPY /deploy /app
+COPY /docker-entrypoint.sh /app
 
 # set the working directory
 WORKDIR /app
 
-# run the server
-ENTRYPOINT [ "/root/.dotnet/dotnet", "FileFlows.Server.dll", "--urls=http://*:5000", "--docker" ]
+ENTRYPOINT ["/docker-entrypoint.sh"]

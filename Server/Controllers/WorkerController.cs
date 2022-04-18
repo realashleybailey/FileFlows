@@ -45,9 +45,12 @@ namespace FileFlows.Server.Controllers
                 string logFile = await GetLogFileName(info.LibraryFile.Uid);
                 if (System.IO.File.Exists(logFile))
                     System.IO.File.Delete(logFile);
+                if (System.IO.File.Exists(logFile.Replace(".log", ".html")))
+                    System.IO.File.Delete(logFile.Replace(".log", ".html"));
             }
             catch (Exception) { }
 
+            info.LibraryFile.ExecutedNodes.Clear();
             info.Uid = Guid.NewGuid();
             info.LastUpdate = DateTime.Now;
             Executors.Add(info.Uid, info);
@@ -201,7 +204,15 @@ namespace FileFlows.Server.Controllers
         {
             var file = await GetLogFileName(uid);
             if (System.IO.File.Exists(file))
-                return System.IO.File.ReadAllText(file);
+            {
+                if (lineCount <= 0)
+                    return System.IO.File.ReadAllText(file);
+
+                var lines = System.IO.File.ReadAllLines(file);
+                if (lines.Count() <= lineCount)
+                    return String.Join(Environment.NewLine, lines);
+                return String.Join(Environment.NewLine, lines.Skip(lines.Count() - lineCount));
+            }
             return String.Empty;
         }
 

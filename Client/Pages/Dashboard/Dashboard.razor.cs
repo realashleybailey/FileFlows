@@ -204,7 +204,7 @@ namespace FileFlows.Client.Pages
         {
             Blocker.Show();
             string log = string.Empty;
-            string url = $"{ApIUrl}/{worker.LibraryFile.Uid}/log";
+            string url = $"{ApIUrl}/{worker.LibraryFile.Uid}/log?lineCount=200";
             try
             {
                 var logResult = await GetLog(url);
@@ -223,7 +223,7 @@ namespace FileFlows.Client.Pages
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.LogView,
+                InputType = FormInputType.LogView,
                 Name = "Log",
                 Parameters = new Dictionary<string, object> {
                     { nameof(Components.Inputs.InputLogView.RefreshUrl), url },

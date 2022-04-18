@@ -4,6 +4,7 @@ namespace FileFlows.Server.Controllers
     using FileFlows.Server.Helpers;
     using FileFlows.Shared.Models;
     using FileFlows.Plugin;
+    using FileFlows.Shared.Helpers;
 
     /// <summary>
     /// Library files controller
@@ -239,7 +240,19 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{uid}")]
         public async Task<LibraryFile> Get(Guid uid)
         {
-            return await GetByUid(uid);
+            var result = await GetByUid(uid);
+            if(result != null && (result.Status == FileStatus.ProcessingFailed || result.Status == FileStatus.Processed))
+            {
+                var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
+                string htmlFile = logFile.Replace(".log", ".html");
+                if(System.IO.File.Exists(logFile) && System.IO.File.Exists(htmlFile) == false)
+                {
+                    string log = System.IO.File.ReadAllText(logFile);
+                    string html = LogToHtml.Convert(log);
+                    System.IO.File.WriteAllText(htmlFile, html); 
+                }
+            }
+            return result;
         }
 
 
@@ -273,9 +286,11 @@ namespace FileFlows.Server.Controllers
         /// Get the log of a library file
         /// </summary>
         /// <param name="uid">The UID of the library file</param>
+        /// <param name="lines">Optional number of lines to fetch</param>
+        /// <param name="html">if the log should be html if possible</param>
         /// <returns>The log of the library file</returns>
         [HttpGet("{uid}/log")]
-        public async Task<string> GetLog(Guid uid)
+        public async Task<string> GetLog([FromRoute] Guid uid, [FromQuery] int lines = 0, [FromQuery] bool html = true)
         {
             var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
             if (string.IsNullOrEmpty(logFile))
@@ -283,14 +298,30 @@ namespace FileFlows.Server.Controllers
             if (System.IO.File.Exists(logFile) == false)
                 return string.Empty;
 
-
             try
             {
+                var logFileHtml = logFile.Replace(".log", ".html");
+                if (html && System.IO.File.Exists(logFileHtml))
+                    logFile = logFileHtml;
+                else if(lines > 0)
+                {
+                    var logLines = System.IO.File.ReadAllLines(logFile);
+                    string log;
+                    if (logLines.Count() <= lines)
+                        log = String.Join(Environment.NewLine, logLines);
+                    else
+                        log = String.Join(Environment.NewLine, logLines.Skip(logLines.Count() - lines));
+
+                    if (html == false)
+                        return log;
+                    return LogToHtml.Convert(log);
+                }
+
                 Stream stream = System.IO.File.Open(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using StreamReader streamReader = new StreamReader(stream);
                 return streamReader.ReadToEnd();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return "Error opening log: " + ex.Message;
             }

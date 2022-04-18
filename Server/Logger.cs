@@ -78,6 +78,10 @@ public class Logger : FileFlows.Plugin.ILogger
             }
             File.AppendAllText(LogFile, message + Environment.NewLine);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error in Logger: " + ex.Message + Environment.NewLine + ex.StackTrace);
+        }
         finally
         {
             mutex.ReleaseMutex();

@@ -60,16 +60,17 @@ namespace FileFlows.Server.Workers
                             continue;
                     }
 
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [1]: {fullpath}");
 
                     if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
                         continue;
-
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [2]: {fullpath}");
                     if (fullpath.ToLower().StartsWith(Library.Path.ToLower()) == false)
                     {
                         Logger.Instance?.ILog($"Library file \"{fullpath}\" no longer belongs to library \"{Library.Path}\"");
                         continue; // library was changed
                     }
-
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [3]: {fullpath}");
                     StringBuilder scanLog = new StringBuilder(); 
                     DateTime dtTotal = DateTime.Now;
 
@@ -79,14 +80,17 @@ namespace FileFlows.Server.Workers
                     var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
                                                 .DistinctBy(x => x.Value.Fingerprint)
                                                 .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
-                    
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [4]: {fullpath}");
                     if (knownFiles.ContainsKey(fullpath.ToLower()))
                         continue;
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [5]: {fullpath}");
                     if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
                         continue;
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [6]: {fullpath}");
 
                     string type = Library.Folders ? "folder" : "file";
 
+                    Logger.Instance.ILog($"{Library.Name} Dequeued [7]: {fullpath}");
 
                     FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
 
@@ -332,8 +336,11 @@ namespace FileFlows.Server.Workers
                 return;
             }
 
-            if(QueuedFiles.Contains(fullPath) == false)
+            if (QueuedFiles.Contains(fullPath) == false)
+            {
+                Logger.Instance.ILog($"{Library.Name} queueing file: {fullPath}");
                 QueuedFiles.Enqueue(fullPath);
+            }
         }
 
         internal void UpdateLibrary(Library library)
@@ -413,7 +420,8 @@ namespace FileFlows.Server.Workers
                     var dirs = new DirectoryInfo(Library.Path).GetDirectories();
                     foreach (var dir in dirs)
                     {
-                        if (QueuedFiles.Contains(dir.FullName) == false) {
+                        if (QueuedFiles.Contains(dir.FullName) == false)
+                        {
                             QueuedFiles.Enqueue(dir.FullName);
                             ++count;
                         }
@@ -426,6 +434,7 @@ namespace FileFlows.Server.Workers
                     {
                         if (QueuedFiles.Contains(file.FullName) == false)
                         {
+                            Logger.Instance.ILog($"{Library.Name} queueing file from scan: {file.FullName}");
                             QueuedFiles.Enqueue(file.FullName);
                             ++count;
                         }

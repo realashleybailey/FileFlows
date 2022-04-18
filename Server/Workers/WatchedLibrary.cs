@@ -44,9 +44,11 @@ namespace FileFlows.Server.Workers
                     string? fullpath;
                     if (QueuedFiles.TryDequeue(out fullpath) == false)
                     {
+                        Logger.Instance.ILog($"{Library.Name} nothing queued");
                         Thread.Sleep(1000);
                         continue;
                     }
+                    Logger.Instance.ILog($"{Library.Name} Dequeued: {fullpath}");
 
                     if (CheckExists(fullpath) == false)
                         continue;

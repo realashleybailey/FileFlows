@@ -60,17 +60,13 @@ namespace FileFlows.Server.Workers
                             continue;
                     }
 
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [1]: {fullpath}");
-
                     if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
                         continue;
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [2]: {fullpath}");
                     if (fullpath.ToLower().StartsWith(Library.Path.ToLower()) == false)
                     {
                         Logger.Instance?.ILog($"Library file \"{fullpath}\" no longer belongs to library \"{Library.Path}\"");
                         continue; // library was changed
                     }
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [3]: {fullpath}");
                     StringBuilder scanLog = new StringBuilder(); 
                     DateTime dtTotal = DateTime.Now;
 
@@ -80,17 +76,19 @@ namespace FileFlows.Server.Workers
                     var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
                                                 .DistinctBy(x => x.Value.Fingerprint)
                                                 .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [4]: {fullpath}");
                     if (knownFiles.ContainsKey(fullpath.ToLower()))
+                    {
+                        Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
                         continue;
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [5]: {fullpath}");
+                    }
                     if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
+                    {
+                        Logger.Instance.DLog($"{Library.Name} skipping known output file '{fullpath}'");
                         continue;
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [6]: {fullpath}");
+                    }
 
                     string type = Library.Folders ? "folder" : "file";
 
-                    Logger.Instance.ILog($"{Library.Name} Dequeued [7]: {fullpath}");
 
                     FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
 

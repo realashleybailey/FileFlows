@@ -3,7 +3,7 @@
 # set -e makes the script exit when a command fails.
 set -e
 
-if [[ -v FFNODE || "$1" = '--node' ]]; then
+if [[ FFNODE == 'true' || FFNODE == '1' || "$1" = '--node' ]]; then
     printf "Launching node\n"
     exec /root/.dotnet/dotnet FileFlows.Node.dll --docker
 else

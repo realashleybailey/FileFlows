@@ -50,7 +50,7 @@ namespace FileFlows.Server.Controllers
             }
             catch (Exception) { }
 
-            info.LibraryFile.ExecutedNodes.Clear();
+            info.LibraryFile?.ExecutedNodes?.Clear();
             info.Uid = Guid.NewGuid();
             info.LastUpdate = DateTime.Now;
             Executors.Add(info.Uid, info);

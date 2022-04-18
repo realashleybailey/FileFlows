@@ -1,4 +1,4 @@
-﻿button:not(.flowtable-button):not(.navbar-toggler) {
+﻿button:not(.flowtable-button):not(.navbar-toggler), a.btn {
     font-size: 0.8rem !important;
     text-transform: uppercase;
     border-radius: unset !important;
@@ -23,4 +23,8 @@
         border-color: var(--input-background);
         color: var(--input-background)
     }
+}
+a.btn {
+    display: inline-flex;
+    place-items: center;
 }

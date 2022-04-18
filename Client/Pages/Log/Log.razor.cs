@@ -11,11 +11,18 @@ namespace FileFlows.Client.Pages
         [CascadingParameter] Blocker Blocker { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
         private string LogText { get; set; }
-#if (!DEMO)
-        private Timer AutoRefreshTimer;
+        private string lblDownload;
+        private string DownloadUrl;
 
+#if (!DEMO)
         protected override void OnInitialized()
         {
+            this.lblDownload = Translater.Instant("Labels.Download");
+#if (DEBUG)
+            this.DownloadUrl = "http://localhost:6868/api/log/download";
+#else
+            this.DownloadUrl = "/api/log/download";
+#endif
             NavigationManager.LocationChanged += NavigationManager_LocationChanged;
             AutoRefreshTimer = new Timer();
             AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;
@@ -23,8 +30,9 @@ namespace FileFlows.Client.Pages
             AutoRefreshTimer.AutoReset = true;
             AutoRefreshTimer.Start();
             _ = Refresh();
-            
+
         }
+        private Timer AutoRefreshTimer;
 
         private void NavigationManager_LocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
@@ -56,5 +64,5 @@ namespace FileFlows.Client.Pages
             }
         }
 #endif
-    }
+        }
 }

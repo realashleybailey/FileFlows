@@ -2,6 +2,14 @@
 @page "/log"
 
 <PageView FullWidth=true>
+    <Head>
+        @if (String.IsNullOrEmpty(DownloadUrl) == false)
+        {
+            <a href="@DownloadUrl" class="btn">
+                @lblDownload
+            </a>
+        }
+    </Head>
     <Body>
         <div class="log">
             @LogText

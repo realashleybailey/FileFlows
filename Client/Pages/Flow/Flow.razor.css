@@ -412,6 +412,7 @@ canvas {
   right: 0;
   flex-direction: row;
   width: unset;
+  z-index: 2;
 }
 ::deep .flow-part.vertical .outputs {
   top: unset;

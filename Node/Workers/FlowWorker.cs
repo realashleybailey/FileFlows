@@ -87,7 +87,7 @@
             string tempPath = node.TempPath;
             if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
             {
-                Logger.Instance?.ELog($"Temp Path not set on node '{nodeName}, cannot process");
+                Logger.Instance?.ELog($"Temp Path not set on node '{nodeName}', cannot process");
                 return;
             }
             var libFileService = LibraryFileService.Load();

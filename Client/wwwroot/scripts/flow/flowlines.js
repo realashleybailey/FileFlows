@@ -58,10 +58,12 @@ class ffFlowLines {
         if (!this.ioNode)
             return;
 
-        let destX = ffFlow.translateCoord(event.clientX) - this.ioCanvasBounds.left;
-        let destY = ffFlow.translateCoord(event.clientY) - this.ioCanvasBounds.top;
+        let destX = ffFlow.translateCoord(event.clientX, true) - this.ioCanvasBounds.left;
+        let destY = ffFlow.translateCoord(event.clientY, true) - this.ioCanvasBounds.top;
         this.redrawLines();
-        this.drawLineToPoint(this.ioSourceBounds.left, this.ioSourceBounds.top, destX, destY);
+        let overInput = !!document.querySelector('.inputs > div > div:hover');
+
+        this.drawLineToPoint({ srcX: this.ioSourceBounds.left, srcY:this.ioSourceBounds.top, destX, destY, color: overInput ? '#ff0090' : null });
     };
 
 
@@ -155,10 +157,10 @@ class ffFlowLines {
         let srcY = (srcBounds.top - canvasBounds.top) + this.ioOffset;
         let destX = (destBounds.left - canvasBounds.left) + this.ioOffset;
         let destY = (destBounds.top - canvasBounds.top) + this.ioOffset;
-        this.drawLineToPoint(srcX, srcY, destX, destY, output, connection);
+        this.drawLineToPoint({ srcX, srcY, destX, destY, output, connection });
     };
 
-    drawLineToPoint(srcX, srcY, destX, destY, output, connection) {
+    drawLineToPoint({ srcX, srcY, destX, destY, output, connection, color }) {
         if (!this.ioContext) {
             let canvas = this.getCanvas();
             this.ioContext = canvas.getContext('2d');
@@ -200,7 +202,7 @@ class ffFlowLines {
         }
 
         context.lineWidth = 5;
-        context.strokeStyle = this.lineColor;
+        context.strokeStyle = color || this.lineColor;
         context.stroke(path);
 
         this.ioLines.push({ path: path, output: output, connection: connection });

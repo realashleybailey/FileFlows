@@ -22,8 +22,10 @@ window.ffFlowPart = {
         ffFlowPart.flowPartElements.push(div);
         div.setAttribute('id', part.uid);
         div.style.position = 'absolute';
-        div.style.left = part.xPos + 'px';
-        div.style.top = part.yPos + 'px';
+        let xPos = Math.floor(part.xPos / 10) * 10;
+        let yPos = Math.floor(part.yPos / 10) * 10;
+        div.style.left = xPos + 'px';
+        div.style.top = yPos + 'px';
         div.classList.add('flow-part');
         if (ffFlow.Vertical)
             div.classList.add('vertical');

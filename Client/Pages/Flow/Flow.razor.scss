@@ -384,6 +384,7 @@ canvas {
             right: 0;
             flex-direction: row;
             width: unset;
+            z-index:2;
         }
 
         .outputs {

@@ -172,7 +172,9 @@ window.ffFlow = {
         });
     },
 
-    translateCoord: function(value) {
+    translateCoord: function (value, lines) {
+        if (lines !== true)
+            value = Math.floor(value / 10) * 10;
         let zoom = ffFlow.Zoom / 100;
         if (!zoom || zoom === 1)
             return value;

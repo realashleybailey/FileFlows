@@ -1,0 +1,72 @@
+﻿.html-log {
+    .line {
+        display: block;
+        white-space: pre;
+        font-family: monospace;
+
+        * {
+            white-space: pre;
+        }
+    }
+
+    .key {
+        color: var(--pink);
+    }
+
+    .value {
+        color: rgba(var(--color-rgb), 0.6);
+    }
+
+    .http-method {
+        color: var(--yellow);
+    }
+
+    .heading {
+        color: var(--info);
+
+        .inner {
+            color: var(--yellow);
+        }
+    }
+
+    .date {
+        color: var(--info);
+    }
+
+    .quote {
+        color: var(--green);
+    }
+
+    .logtype-INFO {
+        color: var(--success);
+    }
+
+    .logtype-ERRR {
+        color: var(--error);
+    }
+
+    .logtype-WARN {
+        color: var(--warning);
+    }
+
+    .logtype-DBUG {
+        color: var(--blue);
+    }
+
+    .url {
+        color: var(--blue);
+        text-decoration: underline;
+    }
+
+    .file {
+        color: var(--teal);
+    }
+
+    .time {
+        color: var(--yellow);
+    }
+
+    .arrow {
+        font-weight: bold;
+    }
+}

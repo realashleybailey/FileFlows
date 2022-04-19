@@ -1,5 +1,6 @@
 ﻿namespace FileFlows.Server.Controllers
 {
+    using FileFlows.Shared.Helpers;
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
@@ -16,8 +17,12 @@
         public string Get()
         {
             if (Logger.Instance is Logger logger)
-                return logger.GetTail(300);
-            return String.Empty;
+            {
+                string log = logger.GetTail(300);
+                string html = LogToHtml.Convert(log);
+                return html;
+            }
+            return string.Empty;
         }
 
         /// <summary>

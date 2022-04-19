@@ -1,4 +1,4 @@
-﻿.log {
+﻿.log ::deep .row {
   white-space: pre;
   font-family: monospace;
   position: absolute;

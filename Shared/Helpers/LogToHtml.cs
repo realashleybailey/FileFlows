@@ -33,6 +33,7 @@ public class LogToHtml
     static Regex regUrl = new Regex(@"(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?");
     static Regex regWindowsNetwork = new Regex(@"(\\\\[a-zA-Z0-9-]+\\[a-zA-Z0-9`~!@#$%^&(){}'._-]+([ ]+[a-zA-Z0-9`~!@#$%^&(){}'._-]+)*)(\\[^ \\/:*?""<>|]+([ ]+[^ \\/:*?""<>|]+)*)*\\?");
     static Regex regWindowsFilename = new Regex(@"([a-zA-Z]:)(\\[^ \\/:*?""<>|]+([ ]+[^ \\/:*?""<>|]+)*)+\\?");
+    static Regex regQuotes= new Regex(@"(?<=('))[^'<>]+(?=('))");
 
     private static string ColorizeSection(string section)
     {
@@ -73,6 +74,7 @@ public class LogToHtml
         section = regUrl.Replace(section, "<span class=\"url\">$0</span>");
         section = regWindowsFilename.Replace(section, "<span class=\"file\">$0</span>");
         section = regTime.Replace(section, "<span class=\"time\">$0</span>");
+        section = regQuotes.Replace(section.Replace("&#39;", "'"), "<span class=\"quote\">$0</span>").Replace("'", "&#39;");
 
         return section;
     }

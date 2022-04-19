@@ -289,6 +289,61 @@ a.btn span {
   background: rgba(var(--color-rgb), 0.2);
 }
 
+.html-log .line {
+  display: block;
+  white-space: pre;
+  font-family: monospace;
+}
+.html-log .line * {
+  white-space: pre;
+}
+.html-log .key {
+  color: var(--pink);
+}
+.html-log .value {
+  color: rgba(var(--color-rgb), 0.6);
+}
+.html-log .http-method {
+  color: var(--yellow);
+}
+.html-log .heading {
+  color: var(--info);
+}
+.html-log .heading .inner {
+  color: var(--yellow);
+}
+.html-log .date {
+  color: var(--info);
+}
+.html-log .quote {
+  color: var(--green);
+}
+.html-log .logtype-INFO {
+  color: var(--success);
+}
+.html-log .logtype-ERRR {
+  color: var(--error);
+}
+.html-log .logtype-WARN {
+  color: var(--warning);
+}
+.html-log .logtype-DBUG {
+  color: var(--blue);
+}
+.html-log .url {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.html-log .file {
+  color: var(--teal);
+}
+.html-log .time {
+  color: var(--yellow);
+}
+.html-log .arrow {
+  font-weight: bold;
+}
+
 @font-face {
   font-family: "Source Sans Pro";
   src: url("webfonts/SourceSansPro-Regular.woff") format("woff");

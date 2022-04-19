@@ -117,7 +117,7 @@ input[type=checkbox]:disabled {
   cursor: not-allowed;
 }
 
-button:not(.flowtable-button):not(.navbar-toggler), a.btn {
+button:not(.flowtable-button):not(.navbar-toggler), a.btn, .btn-select {
   font-size: 0.8rem !important;
   text-transform: uppercase;
   border-radius: unset !important;
@@ -133,11 +133,11 @@ button:not(.flowtable-button):not(.navbar-toggler), a.btn {
   background-color: transparent;
   color: var(--color);
 }
-button:not(.flowtable-button):not(.navbar-toggler):hover:not(:disabled), button:not(.flowtable-button):not(.navbar-toggler):active:not(:disabled), a.btn:hover:not(:disabled), a.btn:active:not(:disabled) {
+button:not(.flowtable-button):not(.navbar-toggler):hover:not(:disabled), button:not(.flowtable-button):not(.navbar-toggler):active:not(:disabled), a.btn:hover:not(:disabled), a.btn:active:not(:disabled), .btn-select:hover:not(:disabled), .btn-select:active:not(:disabled) {
   background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
   box-shadow: inset 0 -3px 0 0 var(--accent) !important;
 }
-button:not(.flowtable-button):not(.navbar-toggler):disabled, a.btn:disabled {
+button:not(.flowtable-button):not(.navbar-toggler):disabled, a.btn:disabled, .btn-select:disabled {
   border-color: var(--input-background);
   color: var(--input-background);
 }
@@ -150,6 +150,15 @@ a.btn {
 }
 a.btn span {
   min-width: 6rem;
+}
+
+.btn-select {
+  min-width: 7rem;
+  text-align: center;
+}
+.btn-select option {
+  background: var(--base);
+  color: var(--color);
 }
 
 .flow-modal-background-overlay {

@@ -5,6 +5,7 @@ namespace FileFlows.Client.Pages
     using Microsoft.AspNetCore.Components;
     using FileFlows.Client.Components;
     using System.Timers;
+    using FileFlows.Plugin;
 
     public partial class Log : ComponentBase
     {
@@ -13,6 +14,8 @@ namespace FileFlows.Client.Pages
         private string LogText { get; set; }
         private string lblDownload;
         private string DownloadUrl;
+
+        private LogType LogLevel { get; set; } = LogType.Info;
 
 #if (!DEMO)
         protected override void OnInitialized()
@@ -56,7 +59,7 @@ namespace FileFlows.Client.Pages
 
         async Task Refresh()
         {
-            var response = await HttpHelper.Get<string>("/api/log");
+            var response = await HttpHelper.Get<string>("/api/log?logLevel=" + LogLevel);
             if (response.Success)
             {
                 this.LogText = response.Data;
@@ -64,5 +67,14 @@ namespace FileFlows.Client.Pages
             }
         }
 #endif
+
+        async Task ChangeLogType(ChangeEventArgs args)
+        {
+#if (DEMO)
+            return;
+#endif
+            this.LogLevel = (LogType)int.Parse(args.Value.ToString());
+            await Refresh();
         }
+    }
 }

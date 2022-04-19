@@ -10,9 +10,9 @@ namespace FileFlows.Server.Helpers
 
         public static void Scan()
         {
-            Logger.Instance.ILog("Scanning for plugins");
+            Logger.Instance.DLog("Scanning for plugins");
             var pluginDir = GetPluginDirectory();
-            Logger.Instance.ILog("Plugin path:" + pluginDir);
+            Logger.Instance.DLog("Plugin path:" + pluginDir);
 
             if (Program.Docker)
                 EnsureDefaultsExist(pluginDir);
@@ -30,7 +30,7 @@ namespace FileFlows.Server.Helpers
 
             foreach (string ffplugin in Directory.GetFiles(pluginDir, "*.ffplugin", SearchOption.AllDirectories))
             {
-                Logger.Instance?.ILog("Plugin file found: " + ffplugin);
+                Logger.Instance?.DLog("Plugin file found: " + ffplugin);
                 try
                 {
                     using var zf = System.IO.Compression.ZipFile.Open(ffplugin, System.IO.Compression.ZipArchiveMode.Read);
@@ -80,11 +80,11 @@ namespace FileFlows.Server.Helpers
                     plugin.Settings = pi.Settings;
                     plugin.HasSettings = pi.Settings?.Any() == true;
 
-                    Logger.Instance.ILog("Plugin.Name: " + plugin.Name);
-                    Logger.Instance.ILog("Plugin.PackageName: " + plugin.PackageName);
-                    Logger.Instance.ILog("Plugin.Version: " + plugin.Version);
-                    Logger.Instance.ILog("Plugin.Url: " + plugin.Url);
-                    Logger.Instance.ILog("Plugin.Authors: " + plugin.Authors);
+                    Logger.Instance.DLog("Plugin.Name: " + plugin.Name);
+                    Logger.Instance.DLog("Plugin.PackageName: " + plugin.PackageName);
+                    Logger.Instance.DLog("Plugin.Version: " + plugin.Version);
+                    Logger.Instance.DLog("Plugin.Url: " + plugin.Url);
+                    Logger.Instance.DLog("Plugin.Authors: " + plugin.Authors);
 
                     if (isNew == false)
                     {

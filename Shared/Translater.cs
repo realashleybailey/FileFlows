@@ -50,7 +50,7 @@ namespace FileFlows.Shared
                 catch (Exception) { }
             }
 
-            Logger?.ILog("Language keys found: " + Language.Keys.Count);
+            Logger?.DLog("Language keys found: " + Language.Keys.Count);
         }
         public static Dictionary<string, string> DeserializeAndFlatten(string json)
         {

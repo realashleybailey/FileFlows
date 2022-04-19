@@ -1,4 +1,4 @@
-﻿button:not(.flowtable-button):not(.navbar-toggler), a.btn {
+﻿button:not(.flowtable-button):not(.navbar-toggler), a.btn, .btn-select {
     font-size: 0.8rem !important;
     text-transform: uppercase;
     border-radius: unset !important;
@@ -32,5 +32,14 @@ a.btn {
     span
     {
         min-width:6rem;
+    }
+}
+
+.btn-select {
+    min-width:7rem;
+    text-align:center;
+    option {
+        background:var(--base);
+        color:var(--color);
     }
 }

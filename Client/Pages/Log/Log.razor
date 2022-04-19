@@ -1,8 +1,15 @@
 @namespace FileFlows.Client.Pages
 @page "/log"
+@using FileFlows.Plugin
 
 <PageView FullWidth=true>
     <Head>
+        <select class="btn-select" @onchange="ChangeLogType">
+            <option value=@((int)LogType.Error)>Error</option>
+            <option value=@((int)LogType.Warning)>Warning</option>
+            <option selected value=@((int)LogType.Info)>Info</option>
+            <option value=@((int)LogType.Debug)>Debug</option>
+        </select>
         @if (String.IsNullOrEmpty(DownloadUrl) == false)
         {
             <a href="@DownloadUrl" class="btn"><span>@lblDownload</span></a>

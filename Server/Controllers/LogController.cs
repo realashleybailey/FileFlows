@@ -11,14 +11,14 @@
     {
         /// <summary>
         /// Gets the system log
-        /// </summary>
-        /// <returns>The system log</returns>
+        /// </summaryog</ret>
+        /// <returns>The systemurns>
         [HttpGet]
-        public string Get()
+        public string Get([FromQuery] Plugin.LogType logLevel = Plugin.LogType.Info)
         {
             if (Logger.Instance is Logger logger)
             {
-                string log = logger.GetTail(300);
+                string log = logger.GetTail(300, logLevel);
                 string html = LogToHtml.Convert(log);
                 return html;
             }

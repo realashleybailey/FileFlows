@@ -4,7 +4,7 @@ namespace FileFlows.Server;
 
 public class Logger : FileFlows.Plugin.ILogger
 {
-    Queue<string> LogTail = new Queue<string>(300);
+    Queue<string> LogTail = new Queue<string>(3000);
 
     private string _LoggingPath;
     public string LoggingPath
@@ -93,14 +93,42 @@ public class Logger : FileFlows.Plugin.ILogger
     public void WLog(params object[] args) => Log(LogType.Warning, args);
     public void ELog(params object[] args) => Log(LogType.Error, args);
 
-    public string GetTail(int length = 50)
+
+    public string GetTail(int length = 50) => GetTail(length, Plugin.LogType.Info);
+
+    internal string GetTail(int length = 50, Plugin.LogType logLevel = Plugin.LogType.Info)
     {
-        if(length == -1)
-            return string.Join(Environment.NewLine, LogTail.ToArray());
-        if (LogTail.Count() <= length)
-            return String.Join(Environment.NewLine, LogTail);
-        return String.Join(Environment.NewLine, LogTail.Skip(LogTail.Count() - length));
-    } 
+        if (length <= 0 || length > 300)
+            length = 300;
+
+        var filtered = logLevel == Plugin.LogType.Debug ? LogTail : LogTail.Where(x =>
+        {
+            // if log level is error, must contain ERRR
+            if (logLevel == Plugin.LogType.Error)
+                return x.Contains("ERRR");
+            // else if log level below error, if it contains ERR, the logging level also includes this
+            if (x.Contains("ERRR"))
+                return x.Contains("ERRR");
+
+            // same logic as error, warning is next highest
+            if (logLevel == Plugin.LogType.Warning)
+                return x.Contains("WARN");
+            if (x.Contains("WARN"))
+                return false;
+
+            if (logLevel == Plugin.LogType.Info)
+                return x.Contains("INFO");
+            if (x.Contains("INFO"))
+                return false;
+
+            return true;
+        });
+        if (length == -1)
+            return string.Join(Environment.NewLine, filtered.ToArray());
+        if (filtered.Count() <= length)
+            return String.Join(Environment.NewLine, filtered);
+        return String.Join(Environment.NewLine, filtered.Skip(filtered.Count() - length));
+    }
 
     static FileFlows.Plugin.ILogger _Instance;
     public static FileFlows.Plugin.ILogger Instance

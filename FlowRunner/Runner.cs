@@ -257,7 +257,7 @@ public class Runner
         var pluginLoader = PluginService.Load();
         var status = ExecuteFlow(Flow, pluginLoader, runFlows);
         SetStatus(status);
-        if(status == FileStatus.ProcessingFailed)
+        if(status == FileStatus.ProcessingFailed && Canceled == false)
         {
             // try run FailureFlow
             var fs = new FlowService();

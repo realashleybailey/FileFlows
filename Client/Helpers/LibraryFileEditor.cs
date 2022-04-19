@@ -89,12 +89,12 @@ namespace FileFlows.Client.Helpers
                     }
                 });
 
-                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true);
+                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true, noTranslateTitle: true);
             }
             else
             {
                 // just show basic info
-                await editor.Open("Pages.LibraryFile", model.RelativePath, GetInfoTab(model), model, large: true, readOnly: true);
+                await editor.Open("Pages.LibraryFile", model.RelativePath, GetInfoTab(model), model, large: true, readOnly: true, noTranslateTitle: true);
             }
         }
 

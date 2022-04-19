@@ -121,14 +121,17 @@ namespace FileFlows.Client.Components
             return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null, bool noTranslateTitle = false)
         {
             this.RegisteredInputs.Clear();
             var expandoModel = ConverToExando(model);
             this.Model = expandoModel;
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
-            this.Title = Translater.TranslateIfNeeded(title);
+            if (noTranslateTitle)
+                this.Title = title;
+            else
+                this.Title = Translater.TranslateIfNeeded(title);
             this.Fields = fields;
             this.Tabs = tabs;
             this.ReadOnly = readOnly;

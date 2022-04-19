@@ -17,7 +17,7 @@ namespace FileFlows.Server.Controllers
     [Route("/api/plugin")]
     public class PluginController : ControllerStore<PluginInfo>
     {
-        internal const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
+        private const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
 
         /// <summary>
         /// Get a list of all plugins in the system
@@ -98,16 +98,35 @@ namespace FileFlows.Server.Controllers
         [HttpGet("plugin-packages")]
         public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages([FromQuery] bool missing = false)
         {
-            // should expose user configurable repositories
-            var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>(PLUGIN_BASE_URL + "?rand=" + System.DateTime.Now.ToFileTime());
-            if (plugins.Success == false || plugins.Data == null)
-                return new PluginPackageInfo[] { };
-
             Version ffVersion = new Version(Globals.Version);
+            List<PluginPackageInfo> data = new List<PluginPackageInfo>();
+            var repos = GetRepositories();
+            foreach (string repo in repos)
+            {
+                try
+                {
+                    var plugins = await HttpHelper.Get<IEnumerable<PluginPackageInfo>>(repo + "?rand=" + System.DateTime.Now.ToFileTime());
+                    if (plugins.Success == false)
+                        continue;
+                    foreach(var plugin in plugins.Data)
+                    {
+                        if (data.Any(x => x.Name == plugin.Name))
+                            continue;
+
+#if (!DEBUG)
+                        if(string.IsNullOrWhiteSpace(plugin.MinimumVersion) == false)
+                        {
+                            if (ffVersion < new Version(plugin.MinimumVersion))
+                                continue;
+                        }
+#endif
+                        data.Add(plugin);
+                    }
+                }
+                catch (Exception) { }
+            }
+
 #if (DEBUG)
-            var data = plugins.Data;
-#else
-            var data = plugins.Data.Where(x => string.IsNullOrEmpty(x.MinimumVersion) || ffVersion >= new Version(x.MinimumVersion));
 #endif
 
             if (missing)
@@ -119,7 +138,6 @@ namespace FileFlows.Server.Controllers
 
             return data;
         }
-
 
         /// <summary>
         /// Download the latest updates for plugins from the Plugin Repository
@@ -153,14 +171,10 @@ namespace FileFlows.Server.Controllers
                     continue;
                 }
 
-                string url = PLUGIN_BASE_URL + "/download/" + ppi.Package;
-                if (url.EndsWith(".ffplugin") == false)
-                    url += ".ffplugin";
-
-                var dlResult = await HttpHelper.Get<byte[]>(url);
+                var dlResult = DownloadPluginFromRepository(ppi.Package);
                 if (dlResult.Success == false)
                 {
-                    Logger.Instance.WLog("PluginUpdate: Failed to download binary data from: " + url);
+                    Logger.Instance.WLog("PluginUpdate: Failed to download plugin");
                     continue;
                 }
 
@@ -396,6 +410,50 @@ namespace FileFlows.Server.Controllers
             /// A list of plugin packages to download
             /// </summary>
             public List<string> Packages { get; set; }
+        }
+
+        private List<string> GetRepositories()
+        {
+            var repos = new SettingsController().Get().Result.PluginRepositoryUrls ?? new List<string>();
+            if (repos.Contains(PLUGIN_BASE_URL) == false)
+                repos.Add(PLUGIN_BASE_URL);
+            return repos;
+        }
+
+        internal (bool Success, byte[] Data) DownloadPluginFromRepository(string packageName)
+        {
+            var repos = GetRepositories();
+            Version ffVersion = new Version(Globals.Version);
+            foreach (string repo in repos)
+            {
+                try
+                {
+                    var plugins = HttpHelper.Get<IEnumerable<PluginPackageInfo>>(repo + "?rand=" + DateTime.Now.ToFileTime()).Result;
+                    if (plugins.Success == false)
+                        continue;
+                    var plugin = plugins?.Data?.Where(x => x.Package == packageName)?.FirstOrDefault();
+                    if (plugin == null)
+                        continue;
+
+                    if(string.IsNullOrWhiteSpace(plugin.MinimumVersion) == false)
+                    {
+                        if (ffVersion < Version.Parse(plugin.MinimumVersion))
+                            continue;
+                    }
+
+                    string url = repo + "/download/" + packageName;
+                    if (url.EndsWith(".ffplugin") == false)
+                        url += ".ffplugin";
+                    var dlResult = HttpHelper.Get<byte[]>(url).Result;
+                    if (dlResult.Success)
+                        return (true, dlResult.Data);
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+            return (false, new byte[0]);
         }
     }
 }

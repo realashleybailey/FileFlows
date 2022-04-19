@@ -17,6 +17,13 @@
 
         public bool DisableTelemetry { get; set; }
 
+        private List<string> _PluginRepositoryUrls = new ();
+        public List<string> PluginRepositoryUrls
+        {
+            get => _PluginRepositoryUrls;
+            set { _PluginRepositoryUrls = value ?? new(); }
+        }
+
         public bool IsWindows { get; set; }
         public bool IsDocker { get; set; }
 

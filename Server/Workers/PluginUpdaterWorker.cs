@@ -36,13 +36,11 @@
                         continue;
                     }
 
-                    string url = PluginController.PLUGIN_BASE_URL + "/download/" + package.Package;
-                    if (url.EndsWith(".ffplugin") == false)
-                        url += ".ffplugin";
-                    var dlResult = HttpHelper.Get<byte[]>(url).Result;
+                    var dlResult = new PluginController().DownloadPluginFromRepository(package.Package);
+
                     if (dlResult.Success == false)
                     {
-                        Logger.Instance.WLog($"Failed to download package '{plugin.PackageName}' update: " + dlResult.Body);
+                        Logger.Instance.WLog($"Failed to download package '{plugin.PackageName}' update");
                         continue;
                     }
                     Helpers.PluginScanner.UpdatePlugin(package.Package, dlResult.Data);

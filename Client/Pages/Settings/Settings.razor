@@ -23,21 +23,21 @@
     <Body>
         <div class="settings">
             
-            @if (ShowInternalProcessingNdoe)
-            {
-                <FlowTabs>
-                    <FlowTab Title="@lblGeneral">
-                        <InputFile @bind-Value="@Model.LoggingPath" Directory="true" Validators=@DirectoryValidators
-                            Label="Pages.Settings.Fields.LoggingPath" />
-                        @if (Model.IsWindows)
-                        {
-                            <InputSwitch @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate" />
-                        }
-                        <InputSwitch @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins" />
-                        <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
-                   </FlowTab>
-                   <FlowTab Title="@lblNode">
-                       <p>@lblInternalProcessingNodeDescription</p>
+            <FlowTabs>
+                <FlowTab Title="@lblGeneral">
+                    <InputFile @bind-Value="@Model.LoggingPath" Directory="true" Validators=@DirectoryValidators
+                        Label="Pages.Settings.Fields.LoggingPath" />
+                    @if (Model.IsWindows)
+                    {
+                        <InputSwitch @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate" />
+                    }
+                    <InputSwitch @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins" />
+                    <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
+                </FlowTab>
+                @if (ShowInternalProcessingNdoe)
+                {
+                    <FlowTab Title="@lblNode">
+                        <p>@lblInternalProcessingNodeDescription</p>
                         <hr />
                         <InputSwitch @bind-Value="@InternalProcessingNode.Enabled" Label="Pages.Settings.Fields.InternalProcessingNode.Enabled" />
                         <InputNumber @bind-Value="@InternalProcessingNode.FlowRunners" Label="Pages.Settings.Fields.InternalProcessingNode.FlowRunners" Min=0 Max=100 />
@@ -45,22 +45,12 @@
                             Label="Pages.Settings.Fields.InternalProcessingNode.TempPath" />
                         <hr />
                         <InputSchedule @bind-Value="@InternalProcessingNode.Schedule" Label="Pages.Settings.Fields.InternalProcessingNode.Schedule" />
-                   </FlowTab>
-                </FlowTabs>
-            }
-            else
-            {             
-                <Fieldset Title="Pages.Settings.Labels.General">
-                    <InputFile @bind-Value="@Model.LoggingPath" Directory="true" Validators=@DirectoryValidators
-                        Label="Pages.Settings.Fields.LoggingPath" />
-                    @if (Model.IsWindows)
-                    {
-                        <InputSwitch @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate" />                    
-                    }
-                    <InputSwitch @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins" />
-                    <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry" />
-                </Fieldset>            
-            }
+                    </FlowTab>
+                }
+                <FlowTab Title="@lblAdvanced">
+                    <InputTextAreaList @bind-Value="@Model.PluginRepositoryUrls" Label="Pages.Settings.Fields.PluginRepositoryUrls" />
+                </FlowTab>
+            </FlowTabs>
         </div>
     </Body>
 

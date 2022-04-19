@@ -202,5 +202,9 @@
   {
     "outputFile": "Pages/Statistics/StatisticsPage.razor.css",
     "inputFile": "Pages/Statistics/StatisticsPage.razor.scss"
+  },
+  {
+    "outputFile": "Components/Inputs/InputTextAreaList/InputTextAreaList.razor.css",
+    "inputFile": "Components/Inputs/InputTextAreaList/InputTextAreaList.razor.scss"
   }
 ]

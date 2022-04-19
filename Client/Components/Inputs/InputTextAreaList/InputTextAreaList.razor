@@ -1,0 +1,8 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<List<string>>
+
+<InputWrapper Input="@this">
+    <div>
+        <textarea id=@Uid @bind-value="TextValue" @bind-value:event="oninput" placeholder="@Placeholder" rows="8" @onblur="UpdateValue" @onkeydown="OnKeyDown" readonly="@(ReadOnly ? "readonly" : null)"></textarea>
+    </div>
+</InputWrapper>

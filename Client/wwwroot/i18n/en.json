@@ -25,6 +25,7 @@
     "Rescan": "Rescan",
     "Help": "Help",
     "Name": "Name",
+    "Advanced": "Advanced",
     "Filter": "Filter",
     "FilterPlaceholder": "Filter (/)",
     "Log": "Log",
@@ -322,8 +323,8 @@
         "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
-        "TimeZone": "Time Zone",
-        "TimeZone-Help": "The Time Zone of the system.  This is used to calculate the schedules for libraries etc.",
+        "PluginRepositoryUrls": "Plugin Repositories",
+        "PluginRepositoryUrls-Help": "A line separated list of plugin repositoriy URLs to use when searching for plugins.\nThe order is important, if multiple repositories contain the same plugin, the first repository will be used as it''s source.\nThe default repository will always be added to the end of this list.",
         "InternalProcessingNode": {
           "Description": "Here you can configure the Internal Processing Node of FileFlows.   A Processing Node is what executes a Flow and processes Files.",
           "Enabled": "Enabled",

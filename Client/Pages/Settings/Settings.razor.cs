@@ -20,7 +20,7 @@ namespace FileFlows.Client.Pages
 
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblHelp, lblGeneral, lblNode, lblInternalProcessingNodeDescription;
+        private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblInternalProcessingNodeDescription;
 
         private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
 
@@ -34,6 +34,7 @@ namespace FileFlows.Client.Pages
             lblSave = Translater.Instant("Labels.Save");
             lblSaving = Translater.Instant("Labels.Saving");
             lblHelp = Translater.Instant("Labels.Help");
+            lblAdvanced = Translater.Instant("Labels.Advanced");
             lblGeneral = Translater.Instant("Pages.Settings.Labels.General");
             lblNode = Translater.Instant("Pages.Settings.Labels.InternalProcessingNode");
             lblInternalProcessingNodeDescription = Translater.Instant("Pages.Settings.Fields.InternalProcessingNode.Description");

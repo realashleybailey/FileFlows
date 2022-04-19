@@ -1,0 +1,11 @@
+textarea {
+    width: 100%;
+    line-height: 1.5;
+    font-size: 1rem;
+    padding: 0.1875rem 0.625rem;
+    max-width: 40rem;
+
+    &:read-only {
+        filter: opacity(0.5);
+    }
+}

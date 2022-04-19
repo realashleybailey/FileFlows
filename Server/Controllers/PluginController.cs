@@ -414,7 +414,7 @@ namespace FileFlows.Server.Controllers
 
         private List<string> GetRepositories()
         {
-            var repos = new SettingsController().Get().Result.PluginRepositoryUrls ?? new List<string>();
+            var repos = new SettingsController().Get().Result.PluginRepositoryUrls?.Select(x => x)?.ToList() ?? new List<string>();
             if (repos.Contains(PLUGIN_BASE_URL) == false)
                 repos.Add(PLUGIN_BASE_URL);
             return repos;

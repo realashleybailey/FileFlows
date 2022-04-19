@@ -13,6 +13,7 @@ namespace FileFlows.Client.Components.Inputs
 
         const string API_URL = "/api/code-eval";
         private bool Updating = false;
+        private string InitialValue;
 
         private MonacoEditor CodeEditor { get; set; }
 
@@ -39,6 +40,28 @@ namespace FileFlows.Client.Components.Inputs
         private void OnEditorInit(MonacoEditorBase e)
         {
             _ = jsRuntime.InvokeVoidAsync("ffCode.initModel", Variables);
+            InitialValue = this.Value;
+        }
+
+        protected override void OnInitialized()
+        {
+            this.InitialValue = Value;
+            this.Editor.OnCancel += Editor_OnCancel;
+            base.OnInitialized();
+        }
+
+        private async Task<bool> Editor_OnCancel()
+        {
+            this.Updating = true;
+            this.Value = await CodeEditor.GetValue();
+            this.Updating = false;
+            if (this.InitialValue != this.Value)
+            {
+                bool cancel = await Dialogs.Confirm.Show(Translater.Instant("Labels.Confirm"), Translater.Instant("Labels.CancelMessage"));
+                if (cancel == false)
+                    return false;
+            }
+            return true;
         }
 
         private void OnBlur()
@@ -73,7 +96,9 @@ namespace FileFlows.Client.Components.Inputs
                 await OnSubmit.InvokeAsync();
             }
             else if (e.Code == "Escape")
+            {
                 await OnClose.InvokeAsync();
+            }
         }
     }
 }

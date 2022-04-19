@@ -34,6 +34,7 @@
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
     "CancelItems": "Are you sure you want to cancel the selected {count, plural, one {item} other {items}}?",
+    "CancelMessage": "Are you sure you want to cancel and lose any unsaved changes?",
     "Confirm": "Confirm",
     "Prompt": "Prompt",
     "SelectOne": "Select One",

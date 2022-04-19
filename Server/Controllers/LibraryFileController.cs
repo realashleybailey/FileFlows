@@ -341,6 +341,9 @@ namespace FileFlows.Server.Controllers
             {
                 var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
                 System.IO.File.WriteAllText(logFile, log);
+
+                string html = LogToHtml.Convert(log);
+                System.IO.File.WriteAllText(logFile.Replace(".log", ".html"), html);
                 return true;
             }
             catch (Exception) { }

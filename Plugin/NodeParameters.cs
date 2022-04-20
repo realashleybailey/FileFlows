@@ -37,6 +37,7 @@ namespace FileFlows.Plugin
 
         public Func<string, string> GetPluginSettingsJson { get; set; }
         public Func<string, string>? PathMapper { get; set; }
+        public Func<string, string>? PathUnMapper { get; set; }
 
         public Action<ObjectReference> GotoFlow { get; set; }
 
@@ -96,6 +97,13 @@ namespace FileFlows.Plugin
             return PathMapper(path);
         }
 
+        public string UnMapPath(string path)
+        {
+            if (Fake) return path;
+            if (PathUnMapper == null)
+                return path;
+            return PathUnMapper(path);
+        }
 
         private bool initDone = false;
         private void InitFile(string filename)

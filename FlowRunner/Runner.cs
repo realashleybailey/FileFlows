@@ -180,7 +180,8 @@ public class Runner
 
         Info.CurrentPartPercent = percentage;
 
-        try { 
+        try 
+        { 
             var service = FlowRunnerService.Load();
             service.Update(Info);
         }
@@ -223,6 +224,7 @@ public class Runner
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
+        nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;
         FileHelper.DontSetPermissions = Node.DontSetPermissions;
@@ -269,12 +271,12 @@ public class Runner
                     { "FailedNode", CurrentNode?.Name },
                     { "FlowName", Flow.Name }
                 });
-                ExecuteFlow(failureFlow, pluginLoader, runFlows);
+                ExecuteFlow(failureFlow, pluginLoader, runFlows, failure: true);
             }
         }
     }
 
-    private FileStatus ExecuteFlow(Flow flow, IPluginService pluginLoader, List<Guid> runFlows)
+    private FileStatus ExecuteFlow(Flow flow, IPluginService pluginLoader, List<Guid> runFlows, bool failure = false)
     { 
         int count = 0;
         ObjectReference gotoFlow = null;
@@ -297,7 +299,8 @@ public class Runner
         StepChanged(step, part.Name);
 
         // need to clear this incase the file is being reprocessed
-        Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
+        if(failure == false)
+            Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
 
         while (count++ < 50)
         {
@@ -349,7 +352,8 @@ public class Runner
                 finally
                 {
                     TimeSpan executionTime = DateTime.Now.Subtract(nodeStartTime);
-                    RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime);
+                    if(failure == false)
+                        RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime);
                 }
 
                 if (gotoFlow != null)

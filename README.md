@@ -7,6 +7,8 @@ FileFlows is a application that lets you configure a "Flow" that can be processe
 
 More information available on [fileflows.com](https://fileflows.com)
 
+[![Download](https://custom-icon-badges.herokuapp.com/badge/-Download-blue?style=for-the-badge&logo=download&logoColor=white "Download")](https://fileflows.com/downloads)
+
 It allows you to monitor files or directories, and then process files matching certain criteria for processing
 
 It is a plugin based system written in .NET and comes with some plugins out of the box.

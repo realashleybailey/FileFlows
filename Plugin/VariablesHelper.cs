@@ -11,8 +11,9 @@
         /// <param name="variables">the variables used to replace</param>
         /// <param name="stripMissing">if missing variables shouild be removed</param>
         /// <param name="cleanSpecialCharacters">if special characters (eg directory path separator) should be replaced</param>
+        /// <param name="encoder">Optional function to encode the variable values before replacing them</param>
         /// <returns>the string with the variables replaced</returns>
-        public static string ReplaceVariables(string input, Dictionary<string, object> variables, bool stripMissing = false, bool cleanSpecialCharacters = false)
+        public static string ReplaceVariables(string input, Dictionary<string, object> variables, bool stripMissing = false, bool cleanSpecialCharacters = false, Func<string, string> encoder = null)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;
@@ -30,7 +31,7 @@
                         strValue = strValue.Replace("/", "-");
                         strValue = strValue.Replace("\\", "-");
                     }
-                    input = ReplaceVariable(input, variable, strValue, variables[variable]);
+                    input = ReplaceVariable(input, variable, strValue, variables[variable], encoder);
                 }
             }
 
@@ -40,7 +41,7 @@
             return input;
         }
 
-        private static string ReplaceVariable(string input, string variable, string value, object actualValue)
+        private static string ReplaceVariable(string input, string variable, string value, object actualValue, Func<string, string> encoder = null)
         {
             string result = input;
             if(Regex.IsMatch(result, @"{" + Regex.Escape(variable) + @"}"))
@@ -58,6 +59,9 @@
                     value = dValue.ToString(new string('0', digits));
                 else if (actualValue is Int64 i64Value)
                     value = i64Value.ToString(new string('0', digits));
+
+                if(encoder != null)
+                    value = encoder(value);
 
                 result = Regex.Replace(result, @"{" + Regex.Escape(variable) + @":[0#]+}", value, RegexOptions.IgnoreCase);
             }

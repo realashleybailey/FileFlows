@@ -132,7 +132,7 @@ namespace FileFlows.Server.Controllers
             if (missing)
             {
                 // remove plugins already installed
-                var installed = (await GetDataList()).Select(x => x.PackageName).ToList();
+                var installed = (await GetDataList()).Where(x => x.Deleted != true).Select(x => x.PackageName).ToList();
                 return data.Where(x => installed.Contains(x.Package) == false);
             }
 
@@ -226,10 +226,7 @@ namespace FileFlows.Server.Controllers
             {
                 try
                 {
-                    string dlPackage = package;
-                    if (dlPackage.EndsWith(".ffplugin") == false)
-                        dlPackage += ".ffplugin";
-                    var dlResult = await HttpHelper.Get<byte[]>(PLUGIN_BASE_URL + "/download/" + dlPackage);
+                    var dlResult = DownloadPluginFromRepository(package);
                     if (dlResult.Success)
                         PluginScanner.UpdatePlugin(package, dlResult.Data);
                 }

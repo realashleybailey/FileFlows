@@ -136,7 +136,7 @@ namespace FileFlows.Server.Controllers
                 return data.Where(x => installed.Contains(x.Package) == false);
             }
 
-            return data;
+            return data.OrderBy(x => x.Name);
         }
 
         /// <summary>

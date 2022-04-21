@@ -8,7 +8,7 @@
       {
         "node": "MusicFile",
         "uid": "00000000-0000-0000-0000-000000000001",
-        "xPos": 375,
+        "xPos": 370,
         "yPos": 30,
         "connections": [
           {
@@ -22,7 +22,7 @@
       {
         "node": "ConvertAudio",
         "uid": "00000000-0000-0000-0000-000000000002",
-        "xPos": 375,
+        "xPos": 370,
         "yPos": 180,
         "connections": [
           {
@@ -45,7 +45,7 @@
       {
         "node": "MoveFile",
         "uid": "00000000-0000-0000-0000-000000000003",
-        "xPos": 375,
+        "xPos": 370,
         "yPos": 350,
         "connections": [
           {
@@ -64,7 +64,7 @@
         "node": "Function",
         "name": "Delete Dir?",
         "uid": "00000000-0000-0000-0000-000000000004",
-        "xPos": 375,
+        "xPos": 370,
         "yPos": 480,
         "outputs": 2,
         "connections": [

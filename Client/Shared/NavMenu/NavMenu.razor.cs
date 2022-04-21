@@ -87,7 +87,11 @@ namespace FileFlows.Client.Shared
         {
             bool ok = await NavigationService.NavigateTo(item.Url);
             if (ok)
+            {
                 SetActive(item);
+                collapseNavMenu = true;
+                this.StateHasChanged();
+            }
         }
 
         private void SetActive(NavMenuItem item)

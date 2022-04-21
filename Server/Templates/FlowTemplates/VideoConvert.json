@@ -8,7 +8,7 @@
       {
         "node": "VideoFile",
         "uid": "00000000-0000-0000-0000-000000000001",
-        "xPos": 375,
+        "xPos": 370,
         "yPos": 10,
         "connections": [
           {
@@ -23,7 +23,7 @@
         "node": "Function",
         "name": "Check Black Bars?",
         "uid": "00000000-0000-0000-0000-000000000002",
-        "xPos": 375,
+        "xPos": 370,
         "yPos": 130,
         "outputs": 2,
         "connections": [
@@ -69,7 +69,7 @@
       {
         "node": "VideoEncode",
         "uid": "00000000-0000-0000-0000-000000000004",
-        "xPos": 575,
+        "xPos": 570,
         "yPos": 400,
         "connections": [
           {

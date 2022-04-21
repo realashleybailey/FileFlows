@@ -1,0 +1,19 @@
+{
+  "name": "FileFlows",
+  "display": "minimal-ui",
+  "start_url": "/",
+  "theme_color": "#ff0090",
+  "background_color": "#111214",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    }
+  ]
+}

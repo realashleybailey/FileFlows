@@ -52,8 +52,10 @@ public class LogToHtml
             string date = dlMatch.Groups[1].Value;
             string type = dlMatch.Groups[2].Value;
             string content = dlMatch.Groups[3].Value;
-            return "<span class=\"date\">" + HtmlEncode(date) + "</span> - " +
-                   "<span class=\"logtype logtype-" + type + "\">" + HtmlEncode(type) + "</span> <span class=\"arrow\">-></span> " +
+            return "<span class=\"line-prefix\">" +
+                   "<span class=\"date\">" + HtmlEncode(date) + "</span> - " +
+                   "<span class=\"logtype logtype-" + type + "\">" + HtmlEncode(type) + "</span> <span class=\"arrow\">-></span>" +
+                   "</span> " +
                    ColorizeSection(content);
         }
 

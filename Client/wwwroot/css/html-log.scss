@@ -70,3 +70,19 @@
         font-weight: bold;
     }
 }
+
+
+@media screen and (max-width: 578px) {
+    .html-log .line .line-prefix {
+        display:none;
+    }
+
+    .vi-container.fullwidth > .content > .log.html-log {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0.5rem;
+        bottom: 0.5rem;
+        overflow:auto;
+    }
+}

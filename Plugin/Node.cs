@@ -44,6 +44,11 @@ namespace FileFlows.Plugin
         /// </summary>
         public virtual string Icon => string.Empty;
 
+        /// <summary>
+        /// Gets if no editor should be shown when adding this node to a flow
+        /// </summary>
+        public virtual bool NoEditorOnAdd => false;
+
 
         /// <summary>
         /// Gets the group this node belongs to

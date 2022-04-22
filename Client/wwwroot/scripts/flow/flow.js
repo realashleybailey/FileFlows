@@ -165,6 +165,9 @@ window.ffFlow = {
             ffFlowPart.addFlowPart(part);
             ffFlow.parts.push(part);
 
+            if (element.noEditorOnAdd === true)
+                return;
+
             if (element.model && Object.keys(element.model).length > 0)
             {
                 ffFlowPart.editFlowPart(part.uid, true);

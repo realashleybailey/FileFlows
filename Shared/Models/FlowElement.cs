@@ -39,6 +39,8 @@ namespace FileFlows.Shared.Models
         public string Icon { get; set; }
         public Dictionary<string, object> Variables { get; set; }
 
+        public bool NoEditorOnAdd { get; set; }
+
         public int Inputs { get; set; }
         public int Outputs { get; set; }
         public string HelpUrl { get; set; }

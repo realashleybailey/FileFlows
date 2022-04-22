@@ -32,7 +32,12 @@ public class Logger : FileFlows.Plugin.ILogger
         this.LoggingPath = loggingPath;
         if (File.Exists(LogFile))
         {
-            File.Move(LogFile, LogFile + ".old", true);
+            try
+            {
+                File.Move(LogFile, LogFile + ".old", true);
+            }
+            catch (Exception) { }
+
         }
     }
     

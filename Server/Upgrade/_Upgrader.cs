@@ -15,6 +15,11 @@ public class Upgrader
             // no stats recorded, we need to add this
             new UpgradeStats().Run();
         }
+        if (currentVersion < new Version(0, 5, 3))
+        {
+            // no stats recorded, we need to add this
+            new Upgrade0_5_3().Run();
+        }
 
         // save the settings
         if (settings.Version != Globals.Version)

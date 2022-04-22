@@ -85,7 +85,14 @@ window.ffFlow = {
         canvas.style.height = canvas.height + 'px';
 
         for (let p of parts) {
-            ffFlowPart.addFlowPart(p);
+            try {
+                ffFlowPart.addFlowPart(p);
+            } catch (err) {
+                if(p != null && p.name)
+                    console.error(`Error adding flow part '${p.name}: ${err}`);
+                else
+                    console.error(`Error adding flow part: ${err}`);
+            }
         }
 
         ffFlow.redrawLines();
@@ -344,6 +351,10 @@ window.ffFlow = {
     },
     setOutputHint(part, output) {
         let element = ffFlow.getElement(part.flowElementUid);
+        if (!element) {
+            console.error("Failed to find element: " + part.flowElementUid);
+            return;
+        }
         console.log(element.name + '.model', part.model);
         ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Outputs.${output}`, part.model).then(result => {
             if (!part.OutputLabels) part.OutputLabels = {};

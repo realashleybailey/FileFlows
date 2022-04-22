@@ -75,7 +75,7 @@ public class Logger : FileFlows.Plugin.ILogger
         {
             Console.WriteLine(message);
             LogTail.Enqueue(message);
-            if (Program.WindowsGui == false)
+            if (Program.WindowsGui == true)
                 return; // windows gui already captures all this
 
             var fi = new FileInfo(LogFile);

@@ -76,10 +76,17 @@ public class Logger : FileFlows.Plugin.ILogger
             Console.WriteLine(message);
             LogTail.Enqueue(message);
             var fi = new FileInfo(LogFile);
-            if(fi.Exists && fi.Length > 10_000)
+            if(fi.Exists && fi.Length > 10_000_000)
             {
                 // larger than 10MB, move it and create new one
-                fi.MoveTo(LogFile + ".old", true);
+                try
+                {
+                    fi.MoveTo(LogFile + ".old", true);
+                }
+                catch (Exception)
+                {
+                    // silent fail here
+                }
             }
             File.AppendAllText(LogFile, message + Environment.NewLine);
         }

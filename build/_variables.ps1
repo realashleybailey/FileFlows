@@ -6,6 +6,7 @@ $copyright = "Copyright $year - John Andrews"
 
 $osWindows = Test-Path env:ProgramFiles
 
+
 if ($osWindows) {
     $dotnet_cmd= "dotnet.exe"
 } else {

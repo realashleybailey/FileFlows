@@ -101,28 +101,37 @@ public class Logger : FileFlows.Plugin.ILogger
         if (length <= 0 || length > 300)
             length = 300;
 
-        var filtered = logLevel == Plugin.LogType.Debug ? LogTail : LogTail.Where(x =>
+        mutex.WaitOne();
+        string[] filtered;
+        try
         {
-            // if log level is error, must contain ERRR
-            if (logLevel == Plugin.LogType.Error)
-                return x.Contains("ERRR");
-            // else if log level below error, if it contains ERR, the logging level also includes this
-            if (x.Contains("ERRR"))
-                return x.Contains("ERRR");
+            filtered = logLevel == Plugin.LogType.Debug ? LogTail.ToArray() : LogTail.Where(x =>
+            {
+                // if log level is error, must contain ERRR
+                if (logLevel == Plugin.LogType.Error)
+                    return x.Contains("ERRR");
+                // else if log level below error, if it contains ERR, the logging level also includes this
+                if (x.Contains("ERRR"))
+                    return x.Contains("ERRR");
 
-            // same logic as error, warning is next highest
-            if (logLevel == Plugin.LogType.Warning)
-                return x.Contains("WARN");
-            if (x.Contains("WARN"))
-                return false;
+                // same logic as error, warning is next highest
+                if (logLevel == Plugin.LogType.Warning)
+                    return x.Contains("WARN");
+                if (x.Contains("WARN"))
+                    return false;
 
-            if (logLevel == Plugin.LogType.Info)
-                return x.Contains("INFO");
-            if (x.Contains("INFO"))
-                return false;
+                if (logLevel == Plugin.LogType.Info)
+                    return x.Contains("INFO");
+                if (x.Contains("INFO"))
+                    return false;
 
-            return true;
-        });
+                return true;
+            }).ToArray();
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
         if (length == -1)
             return string.Join(Environment.NewLine, filtered.ToArray());
         if (filtered.Count() <= length)

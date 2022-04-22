@@ -1,6 +1,6 @@
 {
   "name": "FileFlows",
-  "display": "minimal-ui",
+  "display": "standalone",
   "start_url": "/",
   "theme_color": "#ff0090",
   "background_color": "#111214",

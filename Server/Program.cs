@@ -7,6 +7,8 @@ namespace FileFlows.Server
 
         public static bool Docker { get; private set; }
 
+        internal static bool WindowsGui { get; private set; }
+
         public static void Main(string[] args)
         {
             try
@@ -36,6 +38,7 @@ namespace FileFlows.Server
 
         public static void StartWindows(string[] args)
         {
+            WindowsGui = true;
             string logfile = GetLogFile();
             if (File.Exists(logfile))
             {

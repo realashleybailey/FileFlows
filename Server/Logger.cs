@@ -75,6 +75,9 @@ public class Logger : FileFlows.Plugin.ILogger
         {
             Console.WriteLine(message);
             LogTail.Enqueue(message);
+            if (Program.WindowsGui == false)
+                return; // windows gui already captures all this
+
             var fi = new FileInfo(LogFile);
             if(fi.Exists && fi.Length > 10_000_000)
             {

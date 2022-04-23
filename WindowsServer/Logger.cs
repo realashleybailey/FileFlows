@@ -29,7 +29,8 @@ namespace FileFlows.WindowsServer
                 {
                     File.Move(LogFile, LogFile.Replace(".log", ".old.log"), true);
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }

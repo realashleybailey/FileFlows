@@ -181,7 +181,7 @@ namespace FileFlows.Server.Controllers
                 // save the ffplugin file
                 bool success = PluginScanner.UpdatePlugin(ppi.Package, dlResult.Data);
                 if(success)
-                    Logger.Instance.WLog("PluginUpdate: Successfully updated plugin: " + plugin.Name);
+                    Logger.Instance.ILog("PluginUpdate: Successfully updated plugin: " + plugin.Name);
                 else
                     Logger.Instance.WLog("PluginUpdate: Failed to updated plugin: " + plugin.Name);
 

@@ -57,6 +57,8 @@ namespace FileFlows.WindowsNode
 
         private void UpdateSettings(Shared.Models.ProcessingNode node)
         {
+            if (node == null)
+                return;
             AppSettings.Instance.Enabled = node.Enabled;
             AppSettings.Instance.Runners = node.FlowRunners;
             AppSettings.Instance.TempPath = node.TempPath;

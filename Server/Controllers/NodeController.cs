@@ -138,6 +138,9 @@ namespace FileFlows.Server.Controllers
             address = address.Trim();
             var data = await GetData();
             var node = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
+            if (node == null)
+                return node;
+
             node.SignalrUrl = "flow";
             return node;
         }

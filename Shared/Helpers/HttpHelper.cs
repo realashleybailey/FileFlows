@@ -103,7 +103,7 @@ namespace FileFlows.Shared.Helpers
                         PropertyNameCaseInsensitive = true,
                         Converters = { new FileFlows.Shared.Json.ValidatorConverter() }
                     };
-                    T result = typeof(T) == typeof(string) ? (T)(object)body : JsonSerializer.Deserialize<T>(body, options);
+                    T result = string.IsNullOrEmpty(body) ? default(T) : typeof(T) == typeof(string) ? (T)(object)body : JsonSerializer.Deserialize<T>(body, options);
                     return new RequestResult<T> { Success = true, Body = body, Data = result };
                 }
                 else

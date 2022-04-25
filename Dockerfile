@@ -17,10 +17,11 @@ RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository universe && \
     apt-get update && \
-    ARCH=$(dpkg --print-architecture) && \
-    if [ $ARCH -eq 'amd64' ]; \
-    then apt-get install -y ${DEPS} ${VAAPI_DEPS}; \
-    else apt-get install -y ${DEPS}; \
+    #ARCH=$(dpkg --print-architecture) && \
+    #if [ $ARCH -eq 'amd64' ]; \
+    #then apt-get install -y ${DEPS} ${VAAPI_DEPS}; \
+    #else apt-get install -y ${DEPS}; \
+    apt-get install -y ${DEPS} ${VAAPI_DEPS}; \
     fi && \
     rm -rf /var/lib/apt/lists/*
 

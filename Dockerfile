@@ -21,8 +21,8 @@ RUN apt-get update && \
     #if [ $ARCH -eq 'amd64' ]; \
     #then apt-get install -y ${DEPS} ${VAAPI_DEPS}; \
     #else apt-get install -y ${DEPS}; \
+    #fi && \
     apt-get install -y ${DEPS} ${VAAPI_DEPS}; \
-    fi && \
     rm -rf /var/lib/apt/lists/*
 
 # Install ffmpeg from jellyfin

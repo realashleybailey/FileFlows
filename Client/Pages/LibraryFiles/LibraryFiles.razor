@@ -48,6 +48,9 @@
                         case FileStatus.Duplicate:
                             <span class="icon far fa-copy"></span>
                             break;
+                        case FileStatus.MappingIssue:
+                            <span class="icon fas fa-map-marked-alt"></span>
+                            break;
 
                     }
 
@@ -78,7 +81,7 @@
                 {
                     <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
                 }
-                else if(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed)
+                else if(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
                 {
                     <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
                 }

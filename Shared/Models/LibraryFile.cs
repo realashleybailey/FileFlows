@@ -59,7 +59,8 @@ namespace FileFlows.Shared.Models
         Processing = 2,
         FlowNotFound = 3,
         ProcessingFailed = 4,
-        Duplicate = 5
+        Duplicate = 5,
+        MappingIssue = 6
     }
 
     public class ExecutedNode

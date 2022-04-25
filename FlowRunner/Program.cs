@@ -122,8 +122,22 @@ namespace FileFlows.FlowRunner
 
             var flowService = FlowService.Load();
             FileSystemInfo file = lib.Folders ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
-            if (file.Exists == false)
+            bool fileExists = file.Exists; // set to variable so we can set this to false in debugging easily
+            if (fileExists == false)
             {
+                if(isServer == false)
+                {
+                    // check if the library file exists on the server, if it does its a mapping issue
+                    bool exists = libfileService.ExistsOnServer(libFile.Uid).Result;
+                    if (exists == true)
+                    {
+                        LogError("Library file exists but is not accessible from node: " + file.FullName);
+                        libFile.Status = FileStatus.MappingIssue;
+                        libFile.ExecutedNodes = new List<ExecutedNode>();                        
+                        libfileService.Update(libFile).Wait();
+                        return;
+                    }                    
+                }
                 LogInfo("Library file does not exist, deleting from library files: " + file.FullName);
                 libfileService.Delete(libFile.Uid).Wait();
                 return;
@@ -198,6 +212,14 @@ namespace FileFlows.FlowRunner
         internal static void LogInfo(string message)
         {
             Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - INFO -> " + message);
+        }
+        internal static void LogWarning(string message)
+        {
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - WARN -> " + message);
+        }
+        internal static void LogError(string message)
+        {
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - ERRR -> " + message);
         }
     }
 }

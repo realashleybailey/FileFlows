@@ -18,5 +18,7 @@
 
         public Task<LibraryFile> Update(LibraryFile libraryFile) => new LibraryFileController().Update(libraryFile);
 
+        public Task<bool> ExistsOnServer(Guid uid) => new LibraryFileController().ExistsOnServer(uid);
+
     }
 }

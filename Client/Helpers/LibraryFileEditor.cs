@@ -69,7 +69,7 @@ namespace FileFlows.Client.Helpers
             }
 
 
-            if(model.Status == FileStatus.ProcessingFailed || model.Status == FileStatus.Processing || model.Status == FileStatus.Processed)
+            if(new[] { FileStatus.Unprocessed, FileStatus.Disabled, FileStatus.Duplicate, FileStatus.OutOfSchedule }.Contains(model.Status) == false)
             {
                 // show tabs
                 var tabs = new Dictionary<string, List<ElementField>>();

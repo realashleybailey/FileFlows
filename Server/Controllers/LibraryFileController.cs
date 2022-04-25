@@ -279,6 +279,7 @@ namespace FileFlows.Server.Controllers
             existing.ProcessingEnded = file.ProcessingEnded;
             existing.ProcessingStarted = file.ProcessingStarted;
             existing.WorkerUid = file.WorkerUid;
+            existing.ExecutedNodes = file.ExecutedNodes ?? new List<ExecutedNode>();
             return await base.Update(existing);
         }
 
@@ -417,6 +418,24 @@ namespace FileFlows.Server.Controllers
         }
 
         /// <summary>
+        /// Checks if a library file exists on the server
+        /// </summary>
+        /// <param name="uid">The Uid of the library file to check</param>
+        /// <returns>true if exists, otherwise false</returns>
+        [HttpGet("exists-on-server/{uid}")]
+        public async Task<bool> ExistsOnServer([FromRoute] Guid uid)
+        {
+            var libFile = await Get(uid);
+            if (libFile == null)
+                return false;
+            try
+            {
+                return System.IO.File.Exists(libFile.Name);
+            }
+            catch (Exception) { return false; }
+        }
+
+        /// <summary>
         /// Delete library files from the system
         /// </summary>
         /// <param name="model">A reference model containing UIDs to delete</param>
@@ -451,7 +470,7 @@ namespace FileFlows.Server.Controllers
                     if (libraryFiles.ContainsKey(uid) == false)
                         continue;
                     item = libraryFiles[uid];
-                    if (item.Status != FileStatus.ProcessingFailed && item.Status != FileStatus.Processed && item.Status != FileStatus.Duplicate)
+                    if (item.Status != FileStatus.ProcessingFailed && item.Status != FileStatus.Processed && item.Status != FileStatus.Duplicate && item.Status != FileStatus.MappingIssue)
                         continue;
                     item.Status = FileStatus.Unprocessed;
                 }

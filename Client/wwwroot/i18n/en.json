@@ -87,7 +87,8 @@
       "Unprocessed": "Unprocessed",
       "FlowNotFound": "Flow Not Found",
       "ProcessingFailed": "Processing Failed",
-      "Duplicate": "Duplicate"
+      "Duplicate": "Duplicate",
+      "MappingIssue": "Mapping Issue"
     },
     "ProcessingPriority": {
       "Lowest": "Lowest",

@@ -39,6 +39,9 @@ namespace FileFlows.WindowsNode
                 AppSettings.Init();
 
                 bool minimize = AppSettings.IsConfigured();
+#if (DEBUG)
+                minimize = false;
+#endif
                 ApplicationConfiguration.Initialize();
                 Application.Run(new Form1(minimize));
             }

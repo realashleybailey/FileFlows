@@ -14,6 +14,7 @@
         Task<LibraryFile> Update(LibraryFile libraryFile);
 
         Task<bool> SaveFullLog(Guid uid, string log);
+        Task<bool> ExistsOnServer(Guid uid);
     }
 
     public class LibraryFileService : Service, ILibraryFileService
@@ -37,6 +38,21 @@
             catch (Exception)
             {
                 return;
+            }
+        }
+
+        public async Task<bool> ExistsOnServer(Guid uid)
+        {
+            try
+            {
+                var result = await HttpHelper.Get<bool>($"{ServiceBaseUrl}/api/library-file/exists-on-server/{uid}");
+                if (result.Success == false)
+                    return false;
+                return result.Data;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

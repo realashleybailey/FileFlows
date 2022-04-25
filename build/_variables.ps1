@@ -1,5 +1,5 @@
 $revision = (git rev-list --count --first-parent HEAD) -join "`n"
-$versionThree = "0.5.3"
+$versionThree = "0.5.4"
 $version = "$versionThree.$revision"
 $year = (Get-Date).year
 $copyright = "Copyright $year - John Andrews"

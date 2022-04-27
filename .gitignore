@@ -31,3 +31,5 @@ docker.xml
 /Server/encryptionkey.txt
 /Server/updates
 /Server/FileFlows.log
+build/deploy/
+build/temp/

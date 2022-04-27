@@ -279,7 +279,7 @@ public class Runner
     private FileStatus ExecuteFlow(Flow flow, IPluginService pluginLoader, List<Guid> runFlows, bool failure = false)
     { 
         int count = 0;
-        ObjectReference gotoFlow = null;
+        ObjectReference? gotoFlow = null;
         nodeParameters.GotoFlow = (flow) =>
         {
             if (runFlows.Contains(flow.Uid))
@@ -344,7 +344,7 @@ public class Runner
                 {
                     output = CurrentNode.Execute(nodeParameters);
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     output = -1;
                     throw;
@@ -555,6 +555,8 @@ public class Runner
                 }
             }
         }
+        if(node == null)
+            return default;
         return (Node)node;
 
     }

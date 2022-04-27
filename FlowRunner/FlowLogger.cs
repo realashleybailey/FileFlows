@@ -49,7 +49,7 @@ public class FlowLogger : ILogger
         {
             Communicator.LogMessage(Program.Uid, message).Wait();
         }
-        catch (Exception ex) { }
+        catch (Exception) { }
     }
 
     public override string ToString() => String.Join(Environment.NewLine, log);

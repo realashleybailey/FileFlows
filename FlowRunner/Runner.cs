@@ -366,9 +366,11 @@ public class Runner
                         nodeParameters.Result = NodeResult.Failure;
                         return FileStatus.ProcessingFailed;
                     }
+                    flow = newFlow;
 
                     nodeParameters.Logger?.ILog("Changing flows to: " + newFlow.Name);
                     this.Flow = newFlow;
+                    runFlows.Add(gotoFlow.Uid);
 
                     // find the first node
                     part = flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();

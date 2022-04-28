@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FileFlows.Server.Ui.MainWindow" 
+        Title="FileFlows" Width="400" Height="200"
+        CanResize="False"
+        Foreground="#ff0090"
+        Background="#111214"
+        FontSize="16"
+        Icon="{Binding ImagePath}"
+        >
+    <Grid ColumnDefinitions="100,Auto" RowDefinitions="Auto,Auto,Auto" Margin="10">
+        
+        <Image Grid.Column="1" Source="{Binding ImagePath}" />
+
+        
+        <TextBlock Margin="6" Text="URL:" Grid.Row="1" Grid.Column="0" />
+        <TextBlock Margin="6" Text="{Binding ServerUrl}" Grid.Row="1" Grid.Column="1" />
+
+        <Button    Margin="6" Content="Open UI" Command="{Binding ButtonClicked}" 
+            Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="1" />
+    </Grid>
+</Window>

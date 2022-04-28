@@ -28,6 +28,20 @@ namespace FileFlows.Server.Helpers
 
             List<string> langFiles = new List<string>();
 
+            if(Directory.Exists(pluginDir) == false)
+            {
+                Logger.Instance?.WLog("Plugin directory does not exist: " + pluginDir);
+                try
+                {
+                    Directory.CreateDirectory(pluginDir);
+                }
+                catch(Exception)
+                {
+                    Logger.Instance?.WLog("Failed to create plugin directory: " + pluginDir);
+                    return;
+                }
+            }
+
             foreach (string ffplugin in Directory.GetFiles(pluginDir, "*.ffplugin", SearchOption.AllDirectories))
             {
                 Logger.Instance?.DLog("Plugin file found: " + ffplugin);

@@ -1,3 +1,5 @@
+using Avalonia;
+using FileFlows.Server.Ui;
 using FileFlows.Shared;
 
 namespace FileFlows.Server
@@ -15,6 +17,19 @@ namespace FileFlows.Server
             {
                 Docker = args?.Any(x => x == "--docker") == true;
                 InitEncryptionKey();
+
+                Task.Run(()=> {
+
+                    Console.WriteLine("Starting FileFlows Server...");
+                    WebServer.Start(args);
+                });
+                
+                var appBuilder = BuildAvaloniaApp();
+
+                appBuilder.StartWithClassicDesktopLifetime(args);
+                WebServer.Stop();
+                Console.WriteLine("Exiting FileFlows Server...");
+                return;
 
                 if (args.FirstOrDefault() == "--windows")
                     StartWindows(args.Skip(1).ToArray());
@@ -108,5 +123,11 @@ namespace FileFlows.Server
             return Path.Combine(dir, "FileFlows.log");
         }
 
+
+
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect();
     }
 }

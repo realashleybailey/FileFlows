@@ -23,7 +23,7 @@ public class MainWindow : Window
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
-    string buttonText = "Click Me!";
+    string buttonText = "Click Me";
 
     public string ButtonText
     {

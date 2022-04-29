@@ -23,7 +23,10 @@ namespace FileFlows.Server.Helpers
         // The types present on the host and plugin side would then not match even though they would have the same names.
         protected override Assembly Load(AssemblyName name)
         {
-            string assemblyPath = _resolver.ResolveAssemblyToPath(name);
+            if(name == null)
+                return null;
+
+            var assemblyPath = _resolver?.ResolveAssemblyToPath(name);
             if (assemblyPath != null)
             {
                 Console.WriteLine($"Loading assembly {assemblyPath} into the HostAssemblyLoadContext");

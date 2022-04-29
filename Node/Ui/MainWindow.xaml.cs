@@ -1,4 +1,4 @@
-namespace FileFlows.Server.Ui;
+namespace FileFlows.Node.Ui;
 
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
+using FileFlows.Shared;
 
 /// <summary>
 /// Main window for Server application
@@ -24,7 +25,7 @@ public class MainWindow : Window
         DataContext = new MainWindowViewModel(this);
         _trayIcon.IsVisible = true;
 
-        _trayIcon.Icon = new WindowIcon(AvaloniaLocator.Current.GetService<IAssetLoader>()?.Open(new Uri($"avares://FileFlows.Server/Ui/icon.ico")));
+        _trayIcon.Icon = new WindowIcon(AvaloniaLocator.Current.GetService<IAssetLoader>()?.Open(new Uri($"avares://FileFlows.Node/Ui/icon.ico")));
 
         //this.Events().Closing.Subscribe(_ =>
         //{
@@ -85,13 +86,6 @@ public class MainWindow : Window
     /// </summary>
     public void Launch()
     {
-        string url = $"http://{Environment.MachineName}:{WebServer.Port}/";
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-        else
-        {
-            Process.Start(new ProcessStartInfo("xdg-open", url));
-        }
     }
 
 
@@ -112,11 +106,54 @@ public class MainWindow : Window
     }
 }
 
-public class MainWindowViewModel
+public class MainWindowViewModel:INotifyPropertyChanged
 { 
     private MainWindow Window { get; set; }
-    public string ServerUrl { get; set; }
     public string Version { get; set; }
+
+    private string _ServerUrl;
+    public string ServerUrl
+    {
+        get => _ServerUrl;
+        set
+        {
+            if (_ServerUrl?.EmptyAsNull() != value?.EmptyAsNull())
+            {
+                _ServerUrl = value ?? String.Empty;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ServerUrl)));
+            }
+        }
+    }
+
+    private string _TempPath;
+    public string TempPath
+    {
+        get => _TempPath;
+        set
+        {
+            if (_TempPath?.EmptyAsNull() != value?.EmptyAsNull())
+            {
+                _TempPath = value ?? String.Empty;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TempPath)));
+            }
+        }
+    }
+
+    private int _FlowRunners;
+    public int FlowRunners
+    {
+        get => _FlowRunners;
+        set
+        {
+            if (_FlowRunners != value)
+            {
+                _FlowRunners = value < 0 ? 0 : value > 100 ? 100 : value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FlowRunners)));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Launch() => Window.Launch();
     public void Quit() => Window.Quit();
@@ -126,7 +163,6 @@ public class MainWindowViewModel
     public MainWindowViewModel(MainWindow window)
     {
         this.Window = window;
-        this.ServerUrl = $"http://{Environment.MachineName}:{WebServer.Port}/";
-        this.Version = "FileFlows Version: " + Globals.Version;
+        this.Version = "FileFlows Node Version: " + Globals.Version;
     }
 }

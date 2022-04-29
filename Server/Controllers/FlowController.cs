@@ -62,7 +62,7 @@ namespace FileFlows.Server.Controllers
         [HttpPost("import")]
         public async Task<Flow> Import([FromBody] string json)
         {
-            Flow flow = JsonSerializer.Deserialize<Flow>(json);    
+            Flow? flow = JsonSerializer.Deserialize<Flow>(json);    
             if(flow == null)
                 throw new ArgumentNullException(nameof(flow));
             if (flow.Parts == null || flow.Parts.Count == 0)

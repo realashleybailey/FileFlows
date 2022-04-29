@@ -43,7 +43,7 @@ namespace FileFlows.Node
                         return (true, actualUrl);
 
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                     }
                 }

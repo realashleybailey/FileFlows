@@ -16,7 +16,7 @@
                     fi.Directory.Create();
                 await File.AppendAllTextAsync(fi.FullName, message + Environment.NewLine);
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
 
         }
     }

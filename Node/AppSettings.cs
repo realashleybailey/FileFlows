@@ -67,7 +67,7 @@ namespace FileFlows.Node
             Instance = Load();
         }
 
-        public static AppSettings Instance { get; set; }
+        public static AppSettings Instance { get; set; } = new AppSettings();
 
         public static void Save(AppSettings settings)
         {
@@ -93,7 +93,7 @@ namespace FileFlows.Node
             try
             {
                 string json = File.ReadAllText(file);
-                var settings = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json);
+                var settings = JsonSerializer.Deserialize<AppSettings>(json);
                 return settings ?? new ();
             }
             catch (Exception) { }
@@ -113,7 +113,7 @@ namespace FileFlows.Node
         private static string GetPath()
         {
             string dll = Assembly.GetExecutingAssembly().Location;
-            return Path.GetDirectoryName(dll);
+            return Path.GetDirectoryName(dll) ?? string.Empty;
         }
     }
 }

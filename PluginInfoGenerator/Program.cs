@@ -66,7 +66,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             File.WriteAllText(output, json);
         }
 
-        public static PluginInfo LoadPlugin(FileInfo dll, FileInfo csproj)
+        public static PluginInfo? LoadPlugin(FileInfo dll, FileInfo csproj)
         {
             Console.WriteLine("Checking dll: " + dll);
             Console.WriteLine("CSProject: " + csproj);
@@ -83,7 +83,9 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
                 return null;
             }
 
-            var plugin = (IPlugin)Activator.CreateInstance(pluginType);
+            var plugin = Activator.CreateInstance(pluginType) as IPlugin;
+            if (plugin == null)
+                return null;
             var info = new PluginInfo();
             info.PackageName = dll.FullName;
             info.MinimumVersion = plugin.MinimumVersion;
@@ -130,12 +132,14 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             foreach (var x in nodeTypes)
             {
                 FlowElement element = new FlowElement();
-                element.Group = x.Namespace.Substring(x.Namespace.LastIndexOf(".") + 1);
+                element.Group = x.Namespace == null ? "Unknown" : x.Namespace.Substring(x.Namespace.LastIndexOf(".") + 1);
                 string typeName = x.Name;
                 element.Name = typeName;
-                element.Uid = x.FullName;
+                element.Uid = x.FullName ?? typeName;
                 element.Fields = new();
-                var instance = (Node)Activator.CreateInstance(x);
+                var instance = Activator.CreateInstance(x) as Node;
+                if (instance == null)
+                    continue;
                 element.Inputs = instance.Inputs;
                 element.Outputs = instance.Outputs;
                 element.Type = instance.Type;
@@ -145,8 +149,8 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
                 element.HelpUrl = instance.HelpUrl;
                 element.NoEditorOnAdd = instance.NoEditorOnAdd;
 
-                var model = new ExpandoObject(); ;
-                var dict = (IDictionary<string, object>)model;
+                var model = new ExpandoObject();
+                var dict = model as IDictionary<string, object>;
                 element.Model = model;
 
                 element.Fields = FormHelper.GetFields(x, dict);
@@ -172,13 +176,13 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
 
     class PluginBasicInfo
     {
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string MinimumVersion { get; set; }
-        public string Authors { get; set; }
-        public string Url { get; set; }
-        public string Description { get; set; }
-        public string Package { get; set; }
-        public string[] Elements { get; set; }
+        public string Name { get; set; } = String.Empty;
+        public string Version { get; set; } = String.Empty;
+        public string MinimumVersion { get; set; } = String.Empty;
+        public string Authors { get; set; } = String.Empty;
+        public string Url { get; set; } = String.Empty;
+        public string Description { get; set; } = String.Empty;
+        public string Package { get; set; } = String.Empty;
+        public string[] Elements { get; set; } = new string[] { };
     }
 }

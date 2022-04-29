@@ -5,21 +5,51 @@
     using FileFlows.Shared.Helpers;
     using FileFlows.Shared.Models;
 
+    /// <summary>
+    /// Plugin Service interface
+    /// </summary>
     public interface IPluginService
     {
 
+        /// <summary>
+        /// Get all plugin infos
+        /// </summary>
+        /// <returns>all plugin infos</returns>
         Task<List<PluginInfo>> GetAll();
+
+        /// <summary>
+        /// Updates plugin info
+        /// </summary>
+        /// <param name="pluginInfo">the plugin info</param>
+        /// <returns>the updated plugininfo</returns>
         Task<PluginInfo> Update(PluginInfo pluginInfo);
 
+        /// <summary>
+        /// Download a plugin
+        /// </summary>
+        /// <param name="plugin">the plugin to download</param>
+        /// <returns>the byte data of the plugin</returns>
         Task<byte[]> Download(PluginInfo plugin);
+        /// <summary>
+        /// Gets the settings json for a plugin
+        /// </summary>
+        /// <param name="pluginPackageName">the name of the plugin package</param>
+        /// <returns>the settings json</returns>
         Task<string> GetSettingsJson(string pluginPackageName);
     }
 
+    /// <summary>
+    /// Plugin service
+    /// </summary>
     public class PluginService : Service, IPluginService
     {
 
         public static Func<IPluginService> Loader { get; set; }
 
+        /// <summary>
+        /// Loads an instance of the plugin service
+        /// </summary>
+        /// <returns>an instance of the plugin service</returns>
         public static IPluginService Load()
         {
             if (Loader == null)
@@ -27,6 +57,11 @@
             return Loader.Invoke();
         }
 
+        /// <summary>
+        /// Download a plugin
+        /// </summary>
+        /// <param name="plugin">the plugin to download</param>
+        /// <returns>the byte data of the plugin</returns>
         public async Task<byte[]> Download(PluginInfo plugin)
         {
             try
@@ -43,6 +78,10 @@
             }
         }
 
+        /// <summary>
+        /// Get all plugin infos
+        /// </summary>
+        /// <returns>all plugin infos</returns>
         public async Task<List<PluginInfo>> GetAll()
         {
             try
@@ -59,6 +98,11 @@
             }
         }
 
+        /// <summary>
+        /// Gets the settings json for a plugin
+        /// </summary>
+        /// <param name="pluginPackageName">the name of the plugin package</param>
+        /// <returns>the settings json</returns>
         public async Task<string> GetSettingsJson(string pluginPackageName)
         {
             try
@@ -75,7 +119,13 @@
             }
         }
 
-        public async Task<PluginInfo> Update(PluginInfo pluginInfo)
+        /// <summary>
+        /// Updates plugin info
+        /// </summary>
+        /// <param name="pluginInfo">the plugin info</param>
+        /// <returns>the updated plugininfo</returns>
+        /// <exception cref="NotImplementedException">This not yet implemented</exception>
+        public Task<PluginInfo> Update(PluginInfo pluginInfo)
         {
             throw new NotImplementedException();
         }

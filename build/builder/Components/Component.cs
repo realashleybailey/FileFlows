@@ -18,13 +18,16 @@ public abstract class Component
 
     protected virtual void Clean()
     {
-        Utils.DeleteDirectoryIfExists(OutputPath);
+        Utils.DeleteDirectoryIfExists(ProjectDirectory + "/bin");
+        Utils.DeleteDirectoryIfExists(ProjectDirectory + "/obj");
+        //Utils.DeleteDirectoryIfExists(OutputPath);
     }
 
     protected virtual void Build()
     {        
         DotNet.Build(ProjectFile, new DotNet.BuildSettings{
-            OutputDirectory = OutputPath
+            OutputDirectory = OutputPath,
+            Configuration = "Release"
         });
     }
 

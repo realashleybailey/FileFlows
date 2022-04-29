@@ -1,22 +1,43 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="FileFlows.Server.Ui.MainWindow" 
-        Title="FileFlows" Width="400" Height="200"
+        Title="FileFlows" Width="400" Height="230"
+		MaxWidth="400" MaxHeight="230"
+		
         CanResize="False"
         Foreground="#ff0090"
         Background="#111214"
         FontSize="16"
-        Icon="{Binding ImagePath}"
+		Icon="avares://FileFlows.Server/Ui/icon.ico"
+		
+		HasSystemDecorations="False"
+		ExtendClientAreaToDecorationsHint="True"
         >
-    <Grid ColumnDefinitions="100,Auto" RowDefinitions="Auto,Auto,Auto" Margin="10">
-        
-        <Image Grid.Column="1" Source="{Binding ImagePath}" />
+	<StackPanel Margin="10">
+		<Image Source="avares://FileFlows.Server/Ui/icon.ico" Width="100" />
 
-        
-        <TextBlock Margin="6" Text="URL:" Grid.Row="1" Grid.Column="0" />
-        <TextBlock Margin="6" Text="{Binding ServerUrl}" Grid.Row="1" Grid.Column="1" />
 
-        <Button    Margin="6" Content="Open UI" Command="{Binding ButtonClicked}" 
-            Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="1" />
-    </Grid>
+		<TextBlock Margin="6" Text="{Binding Version}" TextAlignment="Center" />
+		<TextBlock Margin="6" Text="{Binding ServerUrl}" TextAlignment="Center" />
+
+		<StackPanel Orientation="Horizontal" Margin="20 0">
+
+			<Button Margin="6" Content="OPEN" Command="{Binding Launch}" Width="100"
+				Foreground="#ff0090" Background="#111214"				
+				BorderBrush="#ff0090"
+				/>
+			
+			<Button Margin="6" Content="HIDE" Command="{Binding Hide}" Width="100"
+					Foreground="#ff0090" Background="#111214"
+					BorderBrush="#ff0090"
+				/>
+			
+			<Button Margin="6" Content="QUIT" Command="{Binding Quit}" Width="100"
+					Foreground="#ff0090" Background="#111214"
+					BorderBrush="#ff0090"
+				/>
+
+
+		</StackPanel>
+	</StackPanel>
 </Window>

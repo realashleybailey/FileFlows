@@ -26,7 +26,7 @@ namespace FileFlows.Server
 #if (DEBUG)
             Port = 6868;
 #endif
-            string url = args?.Where(x => x.StartsWith("--urls=")).FirstOrDefault();
+            var url = args?.Where(x => x?.StartsWith("--urls=") == true)?.FirstOrDefault();
             if(string.IsNullOrEmpty(url) == false)
             {
                 var portMatch = Regex.Match(url, @"(?<=(:))[\d]+");

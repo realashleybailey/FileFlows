@@ -11,8 +11,8 @@
     {
         /// <summary>
         /// Gets the system log
-        /// </summaryog</ret>
-        /// <returns>The systemurns>
+        /// </summary>
+        /// <returns>the system log</returns>
         [HttpGet]
         public string Get([FromQuery] Plugin.LogType logLevel = Plugin.LogType.Info)
         {

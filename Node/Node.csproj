@@ -13,6 +13,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Ui\App.xaml" />
+    <None Remove="Ui\icon.ico" />
+    <None Remove="Ui\icon.svg" />
+    <None Remove="Ui\MainWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Ui\icon.ico" />
+    <AvaloniaResource Include="Ui\icon.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Ui\App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ui\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ServerShared\ServerShared.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
@@ -27,6 +48,8 @@
 		<PackageReference Include="Jint" Version="3.0.0-beta-2037" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.1" />
+		<PackageReference Include="Avalonia" Version="0.10.13" />
+		<PackageReference Include="Avalonia.Desktop" Version="0.10.13" />
 	</ItemGroup>
 
 </Project>

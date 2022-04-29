@@ -17,6 +17,13 @@
             return data.Where(x => x.Key != uid.Value).Select(x => x.Value.Name);
         }
 
+
+        /// <summary>
+        /// Checks to see if a name is in use
+        /// </summary>
+        /// <param name="uid">the Uid of the item</param>
+        /// <param name="name">the name of the item</param>
+        /// <returns>true if name is in use</returns>
         protected async Task<bool> NameInUse(Guid uid, string name)
         {
             name = name.ToLower().Trim();
@@ -126,7 +133,7 @@
             if (item == null)
                 return;
             item.DateModified = DateTime.Now;
-            await DbManager.UpdateDateModified(item.Uid, item.DateModified);
+            DbManager.UpdateDateModified(item.Uid, item.DateModified);
         }
     }
 }

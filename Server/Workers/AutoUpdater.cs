@@ -124,7 +124,7 @@
                 }
 
                 Version current = Version.Parse(Globals.Version);
-                Version onlineVersion;
+                Version? onlineVersion;
                 if (Version.TryParse(result.Data, out onlineVersion) == false)
                 {
                     Logger.Instance.ILog("AutoUpdater: Failed to parse online version: " + result.Data);
@@ -293,9 +293,9 @@
                             catch (Exception) { }
                         }
                     }
-                    catch (Exception ex) { }
+                    catch (Exception) { }
                 });
-            }catch (Exception ex) { }   
+            }catch (Exception) { }   
         }
     }
 }

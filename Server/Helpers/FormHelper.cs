@@ -35,7 +35,7 @@ namespace FileFlows.Server.Helpers
                         if (new string[] { nameof(FormInputAttribute.Order), nameof(FormInputAttribute.InputType), "TypeId" }.Contains(attProp.Name))
                             continue;
 
-                        object value = attProp.GetValue(attribute);
+                        var value = attProp?.GetValue(attribute);
                         ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
 
                     }

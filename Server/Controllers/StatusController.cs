@@ -14,7 +14,7 @@
         /// </summary>
         /// <returns>True if there is an update</returns>
         [HttpGet("update-available")]
-        public async Task<object> UpdateAvailable()
+        public object UpdateAvailable()
         {
             var result = Workers.AutoUpdater.GetLatestOnlineVersion();
             return new { UpdateAvailable = result.updateAvailable };

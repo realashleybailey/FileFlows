@@ -36,7 +36,7 @@
                     if (new string[] { nameof(FormInputAttribute.Order), nameof(FormInputAttribute.InputType), "TypeId" }.Contains(attProp.Name))
                         continue;
 
-                    object value = attProp.GetValue(attribute);
+                    var value = attProp.GetValue(attribute);
                     Logger.Instance.DLog(attProp.Name, value);
                     ef.Parameters.Add(attProp.Name, attProp.GetValue(attribute));
 
@@ -96,7 +96,7 @@
                     ef.Validators.Add(new Shared.Validators.Pattern { Expression = exp.Pattern });
 
 
-                ConditionEqualsAttribute conditionEquals = prop.GetCustomAttributes(typeof(ConditionEqualsAttribute), false).FirstOrDefault() as ConditionEqualsAttribute;
+                var conditionEquals = prop.GetCustomAttributes(typeof(ConditionEqualsAttribute), false).FirstOrDefault() as ConditionEqualsAttribute;
                 if (conditionEquals != null)
                 {
                     ef.Conditions ??= new List<Condition>();

@@ -6,7 +6,8 @@ SET SRCPATH=%RETVAL%
 
 @echo on
 docker build %SRCPATH% -f ./Dockerfile --tag fileflows:build
-docker run --rm --name FileFlowsBuild -v %SRCPATH%:/src fileflows:build
+:: docker run --rm --name FileFlowsBuild -v %SRCPATH%:/src fileflows:build
+docker run --rm --name FileFlowsBuild -v %SRCPATH%:/src fileflows:build --target Server
 
 
 :: ========== FUNCTIONS ==========

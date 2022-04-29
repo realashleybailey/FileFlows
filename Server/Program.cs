@@ -18,27 +18,31 @@ namespace FileFlows.Server
                 Docker = args?.Any(x => x == "--docker") == true;
                 InitEncryptionKey();
 
-                Task.Run(()=> {
-
-                    Console.WriteLine("Starting FileFlows Server...");
-                    WebServer.Start(args);
-                });
-                
-                var appBuilder = BuildAvaloniaApp();
-
-                appBuilder.StartWithClassicDesktopLifetime(args);
-                WebServer.Stop();
-                Console.WriteLine("Exiting FileFlows Server...");
-                return;
-
-                if (args.FirstOrDefault() == "--windows")
-                    StartWindows(args.Skip(1).ToArray());
-                else
+                if (Docker)
                 {
                     Console.WriteLine("Starting FileFlows Server...");
                     WebServer.Start(args);
-                    Console.WriteLine("Exiting FileFlows Server...");
                 }
+                else
+                {
+                    Task.Run(() =>
+                    {
+
+                        Console.WriteLine("Starting FileFlows Server...");
+                        WebServer.Start(args);
+                    });
+
+
+                    try
+                    {
+                        var appBuilder = BuildAvaloniaApp();
+                        appBuilder.StartWithClassicDesktopLifetime(args);
+                    }
+                    catch (Exception) { }
+                }
+
+                _ = WebServer.Stop();
+                Console.WriteLine("Exiting FileFlows Server...");
             }
             catch (Exception ex)
             {
@@ -49,33 +53,6 @@ namespace FileFlows.Server
                 catch (Exception) { }
                 Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
-        }
-
-        public static void StartWindows(string[] args)
-        {
-            WindowsGui = true;
-            string logfile = GetLogFile();
-            if (File.Exists(logfile))
-            {
-                File.Move(logfile, logfile.Replace(".log", ".old.log"), true);
-            }
-
-            FileStream ostream;
-            StreamWriter writer;
-            TextWriter oldOut = Console.Out;
-            ostream = new FileStream(logfile, FileMode.Create, FileAccess.Write);
-            writer = new StreamWriter(ostream);
-            writer.AutoFlush = true;
-            Console.SetOut(writer);
-
-            Console.WriteLine("Starting FileFlows Server...");
-            WebServer.Start(args);
-            Console.WriteLine("Exiting FileFlows Server...");
-
-
-            Console.SetOut(oldOut);
-            writer.Close();
-            ostream.Close();
         }
 
         /// <summary>
@@ -114,15 +91,6 @@ namespace FileFlows.Server
             }
             return dir;
         }
-
-        private static string GetLogFile()
-        {
-            string dir = Path.Combine(GetAppDirectory(), "Logs");
-            if (Directory.Exists(dir) == false)
-                Directory.CreateDirectory(dir);
-            return Path.Combine(dir, "FileFlows.log");
-        }
-
 
 
         // Avalonia configuration, don't remove; also used by visual designer.

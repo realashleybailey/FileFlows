@@ -31,7 +31,7 @@
             this.Hostname = hostname;
         }
 
-        public Func<bool> IsEnabledCheck { get; set; }
+        public Func<bool>? IsEnabledCheck { get; set; }
 
 
         protected override void Execute()
@@ -77,21 +77,21 @@
                 return;
             }
 
-            if (node.FlowRunners <= ExecutingRunners.Count)
+            if (node?.FlowRunners <= ExecutingRunners.Count)
             {
                 Logger.Instance?.DLog($"At limit of running executors on '{nodeName}': " + node.FlowRunners);
                 return; // already maximum executors running
             }
 
 
-            string tempPath = node.TempPath;
+            string tempPath = node?.TempPath ?? string.Empty;
             if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
             {
                 Logger.Instance?.ELog($"Temp Path not set on node '{nodeName}', cannot process");
                 return;
             }
             var libFileService = LibraryFileService.Load();
-            var libFile = libFileService.GetNext(node.Name, node.Uid, Uid).Result;
+            var libFile = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
             if (libFile == null)
                 return; // nothing to process
 

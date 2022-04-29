@@ -217,7 +217,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="model">A list of plugins to download</param>
         /// <returns>an awaited task</returns>
         [HttpPost("download")]
-        public async Task Download([FromBody] DownloadModel model)
+        public void Download([FromBody] DownloadModel model)
         {
             if (model == null || model.Packages?.Any() != true)
                 return; // nothing to delete
@@ -243,7 +243,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="package">The plugin package name to download</param>
         /// <returns>A download stream of the ffplugin file</returns>
         [HttpGet("download-package/{package}")]
-        public async Task<FileStreamResult> DownloadPackage([FromRoute] string package)
+        public FileStreamResult DownloadPackage([FromRoute] string package)
         {
             if (string.IsNullOrEmpty(package))
             {
@@ -300,16 +300,16 @@ namespace FileFlows.Server.Controllers
                     {
                         bool updated = false;
 
-                        IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(obj.Json);
+                        IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(obj.Json) as IDictionary<string, object> ?? new Dictionary<string, object>();
                         foreach (var key in dict.Keys.ToArray())
                         {
                             if(plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
                             {
                                 // its a password, decrypt 
-                                string text = null;
+                                string text = String.Empty;
                                 if (dict[key] is JsonElement je)
                                 {
-                                    text = je.GetString();
+                                    text = je.GetString() ?? String.Empty;
                                 }
                                 else if(dict[key] is string str)  
                                 {
@@ -341,7 +341,7 @@ namespace FileFlows.Server.Controllers
         /// <summary>
         /// Sets the json plugin settings for a plugin
         /// </summary>
-        /// <param name="pluginSettingsType">The full plugin name</param>
+        /// <param name="packageName">The full plugin name</param>
         /// <param name="json">the settings json</param>
         /// <returns>an awaited task</returns>
         [HttpPost("{packageName}/settings")]
@@ -357,16 +357,16 @@ namespace FileFlows.Server.Controllers
                     {
                         bool updated = false;
 
-                        IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json);
+                        IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json) as IDictionary<string, object> ?? new Dictionary<string, object>();
                         foreach (var key in dict.Keys.ToArray())
                         {
                             if (plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
                             {
                                 // its a password, decrypt 
-                                string text = null;
+                                string text = string.Empty;
                                 if (dict[key] is JsonElement je)
                                 {
-                                    text = je.GetString();
+                                    text = je.GetString() ?? String.Empty;
                                 }
                                 else if (dict[key] is string str)
                                 {

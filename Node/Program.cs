@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
+using FileFlows.Node.Ui;
 using FileFlows.Node.Workers;
 using FileFlows.Server.Workers;
 using FileFlows.ServerShared.Models;
@@ -36,6 +38,7 @@ namespace FileFlows.Node
                         Console.WriteLine("\teg --temp C:\\fileflows\\temp");
                     else
                         Console.WriteLine("\teg --temp /mnt/temp");
+                    Console.WriteLine("--no-gui does not show the GUI");
                 }
 
                 string server = GetArgument(args, "--server");
@@ -47,81 +50,75 @@ namespace FileFlows.Node
                 string name = GetArgument(args, "--name");
                 if (string.IsNullOrEmpty(name) == false)
                     AppSettings.ForcedHostName = name;
-                
 
-                Shared.Logger.Instance = new ServerShared.ConsoleLogger();
+                string logPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+                if (Directory.Exists(logPath) == false)
+                    Directory.CreateDirectory(logPath);
+
+                Shared.Logger.Instance = new ServerShared.FileLogger(logPath, "FileFlows-Node");
                 Shared.Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
                 AppSettings.Init();
 
-                if (AppSettings.IsConfigured() == false)
+
+                bool docker = args?.Any(x => x == "--docker") == true;
+                bool noGui = args?.Any(x => x == "--no-gui") == true;
+                bool showUi = docker == false && noGui == false;
+
+                NodeManager manager = new ();
+                     
+
+                if (showUi)
                 {
-                    Console.WriteLine("Configuration not set");
-                    return;
-                }
-
-                Shared.Helpers.HttpHelper.Client = new HttpClient();
-
-                Shared.Logger.Instance.ILog("Registering FileFlow Node");
-
-                if (Register() == false)
-                    return;
-
-                Shared.Logger.Instance.ILog("FileFlows node starting");
-
-
-                Shared.Logger.Instance.ILog("Press Esc to quit");
-
-
-                Shared.Logger.Instance.ILog("Starting workers");
-                WorkerManager.StartWorkers(new FlowWorker(AppSettings.Instance.HostName)
-                {
-                    IsEnabledCheck = () =>
+                    try
                     {
-                        if (AppSettings.IsConfigured() == false)
-                            return false;
-
-
-                        var nodeService = new ServerShared.Services.NodeService();
-                        try
-                        {
-                            var settings = nodeService.GetByAddress(AppSettings.Instance.HostName).Result;
-
-                            AppSettings.Instance.Enabled = settings.Enabled;
-                            AppSettings.Instance.Runners = settings.FlowRunners;
-                            AppSettings.Instance.TempPath = settings.TempPath;
-                            AppSettings.Instance.Save();
-
-                            return AppSettings.Instance.Enabled;
-                        }
-                        catch (Exception ex)
-                        {
-                            Shared.Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine + ex.StackTrace);
-                        }
-                        return false;
+                        var appBuilder = BuildAvaloniaApp();
+                        appBuilder.StartWithClassicDesktopLifetime(args);
                     }
-                });
+                    catch (Exception) { }
 
-                try
-                {
-                    while (true)
-                    {
-                        var key = System.Console.ReadKey();
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }catch (Exception)
-                {
-                    // can throw an exception if not run from console
-                    Thread.Sleep(-1);
-                    
                 }
+                else
+                {
+                    if (AppSettings.IsConfigured() == false)
+                    {
+                        Shared.Logger.Instance?.ELog("Configuration not set");
+                        return;
+                    }
 
-                Shared.Logger.Instance.ILog("Stopping workers");
+                    Shared.Helpers.HttpHelper.Client = new HttpClient();
 
-                WorkerManager.StopWorkers();
+                    Shared.Logger.Instance?.ILog("Registering FileFlow Node");
 
-                Shared.Logger.Instance.ILog("Exiting");
+                    if (manager.Register() == false)
+                        return;
+
+                    Shared.Logger.Instance?.ILog("FileFlows node starting");
+
+
+                    Shared.Logger.Instance?.ILog("Press Esc to quit");
+
+                    try
+                    {
+                        while (true)
+                        {
+                            var key = Console.ReadKey();
+                            if (key.Key == ConsoleKey.Escape)
+                                break;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // can throw an exception if not run from console
+                        Thread.Sleep(-1);
+                    }
+
+                    Shared.Logger.Instance?.ILog("Stopping workers");
+
+                    manager.Stop();
+
+                    Shared.Logger.Instance?.ILog("Exiting");
+                }
             }
             catch (Exception ex)
             {
@@ -139,47 +136,9 @@ namespace FileFlows.Node
             return args[index + 1];
         }
 
-        private static bool Register()
-        {
-            string dll = Assembly.GetExecutingAssembly().Location;
-            string path = new FileInfo(dll).DirectoryName;
-
-            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-
-            List<RegisterModelMapping> mappings = new List<RegisterModelMapping>
-            {
-                new RegisterModelMapping
-                {
-                    Server = "ffmpeg",
-                    Local = Path.Combine(path, "Tools", windows ? "ffmpeg.exe" : "ffmpeg")
-                }
-            };
-
-            var settings = AppSettings.Instance;
-            var nodeService = new NodeService();
-            Shared.Models.ProcessingNode result;
-            try
-            {
-                result = nodeService.Register(settings.ServerUrl, settings.HostName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
-                if (result == null)
-                    return false;
-            }
-            catch(Exception ex)
-            {
-                Shared.Logger.Instance?.ELog("Failed to register with server: " + ex.Message);
-                return false;
-            }
-
-            Service.ServiceBaseUrl = settings.ServerUrl;
-            if(Service.ServiceBaseUrl.EndsWith("/"))
-                Service.ServiceBaseUrl = Service.ServiceBaseUrl.Substring(0, Service.ServiceBaseUrl.Length - 1);    
-
-            Shared.Logger.Instance?.ILog("Successfully registered node");
-            settings.Enabled = result.Enabled;
-            settings.Runners = result.FlowRunners;
-            settings.Save();
-            return true;
-        }
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect();
     }
 }

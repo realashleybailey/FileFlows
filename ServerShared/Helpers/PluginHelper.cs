@@ -44,7 +44,7 @@
             {
                 var versionDir = subdir.GetDirectories().OrderByDescending(x =>
                 {
-                    if (Version.TryParse(x.Name, out Version v))
+                    if (Version.TryParse(x.Name, out Version? v))
                         return v;
                     return new Version(0, 0);
                 }).FirstOrDefault();
@@ -71,7 +71,7 @@
 
             var versionDir = dirInfo.GetDirectories().OrderByDescending(x =>
             {
-                if (Version.TryParse(x.Name, out Version v))
+                if (Version.TryParse(x.Name, out Version? v))
                     return v;
                 return new Version(0, 0);
             }).FirstOrDefault();
@@ -115,6 +115,8 @@
             if (nt == null)
                 return new Node();
             var node = Activator.CreateInstance(nt);
+            if(node == null)
+                return new Node();
             if (part.Model is IDictionary<string, object> dict)
             {
                 foreach (var k in dict.Keys)

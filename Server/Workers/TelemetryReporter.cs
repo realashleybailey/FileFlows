@@ -18,7 +18,7 @@ namespace FileFlows.Server.Workers
         {
 #if (DEBUG)
             return;
-#endif
+#else
             var settings = new SettingsController().Get().Result;
             if (settings?.DisableTelemetry == true)
                 return; // they have turned it off, dont report anything
@@ -94,6 +94,8 @@ namespace FileFlows.Server.Workers
             
 #endif
             task.Wait();
+
+#endif
         }
 
 

@@ -11,8 +11,6 @@ namespace FileFlows.Server.Helpers
             Medium = 1,
             High = 2
         }
-
-        private static bool Executing = false;
         private static Mutex mutex = new Mutex(false);
         PriorityQueue<Action, Priority> queue = new ();
 
@@ -64,7 +62,7 @@ namespace FileFlows.Server.Helpers
             }
         }
 
-        internal static async Task UpdateDateModified(Guid uid, DateTime date)
+        internal static void UpdateDateModified(Guid uid, DateTime date)
         {
             mutex.WaitOne();
             try

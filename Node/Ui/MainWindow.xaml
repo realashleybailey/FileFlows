@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FileFlows.Node.Ui.MainWindow" 
+        Title="FileFlows Node" Width="400" Height="320"
+		MaxWidth="400" MaxHeight="320"
+		
+        CanResize="False"
+        Foreground="#ff0090"
+        Background="#111214"
+        FontSize="16"
+		Icon="avares://FileFlows.Node/Ui/icon.ico"
+		
+		HasSystemDecorations="False"
+		ExtendClientAreaToDecorationsHint="True"
+        >
+	<StackPanel Margin="10">
+		<Image Source="avares://FileFlows.Node/Ui/icon.ico" Width="100" />
+
+
+		<TextBlock Margin="6" Text="{Binding Version}" TextAlignment="Center" />
+		
+		<Grid ColumnDefinitions="100,4*" RowDefinitions="Auto,Auto,Auto"  Margin="4">
+			<TextBlock Text="Server:" Grid.Row="0" Grid.Column="0"/>
+			<TextBox Text="{Binding ServerUrl}" Watermark="Server Address" Grid.Row="0" Grid.Column="1" Foreground="white" Height="40" VerticalAlignment="Center"  />
+			
+			<TextBlock Text="Temp Path:" Grid.Row="1" Grid.Column="0"/>
+			<TextBox Text="{Binding TempPath}" Watermark="Temp Path" Grid.Row="1" Grid.Column="1"  Foreground="white" Height="40"  />
+
+
+			<TextBlock Text="Flow Runners:" Grid.Row="2" Grid.Column="0"/>
+			<NumericUpDown Text="{Binding FlowRunners}" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Foreground="white" Height="40" />
+
+		</Grid>
+		
+		<StackPanel Orientation="Horizontal" Margin="20 0">
+
+			
+			<Button Margin="6" Content="HIDE" Command="{Binding Hide}" Width="100"
+					Foreground="#ff0090" Background="#111214"
+					BorderBrush="#ff0090"
+				/>
+			
+			<Button Margin="6" Content="QUIT" Command="{Binding Quit}" Width="100"
+					Foreground="#ff0090" Background="#111214"
+					BorderBrush="#ff0090"
+				/>
+
+
+		</StackPanel>
+	</StackPanel>
+</Window>

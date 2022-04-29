@@ -3,6 +3,10 @@ using System.IO.Compression;
 
 public static class Utils
 {
+    public static void CopyLauncher(string name, string path){
+        File.Copy(BuildOptions.SourcePath + "/build/utils/WindowsLauncher.exe", path + "/" + name + ".exe");
+    }
+
     public static string GetGitBranch()
     {
         using var git = new System.Diagnostics.Process();

@@ -181,9 +181,11 @@ namespace FileFlows.Server.Helpers
             {
                 Converters = { new BoolConverter(), new Shared.Json.ValidatorConverter() }
             };
-                
+
             // need to case obj to (ViObject) here so the DataConverter is used
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             T result = System.Text.Json.JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
             result.Uid = Guid.Parse(dbObject.Uid);
             result.Name = dbObject.Name;
             result.DateModified = dbObject.DateModified;
@@ -255,7 +257,7 @@ namespace FileFlows.Server.Helpers
             if (uids?.Any() != true)
                 return; // nothing to delete
 
-            string typeName = typeof(T).FullName;
+            var typeName = typeof(T).FullName;
             string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
             using (var db = GetDb())
             {

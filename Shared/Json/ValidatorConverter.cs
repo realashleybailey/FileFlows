@@ -21,12 +21,12 @@ namespace FileFlows.Shared.Json
                 {
                     if (jsonDocument.RootElement.TryGetProperty(typeProperty, out JsonElement typeValue))
                     {
-                        string typeName = typeValue.GetString();
+                        string typeName = typeValue.GetString() ?? String.Empty;
                         var vts = ValidatorTypes;
                         if (vts.ContainsKey(typeName) == false)
                             return new DefaultValidator();
                         var type = vts[typeName];
-                        return (Validator)jsonDocument.Deserialize(type);
+                        return jsonDocument.Deserialize(type) as Validator;
                     }
                 }
             }

@@ -1,3 +1,6 @@
+using System.Text.RegularExpressions;
+using FileFlows.Shared.Models;
+
 namespace FileFlows.Node.Ui;
 
 using System.ComponentModel;
@@ -9,6 +12,7 @@ using Avalonia;
 using Avalonia.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
 using FileFlows.Shared;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Main window for Server application
@@ -104,6 +108,21 @@ public class MainWindow : Window
             lifetime.Shutdown();
         }
     }
+    
+    public void Minimize()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            this.Hide();
+        else   
+            this.WindowState = WindowState.Minimized;
+    }
+
+    public async Task SaveRegister()
+    {
+        if(Program.Manager != null && await Program.Manager.Register() == true)
+        {
+        }
+    }
 }
 
 public class MainWindowViewModel:INotifyPropertyChanged
@@ -111,7 +130,7 @@ public class MainWindowViewModel:INotifyPropertyChanged
     private MainWindow Window { get; set; }
     public string Version { get; set; }
 
-    private string _ServerUrl;
+    private string _ServerUrl = String.Empty;
     public string ServerUrl
     {
         get => _ServerUrl;
@@ -125,7 +144,7 @@ public class MainWindowViewModel:INotifyPropertyChanged
         }
     }
 
-    private string _TempPath;
+    private string _TempPath = String.Empty;
     public string TempPath
     {
         get => _TempPath;
@@ -152,17 +171,60 @@ public class MainWindowViewModel:INotifyPropertyChanged
             }
         }
     }
+    
+    private bool _Enabled;
+    public bool Enabled
+    {
+        get => _Enabled;
+        set
+        {
+            if (_Enabled != value)
+            {
+                _Enabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Enabled)));
+            }
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Launch() => Window.Launch();
     public void Quit() => Window.Quit();
 
-    public void Hide() => Window.Hide();
+    public void Hide() => Window.Minimize();
+
+    public void SaveRegister()
+    {
+        if (Regex.IsMatch(ServerUrl, "^http(s)?://") == false)
+            ServerUrl = "http://" + ServerUrl;
+        if (ServerUrl.EndsWith("/") == false)
+            ServerUrl += "/";
+        
+        AppSettings.Instance.ServerUrl = ServerUrl;
+        AppSettings.Instance.TempPath = TempPath;
+        AppSettings.Instance.Runners = FlowRunners;
+        AppSettings.Instance.Enabled = Enabled;
+        if(string.IsNullOrWhiteSpace(ServerUrl) || string.IsNullOrWhiteSpace(TempPath))
+            return;
+        
+        _ = Window.SaveRegister();
+    }
 
     public MainWindowViewModel(MainWindow window)
     {
         this.Window = window;
         this.Version = "FileFlows Node Version: " + Globals.Version;
+        
+        ServerUrl = AppSettings.Instance.ServerUrl;
+        TempPath = AppSettings.Instance.TempPath;
+        FlowRunners = AppSettings.Instance.Runners;
+        Enabled = AppSettings.Instance.Enabled;
+    }
+
+    public async Task Browse()
+    {
+        OpenFolderDialog ofd = new OpenFolderDialog();
+        var result = await ofd.ShowAsync(Window);
+        this.TempPath = result ?? string.Empty;
     }
 }

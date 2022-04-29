@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-exec dotnet FileFlows.Server.dll
+exec ~/.dotnet/dotnet FileFlows.Server.dll

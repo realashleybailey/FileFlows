@@ -110,6 +110,14 @@ public class MainWindow : Window
             lifetime.Shutdown();
         }
     }
+
+    public void Minimize()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            this.Hide();
+        else   
+            this.WindowState = WindowState.Minimized;
+    }
 }
 
 public class MainWindowViewModel
@@ -121,7 +129,7 @@ public class MainWindowViewModel
     public void Launch() => Window.Launch();
     public void Quit() => Window.Quit();
 
-    public void Hide() => Window.Hide();
+    public void Hide() => Window.Minimize();
 
     public MainWindowViewModel(MainWindow window)
     {

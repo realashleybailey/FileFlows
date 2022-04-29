@@ -1,8 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="FileFlows.Node.Ui.MainWindow" 
-        Title="FileFlows Node" Width="400" Height="320"
-		MaxWidth="400" MaxHeight="320"
+        Title="FileFlows Node" Width="500" Height="380"
+		MaxWidth="500" MaxHeight="380"
 		
         CanResize="False"
         Foreground="#ff0090"
@@ -10,8 +10,8 @@
         FontSize="16"
 		Icon="avares://FileFlows.Node/Ui/icon.ico"
 		
-		HasSystemDecorations="False"
-		ExtendClientAreaToDecorationsHint="True"
+		HasSystemDecorations="True"
+		ExtendClientAreaChromeHints="NoChrome"
         >
 	<StackPanel Margin="10">
 		<Image Source="avares://FileFlows.Node/Ui/icon.ico" Width="100" />
@@ -19,33 +19,38 @@
 
 		<TextBlock Margin="6" Text="{Binding Version}" TextAlignment="Center" />
 		
-		<Grid ColumnDefinitions="100,4*" RowDefinitions="Auto,Auto,Auto"  Margin="4">
-			<TextBlock Text="Server:" Grid.Row="0" Grid.Column="0"/>
-			<TextBox Text="{Binding ServerUrl}" Watermark="Server Address" Grid.Row="0" Grid.Column="1" Foreground="white" Height="40" VerticalAlignment="Center"  />
+		<Grid ColumnDefinitions="140,4*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"  Margin="4">
+			<TextBlock Text="Server:" Grid.Row="0" Grid.Column="0" Margin="5 13 5 5" TextAlignment="Right" />
+			<TextBox Text="{Binding ServerUrl}" Watermark="Server Address" Grid.Row="0" Grid.Column="1" Foreground="white" VerticalAlignment="Bottom" Margin="5" Height="36" Padding="7" />
 			
-			<TextBlock Text="Temp Path:" Grid.Row="1" Grid.Column="0"/>
-			<TextBox Text="{Binding TempPath}" Watermark="Temp Path" Grid.Row="1" Grid.Column="1"  Foreground="white" Height="40"  />
+			<TextBlock Text="Temp Path:" Grid.Row="1" Grid.Column="0"  Margin="5 13 5 5" TextAlignment="Right"/>
+			<DockPanel Grid.Row="1" Grid.Column="1"  Margin="5" HorizontalAlignment="Stretch">
+				<TextBox Text="{Binding TempPath}" Watermark="Temp Path" Foreground="white" 
+				         Margin="0"  Height="36" Padding="7" Width="280"  />
+				
+				<Button Margin="0" Content="..." Command="{Binding Browse}" Width="40"
+				        Grid.Row="4" Grid.Column="1"
+				        Foreground="#ff0090" Background="#111214"
+				        BorderBrush="#ff0090"
+				/>
+				
+			</DockPanel>
 
 
-			<TextBlock Text="Flow Runners:" Grid.Row="2" Grid.Column="0"/>
-			<NumericUpDown Text="{Binding FlowRunners}" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Foreground="white" Height="40" />
+			<TextBlock Text="Flow Runners:" Grid.Row="2" Grid.Column="0"  Margin="5 13 5 5" TextAlignment="Right" />
+			<NumericUpDown Text="{Binding FlowRunners}" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="100" Foreground="white" Margin="5" />
 
+			<TextBlock Text="Enabled:" Grid.Row="3" Grid.Column="0"  Margin="5 13 5 5" TextAlignment="Right" />
+			<ToggleSwitch IsChecked="{Binding Enabled}" 
+			              Grid.Row="3" Grid.Column="1" Margin="5 0" 
+			              OffContent="" OnContent=""  />
+
+			<Button Margin="6" Content="SAVE / REGISTER" Command="{Binding SaveRegister}"
+			        Grid.Row="4" Grid.Column="1"
+			        Foreground="#ff0090" Background="#111214"
+			        BorderBrush="#ff0090" 
+			/>
 		</Grid>
 		
-		<StackPanel Orientation="Horizontal" Margin="20 0">
-
-			
-			<Button Margin="6" Content="HIDE" Command="{Binding Hide}" Width="100"
-					Foreground="#ff0090" Background="#111214"
-					BorderBrush="#ff0090"
-				/>
-			
-			<Button Margin="6" Content="QUIT" Command="{Binding Quit}" Width="100"
-					Foreground="#ff0090" Background="#111214"
-					BorderBrush="#ff0090"
-				/>
-
-
-		</StackPanel>
 	</StackPanel>
 </Window>

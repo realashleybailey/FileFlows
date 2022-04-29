@@ -127,7 +127,7 @@
                         try
                         {
                             process.StartInfo = new ProcessStartInfo();
-                            string dir = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location).DirectoryName, "FileFlows-Runner");
+                            string dir = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location)?.DirectoryName ?? string.Empty, "FileFlows-Runner");
                             if (windows)
                             {
 #if (DEBUG)

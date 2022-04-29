@@ -111,9 +111,9 @@ public static class Utils
             process.StartInfo.Arguments = parameters;
 
             string line = "Executing " + cmd + " " + parameters;
-            Logger.DLog(new string('=', line.Length));
+            Logger.DLog(new string('=', Math.Min(100, line.Length)));
             Logger.DLog(line);
-            Logger.DLog(new string('=', line.Length));
+            Logger.DLog(new string('=', Math.Min(100, line.Length)));
 
             process.Start();
             string output = process.StandardOutput.ReadToEnd().Trim();

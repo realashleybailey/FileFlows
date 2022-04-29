@@ -33,3 +33,4 @@ docker.xml
 /Server/FileFlows.log
 build/deploy/
 build/temp/
+Node/Logs/

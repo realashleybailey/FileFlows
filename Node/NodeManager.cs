@@ -12,12 +12,11 @@ using System.Threading.Tasks;
 
 namespace FileFlows.Node;
 
-internal class NodeManager
+public class NodeManager
 {
     public void Start()
     {
         StartWorkers();
-
     }
 
     public void Stop()
@@ -34,7 +33,6 @@ internal class NodeManager
             {
                 if (AppSettings.IsConfigured() == false)
                     return false;
-
 
                 var nodeService = new ServerShared.Services.NodeService();
                 try
@@ -57,9 +55,7 @@ internal class NodeManager
         });
     }
 
-
-
-    public bool Register()
+    public async Task<bool> Register()
     {
         string dll = Assembly.GetExecutingAssembly().Location;
         string path = new FileInfo(dll).DirectoryName ?? string.Empty;
@@ -81,7 +77,7 @@ internal class NodeManager
         Shared.Models.ProcessingNode result;
         try
         {
-            result = nodeService.Register(settings.ServerUrl, settings.HostName, settings.TempPath, settings.Runners, settings.Enabled, mappings).Result;
+            result = await nodeService.Register(settings.ServerUrl, settings.HostName, settings.TempPath, settings.Runners, settings.Enabled, mappings);
             if (result == null)
                 return false;
         }

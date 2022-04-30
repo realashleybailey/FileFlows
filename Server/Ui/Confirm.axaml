@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="FileFlows.Server.Ui.Confirm"
+        CanResize="False"
+        Foreground="#ff0090"
+        Background="#111214"
+        FontSize="16"
+        Icon="avares://FileFlows.Server/Ui/icon.ico"
+        Title="Confirm"
+        WindowStartupLocation="CenterOwner"
+        Width="400" Height="140"
+        MaxWidth="400" MaxHeight="140">
+    
+        <Grid>
+                <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="20" Grid.Column="1" Text="{Binding Message}" />
+                
+                <StackPanel Orientation="Horizontal"  Margin="4,16,8,16" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0"
+                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Margin="6" Content="Yes" Command="{Binding Yes}" Width="70"
+                                Grid.Row="4" Grid.Column="1"
+                                Foreground="#ff0090" Background="#111214"
+                                BorderBrush="#ff0090"
+                        />
+                        <Button Margin="6" Content="No" Command="{Binding No}" Width="70"
+                                Grid.Row="4" Grid.Column="1"
+                                Foreground="#ff0090" Background="#111214"
+                                BorderBrush="#ff0090"
+                        />
+                </StackPanel>
+        </Grid>
+</Window>

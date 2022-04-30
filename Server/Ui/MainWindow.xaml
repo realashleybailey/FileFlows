@@ -9,10 +9,7 @@
         Background="#111214"
         FontSize="16"
 		Icon="avares://FileFlows.Server/Ui/icon.ico"
-		
-		HasSystemDecorations="False"
-		ExtendClientAreaToDecorationsHint="True"
-        >
+		>
 	<StackPanel Margin="10">
 		<Image Source="avares://FileFlows.Server/Ui/icon.ico" Width="100" />
 
@@ -20,23 +17,12 @@
 		<TextBlock Margin="6" Text="{Binding Version}" TextAlignment="Center" />
 		<TextBlock Margin="6" Text="{Binding ServerUrl}" TextAlignment="Center" />
 
-		<StackPanel Orientation="Horizontal" Margin="20 0">
+		<StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Center">
 
 			<Button Margin="6" Content="OPEN" Command="{Binding Launch}" Width="100"
 				Foreground="#ff0090" Background="#111214"				
 				BorderBrush="#ff0090"
 				/>
-			
-			<Button Margin="6" Content="HIDE" Command="{Binding Hide}" Width="100"
-					Foreground="#ff0090" Background="#111214"
-					BorderBrush="#ff0090"
-				/>
-			
-			<Button Margin="6" Content="QUIT" Command="{Binding Quit}" Width="100"
-					Foreground="#ff0090" Background="#111214"
-					BorderBrush="#ff0090"
-				/>
-
 
 		</StackPanel>
 	</StackPanel>

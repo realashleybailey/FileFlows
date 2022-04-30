@@ -48,18 +48,42 @@ public class MainWindow : Window
 
     private void MainWindow_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        var pointer = e.GetCurrentPoint(this);
-        //if (pointer.Pointer.Captured is Border)
-        {
-            BeginMoveDrag(e);
-        }
+        // var pointer = e.GetCurrentPoint(this);
+        // //if (pointer.Pointer.Captured is Border)
+        // {
+        //     BeginMoveDrag(e);
+        // }
     }
 
+
+    private bool ConfirmedQuit = false;
     protected override void OnClosing(CancelEventArgs e)
     {
-        _trayIcon.IsVisible = false;
-        _trayIcon.Dispose();
-        base.OnClosing(e);
+        if (ConfirmedQuit == false)
+        {
+            e.Cancel = true;
+            var task = new Confirm("Are you sure you want to quit?", "Quit").ShowDialog<bool>(this);
+            Task.Run(async () =>
+            {
+                await Task.Delay(1);
+                ConfirmedQuit = task.Result;
+                
+                if (ConfirmedQuit)
+                {
+                    if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+                    {
+                        lifetime.Shutdown();
+                    }
+                }
+            });
+        }
+        else
+        {
+            this._trayIcon.Menu = null;
+            this._trayIcon.IsVisible = false;
+        
+            base.OnClosing(e);
+        }
     }
 
     private void InitializeComponent()
@@ -94,21 +118,21 @@ public class MainWindow : Window
         }
     }
 
+    protected override void HandleWindowStateChanged(WindowState state)
+    {
+        base.HandleWindowStateChanged(state);
+        if(Globals.IsWindows && state == WindowState.Minimized)
+            this.Hide();
+    }
 
     /// <summary>
     /// Quit the application
     /// </summary>
     public void Quit()
     {
-        this._trayIcon.Menu = null;
-        this._trayIcon.IsVisible = false;
-        this._trayIcon.Dispose();
-        //this.Close();
-
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-        {
-            lifetime.Shutdown();
-        }
+        this.WindowState = WindowState.Normal;
+        this.Show();
+        this.Close();
     }
 
     public void Minimize()

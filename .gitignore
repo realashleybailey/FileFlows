@@ -34,3 +34,5 @@ docker.xml
 build/deploy/
 build/temp/
 Node/Logs/
+temp/
+.idea/

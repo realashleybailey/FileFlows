@@ -55,8 +55,8 @@ public class Program
             if (Directory.Exists(logPath) == false)
                 Directory.CreateDirectory(logPath);
 
-            Shared.Logger.Instance = new ServerShared.FileLogger(logPath, "FileFlows-Node");
-            Shared.Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
+            Logger.Instance = new ServerShared.FileLogger(logPath, "FileFlows-Node");
+            Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
             AppSettings.Init();
 

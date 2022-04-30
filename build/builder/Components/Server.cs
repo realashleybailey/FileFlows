@@ -12,7 +12,7 @@ public class Server : Component
     }
     public void MakeInstaller()
     {
-        Nsis.Build(BuildOptions.SourcePath + "/build/install/fileflows.nsis");
+        Nsis.Build(BuildOptions.SourcePath + "/build/install/server.nsis");
         Utils.CopyFile(BuildOptions.TempPath + "/Server-Installer.exe", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.exe");
     }
 

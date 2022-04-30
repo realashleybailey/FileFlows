@@ -97,7 +97,7 @@
                 {
                     Directory.CreateDirectory(tempPath);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Logger.Instance?.ELog($"Temp Path does not exist on on node '{nodeName}', and failed to create it: {tempPath}");
                     return;

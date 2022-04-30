@@ -9,10 +9,7 @@
         Background="#111214"
         FontSize="16"
 		Icon="avares://FileFlows.Node/Ui/icon.ico"
-		
-		HasSystemDecorations="True"
-		ExtendClientAreaChromeHints="NoChrome"
-        >
+		>
 	<StackPanel Margin="10">
 		<Image Source="avares://FileFlows.Node/Ui/icon.ico" Width="100" />
 

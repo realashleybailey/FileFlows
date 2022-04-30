@@ -1,18 +1,11 @@
-using System.Text.RegularExpressions;
-using FileFlows.Shared.Models;
-
 namespace FileFlows.Node.Ui;
 
-using System.ComponentModel;
-using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
-using FileFlows.Shared;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Main window for Server application
@@ -20,7 +13,7 @@ using System.Threading.Tasks;
 public class MainWindow : Window
 {
     private readonly TrayIcon _trayIcon;
-    NativeMenu menu = new();
+    readonly NativeMenu menu = new();
 
     public MainWindow()
     {
@@ -46,25 +39,58 @@ public class MainWindow : Window
         PointerPressed += MainWindow_PointerPressed;
     }
 
+    protected override void HandleWindowStateChanged(WindowState state)
+    {
+        base.HandleWindowStateChanged(state);
+        if(Globals.IsWindows && state == WindowState.Minimized)
+            this.Hide();
+    }
+
     private void _trayIcon_Clicked(object? sender, EventArgs e)
     {
+        this.WindowState = WindowState.Normal;
         this.Show();
     }
 
     private void MainWindow_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        var pointer = e.GetCurrentPoint(this);
-        //if (pointer.Pointer.Captured is Border)
-        {
-            BeginMoveDrag(e);
-        }
+        // this is only needed if we dont render the chrome title bar, this allows dragging from anywhere in the UI to move it
+        // leave this code here in case we switch back to no chrome
+        // var pointer = e.GetCurrentPoint(this);
+        // //if (pointer.Pointer.Captured is Border)
+        // {
+        //     BeginMoveDrag(e);
+        // }
     }
 
+    private bool ConfirmedQuit = false;
     protected override void OnClosing(CancelEventArgs e)
     {
-        _trayIcon.IsVisible = false;
-        _trayIcon.Dispose();
-        base.OnClosing(e);
+        if (ConfirmedQuit == false)
+        {
+            e.Cancel = true;
+            var task = new Confirm("Are you sure you want to quit?", "Quit").ShowDialog<bool>(this);
+            Task.Run(async () =>
+            {
+                await Task.Delay(1);
+                ConfirmedQuit = task.Result;
+                
+                if (ConfirmedQuit)
+                {
+                    if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+                    {
+                        lifetime.Shutdown();
+                    }
+                }
+            });
+        }
+        else
+        {
+            this._trayIcon.Menu = null;
+            this._trayIcon.IsVisible = false;
+        
+            base.OnClosing(e);
+        }
     }
 
     private void InitializeComponent()
@@ -93,12 +119,10 @@ public class MainWindow : Window
         if (string.IsNullOrWhiteSpace(url))
             return;
         
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (Globals.IsWindows)
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         else
-        {
             Process.Start(new ProcessStartInfo("xdg-open", url));
-        }
     }
 
 
@@ -107,17 +131,14 @@ public class MainWindow : Window
     /// </summary>
     public void Quit()
     {
-        this._trayIcon.Menu = null;
-        this._trayIcon.IsVisible = false;
-        this._trayIcon.Dispose();
-        //this.Close();
-
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-        {
-            lifetime.Shutdown();
-        }
+        this.WindowState = WindowState.Normal;
+        this.Show();
+        this.Close();
     }
     
+    /// <summary>
+    /// Minimizes the application
+    /// </summary>
     public void Minimize()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -126,6 +147,9 @@ public class MainWindow : Window
             this.WindowState = WindowState.Minimized;
     }
 
+    /// <summary>
+    /// Saves and registers the node on the server
+    /// </summary>
     public async Task SaveRegister()
     {
         if(Program.Manager != null && await Program.Manager.Register() == true)

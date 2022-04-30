@@ -15,15 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Node", "Node\Node.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerShared", "ServerShared\ServerShared.csproj", "{90B4D560-CFF1-4C92-9865-BD32E4B0BFFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsNode", "WindowsNode\WindowsNode.csproj", "{925CBE75-71EC-477A-BBD8-E16F96EF678D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileFlowTests", "FileFlowTests\FileFlowTests.csproj", "{CB414395-F20A-4599-BA70-15F2244EF352}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PluginInfoGenerator", "PluginInfoGenerator\PluginInfoGenerator.csproj", "{111A58D5-1780-4DEA-B667-37383798E780}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlowRunner", "FlowRunner\FlowRunner.csproj", "{91772B3A-AE4D-4817-9D3A-44073ECDE626}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsLauncher", "WindowsLauncher\WindowsLauncher.csproj", "{1591AA48-D294-42D1-A013-07E732527063}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,10 +51,6 @@ Global
 		{90B4D560-CFF1-4C92-9865-BD32E4B0BFFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90B4D560-CFF1-4C92-9865-BD32E4B0BFFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90B4D560-CFF1-4C92-9865-BD32E4B0BFFF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{925CBE75-71EC-477A-BBD8-E16F96EF678D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{925CBE75-71EC-477A-BBD8-E16F96EF678D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{925CBE75-71EC-477A-BBD8-E16F96EF678D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{925CBE75-71EC-477A-BBD8-E16F96EF678D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CB414395-F20A-4599-BA70-15F2244EF352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB414395-F20A-4599-BA70-15F2244EF352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB414395-F20A-4599-BA70-15F2244EF352}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,10 +63,6 @@ Global
 		{91772B3A-AE4D-4817-9D3A-44073ECDE626}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91772B3A-AE4D-4817-9D3A-44073ECDE626}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91772B3A-AE4D-4817-9D3A-44073ECDE626}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1591AA48-D294-42D1-A013-07E732527063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1591AA48-D294-42D1-A013-07E732527063}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1591AA48-D294-42D1-A013-07E732527063}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1591AA48-D294-42D1-A013-07E732527063}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,7 +12,7 @@ public class Node : Component
     }
     public void MakeInstaller()
     {
-        Nsis.Build(BuildOptions.SourcePath + "/build/install/noide.nsis");
+        Nsis.Build(BuildOptions.SourcePath + "/build/install/node.nsis");
         Utils.CopyFile(BuildOptions.TempPath + "/Node-Installer.exe", $"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.exe");
     }
 }

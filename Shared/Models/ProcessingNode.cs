@@ -43,6 +43,8 @@ namespace FileFlows.Shared.Models
                 // now convert / to path charcter
                 if (DirectorySeperatorChar != '/')
                     path = path.Replace('/', DirectorySeperatorChar);
+                if(path.StartsWith("//")) // special case for SMB paths
+                    path = path.Replace('/', '\\');
             }
             return path;
         }

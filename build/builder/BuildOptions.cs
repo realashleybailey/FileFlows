@@ -5,8 +5,8 @@ public class BuildOptions
 {
     public static string SourcePath = "../..";
 
-    public static string Output { get; private set ; } = "../deploy";
-    public static string TempPath { get; private set ; } = "../temp";
+    public static string Output { get; private set ; } = SourcePath + "/deploy";
+    public static string TempPath { get; private set ; } = SourcePath + "/temp";
 
     public static bool BuildAll => string.IsNullOrWhiteSpace(Target);
     public static bool IsWindows { get; set; }

@@ -14,16 +14,30 @@ namespace FileFlows.Node;
 
 public class NodeManager
 {
+    /// <summary>
+    /// Gets or sets if this node is registered
+    /// </summary>
+    public bool Registered { get; private set; }
+
+    /// <summary>
+    /// Starts the node processing
+    /// </summary>
     public void Start()
     {
         StartWorkers();
     }
 
+    /// <summary>
+    /// Stops the node processing
+    /// </summary>
     public void Stop()
     {
         WorkerManager.StopWorkers();
     }
 
+    /// <summary>
+    /// Starts the node workers
+    /// </summary>
     private void StartWorkers()
     {
         Shared.Logger.Instance?.ILog("Starting workers");
@@ -31,6 +45,9 @@ public class NodeManager
         {
             IsEnabledCheck = () =>
             {
+                if (this.Registered == false)
+                    return false;
+                
                 if (AppSettings.IsConfigured() == false)
                     return false;
 
@@ -55,6 +72,11 @@ public class NodeManager
         });
     }
 
+    
+    /// <summary>
+    /// Registers the node with the server
+    /// </summary>
+    /// <returns>whether or not it was registered</returns>
     public async Task<bool> Register()
     {
         string dll = Assembly.GetExecutingAssembly().Location;
@@ -79,11 +101,15 @@ public class NodeManager
         {
             result = await nodeService.Register(settings.ServerUrl, settings.HostName, settings.TempPath, settings.Runners, settings.Enabled, mappings);
             if (result == null)
+            {
+                this.Registered = false;
                 return false;
+            }
         }
         catch (Exception ex)
         {
             Shared.Logger.Instance?.ELog("Failed to register with server: " + ex.Message);
+            this.Registered = false;
             return false;
         }
 
@@ -95,6 +121,7 @@ public class NodeManager
         settings.Enabled = result.Enabled;
         settings.Runners = result.FlowRunners;
         settings.Save();
+        this.Registered = true;
         return true;
     }
 }

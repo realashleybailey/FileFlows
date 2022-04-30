@@ -18,6 +18,9 @@ foreach(var d in srcDir.GetDirectories())
     Logger.ILog("source sub dir: " + d.FullName);
 
 
+//new Server().MakeInstaller();
+//return;
+
 var components = typeof(Component).Assembly.GetTypes().Where(x => x.IsAbstract == false && x.IsSubclassOf(typeof(Component)));
 foreach(var component in components)
 {    

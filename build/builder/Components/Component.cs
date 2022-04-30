@@ -6,7 +6,7 @@ public abstract class Component
 
     public virtual string ProjectDirectory => BuildOptions.SourcePath + "/" + Name;
     public virtual string ProjectFile => ProjectDirectory + "/" + Name + ".csproj";
-    public virtual string OutputPath => BuildOptions.Output + "/" + this.Name;
+    public virtual string OutputPath => BuildOptions.TempPath + "/" + this.Name;
 
     public virtual void Execute()
     {

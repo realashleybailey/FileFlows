@@ -85,11 +85,25 @@
 
 
             string tempPath = node?.TempPath ?? string.Empty;
-            if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
+            if (string.IsNullOrEmpty(tempPath))
             {
                 Logger.Instance?.ELog($"Temp Path not set on node '{nodeName}', cannot process");
                 return;
             }
+            
+            if(Directory.Exists(tempPath) == false)
+            {
+                try
+                {
+                    Directory.CreateDirectory(tempPath);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance?.ELog($"Temp Path does not exist on on node '{nodeName}', and failed to create it: {tempPath}");
+                    return;
+                }
+            }
+            
             var libFileService = LibraryFileService.Load();
             var libFile = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
             if (libFile == null)

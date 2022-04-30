@@ -1,6 +1,6 @@
 public class Client : Component
 {
-    public override string OutputPath => BuildOptions.Output + "/" + nameof(Server);
+    public override string OutputPath => BuildOptions.TempPath + "/" + nameof(Server);
 
     protected override void Build()
     {

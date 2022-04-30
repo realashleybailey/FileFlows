@@ -76,7 +76,6 @@ public class MainWindow : Window
     {
         NativeMenuItem item = new();
         item.Header = label;
-        //item.Icon = AvaloniaLocator.Current.GetService<IAssetLoader>()?.Open(new Uri($"avares://FileFlows.Server/Ui/icon.ico"));
         item.Click += (s, e) =>
         {
             action();
@@ -90,6 +89,16 @@ public class MainWindow : Window
     /// </summary>
     public void Launch()
     {
+        string url = AppSettings.Instance.ServerUrl;
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+        else
+        {
+            Process.Start(new ProcessStartInfo("xdg-open", url));
+        }
     }
 
 
@@ -188,13 +197,30 @@ public class MainWindowViewModel:INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public void Launch() => Window.Launch();
+    public void Launch()
+    {
+        if(string.IsNullOrWhiteSpace(ServerUrl) || ServerUrl == "http://")
+            return;
+        
+        if (Regex.IsMatch(ServerUrl, "^http(s)?://") == false)
+            ServerUrl = "http://" + ServerUrl;
+        if (ServerUrl.EndsWith("/") == false)
+            ServerUrl += "/";
+        
+        AppSettings.Instance.ServerUrl = ServerUrl;
+
+        Window.Launch();
+    }
+
     public void Quit() => Window.Quit();
 
     public void Hide() => Window.Minimize();
 
     public void SaveRegister()
     {
+        if(string.IsNullOrWhiteSpace(ServerUrl) || string.IsNullOrWhiteSpace(TempPath) || ServerUrl == "http://")
+            return;
+        
         if (Regex.IsMatch(ServerUrl, "^http(s)?://") == false)
             ServerUrl = "http://" + ServerUrl;
         if (ServerUrl.EndsWith("/") == false)
@@ -204,8 +230,6 @@ public class MainWindowViewModel:INotifyPropertyChanged
         AppSettings.Instance.TempPath = TempPath;
         AppSettings.Instance.Runners = FlowRunners;
         AppSettings.Instance.Enabled = Enabled;
-        if(string.IsNullOrWhiteSpace(ServerUrl) || string.IsNullOrWhiteSpace(TempPath))
-            return;
         
         _ = Window.SaveRegister();
     }

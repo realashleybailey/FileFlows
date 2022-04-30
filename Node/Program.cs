@@ -70,6 +70,11 @@ public class Program
 
             if (showUi)
             {
+                Task.Run(async () =>
+                {
+                    await Manager.Register();
+                    Manager.Start();
+                });
                 try
                 {
                     var appBuilder = BuildAvaloniaApp();
@@ -92,7 +97,8 @@ public class Program
                     return;
 
                 Shared.Logger.Instance?.ILog("FileFlows node starting");
-
+                
+                Manager.Start();
 
                 Shared.Logger.Instance?.ILog("Press Esc to quit");
 

@@ -7,6 +7,9 @@ Icon "../../icon.ico"
 Name "FileFlows Node"
 LicenseData "eula.rtf"
 
+# For removing Start Menu shortcut in Windows 7
+RequestExecutionLevel user
+
 Page license
 Page directory
 Page instfiles
@@ -15,8 +18,6 @@ UninstPage uninstConfirm
 UninstPage instfiles
 
 
-# For removing Start Menu shortcut in Windows 7
-RequestExecutionLevel user
 
 
 # start default section

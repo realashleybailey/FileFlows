@@ -75,7 +75,12 @@ public abstract class Component
         {
             var instance = GetInstance(dependency);
             if(instance.OutputPath.StartsWith(this.OutputPath) == false)
-                Utils.CopyFiles(instance.OutputPath, this.OutputPath);
+            {
+                if(dependency.Name == nameof(FlowRunner))
+                    Utils.CopyFiles(instance.OutputPath, this.OutputPath + "/Flow-Runner");
+                else
+                    Utils.CopyFiles(instance.OutputPath, this.OutputPath);
+            }
         }
     }
 }

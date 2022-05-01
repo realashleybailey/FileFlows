@@ -4,6 +4,8 @@ public class Server : Component
     protected override void Build()
     {        
         base.Build();
+        
+        Utils.DeleteFile(BuildOptions.TempPath + "/Server/JetBrains.Annotations.dll");
 
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
 

@@ -77,7 +77,7 @@ public abstract class Component
             if(instance.OutputPath.StartsWith(this.OutputPath) == false)
             {
                 if(dependency.Name == nameof(FlowRunner))
-                    Utils.CopyFiles(instance.OutputPath, this.OutputPath + "/Flow-Runner");
+                    Utils.CopyFiles(instance.OutputPath, this.OutputPath + "/FileFlows-Runner");
                 else
                     Utils.CopyFiles(instance.OutputPath, this.OutputPath);
             }

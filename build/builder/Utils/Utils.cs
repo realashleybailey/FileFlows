@@ -39,6 +39,8 @@ public static class Utils
         string error = git.StandardError.ReadToEnd().Trim();
         git.WaitForExit();
 
+        Logger.ILog("Git Build Number Output" +  Environment.NewLine + output + Environment.NewLine + error);
+
         // The output is the number of revisions till HEAD
         if(int.TryParse(output, out int buildNumber))
             return buildNumber;

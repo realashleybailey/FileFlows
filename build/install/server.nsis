@@ -28,6 +28,7 @@ Section
 
     File /r "../../temp/Server/FileFlows-Runner"
     File /r "../../temp/Server/Plugins"
+    File /r "../../temp/Server/Nodes"
     File /r "../../temp/Server/Templates"
     File /r "../../temp/Server/wwwroot"
     File "../../temp/Server/"

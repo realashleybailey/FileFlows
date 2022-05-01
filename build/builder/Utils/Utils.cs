@@ -186,7 +186,7 @@ public static class Utils
         if (File.Exists(filename))
             File.Delete(filename);
 
-        ZipFile.CreateFromDirectory(path, filename);
+        ZipFile.CreateFromDirectory(path, filename, CompressionLevel.SmallestSize, false);
         Logger.ILog("Created zip file: " + filename);
     }
 
@@ -207,6 +207,12 @@ public static class Utils
         var source = new FileInfo(sourceFileName);
         if (source.Exists == false)
             throw new Exception("File does not exist: " + sourceFileName);
+
+        if(destFileName.EndsWith("/") || destFileName.EndsWith("\\")) {
+            destFileName = destFileName[..^1];
+            if(Directory.Exists(destFileName) == false)
+                Directory.CreateDirectory(destFileName);
+        }
 
         if (Directory.Exists(destFileName))
         {

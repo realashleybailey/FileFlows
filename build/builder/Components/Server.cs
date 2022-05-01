@@ -1,6 +1,6 @@
 public class Server : Component
 {
-    public override Type[] Dependencies => new [] { typeof(Client), typeof(FlowRunner) };
+    public override Type[] Dependencies => new [] { typeof(Client), typeof(FlowRunner), typeof(Node) };
     protected override void Build()
     {        
         base.Build();
@@ -8,6 +8,7 @@ public class Server : Component
         Utils.DeleteFile(BuildOptions.TempPath + "/Server/JetBrains.Annotations.dll");
 
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
+        Utils.CopyFile($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip", BuildOptions.TempPath + "/Server/Nodes/");
         if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies/Plugins"))
             Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/Plugins", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
 

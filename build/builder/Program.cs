@@ -23,7 +23,7 @@ if(SpellCheck.Execute() == false)
     return;
 }
 
-File.WriteAllText(BuildOptions.Output + "build-version-variable.ps1", 
+File.WriteAllText(BuildOptions.Output + "/build-version-variable.ps1", 
 $"Write-Output \"Setting env.FF_VERSION to: {Globals.Version}\"" + Environment.NewLine +
 $"Write-Host \"##teamcity[setParameter name='env.FF_VERSION' value='{Globals.Version}']\"");
 

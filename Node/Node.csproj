@@ -1,15 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-16"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ProductName>FileFlows Node</ProductName>
+    <Version>0.2.1.366</Version>
+    <ProductVersion>0.2.1.366</ProductVersion>
+    <Copyright></Copyright>
     <ImplicitUsings>enable</ImplicitUsings>
-	<SelfContained>false</SelfContained>
-	<RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT' ">win-x64</RuntimeIdentifier>
-	<RuntimeIdentifier Condition=" '$(OS)' == 'Unix' ">linux-x64</RuntimeIdentifier>
-	<Nullable>enable</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
     <RootNamespace>FileFlows.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <AssemblyName>FileFlows.$(MSBuildProjectName)</AssemblyName>
+    <AssemblyName>FileFlows.Node</AssemblyName>
+    <UseAppHost>True</UseAppHost>
     <ApplicationIcon>Ui\icon.ico</ApplicationIcon>	  
   </PropertyGroup>
 

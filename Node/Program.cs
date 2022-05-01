@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Avalonia;
+﻿using Avalonia;
 using FileFlows.Node.Ui;
-using FileFlows.Node.Workers;
-using FileFlows.Server.Workers;
-using FileFlows.ServerShared.Models;
-using FileFlows.ServerShared.Services;
 
 namespace FileFlows.Node;
 public class Program
 {
     internal static NodeManager? Manager { get; private set; }
+
+    internal static string LoggingDirectory = String.Empty;
     public static void Main(string[] args)
     {
         try
@@ -53,11 +42,9 @@ public class Program
             if (string.IsNullOrEmpty(name) == false)
                 AppSettings.ForcedHostName = name;
 
-            string logPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
-            if (Directory.Exists(logPath) == false)
-                Directory.CreateDirectory(logPath);
+            LoggingDirectory = GetLoggingDirectory();
 
-            Logger.Instance = new ServerShared.FileLogger(logPath, "FileFlows-Node");
+            Logger.Instance = new ServerShared.FileLogger(LoggingDirectory, "FileFlows-Node");
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
             AppSettings.Init();
@@ -72,6 +59,9 @@ public class Program
 
             if (showUi)
             {
+                if(Globals.IsWindows)
+                    Utils.WindowsConsoleManager.Hide();
+                
                 Logger.Instance?.ILog("Launching GUI");
                 Task.Run(async () =>
                 {
@@ -131,6 +121,18 @@ public class Program
         {
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
+    }
+
+    private static string GetLoggingDirectory()
+    {
+        string current = Directory.GetCurrentDirectory();
+        if (current.Replace("\\", "/").ToLower().EndsWith("fileflows/node"))
+            current = new DirectoryInfo(Directory.GetCurrentDirectory())?.Parent?.FullName ?? current;
+        
+        string dir = Path.Combine(current, "Logs");
+        if (Directory.Exists(dir) == false)
+            Directory.CreateDirectory(dir);
+        return dir;
     }
 
     static string GetArgument(string[] args, string name)

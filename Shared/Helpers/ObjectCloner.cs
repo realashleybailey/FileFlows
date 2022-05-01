@@ -88,7 +88,7 @@ namespace FileFlows.Shared.Helpers
         /// <param name="x">first object</param>
         /// <param name="y">second object</param>
         /// <returns>If the objects are ruqla</returns>
-        public override bool Equals(object x, object y)
+        public override bool Equals(object? x, object? y)
         {
             return ReferenceEquals(x, y);
         }

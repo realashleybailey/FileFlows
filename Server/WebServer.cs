@@ -3,6 +3,10 @@ using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace FileFlows.Server
 {
@@ -96,7 +100,6 @@ namespace FileFlows.Server
 
 
             Globals.IsDevelopment = app.Environment.IsDevelopment();
-            Globals.IsWindows = isWindows;
 
             if (Globals.IsDevelopment)
                 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());

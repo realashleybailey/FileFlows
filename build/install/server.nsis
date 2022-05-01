@@ -6,6 +6,7 @@ InstallDir "$APPDATA\FileFlows\Server"
 Icon "../../icon.ico"
 Name "FileFlows"
 LicenseData "eula.rtf"
+SetCompressor /SOLID lzma
 
 # For removing Start Menu shortcut in Windows 7
 RequestExecutionLevel user
@@ -25,7 +26,15 @@ Section
     # set the installation directory as the destination for the following actions
     SetOutPath $INSTDIR
 
-    File /r "../../temp/Server/"
+    File /r "../../temp/Server/FileFlows-Runner"
+    File /r "../../temp/Server/Plugins"
+    File /r "../../temp/Server/Templates"
+    File /r "../../temp/Server/wwwroot"
+    File "../../temp/Server/"
+    
+    SetOutPath $INSTDIR\runtimes
+    File /r "../../temp/Server/runtimes/win*"
+    SetOutPath $INSTDIR
  
     # create the uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -50,11 +59,14 @@ Section "uninstall"
     # Remove the links from the start menu
     Delete "$SMPROGRAMS\FileFlows\FileFlows.lnk"
     Delete "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk"
+    RMDir /r $INSTDIR\..\Logs
+    RMDir /r $INSTDIR\..\Temp
  
     # Delete the uninstaller
     Delete $INSTDIR\uninstaller.exe
  
     RMDir /r "$INSTDIR"
     RMDir "$SMPROGRAMS\FileFlows"
+    RMDir "$INSTDIR\.."
 # uninstaller section end
 SectionEnd

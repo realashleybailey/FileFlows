@@ -456,7 +456,7 @@ namespace FileFlows.Plugin
             this.Process?.Cancel();
         }
 
-        public void UpdateVariables(Dictionary<string, object> updates)
+        public void UpdateVariables(Dictionary<string, object?>? updates)
         {
             if (updates == null)
                 return;
@@ -479,7 +479,6 @@ namespace FileFlows.Plugin
         /// Replaces variables in a given string
         /// </summary>
         /// <param name="input">the input string</param>
-        /// <param name="variables">the variables used to replace</param>
         /// <param name="stripMissing">if missing variables shouild be removed</param>
         /// <param name="cleanSpecialCharacters">if special characters (eg directory path separator) should be replaced</param>
         /// <returns>the string with the variables replaced</returns>

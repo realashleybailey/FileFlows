@@ -51,12 +51,16 @@
 			              Grid.Row="3" Grid.Column="1" Margin="5 0" 
 			              OffContent="" OnContent=""  />
 
-			
-			<Button Margin="6" Content="SAVE / REGISTER" Command="{Binding SaveRegister}"
-			        Grid.Row="4" Grid.Column="1"
-			        Foreground="#ff0090" Background="#111214"
-			        BorderBrush="#ff0090" 
-			/>
+			<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+				<Button Margin="6" Content="SAVE / REGISTER" Command="{Binding SaveRegister}"
+				        Foreground="#ff0090" Background="#111214" Width="180"
+				        BorderBrush="#ff0090" 
+				/>
+				<Button Margin="6" Content="LOGS" Command="{Binding OpenLogs}"
+				        Foreground="#ff0090" Background="#111214" Width="180"
+				        BorderBrush="#ff0090" 
+				/>
+			</StackPanel>
 		</Grid>
 		
 	</StackPanel>

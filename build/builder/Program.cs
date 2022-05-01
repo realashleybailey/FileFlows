@@ -17,6 +17,12 @@ var srcDir = new DirectoryInfo(BuildOptions.SourcePath);
 foreach(var d in srcDir.GetDirectories())
     Logger.ILog("source sub dir: " + d.FullName);
 
+if(SpellCheck.Execute() == false)
+{
+    Logger.ELog("Spelling mistakes detected, aborting build.");
+    return;
+}
+
 File.WriteAllText(BuildOptions.Output + "/version.txt", Globals.Version);
 File.WriteAllText(BuildOptions.Output + "/version3.txt", Globals.MajorVersion);
 

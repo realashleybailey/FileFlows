@@ -140,6 +140,37 @@ public static class Utils
     }
 
 
+    public static (int exitCode, string output, string error) Exec(string cmd, string[] parameters)
+    {
+        parameters ??= new string[] { };
+        using (var process = new Process())
+        {
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.FileName = cmd;
+            foreach(var arg in parameters)
+                process.StartInfo.ArgumentList.Add(arg);
+
+            string line = ("Executing " + cmd + " " + String.Join(" ", parameters.Select(x => "\"" + x + "\""))).Trim();
+            Logger.DLog(new string('=', Math.Min(100, line.Length)));
+            Logger.DLog(line);
+            Logger.DLog(new string('=', Math.Min(100, line.Length)));
+
+            process.Start();
+            string output = process.StandardOutput.ReadToEnd().Trim();
+            string error = process.StandardError.ReadToEnd().Trim();
+            process.WaitForExit();
+            if (string.IsNullOrEmpty(output) == false)
+                Logger.ILog(output);
+            if (string.IsNullOrEmpty(error) == false)
+                Logger.WLog(error);
+
+            return (process.ExitCode, output, error);
+        }
+    }
+
     /// <summary>
     /// Zips up a path
     /// </summary>

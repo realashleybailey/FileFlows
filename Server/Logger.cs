@@ -14,8 +14,22 @@ public class Logger : FileFlows.Plugin.ILogger
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
-                _LoggingPath = windows ? Path.Combine(Program.GetAppDirectory(), "Logs") : "/app/Logs";
+                if (Program.Docker)
+                {
+                    _LoggingPath = "/app/Logs";
+                }
+                else
+                {
+                    string current = Directory.GetCurrentDirectory();
+                    if (current.Replace("\\", "/").ToLower().EndsWith("fileflows/server"))
+                        current = new DirectoryInfo(Directory.GetCurrentDirectory())?.Parent?.FullName ?? current;
+
+                    string dir = Path.Combine(current, "Logs");
+                    if (Directory.Exists(dir) == false)
+                        Directory.CreateDirectory(dir);
+
+                    _LoggingPath = dir;
+                }
             }
             else 
             {

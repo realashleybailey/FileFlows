@@ -36,3 +36,4 @@ build/temp/
 Node/Logs/
 temp/
 .idea/
+gitversion.txt

@@ -1,3 +1,5 @@
+using FileFlows.Node.Utils;
+
 namespace FileFlows.Node.Ui;
 
 using Avalonia.Controls;
@@ -156,14 +158,32 @@ public class MainWindow : Window
         {
         }
     }
+
+    /// <summary>
+    /// Opens up the logging directory
+    /// </summary>
+    public void OpenLoggingDirectory()
+    {
+        Process.Start(new ProcessStartInfo() {
+            FileName = string.IsNullOrWhiteSpace(Program.LoggingDirectory) ? Directory.GetCurrentDirectory() : Program.LoggingDirectory,
+            UseShellExecute = true,
+            Verb = "open"
+        });
+    }
 }
 
 public class MainWindowViewModel:INotifyPropertyChanged
 { 
     private MainWindow Window { get; set; }
+    /// <summary>
+    /// Gets ors sets the Version string
+    /// </summary>
     public string Version { get; set; }
 
     private string _ServerUrl = String.Empty;
+    /// <summary>
+    /// Gets or sets the URL of the FileFlows Server
+    /// </summary>
     public string ServerUrl
     {
         get => _ServerUrl;
@@ -178,6 +198,9 @@ public class MainWindowViewModel:INotifyPropertyChanged
     }
 
     private string _TempPath = String.Empty;
+    /// <summary>
+    /// Gets or sets the temporary path used during flow processing
+    /// </summary>
     public string TempPath
     {
         get => _TempPath;
@@ -192,6 +215,9 @@ public class MainWindowViewModel:INotifyPropertyChanged
     }
 
     private int _FlowRunners;
+    /// <summary>
+    /// Gets or sets the number of FlowRunners
+    /// </summary>
     public int FlowRunners
     {
         get => _FlowRunners;
@@ -206,6 +232,9 @@ public class MainWindowViewModel:INotifyPropertyChanged
     }
     
     private bool _Enabled;
+    /// <summary>
+    /// Gets or sets if the Node is enabled
+    /// </summary>
     public bool Enabled
     {
         get => _Enabled;
@@ -219,8 +248,14 @@ public class MainWindowViewModel:INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Event that is fired when a property value is changed
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Launches the WebConsole
+    /// </summary>
     public void Launch()
     {
         if(string.IsNullOrWhiteSpace(ServerUrl) || ServerUrl == "http://")
@@ -236,10 +271,25 @@ public class MainWindowViewModel:INotifyPropertyChanged
         Window.Launch();
     }
 
+    
+    /// <summary>
+    /// Quits the application
+    /// </summary>
     public void Quit() => Window.Quit();
 
+    /// <summary>
+    /// Hides the UI
+    /// </summary>
     public void Hide() => Window.Minimize();
 
+    /// <summary>
+    /// Opens the logs 
+    /// </summary>
+    public void OpenLogs() => Window.OpenLoggingDirectory();
+
+    /// <summary>
+    /// Saves and registers the Node on the server
+    /// </summary>
     public void SaveRegister()
     {
         if(string.IsNullOrWhiteSpace(ServerUrl) || string.IsNullOrWhiteSpace(TempPath) || ServerUrl == "http://")
@@ -258,6 +308,10 @@ public class MainWindowViewModel:INotifyPropertyChanged
         _ = Window.SaveRegister();
     }
 
+    /// <summary>
+    /// Model for the main window
+    /// </summary>
+    /// <param name="window">the main window instance</param>
     public MainWindowViewModel(MainWindow window)
     {
         this.Window = window;
@@ -269,6 +323,9 @@ public class MainWindowViewModel:INotifyPropertyChanged
         Enabled = AppSettings.Instance.Enabled;
     }
 
+    /// <summary>
+    /// Opens up a browser to select the temporary path
+    /// </summary>
     public async Task Browse()
     {
         OpenFolderDialog ofd = new OpenFolderDialog();

@@ -4,10 +4,12 @@ public class Server : Component
     protected override void Build()
     {        
         base.Build();
-        
+
         Utils.DeleteFile(BuildOptions.TempPath + "/Server/JetBrains.Annotations.dll");
 
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
+        if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies"))
+            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/*.ffplugin", BuildOptions.TempPath + "/Server/Plugins");
 
         MakeInstaller();        
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");

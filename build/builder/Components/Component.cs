@@ -36,6 +36,11 @@ public abstract class Component
         Utils.RegexReplace(ProjectFile, "<Version>[^<]+</Version>", $"<Version>{Globals.Version}</Version>");
         Utils.RegexReplace(ProjectFile, "<ProductVersion>[^<]+</ProductVersion>", $"<ProductVersion>{Globals.Version}</ProductVersion>");
         Utils.RegexReplace(ProjectFile, "<Copyright>[^<]+</Copyright>", $"<Copyright>{Globals.Copyright}</Copyright>");    
+        string globalcs = ProjectDirectory + "/Globals.cs";
+        if(File.Exists(globalcs))
+        {
+            Utils.RegexReplace(globalcs, Regex.Escape("string Version = \"" + @"([\d]+\.){3}[\d]+") + "\"", $"string Version =\"{Globals.Version}\"");
+        }
     }
 
     static Dictionary<string, Component> Instances = new Dictionary<string, Component>();

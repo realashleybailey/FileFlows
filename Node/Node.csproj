@@ -9,7 +9,8 @@
 	<RuntimeIdentifier Condition=" '$(OS)' == 'Unix' ">linux-x64</RuntimeIdentifier>
 	<Nullable>enable</Nullable>
     <RootNamespace>FileFlows.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <AssemblyName>FileFlows.$(MSBuildProjectName)</AssemblyName>	  
+    <AssemblyName>FileFlows.$(MSBuildProjectName)</AssemblyName>
+    <ApplicationIcon>Ui\icon.ico</ApplicationIcon>	  
   </PropertyGroup>
 
   <ItemGroup>

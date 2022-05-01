@@ -560,13 +560,15 @@ namespace FileFlows.Plugin
         /// <returns>The plugin settings</returns>
         public T GetPluginSettings<T>() where T : IPluginSettings
         {
-            if (Fake) return default(T);
-            string name = typeof(T).Namespace;
-            name = name.Substring(name.IndexOf(".") + 1);
+            if (Fake) return default;
+            var name = typeof(T).Namespace;
+            if (string.IsNullOrEmpty(name))
+                return default;
+            name = name.Substring(name.IndexOf(".", StringComparison.Ordinal) + 1);
             string json = GetPluginSettingsJson(name);
             if (string.IsNullOrEmpty(json))
-                return default(T);
-            return (T)JsonSerializer.Deserialize<T>(json);
+                return default;
+            return JsonSerializer.Deserialize<T>(json);
         }
 
         public string GetToolPath(string tool)

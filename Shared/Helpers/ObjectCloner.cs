@@ -5,6 +5,9 @@ namespace FileFlows.Shared.Helpers
     using System.Reflection;
     using FileFlows.Shared.Helpers.ArrayExtensions;
 
+    /// <summary>
+    /// Clones an object
+    /// </summary>
     public class ObjectCloner
     {
 #pragma warning disable CS8603
@@ -28,7 +31,7 @@ namespace FileFlows.Shared.Helpers
         {
             return InternalCopy(originalObject, new Dictionary<Object, Object>(new ReferenceEqualityComparer()));
         }
-        private static Object InternalCopy(Object originalObject, IDictionary<Object, Object> visited)
+        private static Object InternalCopy(object? originalObject, IDictionary<object, object> visited)
         {
             if (originalObject == null) return null;
             var typeToReflect = originalObject.GetType();
@@ -74,13 +77,27 @@ namespace FileFlows.Shared.Helpers
         }
     }
 
+    /// <summary>
+    /// Checks if objects are teh same reference
+    /// </summary>
     public class ReferenceEqualityComparer : EqualityComparer<Object>
     {
+        /// <summary>
+        /// Checks if two objects are equal
+        /// </summary>
+        /// <param name="x">first object</param>
+        /// <param name="y">second object</param>
+        /// <returns>If the objects are ruqla</returns>
         public override bool Equals(object x, object y)
         {
             return ReferenceEquals(x, y);
         }
-        public override int GetHashCode(object obj)
+        /// <summary>
+        /// Gets a hashcode of an object
+        /// </summary>
+        /// <param name="obj">the object</param>
+        /// <returns>the objec hashcode</returns>
+        public override int GetHashCode(object? obj)
         {
             if (obj == null) return 0;
             return obj.GetHashCode();

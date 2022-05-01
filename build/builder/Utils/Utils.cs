@@ -44,6 +44,15 @@ public static class Utils
         // The output is the number of revisions till HEAD
         if(int.TryParse(output, out int buildNumber))
             return buildNumber;
+
+        if(File.Exists(BuildOptions.SourcePath + "/gitversion.txt"))
+        {
+            string txt = File.ReadAllText(BuildOptions.SourcePath + "/gitversion.txt").Trim();            
+            Logger.ILog("Version from gitversion.txt: " + txt);
+            if(int.TryParse(txt, out int buildNumber2))
+                return buildNumber2;
+        }
+        
         return 0;
     }
 

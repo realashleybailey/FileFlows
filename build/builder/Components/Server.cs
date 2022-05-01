@@ -9,7 +9,7 @@ public class Server : Component
 
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
         if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies"))
-            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies", BuildOptions.TempPath + "/Server/Plugins", pattern: "*.ffplugin");
+            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
 
         MakeInstaller();        
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");

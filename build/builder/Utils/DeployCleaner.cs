@@ -17,7 +17,7 @@ public class DeployCleaner {
                 logFile.Delete();  
         }
         
-
-        Utils.DeleteDirectoryIfExists(BuildOptions.TempPath);
+        Utils.EnsureDirectoryExists(BuildOptions.Output);        
+        Utils.EnsureDirectoryExists(BuildOptions.TempPath, clean: true);
     }
 }

@@ -8,8 +8,8 @@ public class Server : Component
         Utils.DeleteFile(BuildOptions.TempPath + "/Server/JetBrains.Annotations.dll");
 
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
-        if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies"))
-            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
+        if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies/Plugins"))
+            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/Plugins", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
 
         MakeInstaller();        
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");

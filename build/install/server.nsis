@@ -29,6 +29,10 @@ Section
  
     # create the uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
+
+    IfFileExists "$SMPROGRAMS\FileFlows" 0 EndIf
+        CreateDirectory "$SMPROGRAMS\FileFlows"
+    EndIf:
  
     # create a shortcut named "new shortcut" in the start menu programs directory
     # point the new shortcut at the program uninstaller
@@ -51,5 +55,6 @@ Section "uninstall"
     Delete $INSTDIR\uninstaller.exe
  
     RMDir /r "$INSTDIR"
+    RMDir "$SMPROGRAMS\FileFlows"
 # uninstaller section end
 SectionEnd

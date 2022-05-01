@@ -38,7 +38,13 @@ public abstract class Component
         Utils.RegexReplace(ProjectFile, "<Copyright>[^<]+</Copyright>", $"<Copyright>{Globals.Copyright}</Copyright>");    
         string globalcs = ProjectDirectory + "/Globals.cs";
         if(File.Exists(globalcs))
+        {
+            Logger.ILog("Setting version number in Global file: " + globalcs);
             Utils.RegexReplace(globalcs, "string Version = \\\"([^\"]+)\\\"", $"string Version =\"{Globals.Version}\"");
+        }else
+        {
+            Logger.ILog("Global file does not exist: " + globalcs);
+        }
     }
 
     static Dictionary<string, Component> Instances = new Dictionary<string, Component>();

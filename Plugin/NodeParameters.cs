@@ -456,7 +456,7 @@ namespace FileFlows.Plugin
             this.Process?.Cancel();
         }
 
-        public void UpdateVariables(Dictionary<string, object?>? updates)
+        public void UpdateVariables(Dictionary<string, object>? updates)
         {
             if (updates == null)
                 return;

@@ -45,7 +45,7 @@ public class BuildOptions
                 prop.SetValue(null, strValue);
         }
 
-        if(IsDocker)
+        if(IsWindows == false)
             SetVersions = true;
         
         if(BuildOptions.BuildAll)

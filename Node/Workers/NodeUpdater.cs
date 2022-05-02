@@ -10,7 +10,7 @@ public class NodeUpdater:Worker
 {
     internal static bool UpdatePending { get; private set; }
     private Version CurrentVersion { get; init; }
-    public NodeUpdater() : base(ScheduleType.Minute, 5)
+    public NodeUpdater() : base(ScheduleType.Minute, 1)
     {
         CurrentVersion = Version.Parse(Globals.Version);
     }
@@ -22,23 +22,31 @@ public class NodeUpdater:Worker
     
     internal bool RunCheck()
     {
-        #if(DEBUG)
-        return false; // disable during debugging
-        #endif
-        string updateScript = DownloadUpdate();
-        if(string.IsNullOrEmpty(updateScript))
-            return false;
-
-        UpdatePending = true;
-        do
+        Logger.Instance?.ILog("Checking for Node update");
+        try
         {
-            // sleep just in case something has just started
-            Thread.Sleep(10_000);
-        } while (FlowWorker.HasActiveRunners);
+#if(DEBUG)
+            return false; // disable during debugging
+#endif
+            string updateScript = DownloadUpdate();
+            if (string.IsNullOrEmpty(updateScript))
+                return false;
+
+            UpdatePending = true;
+            do
+            {
+                // sleep just in case something has just started
+                Thread.Sleep(10_000);
+            } while (FlowWorker.HasActiveRunners);
 
 
-        RunUpdateScript(updateScript);
-        return true;
+            RunUpdateScript(updateScript);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     private void RunUpdateScript(string updateScript)
@@ -47,14 +55,12 @@ public class NodeUpdater:Worker
         {
             Logger.Instance?.ILog("About to execute upgrade script: " + updateScript);
             var fi = new FileInfo(updateScript);
-            using var process = new Process();
-            process.StartInfo = new ProcessStartInfo(updateScript);
-            process.StartInfo.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
-            process.StartInfo.WorkingDirectory = fi.DirectoryName;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            process.Start();
+            
+            var psi = new ProcessStartInfo(updateScript);
+            psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
+            psi.WorkingDirectory = fi.DirectoryName;
+            psi.UseShellExecute = true;
+            Process.Start(psi); 
             Program.Quit();
         }
         catch (Exception ex)
@@ -112,8 +118,9 @@ public class NodeUpdater:Worker
         }
         catch (Exception ex)
         {
-            Logger.Instance?.ELog("Failed downloading node update: " + ex.Message + Environment.NewLine +
-                                  ex.StackTrace);
+            if (ex.Message == "Object reference not set to an instance of an object")
+                return string.Empty; // just ignore this error, likely due ot it not being configured yet.
+            Logger.Instance?.ELog("Failed checking for node update: " + ex.Message);
             return string.Empty;
         }
     }

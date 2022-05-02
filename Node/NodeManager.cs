@@ -69,7 +69,10 @@ public class NodeManager
                 }
                 catch (Exception ex)
                 {
-                    Shared.Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    if(ex.Message?.Contains("502 Bad Gateway") == true)
+                        Logger.Instance?.ELog("Failed checking enabled: Unable to reach FileFlows Server.");
+                    else
+                        Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 }
                 return false;
             }

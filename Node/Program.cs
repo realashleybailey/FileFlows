@@ -181,6 +181,7 @@ public class Program
     {
         Exiting = true;
         MainWindow.Instance?.ForceQuit();
+        Environment.Exit(0);
     }
     
 }

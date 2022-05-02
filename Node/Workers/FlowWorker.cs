@@ -17,6 +17,8 @@ namespace FileFlows.Node.Workers
     {
         public readonly Guid Uid = Guid.NewGuid();
 
+        private static FlowWorker Instance;
+
         private Mutex mutex = new Mutex();
         private readonly List<Guid> ExecutingRunners = new ();
 
@@ -28,6 +30,7 @@ namespace FileFlows.Node.Workers
 
         public FlowWorker(string hostname, bool isServer = false) : base(ScheduleType.Second, 10)
         {
+            FlowWorker.Instance = this;
             this.isServer = isServer;
             this.FirstExecute = true;
             this.Hostname = hostname;
@@ -35,9 +38,17 @@ namespace FileFlows.Node.Workers
 
         public Func<bool>? IsEnabledCheck { get; set; }
 
+        /// <summary>
+        /// Gets if there are any active runners
+        /// </summary>
+        public static bool HasActiveRunners => Instance?.ExecutingRunners?.Any() == true;
+
 
         protected override void Execute()
         {
+            if (NodeUpdater.UpdatePending)
+                return;
+            
             if (IsEnabledCheck?.Invoke() == false)
                 return;
             var nodeService = NodeService.Load();

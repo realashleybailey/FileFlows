@@ -8,7 +8,9 @@ public class Node : Component
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Node");
 
         MakeInstaller();        
+        Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, "node\\-upgrade\\.(ps1|bat|sh)$");
         Utils.Zip(BuildOptions.TempPath + "/Node", $"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip");
+        Utils.DeleteFiles(BuildOptions.TempPath + "/Node", "node-upgrade.*");
     }
     public void MakeInstaller()
     {

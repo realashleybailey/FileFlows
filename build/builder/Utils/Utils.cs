@@ -25,6 +25,22 @@ public static class Utils
         return output;
     }
 
+    internal static bool DirectoryIsEmpty(string path)
+    {
+        try
+        {
+            var di = new DirectoryInfo(path);
+            if(di.Exists == false)
+                return true;
+
+            return di.GetFiles("*", SearchOption.AllDirectories).Any() == false;
+        }
+        catch(Exception)
+        {
+            return true;
+        }
+    }
+
     public static int GetBuildNumber()
     {
         var git = new System.Diagnostics.Process();
@@ -243,7 +259,7 @@ public static class Utils
         Logger.ILog("Deleted file: " + fi.FullName);
     }
 
-    public static void DeleteFiles(string path, string filename, bool recurisve = false)
+    public static void DeleteFiles(string path, string filename, bool recurisve = false, string pattern = "")
     {
         var dir = new DirectoryInfo(path);
         if (dir.Exists == false)

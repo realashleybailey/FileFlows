@@ -37,3 +37,5 @@ Node/Logs/
 temp/
 .idea/
 gitversion.txt
+Server/Nodes/
+Logs/

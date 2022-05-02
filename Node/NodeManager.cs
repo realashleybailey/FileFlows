@@ -41,6 +41,10 @@ public class NodeManager
     private void StartWorkers()
     {
         Shared.Logger.Instance?.ILog("Starting workers");
+        var updater = new NodeUpdater();
+        if (updater.RunCheck())
+            return;
+        
         WorkerManager.StartWorkers(new FlowWorker(AppSettings.Instance.HostName)
         {
             IsEnabledCheck = () =>
@@ -69,7 +73,7 @@ public class NodeManager
                 }
                 return false;
             }
-        });
+        }, updater);
     }
 
     

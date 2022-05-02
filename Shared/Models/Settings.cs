@@ -15,6 +15,8 @@
 
         public bool AutoUpdate { get; set; }
 
+        public bool AutoUpdateNodes { get; set; }
+
         public bool DisableTelemetry { get; set; }
 
         private List<string> _PluginRepositoryUrls = new ();

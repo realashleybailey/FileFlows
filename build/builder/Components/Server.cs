@@ -6,14 +6,18 @@ public class Server : Component
         base.Build();
 
         Utils.DeleteFile(BuildOptions.TempPath + "/Server/JetBrains.Annotations.dll");
+        Utils.DeleteFile(BuildOptions.TempPath + "/Server/node-upgrade.bat");
+        Utils.DeleteFile(BuildOptions.TempPath + "/Server/node-upgrade.sh");
 
         Utils.EnsureDirectoryExists(OutputPath + "/Plugins");
-        File.WriteAllText(OutputPath + "/Plugins/readme.txt", "This is where plugins are installed");
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
         Utils.CopyFile($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip", BuildOptions.TempPath + "/Server/Nodes/");
         if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies/Plugins"))
             Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/Plugins", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
         
+        if(Utils.DirectoryIsEmpty(OutputPath + "/Plugins"))
+            File.WriteAllText(OutputPath + "/Plugins/readme.txt", "This is where plugins are installed");
+
         MakeInstaller();        
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");
     }

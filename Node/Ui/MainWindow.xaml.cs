@@ -1,3 +1,4 @@
+using Avalonia.Threading;
 using FileFlows.Node.Utils;
 
 namespace FileFlows.Node.Ui;
@@ -16,9 +17,11 @@ public class MainWindow : Window
 {
     private readonly TrayIcon _trayIcon;
     readonly NativeMenu menu = new();
+    internal static MainWindow? Instance;
 
     public MainWindow()
     {
+        Instance = this;
         _trayIcon = new TrayIcon();
         InitializeComponent();
         DataContext = new MainWindowViewModel(this);
@@ -63,6 +66,21 @@ public class MainWindow : Window
         // {
         //     BeginMoveDrag(e);
         // }
+    }
+
+    internal void ForceQuit()
+    {
+        ConfirmedQuit = true;
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            try
+            {
+                this.Close();
+            }
+            catch (Exception)
+            {
+            }
+        });
     }
 
     private bool ConfirmedQuit = false;

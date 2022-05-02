@@ -59,10 +59,12 @@
 	
 	
 	<ItemGroup>
-	  <Content Include="FileFlowsNode.bat">
+	  <None Remove="run.bat" />
+	  <Content Include="run.bat">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="FileFlowsNode.sh">
+	  <None Remove="run.sh" />
+	  <Content Include="run.sh">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>

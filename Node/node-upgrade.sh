@@ -2,12 +2,14 @@
 
 kill %1
 
+rmdir -rf ../FileFlows-Runner
+rmdir -rf ../Logs
+rmdir -rf ../runtimes
 rm ../*
-rm -rf ../runtimes
-rm -rf ../FileFlows-Runner
 
 mv * ../
 
 cd ..
 rm -rf NodeUpdate
-start dotnet .\FileFlows.Node.dll
+chmod +x run.sh
+./run.sh

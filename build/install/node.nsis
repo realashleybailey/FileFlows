@@ -23,12 +23,10 @@ UninstPage instfiles
 Section
     Install:
 
-        IfFileExists $INSTDIR\FileFlows.Node.dll 0 +4
-            MessageBox MB_OK "trying to delete $INSTDIR\FileFlows.Node.dll"
+        IfFileExists $INSTDIR\FileFlows.Node.dll 0 +3
             Delete "$INSTDIR\FileFlows.Node.dll"
             IfErrors AppRunning
         EndIf:    
-        MessageBox MB_OK "past deleting $INSTDIR\FileFlows.Node.dll"
 
         # set the installation directory as the destination for the following actions
         SetOutPath $INSTDIR    

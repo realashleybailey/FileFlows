@@ -1,8 +1,6 @@
 using System.IO.Compression;
-using System.Net.Mime;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FileFlows.Node.Workers;
 
@@ -110,16 +108,12 @@ public class NodeUpdater:Worker
                 return string.Empty;
             }
 
-            if (Globals.IsLinux)
-            {
-                if (MakeExecutable(updateFile) == false)
-                    return string.Empty;
-            }
-            
+            if (Globals.IsLinux && MakeExecutable(updateFile) == false)
+                return string.Empty;
 
             return updateFile;
         }
-        catch (Exception ex)
+        catch (Exception ex) 
         {
             if (ex.Message == "Object reference not set to an instance of an object")
                 return string.Empty; // just ignore this error, likely due ot it not being configured yet.

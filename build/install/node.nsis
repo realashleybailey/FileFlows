@@ -50,10 +50,11 @@ Section
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\icon.ico"
 
         ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
+        Goto Done
 
     AppRunning:
         MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL Done
-        goto Install
+        Goto Install
 
     Done:
 SectionEnd
@@ -78,7 +79,7 @@ Section "uninstall"
     
         MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO NoDelete
             RMDir /r "$INSTDIR"
-            goto RemoveEnd
+            Goto RemoveEnd
     NoDelete:
         Rename $INSTDIR\fileflows.config $INSTDIR\..\fileflows.config
         RMDir /r "$INSTDIR"
@@ -88,11 +89,11 @@ Section "uninstall"
 
         RMDir "$SMPROGRAMS\FileFlows"
         RMDir "$INSTDIR\.."
-        goto Done
+        Goto Done
 
     AppRunning:
         MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL Done
-        goto Uninstall
+        Goto Uninstall
 
     Done:
 

@@ -84,7 +84,7 @@ Section "uninstall"
     goto Done
 
     AppRunning:
-        MessageBox MessageBox MB_RETRYCANCEL|MB_ICONINFORMATION "FileFlows Node is currently running, please stop it and try again." IDCANCEL done
+        MessageBox MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL Done
         goto Uninstall
 
     Done:

@@ -100,6 +100,8 @@ public class NodeUpdater:Worker
             string update = Path.Combine(updateDir, "update.zip");
             File.WriteAllBytes(update, data);
             ZipFile.ExtractToDirectory(update, updateDir);
+            // delete the upgrade file after extraction
+            File.Delete(update);
 
             var updateFile = Path.Combine(updateDir, "node-upgrade" + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
@@ -113,6 +115,7 @@ public class NodeUpdater:Worker
                 if (MakeExecutable(updateFile) == false)
                     return string.Empty;
             }
+            
 
             return updateFile;
         }
@@ -131,12 +134,14 @@ public class NodeUpdater:Worker
         {
             var fi = new FileInfo(file);
             using var process = new Process();
-            process.StartInfo = new ProcessStartInfo("/bin/bash", $"-c \"chmod +x {fi.Name}\"");
-            process.StartInfo.WorkingDirectory = fi.DirectoryName;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo = new ProcessStartInfo("/bin/bash", $"-c \"chmod +x {fi.Name}\"")
+            {
+                WorkingDirectory = fi.DirectoryName,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
 
             process.Start();
             string output = process.StandardError.ReadToEnd();

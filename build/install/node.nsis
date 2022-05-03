@@ -25,10 +25,10 @@ Section
         # set the installation directory as the destination for the following actions
         SetOutPath $INSTDIR
 
-        IfFileExists $INSTDIR\FileFlows.Node.dll End
+        IfFileExists $INSTDIR\FileFlows.Node.dll EndIf
             Delete "$INSTDIR\FileFlows.Node.dll"
             IfErrors AppRunning
-        End        
+        EndIf:        
 
         File /r "../../temp/Node/FileFlows-Runner"
         File "../../temp/Node/"

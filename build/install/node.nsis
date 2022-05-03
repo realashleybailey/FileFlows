@@ -63,8 +63,18 @@ Section "uninstall"
     # Delete the uninstaller
     Delete $INSTDIR\uninstaller.exe
  
-    RMDir /r "$INSTDIR"
+    MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO NoDelete
+        RMDir /r "$INSTDIR"
+        goto RemoveEnd
+    NoDelete:
+        Rename $INSTDIR\fileflows.config $INSTDIR\..\fileflows.config
+        RMDir /r "$INSTDIR"
+        CreateDirectory "$INSTDIR"
+        Rename $INSTDIR\..\fileflows.config $INSTDIR\fileflows.config
+    RemoveEnd:
+
     RMDir "$SMPROGRAMS\FileFlows"
     RMDir "$INSTDIR\.."
+
 # uninstaller section end
 SectionEnd

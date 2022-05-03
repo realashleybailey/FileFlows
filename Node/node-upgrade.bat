@@ -1,4 +1,10 @@
-taskkill %1
+IF %1=="UPDATE" GOTO RunUpdate
+start node-upgrade.bat "UPDATE" %1
+GOTO Done
+
+:RunUpdate
+timeout /t 3
+taskkill %2
 
 del ../*.*
 rmdir /s ../runtimes
@@ -10,3 +16,5 @@ for /d %%a in ("*") do move /y "%%~fa" ..\
 cd ..
 rmdir /s NodeUpdate
 start dotnet .\FileFlows.Node.dll
+
+:Done

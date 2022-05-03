@@ -52,7 +52,7 @@ namespace FileFlows.Shared.Helpers
             if (logger != null)
                 logger.ILog(message);
             else
-                Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - INFO -> " + message);
+                Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - INFO -> " + message);
         }
 
         private static async Task<RequestResult<T>> MakeRequest<T>(HttpMethod method, string url, object data = null, int timeoutSeconds = 0, bool noLog = false)
@@ -110,6 +110,11 @@ namespace FileFlows.Shared.Helpers
                 {
                     if (body.Contains("An unhandled error has occurred."))
                         body = "An unhandled error has occurred."; // asp.net error
+                    else if (body.Contains("502 Bad Gateway"))
+                    {
+                        body = "Unable to connect, server possibly down";
+                        noLog = true;
+                    }
                     if(noLog == false)
                         Log("Error Body: " + body);
                     return new RequestResult<T> { Success = false, Body = body, Data = default(T) };

@@ -73,7 +73,7 @@ public class NodeUpdater:Worker
         {
             var settingsService = SettingsService.Load();
             var settings = settingsService.Get().Result;
-            if (settings.AutoUpdateNodes == false)
+            if (settings?.AutoUpdateNodes != true)
                 return string.Empty;
 
             var systemService = SystemService.Load();

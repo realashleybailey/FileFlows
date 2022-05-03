@@ -22,14 +22,16 @@ UninstPage instfiles
 # start default section
 Section
     Install:
-        # set the installation directory as the destination for the following actions
-        SetOutPath $INSTDIR
 
         IfFileExists $INSTDIR\FileFlows.Node.dll EndIf
             MessageBox MB_OK "trying to delete $INSTDIR\FileFlows.Node.dll"
             Delete "$INSTDIR\FileFlows.Node.dll"
             IfErrors AppRunning
-        EndIf:        
+        EndIf:    
+        MessageBox MB_OK "past deleting $INSTDIR\FileFlows.Node.dll"
+
+        # set the installation directory as the destination for the following actions
+        SetOutPath $INSTDIR    
 
         File /r "../../temp/Node/FileFlows-Runner"
         File "../../temp/Node/"

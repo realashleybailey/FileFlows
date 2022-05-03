@@ -19,59 +19,66 @@ UninstPage uninstConfirm
 UninstPage instfiles
 
 
-
-
 # start default section
 Section
- 
-    # set the installation directory as the destination for the following actions
-    SetOutPath $INSTDIR
+    Install:
+        # set the installation directory as the destination for the following actions
+        SetOutPath $INSTDIR
 
-    File /r "../../temp/Node/FileFlows-Runner"
-    File "../../temp/Node/"
+        IfFileExists $INSTDIR\FileFlows.Node.dll End
+            Delete "$INSTDIR\FileFlows.Node.dll"
+            IfErrors AppRunning
+        End        
 
-    SetOutPath $INSTDIR\runtimes
-    File /r "../../temp/Node/runtimes/win*"
-    SetOutPath $INSTDIR
- 
-    # create the uninstaller
-    WriteUninstaller "$INSTDIR\uninstall.exe"
- 
-    #IfFileExists "$SMPROGRAMS\FileFlows" 0 EndIf
-    CreateDirectory "$SMPROGRAMS\FileFlows"
-    #EndIf:
+        File /r "../../temp/Node/FileFlows-Runner"
+        File "../../temp/Node/"
 
-    # create a shortcut named "new shortcut" in the start menu programs directory
-    # point the new shortcut at the program uninstaller
-    CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\uninstall.exe"
+        SetOutPath $INSTDIR\runtimes
+        File /r "../../temp/Node/runtimes/win*"
+        SetOutPath $INSTDIR
+    
+        # create the uninstaller
+        WriteUninstaller "$INSTDIR\uninstall.exe"
+    
+        CreateDirectory "$SMPROGRAMS\FileFlows"
 
-    # create a shortcut named "new shortcut" in the start menu programs directory
-    CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\icon.ico"
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        # point the new shortcut at the program uninstaller
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
-    ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\icon.ico"
+
+        ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
+
+    AppRunning:
+        MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL Done
+        goto Install
+
+    Done:
 SectionEnd
  
 # uninstaller section start
 Section "uninstall"
  
     Uninstall:
-    # delete this file, if it fails the app is running
-    Delete "$INSTDIR\FileFlows.Node.dll"
-	IfErrors AppRunning
+        # delete this file, if it fails the app is running
+        Delete "$INSTDIR\FileFlows.Node.dll"
+        IfErrors AppRunning
 
 
-    # Remove the links from the start menu
-    Delete "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
-    Delete "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk"
-    RMDir /r $INSTDIR\..\Logs
-    RMDir /r $INSTDIR\..\Temp
- 
-    # Delete the uninstaller
-    Delete $INSTDIR\uninstaller.exe
- 
-    MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO NoDelete
-        RMDir /r "$INSTDIR"
-        goto RemoveEnd
+        # Remove the links from the start menu
+        Delete "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
+        Delete "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk"
+        RMDir /r $INSTDIR\..\Logs
+        RMDir /r $INSTDIR\..\Temp
+    
+        # Delete the uninstaller
+        Delete $INSTDIR\uninstaller.exe
+    
+        MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO NoDelete
+            RMDir /r "$INSTDIR"
+            goto RemoveEnd
     NoDelete:
         Rename $INSTDIR\fileflows.config $INSTDIR\..\fileflows.config
         RMDir /r "$INSTDIR"
@@ -79,9 +86,9 @@ Section "uninstall"
         Rename $INSTDIR\..\fileflows.config $INSTDIR\fileflows.config
     RemoveEnd:
 
-    RMDir "$SMPROGRAMS\FileFlows"
-    RMDir "$INSTDIR\.."
-    goto Done
+        RMDir "$SMPROGRAMS\FileFlows"
+        RMDir "$INSTDIR\.."
+        goto Done
 
     AppRunning:
         MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL Done

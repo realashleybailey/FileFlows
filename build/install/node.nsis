@@ -54,9 +54,10 @@ SectionEnd
 # uninstaller section start
 Section "uninstall"
  
+    Uninstall:
     # delete this file, if it fails the app is running
     Delete "$INSTDIR\FileFlows.Node.dll"
-	IfErrors appRunning
+	IfErrors AppRunning
 
 
     # Remove the links from the start menu
@@ -80,12 +81,13 @@ Section "uninstall"
 
     RMDir "$SMPROGRAMS\FileFlows"
     RMDir "$INSTDIR\.."
-    goto done
+    goto Done
 
-    appRunning:
-        MessageBox MessageBox MB_OK|MB_ICONEXCLAMATION "FileFlows Node is currently running, please stop it and try again." 
+    AppRunning:
+        MessageBox MessageBox MB_RETRYCANCEL|MB_ICONINFORMATION "FileFlows Node is currently running, please stop it and try again." IDCANCEL done
+        goto Uninstall
 
-    done:
+    Done:
 
 # uninstaller section end
 SectionEnd

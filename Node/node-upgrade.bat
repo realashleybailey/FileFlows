@@ -30,6 +30,7 @@ echo.
 echo Starting FileFlows Node
 start dotnet FileFlows.Node.dll
 
-if exist node-upgrade.bat start /min del node-upgrade.bat
+if exist node-upgrade.bat start /min del node-upgrade.bat & exit
 
 :Done
+exit

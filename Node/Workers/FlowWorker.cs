@@ -19,12 +19,12 @@ namespace FileFlows.Node.Workers
 
         private static FlowWorker Instance;
 
-        private Mutex mutex = new Mutex();
+        private readonly Mutex mutex = new Mutex();
         private readonly List<Guid> ExecutingRunners = new ();
 
         private readonly bool isServer;
 
-        private bool FirstExecute = true;
+        private bool FirstExecute;
 
         private string Hostname { get; set; }
 
@@ -267,7 +267,7 @@ namespace FileFlows.Node.Workers
                     ExecutingRunners.Remove(uid);
                 else
                 {
-                    Logger.Instance?.ILog("Exeucting runner not in list: " + uid +" => " + String.Join(",", ExecutingRunners.Select(x => x.ToString())));
+                    Logger.Instance?.ILog("Executing runner not in list: " + uid +" => " + string.Join(",", ExecutingRunners.Select(x => x.ToString())));
                 }
                 Logger.Instance?.ILog("Runner count: " + ExecutingRunners.Count);
             }
@@ -302,9 +302,7 @@ namespace FileFlows.Node.Workers
                 if (File.Exists("/root/.dotnet/dotnet"))
                     Dotnet = "/root/.dotnet/dotnet"; // location of docker
                 else
-                {
                     Dotnet = "dotnet";// assume in PATH
-                }
             }
             return Dotnet;
         }

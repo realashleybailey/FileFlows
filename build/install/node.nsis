@@ -43,6 +43,9 @@ Section
     
         CreateDirectory "$SMPROGRAMS\FileFlows"
 
+        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "DisplayName" "FileFlows Node"
+        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "UninstallString" '"$INSTDIR\uninstall.exe"'
+
         # create a shortcut named "new shortcut" in the start menu programs directory
         # point the new shortcut at the program uninstaller
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\uninstall.exe"
@@ -68,6 +71,7 @@ Section "uninstall"
         Delete "$INSTDIR\FileFlows.Node.dll"
         IfErrors AppRunning
 
+        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode"
 
         # Remove the links from the start menu
         Delete "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"

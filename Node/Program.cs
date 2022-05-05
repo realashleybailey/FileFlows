@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Avalonia;
+﻿using Avalonia;
 using FileFlows.Node.Ui;
 using FileFlows.ServerShared.Services;
 
@@ -31,29 +30,18 @@ public class Program
             args ??= new string[] { };
             if (args.Any(x => x.ToLower() == "--help" || x.ToLower() == "-?" || x.ToLower() == "/?" || x.ToLower() == "/help" || x.ToLower() == "-help"))
             {
-                Console.WriteLine("FileFlows Node Version:" + Globals.Version);
-                Console.WriteLine("");
-                Console.WriteLine("--server [serveraddress]");
-                Console.WriteLine("\teg --server http://tower:5000/");
-                Console.WriteLine("--name [nodename]");
-                Console.WriteLine("\teg --name " + Environment.MachineName);
-                Console.WriteLine("--temp [tempdir]");
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    Console.WriteLine("\teg --temp C:\\fileflows\\temp");
-                else
-                    Console.WriteLine("\teg --temp /mnt/temp");
-                Console.WriteLine("--no-gui does not show the GUI");
+                CommandLineOptions.PrintHelp();
+                return;
             }
 
-            string server = GetArgument(args, "--server");
-            if (string.IsNullOrEmpty(server) == false)
-                AppSettings.ForcedServerUrl = server;
-            string temp = GetArgument(args, "--temp");
-            if (string.IsNullOrEmpty(temp) == false)
-                AppSettings.ForcedTempPath = temp;
-            string name = GetArgument(args, "--name");
-            if (string.IsNullOrEmpty(name) == false)
-                AppSettings.ForcedHostName = name;
+            var options = CommandLineOptions.Parse(args);
+
+            if (string.IsNullOrEmpty(options.Server) == false)
+                AppSettings.ForcedServerUrl = options.Server;
+            if (string.IsNullOrEmpty(options.Temp) == false)
+                AppSettings.ForcedTempPath = options.Temp;
+            if (string.IsNullOrEmpty(options.Name) == false)
+                AppSettings.ForcedHostName = options.Name;
 
             LoggingDirectory = GetLoggingDirectory();
 
@@ -63,9 +51,7 @@ public class Program
             AppSettings.Init();
 
 
-            bool docker = args?.Any(x => x == "--docker") == true;
-            bool noGui = args?.Any(x => x == "--no-gui") == true;
-            bool showUi = docker == false && noGui == false;
+            bool showUi = options.Docker == false && options.NoGui == false;
 
             Manager = new ();
             Shared.Helpers.HttpHelper.Client = new HttpClient();
@@ -159,15 +145,6 @@ public class Program
         return dir;
     }
 
-    static string GetArgument(string[] args, string name)
-    {
-        int index = args.Select(x => x.ToLower()).ToList().IndexOf(name.ToLower());
-        if (index < 0)
-            return string.Empty;
-        if (index >= args.Length - 1)
-            return string.Empty;
-        return args[index + 1];
-    }
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()

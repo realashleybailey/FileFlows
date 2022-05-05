@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-kill %1
+if [%1 -ne 'docker']; then 
+  kill %1
+fi
 
 cp ../fileflows.config fileflows.config
 rmdir -rf ../FileFlows-Runner
@@ -12,5 +14,7 @@ mv * ../
 
 cd ..
 rm -rf NodeUpdate
-chmod +x run.sh
-./run.sh
+if [%1 -ne 'docker']; then 
+  chmod +x run.sh
+  ./run.sh
+fi

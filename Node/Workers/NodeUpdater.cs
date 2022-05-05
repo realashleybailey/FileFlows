@@ -51,14 +51,19 @@ public class NodeUpdater:Worker
     {
         try
         {
-            Logger.Instance?.ILog("About to execute upgrade script: " + updateScript);
-            var fi = new FileInfo(updateScript);
-            
-            var psi = new ProcessStartInfo(updateScript);
-            psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
-            psi.WorkingDirectory = fi.DirectoryName;
-            psi.UseShellExecute = true;
-            Process.Start(psi); 
+            // if inside docker we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
+            if (Globals.IsDocker == false) 
+            {
+                Logger.Instance?.ILog("About to execute upgrade script: " + updateScript);
+                var fi = new FileInfo(updateScript);
+
+                var psi = new ProcessStartInfo(updateScript);
+                psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
+                psi.WorkingDirectory = fi.DirectoryName;
+                psi.UseShellExecute = true;
+                Process.Start(psi);
+            }
+
             Program.Quit();
         }
         catch (Exception ex)

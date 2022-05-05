@@ -23,5 +23,10 @@ public class Globals
     /// <summary>
     /// Gets if this is running on Mac
     /// </summary>
-    public static bool IsMac => RuntimeInformation.IsOSPlatform(OSPlatform.OSX); 
+    public static bool IsMac => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+    /// <summary>
+    /// Gets or sets if this node is running inside a docker container
+    /// </summary>
+    public static bool IsDocker { get; set; }
 }

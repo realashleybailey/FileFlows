@@ -35,6 +35,7 @@ public class Program
             }
 
             var options = CommandLineOptions.Parse(args);
+            Globals.IsDocker = options.Docker;
 
             if (string.IsNullOrEmpty(options.Server) == false)
                 AppSettings.ForcedServerUrl = options.Server;

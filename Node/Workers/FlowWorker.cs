@@ -155,21 +155,9 @@ namespace FileFlows.Node.Workers
                         {
                             process.StartInfo = new ProcessStartInfo();
                             string dir = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location)?.DirectoryName ?? string.Empty, "FileFlows-Runner");
-                            if (windows)
-                            {
-#if (DEBUG)
-                                process.StartInfo.FileName = @"D:\src\FileFlows\FileFlows\FlowRunner\bin\debug\net6.0\FileFlows.FlowRunner.exe";
-#else
-                                string flowRunner = Path.Combine(dir, "FileFlows.FlowRunner" + (windows ? ".exe" : ".dll"));
-                                process.StartInfo.FileName = flowRunner;
-#endif
-                            }
-                            else
-                            {
-                                process.StartInfo.FileName = GetDotnetLocation();
-                                process.StartInfo.WorkingDirectory = dir;
-                                process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");
-                            }
+                            process.StartInfo.FileName = GetDotnetLocation();
+                            process.StartInfo.WorkingDirectory = dir;
+                            process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);
 
@@ -299,7 +287,7 @@ namespace FileFlows.Node.Workers
         {
             if(string.IsNullOrEmpty(Dotnet))
             {
-                if (File.Exists("/root/.dotnet/dotnet"))
+                if (Globals.IsWindows == false && File.Exists("/root/.dotnet/dotnet"))
                     Dotnet = "/root/.dotnet/dotnet"; // location of docker
                 else
                     Dotnet = "dotnet";// assume in PATH

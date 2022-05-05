@@ -2,7 +2,7 @@
 
 IF %1=="UPDATE" GOTO RunUpdate
 copy node-upgrade.bat ..\
-start ..\node-upgrade.bat "UPDATE" %1
+start ..\node-upgrade.bat "UPDATE" %1 & exit
 GOTO Done
 
 :RunUpdate

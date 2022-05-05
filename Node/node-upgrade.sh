@@ -2,6 +2,7 @@
 
 kill %1
 
+cp ../fileflows.config fileflows.config
 rmdir -rf ../FileFlows-Runner
 rmdir -rf ../Logs
 rmdir -rf ../runtimes

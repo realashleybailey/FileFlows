@@ -9,12 +9,46 @@ public class Program
 
     internal static string LoggingDirectory = String.Empty;
     private static bool Exiting = false;
+    private static Mutex appMutex = null;
+    const string appName = "FileFlowsNode";
     public static void Main(string[] args)
     {
         if(File.Exists("node-upgrade.bat"))
             File.Delete("node-upgrade.bat");
         if(File.Exists("node-upgrade.sh"))
             File.Delete("node-upgrade.sh");
+        
+        args ??= new string[] { };
+        if (args.Any(x => x.ToLower() == "--help" || x.ToLower() == "-?" || x.ToLower() == "/?" || x.ToLower() == "/help" || x.ToLower() == "-help"))
+        {
+            CommandLineOptions.PrintHelp();
+            return;
+        }
+
+        var options = CommandLineOptions.Parse(args);
+        appMutex = new Mutex(true, appName, out bool createdNew);
+        if (createdNew == false)
+        {
+            // app is already running
+            if (options.NoGui)
+            {
+                Console.WriteLine("An instance of FileFlows Node is already running");
+            }
+            else
+            {
+                try
+                {
+                    var appBuilder = BuildAvaloniaApp(true);
+                    appBuilder.StartWithClassicDesktopLifetime(args);
+                }
+                catch (Exception) { }
+            }
+            
+            return;
+        }
+        
+        
+        Globals.IsDocker = options.Docker;
         try
         {
             AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
@@ -27,15 +61,6 @@ public class Program
                 Service.ServiceBaseUrl = "http://localhost:6868/";
             #endif
 
-            args ??= new string[] { };
-            if (args.Any(x => x.ToLower() == "--help" || x.ToLower() == "-?" || x.ToLower() == "/?" || x.ToLower() == "/help" || x.ToLower() == "-help"))
-            {
-                CommandLineOptions.PrintHelp();
-                return;
-            }
-
-            var options = CommandLineOptions.Parse(args);
-            Globals.IsDocker = options.Docker;
 
             if (string.IsNullOrEmpty(options.Server) == false)
                 AppSettings.ForcedServerUrl = options.Server;
@@ -148,8 +173,8 @@ public class Program
 
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    public static AppBuilder BuildAvaloniaApp(bool messagebox = false)
+        => (messagebox ? AppBuilder.Configure<MessageApp>() : AppBuilder.Configure<App>())
             .UsePlatformDetect();
 
     /// <summary>

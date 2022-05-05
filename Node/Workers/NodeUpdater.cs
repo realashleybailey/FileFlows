@@ -61,6 +61,7 @@ public class NodeUpdater:Worker
                 psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
                 psi.WorkingDirectory = fi.DirectoryName;
                 psi.UseShellExecute = true;
+                psi.CreateNoWindow = true;
                 Process.Start(psi);
             }
 

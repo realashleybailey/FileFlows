@@ -36,6 +36,9 @@
     <EmbeddedResource Include="Ui\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Ui\MessageApp.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +70,14 @@
 	  <Content Include="run.sh">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	</ItemGroup>
+	
+	
+	<ItemGroup>
+	  <Compile Update="Ui\MessageBox.axaml.cs">
+	    <DependentUpon>MessageBox.axaml</DependentUpon>
+	    <SubType>Code</SubType>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

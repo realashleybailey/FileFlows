@@ -13,6 +13,7 @@ taskkill %2
 
 echo.
 echo Removing previous version
+copy "fileflows.config" "NodeUpdate\fileflows.config"
 FOR /d %%a IN ("*.*") DO IF /i NOT "%%~nxa"=="NodeUpdate" RD /S /Q "%%a"
 FOR %%a IN ("*") DO IF /i NOT "%%~nxa"=="node-upgrade.bat" DEL "%%a"
 

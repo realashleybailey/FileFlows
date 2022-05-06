@@ -12,7 +12,8 @@ public class Node : Component
 
         // we want to make a "Node" directory inside the zip, this is so we keep the directory structure of
         // /FileFlows/Data, /FileFlows/Logs, /FileFlows/Node etc
-        Directory.Move(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Node2");
+        Directory.Move(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Node2"); //move this since we cant move it to itself
+        Directory.CreateDirectory(BuildOptions.TempPath + "/Node/Node");
         Directory.Move(BuildOptions.TempPath + "/Node2", BuildOptions.TempPath + "/Node/Node");
         File.Move(BuildOptions.TempPath + "/Node/Node/run-node.bat",BuildOptions.TempPath + "/Node/run-node.bat");
         File.Move(BuildOptions.TempPath + "/Node/Node/run-node.sh",BuildOptions.TempPath + "/Node/run-node.sh");

@@ -1,4 +1,6 @@
-﻿namespace FileFlows.ServerShared.Helpers
+﻿using FileFlows.Plugin;
+
+namespace FileFlows.ServerShared.Helpers
 {
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
@@ -47,14 +49,13 @@
                     // get the options
                     if(string.IsNullOrWhiteSpace(chk.OptionsProperty) == false)
                     {
-                        var chkProperty = type.GetProperty(chk.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
-                        if(chkProperty != null)
+                        var chkPropertyValue = GetStaticProperty(type, chk.OptionsProperty);
+                        if(chkPropertyValue != null)
                         {
                             try
                             {
                                 ef.Parameters ??= new Dictionary<string, object>();
-                                var options = chkProperty.GetValue(null) as List<Plugin.ListOption>;
-                                if(ef.Parameters.ContainsKey("Options") == false && options != null)
+                                if(ef.Parameters.ContainsKey("Options") == false && chkPropertyValue is List<ListOption> options)
                                     ef.Parameters.Add("Options", options);
                             }                                
                             catch (Exception){}
@@ -66,14 +67,13 @@
                     // get the options
                     if (string.IsNullOrWhiteSpace(sel.OptionsProperty) == false)
                     {
-                        var selProperty = type.GetProperty(sel.OptionsProperty, BindingFlags.Public | BindingFlags.Static);
-                        if (selProperty != null)
+                        var selPropertyValue = GetStaticProperty(type, sel.OptionsProperty);
+                        if (selPropertyValue != null)
                         {
                             try
                             {
                                 ef.Parameters ??= new Dictionary<string, object>();
-                                var options = selProperty.GetValue(null) as List<Plugin.ListOption>;
-                                if (ef.Parameters.ContainsKey("Options") == false && options != null)
+                                if (ef.Parameters.ContainsKey("Options") == false && selPropertyValue is List<ListOption> options)
                                     ef.Parameters.Add("Options", options);
                             }
                             catch (Exception) { }
@@ -110,6 +110,17 @@
 
             }
             return fields;
+        }
+
+        private static object GetStaticProperty(Type type, string name)
+        {
+            if (type == null || type.Name == "Node" || type == typeof(object))
+                return null;
+                
+            var prop = type.GetProperty(name, BindingFlags.Public | BindingFlags.Static);
+            if (prop == null)
+                return GetStaticProperty(type.BaseType, name);
+            return prop.GetValue(null);
         }
     }
 }

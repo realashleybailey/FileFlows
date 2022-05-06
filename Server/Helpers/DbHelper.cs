@@ -301,12 +301,7 @@ namespace FileFlows.Server.Helpers
 
         private static string GetDbFilename()
         {
-            string dir = Program.GetAppDirectory();
-            dir = Path.Combine(dir, "Data");
-
-            FileHelper.CreateDirectoryIfNotExists(dir);
-
-            DbFilename = Path.Combine(dir, "FileFlows.sqlite");
+            DbFilename = Path.Combine(DirectoryHelper.DatabaseDirectory, "FileFlows.sqlite");
             return DbFilename;
         }
 
@@ -359,7 +354,7 @@ namespace FileFlows.Server.Helpers
             await AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",
-                Path = windows ? Path.Combine(Program.GetAppDirectory(), @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
+                Path = windows ? Path.Combine(Directory.GetCurrentDirectory(), @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now
             });
@@ -368,7 +363,7 @@ namespace FileFlows.Server.Helpers
             {
                 Name = "Settings",
                 AutoUpdatePlugins = true,
-                LoggingPath = windows ? Path.Combine(Program.GetAppDirectory(), "Logs") : "/app/Logs",
+                LoggingPath = DirectoryHelper.LoggingDirectory,
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now
             });

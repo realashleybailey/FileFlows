@@ -6,7 +6,7 @@ namespace FileFlows.Server.Helpers
     {
         internal static void InitTranslater(string langCode = "en")
         {
-            string appdir = Program.GetAppDirectory();
+            string appdir = Directory.GetCurrentDirectory();
             string wwwroot = Path.Combine(appdir, $"wwwroot");
             
             if (Directory.Exists(wwwroot) == false)

@@ -2,7 +2,7 @@
 OutFile "../../temp/Server-Installer.exe"
  
 # define installation directory
-InstallDir "$APPDATA\FileFlows\Server"
+InstallDir "$APPDATA\FileFlows"
 Icon "../../icon.ico"
 Name "FileFlows"
 LicenseData "eula.rtf"
@@ -22,52 +22,83 @@ UninstPage instfiles
 
 # start default section
 Section
- 
-    # set the installation directory as the destination for the following actions
-    SetOutPath $INSTDIR
+    Install:
 
-    File /r "../../temp/Server/FileFlows-Runner"
-    File /r "../../temp/Server/Plugins"
-    File /r "../../temp/Server/Nodes"
-    File /r "../../temp/Server/Templates"
-    File /r "../../temp/Server/wwwroot"
-    File "../../temp/Server/"
+    IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
+        Delete "$INSTDIR\Server\FileFlows.Server.dll"
+        IfErrors AppRunning
+    EndIf:    
+ 
+        # set the installation directory as the destination for the following actions
+        SetOutPath $INSTDIR\Server
+
+        File /r "../../temp/Server/FileFlows-Runner"
+        File /r "../../temp/Server/Plugins"
+        File /r "../../temp/Server/Nodes"
+        File /r "../../temp/Server/Templates"
+        File /r "../../temp/Server/wwwroot"
+        File "../../temp/Server/"
+        
+        SetOutPath $INSTDIR\Server\runtimes
+        File /r "../../temp/Server/runtimes/win*"
+        SetOutPath $INSTDIR\Server
     
-    SetOutPath $INSTDIR\runtimes
-    File /r "../../temp/Server/runtimes/win*"
-    SetOutPath $INSTDIR
- 
-    # create the uninstaller
-    WriteUninstaller "$INSTDIR\uninstall.exe"
+        # create the uninstaller
+        WriteUninstaller "$INSTDIR\Server\uninstall.exe"
 
-    #IfFileExists "$SMPROGRAMS\FileFlows" 0 EndIf
-    CreateDirectory "$SMPROGRAMS\FileFlows"
-    #EndIf:
- 
-    # create a shortcut named "new shortcut" in the start menu programs directory
-    # point the new shortcut at the program uninstaller
-    CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk" "$INSTDIR\uninstall.exe"
+        #IfFileExists "$SMPROGRAMS\FileFlows" 0 EndIf
+        CreateDirectory "$SMPROGRAMS\FileFlows"
+        #EndIf:
+    
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        # point the new shortcut at the program uninstaller
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk" "$INSTDIR\Server\uninstall.exe"
 
-    # create a shortcut named "new shortcut" in the start menu programs directory
-    CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows.lnk" "dotnet.exe"" FileFlows.Server.dll" "$INSTDIR\icon.ico"
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows.lnk" "dotnet.exe"" FileFlows.Server.dll" "$INSTDIR\Server\icon.ico"
 
-    ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows.lnk"
+        ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows.lnk"
+        Goto Done
+
+    AppRunning:
+        MessageBox MB_RETRYCANCEL "FileFlows is currently running, please stop it and try again." IDCANCEL Done
+        Goto Install
+
+    Done:
 SectionEnd
  
 # uninstaller section start
 Section "uninstall"
  
-    # Remove the links from the start menu
-    Delete "$SMPROGRAMS\FileFlows\FileFlows.lnk"
-    Delete "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk"
-    RMDir /r $INSTDIR\..\Logs
-    RMDir /r $INSTDIR\..\Temp
- 
-    # Delete the uninstaller
-    Delete $INSTDIR\uninstaller.exe
- 
-    RMDir /r "$INSTDIR"
-    RMDir "$SMPROGRAMS\FileFlows"
-    RMDir "$INSTDIR\.."
+    Uninstall:
+        # delete this file, if it fails the app is running
+        Delete "$INSTDIR\Server\FileFlows.Server.dll"
+        IfErrors AppRunning
+
+        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlows"
+
+        # Remove the links from the start menu
+        Delete "$SMPROGRAMS\FileFlows\FileFlows.lnk"
+        Delete "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk"
+    
+        # Delete the uninstaller
+        Delete $INSTDIR\Server\uninstaller.exe
+
+        MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO RemoveEnd
+            RMDir /r "$INSTDIR\Data"
+            RMDir /r "$INSTDIR\Logs"
+            RMDir /r "$INSTDIR\Temp"
+            Goto RemoveEnd
+    RemoveEnd:
+        RMDir /r "$INSTDIR\Server"        
+        RMDir "$SMPROGRAMS\FileFlows"
+        RMDir "$INSTDIR"
+        Goto Done
+
+    AppRunning:
+        MessageBox MB_RETRYCANCEL "FileFlows is currently running, please stop it and try again." IDCANCEL Done
+        Goto Uninstall
+
+    Done:
 # uninstaller section end
 SectionEnd

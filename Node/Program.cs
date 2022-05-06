@@ -1,5 +1,7 @@
-﻿using Avalonia;
+﻿using System.Runtime.CompilerServices;
+using Avalonia;
 using FileFlows.Node.Ui;
+using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 
 namespace FileFlows.Node;
@@ -7,7 +9,6 @@ public class Program
 {
     internal static NodeManager? Manager { get; private set; }
 
-    internal static string LoggingDirectory = String.Empty;
     private static bool Exiting = false;
     private static Mutex appMutex = null;
     const string appName = "FileFlowsNode";
@@ -26,6 +27,9 @@ public class Program
         }
 
         var options = CommandLineOptions.Parse(args);
+        Globals.IsDocker = options.Docker;
+        DirectoryHelper.Init(options.Docker, true);
+        
         appMutex = new Mutex(true, appName, out bool createdNew);
         if (createdNew == false)
         {
@@ -47,8 +51,6 @@ public class Program
             return;
         }
         
-        
-        Globals.IsDocker = options.Docker;
         try
         {
             AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
@@ -69,9 +71,8 @@ public class Program
             if (string.IsNullOrEmpty(options.Name) == false)
                 AppSettings.ForcedHostName = options.Name;
 
-            LoggingDirectory = GetLoggingDirectory();
 
-            Logger.Instance = new ServerShared.FileLogger(LoggingDirectory, "FileFlows-Node");
+            Logger.Instance = new ServerShared.FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
             AppSettings.Init();
@@ -157,18 +158,6 @@ public class Program
         {
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
-    }
-
-    private static string GetLoggingDirectory()
-    {
-        string current = Directory.GetCurrentDirectory();
-        if (current.Replace("\\", "/").ToLower().EndsWith("fileflows/node"))
-            current = new DirectoryInfo(Directory.GetCurrentDirectory())?.Parent?.FullName ?? current;
-        
-        string dir = Path.Combine(current, "Logs");
-        if (Directory.Exists(dir) == false)
-            Directory.CreateDirectory(dir);
-        return dir;
     }
 
 

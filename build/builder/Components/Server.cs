@@ -19,6 +19,13 @@ public class Server : Component
             File.WriteAllText(OutputPath + "/Plugins/readme.txt", "This is where plugins are installed");
 
         MakeInstaller();        
+
+        // we want to make a "Server" directory inside the zip, this is so we keep the directory structure of
+        // /FileFlows/Data, /FileFlows/Logs, /FileFlows/Server etc
+        Directory.Move(BuildOptions.TempPath + "/Server", BuildOptions.TempPath + "/Server/Server");
+        File.Move(BuildOptions.TempPath + "/Server/Server/run-server.bat",BuildOptions.TempPath + "/Server/run-server.bat");
+        File.Move(BuildOptions.TempPath + "/Server/Server/run-server.sh",BuildOptions.TempPath + "/Server/run-server.sh");
+
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");
     }
     public void MakeInstaller()

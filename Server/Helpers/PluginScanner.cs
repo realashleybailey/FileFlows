@@ -6,7 +6,7 @@ namespace FileFlows.Server.Helpers
 {
     public class PluginScanner
     {
-        public static string GetPluginDirectory() => Path.Combine(Program.GetAppDirectory(), "Plugins");
+        public static string GetPluginDirectory() => DirectoryHelper.PluginsDirectory;
 
         public static void Scan()
         {
@@ -282,10 +282,8 @@ namespace FileFlows.Server.Helpers
             {
                 Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
             }
-
-            string dir = Program.GetAppDirectory();
-            if (Program.Docker)
-                dir = new DirectoryInfo(dir).Parent.FullName;
+            
+            string dir = Directory.GetCurrentDirectory();
             dir = Path.Combine(dir, "wwwroot/i18n");
 
             if(Directory.Exists(dir) == false)

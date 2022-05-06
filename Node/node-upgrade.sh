@@ -15,6 +15,6 @@ mv * ../
 cd ..
 rm -rf NodeUpdate
 if [%1 -ne 'docker']; then 
-  chmod +x run.sh
-  ./run.sh
+  chmod +x run-node.sh
+  ./run-node.sh
 fi

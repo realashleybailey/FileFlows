@@ -7,15 +7,52 @@ public class Program
 {
     public static bool Docker { get; private set; }
     internal static bool WindowsGui { get; private set; }
+    private static Mutex appMutex = null;
+    const string appName = "FileFlowsServer";
 
     public static void Main(string[] args)
     {
         try
         {
+            if (args.Any(x =>
+                    x.ToLower() == "--help" || x.ToLower() == "-?" || x.ToLower() == "/?" || x.ToLower() == "/help" ||
+                    x.ToLower() == "-help"))
+            {
+                Console.WriteLine("FileFlows v" + Globals.Version);
+                Console.WriteLine("--no-gui: To hide the GUI");
+                return;
+            }
+            
             Docker = args?.Any(x => x == "--docker") == true;
+            var noGui = args?.Any((x => x.ToLower() == "--no-gui")) == true || Docker;
+            DirectoryHelper.Init(Docker, false);
             InitEncryptionKey();
 
-            if (Docker)
+            if (Docker == false)
+            {
+                appMutex = new Mutex(true, appName, out bool createdNew);
+                if (createdNew == false)
+                {
+                    // app is already running
+                    if (noGui)
+                    {
+                        Console.WriteLine("An instance of FileFlows is already running");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var appBuilder = BuildAvaloniaApp(true);
+                            appBuilder.StartWithClassicDesktopLifetime(args);
+                        }
+                        catch (Exception) { }
+                    }
+            
+                    return;
+                }
+            }
+
+            if (Docker || noGui)
             {
                 Console.WriteLine("Starting FileFlows Server...");
                 WebServer.Start(args);
@@ -59,7 +96,7 @@ public class Program
     /// </summary>
     private static void InitEncryptionKey()
     {
-        string encryptionFile = Path.Combine(GetAppDirectory(), "encryptionkey.txt");
+        string encryptionFile = DirectoryHelper.EncryptionKeyFile;
         if (File.Exists(encryptionFile))
         {
             string key = File.ReadAllText(encryptionFile);
@@ -76,23 +113,23 @@ public class Program
             Helpers.Decrypter.EncryptionKey = key;
         }
     }
-
-    internal static string GetAppDirectory()
-    {
-        var dir = Directory.GetCurrentDirectory();
-        if (Docker)
-        {
-            // docker we move this to the Data directory which is configured outside of the docker image
-            // this is so the database and any plugins that are downloaded will be kept if the docker
-            // image is updated/re-downloaded.
-            dir = Path.Combine(dir, "Data");
-        }
-        return dir;
-    }
+    //
+    // internal static string GetAppDirectory()
+    // {
+    //     var dir = Directory.GetCurrentDirectory();
+    //     if (Docker)
+    //     {
+    //         // docker we move this to the Data directory which is configured outside of the docker image
+    //         // this is so the database and any plugins that are downloaded will be kept if the docker
+    //         // image is updated/re-downloaded.
+    //         dir = Path.Combine(dir, "Data");
+    //     }
+    //     return dir;
+    // }
 
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    public static AppBuilder BuildAvaloniaApp(bool messagebox = false)
+        => (messagebox ? AppBuilder.Configure<MessageApp>() : AppBuilder.Configure<App>())
             .UsePlatformDetect();
 }

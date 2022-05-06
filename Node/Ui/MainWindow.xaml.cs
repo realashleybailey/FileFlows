@@ -1,5 +1,6 @@
 using Avalonia.Threading;
 using FileFlows.Node.Utils;
+using FileFlows.ServerShared.Helpers;
 
 namespace FileFlows.Node.Ui;
 
@@ -182,8 +183,9 @@ public class MainWindow : Window
     /// </summary>
     public void OpenLoggingDirectory()
     {
-        Process.Start(new ProcessStartInfo() {
-            FileName = string.IsNullOrWhiteSpace(Program.LoggingDirectory) ? Directory.GetCurrentDirectory() : Program.LoggingDirectory,
+        Process.Start(new ProcessStartInfo() 
+        {
+            FileName = DirectoryHelper.LoggingDirectory,
             UseShellExecute = true,
             Verb = "open"
         });

@@ -23,7 +23,7 @@
     "name": "Picture Library",
     "group": "Generic",
     "description": "Generic picture library that searches for common picture file extensions",
-    "filter": "\\.(jpe?g|jpe|tiff?|gif|png|webp|bmp|psd|svg)$",
+    "filter": "\\.(jpe?g|jpe|tiff?|gif|png|webp|tga|pbm|bmp)$",
     "path": "/media/pictures",
     "scanInterval": 60,
     "fileSizeDetectionInterval": 0

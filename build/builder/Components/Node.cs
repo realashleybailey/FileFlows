@@ -17,7 +17,7 @@ public class Node : Component
         Directory.Move(BuildOptions.TempPath + "/Node2", BuildOptions.TempPath + "/Node/Node");
 
         Utils.DeleteFiles(BuildOptions.TempPath + "/Node/Node", "run-node.*");
-        Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, @"run-node\.[bat|sh]$");
+        Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, @"run-node\.(bat|sh)$");
 
         Utils.Zip(BuildOptions.TempPath + "/Node", $"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip");
         Utils.DeleteFiles(BuildOptions.TempPath + "/Node", "node-upgrade.*");

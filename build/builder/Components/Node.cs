@@ -15,8 +15,9 @@ public class Node : Component
         Directory.Move(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Node2"); //move this since we cant move it to itself        
         Directory.CreateDirectory(BuildOptions.TempPath + "/Node");
         Directory.Move(BuildOptions.TempPath + "/Node2", BuildOptions.TempPath + "/Node/Node");
-        File.Move(BuildOptions.TempPath + "/Node/Node/run-node.bat",BuildOptions.TempPath + "/Node/run-node.bat");
-        File.Move(BuildOptions.TempPath + "/Node/Node/run-node.sh",BuildOptions.TempPath + "/Node/run-node.sh");
+
+        Utils.DeleteFiles(BuildOptions.TempPath + "/Node/Node", "run-node.*");
+        Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, @"run-node\.[bat|sh]$");
 
         Utils.Zip(BuildOptions.TempPath + "/Node", $"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip");
         Utils.DeleteFiles(BuildOptions.TempPath + "/Node", "node-upgrade.*");

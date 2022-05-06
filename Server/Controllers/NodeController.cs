@@ -266,7 +266,7 @@ namespace FileFlows.Server.Controllers
 #if (DEBUG)
                     TempPath = windows ? @"d:\videos\temp" : "/temp",
 #else
-                    TempPath = windows ? Path.Combine(Program.GetAppDirectory(), "Temp") : "/temp",
+                    TempPath = Node.Globals.IsDocker ? "/temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
 #endif
                 });
             }

@@ -23,7 +23,6 @@ public class Server : Component
         // we want to make a "Server" directory inside the zip, this is so we keep the directory structure of
         // /FileFlows/Data, /FileFlows/Logs, /FileFlows/Server etc
         Directory.Move(BuildOptions.TempPath + "/Server", BuildOptions.TempPath + "/Server2"); //move this since we cant move it to itself
-        Directory.CreateDirectory(BuildOptions.TempPath + "/Server/Server");
         Directory.Move(BuildOptions.TempPath + "/Server2", BuildOptions.TempPath + "/Server/Server");
         File.Move(BuildOptions.TempPath + "/Server/Server/run-server.bat",BuildOptions.TempPath + "/Server/run-server.bat");
         File.Move(BuildOptions.TempPath + "/Server/Server/run-server.sh",BuildOptions.TempPath + "/Server/run-server.sh");

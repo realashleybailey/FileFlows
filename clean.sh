@@ -1,0 +1,12 @@
+rm -r -v -f Client/obj
+rm -r -v -f FlowRunner/obj
+rm -r -v -f Node/obj
+rm -r -v -f Server/obj
+rm -r -v -f ServerShared/obj
+rm -r -v -f Shared/obj
+rm -r -v -f Client/bin
+rm -r -v -f FlowRunner/bin
+rm -r -v -f Node/bin
+rm -r -v -f Server/bin
+rm -r -v -f ServerShared/bin
+rm -r -v -f Shared/bin

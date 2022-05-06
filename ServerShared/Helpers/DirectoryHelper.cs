@@ -57,7 +57,7 @@ public class DirectoryHelper
         // look for logs from other directories
         string localLogs = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
         if(localLogs != dir && Directory.Exists(localLogs))
-            Directory.Move(localLogs, dir);
+            MoveDirectoryContent(localLogs, dir);
         
         LoggingDirectory = dir;
     }
@@ -75,7 +75,7 @@ public class DirectoryHelper
         // look for logs from other directories
         string localData = Path.Combine(Directory.GetCurrentDirectory(), "Data");
         if(localData != dir && Directory.Exists(localData))
-            Directory.Move(localData, dir);
+            MoveDirectoryContent(localData, dir);
 
         const string encryptKey = "encryptionkey.txt";
         EncryptionKeyFile = Path.Combine(dir, encryptKey);
@@ -112,4 +112,37 @@ public class DirectoryHelper
     /// Gets the location of hte encryption key file
     /// </summary>
     public static string EncryptionKeyFile { get;private set; }
+
+
+
+
+    private static void MoveDirectoryContent(string source, string destination)
+    {
+        if(Directory.Exists(destination) == false)
+            Directory.CreateDirectory(destination);
+
+        if(Directory.Exists(source) == false)
+            return;
+
+        var dirInfo = new DirectoryInfo(source);
+        foreach(var dir in dirInfo.GetDirectories())
+        {
+            MoveDirectoryContent(dir.FullName, Path.Combine(destination, dir.Name));
+        }
+
+        foreach(var file in dirInfo.GetFiles())
+        {
+            try
+            {
+                file.MoveTo(destination);
+            }
+            catch(Exception) { }
+        }
+
+        try
+        {
+           dirInfo.Delete(true); 
+        }
+        catch(Exception) { }
+    }
 }

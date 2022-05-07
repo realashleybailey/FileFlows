@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [        
+        {
+            "name": "Client Build", 
+            "type": "blazorwasm",            
+            "request": "launch",
+            "preLaunchTask": "Client Build",
+            "program": "bin/Debug/net6.0/Client.dll",
+            "args": [],
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5002"
+            },
+            "stopAtEntry": false,
+            "url":"https://localhost:5002",
+            "console": "internalConsole"
+        }
+    ]
+}

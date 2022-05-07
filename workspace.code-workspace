@@ -1,0 +1,75 @@
+{
+	"folders": [
+		{
+			"path": "Client"
+		},
+		{
+			"path": "FileFlowTests"
+		},
+		{
+			"path": "FlowRunner"
+		},
+		{
+			"path": "Node"
+		},
+		{
+			"path": "Server"
+		},
+		{
+			"path": "ServerShared"
+		},
+		{
+			"path": "Shared"
+		},
+		{
+			"path": ".vscode"
+		}
+	],
+	"launch": {
+		"version": "0.2.0",
+		
+		"configurations": [        
+			{
+				"name": "Server Build", 
+				"type": "coreclr",            
+				"request": "launch",
+				"preLaunchTask": "Server Build",
+				"program": "${workspaceFolder}/Server/bin/Debug/net6.0/Server.dll",
+				"args": [],
+				"cwd": "${workspaceFolder}/Server",
+				"env": {
+					"ASPNETCORE_ENVIRONMENT": "Development",
+					"cwd": "${workspaceFolder}/Server",
+					"ASPNETCORE_URLS": "http://localhost:6868"
+				},
+				"sourceFileMap": {
+					"/Views": "${workspaceFolder}/Server/Views"
+				},
+				"stopAtEntry": false,
+				"console": "internalConsole"
+			},
+			{
+				"name": "Client Build", 
+				"type": "coreclr",            
+				"request": "launch",
+				"preLaunchTask": "Client Build",
+				"program": "${workspaceFolder}/Client/bin/Debug/net6.0/Client.dll",
+				"args": [],
+				"cwd": "${workspaceFolder}/Client",
+				"env": {
+					"ASPNETCORE_ENVIRONMENT": "Development",
+					"cwd": "${workspaceFolder}/Client",
+					"ASPNETCORE_URLS": "http://localhost:6969"
+				},
+				"stopAtEntry": false,
+				"console": "internalConsole"
+			}
+		],     
+		"compounds": [
+		  {
+			"name": "Server/Client Debug",
+			"configurations": ["Client Build", "Server Build"]
+		  }
+		] 
+	}
+}

@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"path": "../Client"
+		},
+		{
+			"path": "../FileFlowTests"
+		},
+		{
+			"path": "../FlowRunner"
+		},
+		{
+			"path": "../Node"
+		},
+		{
+			"path": "../Server"
+		},
+		{
+			"path": "../ServerShared"
+		},
+		{
+			"path": "../Shared"
+		},
+		{
+			"path": "."
+		}
+	],
+	"launch": {
+		"version": "0.2.0",   
+		"compounds": [
+		  {
+			"name": "Server/Client Debug",
+			"configurations": ["Client Build", "Server Build"]
+		  }
+		]
+	}
+}

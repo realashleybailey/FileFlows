@@ -128,12 +128,9 @@ namespace FileFlows.Server.Workers
                     }
 
                     int skip = Library.Path.Length;
-                    // check if the length is != 3 incase its jusst a directory, eg "Z:\"
-                    // else if the path is windows and just "Z:" we will include the "\" to skip by increasing the skip count
-                    // else its in a folder and we have to increase the skip by 1 to add the directory separator
-                    if (Globals.IsWindows == false || Library.Path.Length != 3)
+                    if(Library.Path.EndsWith("/") == false && Library.Path.EndsWith("\\") == false)
                         ++skip;
-
+                        
                     long size = Library.Folders ? 0 : ((FileInfo)fsInfo).Length;
 
                     string relative = fullpath.Substring(skip);

@@ -1,6 +1,5 @@
 # define name of installer
-!define MYSOURCE "../../temp"
-OutFile "${MYSOURCE}/Node-Installer.exe"
+OutFile "../../temp/Node-Installer.exe"
  
 # define installation directory
 InstallDir "$APPDATA\FileFlows\Node"
@@ -32,11 +31,11 @@ Section
         # set the installation directory as the destination for the following actions
         SetOutPath $INSTDIR    
 
-        File /r "${MYSOURCE}/Node/Node/FileFlows-Runner"
-        File "${MYSOURCE}/Node/Node"
+        File /r "../../temp/Node/FileFlows-Runner"
+        File "../../temp/Node/"
 
         SetOutPath $INSTDIR\runtimes
-        File /r "${MYSOURCE}/Node/runtimes/win*"
+        File /r "../../temp/Node/runtimes/win*"
         SetOutPath $INSTDIR
     
         # create the uninstaller

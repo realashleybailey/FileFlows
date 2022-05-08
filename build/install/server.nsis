@@ -1,5 +1,7 @@
 # define name of installer
-OutFile "../../temp/Server-Installer.exe"
+!define MYSOURCE "../../temp"
+OutFile "${MYSOURCE}/Server-Installer.exe"
+
  
 # define installation directory
 InstallDir "$APPDATA\FileFlows"
@@ -8,10 +10,13 @@ Name "FileFlows"
 LicenseData "eula.rtf"
 SetCompressor /SOLID lzma
 
+#!include sections.nsh
+
 # For removing Start Menu shortcut in Windows 7
 RequestExecutionLevel user
 
 Page license
+#Page components
 Page directory
 Page instfiles
 
@@ -20,11 +25,59 @@ UninstPage instfiles
 
 
 
+
 # start default section
-Section
+Section /o "FileFlows Node" P1
     Install:
 
-    IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
+        IfFileExists $INSTDIR\FileFlows.Node.dll 0 +3
+            Delete "$INSTDIR\FileFlows.Node.dll"
+            IfErrors AppRunning
+        EndIf:    
+
+        # set the installation directory as the destination for the following actions
+        
+        SetOutPath $INSTDIR
+        File "${MYSOURCE}/Node"
+
+        SetOutPath $INSTDIR\Node  
+        File /r "${MYSOURCE}/Node/Node/FileFlows-Runner"
+        File "${MYSOURCE}/Node/Node"
+
+        SetOutPath $INSTDIR\Node\runtimes
+        File /r "${MYSOURCE}/Node/Node/runtimes/win*"
+        SetOutPath $INSTDIR\Node
+    
+        # create the uninstaller
+        WriteUninstaller "$INSTDIR\Node\uninstall.exe"
+    
+        CreateDirectory "$SMPROGRAMS\FileFlows"
+
+        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "DisplayName" "FileFlows Node"
+        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "UninstallString" '"$INSTDIR\Node\uninstall.exe"'
+
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        # point the new shortcut at the program uninstaller
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\Node\uninstall.exe"
+
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\Node\icon.ico"
+
+        ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
+        Goto Done
+
+    AppRunning:
+        MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL Done
+        Goto Install
+
+    Done:
+SectionEnd
+
+# start default section
+Section /o "FileFlows Server" P2
+    Install:
+
+    IfFileExists $INSTDIR\Server\FileFlows.Server.dll 0 +3
         Delete "$INSTDIR\Server\FileFlows.Server.dll"
         IfErrors AppRunning
     EndIf:    
@@ -32,15 +85,15 @@ Section
         # set the installation directory as the destination for the following actions
         SetOutPath $INSTDIR\Server
 
-        File /r "../../temp/Server/FileFlows-Runner"
-        File /r "../../temp/Server/Plugins"
-        File /r "../../temp/Server/Nodes"
-        File /r "../../temp/Server/Templates"
-        File /r "../../temp/Server/wwwroot"
-        File "../../temp/Server/"
+        File /r "${MYSOURCE}/Server/FileFlows-Runner"
+        File /r "${MYSOURCE}/Server/Plugins"
+        File /r "${MYSOURCE}/Server/Nodes"
+        File /r "${MYSOURCE}/Server/Templates"
+        File /r "${MYSOURCE}/Server/wwwroot"
+        File "${MYSOURCE}/Server/"
         
         SetOutPath $INSTDIR\Server\runtimes
-        File /r "../../temp/Server/runtimes/win*"
+        File /r "${MYSOURCE}/Server/runtimes/win*"
         SetOutPath $INSTDIR\Server
     
         # create the uninstaller
@@ -72,8 +125,15 @@ Section "uninstall"
  
     Uninstall:
         # delete this file, if it fails the app is running
-        Delete "$INSTDIR\Server\FileFlows.Server.dll"
-        IfErrors AppRunning
+        
+        IfFileExists $INSTDIR\Server\FileFlows.Server.dll 0 +3
+            Delete "$INSTDIR\Server\FileFlows.Server.dll"
+            IfErrors AppRunning
+        EndIf:    
+        IfFileExists $INSTDIR\Node\FileFlows.Node.dll 0 +3
+            Delete "$INSTDIR\Server\FileFlows.Node.dll"
+            IfErrors AppRunning
+        EndIf:    
 
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlows"
 
@@ -82,7 +142,7 @@ Section "uninstall"
         Delete "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk"
     
         # Delete the uninstaller
-        Delete $INSTDIR\Server\uninstaller.exe
+        Delete "$INSTDIR\Server\uninstaller.exe"
 
         MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO RemoveEnd
             RMDir /r "$INSTDIR\Data"

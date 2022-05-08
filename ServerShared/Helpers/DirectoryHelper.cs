@@ -134,7 +134,7 @@ public class DirectoryHelper
         {
             try
             {
-                file.MoveTo(destination);
+                file.MoveTo(Path.Combine(destination, file.Name));
             }
             catch(Exception) { }
         }

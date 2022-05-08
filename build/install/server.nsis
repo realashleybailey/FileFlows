@@ -1,5 +1,8 @@
 # define name of installer
-OutFile "../../temp/Server-Installer.exe"
+!define MYSOURCE "../../temp"
+OutFile "${MYSOURCE}/Server-Installer.exe"
+!include sections.nsh
+!include LogicLib.nsh
  
 # define installation directory
 InstallDir "$APPDATA\FileFlows"
@@ -10,9 +13,37 @@ SetCompressor /SOLID lzma
 
 # For removing Start Menu shortcut in Windows 7
 RequestExecutionLevel user
+;Version Information
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
+
+  VIProductVersion "0.6.0.1234"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "FileFlows"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Reven"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Copyright FileFlows 2022"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "FileFlows"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "0.6.0"
+
+;--------------------------------
+
+
+!define SECTIONCOUNT 2 ; total -1
+;SaveSections adds one bit to the given variable for each selected component
+!macro SaveSections VAR
+    StrCpy ${VAR} 0
+    ${ForEach} $R0 ${SECTIONCOUNT} 0 - 1
+        IntOp ${VAR} ${VAR} << 1
+        ${If} ${SectionIsSelected} $R0
+            ;${DEBUG} "Section $R0 checked"
+            IntOp ${VAR} ${VAR} + 1
+        ${EndIf}
+    ${Next}
+!macroend
 
 Page license
 Page directory
+PageEx components
+    PageCallbacks DummyFunc DummyFunc componentsLeave
+PageExEnd
 Page instfiles
 
 UninstPage uninstConfirm
@@ -21,26 +52,30 @@ UninstPage instfiles
 
 
 # start default section
-Section
-    Install:
+Section !FileFlows
+  SectionIn RO
+SectionEnd
+
+
+Section /o "Server" g1o1
+    ServerInstall:
 
     IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
         Delete "$INSTDIR\Server\FileFlows.Server.dll"
-        IfErrors AppRunning
-    EndIf:    
+        IfErrors ServerAppRunning
  
         # set the installation directory as the destination for the following actions
         SetOutPath $INSTDIR\Server
 
-        File /r "../../temp/Server/FileFlows-Runner"
-        File /r "../../temp/Server/Plugins"
-        File /r "../../temp/Server/Nodes"
-        File /r "../../temp/Server/Templates"
-        File /r "../../temp/Server/wwwroot"
-        File "../../temp/Server/"
+        File /r "${MYSOURCE}/Server/FileFlows-Runner"
+        File /r "${MYSOURCE}/Server/Plugins"
+        File /r "${MYSOURCE}/Server/Nodes"
+        File /r "${MYSOURCE}/Server/Templates"
+        File /r "${MYSOURCE}/Server/wwwroot"
+        File "${MYSOURCE}/Server/"
         
         SetOutPath $INSTDIR\Server\runtimes
-        File /r "../../temp/Server/runtimes/win*"
+        File /r "${MYSOURCE}/Server/runtimes/win*"
         SetOutPath $INSTDIR\Server
     
         # create the uninstaller
@@ -58,13 +93,60 @@ Section
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows.lnk" "dotnet.exe"" FileFlows.Server.dll" "$INSTDIR\Server\icon.ico"
 
         ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows.lnk"
-        Goto Done
+        Goto ServerDone
 
-    AppRunning:
-        MessageBox MB_RETRYCANCEL "FileFlows is currently running, please stop it and try again." IDCANCEL Done
-        Goto Install
+    ServerAppRunning:
+        MessageBox MB_RETRYCANCEL "FileFlows is currently running, please stop it and try again." IDCANCEL ServerDone
+        Goto ServerInstall
 
-    Done:
+    ServerDone:
+SectionEnd
+
+Section /o "Node" g1o2
+
+    NodeInstall:
+
+        IfFileExists $INSTDIR\FileFlows.Node.dll 0 +3
+            Delete "$INSTDIR\FileFlows.Node.dll"
+            IfErrors NodeAppRunning
+        EndIf:    
+
+        # set the installation directory as the destination for the following actions
+        SetOutPath "$INSTDIR"
+        File "${MYSOURCE}/Node/*.bat"
+
+        SetOutPath $INSTDIR\Node
+
+        File /r "${MYSOURCE}/Server/FileFlows-Runner"
+        File "${MYSOURCE}/Node/Node/*"
+
+        SetOutPath $INSTDIR\Node\runtimes
+        File /r "${MYSOURCE}/Server/runtimes/win*"
+        SetOutPath $INSTDIR\Node
+    
+        # create the uninstaller
+        WriteUninstaller "$INSTDIR\Node\uninstall.exe"
+    
+        CreateDirectory "$SMPROGRAMS\FileFlows"
+
+        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "DisplayName" "FileFlows Node"
+        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "UninstallString" '"$INSTDIR\Node\uninstall.exe"'
+
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        # point the new shortcut at the program uninstaller
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\Node\uninstall.exe"
+
+        # create a shortcut named "new shortcut" in the start menu programs directory
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\Node\icon.ico"
+
+        ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
+        Goto NodeDone
+
+    NodeAppRunning:
+        MessageBox MB_RETRYCANCEL "FileFlows Node is currently running, please stop it and try again." IDCANCEL NodeDone
+        Goto NodeInstall
+
+    NodeDone:
 SectionEnd
  
 # uninstaller section start
@@ -102,3 +184,38 @@ Section "uninstall"
     Done:
 # uninstaller section end
 SectionEnd
+
+
+;--------------------------------
+
+; Functions
+
+; $1 stores the status of group 1
+; $2 stores the status of group 2
+
+Function .onInit
+
+  StrCpy $1 ${g1o1} ; Group 1 - Option 1 is selected by default
+
+FunctionEnd
+
+Function .onSelChange
+
+  !insertmacro StartRadioButtons $1
+    !insertmacro RadioButton ${g1o1}
+    !insertmacro RadioButton ${g1o2}
+  !insertmacro EndRadioButtons
+
+FunctionEnd
+
+
+Function DummyFunc
+FunctionEnd
+
+Function componentsLeave
+    !insertmacro SaveSections $2
+    ${if} $2 = 0
+        MessageBox MB_OK|MB_ICONEXCLAMATION "You must select a component to install" /sd IDOK
+        Abort
+    ${endif}
+FunctionEnd

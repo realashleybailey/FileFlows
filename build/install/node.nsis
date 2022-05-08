@@ -1,5 +1,5 @@
 # define name of installer
-!define MYSOURCE "${MYSOURCE}"
+!define MYSOURCE "../../temp"
 OutFile "${MYSOURCE}/Node-Installer.exe"
  
 # define installation directory

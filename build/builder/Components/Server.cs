@@ -28,7 +28,7 @@ public class Server : Component
         
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server/Server", "run-server.*");
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Server", false, @"run-server\.(bat|sh)$");
-        Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, @"run-node\.(bat|sh)$");
+        Utils.CopyFiles(BuildOptions.SourcePath + "/Node", BuildOptions.TempPath + "/Server", false, @"run-node\.(bat|sh)$");
 
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");
     }

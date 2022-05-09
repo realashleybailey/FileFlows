@@ -135,7 +135,7 @@ namespace FileFlows.Server
             new Upgrade.Upgrader().Run(settings);
 
             Logger.Instance.ILog(new string('=', 50));
-            Logger.Instance.ILog("Starting File Flows " + Globals.Version);
+            Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
             if(Program.Docker)
                 Logger.Instance.ILog("Running inside docker container");
 

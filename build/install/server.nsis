@@ -21,8 +21,13 @@ SetCompressor /SOLID lzma
 
 # For removing Start Menu shortcut in Windows 7
 RequestExecutionLevel user
+;--------------------------------
+;Languages
+ 
+  !insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
 ;Version Information
-LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
 
   VIProductVersion "0.6.0.1234"
   VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "FileFlows"
@@ -45,12 +50,6 @@ LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
   !insertmacro MUI_UNPAGE_INSTFILES
 ;--------------------------------
 
-;--------------------------------
-;Languages
- 
-  !insertmacro MUI_LANGUAGE "English"
-
-;--------------------------------
 
 #Page license
 #Page directory

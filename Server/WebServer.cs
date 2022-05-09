@@ -23,6 +23,8 @@ namespace FileFlows.Server
 
         public static void Start(string[] args)
         {
+            Logger.Instance.DLog("Arguments: " + string.Join(" ", args));
+
             var builder = WebApplication.CreateBuilder(args);
 
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

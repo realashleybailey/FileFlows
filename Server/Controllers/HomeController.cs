@@ -1,14 +1,14 @@
-namespace FileFlows.Server.Controllers
-{
-    using Microsoft.AspNetCore.Mvc;
+namespace FileFlows.Server.Controllers;
 
-    public class HomeController : Controller
+using Microsoft.AspNetCore.Mvc;
+
+public class HomeController : Controller
+{
+    [ApiExplorerSettings(IgnoreApi = true)]
+    [ResponseCache(NoStore = true, Duration = 0)]
+    public IActionResult Index()
     {
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [ResponseCache(NoStore = true, Duration = 0)]
-        public IActionResult Spa()
-        {
-            return File("~/index.html", "text/html");
-        }
+        Logger.Instance.DLog("HomeController.Index");
+        return File("~/index.html", "text/html");
     }
 }

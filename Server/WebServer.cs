@@ -116,7 +116,7 @@ public class WebServer
         app.MapControllerRoute(
             name: "Spa",
             pattern: "{*url}",
-            defaults: new { controller = "Home", action = "Spa" }
+            defaults: new { controller = "Home", action = "Index" }
         );
 
         Shared.Logger.Instance = Logger.Instance;

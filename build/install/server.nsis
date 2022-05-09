@@ -67,12 +67,14 @@ Section "Server" g1o1
         # set the installation directory as the destination for the following actions
         SetOutPath $INSTDIR\Server
 
-        File /r "${MYSOURCE}/Server/FileFlows-Runner"
         File /r "${MYSOURCE}/Server/Plugins"
         File /r "${MYSOURCE}/Server/Nodes"
         File /r "${MYSOURCE}/Server/Templates"
         File /r "${MYSOURCE}/Server/wwwroot"
         File "${MYSOURCE}/Server/"
+
+        SetOutPath $INSTDIR\FlowRunner
+        File /r "${MYSOURCE}/FlowRunner"
         
         SetOutPath $INSTDIR\Server\runtimes
         File /r "${MYSOURCE}/Server/runtimes/win*"
@@ -115,9 +117,10 @@ Section /o "Node" g1o2
         File "${MYSOURCE}/Node/*.bat"
 
         SetOutPath $INSTDIR\Node
-
-        File /r "${MYSOURCE}/Server/FileFlows-Runner"
         File "${MYSOURCE}/Node/Node/*"
+
+        SetOutPath $INSTDIR\FlowRunner
+        File /r "${MYSOURCE}/FlowRunner"
 
         SetOutPath $INSTDIR\Node\runtimes
         File /r "${MYSOURCE}/Server/runtimes/win*"
@@ -165,7 +168,8 @@ Section "uninstall"
 
         # Remove the links from the start menu
         RMDir /r "$INSTDIR\Server"       
-        RMDir /r "$INSTDIR\Node"    
+        RMDir /r "$INSTDIR\Node"      
+        RMDir /r "$INSTDIR\FlowRunner"    
         RMDir /r "$SMPROGRAMS\FileFlows"
     
         # Delete the uninstaller

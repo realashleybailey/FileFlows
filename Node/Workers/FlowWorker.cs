@@ -146,7 +146,7 @@ namespace FileFlows.Node.Workers
                     }.Where(x => x != null).ToArray();
 #pragma warning restore CS8601 // Possible null reference assignment.
 
-#if (DEBUG)
+#if (DEBUG && false)
                     FileFlows.FlowRunner.Program.Main(parameters);
 #else
                     using (Process process = new Process())
@@ -154,7 +154,7 @@ namespace FileFlows.Node.Workers
                         try
                         {
                             process.StartInfo = new ProcessStartInfo();
-                            string dir = Path.Combine(new FileInfo(typeof(FlowWorker).Assembly.Location)?.DirectoryName ?? string.Empty, "FileFlows-Runner");
+                            string dir = Path.Combine(DirectoryHelper.FlowRunnerDirectory);
                             process.StartInfo.FileName = GetDotnetLocation();
                             process.StartInfo.WorkingDirectory = dir;
                             process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");

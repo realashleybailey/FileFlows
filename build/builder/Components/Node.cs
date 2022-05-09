@@ -7,7 +7,7 @@ public class Node : Component
 
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Node");
 
-        MakeInstaller();        
+        //MakeInstaller();        
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, "node\\-upgrade\\.(ps1|bat|sh)$");
 
         // we want to make a "Node" directory inside the zip, this is so we keep the directory structure of
@@ -18,6 +18,7 @@ public class Node : Component
 
         Utils.DeleteFiles(BuildOptions.TempPath + "/Node/Node", "run-node.*");
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Node", false, @"run-node\.(bat|sh)$");
+        Utils.CopyFiles(BuildOptions.TempPath + "/FlowRunner", BuildOptions.TempPath + "/Node/FlowRunner");
 
         Utils.Zip(BuildOptions.TempPath + "/Node", $"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip");
         Utils.DeleteFiles(BuildOptions.TempPath + "/Node", "node-upgrade.*");

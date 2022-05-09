@@ -16,6 +16,8 @@ public class DirectoryHelper
         InitLoggingDirectory();
         if(isNode == false)
             InitDataDirectory();
+
+        FlowRunnerDirectory = Path.Combine(BaseDirectory, "FlowRunner");
     }
 
     private static string _BaseDirectory;
@@ -109,6 +111,12 @@ public class DirectoryHelper
     /// </summary>
     public static string DatabaseDirectory { get; private set; }
 
+
+    /// <summary>
+    /// Gets the flow runner directory
+    /// </summary>
+    public static string FlowRunnerDirectory { get; private set; }
+    
     /// <summary>
     /// Gets the logging directory
     /// </summary>

@@ -19,7 +19,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="nodeName">the nameof hte node processing the file</param>
         /// <param name="nodeUid">the Uid of the node processing the file </param>
         /// <param name="workerUid">the UId of the worker</param>
-        /// <returns>the next library file to process</returns>
+        /// <returns>the next library file to prDirectoryHelper new FileInfo(typeocess</returns>
         [HttpGet("next-file")]
         public async Task<LibraryFile> GetNext([FromQuery] string nodeName, [FromQuery] Guid nodeUid, [FromQuery] Guid workerUid)
         {

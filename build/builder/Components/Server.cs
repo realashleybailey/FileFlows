@@ -25,11 +25,13 @@ public class Server : Component
         Directory.Move(BuildOptions.TempPath + "/Server", BuildOptions.TempPath + "/Server2"); //move this since we cant move it to itself
         Directory.CreateDirectory(BuildOptions.TempPath + "/Server");
         Directory.Move(BuildOptions.TempPath + "/Server2", BuildOptions.TempPath + "/Server/Server");
-        Utils.CopyFiles(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Server/Node");
+        Utils.CopyFiles(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Server");
+        Utils.DeleteDirectoryIfExists(BuildOptions.TempPath + "/Server/Node/FlowRunner");
         
+
+        Utils.CopyFiles(BuildOptions.TempPath + "/FlowRunner", BuildOptions.TempPath + "/Server/FlowRunner");
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server/Server", "run-server.*");
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Server", false, @"run-server\.(bat|sh)$");
-        Utils.CopyFiles(BuildOptions.SourcePath + "/Node", BuildOptions.TempPath + "/Server", false, @"run-node\.(bat|sh)$");
 
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");
     }

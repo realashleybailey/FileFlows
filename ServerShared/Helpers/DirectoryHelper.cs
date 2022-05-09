@@ -32,16 +32,10 @@ public class DirectoryHelper
         {
             if (string.IsNullOrEmpty(_BaseDirectory))
             {
-                if(IsDocker)
-                    _BaseDirectory = Directory.GetCurrentDirectory();
-                else
-                {
-                    string dir = Directory.GetCurrentDirectory();
-                    if (dir.Replace("\\", "/").ToLower().EndsWith("/server") ||
-                        dir.Replace("\\", "/").ToLower().EndsWith("/node"))
-                        dir = new DirectoryInfo(dir).Parent.FullName;
-                    _BaseDirectory = dir;
-                }
+                var dllDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                if (string.IsNullOrEmpty(dllDir))
+                    throw new Exception("Failed to find DLL directory");
+                _BaseDirectory = new DirectoryInfo(dllDir).Parent.FullName;
             }
             return _BaseDirectory;
         }

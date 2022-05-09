@@ -114,7 +114,7 @@ public class DirectoryHelper
     /// <summary>
     /// Gets the logging directory
     /// </summary>
-    public static string PluginsDirectory => Path.Combine(Directory.GetCurrentDirectory(), "Plugins");
+    public static string PluginsDirectory => Path.Combine(BaseDirectory, IsNode ? "Node" : "Server", "Plugins");
     
     /// <summary>
     /// Gets the location of the encryption key file

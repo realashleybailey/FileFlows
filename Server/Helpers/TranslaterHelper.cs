@@ -6,11 +6,9 @@ namespace FileFlows.Server.Helpers
     {
         internal static void InitTranslater(string langCode = "en")
         {
-            string appdir = Directory.GetCurrentDirectory();
+            string appdir = DirectoryHelper.BaseDirectory + "/Server";
             string wwwroot = Path.Combine(appdir, $"wwwroot");
             
-            if (Directory.Exists(wwwroot) == false)
-                wwwroot = Path.Combine(appdir, "..", "wwwroot");
             wwwroot = Path.Combine(wwwroot, "i18n", $"{langCode}.json");
 
             List<string> json = new List<string>();
@@ -19,7 +17,7 @@ namespace FileFlows.Server.Helpers
             else
                 Logger.Instance.ILog("Language file not found: " + wwwroot);
 
-            foreach (var file in new DirectoryInfo(Path.Combine(appdir, "Plugins"))
+            foreach (var file in new DirectoryInfo(DirectoryHelper.PluginsDirectory)
                                         .GetFiles($"*{langCode}.json", SearchOption.AllDirectories)
                                         .OrderByDescending(x => x.CreationTime)
                                         .DistinctBy(x => x.Name))

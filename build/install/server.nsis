@@ -7,7 +7,8 @@ OutFile "${MYSOURCE}/Server-Installer.exe"
 ;Include Modern UI
 
   !include "MUI2.nsh"
-
+  !define MUI_BGCOLOR 222222
+  !define MUI_HEADERIMAGE_BITMAP "header.bmp"
 ;--------------------------------
  
 # define installation directory
@@ -16,6 +17,7 @@ Icon "../../icon.ico"
 Name "FileFlows"
 LicenseData "eula.rtf"
 SetCompressor /SOLID lzma
+#222222
 
 # For removing Start Menu shortcut in Windows 7
 RequestExecutionLevel user
@@ -43,6 +45,13 @@ LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
   !insertmacro MUI_UNPAGE_INSTFILES
 ;--------------------------------
 
+;--------------------------------
+;Languages
+ 
+  !insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
+
 #Page license
 #Page directory
 #Page components 
@@ -54,12 +63,12 @@ LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
 
 
 # start default section
-Section !FileFlows
-  SectionIn RO
-SectionEnd
+#Section !FileFlows
+#  SectionIn RO
+#SectionEnd
 
 
-Section "Server" g1o1
+Section "FileFlows Server" g1o1
     ServerInstall:
 
     IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
@@ -106,7 +115,7 @@ Section "Server" g1o1
     ServerDone:
 SectionEnd
 
-Section /o "Node" g1o2
+Section /o "FileFlows Node" g1o2
 
     NodeInstall:
 
@@ -189,6 +198,20 @@ Section "uninstall"
 # uninstaller section end
 SectionEnd
 
+;--------------------------------
+;Descriptions
+
+  ;Language strings
+  LangString DESC_g1o1 ${LANG_ENGLISH} "Install the main FileFlows server.  This is all that is needed for a basic FileFlows installation."
+  LangString DESC_g1o2 ${LANG_ENGLISH} "Install an external processing node that will connect to an existing FileFlows server."
+
+  ;Assign language strings to sections
+  !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${g1o1} $(DESC_g1o1)
+    !insertmacro MUI_DESCRIPTION_TEXT ${g1o2} $(DESC_g1o2)
+  !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+;--------------------------------
 
 ;--------------------------------
 

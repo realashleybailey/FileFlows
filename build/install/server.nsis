@@ -57,7 +57,7 @@ Section !FileFlows
 SectionEnd
 
 
-Section /o "Server" g1o1
+Section "Server" g1o1
     ServerInstall:
 
     IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
@@ -156,7 +156,7 @@ Section "uninstall"
         IfFileExists $INSTDIR\Server\FileFlows.Server.dll 0 +3
             Delete "$INSTDIR\Server\FileFlows.Server.dll"
             IfErrors UninstallAppRunning
-
+            
         IfFileExists $INSTDIR\Node\FileFlows.Node.dll 0 +3
             Delete "$INSTDIR\Node\FileFlows.Node.dll"
             IfErrors UninstallAppRunning
@@ -194,7 +194,7 @@ SectionEnd
 
 Function .onInit
 
-  StrCpy ${g1o1} $1; Group 1 - Option 1 is selected by default
+  StrCpy $1 ${g1o1} ; Group 1 - Option 1 is selected by default
 
 FunctionEnd
 

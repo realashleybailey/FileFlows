@@ -11,6 +11,7 @@ public class Server : Component
 
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "*EntityFramework*.*", true);
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "Avalonia.Themes.Fluent.dll", true);
+        Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "appsettings.Development.json", true);
 
         Utils.EnsureDirectoryExists(OutputPath + "/Plugins");
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");

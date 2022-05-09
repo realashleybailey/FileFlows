@@ -1,1 +1,0 @@
-dotnet FileFlows.Server.dll

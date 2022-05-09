@@ -26,6 +26,8 @@ public class Program
             Docker = args?.Any(x => x == "--docker") == true;
             var noGui = args?.Any((x => x.ToLower() == "--no-gui")) == true || Docker;
             DirectoryHelper.Init(Docker, false);
+            Logger.Instance = new Server.Logger();
+            Logger.Instance.ILog("Starting FileFlows v" + Globals.Version);
             InitEncryptionKey();
 
             if (Docker == false)
@@ -113,19 +115,6 @@ public class Program
             Helpers.Decrypter.EncryptionKey = key;
         }
     }
-    //
-    // internal static string GetAppDirectory()
-    // {
-    //     var dir = Directory.GetCurrentDirectory();
-    //     if (Docker)
-    //     {
-    //         // docker we move this to the Data directory which is configured outside of the docker image
-    //         // this is so the database and any plugins that are downloaded will be kept if the docker
-    //         // image is updated/re-downloaded.
-    //         dir = Path.Combine(dir, "Data");
-    //     }
-    //     return dir;
-    // }
 
 
     // Avalonia configuration, don't remove; also used by visual designer.

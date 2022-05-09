@@ -46,6 +46,9 @@ public class DirectoryHelper
             return _BaseDirectory;
         }
     }
+    
+    private static string ExecutingDirectory => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
 
     /// <summary>
     /// Inits the logging directory and moves any files if they need to be moved
@@ -57,7 +60,7 @@ public class DirectoryHelper
             Directory.CreateDirectory(dir);
         
         // look for logs from other directories
-        string localLogs = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+        string localLogs = Path.Combine(ExecutingDirectory, "Logs");
         if(localLogs != dir && Directory.Exists(localLogs))
             MoveDirectoryContent(localLogs, dir);
         

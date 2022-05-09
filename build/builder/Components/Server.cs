@@ -25,7 +25,7 @@ public class Server : Component
         Directory.Move(BuildOptions.TempPath + "/Server", BuildOptions.TempPath + "/Server2"); //move this since we cant move it to itself
         Directory.CreateDirectory(BuildOptions.TempPath + "/Server");
         Directory.Move(BuildOptions.TempPath + "/Server2", BuildOptions.TempPath + "/Server/Server");
-        Directory.CopyFiles(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Server/Node");
+        Utils.CopyFiles(BuildOptions.TempPath + "/Node", BuildOptions.TempPath + "/Server/Node");
         
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server/Server", "run-server.*");
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Server", false, @"run-server\.(bat|sh)$");

@@ -14,6 +14,7 @@ OutFile "${MYSOURCE}/Server-Installer.exe"
   !define MUI_BGCOLOR 222222
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_BITMAP "header.bmp"
+  !define MUI_HEADERIMAGE_UNBITMAP "header.bmp"
 ;--------------------------------
  
 # define installation directory
@@ -56,24 +57,11 @@ RequestExecutionLevel user
 ;--------------------------------
 
 
-#Page license
-#Page directory
-#Page components 
-#Page instfiles
-#
-#UninstPage uninstConfirm
-#UninstPage instfiles
-
-
-
-# start default section
-#Section !FileFlows
-#  SectionIn RO
-#SectionEnd
-
-
 Section "FileFlows Server" g1o1
     ServerInstall:
+
+    IfFileExists "$INSTDIR\Node" 0 +2
+        MessageBox MB_OK "FileFlows Node is already installed.  You cannot install both the Server and Node on the same machine." IDOK ServerDone
 
     IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
         Delete "$INSTDIR\Server\FileFlows.Server.dll"
@@ -122,6 +110,9 @@ SectionEnd
 Section /o "FileFlows Node" g1o2
 
     NodeInstall:
+    
+        IfFileExists "$INSTDIR\Server" 0 +2
+            MessageBox MB_OK "FileFlows Server is already installed.  You cannot install both the Server and Node on the same machine." IDOK NodeDone
 
         IfFileExists $INSTDIR\FileFlows.Node.dll 0 +3
             Delete "$INSTDIR\FileFlows.Node.dll"
@@ -171,24 +162,25 @@ Section "uninstall"
  
     Uninstall:
         # delete this file, if it fails the app is running
-        IfFileExists $INSTDIR\Server\FileFlows.Server.dll 0 +3
+        IfFileExists $INSTDIR\Server\FileFlows.Server.dll 0 +2
             Delete "$INSTDIR\Server\FileFlows.Server.dll"
             IfErrors UninstallAppRunning
             
-        IfFileExists $INSTDIR\Node\FileFlows.Node.dll 0 +3
+        IfFileExists $INSTDIR\Node\FileFlows.Node.dll 0 +2
             Delete "$INSTDIR\Node\FileFlows.Node.dll"
             IfErrors UninstallAppRunning
 
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlows"
 
-        RMDir /r "$INSTDIR\Server"       
-        RMDir /r "$INSTDIR\Node"      
-        RMDir /r "$INSTDIR\FlowRunner"    
         RMDir /r "$SMPROGRAMS\FileFlows"
-    
-        # Delete the uninstaller
-        Delete "$INSTDIR\Server\uninstaller.exe"
-        Delete "$INSTDIR\Node\uninstaller.exe"
+        
+        IfFileExists "$INSTDIR\Server" 0 +1
+            RMDir /r "$INSTDIR\Server"   
+            
+        IfFileExists "$INSTDIR\Node" 0 +1
+            RMDir /r "$INSTDIR\Node"   
+            
+        RMDir /r "$INSTDIR\FlowRunner"    
 
         MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO UninstallDone
             RMDir /r "$INSTDIR"

@@ -9,6 +9,8 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         Logger.Instance.DLog("HomeController.Index");
-        return File("~/index.html", "text/html");
+        string index = Path.Combine(DirectoryHelper.BaseDirectory, "Server", "wwwroot", "index.html");
+        using var stream = System.IO.File.OpenRead(index);
+        return File(stream, "text/html");
     }
 }

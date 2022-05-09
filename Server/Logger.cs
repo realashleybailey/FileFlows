@@ -6,44 +6,11 @@ public class Logger : FileFlows.Plugin.ILogger
 {
     Queue<string> LogTail = new Queue<string>(3000);
 
-    private string _LoggingPath;
-    public string LoggingPath
-    {
-        get => _LoggingPath;
-        set
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                if (Program.Docker)
-                {
-                    _LoggingPath = "/app/Logs";
-                }
-                else
-                {
-                    string current = Directory.GetCurrentDirectory();
-                    if (current.Replace("\\", "/").ToLower().EndsWith("fileflows/server"))
-                        current = new DirectoryInfo(Directory.GetCurrentDirectory())?.Parent?.FullName ?? current;
-
-                    string dir = Path.Combine(current, "Logs");
-                    if (Directory.Exists(dir) == false)
-                        Directory.CreateDirectory(dir);
-
-                    _LoggingPath = dir;
-                }
-            }
-            else 
-            {
-                _LoggingPath = value;
-            }
-            LogFile = Path.Combine(_LoggingPath, "FileFlows.log");
-        }
-    }
-
     public string LogFile { get; private set; }
 
-    public Logger(string loggingPath)
+    public Logger()
     {
-        this.LoggingPath = loggingPath;
+        this.LogFile = Path.Combine(DirectoryHelper.LoggingDirectory, DirectoryHelper.IsNode ? "FileFlowsNode.log" : "FileFlows.log");
         if (File.Exists(LogFile))
         {
             try
@@ -174,11 +141,7 @@ public class Logger : FileFlows.Plugin.ILogger
         get
         {
             if (_Instance == null)
-            {
-                // we pass in null here since this logger is created before we have access to the settings....
-                // may have to alter this later
-                _Instance = new Logger(null);
-            }
+                _Instance = new Logger();
             return _Instance;
         }
         set

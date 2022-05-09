@@ -152,7 +152,7 @@ namespace FileFlows.Server.Helpers
             DirectoryInfo di = new DirectoryInfo(pluginDir);
             FileHelper.CreateDirectoryIfNotExists(di.FullName);
 
-            var rootPlugins = new DirectoryInfo(Path.Combine(di.Parent.Parent.FullName, "Plugins"));
+            var rootPlugins = new DirectoryInfo(Path.Combine(DirectoryHelper.BaseDirectory, "Server/Plugins"));
 
             if (rootPlugins.Exists == false)
             {

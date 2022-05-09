@@ -5,8 +5,14 @@ namespace FileFlows.ServerShared.Helpers;
 /// </summary>
 public class DirectoryHelper
 {
-    private static bool IsDocker { get; set; }
-    private static bool IsNode { get; set; }
+    /// <summary>
+    /// Gets if this is a Docker instance or not
+    /// </summary>
+    public static bool IsDocker { get; private set; }
+    /// <summary>
+    /// Gets if this is a Node or Server
+    /// </summary>
+    public static bool IsNode { get; private set; }
 
     public static void Init(bool isDocker, bool isNode)
     {
@@ -46,7 +52,7 @@ public class DirectoryHelper
     /// </summary>
     private static void InitLoggingDirectory()
     {
-        string dir = IsDocker ? "/app/Logs" : Path.Combine(BaseDirectory, "Logs");
+        string dir = Path.Combine(BaseDirectory, "Logs");
         if (Directory.Exists(dir) == false)
             Directory.CreateDirectory(dir);
         
@@ -110,12 +116,21 @@ public class DirectoryHelper
     /// Gets the flow runner directory
     /// </summary>
     public static string FlowRunnerDirectory { get; private set; }
-    
+
     /// <summary>
     /// Gets the logging directory
     /// </summary>
-    public static string PluginsDirectory => Path.Combine(BaseDirectory, IsNode ? "Node" : "Server", "Plugins");
-    
+    public static string PluginsDirectory
+    {
+        get
+        {
+            // docker we expose this in the data directory so we
+            // reduce how many things we have to map out
+            if (IsDocker) 
+                return Path.Combine(DataDirectory, "Plugins");
+            return  Path.Combine(BaseDirectory, IsNode ? "Node" : "Server", "Plugins");
+        }
+    }
     /// <summary>
     /// Gets the location of the encryption key file
     /// </summary>

@@ -1,1 +1,3 @@
-dotnet Server\FileFlows.Server.dll
+cd Server
+dotnet FileFlows.Server.dll
+cd ..

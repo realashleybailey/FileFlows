@@ -264,9 +264,9 @@ namespace FileFlows.Server.Controllers
                     Enabled = true,
                     FlowRunners = 1,
 #if (DEBUG)
-                    TempPath = windows ? @"d:\videos\temp" : "/temp",
+                    TempPath = windows ? @"d:\videos\temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
 #else
-                    TempPath = Node.Globals.IsDocker ? "/temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
+                    TempPath = DirectoryHelper.IsDocker ? "/temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
 #endif
                 });
             }

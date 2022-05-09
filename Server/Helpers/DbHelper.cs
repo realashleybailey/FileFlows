@@ -368,7 +368,14 @@ namespace FileFlows.Server.Helpers
                 DateModified = DateTime.Now
             });
 
-            string tempPath = windows ? @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FileFlows\\Temp") : "/temp";
+            string tempPath;
+            if(DirectoryHelper.IsDocker)
+                tempPath = "/temp";
+            else if(windows)
+                tempPath = @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FileFlows\\Temp");
+            else
+                tempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+            
             if (Directory.Exists(tempPath) == false)
                 Directory.CreateDirectory(tempPath);
 

@@ -283,8 +283,7 @@ namespace FileFlows.Server.Helpers
                 Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
             }
             
-            string dir = Directory.GetCurrentDirectory();
-            dir = Path.Combine(dir, "wwwroot/i18n");
+            var dir = Path.Combine(DirectoryHelper.BaseDirectory, "Server/wwwroot/i18n");
 
             if(Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);

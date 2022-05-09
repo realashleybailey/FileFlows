@@ -177,7 +177,7 @@ Section "uninstall"
         Goto UninstallDone
 
     UninstallAppRunning:
-        MessageBox MB_RETRYCANCEL "FileFlows is currently running, please stop it and try again." IDCANCEL Done
+        MessageBox MB_RETRYCANCEL "FileFlows is currently running, please stop it and try again." IDCANCEL UninstallDone
         Goto Uninstall
 
     UninstallDone:

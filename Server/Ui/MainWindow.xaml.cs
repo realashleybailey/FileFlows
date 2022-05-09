@@ -158,7 +158,7 @@ public class MainWindowViewModel
     public MainWindowViewModel(MainWindow window)
     {
         this.Window = window;
-        this.ServerUrl = $"http://{Environment.MachineName}:{WebServer.Port}/";
+        this.ServerUrl = $"http://{Environment.MachineName.ToLower()}:{WebServer.Port}/";
         this.Version = "FileFlows Version: " + Globals.Version;
     }
 }

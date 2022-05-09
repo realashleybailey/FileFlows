@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 
@@ -96,7 +97,7 @@ public class NodeUpdater:Worker
                 return string.Empty;
             }
 
-            var updateDir = Path.Combine(Directory.GetCurrentDirectory(), "NodeUpdate");
+            var updateDir = Path.Combine(DirectoryHelper.BaseDirectory, "NodeUpdate");
             if (Directory.Exists(updateDir)) // delete the update dir so we get a full fresh update
                 Directory.Delete(updateDir, true);
             Directory.CreateDirectory(updateDir);
@@ -107,7 +108,7 @@ public class NodeUpdater:Worker
             // delete the upgrade file after extraction
             File.Delete(update);
 
-            var updateFile = Path.Combine(updateDir, "node-upgrade" + (Globals.IsWindows ? ".bat" : ".sh"));
+            var updateFile = Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade" + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
             {
                 Logger.Instance.WLog("No update script found: " + updateFile);

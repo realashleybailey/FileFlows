@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FileFlows.ServerShared.Helpers;
 
 namespace FileFlows.Node
 {
@@ -78,11 +79,11 @@ namespace FileFlows.Node
             {
                 WriteIndented = true
             });
-            File.WriteAllText(GetAppSettingsFile(), json);
+            File.WriteAllText(DirectoryHelper.NodeConfigFile, json);
         }
         public static AppSettings Load()
         {
-            string file = GetAppSettingsFile();
+            string file = DirectoryHelper.NodeConfigFile;
             if (File.Exists(file) == false)
             {
                 AppSettings settings = new();
@@ -103,17 +104,6 @@ namespace FileFlows.Node
         public static bool IsConfigured()
         {
             return string.IsNullOrWhiteSpace(Load().ServerUrl) == false;
-        }
-
-        private static string GetAppSettingsFile()
-        {
-            return Path.Combine(GetPath(), "fileflows.config");
-        }
-
-        private static string GetPath()
-        {
-            string dll = Assembly.GetExecutingAssembly().Location;
-            return Path.GetDirectoryName(dll) ?? string.Empty;
         }
     }
 }

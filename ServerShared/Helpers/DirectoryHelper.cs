@@ -82,6 +82,12 @@ public class DirectoryHelper
         if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), encryptKey)))
             File.Move(Path.Combine(Directory.GetCurrentDirectory(), encryptKey), EncryptionKeyFile);
         
+        const string nodeConfig = "node.config";
+        NodeConfigFile = Path.Combine(dir, nodeConfig);
+        if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "fileflows.config")))
+            File.Move(Path.Combine(Directory.GetCurrentDirectory(), "fileflows.config"), NodeConfigFile);
+        
+
         DatabaseDirectory = IsDocker == false ? dir : Path.Combine(dir, "Data");
         if (Directory.Exists(DatabaseDirectory) == false)
             Directory.CreateDirectory(DatabaseDirectory);
@@ -109,11 +115,14 @@ public class DirectoryHelper
     public static string PluginsDirectory => Path.Combine(Directory.GetCurrentDirectory(), "Plugins");
     
     /// <summary>
-    /// Gets the location of hte encryption key file
+    /// Gets the location of the encryption key file
     /// </summary>
     public static string EncryptionKeyFile { get;private set; }
 
-
+    /// <summary>
+    /// Gets the location of the node configuration file
+    /// </summary>
+    public static string NodeConfigFile { get; private set; }
 
 
     private static void MoveDirectoryContent(string source, string destination)

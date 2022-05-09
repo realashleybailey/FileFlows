@@ -2,7 +2,13 @@
 !define MYSOURCE "../../temp"
 OutFile "${MYSOURCE}/Server-Installer.exe"
 !include sections.nsh
-!include LogicLib.nsh
+
+;--------------------------------
+;Include Modern UI
+
+  !include "MUI2.nsh"
+
+;--------------------------------
  
 # define installation directory
 InstallDir "$APPDATA\FileFlows"
@@ -25,29 +31,25 @@ LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
 
 ;--------------------------------
 
+;--------------------------------
+;Pages
 
-!define SECTIONCOUNT 2 ; total -1
-;SaveSections adds one bit to the given variable for each selected component
-!macro SaveSections VAR
-    StrCpy ${VAR} 0
-    ${ForEach} $R0 ${SECTIONCOUNT} 0 - 1
-        IntOp ${VAR} ${VAR} << 1
-        ${If} ${SectionIsSelected} $R0
-            ;${DEBUG} "Section $R0 checked"
-            IntOp ${VAR} ${VAR} + 1
-        ${EndIf}
-    ${Next}
-!macroend
+  !insertmacro MUI_PAGE_LICENSE "eula.rtf"
+  !insertmacro MUI_PAGE_COMPONENTS
+  !insertmacro MUI_PAGE_DIRECTORY
+  !insertmacro MUI_PAGE_INSTFILES
+  
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+;--------------------------------
 
-Page license
-Page directory
-PageEx components
-    PageCallbacks DummyFunc DummyFunc componentsLeave
-PageExEnd
-Page instfiles
-
-UninstPage uninstConfirm
-UninstPage instfiles
+#Page license
+#Page directory
+#Page components 
+#Page instfiles
+#
+#UninstPage uninstConfirm
+#UninstPage instfiles
 
 
 
@@ -166,7 +168,6 @@ Section "uninstall"
 
         DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlows"
 
-        # Remove the links from the start menu
         RMDir /r "$INSTDIR\Server"       
         RMDir /r "$INSTDIR\Node"      
         RMDir /r "$INSTDIR\FlowRunner"    
@@ -209,16 +210,4 @@ Function .onSelChange
     !insertmacro RadioButton ${g1o2}
   !insertmacro EndRadioButtons
 
-FunctionEnd
-
-
-Function DummyFunc
-FunctionEnd
-
-Function componentsLeave
-    !insertmacro SaveSections $2
-    ${if} $2 = 0
-        MessageBox MB_OK|MB_ICONEXCLAMATION "You must select a component to install" /sd IDOK
-        Abort
-    ${endif}
 FunctionEnd

@@ -1,1 +1,1 @@
-dotnet FileFlows.Node.dll
+dotnet Node\FileFlows.Node.dll

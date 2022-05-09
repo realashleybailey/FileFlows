@@ -5,6 +5,7 @@ public class Node : Component
     {        
         base.Build();
 
+        Utils.DeleteFiles(BuildOptions.TempPath + "/Node", "Avalonia.Themes.Fluent.dll", true);
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Node");
 
         //MakeInstaller();        

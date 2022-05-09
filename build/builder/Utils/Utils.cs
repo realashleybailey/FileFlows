@@ -259,7 +259,7 @@ public static class Utils
         Logger.ILog("Deleted file: " + fi.FullName);
     }
 
-    public static void DeleteFiles(string path, string filename, bool recurisve = false, string pattern = "")
+    public static void DeleteFiles(string path, string filename, bool recurisve = false)
     {
         var dir = new DirectoryInfo(path);
         if (dir.Exists == false)

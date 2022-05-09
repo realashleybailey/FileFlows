@@ -9,6 +9,9 @@ public class Server : Component
         Utils.DeleteFile(BuildOptions.TempPath + "/Server/node-upgrade.bat");
         Utils.DeleteFile(BuildOptions.TempPath + "/Server/node-upgrade.sh");
 
+        Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "*EntityFramework*.*", true);
+        Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "Avalonia.Themes.Fluent.dll", true);
+
         Utils.EnsureDirectoryExists(OutputPath + "/Plugins");
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
         Utils.CopyFile($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip", BuildOptions.TempPath + "/Server/Nodes/");

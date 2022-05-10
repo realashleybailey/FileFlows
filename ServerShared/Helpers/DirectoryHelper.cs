@@ -20,8 +20,7 @@ public class DirectoryHelper
         DirectoryHelper.IsNode = isNode;
         
         InitLoggingDirectory();
-        if(isNode == false)
-            InitDataDirectory();
+        InitDataDirectory();
 
         FlowRunnerDirectory = Path.Combine(BaseDirectory, "FlowRunner");
     }

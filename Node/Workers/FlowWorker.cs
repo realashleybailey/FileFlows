@@ -154,9 +154,8 @@ namespace FileFlows.Node.Workers
                         try
                         {
                             process.StartInfo = new ProcessStartInfo();
-                            string dir = Path.Combine(DirectoryHelper.FlowRunnerDirectory);
                             process.StartInfo.FileName = GetDotnetLocation();
-                            process.StartInfo.WorkingDirectory = dir;
+                            process.StartInfo.WorkingDirectory = DirectoryHelper.FlowRunnerDirectory;
                             process.StartInfo.ArgumentList.Add("FileFlows.FlowRunner.dll");
                             foreach (var str in parameters)
                                 process.StartInfo.ArgumentList.Add(str);

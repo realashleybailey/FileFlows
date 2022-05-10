@@ -8,11 +8,11 @@ OutFile "${MYSOURCE}/Server-Installer.exe"
   !define MUI_ABORTWARNING
 
   !define MUI_ICON "../../icon.ico"
-  #!define MUI_UNICON "../../icon.ico"
 
   !define MUI_BGCOLOR 222222
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_BITMAP "header.bmp"
+  !define MUI_HEADERIMAGE_UNBITMAP "$PLUGINSDIR\header.bmp"
   
   !include "MUI2.nsh"
 ;--------------------------------
@@ -78,7 +78,7 @@ Section "FileFlows Server" g1o1
         File "${MYSOURCE}/Server/"
 
         SetOutPath $INSTDIR\FlowRunner
-        File /r "${MYSOURCE}/FlowRunner"
+        File /r "${MYSOURCE}/Server/FlowRunner"
         
         SetOutPath $INSTDIR\Tools
         File "${MYSOURCE}/ffmpeg.exe"
@@ -129,7 +129,7 @@ Section /o "FileFlows Node" g1o2
         File "${MYSOURCE}/Node/Node/*"
 
         SetOutPath $INSTDIR\FlowRunner
-        File /r "${MYSOURCE}/FlowRunner"
+        File /r "${MYSOURCE}/Server/FlowRunner"
 
         SetOutPath $INSTDIR\Tools
         File "${MYSOURCE}/ffmpeg.exe"

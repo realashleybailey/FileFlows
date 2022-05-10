@@ -1,10 +1,8 @@
-using FileFlows.Shared.Models;
-
 namespace FileFlows.Server;
 
 public class Logger : FileFlows.Plugin.ILogger
 {
-    Queue<string> LogTail = new Queue<string>(300);
+    Queue<LogTailItem> LogTail = new (3000);
 
     public string LogFile { get; private set; }
 
@@ -55,7 +53,11 @@ public class Logger : FileFlows.Plugin.ILogger
         try
         {
             Console.WriteLine(message);
-            LogTail.Enqueue(message);
+            LogTail.Enqueue(new LogTailItem
+            {
+                Type = (byte)type,
+                Message = System.Text.Encoding.UTF8.GetBytes(message)
+            });
             if (Program.WindowsGui == true)
                 return; // windows gui already captures all this
 
@@ -98,41 +100,20 @@ public class Logger : FileFlows.Plugin.ILogger
             length = 300;
 
         mutex.WaitOne();
-        string[] filtered;
+        LogTailItem[] filtered;
         try
         {
-            filtered = logLevel == Plugin.LogType.Debug ? LogTail.ToArray() : LogTail.Where(x =>
-            {
-                // if log level is error, must contain ERRR
-                if (logLevel == Plugin.LogType.Error)
-                    return x.Contains("ERRR");
-                // else if log level below error, if it contains ERR, the logging level also includes this
-                if (x.Contains("ERRR"))
-                    return x.Contains("ERRR");
-
-                // same logic as error, warning is next highest
-                if (logLevel == Plugin.LogType.Warning)
-                    return x.Contains("WARN");
-                if (x.Contains("WARN"))
-                    return false;
-
-                if (logLevel == Plugin.LogType.Info)
-                    return x.Contains("INFO");
-                if (x.Contains("INFO"))
-                    return false;
-
-                return true;
-            }).ToArray();
+            filtered = logLevel == Plugin.LogType.Debug ? LogTail.ToArray() : LogTail.Where(x => x.Type <= (byte)logLevel).ToArray();
         }
         finally
         {
             mutex.ReleaseMutex();
         }
-        if (length == -1)
-            return string.Join(Environment.NewLine, filtered.ToArray());
-        if (filtered.Count() <= length)
-            return String.Join(Environment.NewLine, filtered);
-        return String.Join(Environment.NewLine, filtered.Skip(filtered.Count() - length));
+
+        bool all = filtered.Length <= length;
+        return string.Join(Environment.NewLine, 
+            (all ? filtered : filtered.Skip(filtered.Count() - length))
+            .Select(x => System.Text.Encoding.UTF8.GetString(x.Message)));
     }
 
     static FileFlows.Plugin.ILogger _Instance;
@@ -149,5 +130,11 @@ public class Logger : FileFlows.Plugin.ILogger
             if (value != null)
                 _Instance = value;
         }
+    }
+    
+    private struct LogTailItem
+    {
+        public byte Type { get; set; }
+        public byte[] Message { get; set; }
     }
 }

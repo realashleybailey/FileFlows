@@ -41,7 +41,12 @@ public class Server : Component
     }
     public void MakeInstaller()
     {
-        Nsis.Build(BuildOptions.SourcePath + "/build/install/server.nsis");
+        string nsisFile = BuildOptions.SourcePath + "/build/install/server.nsis";
+        Utils.RegexReplace(nsisFile, "VIProductVersion \"[^\"]+\"", $"VIProductVersion = \"{Globals.Version}\"");
+        Utils.RegexReplace(nsisFile, "\"LegalCopyright\" \"[^\"]+\"", $"\"LegalCopyright\" \"Copyright FileFlows {DateTime.Now.Year}\"");
+        Utils.RegexReplace(nsisFile, "\"FileVersion\" \"[^\"]+\"", $"\"FileVersion\" \"{(Globals.Version.Substring(0, Globals.Version.LastIndexOf(".")))}\"");
+
+        Nsis.Build(nsisFile);
         Utils.CopyFile(BuildOptions.TempPath + "/Server-Installer.exe", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.exe");
     }
 

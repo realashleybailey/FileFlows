@@ -27,35 +27,35 @@ public class FileHelper
         {
             var fileInfo = new FileInfo(file);
             if (fileInfo.Exists == false)
-                return String.Empty;
+                return string.Empty;
 
             using var hasher = System.Security.Cryptography.SHA256.Create();
-            DateTime start = DateTime.Now;
             byte[] hash;
             if (fileInfo.Length > 100_000_000)
             {
                 // compute hash on first 100MB to speed it update
-                using (var stream = new FileStream(file, FileMode.Open))
-                {
-                    var bytes = new byte[100_000_000];
-                    int realLength = stream.Read(bytes, 0, bytes.Length);
-                    hash = hasher.ComputeHash(bytes, 0, realLength);
-                    bytes = null;
-                }
-                GC.Collect();
+                using var stream = new FileStream(file, FileMode.Open);
+                var bytes = new byte[100_000_000];
+                int realLength = stream.Read(bytes, 0, bytes.Length);
+                hash = hasher.ComputeHash(bytes, 0, realLength);
             }
             else
             {
                 using var stream = File.OpenRead(file);
                 hash = hasher.ComputeHash(stream);
             }
+
             string hashStr = BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
             return hashStr;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logger.Instance?.ELog($"Failed to calculate fingerprint for file '{file}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return string.Empty;
+        }
+        finally
+        {
+            GC.Collect();
         }
     }
 }

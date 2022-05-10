@@ -84,10 +84,10 @@ public class WebServer
         var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
         provider.Mappings[".br"] = "text/plain";
 
-        var wwwroot = Path.Combine(DirectoryHelper.BaseDirectory, "Server", "wwwroot");
+        //var wwwroot = Path.Combine(DirectoryHelper.BaseDirectory, "Server", "wwwroot");
         app.UseStaticFiles(new StaticFileOptions
         {
-            FileProvider = new PhysicalFileProvider(wwwroot),
+            //FileProvider = new PhysicalFileProvider(wwwroot),
             ContentTypeProvider = provider,
             OnPrepareResponse = x =>
             {

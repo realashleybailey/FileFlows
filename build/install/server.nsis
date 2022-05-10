@@ -78,7 +78,7 @@ Section "FileFlows Server" g1o1
         File "${MYSOURCE}/Server/"
 
         SetOutPath $INSTDIR\FlowRunner
-        File /r "${MYSOURCE}/FlowRunner"
+        File /r "${MYSOURCE}/FlowRunner/*"
         
         SetOutPath $INSTDIR\Tools
         File "${MYSOURCE}/ffmpeg.exe"

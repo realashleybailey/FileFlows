@@ -42,7 +42,7 @@ public class Server : Component
     public void MakeInstaller()
     {
         string nsisFile = BuildOptions.SourcePath + "/build/install/server.nsis";
-        Utils.RegexReplace(nsisFile, "VIProductVersion \"[^\"]+\"", $"VIProductVersion = \"{Globals.Version}\"");
+        Utils.RegexReplace(nsisFile, "VIProductVersion \"[^\"]+\"", $"VIProductVersion \"{Globals.Version}\"");
         Utils.RegexReplace(nsisFile, "\"LegalCopyright\" \"[^\"]+\"", $"\"LegalCopyright\" \"Copyright FileFlows {DateTime.Now.Year}\"");
         Utils.RegexReplace(nsisFile, "\"FileVersion\" \"[^\"]+\"", $"\"FileVersion\" \"{Globals.MajorVersion}\"");
 

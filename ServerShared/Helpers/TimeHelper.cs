@@ -1,29 +1,28 @@
-﻿namespace FileFlows.ServerShared.Helpers
+﻿namespace FileFlows.ServerShared.Helpers;
+
+public class TimeHelper
 {
-    public class TimeHelper
+    public static int GetCurrentQuarter()
     {
-        public static int GetCurrentQuarter()
-        {
-            DateTime date = DateTime.Now;
+        DateTime date = DateTime.Now;
 
-            int quarter = (((int)date.DayOfWeek) * 96) + (date.Hour * 4);
-            if (date.Minute >= 45)
-                quarter += 3;
-            else if (date.Minute >= 30)
-                quarter += 2;
-            else if (date.Minute >= 15)
-                quarter += 1;
-            return quarter;
-        }
+        int quarter = (((int)date.DayOfWeek) * 96) + (date.Hour * 4);
+        if (date.Minute >= 45)
+            quarter += 3;
+        else if (date.Minute >= 30)
+            quarter += 2;
+        else if (date.Minute >= 15)
+            quarter += 1;
+        return quarter;
+    }
 
 
-        public static bool InSchedule(string schedule)
-        {
-            if (string.IsNullOrEmpty(schedule) || schedule.Length != 672)
-                return true; // bad schedule treat as always in schedule
+    public static bool InSchedule(string schedule)
+    {
+        if (string.IsNullOrEmpty(schedule) || schedule.Length != 672)
+            return true; // bad schedule treat as always in schedule
 
-            int quarter = GetCurrentQuarter();
-            return schedule[quarter] == '1';
-        }
+        int quarter = GetCurrentQuarter();
+        return schedule[quarter] == '1';
     }
 }

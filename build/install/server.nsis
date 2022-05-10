@@ -23,6 +23,7 @@ Icon "../../icon.ico"
 Name "FileFlows"
 LicenseData "eula.rtf"
 SetCompressor /SOLID lzma
+!define REGPATH_UNINSTSUBKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
 
 # For removing Start Menu shortcut in Windows 7
 RequestExecutionLevel user
@@ -181,10 +182,15 @@ Section "uninstall"
             Delete "$INSTDIR\Node\FileFlows.Node.dll"
             IfErrors UninstallAppRunning
 
-        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlows"
+        DeleteRegKey HKLM "${REGPATH_UNINSTSUBKEY}"
 
         RMDir /r "$SMPROGRAMS\FileFlows"
+
+        MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO UninstallMinimal
+            RMDir /r "$INSTDIR"
+            Goto UninstallDone
         
+    UninstallMinimal:
         IfFileExists "$INSTDIR\Server" 0 +1
             RMDir /r "$INSTDIR\Server"   
             
@@ -192,12 +198,6 @@ Section "uninstall"
             RMDir /r "$INSTDIR\Node"   
             
         RMDir /r "$INSTDIR\FlowRunner"    
-
-        MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to remove all data?" IDNO UninstallDone
-            RMDir /r "$INSTDIR\Logs"
-            RMDir /r "$INSTDIR\Temp"
-            RMDir /r "$INSTDIR\Data"
-            RMDir /r "$INSTDIR"
         Goto UninstallDone
 
     UninstallAppRunning:

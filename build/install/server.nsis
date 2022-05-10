@@ -46,7 +46,7 @@ RequestExecutionLevel user
 
 ;--------------------------------
 ;Pages
-
+  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE ComponentsPageLeave
   #!insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "eula.rtf"
   !insertmacro MUI_PAGE_COMPONENTS
@@ -238,5 +238,25 @@ Function .onSelChange
     !insertmacro RadioButton ${g1o1}
     !insertmacro RadioButton ${g1o2}
   !insertmacro EndRadioButtons
+
+FunctionEnd
+
+
+Function ComponentsPageLeave
+
+  ${If} ${SectionIsSelected} ${g1o1}
+
+    IfFileExists "$INSTDIR\Node" 0 ComponentCheckDone
+        MessageBox MB_OK "FileFlows Node is already installed.  You cannot install both the Server and Node on the same machine." IDOK
+        Abort
+  ${ElseIf} ${SectionIsSelected} ${g1o2}
+      
+    IfFileExists "$INSTDIR\Server" 0 ComponentCheckDone
+        MessageBox MB_OK "FileFlows Server is already installed.  You cannot install both the Server and Node on the same machine." IDOK
+        Abort
+
+  ${EndIf}
+
+  ComponentCheckDone:
 
 FunctionEnd

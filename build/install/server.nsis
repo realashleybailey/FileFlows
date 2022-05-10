@@ -191,13 +191,17 @@ Section "uninstall"
             Goto UninstallDone
         
     UninstallMinimal:
-        IfFileExists "$INSTDIR\Server" 0 +1
+        IfFileExists "$INSTDIR\Server" 0 +\2
             RMDir /r "$INSTDIR\Server"   
+            Delete "$INSTDIR\FileFlows.lnk"
             
-        IfFileExists "$INSTDIR\Node" 0 +1
-            RMDir /r "$INSTDIR\Node"   
+        IfFileExists "$INSTDIR\Node" 0 +2
+            RMDir /r "$INSTDIR\Node"               
+            Delete "$INSTDIR\FileFlows Node.lnk"
             
         RMDir /r "$INSTDIR\FlowRunner"    
+        
+        Delete "$INSTDIR\uninstall.exe"
         Goto UninstallDone
 
     UninstallAppRunning:

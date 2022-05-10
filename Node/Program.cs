@@ -119,31 +119,38 @@ public class Program
                 
                 Manager.Start();
 
-                Shared.Logger.Instance?.ILog("Press Esc to quit");
+                if (Globals.IsDocker == false)
+                {
+                    Shared.Logger.Instance?.ILog("Press Esc to quit");
 
-                try
-                {
-                    Task.WhenAny(new []
+                    try
                     {
-                        new Task( () =>
+                        Task.WhenAny(new[]
                         {
-                            while (true)
+                            new Task(() =>
                             {
-                                var key = Console.ReadKey();
-                                if (key.Key == ConsoleKey.Escape)
-                                    break;
-                            }
-                        }),
-                        new Task(() =>
-                        {
-                            while (Exiting == false)
-                                Thread.Sleep(100);
-                        })
-                    });
+                                while (true)
+                                {
+                                    var key = Console.ReadKey();
+                                    if (key.Key == ConsoleKey.Escape)
+                                        break;
+                                }
+                            }),
+                            new Task(() =>
+                            {
+                                while (Exiting == false)
+                                    Thread.Sleep(100);
+                            })
+                        });
+                    }
+                    catch (Exception)
+                    {
+                        // can throw an exception if not run from console
+                        Thread.Sleep(-1);
+                    }
                 }
-                catch (Exception)
+                else
                 {
-                    // can throw an exception if not run from console
                     Thread.Sleep(-1);
                 }
 

@@ -5,16 +5,16 @@ OutFile "${MYSOURCE}/Server-Installer.exe"
 
 ;--------------------------------
 ;Include Modern UI
-  !include "MUI2.nsh"
   !define MUI_ABORTWARNING
 
   !define MUI_ICON "../../icon.ico"
-  !define MUI_UNICON "../../icon.ico"
+  #!define MUI_UNICON "../../icon.ico"
 
   !define MUI_BGCOLOR 222222
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_BITMAP "header.bmp"
-  !define MUI_HEADERIMAGE_UNBITMAP "header.bmp"
+  
+  !include "MUI2.nsh"
 ;--------------------------------
  
 # define installation directory
@@ -224,16 +224,11 @@ SectionEnd
 
 ;--------------------------------
 
-;--------------------------------
-
 ; Functions
-
-; $1 stores the status of group 1
-; $2 stores the status of group 2
 
 Function .onInit
 
-  StrCpy $1 ${g1o1} ; Group 1 - Option 1 is selected by default
+  StrCpy $1 ${g1o1} 
 
 FunctionEnd
 

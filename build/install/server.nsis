@@ -88,7 +88,7 @@ Section "FileFlows Server" g1o1
         SetOutPath $INSTDIR\Server
     
         # create the uninstaller
-        WriteUninstaller "$INSTDIR\Server\uninstall.exe"
+        WriteUninstaller "$INSTDIR\uninstall.exe"
         WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "FileFlows Server"
         WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\Server\icon.ico"
         WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\uninstall.exe"'
@@ -100,7 +100,7 @@ Section "FileFlows Server" g1o1
     
         # create a shortcut named "new shortcut" in the start menu programs directory
         # point the new shortcut at the program uninstaller
-        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk" "$INSTDIR\Server\uninstall.exe"
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
         # create a shortcut named "new shortcut" in the start menu programs directory
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows.lnk" "dotnet.exe"" FileFlows.Server.dll" "$INSTDIR\Server\icon.ico"
@@ -142,7 +142,7 @@ Section /o "FileFlows Node" g1o2
         SetOutPath $INSTDIR\Node
     
         # create the uninstaller
-        WriteUninstaller "$INSTDIR\Node\uninstall.exe"
+        WriteUninstaller "$INSTDIR\uninstall.exe"
         WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "FileFlows Node"
         WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\Node\icon.ico"
         WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\uninstall.exe"'
@@ -153,7 +153,7 @@ Section /o "FileFlows Node" g1o2
 
         # create a shortcut named "new shortcut" in the start menu programs directory
         # point the new shortcut at the program uninstaller
-        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\Node\uninstall.exe"
+        CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
         # create a shortcut named "new shortcut" in the start menu programs directory
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\Node\icon.ico"

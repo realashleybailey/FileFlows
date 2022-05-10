@@ -128,9 +128,6 @@ Section /o "FileFlows Node" g1o2
             IfErrors NodeAppRunning
 
         # set the installation directory as the destination for the following actions
-        SetOutPath "$INSTDIR"
-        File "${MYSOURCE}/Node/*.bat"
-
         SetOutPath $INSTDIR\Node
         File "${MYSOURCE}/Node/Node/*"
 

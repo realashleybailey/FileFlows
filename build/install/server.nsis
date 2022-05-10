@@ -191,7 +191,7 @@ Section "uninstall"
             Goto UninstallDone
         
     UninstallMinimal:
-        IfFileExists "$INSTDIR\Server" 0 +\2
+        IfFileExists "$INSTDIR\Server" 0 +2
             RMDir /r "$INSTDIR\Server"   
             Delete "$INSTDIR\FileFlows.lnk"
             

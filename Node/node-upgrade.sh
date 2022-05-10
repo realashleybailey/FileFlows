@@ -4,10 +4,16 @@ if [%1 -ne 'docker']; then
   kill %1
 fi
 
+cd ..
 rmdir -rf Node
-mv NodeUpdate node
+rmdir -rf FlowRunnner
+del run-node.sh
 
-del node-upgrade.sh
+mv NodeUpdate/FlowRunnner ../FlowRunnner
+mv NodeUpdate/Node ../Node
+mv run-node.sh ../run-node.sh
+
+rmdir -rf NodeUpdate
 
 if [%1 -ne 'docker']; then 
   chmod +x run-node.sh

@@ -108,7 +108,7 @@ public class NodeUpdater:Worker
             // delete the upgrade file after extraction
             File.Delete(update);
 
-            var updateFile = Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade" + (Globals.IsWindows ? ".bat" : ".sh"));
+            var updateFile = Path.Combine(updateDir, "node-upgrade" + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
             {
                 Logger.Instance.WLog("No update script found: " + updateFile);

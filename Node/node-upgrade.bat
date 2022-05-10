@@ -6,7 +6,6 @@ start ..\node-upgrade.bat "UPDATE" %1 & exit
 GOTO Done
 
 :RunUpdate
-cd ..
 timeout /t 3
 echo Stopping FileFlows Node if running
 taskkill %2

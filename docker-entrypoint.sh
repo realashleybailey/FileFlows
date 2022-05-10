@@ -6,10 +6,10 @@ set -e
 if [[ "$FFNODE" == 'true' || "$FFNODE" == '1' || "$1" = '--node' ]]; then
 
     # check if there is an upgrade to apply
-    if test -f "/app/node-upgrade.sh"; then
+    if test -f "/app/NodeUpgrade/node-upgrade.sh"; then
         echo "Upgrade found"
-        chmod +x /app/node-upgrade.sh
-        cd /app
+        chmod +x /app/NodeUpgrade/node-upgrade.sh
+        cd /app/NodeUpgrade
         exec node-upgrade.sh docker
     fi
 

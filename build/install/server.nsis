@@ -88,6 +88,10 @@ Section "FileFlows Server" g1o1
     
         # create the uninstaller
         WriteUninstaller "$INSTDIR\Server\uninstall.exe"
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "FileFlows Server"
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\Server\icon.ico"
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\uninstall.exe"'
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "QuietUninstallString" '"$InstDir\uninstall.exe" /S'
 
         #IfFileExists "$SMPROGRAMS\FileFlows" 0 EndIf
         CreateDirectory "$SMPROGRAMS\FileFlows"
@@ -99,6 +103,7 @@ Section "FileFlows Server" g1o1
 
         # create a shortcut named "new shortcut" in the start menu programs directory
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows.lnk" "dotnet.exe"" FileFlows.Server.dll" "$INSTDIR\Server\icon.ico"
+        CreateShortcut "$INSTDIR\FileFlows.lnk" "dotnet.exe"" FileFlows.Server.dll" "$INSTDIR\Server\icon.ico"
 
         ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows.lnk"
         Goto ServerDone
@@ -137,11 +142,13 @@ Section /o "FileFlows Node" g1o2
     
         # create the uninstaller
         WriteUninstaller "$INSTDIR\Node\uninstall.exe"
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "FileFlows Node"
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\Node\icon.ico"
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\uninstall.exe"'
+        WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "QuietUninstallString" '"$InstDir\uninstall.exe" /S'
     
         CreateDirectory "$SMPROGRAMS\FileFlows"
 
-        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "DisplayName" "FileFlows Node"
-        WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\FileFlowsNode" "UninstallString" '"$INSTDIR\Node\uninstall.exe"'
 
         # create a shortcut named "new shortcut" in the start menu programs directory
         # point the new shortcut at the program uninstaller
@@ -149,6 +156,7 @@ Section /o "FileFlows Node" g1o2
 
         # create a shortcut named "new shortcut" in the start menu programs directory
         CreateShortcut "$SMPROGRAMS\FileFlows\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\Node\icon.ico"
+        CreateShortcut "$INSTDIR\FileFlows Node.lnk" "dotnet.exe"" FileFlows.Node.dll" "$INSTDIR\Node\icon.ico"
 
         ExecShell "" "$SMPROGRAMS\FileFlows\FileFlows Node.lnk"
         Goto NodeDone

@@ -22,6 +22,9 @@ public class Server : Component
         if(Utils.DirectoryIsEmpty(OutputPath + "/Plugins"))
             File.WriteAllText(OutputPath + "/Plugins/readme.txt", "This is where plugins are installed");
 
+        if(File.Exists(BuildOptions.SourcePath + "/build/dependencies/ffmpeg.exe"))
+            File.Copy(BuildOptions.SourcePath + "/build/dependencies/ffmpeg.exe", BuildOptions.TempPath + "/ffmpeg.exe");
+
         MakeInstaller();        
 
         // we want to make a "Server" directory inside the zip, this is so we keep the directory structure of

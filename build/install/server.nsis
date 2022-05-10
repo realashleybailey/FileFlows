@@ -80,6 +80,9 @@ Section "FileFlows Server" g1o1
         SetOutPath $INSTDIR\FlowRunner
         File /r "${MYSOURCE}/FlowRunner"
         
+        SetOutPath $INSTDIR\Tools
+        File "${MYSOURCE}/ffmpeg.exe"
+        
         SetOutPath $INSTDIR\Server\runtimes
         File /r "${MYSOURCE}/Server/runtimes/win*"
         SetOutPath $INSTDIR\Server
@@ -127,6 +130,9 @@ Section /o "FileFlows Node" g1o2
 
         SetOutPath $INSTDIR\FlowRunner
         File /r "${MYSOURCE}/FlowRunner"
+
+        SetOutPath $INSTDIR\Tools
+        File "${MYSOURCE}/ffmpeg.exe"
 
         SetOutPath $INSTDIR\Node\runtimes
         File /r "${MYSOURCE}/Server/runtimes/win*"

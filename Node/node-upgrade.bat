@@ -14,14 +14,21 @@ taskkill %2
 echo.
 echo Removing previous version
 rmdir /q /s Node
+rmdir /q /s FlowRunner
 
 echo.
 echo Copying Node update files
-rename NodeUpdate Node
+move NodeUpdate/FlowRunner FlowRunner
+move NodeUpdate/Node Node
+rmdir /q /s NodeUpdate
 
 echo.
 echo Starting FileFlows Node
-start run-node.bat
+if exist "FileFlows Node.lnk"(
+    start "FileFlows Node.lnk"
+) else (
+    start run-node.bat
+)
 
 if exist node-upgrade.bat goto Done
 del node-upgrade.bat & exit

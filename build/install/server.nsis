@@ -46,9 +46,9 @@ RequestExecutionLevel user
 
 ;--------------------------------
 ;Pages
-  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE ComponentsPageLeave
   #!insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "eula.rtf"
+  !define MUI_PAGE_CUSTOMFUNCTION_LEAVE ComponentsPageLeave
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES

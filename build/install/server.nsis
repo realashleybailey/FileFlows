@@ -64,9 +64,6 @@ RequestExecutionLevel user
 Section "FileFlows Server" g1o1
     ServerInstall:
 
-    IfFileExists "$INSTDIR\Node" 0 +2
-        MessageBox MB_OK "FileFlows Node is already installed.  You cannot install both the Server and Node on the same machine." IDOK ServerDone
-
     IfFileExists $INSTDIR\ServerFileFlows.Server.dll 0 +3
         Delete "$INSTDIR\Server\FileFlows.Server.dll"
         IfErrors ServerAppRunning
@@ -119,9 +116,6 @@ SectionEnd
 Section /o "FileFlows Node" g1o2
 
     NodeInstall:
-    
-        IfFileExists "$INSTDIR\Server" 0 +2
-            MessageBox MB_OK "FileFlows Server is already installed.  You cannot install both the Server and Node on the same machine." IDOK NodeDone
 
         IfFileExists $INSTDIR\FileFlows.Node.dll 0 +3
             Delete "$INSTDIR\FileFlows.Node.dll"

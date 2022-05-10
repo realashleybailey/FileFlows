@@ -354,7 +354,7 @@ namespace FileFlows.Server.Helpers
             await AddOrUpdateObject(db, new Tool
             {
                 Name = "FFMpeg",
-                Path = windows ? Path.Combine(Directory.GetCurrentDirectory(), @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
+                Path = windows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now
             });

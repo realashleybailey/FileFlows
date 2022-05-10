@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using FileFlows.ServerShared.Helpers;
 
 namespace FileFlows.Node;
 
@@ -87,7 +88,7 @@ public class NodeManager
     public async Task<bool> Register()
     {
         string dll = Assembly.GetExecutingAssembly().Location;
-        string path = new FileInfo(dll).DirectoryName ?? string.Empty;
+        string path = DirectoryHelper.BaseDirectory;
 
         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 

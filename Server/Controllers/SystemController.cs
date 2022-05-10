@@ -42,7 +42,7 @@ public class SystemController:Controller
     [HttpGet("node-updater")]
     public IActionResult GetNodeUpdater([FromQuery] bool windows)
     {
-        string updateFile = Path.Combine(Directory.GetCurrentDirectory(), "Nodes",
+        string updateFile = Path.Combine(DirectoryHelper.BaseDirectory, "Server", "Nodes",
             $"FileFlows-Node-{Globals.Version}.zip");
         if (System.IO.File.Exists(updateFile) == false)
             return new ContentResult();

@@ -4,7 +4,7 @@ namespace FileFlows.Server;
 
 public class Logger : FileFlows.Plugin.ILogger
 {
-    Queue<string> LogTail = new Queue<string>(3000);
+    Queue<string> LogTail = new Queue<string>(300);
 
     public string LogFile { get; private set; }
 
@@ -35,7 +35,7 @@ public class Logger : FileFlows.Plugin.ILogger
 
         var now = DateTime.Now;
 
-        return now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + prefix + " -> ";
+        return now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - " + prefix + " -> ";
     }
 
     private Mutex mutex = new Mutex();

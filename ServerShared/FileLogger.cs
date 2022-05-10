@@ -33,7 +33,7 @@ public class FileLogger : Plugin.ILogger
             _ => ""
         };
 
-        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffff") + " [" + prefix + "]-> "  + string.Join(", ", args.Select(x =>
+        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " [" + prefix + "]-> "  + string.Join(", ", args.Select(x =>
             x == null ? "null" :
             x.GetType().IsPrimitive ? x.ToString() :
             x is string ? x.ToString() :

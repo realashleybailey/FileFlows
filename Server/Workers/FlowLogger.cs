@@ -24,7 +24,7 @@ public class FlowLogger : ILogger
     {
         if (args == null || args.Length == 0)
             return;
-        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + type + " -> " +
+        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - " + type + " -> " +
             string.Join(", ", args.Select(x =>
             x == null ? "null" :
             x.GetType().IsPrimitive || x is string ? x.ToString() :

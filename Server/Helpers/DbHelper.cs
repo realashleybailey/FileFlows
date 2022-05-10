@@ -363,7 +363,6 @@ namespace FileFlows.Server.Helpers
             {
                 Name = "Settings",
                 AutoUpdatePlugins = true,
-                LoggingPath = DirectoryHelper.LoggingDirectory,
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now
             });

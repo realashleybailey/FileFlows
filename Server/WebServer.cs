@@ -159,8 +159,8 @@ public class WebServer
             new LibraryWorker(),
             new FlowWorker(string.Empty, isServer: true),
             new PluginUpdaterWorker(),
-            new TelemetryReporter(),
-            isWindows ? new AutoUpdater() : null
+            new TelemetryReporter()//,
+            //isWindows ? new AutoUpdater() : null
         );
 
         app.MapHub<Hubs.FlowHub>("/flow");
@@ -187,7 +187,7 @@ public class WebServer
             Logger.Instance.ILog("Startup cleanup");
             Workers.AutoUpdater.CleanUpOldFiles(60_000);
 
-            string? source = new Controllers.SettingsController().Get().Result?.LoggingPath;
+            string? source = DirectoryHelper.LoggingDirectory;
             if (string.IsNullOrEmpty(source))
                 return;
 

@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace FileFlows.ServerShared.Helpers;
 
 /// <summary>
@@ -55,13 +57,27 @@ public class DirectoryHelper
     private static void InitLoggingDirectory()
     {
         string dir = Path.Combine(BaseDirectory, "Logs");
+        string libFilesDir = Path.Combine(dir, "LibraryFiles");
         if (Directory.Exists(dir) == false)
             Directory.CreateDirectory(dir);
+        if(Directory.Exists(libFilesDir) == false)
+            Directory.CreateDirectory(libFilesDir);
+        
         
         // look for logs from other directories
         string localLogs = Path.Combine(ExecutingDirectory, "Logs");
         if(localLogs != dir && Directory.Exists(localLogs))
             MoveDirectoryContent(localLogs, dir);
+        
+        // move library file log files if needed
+        var files = new DirectoryInfo(dir).GetFiles("*.log");
+        foreach (var file in files)
+        {
+            if (Regex.IsMatch(file.Name, $"[a-fA-F0-9\\-]{36}\\.log"))
+            {
+                file.MoveTo(Path.Combine(libFilesDir, file.Name));
+            }
+        }
         
         LoggingDirectory = dir;
     }

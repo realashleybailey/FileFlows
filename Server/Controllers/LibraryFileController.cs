@@ -30,7 +30,7 @@ namespace FileFlows.Server.Controllers
             _mutex.WaitOne();
             try
             {
-                // iterate these incase, something starts processing
+                // iterate these in case, something starts processing
                 for(int i = 0; i < data.Length; i++)
                 {
                     if (data[i].Status == FileStatus.Unprocessed)
@@ -243,7 +243,7 @@ namespace FileFlows.Server.Controllers
             var result = await GetByUid(uid);
             if(result != null && (result.Status == FileStatus.ProcessingFailed || result.Status == FileStatus.Processed))
             {
-                var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
+                var logFile = (await new SettingsController().Get())?.GetLogFile(DirectoryHelper.LoggingDirectory, uid);
                 string htmlFile = logFile.Replace(".log", ".html");
                 if(System.IO.File.Exists(logFile) && System.IO.File.Exists(htmlFile) == false)
                 {
@@ -293,7 +293,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("{uid}/log")]
         public async Task<string> GetLog([FromRoute] Guid uid, [FromQuery] int lines = 0, [FromQuery] bool html = true)
         {
-            var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
+            var logFile = (await new SettingsController().Get())?.GetLogFile(DirectoryHelper.LoggingDirectory, uid);
             if (string.IsNullOrEmpty(logFile))
                 return string.Empty;
             if (System.IO.File.Exists(logFile) == false)
@@ -340,7 +340,7 @@ namespace FileFlows.Server.Controllers
         {
             try
             {
-                var logFile = (await new SettingsController().Get())?.GetLogFile(uid);
+                var logFile = (await new SettingsController().Get())?.GetLogFile(DirectoryHelper.LoggingDirectory, uid);
                 System.IO.File.WriteAllText(logFile, log);
 
                 string html = LogToHtml.Convert(log);

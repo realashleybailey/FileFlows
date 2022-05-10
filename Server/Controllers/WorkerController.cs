@@ -27,7 +27,7 @@ namespace FileFlows.Server.Controllers
 
         private async Task<string> GetLogFileName(Guid libraryFileUid)
         {
-            var logFile = (await new SettingsController().Get()).GetLogFile(libraryFileUid);
+            var logFile = (await new SettingsController().Get()).GetLogFile(DirectoryHelper.LoggingDirectory, libraryFileUid);
             return logFile;
         }
 

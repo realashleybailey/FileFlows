@@ -6,11 +6,6 @@
 
     public class Settings : FileFlowObject
     {
-
-        [Folder(1)]
-        [Required]
-        public string LoggingPath { get; set; }
-
         public bool AutoUpdatePlugins { get; set; }
 
         public bool AutoUpdate { get; set; }
@@ -31,15 +26,21 @@
 
         public string Version { get; set; }
 
-        public string GetLogFile(System.Guid uid)
+        /// <summary>
+        /// Gets a lof file
+        /// </summary>
+        /// <param name="logPath">The path where the logs are kept</param>
+        /// <param name="uid">the uid of the library file to get a log for</param>
+        /// <returns>The log file</returns>
+        public string GetLogFile(string logPath, Guid uid)
         {
-            if (string.IsNullOrEmpty(LoggingPath))
+            if (string.IsNullOrEmpty(logPath))
                 return string.Empty;
             
-            if(IsDocker) // docker is in the base directory
-                return System.IO.Path.Combine(LoggingPath, uid + ".log");
+            //if(IsDocker) // docker is in the base directory
+                //return System.IO.Path.Combine(logPath, uid + ".log");
 
-            return System.IO.Path.Combine(LoggingPath, "LibraryFiles", uid + ".log");
+            return System.IO.Path.Combine(logPath, "LibraryFiles", uid + ".log");
         }
     }
 

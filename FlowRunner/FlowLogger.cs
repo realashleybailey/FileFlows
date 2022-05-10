@@ -37,7 +37,7 @@ public class FlowLogger : ILogger
             _ => ""
         };
 
-        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff") + " - " + prefix + " -> " +
+        string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - " + prefix + " -> " +
             string.Join(", ", args.Select(x =>
             x == null ? "null" :
             x.GetType().IsPrimitive || x is string ? x.ToString() :

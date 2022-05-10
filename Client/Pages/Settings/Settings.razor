@@ -25,7 +25,7 @@
             
             <FlowTabs>
                 <FlowTab Title="@lblGeneral">
-                    @if (Model.IsWindows)
+                    @if (Model.IsWindows && false)
                     {
                         <InputSwitch @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
                     }

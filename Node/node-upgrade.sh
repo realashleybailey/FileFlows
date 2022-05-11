@@ -7,12 +7,12 @@ fi
 
 cd ..
 rm -rf Node
-rm -rf FlowRunnner
-del run-node.sh
+rm -rf FlowRunner
+rm run-node.sh
 
-mv NodeUpdate/FlowRunnner FlowRunnner
+mv NodeUpdate/FlowRunner FlowRunner
 mv NodeUpdate/Node Node
-mv run-node.sh run-node.sh
+mv NodeUpdate/run-node.sh run-node.sh
 
 rm -rf NodeUpdate
 

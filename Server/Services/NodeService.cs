@@ -20,7 +20,7 @@
 
         public async Task<ProcessingNode> GetByAddress(string address)
         {
-            var result = await new NodeController().GetByAddress(address);
+            var result = await new NodeController().GetByAddress(address, Globals.Version);
             result.SignalrUrl = $"http://localhost:{WebServer.Port}/flow";
             return result;
         }

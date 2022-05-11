@@ -16,15 +16,29 @@ namespace FileFlows.Server.Controllers
         /// <summary>
         /// Gets the next library file for processing, and puts it into progress
         /// </summary>
-        /// <param name="nodeName">the nameof hte node processing the file</param>
-        /// <param name="nodeUid">the Uid of the node processing the file </param>
-        /// <param name="workerUid">the UId of the worker</param>
+        /// <param name="args">The arguments for the call</param>
         /// <returns>the next library file to prDirectoryHelper new FileInfo(typeocess</returns>
-        [HttpGet("next-file")]
-        public async Task<LibraryFile> GetNext([FromQuery] string nodeName, [FromQuery] Guid nodeUid, [FromQuery] Guid workerUid)
+        [HttpPost("next-file")]
+        public async Task<LibraryFile> GetNext([FromBody] NextLibraryFileArgs args)
         {
-            if (Workers.AutoUpdater.UpdatePending)
+            if (Workers.AutoUpdater.UpdatePending || args == null)
                 return null; // if an update is pending, stop providing new files to process
+
+            if (Version.TryParse(args.NodeVersion, out var nodeVersion) == false)
+                return null;
+
+            if (nodeVersion < Globals.MinimumNodeVersion)
+            {
+                Logger.Instance.ILog($"Node '{args.NodeName}' version is less than minimum supported version '{Globals.MinimumNodeVersion}'");
+                return null;
+            }
+
+            var node = (await new NodeController().Get(args.NodeUid));
+            if (node != null && node.Version != args.NodeVersion)
+            {
+                node.Version = args.NodeVersion;
+                await new NodeController().Update(node);
+            }
 
             var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
             _mutex.WaitOne();
@@ -36,8 +50,8 @@ namespace FileFlows.Server.Controllers
                     if (data[i].Status == FileStatus.Unprocessed)
                     {
                         data[i].Status = FileStatus.Processing;
-                        data[i].Node = new ObjectReference { Uid = nodeUid, Name = nodeName };
-                        data[i].WorkerUid = workerUid;
+                        data[i].Node = new ObjectReference { Uid = args.NodeUid, Name = args.NodeName };
+                        data[i].WorkerUid = args.WorkerUid;
                         data[i].ProcessingStarted = DateTime.Now;
                         data[i] = await DbManager.Update(data[i]);
                         return data[i];

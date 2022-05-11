@@ -76,7 +76,13 @@
             // can throw exception if nothing to process
             try
             {
-                var result = await HttpHelper.Get<LibraryFile>($"{ServiceBaseUrl}/api/library-file/next-file?nodeName={Uri.EscapeDataString(nodeName)}&nodeUid={Uri.EscapeDataString(nodeUid.ToString())}&workerUid={Uri.EscapeDataString(workerUid.ToString())}");
+                var result = await HttpHelper.Post<LibraryFile>($"{ServiceBaseUrl}/api/library-file/next-file", new NextLibraryFileArgs
+                {
+                    NodeName = nodeName,
+                    NodeUid = nodeUid,
+                    WorkerUid = workerUid,
+                    NodeVersion = Globals.Version
+                });
                 if (result.Success == false)
                     return null; 
                 return result.Data;

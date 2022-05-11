@@ -20,6 +20,13 @@ public class Upgrader
             // no stats recorded, we need to add this
             new Upgrade0_5_3().Run();
         }
+        if (currentVersion < new Version(0, 6, 0))
+        {
+            // directory changes, ffmpeg on windows directory changed
+            new Upgrade0_6_0().Run();
+        }
+        
+        
 
         // save the settings
         if (settings.Version != Globals.Version)

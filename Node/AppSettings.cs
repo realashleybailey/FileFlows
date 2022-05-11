@@ -1,109 +1,102 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using FileFlows.ServerShared.Helpers;
 
-namespace FileFlows.Node
+namespace FileFlows.Node;
+
+public class AppSettings
 {
-    public class AppSettings
+    public static string? ForcedServerUrl { get; set; }
+    public static string? ForcedTempPath { get; set; }
+    public static string? ForcedHostName { get; set; }
+
+    private string _ServerUrl = string.Empty;
+    private string _TempPath = string.Empty;
+    public string ServerUrl
     {
-        public static string? ForcedServerUrl { get; set; }
-        public static string? ForcedTempPath { get; set; }
-        public static string? ForcedHostName { get; set; }
-
-        private string _ServerUrl = string.Empty;
-        private string _TempPath = string.Empty;
-        public string ServerUrl
+        get
         {
-            get
-            {
-                if (string.IsNullOrEmpty(ForcedServerUrl) == false)
-                    return ForcedServerUrl;
-                return _ServerUrl;
-            }
-            set
-            {
-                _ServerUrl = value ?? String.Empty;
-            }
+            if (string.IsNullOrEmpty(ForcedServerUrl) == false)
+                return ForcedServerUrl;
+            return _ServerUrl;
         }
-
-        public string TempPath
+        set
         {
-            get
-            {
-                if (string.IsNullOrEmpty(ForcedTempPath) == false)
-                    return ForcedTempPath;
-                return _TempPath;
-            }
-            set
-            {
-                _TempPath = value ?? String.Empty;
-            }
+            _ServerUrl = value ?? String.Empty;
         }
+    }
 
-        public string HostName
+    public string TempPath
+    {
+        get
         {
-            get
-            {
-                if (string.IsNullOrEmpty(ForcedHostName) == false)
-                    return ForcedHostName;
-                return Environment.MachineName;
-            }
+            if (string.IsNullOrEmpty(ForcedTempPath) == false)
+                return ForcedTempPath;
+            return _TempPath;
         }
-
-        public int Runners { get; set; }
-        public bool Enabled { get; set; }
-
-        public void Save()
+        set
         {
-            Save(this);
+            _TempPath = value ?? String.Empty;
         }
+    }
 
-        public static void Init()
+    public string HostName
+    {
+        get
         {
-            Instance = Load();
+            if (string.IsNullOrEmpty(ForcedHostName) == false)
+                return ForcedHostName;
+            return Environment.MachineName;
         }
+    }
 
-        public static AppSettings Instance { get; set; } = new AppSettings();
+    public int Runners { get; set; }
+    public bool Enabled { get; set; }
 
-        public static void Save(AppSettings settings)
-        {
-            if (settings == null)
-                return;
-            Instance = settings;
-            string json = System.Text.Json.JsonSerializer.Serialize(settings, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-            File.WriteAllText(DirectoryHelper.NodeConfigFile, json);
-        }
-        public static AppSettings Load()
-        {
-            string file = DirectoryHelper.NodeConfigFile;
-            if (File.Exists(file) == false)
-            {
-                AppSettings settings = new();
-                settings.TempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
-                settings.Save();
-                return settings;
-            }
-            try
-            {
-                string json = File.ReadAllText(file);
-                var settings = JsonSerializer.Deserialize<AppSettings>(json);
-                return settings ?? new ();
-            }
-            catch (Exception) { }
-            return new();
-        }
+    public void Save()
+    {
+        Save(this);
+    }
 
-        public static bool IsConfigured()
+    public static void Init()
+    {
+        Instance = Load();
+    }
+
+    public static AppSettings Instance { get; set; } = new AppSettings();
+
+    public static void Save(AppSettings settings)
+    {
+        if (settings == null)
+            return;
+        Instance = settings;
+        string json = System.Text.Json.JsonSerializer.Serialize(settings, new JsonSerializerOptions
         {
-            return string.IsNullOrWhiteSpace(Load().ServerUrl) == false;
+            WriteIndented = true
+        });
+        File.WriteAllText(DirectoryHelper.NodeConfigFile, json);
+    }
+    public static AppSettings Load()
+    {
+        string file = DirectoryHelper.NodeConfigFile;
+        if (File.Exists(file) == false)
+        {
+            AppSettings settings = new();
+            settings.TempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+            settings.Save();
+            return settings;
         }
+        try
+        {
+            string json = File.ReadAllText(file);
+            var settings = JsonSerializer.Deserialize<AppSettings>(json);
+            return settings ?? new ();
+        }
+        catch (Exception) { }
+        return new();
+    }
+
+    public static bool IsConfigured()
+    {
+        return string.IsNullOrWhiteSpace(Load().ServerUrl) == false;
     }
 }

@@ -88,7 +88,7 @@ public class NodeUpdater:Worker
             if (serverVersion <= CurrentVersion)
                 return string.Empty;
 
-            Logger.Instance.ILog($"New Node version {serverVersion} detected, starting downloaded");
+            Logger.Instance.ILog($"New Node version {serverVersion} detected, starting download");
 
             var data = systemService.GetNodeUpdater().Result;
             if (data?.Any() != true)
@@ -117,7 +117,8 @@ public class NodeUpdater:Worker
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
                 return string.Empty;
-            
+
+            Logger.Instance.ILog("Upgrade directory ready: " + updateDir);
             Logger.Instance.ILog("Upgrade script ready: " + updateFile);
 
             return updateFile;

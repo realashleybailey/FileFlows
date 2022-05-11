@@ -10,6 +10,7 @@ if [[ "$FFNODE" == 'true' || "$FFNODE" == '1' || "$1" = '--node' ]]; then
         echo "Upgrade found"
         chmod +x /app/NodeUpdate/node-upgrade.sh
         cd /app/NodeUpdate
+        echo "bash node-upgrade.sh docker"
         bash node-upgrade.sh docker
     fi
 

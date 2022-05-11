@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
-if [%1 -ne 'docker']; then 
+if [ "$1" != "docker" ]; then 
+print 'dfsdf'
   kill %1
 fi
 
 cd ..
-rmdir -rf Node
-rmdir -rf FlowRunnner
+rm -rf Node
+rm -rf FlowRunnner
 del run-node.sh
 
 mv NodeUpdate/FlowRunnner ../FlowRunnner
 mv NodeUpdate/Node ../Node
 mv run-node.sh ../run-node.sh
 
-rmdir -rf NodeUpdate
+rm -rf NodeUpdate
 
-if [%1 -ne 'docker']; then 
+if [ "$1" != "docker" ]; then 
   chmod +x run-node.sh
   ./run-node.sh
 fi

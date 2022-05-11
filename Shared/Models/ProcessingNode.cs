@@ -12,6 +12,7 @@ namespace FileFlows.Shared.Models
         public bool Enabled { get; set; }
 
         public OperatingSystemType OperatingSystem { get; set; }
+        public string Version { get; set; }
 
         public int FlowRunners { get; set; }
 

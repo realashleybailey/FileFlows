@@ -9,12 +9,13 @@ namespace FileFlows.Client.Pages
 
         private ProcessingNode EditingItem = null;
 
-        private string lblAddress, lblRunners;
+        private string lblAddress, lblRunners, lblVersion;
         protected override void OnInitialized()
         {
             base.OnInitialized();
             lblAddress = Translater.Instant("Pages.Nodes.Labels.Address");
             lblRunners = Translater.Instant("Pages.Nodes.Labels.Runners");
+            lblVersion = Translater.Instant("Pages.Nodes.Labels.Version");
         }
 
 

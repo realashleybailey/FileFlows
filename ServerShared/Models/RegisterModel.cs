@@ -10,6 +10,8 @@ namespace FileFlows.ServerShared.Models
         public bool Enabled { get; set; }
         public List<RegisterModelMapping> Mappings { get; set; }
         public OperatingSystemType OperatingSystem { get; set; }
+
+        public string Version { get; set; }
     }
 
     public class RegisterModelMapping

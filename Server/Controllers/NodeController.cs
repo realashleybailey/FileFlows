@@ -21,21 +21,31 @@ namespace FileFlows.Server.Controllers
         {
             var nodes = (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);
             var internalNode = nodes.Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();
-            if(internalNode != null && internalNode.OperatingSystem == Shared.OperatingSystemType.Unknown)
+            if(internalNode != null)
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    internalNode.OperatingSystem = Shared.OperatingSystemType.Windows;
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    internalNode.OperatingSystem = Shared.OperatingSystemType.Mac;
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
-                    internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
-
-                if(internalNode.OperatingSystem != Shared.OperatingSystemType.Unknown)
+                bool update = false;
+                if (internalNode.Version != Globals.Version)
                 {
-                    await Update(internalNode);
+                    internalNode.Version = Globals.Version;
+                    update = true;
                 }
+
+                if (internalNode.OperatingSystem == Shared.OperatingSystemType.Unknown)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        internalNode.OperatingSystem = Shared.OperatingSystemType.Windows;
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        internalNode.OperatingSystem = Shared.OperatingSystemType.Mac;
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                        internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+                        internalNode.OperatingSystem = Shared.OperatingSystemType.Linux;
+
+                    if (internalNode.OperatingSystem != Shared.OperatingSystemType.Unknown)
+                        update = true;
+                }
+                if(update)
+                    await Update(internalNode);
             }
 #if (DEBUG)
             // set this to linux so we can test the full UI
@@ -208,6 +218,7 @@ namespace FileFlows.Server.Controllers
                     existing.TempPath = model.TempPath;
                     existing.Enabled = model.Enabled;
                     existing.OperatingSystem = model.OperatingSystem;
+                    existing.Version = model.Version;
                     await Update(existing);
                 }
                 existing.SignalrUrl = "flow";
@@ -239,6 +250,7 @@ namespace FileFlows.Server.Controllers
                 FlowRunners = model.FlowRunners,
                 TempPath = model.TempPath,
                 OperatingSystem = model.OperatingSystem,
+                Version = model.Version,
                 Schedule = new string('1', 672),
                 Mappings = model.Mappings?.Select(x => new KeyValuePair<string, string>(x.Server, x.Local))?.ToList() ?? tools?.Select(x => new
                    KeyValuePair<string, string>(x.Path, "")
@@ -263,6 +275,7 @@ namespace FileFlows.Server.Controllers
                     Schedule = new string('1', 672),
                     Enabled = true,
                     FlowRunners = 1,
+                    Version = Globals.Version,
 #if (DEBUG)
                     TempPath = windows ? @"d:\videos\temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
 #else

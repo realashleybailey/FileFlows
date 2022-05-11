@@ -107,6 +107,7 @@
                 FlowRunners = runners,
                 Enabled = enabled,
                 Mappings = mappings,
+                Version = Globals.Version,
                 OperatingSystem = isWindows ? Shared.OperatingSystemType.Windows : 
                      isLinux ? Shared.OperatingSystemType.Linux :       
                      isMacOs ? Shared.OperatingSystemType.Mac :

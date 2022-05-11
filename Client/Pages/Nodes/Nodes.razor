@@ -28,6 +28,14 @@
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="ProcessingNode" Width="8rem" MobileWidth="0">
+                    <Header>
+                        @lblVersion
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Version</span>
+                    </Cell>
+                </FlowTableColumn>
                 <FlowTableColumn TItem="ProcessingNode" Width="30vw" MobileWidth="0">
                     <Header>
                         @lblAddress

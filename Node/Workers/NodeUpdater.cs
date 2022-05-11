@@ -117,6 +117,8 @@ public class NodeUpdater:Worker
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
                 return string.Empty;
+            
+            Logger.Instance.ILog("Upgrade script ready: " + updateFile);
 
             return updateFile;
         }

@@ -78,8 +78,7 @@ public class SystemService : Service, ISystemService
     {
         try
         {
-            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/system/node-updater?windows={windows}");
+            var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/system/node-updater");
             if (result.Success == false)
                 throw new Exception("Failed to get update: " + result.Body);
             return result.Data;

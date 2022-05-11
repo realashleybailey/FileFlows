@@ -12,7 +12,14 @@
 
         public Task<LibraryFile> Get(Guid uid) => new LibraryFileController().Get(uid);
 
-        public Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid) => new LibraryFileController().GetNext(nodeName, nodeUid, workerUid);
+        public Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid) 
+            => new LibraryFileController().GetNext(new NextLibraryFileArgs
+                {
+                     NodeName   = nodeName,
+                     NodeUid = nodeUid,
+                     WorkerUid = workerUid,
+                     NodeVersion = Globals.Version
+                });
 
         public Task<bool> SaveFullLog(Guid uid, string log) => new LibraryFileController().SaveFullLog(uid, log);
 

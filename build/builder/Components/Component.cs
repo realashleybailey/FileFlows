@@ -20,7 +20,6 @@ public abstract class Component
     {
         Utils.DeleteDirectoryIfExists(ProjectDirectory + "/bin");
         Utils.DeleteDirectoryIfExists(ProjectDirectory + "/obj");
-        //Utils.DeleteDirectoryIfExists(OutputPath);
     }
 
     protected virtual void Build()

@@ -72,7 +72,7 @@
         {
             try
             {
-                var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/" + Uri.EscapeDataString(address));
+                var result = await HttpHelper.Get<ProcessingNode>(ServiceBaseUrl + "/api/node/by-address/" + Uri.EscapeDataString(address) + "?version=" + Globals.Version);
                 if (result.Success == false)
                     throw new Exception("Failed to get node: " + result.Body);                
                 if(result.Data == null)

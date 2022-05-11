@@ -135,9 +135,10 @@ namespace FileFlows.Server.Controllers
         /// Get processing node by address
         /// </summary>
         /// <param name="address">The address</param>
+        /// <param name="version">The version of the node</param>
         /// <returns>If found, the processing node</returns>
         [HttpGet("by-address/{address}")]
-        public async Task<ProcessingNode> GetByAddress([FromRoute] string address)
+        public async Task<ProcessingNode> GetByAddress([FromRoute] string address, [FromQuery] string version)
         {
             if (address == "INTERNAL_NODE")
                 return await GetServerNode();
@@ -150,6 +151,12 @@ namespace FileFlows.Server.Controllers
             var node = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
             if (node == null)
                 return node;
+
+            if (string.IsNullOrEmpty(version) == false && node.Version != version)
+            {
+                node.Version = version;
+                await Update(node);
+            }
 
             node.SignalrUrl = "flow";
             return node;

@@ -87,7 +87,7 @@ namespace FileFlows.Node
             if (File.Exists(file) == false)
             {
                 AppSettings settings = new();
-                settings.TempPath = Path.Combine(Path.GetTempPath(), "FileFlows");
+                settings.TempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
                 settings.Save();
                 return settings;
             }

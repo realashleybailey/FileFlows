@@ -11,23 +11,38 @@
         Icon="avares://FileFlows.Node/Ui/icon.ico"
         Title="Message"
         WindowStartupLocation="CenterScreen"
-        Width="280" Height="120"
-        MaxWidth="280" MaxHeight="120">
+        Width="280" Height="150"
+        MaxWidth="280" MaxHeight="150"
+        
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaToDecorationsHint="True"
+        >
     
-        <Grid>
-                <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                
-                <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="20"  Text="{Binding Message}" />
-                
-                <Button Grid.Row="1" Content="OK" Command="{Binding Ok}" Width="70"
-                        Foreground="#ff0090" Background="#111214"
-                        BorderBrush="#ff0090"
-                />
+        <Grid RowDefinitions="30,*">
+
+                <!-- Title bar -->
+                <Grid ColumnDefinitions="Auto, *,Auto,Auto" IsHitTestVisible="True" Background="Transparent">
+                        <Image      Grid.Column="0" VerticalAlignment="Center" Source="avares://FileFlows.Node/Ui/icon.ico" Width="40" Margin="0,4,0,0" ></Image>
+                        <TextBlock  Grid.Column="1" VerticalAlignment="Center" FontSize="16" Text="FileFlows Node"></TextBlock>
+			
+                        <Button Grid.Column="3" Margin="0" Content="✕" Command="{Binding Ok}" Width="60"
+                                Foreground="#eee" Background="Transparent" BorderBrush="Transparent" />
+                </Grid>
+                <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="20"  Text="{Binding Message}" />
+                        
+                        <Button Grid.Row="1" Content="OK" Command="{Binding Ok}" Width="70"
+                                Foreground="#ff0090" Background="#111214"
+                                BorderBrush="#ff0090"
+                        />
+                </Grid>
         </Grid>
 </Window>

@@ -1,29 +1,46 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="FileFlows.Server.Ui.MainWindow" 
-        Title="FileFlows" Width="400" Height="230"
-		MaxWidth="400" MaxHeight="230"
+        Title="FileFlows" Width="400" Height="260"
+		MaxWidth="400" MaxHeight="260"
 		
         CanResize="False"
         Foreground="#ff0090"
         Background="#111214"
         FontSize="16"
 		Icon="avares://FileFlows.Server/Ui/icon.ico"
-		>
-	<StackPanel Margin="10">
-		<Image Source="avares://FileFlows.Server/Ui/icon.ico" Width="100" />
+		
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaToDecorationsHint="True"
+	>
+	<Grid RowDefinitions="30,*">
+
+		<!-- Title bar -->
+		<Grid ColumnDefinitions="Auto, *,Auto,Auto" IsHitTestVisible="True" Background="Transparent">
+			<Image      Grid.Column="0" VerticalAlignment="Center" Source="avares://FileFlows.Server/Ui/icon.ico" Width="40" Margin="0,4,0,0" ></Image>
+			<TextBlock  Grid.Column="1" VerticalAlignment="Center" FontSize="16" Text="FileFlows"></TextBlock>
+			
+			<Button Grid.Column="2" Margin="0" Content="🗕" Command="{Binding Hide}" Width="60"
+			        Foreground="#eee" Background="Transparent" BorderBrush="Transparent"
+			/>
+			<Button Grid.Column="3" Margin="0" Content="✕" Command="{Binding Quit}" Width="60"
+			        Foreground="#eee" Background="Transparent" BorderBrush="Transparent" />
+		</Grid>
+		<StackPanel Grid.Row="1" Margin="10">
+			<Image Source="avares://FileFlows.Server/Ui/icon.ico" Width="100" />
 
 
-		<TextBlock Margin="6" Text="{Binding Version}" TextAlignment="Center" />
-		<TextBlock Margin="6" Text="{Binding ServerUrl}" TextAlignment="Center" />
+			<TextBlock Margin="6" Text="{Binding Version}" TextAlignment="Center" />
+			<TextBlock Margin="6" Text="{Binding ServerUrl}" TextAlignment="Center" />
 
-		<StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Center">
+			<StackPanel Orientation="Horizontal" Margin="20 0" HorizontalAlignment="Center">
 
-			<Button Margin="6" Content="OPEN" Command="{Binding Launch}" Width="100"
-				Foreground="#ff0090" Background="#111214"				
-				BorderBrush="#ff0090"
-				/>
+				<Button Margin="6" Content="OPEN" Command="{Binding Launch}" Width="100"
+					Foreground="#ff0090" Background="#111214"				
+					BorderBrush="#ff0090"
+					/>
 
+			</StackPanel>
 		</StackPanel>
-	</StackPanel>
+	</Grid>
 </Window>

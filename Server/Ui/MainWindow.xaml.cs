@@ -48,11 +48,7 @@ public class MainWindow : Window
 
     private void MainWindow_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        // var pointer = e.GetCurrentPoint(this);
-        // //if (pointer.Pointer.Captured is Border)
-        // {
-        //     BeginMoveDrag(e);
-        // }
+        BeginMoveDrag(e);
     }
 
 

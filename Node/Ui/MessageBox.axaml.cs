@@ -9,6 +9,7 @@ public partial class MessageBox : Window
     public MessageBox()
     {
         InitializeComponent();
+        PointerPressed += MessageBox_PointerPressed;
     }
     public MessageBox(string message, string title = "")
     {
@@ -21,6 +22,10 @@ public partial class MessageBox : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+    private void MessageBox_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        BeginMoveDrag(e);
     }
 }
 

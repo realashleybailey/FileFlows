@@ -8,7 +8,7 @@ internal class MessageApp : Application
     {
         base.Initialize();
         
-        var window = new MessageBox("FileFlows node is already running.", "FileFlows");
+        var window = new MessageBox("FileFlows Node is already running.", "FileFlows");
         window.Show();
     }
 }

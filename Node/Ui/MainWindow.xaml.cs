@@ -1,3 +1,4 @@
+using Avalonia.Controls.Chrome;
 using Avalonia.Threading;
 using FileFlows.Node.Utils;
 using FileFlows.ServerShared.Helpers;
@@ -19,6 +20,8 @@ public class MainWindow : Window
     private readonly TrayIcon _trayIcon;
     readonly NativeMenu menu = new();
     internal static MainWindow? Instance;
+
+    public Grid TitleBar;
 
     public MainWindow()
     {
@@ -60,13 +63,13 @@ public class MainWindow : Window
 
     private void MainWindow_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        // this is only needed if we dont render the chrome title bar, this allows dragging from anywhere in the UI to move it
-        // leave this code here in case we switch back to no chrome
-        // var pointer = e.GetCurrentPoint(this);
-        // //if (pointer.Pointer.Captured is Border)
-        // {
-        //     BeginMoveDrag(e);
-        // }
+        //this is only needed if we dont render the chrome title bar, this allows dragging from anywhere in the UI to move it
+        //leave this code here in case we switch back to no chrome
+        var pointer = e.GetCurrentPoint(this);
+        //if (pointer.Pointer.Captured is Border)
+        {
+            BeginMoveDrag(e);
+        }
     }
 
     internal void ForceQuit()

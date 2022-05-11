@@ -9,6 +9,7 @@ public partial class Confirm : Window
     public Confirm()
     {
         InitializeComponent();
+        PointerPressed += Confirm_PointerPressed;
     }
     public Confirm(string message, string title = "")
     {
@@ -21,6 +22,14 @@ public partial class Confirm : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+    
+    private void Confirm_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        var pointer = e.GetCurrentPoint(this);
+        {
+            BeginMoveDrag(e);
+        }
     }
 }
 

@@ -11,17 +11,13 @@
         Icon="avares://FileFlows.Node/Ui/icon.ico"
         Title="Confirm"
         WindowStartupLocation="CenterOwner"
-        Width="400" Height="170"
-        MaxWidth="400" MaxHeight="170"
-        
-        ExtendClientAreaChromeHints="NoChrome"
-        ExtendClientAreaToDecorationsHint="True"
+        Width="400" MaxWidth="400"
         >
     
-        <Grid RowDefinitions="30,*">
+        <Grid RowDefinitions="Auto,*">
 
                 <!-- Title bar -->
-                <Grid ColumnDefinitions="Auto, *,Auto,Auto" IsHitTestVisible="True" Background="Transparent">
+                <Grid Height="30" IsVisible="{Binding CustomTitle}" ColumnDefinitions="Auto, *,Auto,Auto" IsHitTestVisible="True" Background="Transparent">
                         <Image      Grid.Column="0" VerticalAlignment="Center" Source="avares://FileFlows.Node/Ui/icon.ico" Width="40" Margin="0,4,0,0" ></Image>
                         <TextBlock  Grid.Column="1" VerticalAlignment="Center" FontSize="16" Text="Quit"></TextBlock>
 			

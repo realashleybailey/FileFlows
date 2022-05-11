@@ -21,7 +21,20 @@ public class MainWindow : Window
     {
         _trayIcon = new TrayIcon();
         InitializeComponent();
-        DataContext = new MainWindowViewModel(this);
+        
+        var dc = new MainWindowViewModel(this)
+        {
+            CustomTitle = Globals.IsWindows
+        };
+
+        ExtendClientAreaChromeHints =
+            dc.CustomTitle ? ExtendClientAreaChromeHints.NoChrome : ExtendClientAreaChromeHints.Default;
+        ExtendClientAreaToDecorationsHint = dc.CustomTitle;
+        this.MaxHeight = dc.CustomTitle ? 260 : 230;
+        this.Height = dc.CustomTitle ? 260 : 230;
+
+        DataContext = dc;
+        
         _trayIcon.IsVisible = true;
 
         _trayIcon.Icon = new WindowIcon(AvaloniaLocator.Current.GetService<IAssetLoader>()?.Open(new Uri($"avares://FileFlows.Server/Ui/icon.ico")));
@@ -142,6 +155,10 @@ public class MainWindow : Window
 
 public class MainWindowViewModel
 { 
+    /// <summary>
+    /// Gets or sets if a custom title should be rendered
+    /// </summary>
+    public bool CustomTitle { get; set; }
     private MainWindow Window { get; set; }
     public string ServerUrl { get; set; }
     public string Version { get; set; }

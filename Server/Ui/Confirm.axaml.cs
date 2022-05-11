@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 
 namespace FileFlows.Server.Ui;
 
@@ -15,7 +16,18 @@ public partial class Confirm : Window
         InitializeComponent();
         if (string.IsNullOrWhiteSpace(title) == false)
             this.Title = title;
-        DataContext = new ConfirmViewModel(this, message);
+        
+        var dc = new ConfirmViewModel(this, message)
+        {
+            CustomTitle = Globals.IsWindows
+        };
+        DataContext = dc;
+
+        this.ExtendClientAreaChromeHints = 
+            dc.CustomTitle ? ExtendClientAreaChromeHints.NoChrome : ExtendClientAreaChromeHints.Default;
+        ExtendClientAreaToDecorationsHint = dc.CustomTitle;
+        this.MaxHeight = dc.CustomTitle ? 160 : 130;
+        this.Height = dc.CustomTitle ? 160 : 130;
     }
 
     private void InitializeComponent()
@@ -27,6 +39,10 @@ public partial class Confirm : Window
 
 public class ConfirmViewModel
 { 
+    /// <summary>
+    /// Gets or sets if a custom title should be rendered
+    /// </summary>
+    public bool CustomTitle { get; set; }
     private Confirm Window { get; set; }
     
     public string Message { get; set; } = string.Empty;

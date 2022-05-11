@@ -1,22 +1,19 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="FileFlows.Node.Ui.MainWindow" 
-        Title="FileFlows Node" Width="600" Height="420"
-		MaxWidth="600" MaxHeight="420"
+        Title="FileFlows Node" Width="600" Height="390"
+		MaxWidth="600" MaxHeight="390"
 		
         CanResize="False"
         Foreground="#ff0090"
         Background="#111214"
         FontSize="16"
 		Icon="avares://FileFlows.Node/Ui/icon.ico"
-        
-        ExtendClientAreaChromeHints="NoChrome"
-        ExtendClientAreaToDecorationsHint="True"
 		>
-	<Grid RowDefinitions="30,*">
+	<Grid RowDefinitions="Auto,*">
 
 		<!-- Title bar -->
-		<Grid ColumnDefinitions="Auto, *,Auto,Auto" IsHitTestVisible="True" Background="Transparent">
+		<Grid IsVisible="{Binding CustomTitle}" Height="30" ColumnDefinitions="Auto, *,Auto,Auto" IsHitTestVisible="True" Background="Transparent">
 			<Image      Grid.Column="0" VerticalAlignment="Center" Source="avares://FileFlows.Node/Ui/icon.ico" Width="40" Margin="0,4,0,0" ></Image>
 			<TextBlock  Grid.Column="1" VerticalAlignment="Center" FontSize="16" Text="FileFlows Node"></TextBlock>
 			

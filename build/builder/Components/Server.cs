@@ -16,6 +16,7 @@ public class Server : Component
         Utils.EnsureDirectoryExists(OutputPath + "/Plugins");
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
         Utils.CopyFile($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip", BuildOptions.TempPath + "/Server/Nodes/");
+        File.Delete($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip"); // no longer need it
         if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies/Plugins"))
             Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/Plugins", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
         

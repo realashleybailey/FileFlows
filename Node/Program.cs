@@ -14,11 +14,6 @@ public class Program
     const string appName = "FileFlowsNode";
     public static void Main(string[] args)
     {
-        if(File.Exists("node-upgrade.bat"))
-            File.Delete("node-upgrade.bat");
-        if(File.Exists("node-upgrade.sh"))
-            File.Delete("node-upgrade.sh");
-        
         args ??= new string[] { };
         if (args.Any(x => x.ToLower() == "--help" || x.ToLower() == "-?" || x.ToLower() == "/?" || x.ToLower() == "/help" || x.ToLower() == "-help"))
         {
@@ -82,6 +77,12 @@ public class Program
 
             Manager = new ();
             Shared.Helpers.HttpHelper.Client = new HttpClient();
+            
+            
+            if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat")))
+                File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat"));
+            if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.sh")))
+                File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.sh"));
 
             if (showUi)
             {

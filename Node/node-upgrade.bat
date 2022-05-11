@@ -9,7 +9,7 @@ GOTO Done
 :RunUpdate
 timeout /t 3
 echo Stopping FileFlows Node if running
-taskkill %2
+taskkill /PID %2
 
 echo.
 echo Removing previous version

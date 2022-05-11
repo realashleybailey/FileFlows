@@ -10,9 +10,9 @@ rm -rf Node
 rm -rf FlowRunnner
 del run-node.sh
 
-mv NodeUpdate/FlowRunnner ../FlowRunnner
-mv NodeUpdate/Node ../Node
-mv run-node.sh ../run-node.sh
+mv NodeUpdate/FlowRunnner FlowRunnner
+mv NodeUpdate/Node Node
+mv run-node.sh run-node.sh
 
 rm -rf NodeUpdate
 

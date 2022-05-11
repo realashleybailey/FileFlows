@@ -23,8 +23,6 @@ public class WebServer
 
     public static void Start(string[] args)
     {
-        Logger.Instance.DLog("Arguments: " + string.Join(" ", args));
-
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -133,13 +131,6 @@ public class WebServer
 
         // run any upgrade code that may need to be run
         new Upgrade.Upgrader().Run(settings);
-
-        Logger.Instance.ILog(new string('=', 50));
-        Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
-        if(Program.Docker)
-            Logger.Instance.ILog("Running inside docker container");
-
-        Logger.Instance.ILog(new string('=', 50));
 
         StartupCleanup();
 

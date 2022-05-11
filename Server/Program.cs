@@ -27,7 +27,14 @@ public class Program
             var noGui = args?.Any((x => x.ToLower() == "--no-gui")) == true || Docker;
             DirectoryHelper.Init(Docker, false);
             Logger.Instance = new Server.Logger();
-            Logger.Instance.ILog("Starting FileFlows v" + Globals.Version);
+            
+            Logger.Instance.ILog(new string('=', 50));
+            Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
+            if(Docker)
+                Logger.Instance.ILog("Running inside docker container");
+            Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
+
+            Logger.Instance.ILog(new string('=', 50));
             InitEncryptionKey();
 
             if (Docker == false)

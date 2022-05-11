@@ -2,7 +2,10 @@ namespace FileFlows.Server;
 
 public class Logger : FileFlows.Plugin.ILogger
 {
-    Queue<LogTailItem> LogTail = new (3000);
+    Queue<LogTailItem> LogTailDebug = new (300);
+    Queue<LogTailItem> LogTailInfo = new (300);
+    Queue<LogTailItem> LogTailWarning = new (100);
+    Queue<LogTailItem> LogTailError = new (100);
 
     public string LogFile { get; private set; }
 
@@ -38,7 +41,7 @@ public class Logger : FileFlows.Plugin.ILogger
 
     private Mutex mutex = new Mutex();
 
-    internal enum LogType { Error, Warning, Debug, Info }
+    internal enum LogType { Error, Warning, Info, Debug }
     private void Log(LogType type, object[] args)
     {
         string prefix = GetPrefix(type);
@@ -53,8 +56,16 @@ public class Logger : FileFlows.Plugin.ILogger
         try
         {
             Console.WriteLine(message);
-            LogTail.Enqueue(new LogTailItem
+            var tail = type switch
             {
+                LogType.Error => LogTailError,
+                LogType.Warning => LogTailWarning,
+                LogType.Info => LogTailInfo,
+                _ => LogTailDebug,
+            };
+            tail.Enqueue(new LogTailItem
+            {
+                Date = DateTime.Now,
                 Type = (byte)type,
                 Message = System.Text.Encoding.UTF8.GetBytes(message)
             });
@@ -103,7 +114,16 @@ public class Logger : FileFlows.Plugin.ILogger
         LogTailItem[] filtered;
         try
         {
-            filtered = logLevel == Plugin.LogType.Debug ? LogTail.ToArray() : LogTail.Where(x => x.Type <= (byte)logLevel).ToArray();
+            List<LogTailItem> tails = new();
+            tails.AddRange(LogTailError);
+            if((int)logLevel >= (int)Plugin.LogType.Warning)
+                tails.AddRange(LogTailWarning);
+            if((int)logLevel >= (int)Plugin.LogType.Info)
+                tails.AddRange(LogTailInfo);
+            if((int)logLevel >= (int)Plugin.LogType.Debug)
+                tails.AddRange(LogTailDebug);
+
+            filtered = tails.OrderBy(x => x.Date).ToArray();
         }
         finally
         {
@@ -134,6 +154,7 @@ public class Logger : FileFlows.Plugin.ILogger
     
     private struct LogTailItem
     {
+        public DateTime Date { get; set; }
         public byte Type { get; set; }
         public byte[] Message { get; set; }
     }

@@ -87,18 +87,16 @@ public class NodeManager
     /// <returns>whether or not it was registered</returns>
     public async Task<bool> Register()
     {
-        string dll = Assembly.GetExecutingAssembly().Location;
         string path = DirectoryHelper.BaseDirectory;
 
         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
 
         List<RegisterModelMapping> mappings = new List<RegisterModelMapping>
             {
                 new RegisterModelMapping
                 {
                     Server = "ffmpeg",
-                    Local = Path.Combine(path, "Tools", windows ? "ffmpeg.exe" : "ffmpeg")
+                    Local = windows ? Path.Combine(path, "Tools", "ffmpeg.exe") : "/usr/bin/ffmpeg"
                 }
             };
 

@@ -52,11 +52,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 if (item.Status != FileStatus.Unprocessed)
                     continue;
 
+                string nodeName = node.Name == "FileFlowsServer" ? "Internal Processing Node" : node.Name;
+
                 if (node.AllLibraries == false)
                 {
                     if (node.Libraries?.Any(x => x.Uid == item.Library?.Uid) != true)
                     {
-                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")} not available for node '{node.Name}': " + item.Name);
+                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")} not available for node '{nodeName}': " + item.Name);
                         continue;
                     }
                 }
@@ -66,7 +68,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                     if (item.OriginalSize > (node.MaxFileSizeMb * 1000L * 1000L))
                     {
                         var nodeLimit = FileSizeFormatter.Format(node.MaxFileSizeMb * 1000L * 1000L);
-                        Logger.Instance?.DLog($"File size '{FileSizeFormatter.Format(item.OriginalSize)} is over file size for node '{node.Name}'({nodeLimit}): " + item.Name);
+                        Logger.Instance?.DLog($"File size '{FileSizeFormatter.Format(item.OriginalSize)} is over file size for node '{nodeName}'({nodeLimit}): " + item.Name);
                         continue; 
                     }
                 }

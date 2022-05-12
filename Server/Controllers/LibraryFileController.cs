@@ -47,15 +47,28 @@ namespace FileFlows.Server.Controllers
                 // iterate these in case, something starts processing
                 for(int i = 0; i < data.Length; i++)
                 {
-                    if (data[i].Status == FileStatus.Unprocessed)
+                    var item = data[i];
+                    if (item.Status != FileStatus.Unprocessed)
+                        continue;
+
+                    if (node.AllLibraries == false)
                     {
-                        data[i].Status = FileStatus.Processing;
-                        data[i].Node = new ObjectReference { Uid = args.NodeUid, Name = args.NodeName };
-                        data[i].WorkerUid = args.WorkerUid;
-                        data[i].ProcessingStarted = DateTime.Now;
-                        data[i] = await DbManager.Update(data[i]);
-                        return data[i];
+                        if (node.Libraries?.Any(x => x.Uid == item.Library?.Uid) != true)
+                            continue;
                     }
+
+                    if (node.MaxFileSizeMb > 0)
+                    {
+                        if (item.OriginalSize > node.MaxFileSizeMb * 1000 * 1000)
+                            continue;
+                    }
+
+                    item.Status = FileStatus.Processing;
+                    item.Node = new ObjectReference { Uid = args.NodeUid, Name = args.NodeName };
+                    item.WorkerUid = args.WorkerUid;
+                    item.ProcessingStarted = DateTime.Now;
+                    data[i] = await DbManager.Update(item);
+                    return data[i];
                 }
                 return null;
             }

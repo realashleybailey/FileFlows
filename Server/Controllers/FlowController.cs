@@ -451,8 +451,14 @@ namespace FileFlows.Server.Controllers
 
                             List<FlowPart> flowParts = new List<FlowPart>();
                             int y = DEFAULT_YPOS;
+                            bool invalid = false;
                             foreach (var jsPart in jst.Parts)
                             {
+                                if (parts.ContainsKey(jsPart.Name) == false)
+                                {
+                                    invalid = true;
+                                    break;
+                                }
                                 var element = parts[jsPart.Node];
 
                                 flowParts.Add(new FlowPart
@@ -476,6 +482,9 @@ namespace FileFlows.Server.Controllers
                                 });
                                 y += 150;
                             }
+
+                            if (invalid)
+                                continue;
 
                             if (templates.ContainsKey(_jst.Group ?? String.Empty) == false)
                                 templates.Add(_jst.Group ?? String.Empty, new List<FlowTemplateModel>());

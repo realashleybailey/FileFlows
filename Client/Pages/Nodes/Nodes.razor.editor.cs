@@ -1,4 +1,5 @@
-﻿using FileFlows.Plugin;
+﻿using FileFlows.Client.Components.Inputs;
+using FileFlows.Plugin;
 
 namespace FileFlows.Client.Pages
 {
@@ -19,6 +20,7 @@ namespace FileFlows.Client.Pages
             tabs.Add("Schedule", TabSchedule(node, isServerProcessingNode));
             if(isServerProcessingNode == false)
                 tabs.Add("Mappings", TabMappings(node));
+            tabs.Add("Processing", await TabProcessing(node));
             if (node.OperatingSystem == OperatingSystemType.Linux || node.OperatingSystem == OperatingSystemType.Unknown)
                 tabs.Add("Advanced", TabAdvanced(node));
 
@@ -129,6 +131,50 @@ namespace FileFlows.Client.Pages
                 {
                     { "HideLabel", true }
                 }
+            });
+            return fields;
+        }
+        
+        
+        private async Task<List<ElementField>> TabProcessing(ProcessingNode node)
+        {
+            var librariesResult = await HttpHelper.Get<Library[]>("/api/library");
+            var libraries = librariesResult?.Data?.Select(x => new ObjectReference
+            {
+                Uid = x.Uid,
+                Name = x.Name,
+                Type = typeof(Library).FullName
+            })?.OrderBy(x => x.Name)?.ToList() ?? new List<ObjectReference>();
+            List<ElementField> fields = new List<ElementField>();
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Label,
+                Name = "ProcessingDescription"
+            });
+            var efAllLibraries = new ElementField
+            {
+                InputType = FormInputType.Switch,
+                Name = nameof(node.AllLibraries)
+            };
+            fields.Add(efAllLibraries);
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Checklist,
+                Name = nameof(node.Libraries),
+                Parameters = new()
+                {
+                    { nameof(InputChecklist.Options), libraries }
+                },
+                Conditions = new List<Condition>
+                {
+                    new Condition(efAllLibraries, node.AllLibraries, value: false)
+                }
+            });
+            
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Int,
+                Name = nameof(node.MaxFileSizeMb)
             });
             return fields;
         }

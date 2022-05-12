@@ -139,12 +139,16 @@ namespace FileFlows.Client.Pages
         private async Task<List<ElementField>> TabProcessing(ProcessingNode node)
         {
             var librariesResult = await HttpHelper.Get<Library[]>("/api/library");
-            var libraries = librariesResult?.Data?.Select(x => new ObjectReference
+            var libraries = librariesResult?.Data?.Select(x => new ListOption
             {
-                Uid = x.Uid,
-                Name = x.Name,
-                Type = typeof(Library).FullName
-            })?.OrderBy(x => x.Name)?.ToList() ?? new List<ObjectReference>();
+                Label = x.Name,
+                Value = new ObjectReference
+                {
+                    Uid = x.Uid,
+                    Name = x.Name,
+                    Type = typeof(Library)?.FullName ?? string.Empty
+                }
+            })?.OrderBy(x => x.Label)?.ToList() ?? new List<ListOption>();
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {

@@ -72,7 +72,7 @@ namespace FileFlows.Server.Controllers
         public async Task<ProcessingNode> Save([FromBody] ProcessingNode node)
         {
             // see if we are updating the internal node
-            if(node.Address  == Globals.FileFlowsServer)
+            if(node.Address == Globals.FileFlowsServer)
             {
                 var internalNode = (await GetAll()).Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();
                 if(internalNode != null)
@@ -84,6 +84,9 @@ namespace FileFlows.Server.Controllers
                     internalNode.DontChangeOwner = node.DontChangeOwner;
                     internalNode.DontSetPermissions = node.DontSetPermissions;
                     internalNode.Permissions = node.Permissions;
+                    internalNode.AllLibraries = node.AllLibraries;
+                    internalNode.MaxFileSizeMb = node.MaxFileSizeMb;
+                    internalNode.Libraries = node.Libraries;
                     return await Update(internalNode, checkDuplicateName: true);
                 }
                 else

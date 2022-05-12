@@ -48,8 +48,10 @@ public class Runner
 
     public void Run()
     {
+        var systemHelper = new SystemHelper();
         try
         {
+            systemHelper.Start();
             var service = FlowRunnerService.Load();
             var updated = service.Start(Info).Result;
             if (updated == null)
@@ -75,6 +77,7 @@ public class Runner
         finally
         {
             Finish().Wait();
+            systemHelper.Stop();
         }
     }
 

@@ -63,10 +63,11 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
                 if (node.MaxFileSizeMb > 0)
                 {
-                    if (item.OriginalSize > node.MaxFileSizeMb * 1000 * 1000)
-                    {   
-                        Logger.Instance?.DLog($"File size '{FileSizeFormatter.Format(item.OriginalSize)} is over file size for node '{node.Name}': " + item.Name);
-                        continue;
+                    if (item.OriginalSize > (node.MaxFileSizeMb * 1000 * 1000))
+                    {
+                        var nodeLimit = FileSizeFormatter.Format(node.MaxFileSizeMb * 1000 * 1000);
+                        Logger.Instance?.DLog($"File size '{FileSizeFormatter.Format(item.OriginalSize)} is over file size for node '{node.Name}'({nodeLimit}): " + item.Name);
+                        continue; 
                     }
                 }
 

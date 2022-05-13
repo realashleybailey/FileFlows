@@ -24,8 +24,8 @@ if(SpellCheck.Execute() == false)
 }
 
 File.WriteAllText(BuildOptions.Output + "/build-version-variable.ps1", 
-$"Write-Output \"Setting env.FF_VERSION to: {Globals.Version}\"" + Environment.NewLine +
-$"Write-Host \"##teamcity[setParameter name='env.FF_VERSION' value='{Globals.Version}']\"");
+$"Write-Output \"Setting env.FF_VERSION to: {Globals.MajorVersion}\"" + Environment.NewLine +
+$"Write-Host \"##teamcity[setParameter name='env.FF_VERSION' value='{Globals.MajorVersion}']\"");
 
 //new Server().MakeInstaller();
 //return;

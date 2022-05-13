@@ -77,7 +77,9 @@ public class DirectoryHelper
             if (Regex.IsMatch(file.Name, @"^[a-fA-F0-9\-]{36}\.(log|html)$"))
             {
                 var destLogFile = Path.Combine(libFilesDir, file.Name);
-                file.MoveTo(destLogFile);
+                if (file.FullName == destLogFile)
+                    continue; // shouldn't happen
+                file.MoveTo(destLogFile, true);
                 Shared.Logger.Instance?.ILog("Moved library file log file: " + destLogFile);
             }
         }

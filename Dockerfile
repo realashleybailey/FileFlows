@@ -56,6 +56,9 @@ EXPOSE 5000
 RUN dos2unix /app/docker-entrypoint.sh && \
     chmod +x /app/docker-entrypoint.sh
 
+# add dotnet to path so can run dotnet anywhere
+ENV PATH="/root/.dotnet:${PATH}"
+
 # set the working directory
 WORKDIR /app
 

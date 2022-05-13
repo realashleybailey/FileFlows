@@ -70,12 +70,15 @@ public class DirectoryHelper
             MoveDirectoryContent(localLogs, dir);
         
         // move library file log files if needed
-        var files = new DirectoryInfo(dir).GetFiles("*.log");
+        var di = new DirectoryInfo(dir);
+        var files = di.GetFiles("*.log").Union(di.GetFiles("*.html"));
         foreach (var file in files)
         {
-            if (Regex.IsMatch(file.Name, $"[a-fA-F0-9\\-]{36}\\.log"))
+            if (Regex.IsMatch(file.Name, @"^[a-fA-F0-9\-]{36}\.(log|html)$"))
             {
-                file.MoveTo(Path.Combine(libFilesDir, file.Name));
+                var destLogFile = Path.Combine(libFilesDir, file.Name);
+                file.MoveTo(destLogFile);
+                Shared.Logger.Instance?.ILog("Moved library file log file: " + destLogFile);
             }
         }
         

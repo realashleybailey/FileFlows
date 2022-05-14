@@ -1,3 +1,4 @@
+using System.Collections;
 using Avalonia;
 using FileFlows.Server.Ui;
 
@@ -40,7 +41,11 @@ public class Program
             if(Docker)
                 Logger.Instance.ILog("Running inside docker container");
             Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
-
+            foreach (DictionaryEntry var in Environment.GetEnvironmentVariables())
+            {
+                Logger.Instance.DLog($"ENV.{var.Key} = {var.Value} [{var.Value?.GetType()?.FullName ?? "null"}]");
+            }
+            
             Logger.Instance.ILog(new string('=', 50));
             InitEncryptionKey();
 

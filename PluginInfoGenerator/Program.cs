@@ -93,7 +93,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             if (fvi == null)
                 return null;
             info.Name = fvi.ProductName ?? dll.Name;
-            info.Version = fvi.FileVersion.ToString();
+            info.Version = fvi?.FileVersion ?? string.Empty;
             info.Elements = GetElements(assembly);
             info.Settings = GetSettings(assembly);
 

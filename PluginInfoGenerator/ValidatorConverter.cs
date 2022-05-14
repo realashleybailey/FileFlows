@@ -21,19 +21,20 @@
                 {
                     if (jsonDocument.RootElement.TryGetProperty(typeProperty, out JsonElement typeValue))
                     {
-                        string typeName = typeValue.GetString();
+                        var typeName = typeValue.GetString();
                         var vts = ValidatorTypes;
-                        if (vts.ContainsKey(typeName) == false)
+                        if (typeName == null || vts.ContainsKey(typeName) == false)
                             return new DefaultValidator();
                         var type = vts[typeName];
-                        return (Validator)jsonDocument.Deserialize(type);
+                        var result = jsonDocument.Deserialize(type);
+                        return result as Validator ?? new DefaultValidator();
                     }
                 }
             }
             return new DefaultValidator();
         }
 
-        private Dictionary<string, Type> _ValidatorTypes;
+        private Dictionary<string, Type> _ValidatorTypes = new ();
 
         private Dictionary<string, Type> ValidatorTypes
         {

@@ -1,4 +1,8 @@
-﻿namespace FileFlows.Client.Components.Common
+﻿using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
+
+namespace FileFlows.Client.Components.Common
 {
     using FileFlows.Shared.Models;
     using Microsoft.AspNetCore.Components;
@@ -24,7 +28,15 @@
                     return;
                 this._FilterText = string.Empty;
                 this._Data = value ?? new();
-                this.DataDictionary = this._Data.ToDictionary(x => x, x => JsonSerializer.Serialize(x).ToLower());
+                var jsonOptions = new System.Text.Json.JsonSerializerOptions()
+                {   
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                this.DataDictionary = this._Data.ToDictionary(x => x, x =>
+                {
+                    string result = JsonSerializer.Serialize(x, jsonOptions);  
+                    return result.ToLowerExplicit();
+                });
                 FilterData();
             }
         }
@@ -153,7 +165,7 @@
                 this.SelectedItems.Clear();
                 this.NotifySelectionChanged();
             }
-            string filter = this.FilterText.ToLower();
+            string filter = this.FilterText.ToLowerExplicit();
             if (filter == string.Empty)
                 this.DisplayData = this.DataDictionary;
             else if (filter.StartsWith(CurrentFilter))

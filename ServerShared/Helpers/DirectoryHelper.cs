@@ -147,6 +147,9 @@ public class DirectoryHelper
     {
         get
         {
+            #if(DEBUG)
+            return "Plugins";
+            #endif
             // docker we expose this in the data directory so we
             // reduce how many things we have to map out
             if (IsDocker) 

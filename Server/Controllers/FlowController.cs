@@ -403,7 +403,11 @@ namespace FileFlows.Server.Controllers
             }
         }
 
-        private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
+        /// <summary>
+        /// Gets all the flow template files
+        /// </summary>
+        /// <returns>a array of all flow template files</returns>
+        private FileInfo[] GetTemplateFiles() => new DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
     
         /// <summary>
         /// Get flow templates
@@ -454,7 +458,7 @@ namespace FileFlows.Server.Controllers
                             bool invalid = false;
                             foreach (var jsPart in jst.Parts)
                             {
-                                if (parts.ContainsKey(jsPart.Name) == false)
+                                if (jsPart.Node == null || parts.ContainsKey(jsPart.Node) == false)
                                 {
                                     invalid = true;
                                     break;

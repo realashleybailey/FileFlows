@@ -7,7 +7,7 @@ window.ffFlowPart = {
     },
 
     unselectAll: function () {
-        for (let ele of ffFlowPart.flowPartElements)
+        for (let ele of ffFlowPart.flowPartElements) 
             ele.classList.remove('selected');
     },
 
@@ -57,7 +57,7 @@ window.ffFlowPart = {
             event.preventDefault();
             ffFlowPart.unselectAll();
             div.classList.add('selected');
-            ffFlow.SelectedPart = part;
+            ffFlow.SelectedParts = [part];
             ffFlow.selectNode(part);
         });
         div.addEventListener("dblclick", function (event) {
@@ -150,10 +150,8 @@ window.ffFlowPart = {
         }
     },
 
-    deleteFlowPart: function (uid) {
-
-        console.log('deleting: ', uid);
-
+    deleteFlowPart: function (uid) 
+    {
         var div = document.getElementById(uid);
         if (div)
             div.remove();
@@ -183,7 +181,6 @@ window.ffFlowPart = {
                 }
                 return; // editor was canceled
             }
-            console.log('edit result:', result);
             if (result.model.Name) {
                 part.name = result.model.Name;
                 delete result.model.Name;
@@ -212,7 +209,6 @@ window.ffFlowPart = {
 
     getNodeName: function (elementUid) {
         let node = ffFlow.elements.filter(x => x.uid === elementUid)[0];
-        console.log('node', node.displayName, node);
         if (node)
             return node.displayName;
         return '';

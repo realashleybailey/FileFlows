@@ -136,7 +136,26 @@ class ffFlowLines {
                 this.drawLine(inputEle, output, input);
             }
         }
+        this.drawDottedSelection();
     };
+    
+    drawDottedSelection(context){
+        if(window.ffFlow.Mouse.canvasSelecting !== true)
+            return;
+        let canvas = this.getCanvas();
+        let canvasBounds = canvas.getBoundingClientRect();
+        
+        let x1 = window.ffFlow.Mouse.initialX;
+        let y1 = window.ffFlow.Mouse.initialY;
+        let x2 = window.ffFlow.Mouse.currentX;
+        let y2 = window.ffFlow.Mouse.currentY;
+        x1 -= canvasBounds.left;
+        y1 -= canvasBounds.top;
+        this.ioContext.strokeStyle = this.accentColor;
+        this.ioContext.setLineDash([2]);
+        this.ioContext.strokeRect(x1, y1, x2, y2);
+        this.ioContext.setLineDash([0]);
+    }
 
     drawLine(input, output, connection) {
         if (!input || !output)

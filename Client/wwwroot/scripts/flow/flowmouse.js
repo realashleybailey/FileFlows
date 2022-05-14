@@ -7,6 +7,7 @@ class ffFlowMouse {
     xOffset = 0;
     yOffset = 0;
     draggingElementUid = null;
+    canvasSelecting = false;
 
     reset() {
         this.currentX = 0;
@@ -35,32 +36,92 @@ class ffFlowMouse {
         }
 
         if (e.target.classList.contains('draggable') === true) {
+            var part = ffFlow.parts.find(x => x.uid === e.target.parentNode.id);
+            let selected = ffFlow.SelectedParts.indexOf(part) >= 0;
+            if (selected !== true)
+            {
+                ffFlowPart.unselectAll();
+                ffFlow.selectNode(part);
+            }
             this.currentX = 0;
             this.currentY = 0;
             this.dragItem = e.target.parentNode;
             ffFlow.active = true;
-
+            this.canvasSelecting = false;
+        }
+        else if(e.target.tagName == 'CANVAS'){
+            this.canvasSelecting = true;
+        }else {
+            this.canvasSelecting = false;
         }
     }
 
     dragEnd(e) {
-        this.initialX = this.currentX;
-        this.initialY = this.currentY;
         if (ffFlow.active && this.dragItem) {
-            this.dragItem.style.transform = '';
-            let xPos = parseInt(this.dragItem.style.left, 10) + ffFlow.translateCoord(this.currentX);
-            let yPos = parseInt(this.dragItem.style.top, 10) + ffFlow.translateCoord(this.currentY);
-            this.dragItem.style.left = xPos + 'px';
-            this.dragItem.style.top = yPos + 'px';
+            this.initialX = this.currentX;
+            this.initialY = this.currentY;
+            for(let part of document.querySelectorAll('.flow-part.selected')) {
+                // this.dragItem.style.transform = '';
+                // let xPos = parseInt(this.dragItem.style.left, 10) + ffFlow.translateCoord(this.currentX);
+                // let yPos = parseInt(this.dragItem.style.top, 10) + ffFlow.translateCoord(this.currentY);
+                // this.dragItem.style.left = xPos + 'px';
+                // this.dragItem.style.top = yPos + 'px';
+
+                part.style.transform = '';
+                let xPos = parseInt(part.style.left, 10) + ffFlow.translateCoord(this.currentX);
+                let yPos = parseInt(part.style.top, 10) + ffFlow.translateCoord(this.currentY);
+                part.style.left = xPos + 'px';
+                part.style.top = yPos + 'px';
+            }
 
 
             ffFlow.redrawLines();
         }
+        else if(this.canvasSelecting){
+            let endX = e.x;
+            let endY = e.y;
+            let selectedBounds = {
+                x: Math.min(this.initialX, this.initialX + this.currentX),
+                y: Math.min(this.initialY, this.initialY + this.currentY),
+                width: Math.abs(this.currentX),
+                height: Math.abs(this.currentY)
+            };            
+            // set this in a timeout, this fixes an issue with the mouse click event clearing our selection
+            setTimeout(()=>{
+                    
+                ffFlowPart.unselectAll();   
+                // select all nodes in this area
+                let selected = [];
+                
+                if(Math.abs(selectedBounds.width + selectedBounds.height) > 10) {
+
+                    for (let p of window.ffFlow.parts) {
+                        var ele = document.getElementById(p.uid);
+                        if (!ele)
+                            continue;
+                        let eleBounds = ele.getBoundingClientRect();
+
+                        let inbounds = ((selectedBounds.x + selectedBounds.width) >= eleBounds.left)
+                            && (selectedBounds.x <= (eleBounds.left + eleBounds.width))
+                            && ((selectedBounds.y + selectedBounds.height) >= eleBounds.top)
+                            && (selectedBounds.y <= (eleBounds.top + eleBounds.height));
+                        if (inbounds) {
+                            selected.push(p);
+                            ele.classList.add('selected');
+                        }
+                    }
+                }
+                window.ffFlow.SelectedParts = selected;
+                this.canvasSelecting = false;
+                ffFlow.redrawLines();
+            });
+        }
+        this.canvasSelecting = false;
         ffFlow.active = false;
     }
 
     drag(e) {
-        if (ffFlow.active) {
+        if (ffFlow.active || this.canvasSelecting) {
 
             e.preventDefault();
 
@@ -75,8 +136,13 @@ class ffFlowMouse {
 
             this.xOffset = this.currentX;
             this.yOffset = this.currentY;
-
-            this.setTranslate(this.currentX, this.currentY, this.dragItem);
+            if(ffFlow.active) 
+            {
+                for(let part of document.querySelectorAll('.flow-part.selected')) 
+                {
+                    this.setTranslate(this.currentX, this.currentY, part);
+                }
+            }
             ffFlow.redrawLines();
         }
     }

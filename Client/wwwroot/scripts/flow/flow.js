@@ -5,7 +5,7 @@ window.ffFlow = {
     elements: [],
     FlowLines: new ffFlowLines(),
     Mouse: new ffFlowMouse(),
-    SelectedPart: null,
+    SelectedParts: [],
     SingleOutputConnection: true,
     Vertical: true,
     lblDelete: 'Delete',
@@ -29,7 +29,7 @@ window.ffFlow = {
     },
 
     unSelect: function () {
-        ffFlow.SelectedPart = null;
+        ffFlow.SelectedParts = [];
         ffFlowPart.unselectAll();
     },
 
@@ -58,6 +58,7 @@ window.ffFlow = {
             }
             container = c;
         }
+        container.addEventListener("keydown", (e) => ffFlow.onKeyDown(e), false);
         container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
         container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
         container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
@@ -192,9 +193,7 @@ window.ffFlow = {
     },
 
     getModel: function () {
-        console.log('getModel');
         let connections = this.FlowLines.ioOutputConnections;
-        console.log('getting model, connections', connections);
 
 
         let connectionUids = [];
@@ -250,13 +249,10 @@ window.ffFlow = {
             p.yPos = parseInt(div.style.top, 10);
         }
 
-        console.log('model in js', this.parts);
-
         return this.parts;
     },
 
     getElement: function (uid) {
-        console.log('getting element: ' + uid);
         return ffFlow.elements.filter(x => x.uid == uid)[0];
     },
 
@@ -289,8 +285,10 @@ window.ffFlow = {
                     if (ffFlow.infoSelectedType === 'Connection')
                         ffFlow.FlowLines.deleteConnection();
                     else if (ffFlow.infoSelectedType === 'Node') {
-                        if (ffFlow.SelectedPart)
-                            ffFlowPart.deleteFlowPart(ffFlow.SelectedPart.uid);
+                        if (ffFlow.SelectedParts?.length) {
+                            for(let p of ffFlow.SelectedParts)
+                                ffFlowPart.deleteFlowPart(p.uid);
+                        }
                     }
                 }, false);
                 box.appendChild(remove);
@@ -336,6 +334,14 @@ window.ffFlow = {
             ffFlow.setInfo();
             return;
         }
+        ffFlow.SelectedParts = [part];
+        
+        var ele = document.getElementById(part.uid);
+        if(ele)
+        {
+            ele.classList.remove('selected');
+            ele.classList.add('selected');
+        }
 
         if (!part.displayDescription) {
             let element = ffFlow.getElement(part.flowElementUid);
@@ -355,7 +361,6 @@ window.ffFlow = {
             console.error("Failed to find element: " + part.flowElementUid);
             return;
         }
-        console.log(element.name + '.model', part.model);
         ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Outputs.${output}`, part.model).then(result => {
             if (!part.OutputLabels) part.OutputLabels = {};
             part.OutputLabels[output] = result;
@@ -369,6 +374,16 @@ window.ffFlow = {
             return;
         for (let i = 0; i < part.outputs; i++) {
             ffFlow.setOutputHint(part, i + 1);
+        }
+    },
+    
+    onKeyDown(event) {
+        if (event.code === 'Delete' || event.code === 'Backspace') {
+            for(let part of this.SelectedParts || []) {
+                ffFlowPart.deleteFlowPart(part.uid);
+            }
+            event.stopImmediatePropagation();
+            event.preventDefault();
         }
     }
 }

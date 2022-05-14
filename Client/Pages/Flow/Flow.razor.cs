@@ -50,7 +50,6 @@ namespace FileFlows.Client.Pages
 
         private ElementReference eleFilter { get; set; }
 
-        public ffPart SelectedPart { get; set; }
         [Inject]
         private IJSRuntime jsRuntime { get; set; }
         private bool IsSaving { get; set; }
@@ -776,7 +775,7 @@ let process = Flow.Execute({
         'x265',
         '-E',
         'copy',
-        '–audio-fallback',
+        'ï¿½audio-fallback',
         'aac',
         '--all-audio',
         '--all-subtitles',

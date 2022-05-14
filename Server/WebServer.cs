@@ -150,6 +150,8 @@ public class WebServer
             new LibraryWorker(),
             new FlowWorker(string.Empty, isServer: true),
             new PluginUpdaterWorker(),
+            new LogPruner(),
+            new LogConverter(),
             new TelemetryReporter()//,
             //isWindows ? new AutoUpdater() : null
         );
@@ -178,35 +180,6 @@ public class WebServer
             Logger.Instance.ILog("Startup cleanup");
             Workers.AutoUpdater.CleanUpOldFiles(60_000);
 
-            string? source = DirectoryHelper.LoggingDirectory;
-            if (string.IsNullOrEmpty(source))
-                return;
-
-            string dest = Path.Combine(source, "LibraryFiles");
-            if (Directory.Exists(dest) == false)
-            {
-                Logger.Instance.ILog("Creating LibraryFiles Logging: " + dest);
-                Directory.CreateDirectory(dest);
-            }
-
-            foreach (var file in new DirectoryInfo(source).GetFiles("*.log"))
-            {
-                if (file.Name.Contains("FileFlows"))
-                    continue;
-                if (file.Name.Length != 40)
-                {
-                    Logger.Instance.ILog("Not a library file: " + file.Name);
-                    continue; // not a guid name
-                }
-                try
-                {
-                    file.MoveTo(Path.Combine(dest, file.Name), true);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Instance.ELog("Failed moving file: " + file.Name + " => " + ex.Message);
-                }
-            }
         }
         catch (Exception ex)
         {

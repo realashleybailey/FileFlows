@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Hubs
+﻿using FileFlows.Server.Helpers;
+
+namespace FileFlows.Server.Hubs
 {
     using FileFlows.Server.Controllers;
     using Microsoft.AspNetCore.SignalR;
@@ -10,11 +12,7 @@
         {
             try
             {
-                string filename = (await new SettingsController().Get()).GetLogFile(DirectoryHelper.LoggingDirectory, libraryFileUid);
-                var fi = new FileInfo(filename);
-                if(fi.Directory.Exists == false)
-                    fi.Directory.Create();
-                await File.AppendAllTextAsync(fi.FullName, message + Environment.NewLine);
+                await LibraryFileLogHelper.AppendToLog(libraryFileUid, message);
             }
             catch (Exception) { }
 

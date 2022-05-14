@@ -57,11 +57,11 @@ public class DirectoryHelper
     private static void InitLoggingDirectory()
     {
         string dir = Path.Combine(BaseDirectory, "Logs");
-        string libFilesDir = Path.Combine(dir, "LibraryFiles");
+        LibraryFilsLoggingDirectory = Path.Combine(dir, "LibraryFiles");
         if (Directory.Exists(dir) == false)
             Directory.CreateDirectory(dir);
-        if(Directory.Exists(libFilesDir) == false)
-            Directory.CreateDirectory(libFilesDir);
+        if(Directory.Exists(LibraryFilsLoggingDirectory) == false)
+            Directory.CreateDirectory(LibraryFilsLoggingDirectory);
         
         
         // look for logs from other directories
@@ -76,7 +76,7 @@ public class DirectoryHelper
         {
             if (Regex.IsMatch(file.Name, @"^[a-fA-F0-9\-]{36}\.(log|html)$"))
             {
-                var destLogFile = Path.Combine(libFilesDir, file.Name);
+                var destLogFile = Path.Combine(LibraryFilsLoggingDirectory, file.Name);
                 if (file.FullName == destLogFile)
                     continue; // shouldn't happen
                 file.MoveTo(destLogFile, true);
@@ -123,6 +123,10 @@ public class DirectoryHelper
     /// Gets the logging directory
     /// </summary>
     public static string LoggingDirectory { get; private set; }
+    /// <summary>
+    /// Gets the directory where library file logs are stored 
+    /// </summary>
+    public static string LibraryFilsLoggingDirectory { get; private set; }
 
     /// <summary>
     /// Gets the data directory

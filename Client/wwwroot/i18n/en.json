@@ -334,6 +334,8 @@
         "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "AutoUpdateNodes": "Auto Update Nodes",
         "AutoUpdateNodes-Help": "When enabled external nodes will automatically update when FileFlows server updates.  Meaning you will only have to update the FileFlows server instance in a distributed environment.",
+        "CompressLibraryFileLogs":"Compress Library Log Files",
+        "CompressLibraryFileLogs-Help":"When enabled, all library log files will be saved in a compressed format.\nThis will reduce the size on disk of the log files, but make them harder to read outside of FileFlows",
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
         "PluginRepositoryUrls": "Plugin Repositories",

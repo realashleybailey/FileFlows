@@ -1,3 +1,5 @@
+using FileFlows.Server.Helpers;
+
 namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -25,28 +27,18 @@ namespace FileFlows.Server.Controllers
             this.Context = context;
         }
 
-        private async Task<string> GetLogFileName(Guid libraryFileUid)
-        {
-            var logFile = (await new SettingsController().Get()).GetLogFile(DirectoryHelper.LoggingDirectory, libraryFileUid);
-            return logFile;
-        }
-
         /// <summary>
         /// Start work, tells the server work has started on a flow runner
         /// </summary>
         /// <param name="info">The info about the work starting</param>
         /// <returns>the updated info</returns>
         [HttpPost("work/start")]
-        public async Task<FlowExecutorInfo> StartWork([FromBody] FlowExecutorInfo info)
+        public FlowExecutorInfo StartWork([FromBody] FlowExecutorInfo info)
         {
             try
             {
-                // try to delete a log file for this library file if one already exists (incase the flow was cancelled and now its being re-run)                
-                string logFile = await GetLogFileName(info.LibraryFile.Uid);
-                if (System.IO.File.Exists(logFile))
-                    System.IO.File.Delete(logFile);
-                if (System.IO.File.Exists(logFile.Replace(".log", ".html")))
-                    System.IO.File.Delete(logFile.Replace(".log", ".html"));
+                // try to delete a log file for this library file if one already exists (in case the flow was cancelled and now its being re-run)                
+                LibraryFileLogHelper.DeleteLogs(info.LibraryFile.Uid);
             }
             catch (Exception) { }
 
@@ -69,8 +61,7 @@ namespace FileFlows.Server.Controllers
                 // this contains the full log file, save it incase a message was lost or recieved out of order during processing
                 try
                 {
-                    string logfile = await GetLogFileName(info.LibraryFile.Uid);
-                    System.IO.File.WriteAllText(logfile, info.Log);
+                    _ = LibraryFileLogHelper.SaveLog(info.LibraryFile.Uid, info.Log, saveHtml: true);
                 }
                 catch (Exception) { }
             }
@@ -200,21 +191,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="lineCount">The number of lines to fetch, 0 to fetch them all</param>
         /// <returns>The log of a library file</returns>
         [HttpGet("{uid}/log")]
-        public async Task<string> Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0)
-        {
-            var file = await GetLogFileName(uid);
-            if (System.IO.File.Exists(file))
-            {
-                if (lineCount <= 0)
-                    return System.IO.File.ReadAllText(file);
-
-                var lines = System.IO.File.ReadAllLines(file);
-                if (lines.Count() <= lineCount)
-                    return String.Join(Environment.NewLine, lines);
-                return String.Join(Environment.NewLine, lines.Skip(lines.Count() - lineCount));
-            }
-            return String.Empty;
-        }
+        public string Log([FromRoute] Guid uid, [FromQuery] int lineCount = 0) => LibraryFileLogHelper.GetLog(uid);
 
         /// <summary>
         /// Abort work by library file
@@ -237,7 +214,7 @@ namespace FileFlows.Server.Controllers
                 // may not have an executor, just update the status
                 var libfileController = new LibraryFileController();
                 var libFile = await libfileController.Get(uid);
-                if (libFile != null && libFile.Status == FileStatus.Processing)
+                if (libFile is { Status: FileStatus.Processing })
                 {
                     libFile.Status = FileStatus.ProcessingFailed;
                     await libfileController.Update(libFile);

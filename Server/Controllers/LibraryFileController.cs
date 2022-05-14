@@ -280,14 +280,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         var result = await GetByUid(uid);
         if(result != null && (result.Status == FileStatus.ProcessingFailed || result.Status == FileStatus.Processed))
         {
-            var logFile = (await new SettingsController().Get())?.GetLogFile(DirectoryHelper.LoggingDirectory, uid);
-            string htmlFile = logFile.Replace(".log", ".html");
-            if(System.IO.File.Exists(logFile) && System.IO.File.Exists(htmlFile) == false)
-            {
-                string log = System.IO.File.ReadAllText(logFile);
-                string html = LogToHtml.Convert(log);
-                System.IO.File.WriteAllText(htmlFile, html); 
-            }
+            if (LibraryFileLogHelper.HtmlLogExists(uid))
+                return result;
+            LibraryFileLogHelper.CreateHtmlOfLog(uid);
         }
         return result;
     }
@@ -328,36 +323,11 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="html">if the log should be html if possible</param>
     /// <returns>The log of the library file</returns>
     [HttpGet("{uid}/log")]
-    public async Task<string> GetLog([FromRoute] Guid uid, [FromQuery] int lines = 0, [FromQuery] bool html = true)
+    public string GetLog([FromRoute] Guid uid, [FromQuery] int lines = 0, [FromQuery] bool html = true)
     {
-        var logFile = (await new SettingsController().Get())?.GetLogFile(DirectoryHelper.LoggingDirectory, uid);
-        if (string.IsNullOrEmpty(logFile))
-            return string.Empty;
-        if (System.IO.File.Exists(logFile) == false)
-            return string.Empty;
-
         try
         {
-            var logFileHtml = logFile.Replace(".log", ".html");
-            if (html && System.IO.File.Exists(logFileHtml))
-                logFile = logFileHtml;
-            else if(lines > 0)
-            {
-                var logLines = System.IO.File.ReadAllLines(logFile);
-                string log;
-                if (logLines.Count() <= lines)
-                    log = String.Join(Environment.NewLine, logLines);
-                else
-                    log = String.Join(Environment.NewLine, logLines.Skip(logLines.Count() - lines));
-
-                if (html == false)
-                    return log;
-                return LogToHtml.Convert(log);
-            }
-
-            Stream stream = System.IO.File.Open(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using StreamReader streamReader = new StreamReader(stream);
-            return streamReader.ReadToEnd();
+            return html ? LibraryFileLogHelper.GetHtmlLog(uid, lines) : LibraryFileLogHelper.GetLog(uid);
         }
         catch (Exception ex)
         {
@@ -377,11 +347,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     {
         try
         {
-            var logFile = (await new SettingsController().Get())?.GetLogFile(DirectoryHelper.LoggingDirectory, uid);
-            System.IO.File.WriteAllText(logFile, log);
-
-            string html = LogToHtml.Convert(log);
-            System.IO.File.WriteAllText(logFile.Replace(".log", ".html"), html);
+            await LibraryFileLogHelper.SaveLog(uid, log, saveHtml: true);
             return true;
         }
         catch (Exception) { }

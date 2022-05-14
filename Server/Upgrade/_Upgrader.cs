@@ -11,21 +11,13 @@ public class Upgrader
         var currentVersion = string.IsNullOrWhiteSpace(settings.Version) ? new Version() : Version.Parse(settings.Version);
 
         if(currentVersion <  new Version(0, 5, 0))
-        {
-            // no stats recorded, we need to add this
             new UpgradeStats().Run();
-        }
         if (currentVersion < new Version(0, 5, 3))
-        {
-            // no stats recorded, we need to add this
             new Upgrade0_5_3().Run();
-        }
         if (currentVersion < new Version(0, 6, 0))
-        {
-            // directory changes, ffmpeg on windows directory changed
             new Upgrade0_6_0().Run();
-        }
-        
+        if (currentVersion < new Version(0, 6, 1))
+            new Upgrade0_6_1().Run(settings);
         
 
         // save the settings

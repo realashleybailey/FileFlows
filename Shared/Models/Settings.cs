@@ -6,42 +6,56 @@
 
     public class Settings : FileFlowObject
     {
+        /// <summary>
+        /// Gets or sets if plugins should automatically be updated when new version are available online
+        /// </summary>
         public bool AutoUpdatePlugins { get; set; }
 
+        /// <summary>
+        /// Gets or sets if the server should automatically update when a new version is available online
+        /// </summary>
         public bool AutoUpdate { get; set; }
 
+        /// <summary>
+        /// Gets or sets if nodes should be automatically updated when the server is updated
+        /// </summary>
         public bool AutoUpdateNodes { get; set; }
 
+        /// <summary>
+        /// Gets or sets if telemetry should be disabled
+        /// </summary>
         public bool DisableTelemetry { get; set; }
+        
+        /// <summary>
+        /// Gets or sets if the library file logs should be saved in a compressed format to reduce file size
+        /// </summary>
+
+        public bool CompressLibraryFileLogs { get; set; }
 
         private List<string> _PluginRepositoryUrls = new ();
+        /// <summary>
+        /// Gets or sets a list of available URLs to additional plugin repositories
+        /// </summary>
         public List<string> PluginRepositoryUrls
         {
             get => _PluginRepositoryUrls;
-            set { _PluginRepositoryUrls = value ?? new(); }
+            set => _PluginRepositoryUrls = value ?? new();
         }
-
-        public bool IsWindows { get; set; }
-        public bool IsDocker { get; set; }
-
-        public string Version { get; set; }
 
         /// <summary>
-        /// Gets a lof file
+        /// Gets or sets if this is running on Windows
         /// </summary>
-        /// <param name="logPath">The path where the logs are kept</param>
-        /// <param name="uid">the uid of the library file to get a log for</param>
-        /// <returns>The log file</returns>
-        public string GetLogFile(string logPath, Guid uid)
-        {
-            if (string.IsNullOrEmpty(logPath))
-                return string.Empty;
-            
-            //if(IsDocker) // docker is in the base directory
-                //return System.IO.Path.Combine(logPath, uid + ".log");
-
-            return System.IO.Path.Combine(logPath, "LibraryFiles", uid + ".log");
-        }
+        public bool IsWindows { get; set; }
+        
+        /// <summary>
+        /// Gets or sets if this is running inside Docker
+        /// </summary>
+        public bool IsDocker { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the FileFlows version number
+        /// </summary>
+        public string Version { get; set; }
     }
 
 }

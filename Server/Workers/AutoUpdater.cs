@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Workers;
+﻿using NPoco.Expressions;
+
+namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
@@ -13,13 +15,18 @@ public class AutoUpdater : UpdaterWorker
     private DateTime LastCheckedOnline = DateTime.MinValue;
     private int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
 
-    private static bool DevTest;
+    private static string UpdateUrl, DownloadUrl;
 
     public AutoUpdater() : base("server-upgrade", 60)
     {
-        DevTest = Environment.GetEnvironmentVariable("DevTest") == "1";
-        if(DevTest)
-            SetSchedule(ScheduleType.Minute, 1);
+        if(int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) && minutes > 0)
+            SetSchedule(ScheduleType.Minute, minutes);
+
+        var updateUrl = Environment.GetEnvironmentVariable("AutoUpdateUrl");
+        UpdateUrl = string.IsNullOrEmpty(updateUrl) == false ? updateUrl : "https://fileflows.com/api/telemetry/latest-version";
+        
+        var downloadUrl = Environment.GetEnvironmentVariable("AutoUpdateDownloadUrl");
+        UpdateUrl = string.IsNullOrEmpty(downloadUrl) == false ? downloadUrl : "https://fileflows.com/downloads/zip";
     }
 
     protected override void QuitApplication()
@@ -73,9 +80,7 @@ public class AutoUpdater : UpdaterWorker
     {
         try
         {
-            string url = "https://fileflows.com/api/telemetry/latest-version";
-            if (DevTest)
-                url += "?devtest=true";
+            string url = UpdateUrl;
             var result = HttpHelper.Get<string>(url, noLog: true).Result;
             if (result.Success == false)
             {
@@ -106,9 +111,9 @@ public class AutoUpdater : UpdaterWorker
     
     private async Task DownloadFile(string file)
     {
-        string url = "https://fileflows.com/downloads/zip?ts=" + DateTime.Now.Ticks;
-        if (DevTest)
-            url += "&devtest=true";
+        string url = DownloadUrl + 
+                     (DownloadUrl.IndexOf("?", StringComparison.Ordinal) > 0 ? "&" : "?") + 
+                     "ts=" + DateTime.Now.Ticks;
 
         using HttpClient httpClient = new();
         

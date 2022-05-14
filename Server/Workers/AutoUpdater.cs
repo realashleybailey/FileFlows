@@ -12,21 +12,31 @@ using FileFlows.Shared.Helpers;
 /// </summary>
 public class AutoUpdater : UpdaterWorker
 {
-    private DateTime LastCheckedOnline = DateTime.MinValue;
-    private int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
-
-    private static string UpdateUrl, DownloadUrl;
+    private static string UpdateUrl = "https://fileflows.com/api/telemetry/latest-version";
+    private static string DownloadUrl = "https://fileflows.com/downloads/zip";
 
     public AutoUpdater() : base("server-upgrade", 60)
     {
-        if(int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) && minutes > 0)
+        if (int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) &&
+            minutes > 0)
+        {
+            Logger.Instance?.DLog("Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
             SetSchedule(ScheduleType.Minute, minutes);
+        }
 
         var updateUrl = Environment.GetEnvironmentVariable("AutoUpdateUrl");
-        UpdateUrl = string.IsNullOrEmpty(updateUrl) == false ? updateUrl : "https://fileflows.com/api/telemetry/latest-version";
+        if (string.IsNullOrEmpty(updateUrl) == false)
+        {
+            Logger.Instance?.DLog("Using Auto Update URL: " + updateUrl);
+            UpdateUrl = updateUrl;
+        }
         
         var downloadUrl = Environment.GetEnvironmentVariable("AutoUpdateDownloadUrl");
-        UpdateUrl = string.IsNullOrEmpty(downloadUrl) == false ? downloadUrl : "https://fileflows.com/downloads/zip";
+        if (string.IsNullOrEmpty(downloadUrl) == false)
+        {
+            Logger.Instance?.DLog("Using Auto Download URL: " + downloadUrl);
+            DownloadUrl = downloadUrl;
+        }
     }
 
     protected override void QuitApplication()

@@ -13,14 +13,14 @@ public class Server : Component
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "Avalonia.Themes.Fluent.dll", true);
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server", "appsettings.Development.json", true);
 
-        Utils.EnsureDirectoryExists(OutputPath + "/Plugins");
+        Utils.EnsureDirectoryExists(BuildOptions.TempPath + "/Plugins");
         Utils.CopyFile(BuildOptions.SourcePath + "/icon.ico", BuildOptions.TempPath + "/Server");
         Utils.CopyFile($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip", BuildOptions.TempPath + "/Server/Nodes/");
         File.Delete($"{BuildOptions.Output}/FileFlows-Node-{Globals.Version}.zip"); // no longer need it
         if(Directory.Exists(BuildOptions.SourcePath + "/build/dependencies/Plugins"))
-            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/Plugins", BuildOptions.TempPath + "/Server/Plugins", pattern: @"\.ffplugin$");
+            Utils.CopyFiles(BuildOptions.SourcePath + "/build/dependencies/Plugins", BuildOptions.TempPath + "/Plugins", pattern: @"\.ffplugin$");
         
-        if(Utils.DirectoryIsEmpty(OutputPath + "/Plugins"))
+        if(Utils.DirectoryIsEmpty(BuildOptions.TempPath + "/Plugins"))
             File.WriteAllText(OutputPath + "/Plugins/readme.txt", "This is where plugins are installed");
 
         if(File.Exists(BuildOptions.SourcePath + "/build/dependencies/ffmpeg.exe"))
@@ -40,6 +40,7 @@ public class Server : Component
         Utils.CopyFiles(BuildOptions.TempPath + "/FlowRunner", BuildOptions.TempPath + "/Server/FlowRunner");
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server/Server", "run-server.*");
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Server", false, @"run-server\.(bat|sh)$");
+        Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Server", false, @"server-update\.(bat|sh)$");
 
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");
     }

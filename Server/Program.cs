@@ -26,6 +26,13 @@ public class Program
             ServerShared.Globals.IsDocker = args?.Any(x => x == "--docker") == true;
             var noGui = args?.Any((x => x.ToLower() == "--no-gui")) == true || Docker;
             DirectoryHelper.Init(Docker, false);
+            
+            
+            if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.bat")))
+                File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.bat"));
+            if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh")))
+                File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
+            
             Logger.Instance = new Server.Logger();
             
             Logger.Instance.ILog(new string('=', 50));

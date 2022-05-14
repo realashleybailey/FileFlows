@@ -358,11 +358,39 @@ namespace FileFlows.Plugin
             return true;
         }
 
-
-        public bool CopyFile(string destination)
+        /// <summary>
+        /// Copies a folder to the destination
+        /// Paths will automatically be mapped relative to the Node executing it
+        /// </summary>
+        /// <param name="source">the source file</param>
+        /// <param name="destination">the destination file</param>
+        /// <param name="updateWorkingFile"></param>
+        /// <returns>whether or not the file was copied successfully</returns>
+        public bool CopyFile(string source, string destination, bool updateWorkingFile = false)
         {
             if (Fake) return true;
 
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                Logger?.WLog("CopyFile.Source was not supplied");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(destination))
+            {
+                Logger?.WLog("CopyFile.Destination was not supplied");
+                return false;
+            }
+            
+            string originalSource = source;
+            source = MapPath(source);
+            if(originalSource != source)
+                Logger?.ILog($"Mapped path from '{originalSource}' to '{source}'");
+
+            string originalDestination = destination;
+            destination = MapPath(destination);
+            if(originalDestination != destination)
+                Logger?.ILog($"Mapped path from '{originalDestination}' to '{destination}'");
+            
             FileInfo file = new FileInfo(destination);
             if (string.IsNullOrEmpty(file.Extension) == false)
             {
@@ -370,12 +398,10 @@ namespace FileFlows.Plugin
                 destination = new FileInfo(file.FullName.Substring(0, file.FullName.LastIndexOf(file.Extension)) + file.Extension.ToLower()).FullName;
             }
 
-            destination = MapPath(destination);
-
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (isWindows)
             {
-                if (destination.ToLower() == WorkingFile?.ToLower())
+                if (destination.ToLower() == source.ToLower())
                 {
                     Logger?.ILog("Source and destination are the same, skipping move");
                     return true;
@@ -384,7 +410,7 @@ namespace FileFlows.Plugin
             else
             {
                 // linux, is case sensitive
-                if (destination == WorkingFile)
+                if (destination == source)
                 {
                     Logger?.ILog("Source and destination are the same, skipping move");
                     return true;
@@ -393,7 +419,7 @@ namespace FileFlows.Plugin
 
 
             bool copied = false;
-            long fileSize = new FileInfo(WorkingFile).Length;
+            long fileSize = new FileInfo(source).Length;
             Task task = Task.Run(() =>
             {
                 try
@@ -405,14 +431,20 @@ namespace FileFlows.Plugin
                     else
                         CreateDirectoryIfNotExists(fileInfo?.DirectoryName);
 
-                    bool isTempFile = this.WorkingFile.ToLower().StartsWith(this.TempPath.ToLower()) == true;
+                    bool isTempFile = source.ToLower().StartsWith(this.TempPath.ToLower()) == true;
 
-                    Logger?.ILog($"Copying file: \"{WorkingFile}\" to \"{destination}\"");
-                    File.Copy(WorkingFile, destination, true);
+                    Logger?.ILog($"Copying file: \"{source}\" to \"{destination}\"");
+                    File.Copy(source, destination, true);
                     Logger?.ILog("File copied successfully");
 
                     if (isWindows == false && isTempFile)
                         Helpers.FileHelper.ChangeOwner(Logger, destination, file: true);
+
+                    if (updateWorkingFile == false)
+                    {
+                        copied = true;
+                        return;
+                    }
 
                     this.WorkingFile = destination;
                     try

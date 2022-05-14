@@ -25,14 +25,11 @@
             
             <FlowTabs>
                 <FlowTab Title="@lblGeneral">
-                    @if (Model.IsWindows && false)
-                    {
-                        <InputSwitch @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
-                    }
-                    <InputSwitch @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins"/>
-                    <InputSwitch @bind-Value="@Model.AutoUpdateNodes" Label="Pages.Settings.Fields.AutoUpdateNodes"/>
                     <InputSwitch @bind-Value="@Model.CompressLibraryFileLogs" Label="Pages.Settings.Fields.CompressLibraryFileLogs"/>
                     <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry"/>
+                    <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
+                    <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins"/>
+                    <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdateNodes" Label="Pages.Settings.Fields.AutoUpdateNodes"/>
                 </FlowTab>
                 @if (ShowInternalProcessingNdoe)
                 {

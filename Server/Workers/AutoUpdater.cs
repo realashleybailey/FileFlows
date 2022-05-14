@@ -1,99 +1,74 @@
-﻿// disabling for now as switched to a nsis/exe installer
-
-namespace FileFlows.Server.Workers;
+﻿namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared;
 using FileFlows.Shared.Helpers;
-using System.Diagnostics;
-using System.Reflection;
-using System.Text.RegularExpressions;
 
 /// <summary>
 /// A worker that automatically updates FileFlows
 /// </summary>
-public class AutoUpdater : Worker
+public class AutoUpdater : UpdaterWorker
 {
-    private static string _UpdateDirectory;
-    private static string UpdateDirectory
+    private DateTime LastCheckedOnline = DateTime.MinValue;
+    private int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
+
+    private static bool DevTest;
+
+    public AutoUpdater() : base("server-upgrade", 60)
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_UpdateDirectory))
-            {
-                _UpdateDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Updates");
-            }
-            return _UpdateDirectory;
-        }
+        DevTest = Environment.GetEnvironmentVariable("DevTest") == "1";
+        if(DevTest)
+            SetSchedule(ScheduleType.Minute, 1);
     }
 
-    private DateTime LastCheckedOnline = DateTime.MinValue;
-    //private int LastCheckedOnlineIntervalMinutes = 60; // 60 minutes
+    protected override void QuitApplication()
+    {
+        WorkerManager.StopWorkers();
+        Environment.Exit(99);
+    }
+    
+    protected override bool GetAutoUpdatesEnabled()
+    {
+        var settings = new SettingsController().Get().Result;
+        return settings?.AutoUpdate == true;
+    }
 
-    private static bool DevTest = false;
+    protected override bool CanUpdate()
+    {
+        var workers = new WorkerController(null).GetAll();
+        return workers?.Any() != true;
+    }
+
+    protected override string DownloadUpdateBinary()
+    {
+        var result = GetLatestOnlineVersion();
+        if (result.updateAvailable == false)
+            return string.Empty;
+        
+        Version onlineVersion = result.onlineVersion;
+
+        string updateDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Updates");
+
+        string file = Path.Combine(updateDirectory, $"FileFlows-{onlineVersion}.zip");
+        if (File.Exists(file))
+        {
+            Logger.Instance.ILog("AutoUpdater: Update already downloaded: " + file);
+            return string.Empty;
+        }
+
+        if (Directory.Exists(updateDirectory) == false)
+            Directory.CreateDirectory(updateDirectory);
+
+        Logger.Instance.ILog("AutoUpdater: Downloading update: " + onlineVersion);
+        DownloadFile(file).Wait();
+        return file;
+    }
 
     /// <summary>
-    /// Gets or sets if a updating is pending installation
+    /// Gets the latest version available online
     /// </summary>
-    public static bool UpdatePending { get; private set; }
-
-    public AutoUpdater() : base(ScheduleType.Minute, 1)
-    {
-        // Logger.Instance.ILog("AutoUpdater: Starting AutoUpdater");
-        //
-        // DevTest = File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "devtest"));
-        // if (DevTest)
-        // {
-        //     LastCheckedOnlineIntervalMinutes = 2;
-        // }
-        //
-        // if (Directory.Exists(UpdateDirectory) == false)
-        // {
-        //     Logger.Instance.ILog("AutoUpdater: Creating updates directory: " + UpdateDirectory);
-        //     Directory.CreateDirectory(UpdateDirectory);
-        // }
-        // else
-        // {
-        //     CleanUpOldFiles();
-        //     Logger.Instance.ILog("AutoUpdater: Watch Directory: " + UpdateDirectory);
-        // }
-        //
-        // FileSystemWatcher watcher = new FileSystemWatcher(UpdateDirectory);
-        // watcher.NotifyFilter =
-        //                  NotifyFilters.FileName |
-        //                  NotifyFilters.DirectoryName |
-        //                  NotifyFilters.Attributes |
-        //                  NotifyFilters.Size |
-        //                  NotifyFilters.LastWrite |
-        //                  NotifyFilters.LastAccess |
-        //                  NotifyFilters.CreationTime |
-        //                  NotifyFilters.Security;
-        //
-        // watcher.Changed += Watcher_Changed;
-        // watcher.Created += Watcher_Changed;
-        // watcher.Renamed += Watcher_Changed;
-        //
-        // watcher.EnableRaisingEvents = true;
-        //
-        // Execute();
-    }
-
-    protected override void Execute()
-    {
-        // var settings = new SettingsController().Get().Result;
-        // if (settings.AutoUpdate == false)
-        //     return;
-        //
-        // if (LastCheckedOnline < DateTime.Now.AddMinutes(-LastCheckedOnlineIntervalMinutes).AddSeconds(5))
-        // {
-        //     CheckForUpdateOnline();
-        //     LastCheckedOnline = DateTime.Now;
-        // }
-        //
-        // CheckForUpdate();
-    }
-
+    /// <returns>The latest version available online</returns>
     public static (bool updateAvailable, Version onlineVersion) GetLatestOnlineVersion()
     {
         try
@@ -128,158 +103,18 @@ public class AutoUpdater : Worker
             return (false, new Version(0, 0, 0, 0));
         }
     }
-
-    private void CheckForUpdateOnline()
+    
+    private async Task DownloadFile(string file)
     {
-        try
-        {
-            var result = GetLatestOnlineVersion();
-            if (result.updateAvailable == false)
-                return;
-
-            Version onlineVersion = result.onlineVersion;
-
-            string file = Path.Combine(UpdateDirectory, $"FileFlows-{onlineVersion}.msi");
-            if (File.Exists(file))
-            {
-                Logger.Instance.ILog("AutoUpdater: Update already downloaded: " + file);
-                return;
-            }
-
-            Logger.Instance.ILog("AutoUpdater: Downloading update: " + onlineVersion);
-            DownloadFile(file);
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.ELog("AutoUpdater: Failed checking online version: " + ex.Message);
-        }
-    }
-
-    private void DownloadFile(string file)
-    {
-        string downloadUrl = "https://fileflows.com/downloads/server-msi?ts=" + DateTime.Now.Ticks;
+        string url = "https://fileflows.com/downloads/zip?ts=" + DateTime.Now.Ticks;
         if (DevTest)
-            downloadUrl += "&devtest=true";
+            url += "&devtest=true";
 
-#pragma warning disable SYSLIB0014 // Type or member is obsolete
-        using (var client = new System.Net.WebClient())
-        {
-            client.DownloadFile(downloadUrl, file);
-        }
-#pragma warning restore SYSLIB0014 // Type or member is obsolete
-    }
-
-    private void Watcher_Changed(object sender, FileSystemEventArgs e)
-    {
-        Logger.Instance.ILog("AutoUpdater: File change detected: " + e.FullPath);
-        if (e.FullPath.EndsWith(".msi") == false)
-            return;
-        CheckForUpdate();
-    }
-
-    private void CheckForUpdate()
-    {
-        Logger.Instance.ILog("AutoUpdater: Checking for updates");
-        var update = GetUpdate();
-        if (string.IsNullOrEmpty(update.Item1))
-        {
-            Logger.Instance.ILog("AutoUpdater: No updates found");
-            return;
-        }
-
-        Logger.Instance.ILog("AutoUpdater: Found update: " + update.Item1);
-
-        UpdatePending = true;
-
-        var workers = new WorkerController(null).GetAll();
-        bool canUpdate = workers?.Any() != true;
-        if(canUpdate == false)
-        {
-            Logger.Instance.ILog("AutoUpdater: Currently processing files, cannot update");
-            return;
-        }
-
-        Logger.Instance.ILog("AutoUpdater: Currently not processing files, can update");
-        RunUpdate(update.Item1, update.Item2);
-    }
-
-    private (string, string) GetUpdate()
-    {
-        foreach (var file in new DirectoryInfo(UpdateDirectory).GetFiles("*.msi"))
-        {
-            var isGreater = IsGreaterThanCurrent(file.FullName);
-            if (isGreater.greater == true)
-                return (file.FullName, isGreater.version);
-        }
-        return (string.Empty, string.Empty);
-    }
-
-    private static (bool greater, string version) IsGreaterThanCurrent(string filename)
-    {
-        string shortName = new FileInfo(filename).Name;
-        var rgxVersion = new Regex(@"(?<=(^FileFlows-))([\d]+\.){3}[\d]+(?=(\.msi$))");
-        var currentVersion = Version.Parse(Globals.Version);
-        var match = rgxVersion.Match(shortName);
-        if (match.Success == false)
-        {
-            Logger.Instance.ILog("AutoUpdater: File does not match version regex: " + filename);
-            return (false, string.Empty);
-        }
-
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-        Version version;
-        if (Version.TryParse(match.Value, out version) == false)
-        {
-            Logger.Instance.ILog("AutoUpdater: Failed to parse version: " + match.Value);
-            return (false, string.Empty); ;
-        }
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-
-        if (version > currentVersion)
-            return (true, match.Value);
-        return (false, match.Value);
-    }
-
-    public void RunUpdate(string msi, string version)
-    {
-        Logger.Instance.ILog($"AutoUpdater: Running update [{version}]: {msi}");
-        Process.Start("msiexec.exe", $"/i \"{msi}\" /quiet /qn");
-
-        WorkerManager.StopWorkers();
-        Environment.Exit(99);
-    }
-
-    internal static void CleanUpOldFiles(int delayMilliseconds = 30_000)
-    {
-        try
-        {
-            string dir = UpdateDirectory;
-            if (Directory.Exists(dir) == false)
-                return;
-
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(delayMilliseconds);
-
-                    foreach (var file in Directory.GetFiles(dir, "FileFlows-*.msi"))
-                    {
-                    // check if version greater than this
-                    var isGreater = IsGreaterThanCurrent(file);
-                        if (isGreater.greater)
-                            continue; // dont delete
-                    try
-                        {
-                        // maybe locked
-                        File.Delete(file);
-                            Logger.Instance.ILog("AutoUpdater: Deleting old update file");
-                        }
-                        catch (Exception) { }
-                    }
-                }
-                catch (Exception) { }
-            });
-        }catch (Exception) { }   
+        using HttpClient httpClient = new();
+        
+        using HttpResponseMessage response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+        using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync(); 
+        using Stream streamToWriteTo = File.Open(file, FileMode.Create); 
+        await streamToReadFrom.CopyToAsync(streamToWriteTo);
     }
 }

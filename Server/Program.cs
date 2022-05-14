@@ -5,7 +5,7 @@ namespace FileFlows.Server;
 
 public class Program
 {
-    public static bool Docker { get; private set; }
+    public static bool Docker => ServerShared.Globals.IsDocker;
     internal static bool WindowsGui { get; private set; }
     private static Mutex appMutex = null;
     const string appName = "FileFlowsServer";
@@ -23,7 +23,7 @@ public class Program
                 return;
             }
             
-            Docker = args?.Any(x => x == "--docker") == true;
+            ServerShared.Globals.IsDocker = args?.Any(x => x == "--docker") == true;
             var noGui = args?.Any((x => x.ToLower() == "--no-gui")) == true || Docker;
             DirectoryHelper.Init(Docker, false);
             Logger.Instance = new Server.Logger();

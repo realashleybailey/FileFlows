@@ -18,7 +18,7 @@ public class LogPruner:Worker
     protected override void Execute()
     {
         var libFiles = new LibraryFileController().GetDataList().Result.Select(x => x.Uid.ToString()).ToList();
-        var files = Directory.GetFiles(DirectoryHelper.LibraryFilsLoggingDirectory);
+        var files = Directory.GetFiles(DirectoryHelper.LibraryFilesLoggingDirectory);
         foreach (var file in files)
         {
             bool exists = file.IndexOf(".", StringComparison.Ordinal) > 0 

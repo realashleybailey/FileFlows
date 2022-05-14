@@ -23,8 +23,25 @@ public class DirectoryHelper
         
         InitLoggingDirectory();
         InitDataDirectory();
+        InitPluginsDirectory();
 
         FlowRunnerDirectory = Path.Combine(BaseDirectory, "FlowRunner");
+    }
+
+    private static void InitPluginsDirectory()
+    {
+        #if(DEBUG)
+        return;
+        #else
+        string dir = PluginsDirectory;
+        if (Directory.Exists(dir) == false)
+            Directory.CreateDirectory(dir);
+
+        string oldDir = Path.Combine(BaseDirectory, IsNode ? "Node" : "Server", "Plugins");
+        if (Directory.Exists(oldDir) == false)
+            return;
+        MoveDirectoryContent(oldDir, dir);
+        #endif
     }
 
     private static string _BaseDirectory;
@@ -57,11 +74,11 @@ public class DirectoryHelper
     private static void InitLoggingDirectory()
     {
         string dir = Path.Combine(BaseDirectory, "Logs");
-        LibraryFilsLoggingDirectory = Path.Combine(dir, "LibraryFiles");
+        LibraryFilesLoggingDirectory = Path.Combine(dir, "LibraryFiles");
         if (Directory.Exists(dir) == false)
             Directory.CreateDirectory(dir);
-        if(Directory.Exists(LibraryFilsLoggingDirectory) == false)
-            Directory.CreateDirectory(LibraryFilsLoggingDirectory);
+        if(Directory.Exists(LibraryFilesLoggingDirectory) == false)
+            Directory.CreateDirectory(LibraryFilesLoggingDirectory);
         
         
         // look for logs from other directories
@@ -76,7 +93,7 @@ public class DirectoryHelper
         {
             if (Regex.IsMatch(file.Name, @"^[a-fA-F0-9\-]{36}\.(log|html)$"))
             {
-                var destLogFile = Path.Combine(LibraryFilsLoggingDirectory, file.Name);
+                var destLogFile = Path.Combine(LibraryFilesLoggingDirectory, file.Name);
                 if (file.FullName == destLogFile)
                     continue; // shouldn't happen
                 file.MoveTo(destLogFile, true);
@@ -123,10 +140,11 @@ public class DirectoryHelper
     /// Gets the logging directory
     /// </summary>
     public static string LoggingDirectory { get; private set; }
+    
     /// <summary>
     /// Gets the directory where library file logs are stored 
     /// </summary>
-    public static string LibraryFilsLoggingDirectory { get; private set; }
+    public static string LibraryFilesLoggingDirectory { get; private set; }
 
     /// <summary>
     /// Gets the data directory
@@ -137,7 +155,6 @@ public class DirectoryHelper
     /// Gets the directory the database is saved in
     /// </summary>
     public static string DatabaseDirectory { get; private set; }
-
 
     /// <summary>
     /// Gets the flow runner directory
@@ -158,7 +175,7 @@ public class DirectoryHelper
             // reduce how many things we have to map out
             if (IsDocker) 
                 return Path.Combine(DataDirectory, "Plugins");
-            return  Path.Combine(BaseDirectory, IsNode ? "Node" : "Server", "Plugins");
+            return Path.Combine(BaseDirectory, "Plugins");
         }
     }
     /// <summary>
@@ -180,13 +197,13 @@ public class DirectoryHelper
         if(Directory.Exists(source) == false)
             return;
 
-        var dirInfo = new DirectoryInfo(source);
-        foreach(var dir in dirInfo.GetDirectories())
+        var diSource = new DirectoryInfo(source);
+        foreach(var dir in diSource.GetDirectories())
         {
             MoveDirectoryContent(dir.FullName, Path.Combine(destination, dir.Name));
         }
 
-        foreach(var file in dirInfo.GetFiles())
+        foreach(var file in diSource.GetFiles())
         {
             try
             {
@@ -197,7 +214,7 @@ public class DirectoryHelper
 
         try
         {
-           dirInfo.Delete(true); 
+           diSource.Delete(true); 
         }
         catch(Exception) { }
     }

@@ -46,7 +46,7 @@ namespace FileFlows.Node.Workers
 
         protected override void Execute()
         {
-            if (NodeUpdater.UpdatePending)
+            if (UpdaterWorker.UpdatePending)
                 return;
             
             if (IsEnabledCheck?.Invoke() == false)

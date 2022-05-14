@@ -52,6 +52,27 @@
             }
         }
 
+        protected void SetSchedule(ScheduleType schedule, int interval)
+        {
+            if (interval < 1)
+                interval = 1;
+
+            if (schedule == ScheduleType.Minute)
+                interval *= 60;
+            if (schedule == ScheduleType.Hourly)
+                interval *= 60 * 60;
+            if (schedule == ScheduleType.Daily)
+                interval *= 60 * 60 * 24;
+
+            this.Schedule = schedule;
+            this.Seconds = interval;
+            if (timer != null)
+            {
+                Stop();
+                Start();
+            }
+        }
+
         public virtual void Stop()
         {
             if (timer == null)

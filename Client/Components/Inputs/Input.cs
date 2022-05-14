@@ -80,6 +80,7 @@ namespace FileFlows.Client.Components.Inputs
         [Parameter]
         public bool ReadOnly { get; set; }
 
+        [Parameter]
         public bool Disabled { get; set; }
         public bool Visible { get; set; }
 

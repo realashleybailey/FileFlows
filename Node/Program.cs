@@ -23,6 +23,8 @@ public class Program
 
         var options = CommandLineOptions.Parse(args);
         Globals.IsDocker = options.Docker;
+        ServerShared.Globals.IsDocker = options.Docker;
+        
         DirectoryHelper.Init(options.Docker, true);
         
         appMutex = new Mutex(true, appName, out bool createdNew);

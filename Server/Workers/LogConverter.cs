@@ -28,7 +28,7 @@ public class LogConverter:Worker
     {
 
         bool compress = new SettingsController().Get().Result.CompressLibraryFileLogs = true;
-        var files = new DirectoryInfo(DirectoryHelper.LibraryFilsLoggingDirectory).GetFiles();
+        var files = new DirectoryInfo(DirectoryHelper.LibraryFilesLoggingDirectory).GetFiles();
         foreach (var file in files)
         {
             if(file.LastWriteTime > DateTime.Now.AddHours(-3))

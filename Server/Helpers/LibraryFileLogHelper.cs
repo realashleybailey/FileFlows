@@ -16,7 +16,7 @@ public class LibraryFileLogHelper
     /// <returns>the html log file</returns>
     public static string GetHtmlLog(Guid uid, int lines = 0)
     {
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid.ToString());
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
 
         if (File.Exists(logFile + ".html.gz"))
             return Gzipper.DecompressFileToString(logFile + ".html.gz");
@@ -42,7 +42,7 @@ public class LibraryFileLogHelper
     /// <returns>the plain text log file</returns>
     public static string GetLog(Guid uid)
     {
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid.ToString());
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
 
         if (File.Exists(logFile + ".log"))
             return File.ReadAllText(logFile + ".log");
@@ -61,7 +61,7 @@ public class LibraryFileLogHelper
     /// <returns>the plain text log file</returns>
     public static async Task SaveLog(Guid uid, string content, bool saveHtml = false)
     {
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid.ToString());
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
         var compress  = (await new SettingsController().Get())?.CompressLibraryFileLogs != false;
 
         if (compress)
@@ -84,7 +84,7 @@ public class LibraryFileLogHelper
     /// <param name="content">the content to append</param>
     public static async Task AppendToLog(Guid uid, string content)
     {
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid + ".log");
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid + ".log");
         await File.AppendAllTextAsync(logFile, content + Environment.NewLine);
     }
 
@@ -95,7 +95,7 @@ public class LibraryFileLogHelper
     /// <returns>true if the html log exists</returns>
     public static bool HtmlLogExists(Guid uid)
     {
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid + ".html.gz");
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid + ".html.gz");
         return File.Exists(logFile);
     }
 
@@ -109,7 +109,7 @@ public class LibraryFileLogHelper
         if (string.IsNullOrWhiteSpace(plaintext))
             return;
         
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid + ".html.gz");
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid + ".html.gz");
         string html = LogToHtml.Convert(plaintext);
         Gzipper.CompressToFile(logFile, html);
     }
@@ -120,7 +120,7 @@ public class LibraryFileLogHelper
     /// <param name="uid">the UID of the library file</param>
     public static void DeleteLogs(Guid uid)
     {
-        var logFile = Path.Combine(DirectoryHelper.LibraryFilsLoggingDirectory, uid.ToString());
+        var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
         if (File.Exists(logFile + ".log"))
             File.Delete(logFile + ".log");
         if (File.Exists(logFile + ".log.gz"))

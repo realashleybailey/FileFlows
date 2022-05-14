@@ -132,9 +132,6 @@ public class WebServer
         // run any upgrade code that may need to be run
         new Upgrade.Upgrader().Run(settings);
 
-        StartupCleanup();
-
-
         // need to scan for plugins before initing the translater as that depends on the plugins directory
         Helpers.PluginScanner.Scan();
 
@@ -168,22 +165,5 @@ public class WebServer
         Console.WriteLine("Finished running FileFlows Server");
 
         WorkerManager.StopWorkers();
-    }
-    
-    private static void StartupCleanup()
-    {
-        try
-        {
-            if (Program.Docker)
-                return;
-
-            Logger.Instance.ILog("Startup cleanup");
-            Workers.AutoUpdater.CleanUpOldFiles(60_000);
-
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance?.ELog("Failed moving old log files: " + ex.Message + Environment.NewLine + ex.StackTrace);
-        }
     }
 }

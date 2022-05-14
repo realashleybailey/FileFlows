@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 if [ "$1" != "docker" ]; then 
-print 'dfsdf'
   kill %1
 fi
 

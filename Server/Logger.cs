@@ -69,8 +69,6 @@ public class Logger : FileFlows.Plugin.ILogger
                 Type = (byte)type,
                 Message = System.Text.Encoding.UTF8.GetBytes(message)
             });
-            if (Program.WindowsGui == true)
-                return; // windows gui already captures all this
 
             var fi = new FileInfo(LogFile);
             if(fi.Exists && fi.Length > 10_000_000)

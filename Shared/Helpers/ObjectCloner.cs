@@ -21,12 +21,23 @@ namespace FileFlows.Shared.Helpers
         }
 
 #pragma warning disable CS8604
+        /// <summary>
+        /// Clones an object
+        /// </summary>
+        /// <param name="original">the object to clone</param>
+        /// <typeparam name="T">the object type to clone</typeparam>
+        /// <returns>a cloned instance</returns>
         public static T Clone<T>(T original)
         {
             return (T)Clone((object)original);
         }
 #pragma warning restore CS8604
 
+        /// <summary>
+        /// Clones an object
+        /// </summary>
+        /// <param name="originalObject">the object to clone</param>
+        /// <returns>A cloned instance</returns>
         public static object Clone(object originalObject)
         {
             return InternalCopy(originalObject, new Dictionary<Object, Object>(new ReferenceEqualityComparer()));
@@ -106,8 +117,16 @@ namespace FileFlows.Shared.Helpers
 
     namespace ArrayExtensions
     {
+        /// <summary>
+        /// Array extensions
+        /// </summary>
         public static class ArrayExtensions
         {
+            /// <summary>
+            /// Method to perform a foreach
+            /// </summary>
+            /// <param name="array">the array to foreach</param>
+            /// <param name="action">the action to perform on each item</param>
             public static void ForEach(this Array array, Action<Array, int[]> action)
             {
                 if (array.LongLength == 0) return;
@@ -117,11 +136,21 @@ namespace FileFlows.Shared.Helpers
             }
         }
 
+        /// <summary>
+        /// Array transverse
+        /// </summary>
         internal class ArrayTraverse
         {
+            /// <summary>
+            /// Array positional indexes
+            /// </summary>
             public int[] Position;
             private int[] maxLengths;
 
+            /// <summary>
+            /// Transfers an array
+            /// </summary>
+            /// <param name="array">the array to transverse</param>
             public ArrayTraverse(Array array)
             {
                 maxLengths = new int[array.Rank];
@@ -132,6 +161,10 @@ namespace FileFlows.Shared.Helpers
                 Position = new int[array.Rank];
             }
 
+            /// <summary>
+            /// Step to the next item in the array
+            /// </summary>
+            /// <returns>true if successful</returns>
             public bool Step()
             {
                 for (int i = 0; i < Position.Length; ++i)

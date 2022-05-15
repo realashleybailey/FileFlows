@@ -6,8 +6,10 @@ namespace FileFlows.Server;
 
 public class Program
 {
+    /// <summary>
+    /// Gets if this is running inside a docker container
+    /// </summary>
     public static bool Docker => ServerShared.Globals.IsDocker;
-    internal static bool WindowsGui { get; private set; }
     private static Mutex appMutex = null;
     const string appName = "FileFlowsServer";
 

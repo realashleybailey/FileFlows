@@ -3,8 +3,16 @@ using System.Text;
 
 namespace FileFlows.Shared.Helpers;
 
+/// <summary>
+/// Utility to convert a plain text log to a colorized HTML log
+/// </summary>
 public class LogToHtml
 {
+    /// <summary>
+    /// Converts a plain text log to a HTML log
+    /// </summary>
+    /// <param name="log">the plain text log</param>
+    /// <returns>an HTML version of the log</returns>
     public static string Convert(string log)
     {
         StringBuilder colorized = new StringBuilder();
@@ -35,6 +43,11 @@ public class LogToHtml
     static Regex regWindowsFilename = new Regex(@"([a-zA-Z]:)(\\[^ \\/:*?""<>|]+([ ]+[^ \\/:*?""<>|]+)*)+\\?");
     static Regex regQuotes= new Regex(@"(?<=('))[^'<>]+(?=('))");
 
+    /// <summary>
+    /// Colorizes a section and converts to HTML
+    /// </summary>
+    /// <param name="section">The section to colorize</param>
+    /// <returns>the colorized string</returns>
     private static string ColorizeSection(string section)
     {
         if (string.IsNullOrWhiteSpace(section))
@@ -81,11 +94,15 @@ public class LogToHtml
         return section;
     }
 
+    /// <summary>
+    /// HTML encodes a string
+    /// </summary>
+    /// <param name="input">the string to encode</param>
+    /// <returns>the HTML encoded string</returns>
     private static string HtmlEncode(string input)
     {
         input = WebUtility.HtmlEncode(input);
         input = input.Replace("&quot;", "\""); // dont need to encode this, make matching regexes harder
         return input;
-
     }
 }

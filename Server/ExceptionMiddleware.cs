@@ -1,15 +1,27 @@
 using System.Net;
 
 namespace FileFlows.Server;
+
+/// <summary>
+/// A middleware used to capture all exceptions
+/// </summary>
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
 
+    /// <summary>
+    /// Constructs a instance of the exception middleware
+    /// </summary>
+    /// <param name="next">the next middleware to call</param>
     public ExceptionMiddleware(RequestDelegate next)
     {
         _next = next;
     }
 
+    /// <summary>
+    /// Invokes the middleware
+    /// </summary>
+    /// <param name="context">the HttpContext executing this middleware</param>
     public async Task Invoke(HttpContext context)
     {
         try

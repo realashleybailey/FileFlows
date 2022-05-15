@@ -1,4 +1,5 @@
-﻿using NPoco.Expressions;
+﻿using System.Security.Policy;
+using NPoco.Expressions;
 
 namespace FileFlows.Server.Workers;
 
@@ -12,8 +13,7 @@ using FileFlows.Shared.Helpers;
 /// </summary>
 public class AutoUpdater : UpdaterWorker
 {
-    private static string UpdateUrl = "https://fileflows.com/api/telemetry/latest-version";
-    private static string DownloadUrl = "https://fileflows.com/downloads/zip";
+    private static string UpdateUrl = "https://fileflows.com/auto-update";
 
     public AutoUpdater() : base("server-upgrade", 60)
     {
@@ -27,15 +27,10 @@ public class AutoUpdater : UpdaterWorker
         var updateUrl = Environment.GetEnvironmentVariable("AutoUpdateUrl");
         if (string.IsNullOrEmpty(updateUrl) == false)
         {
+            if (updateUrl.EndsWith("/"))
+                updateUrl = updateUrl[..^1];
             Logger.Instance?.DLog("Using Auto Update URL: " + updateUrl);
             UpdateUrl = updateUrl;
-        }
-        
-        var downloadUrl = Environment.GetEnvironmentVariable("AutoUpdateDownloadUrl");
-        if (string.IsNullOrEmpty(downloadUrl) == false)
-        {
-            Logger.Instance?.DLog("Using Auto Download URL: " + downloadUrl);
-            DownloadUrl = downloadUrl;
         }
     }
 
@@ -78,7 +73,7 @@ public class AutoUpdater : UpdaterWorker
             Directory.CreateDirectory(updateDirectory);
 
         Logger.Instance.ILog("AutoUpdater: Downloading update: " + onlineVersion);
-        DownloadFile(file).Wait();
+        DownloadFile(onlineVersion.ToString(), file).Wait();
         return file;
     }
 
@@ -90,7 +85,7 @@ public class AutoUpdater : UpdaterWorker
     {
         try
         {
-            string url = UpdateUrl;
+            string url = UpdateUrl + "/latest-version";
             var result = HttpHelper.Get<string>(url, noLog: true).Result;
             if (result.Success == false)
             {
@@ -119,11 +114,9 @@ public class AutoUpdater : UpdaterWorker
         }
     }
     
-    private async Task DownloadFile(string file)
+    private async Task DownloadFile(string version, string file)
     {
-        string url = DownloadUrl + 
-                     (DownloadUrl.IndexOf("?", StringComparison.Ordinal) > 0 ? "&" : "?") + 
-                     "ts=" + DateTime.Now.Ticks;
+        string url = $"{UpdateUrl}/download/{version}?ts={DateTime.Now.Ticks}";
 
         using HttpClient httpClient = new();
         

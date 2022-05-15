@@ -1,9 +1,14 @@
 ﻿using FileFlows.Shared.Models;
 
-namespace FileFlows.Server.Models
+namespace FileFlows.Server.Models;
+
+/// <summary>
+/// Plugin Settings Model
+/// </summary>
+internal class PluginSettingsModel : FileFlowObject
 {
-    internal class PluginSettingsModel : FileFlowObject
-    {
-        public string Json { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the JSON for hte plugin settings
+    /// </summary>
+    public string Json { get; set; }
 }

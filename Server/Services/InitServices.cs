@@ -1,20 +1,23 @@
-﻿namespace FileFlows.Server.Services
+﻿namespace FileFlows.Server.Services;
+
+/// <summary>
+/// A class to initialize the services
+/// </summary>
+internal class InitServices
 {
-    using FileFlows.ServerShared.Services;
-
-    internal class InitServices
+    /// <summary>
+    /// Initializes the services
+    /// </summary>
+    public static void Init()
     {
-        public static void Init()
-        {
-            //Node.FlowExecution.FlowRunnerCommunicator.SignalrUrl = Controllers.NodeController.SignalrUrl;
+        //Node.FlowExecution.FlowRunnerCommunicator.SignalrUrl = Controllers.NodeController.SignalrUrl;
 
-            ServerShared.Services.SettingsService.Loader = () => new SettingsService();
-            ServerShared.Services.NodeService.Loader = () => new NodeService();
-            ServerShared.Services.PluginService.Loader = () => new PluginService();
-            ServerShared.Services.FlowService.Loader = () => new FlowService();
-            ServerShared.Services.FlowRunnerService.Loader = () => new FlowRunnerService();
-            ServerShared.Services.LibraryService.Loader = () => new LibraryService();
-            ServerShared.Services.LibraryFileService.Loader = () => new LibraryFileService();
-        }
+        ServerShared.Services.SettingsService.Loader = () => new SettingsService();
+        ServerShared.Services.NodeService.Loader = () => new NodeService();
+        ServerShared.Services.PluginService.Loader = () => new PluginService();
+        ServerShared.Services.FlowService.Loader = () => new FlowService();
+        ServerShared.Services.FlowRunnerService.Loader = () => new FlowRunnerService();
+        ServerShared.Services.LibraryService.Loader = () => new LibraryService();
+        ServerShared.Services.LibraryFileService.Loader = () => new LibraryFileService();
     }
 }

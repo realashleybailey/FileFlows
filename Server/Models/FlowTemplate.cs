@@ -1,38 +1,118 @@
 ﻿using FileFlows.Shared;
 using System.Dynamic;
 
-namespace FileFlows.Server.Models
+namespace FileFlows.Server.Models;
+
+/// <summary>
+/// A flow template
+/// </summary>
+class FlowTemplate
 {
-    class FlowTemplate
-    {
-        public string Name { get; set; }
-        public string Group { get; set; }
-        public string Description { get; set; }
-        public List<FlowTemplatePart> Parts { get; set; }
-        public List<Shared.Models.TemplateField> Fields { get; set; }
-        public int? Order { get; set; }
-        public bool Save { get; set; }
-        public FlowType Type{ get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the name of the template
+    /// </summary>
+    public string Name { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the group of this template
+    /// </summary>
+    public string Group { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the description of the template
+    /// </summary>
+    public string Description { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the parts in this template
+    /// </summary>
+    public List<FlowTemplatePart> Parts { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the fields in this template
+    /// </summary>
+    public List<Shared.Models.TemplateField> Fields { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the order this template appears
+    /// </summary>
+    public int? Order { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if this template should be saved or go to the editor
+    /// </summary>
+    public bool Save { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the Flow Type
+    /// </summary>
+    public FlowType Type{ get; set; }
+}
 
-    class FlowTemplatePart
-    {
-        public string Node { get; set; }
-        public Guid Uid { get; set; }
-        public ExpandoObject Model { get; set; }
-        public string Name { get; set; }
+/// <summary>
+/// A Part belonging to a flow template
+/// </summary>
+class FlowTemplatePart
+{
+    /// <summary>
+    /// Gets or sets the node 
+    /// </summary>
+    public string Node { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the UID of the part
+    /// </summary>
+    public Guid Uid { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the model
+    /// </summary>
+    public ExpandoObject Model { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the name of the part
+    /// </summary>
+    public string Name { get; set; }
 
-        public int? Outputs { get; set; }
-        public int? xPos { get; set; }
-        public int? yPos { get; set; }
+    /// <summary>
+    /// Gets or sets the number of outputs this part has
+    /// </summary>
+    public int? Outputs { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the x coordinates on the canvas of this part
+    /// </summary>
+    public int? xPos { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the y coordinates on the canvas of this part
+    /// </summary>
+    public int? yPos { get; set; }
 
-        public List<FlowTemplateConnection> Connections { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the output connections of this part
+    /// </summary>
+    public List<FlowTemplateConnection> Connections { get; set; }
+}
 
-    class FlowTemplateConnection
-    {
-        public int Input { get; set; }
-        public int Output { get; set; }
-        public Guid Node { get; set; }
-    }
+
+/// <summary>
+/// A connection to a flow part
+/// </summary>
+class FlowTemplateConnection
+{
+    /// <summary>
+    /// Gets or sets the input nude index
+    /// </summary>
+    public int Input { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the output node index
+    /// </summary>
+    public int Output { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the node that contains the Input
+    /// </summary>
+    public Guid Node { get; set; }
 }

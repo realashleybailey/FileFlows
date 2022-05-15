@@ -1,19 +1,50 @@
 ﻿using FileFlows.Shared.Models;
 using System.Dynamic;
 
-namespace FileFlows.Server.Models
+namespace FileFlows.Server.Models;
+
+/// <summary>
+/// A library template
+/// </summary>
+class LibraryTemplate
 {
-    class LibraryTemplate
-    {
-        public string Name { get; set; }
-        public string Group { get; set; }
-        public string Description { get; set; }
-        public string Filter { get; set; }
-        public string Path { get; set; }
-        public int ScanInterval { get; set; }
+    /// <summary>
+    /// Gets or sets the name of the library template
+    /// </summary>
+    public string Name { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the group this template belongs to
+    /// </summary>
+    public string Group { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the description of this template
+    /// </summary>
+    public string Description { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the filter for this template
+    /// </summary>
+    public string Filter { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the path for this template
+    /// </summary>
+    public string Path { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the scan interval for this template
+    /// </summary>
+    public int ScanInterval { get; set; }
 
-        public ProcessingPriority Priority { get; set; }
-
-        public int FileSizeDetectionInterval { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the priority of this template
+    /// </summary>
+    public ProcessingPriority Priority { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the period to detect file size changes for this template
+    /// </summary>
+    public int FileSizeDetectionInterval { get; set; }
 }

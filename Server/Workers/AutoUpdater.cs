@@ -26,6 +26,7 @@ public class AutoUpdater : UpdaterWorker
         {
             Logger.Instance?.DLog("Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
             interval = minutes;
+            schedule = ScheduleType.Minute;
         }
 
         var updateUrl = Environment.GetEnvironmentVariable("AutoUpdateUrl");

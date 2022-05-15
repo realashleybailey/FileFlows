@@ -122,13 +122,19 @@ public abstract class UpdaterWorker:Worker
 
             string update = DownloadUpdateBinary();
             if (string.IsNullOrEmpty(update))
+            {
+                Shared.Logger.Instance.DLog("AutoUpdater: No update available");
                 return string.Empty;
+            }
+
             var updateDir = new FileInfo(update).DirectoryName;
             
+            Logger.Instance.ILog("AutoUpdater: Extracting update to: " + updateDir);
             ZipFile.ExtractToDirectory(update, updateDir);
             Logger.Instance.ILog("AutoUpdater: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);
+            Logger.Instance.ILog("AutoUpdater: Deleted update file: " + update);
 
             var updateFile = Path.Combine(updateDir, UpgradeScriptPrefix + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
@@ -136,6 +142,7 @@ public abstract class UpdaterWorker:Worker
                 Logger.Instance.WLog("AutoUpdater: No update script found: " + updateFile);
                 return string.Empty;
             }
+            Logger.Instance.ILog("AutoUpdater: Update script found: " + updateFile);
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
             {

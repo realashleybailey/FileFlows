@@ -6,7 +6,7 @@ using FileFlows.Plugin;
 using FileFlows.Shared.Models;
 
 /// <summary>
-/// Logger specificially for the Flow execution
+/// Logger specifically for the Flow execution
 /// </summary>
 public class FlowLogger : ILogger
 {
@@ -14,7 +14,9 @@ public class FlowLogger : ILogger
     /// Gets or sets the log file used by this logger
     /// </summary>
     public string LogFile { get; set; }
+    
     List<string> log = new List<string>();
+    
     /// <summary>
     /// Logs a debug message
     /// </summary>

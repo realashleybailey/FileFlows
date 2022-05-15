@@ -74,7 +74,7 @@ public class ServerUpdater : UpdaterWorker
         
         Version onlineVersion = result.onlineVersion;
 
-        string updateDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Updates");
+        string updateDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Update");
 
         string file = Path.Combine(updateDirectory, $"FileFlows-{onlineVersion}.zip");
         if (File.Exists(file))

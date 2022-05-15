@@ -22,7 +22,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpPost("next-file")]
     public async Task<LibraryFile> GetNext([FromBody] NextLibraryFileArgs args)
     {
-        if (Workers.AutoUpdater.UpdatePending || args == null)
+        if (Workers.ServerUpdater.UpdatePending || args == null)
             return null; // if an update is pending, stop providing new files to process
 
         if (Version.TryParse(args.NodeVersion, out var nodeVersion) == false)

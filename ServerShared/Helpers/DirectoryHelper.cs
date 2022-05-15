@@ -16,6 +16,11 @@ public class DirectoryHelper
     /// </summary>
     public static bool IsNode { get; private set; }
 
+    /// <summary>
+    /// Initializes the Directory Helper
+    /// </summary>
+    /// <param name="isDocker">True if running inside a docker</param>
+    /// <param name="isNode">True if running on a node</param>
     public static void Init(bool isDocker, bool isNode)
     {
         DirectoryHelper.IsDocker = isDocker;
@@ -170,12 +175,13 @@ public class DirectoryHelper
         {
             #if(DEBUG)
             return "Plugins";
-            #endif
+            #else
             // docker we expose this in the data directory so we
             // reduce how many things we have to map out
             if (IsDocker) 
                 return Path.Combine(DataDirectory, "Plugins");
             return Path.Combine(BaseDirectory, "Plugins");
+            #endif
         }
     }
     /// <summary>

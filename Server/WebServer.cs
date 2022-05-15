@@ -150,7 +150,7 @@ public class WebServer
             new LogPruner(),
             new LogConverter(),
             new TelemetryReporter(),
-            new AutoUpdater()
+            new ServerUpdater()
         );
 
         app.MapHub<Hubs.FlowHub>("/flow");

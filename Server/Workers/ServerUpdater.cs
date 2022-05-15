@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Workers;
+﻿using Esprima.Ast;
+
+namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
@@ -8,14 +10,14 @@ using FileFlows.Shared.Helpers;
 /// <summary>
 /// A worker that automatically updates FileFlows
 /// </summary>
-public class AutoUpdater : UpdaterWorker
+public class ServerUpdater : UpdaterWorker
 {
     private static string UpdateUrl = "https://fileflows.com/auto-update";
 
     /// <summary>
     /// Creates an instance of a worker to automatically update FileFlows Server
     /// </summary>
-    public AutoUpdater() : base("server-upgrade", 60)
+    public ServerUpdater() : base("server-upgrade", 60)
     {
     }
 
@@ -24,7 +26,7 @@ public class AutoUpdater : UpdaterWorker
         if (int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) &&
             minutes > 0)
         {
-            Logger.Instance?.DLog("Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
+            Logger.Instance?.DLog($"{UpdaterName}: Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
             interval = minutes;
             schedule = ScheduleType.Minute;
         }
@@ -34,7 +36,7 @@ public class AutoUpdater : UpdaterWorker
         {
             if (updateUrl.EndsWith("/"))
                 updateUrl = updateUrl[..^1];
-            Logger.Instance?.DLog("Using Auto Update URL: " + updateUrl);
+            Logger.Instance?.DLog($"{UpdaterName}: Using Auto Update URL: " + updateUrl);
             UpdateUrl = updateUrl;
         }
 
@@ -72,22 +74,22 @@ public class AutoUpdater : UpdaterWorker
         string file = Path.Combine(updateDirectory, $"FileFlows-{onlineVersion}.zip");
         if (File.Exists(file))
         {
-            Logger.Instance.ILog("AutoUpdater: Update already downloaded: " + file);
+            Logger.Instance.ILog($"{UpdaterName}: Update already downloaded: " + file);
             return string.Empty;
         }
 
         if (Directory.Exists(updateDirectory) == false)
             Directory.CreateDirectory(updateDirectory);
 
-        Logger.Instance.ILog("AutoUpdater: Downloading update: " + onlineVersion);
+        Logger.Instance.ILog($"{UpdaterName}: Downloading update: " + onlineVersion);
         DownloadFile(onlineVersion.ToString(), file).Wait();
         if (File.Exists(file) == false)
         {
-            Logger.Instance.ILog("AutoUpdater: Download failed");
+            Logger.Instance.ILog($"{UpdaterName}: Download failed");
             return string.Empty;
         }
 
-        Logger.Instance.ILog("AutoUpdater: Download complete: " + file);
+        Logger.Instance.ILog($"{UpdaterName}: Download complete: " + file);
         return file;
     }
 
@@ -103,7 +105,7 @@ public class AutoUpdater : UpdaterWorker
             var result = HttpHelper.Get<string>(url, noLog: true).Result;
             if (result.Success == false)
             {
-                Logger.Instance.ILog("AutoUpdater: Failed to retrieve online version");
+                Logger.Instance.ILog($"{nameof(ServerUpdater)}: Failed to retrieve online version");
                 return (false, new Version(0,0,0,0));
             }
 
@@ -111,19 +113,19 @@ public class AutoUpdater : UpdaterWorker
             Version? onlineVersion;
             if (Version.TryParse(result.Data, out onlineVersion) == false)
             {
-                Logger.Instance.ILog("AutoUpdater: Failed to parse online version: " + result.Data);
+                Logger.Instance.ILog($"{nameof(ServerUpdater)}: Failed to parse online version: " + result.Data);
                 return (false, new Version(0, 0, 0, 0));
             }
             if (current >= onlineVersion)
             {
-                Logger.Instance.ILog($"AutoUpdater: Current version '{current}' newer or same as online version '{onlineVersion}'");
+                Logger.Instance.ILog($"{nameof(ServerUpdater)}: Current version '{current}' newer or same as online version '{onlineVersion}'");
                 return (false, onlineVersion);
             }
             return (true, onlineVersion);
         }
         catch (Exception ex)
         {
-            Logger.Instance.ELog("AutoUpdater: Failed checking online version: " + ex.Message);
+            Logger.Instance.ELog($"{nameof(ServerUpdater)}: Failed checking online version: " + ex.Message);
             return (false, new Version(0, 0, 0, 0));
         }
     }

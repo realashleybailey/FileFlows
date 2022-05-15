@@ -31,6 +31,10 @@ public class PluginHelper
     private static string GetPluginDirectory() => new DirectoryInfo("Plugins").FullName;
 #endif
 
+    /// <summary>
+    /// Gets a list of all the plugins directories
+    /// </summary>
+    /// <returns>a list of all the plugins directories</returns>
     public List<string> GetPluginDirectories()
     {
 
@@ -108,7 +112,7 @@ public class PluginHelper
     /// This needs to return an instance so the FlowExecutor can use it...
     /// </summary>
     /// <param name="part">The flow part</param>
-    /// <returns>an insstance of the plugin node</returns>
+    /// <returns>an instance of the plugin node</returns>
     public Node LoadNode(FlowPart part)
     {
         var nt = GetNodeType(part.FlowElementUid);

@@ -1,7 +1,15 @@
 ﻿namespace FileFlows.ServerShared.Helpers;
 
+/// <summary>
+/// The time helper provides help methods regarding scheduling
+/// </summary>
 public class TimeHelper
 {
+    /// <summary>
+    /// Gets the integer index of the current time quarter
+    /// A time quarter is a 15minute block, starting on Sunday at midnight.
+    /// </summary>
+    /// <returns>The integer index of the current time quater</returns>
     public static int GetCurrentQuarter()
     {
         DateTime date = DateTime.Now;
@@ -17,6 +25,11 @@ public class TimeHelper
     }
 
 
+    /// <summary>
+    /// Checks if the current time is in the supplied schedule
+    /// </summary>
+    /// <param name="schedule">The schedule to check</param>
+    /// <returns>true if the current time is within the schedule</returns>
     public static bool InSchedule(string schedule)
     {
         if (string.IsNullOrEmpty(schedule) || schedule.Length != 672)

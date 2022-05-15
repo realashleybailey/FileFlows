@@ -1,5 +1,8 @@
 ﻿namespace FileFlows.ServerShared.Helpers;
 
+/// <summary>
+/// A helper for interacting with files 
+/// </summary>
 public class FileHelper
 {
 

@@ -7,8 +7,17 @@ using FileFlows.Plugin.Attributes;
 using FileFlows.Shared.Models;
 using FileFlows.Plugin;
 
+/// <summary>
+/// Helper used for UI Forms
+/// </summary>
 public class FormHelper
 {
+    /// <summary>
+    /// Gets the form fields of a give type of object
+    /// </summary>
+    /// <param name="type">The type of object to load the form fields of</param>
+    /// <param name="model">The model used to bind to the form fields</param>
+    /// <returns>A list of all form fields</returns>
     public static List<ElementField> GetFields(Type type, IDictionary<string, object> model)
     {
         var fields = new List<ElementField>();

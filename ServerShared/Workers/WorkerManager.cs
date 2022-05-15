@@ -2,10 +2,17 @@
 
 using FileFlows.ServerShared.Workers;
 
+/// <summary>
+/// A manager for the workers that run in the system
+/// </summary>
 public class WorkerManager
 {
     static readonly List<Worker> Workers = new List<Worker>();
 
+    /// <summary>
+    /// Starts a list of workers and keeps track of them 
+    /// </summary>
+    /// <param name="workers">A list of workers to start</param>
     public static void StartWorkers(params Worker[] workers)
     {
         if (workers?.Any() != true)
@@ -18,6 +25,10 @@ public class WorkerManager
             worker.Start();
         }
     }
+    
+    /// <summary>
+    /// Stops all the currently running workers
+    /// </summary>
     public static void StopWorkers()
     {
         foreach (var worker in Workers)

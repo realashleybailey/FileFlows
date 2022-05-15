@@ -16,7 +16,7 @@
         [HttpGet("update-available")]
         public object UpdateAvailable()
         {
-            var result = Workers.AutoUpdater.GetLatestOnlineVersion();
+            var result = Workers.ServerUpdater.GetLatestOnlineVersion();
             return new { UpdateAvailable = result.updateAvailable };
         }
 

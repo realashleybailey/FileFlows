@@ -46,7 +46,7 @@ namespace FileFlows.Server.Controllers
                 return string.Empty; // we let the auto updater take care of this.
             try
             {
-                var result = Workers.AutoUpdater.GetLatestOnlineVersion();
+                var result = Workers.ServerUpdater.GetLatestOnlineVersion();
                 if (result.updateAvailable == false)
                     return string.Empty;
                 return result.onlineVersion.ToString();

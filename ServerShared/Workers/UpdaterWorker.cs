@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace FileFlows.ServerShared.Workers;
 
 using System.Diagnostics;
@@ -14,6 +16,8 @@ public abstract class UpdaterWorker:Worker
     public static bool UpdatePending { get; private set; }
     protected Version CurrentVersion { get; init; }
 
+    protected readonly string UpdaterName; 
+
     private readonly string UpgradeScriptPrefix;
     
     /// <summary>
@@ -25,6 +29,7 @@ public abstract class UpdaterWorker:Worker
     {
         CurrentVersion = Version.Parse(Globals.Version);
         this.UpgradeScriptPrefix = upgradeScriptPrefix;
+        UpdaterName = this.GetType().Name;
     }
 
     protected override void Execute()
@@ -48,7 +53,7 @@ public abstract class UpdaterWorker:Worker
     /// <returns>A update has been downloaded</returns>
     public bool RunCheck()
     {
-        Logger.Instance?.ILog("AutoUpdater: Checking for update");
+        Logger.Instance?.ILog($"{UpdaterName}: Checking for update");
         try
         {
 #if(DEBUG)
@@ -82,7 +87,7 @@ public abstract class UpdaterWorker:Worker
             // if inside docker we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
             if (Globals.IsDocker == false) 
             {
-                Logger.Instance?.ILog("About to execute upgrade script: " + updateScript);
+                Logger.Instance?.ILog($"{UpdaterName}About to execute upgrade script: " + updateScript);
                 var fi = new FileInfo(updateScript);
 
                 var psi = new ProcessStartInfo(updateScript);
@@ -97,7 +102,7 @@ public abstract class UpdaterWorker:Worker
         }
         catch (Exception ex)
         {
-            Logger.Instance?.ELog("AutoUpdater: Failed running update script: " + ex.Message);
+            Logger.Instance?.ELog($"{UpdaterName}: Failed running update script: " + ex.Message);
         }
     }
 
@@ -120,40 +125,40 @@ public abstract class UpdaterWorker:Worker
             if(GetAutoUpdatesEnabled() == false)
                 return string.Empty;
 
-            Logger.Instance?.DLog("AutoUpdater: Checking for new update binary");
+            Logger.Instance?.DLog($"{UpdaterName}: Checking for new update binary");
             string update = DownloadUpdateBinary();
             if (string.IsNullOrEmpty(update))
             {
-                Logger.Instance?.DLog("AutoUpdater: No update available");
+                Logger.Instance?.DLog($"{UpdaterName}: No update available");
                 return string.Empty;
             }
-            Logger.Instance?.DLog("AutoUpdater: Downloaded update: " + update);
+            Logger.Instance?.DLog($"{UpdaterName}: Downloaded update: " + update);
 
             var updateDir = new FileInfo(update).DirectoryName;
             
-            Logger.Instance?.ILog("AutoUpdater: Extracting update to: " + updateDir);
+            Logger.Instance?.ILog($"{UpdaterName}: Extracting update to: " + updateDir);
             ZipFile.ExtractToDirectory(update, updateDir);
-            Logger.Instance?.ILog("AutoUpdater: Extracted update to: " + updateDir);
+            Logger.Instance?.ILog($"{UpdaterName}: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);
-            Logger.Instance?.ILog("AutoUpdater: Deleted update file: " + update);
+            Logger.Instance?.ILog($"{UpdaterName}: Deleted update file: " + update);
 
             var updateFile = Path.Combine(updateDir, UpgradeScriptPrefix + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
             {
-                Logger.Instance?.WLog("AutoUpdater: No update script found: " + updateFile);
+                Logger.Instance?.WLog($"{UpdaterName}: No update script found: " + updateFile);
                 return string.Empty;
             }
-            Logger.Instance?.ILog("AutoUpdater: Update script found: " + updateFile);
+            Logger.Instance?.ILog($"{UpdaterName}: Update script found: " + updateFile);
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
             {
-                Logger.Instance?.WLog("AutoUpdater: Failed to make update script executable");
+                Logger.Instance?.WLog($"{UpdaterName}: Failed to make update script executable");
                 return string.Empty;
             }
 
-            Logger.Instance?.ILog("AutoUpdater: Upgrade directory ready: " + updateDir);
-            Logger.Instance?.ILog("AutoUpdater: Upgrade script ready: " + updateFile);
+            Logger.Instance?.ILog($"{UpdaterName}: Upgrade directory ready: " + updateDir);
+            Logger.Instance?.ILog($"{UpdaterName}: Upgrade script ready: " + updateFile);
 
             return updateFile;
         }
@@ -161,7 +166,7 @@ public abstract class UpdaterWorker:Worker
         {
             //if (ex.Message == "Object reference not set to an instance of an object")
             //    return string.Empty; // just ignore this error, likely due ot it not being configured yet.
-            Logger.Instance?.ELog("AutoUpdater: Failed checking for update: " + ex.Message);
+            Logger.Instance?.ELog($"{UpdaterName}: Failed checking for update: " + ex.Message);
             return string.Empty;
         }
     }
@@ -189,15 +194,15 @@ public abstract class UpdaterWorker:Worker
 
             if (process.ExitCode == 0)
                 return true;
-            Logger.Instance?.ELog("AutoUpdater: Failed making executable:" + process.StartInfo.FileName,
+            Logger.Instance?.ELog($"{UpdaterName}: Failed making executable:" + process.StartInfo.FileName,
                 process.StartInfo.Arguments + Environment.NewLine + output);
             if (string.IsNullOrWhiteSpace(error) == false)
-                Logger.Instance?.ELog("AutoUpdater: Error output:" + output);
+                Logger.Instance?.ELog($"{UpdaterName}: Error output:" + output);
             return false;
         }
         catch (Exception ex)
         {
-            Logger.Instance?.ELog("AutoUpdater: Failed making executable: " + file + " => " + ex.Message);
+            Logger.Instance?.ELog($"{UpdaterName}: Failed making executable: " + file + " => " + ex.Message);
             return false;
         }
     }

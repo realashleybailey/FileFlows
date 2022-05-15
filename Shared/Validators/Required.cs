@@ -1,32 +1,37 @@
-using System;
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace FileFlows.Shared.Validators
+namespace FileFlows.Shared.Validators;
+
+/// <summary>
+/// Validator to a validate a object has a value
+/// </summary>
+public class Required : Validator
 {
-    public class Required : Validator
+    /// <summary>
+    /// Validates the object has a value
+    /// </summary>
+    /// <param name="value">The value to validate</param>
+    /// <returns>true if the value has a propre value</returns>
+    public async override Task<bool> Validate(object value)
     {
-        public async override Task<bool> Validate(object value)
+        await Task.CompletedTask;
+        if (value == null)
+            return false;
+        if (value is string str)
         {
-            await Task.CompletedTask;
-            if (value == null)
-                return false;
-            if (value is string str)
-            {
-                bool valid = string.IsNullOrWhiteSpace(str) == false;
-                Logger.Instance.DLog("Validating required string: '" + str + "' = " + valid);
-                return valid;
+            bool valid = string.IsNullOrWhiteSpace(str) == false;
+            Logger.Instance.DLog("Validating required string: '" + str + "' = " + valid);
+            return valid;
 
-            }
-
-            if (value is Array array)
-                return array.Length > 0;
-
-            if (value is ICollection collection)
-                return collection.Count > 0;
-
-            return true;
         }
-    }
 
+        if (value is Array array)
+            return array.Length > 0;
+
+        if (value is ICollection collection)
+            return collection.Count > 0;
+
+        return true;
+    }
 }

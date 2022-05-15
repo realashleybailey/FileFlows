@@ -13,7 +13,7 @@ using FileFlows.Shared.Helpers;
 public class ServerUpdater : UpdaterWorker
 {
     private static string UpdateUrl = "https://fileflows.com/auto-update";
-
+    
     /// <summary>
     /// Creates an instance of a worker to automatically update FileFlows Server
     /// </summary>
@@ -39,7 +39,6 @@ public class ServerUpdater : UpdaterWorker
             Logger.Instance?.DLog($"{UpdaterName}: Using Auto Update URL: " + updateUrl);
             UpdateUrl = updateUrl;
         }
-
         base.Initialize(schedule, minutes);
     }
 
@@ -75,11 +74,12 @@ public class ServerUpdater : UpdaterWorker
         if (File.Exists(file))
         {
             Logger.Instance.ILog($"{UpdaterName}: Update already downloaded: " + file);
-            return string.Empty;
+            return file;
         }
 
-        if (Directory.Exists(updateDirectory) == false)
-            Directory.CreateDirectory(updateDirectory);
+        if (Directory.Exists(updateDirectory))
+            Directory.Delete(updateDirectory, true);
+        Directory.CreateDirectory(updateDirectory);
 
         Logger.Instance.ILog($"{UpdaterName}: Downloading update: " + onlineVersion);
         DownloadFile(onlineVersion.ToString(), file).Wait();

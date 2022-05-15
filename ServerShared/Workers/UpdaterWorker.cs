@@ -30,6 +30,7 @@ public abstract class UpdaterWorker:Worker
         CurrentVersion = Version.Parse(Globals.Version);
         this.UpgradeScriptPrefix = upgradeScriptPrefix;
         UpdaterName = this.GetType().Name;
+        RunCheck();
     }
 
     protected override void Execute()
@@ -56,7 +57,7 @@ public abstract class UpdaterWorker:Worker
         Logger.Instance?.ILog($"{UpdaterName}: Checking for update");
         try
         {
-#if(DEBUG)
+#if(DEBUG && false)
             return false; // disable during debugging
 #else       
             string updateScript = DownloadUpdate();
@@ -137,7 +138,7 @@ public abstract class UpdaterWorker:Worker
             var updateDir = new FileInfo(update).DirectoryName;
             
             Logger.Instance?.ILog($"{UpdaterName}: Extracting update to: " + updateDir);
-            ZipFile.ExtractToDirectory(update, updateDir);
+            ZipFile.ExtractToDirectory(update, updateDir, true);
             Logger.Instance?.ILog($"{UpdaterName}: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);

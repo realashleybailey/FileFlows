@@ -1,75 +1,88 @@
-namespace FileFlows.Shared
+namespace FileFlows.Shared;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.Json;
+
+/// <summary>
+/// A class used to convert objects from one type to another
+/// </summary>
+public class Converter
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Text.Json;
-
-    public class Converter
+    /// <summary>
+    /// Converts an object to a specific type
+    /// </summary>
+    /// <param name="type">The type to convert to</param>
+    /// <param name="value">The object to convert</param>
+    /// <returns>The converted object</returns>
+    public static object ConvertObject(Type type, object? value)
     {
-
-        public static object ConvertObject(Type type, object value)
+        if (value == null)
+            return Activator.CreateInstance(type)!;
+        Type valueType = value.GetType();
+        if (value is JsonElement je)
         {
-            if (value == null)
-                return Activator.CreateInstance(type)!;
-            Type valueType = value.GetType();
-            if (value is JsonElement je)
+            string json = je.GetRawText();
+            var options = new JsonSerializerOptions
             {
-                string json = je.GetRawText();
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-                return JsonSerializer.Deserialize(json, type, options)!;
-            }
-            if (valueType == type)
-                return value;
-
-
-            if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
-                return ChangeListToArray(type.GetElementType()!, (IEnumerable)value, valueType);
-
-
-            // not used yet, so not tested
-            // if (valueType.IsArray && typeof(IEnumerable).IsAssignableFrom(type))
-            //     return ChangeArrayToList(type.GetElementType(), (Array)value);
-
-            if (valueType == typeof(Int64) && type == typeof(Int32))
-                return Convert.ToInt32(value);
-            if(type == typeof(List<object>) && value is IEnumerable enumerable)
-            {
-                List<object> result = new();
-                foreach (object item in enumerable)
-                    result.Add(item);
-                return result;
-            }
-            return Convert.ChangeType(value, type);
+                PropertyNameCaseInsensitive = true
+            };
+            return JsonSerializer.Deserialize(json, type, options)!;
         }
+        if (valueType == type)
+            return value;
 
-        public static object ChangeListToArray<T>(IEnumerable value, Type valueType)
+
+        if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
+            return ChangeListToArray(type.GetElementType()!, (IEnumerable)value, valueType);
+
+
+        // not used yet, so not tested
+        // if (valueType.IsArray && typeof(IEnumerable).IsAssignableFrom(type))
+        //     return ChangeArrayToList(type.GetElementType(), (Array)value);
+
+        if (valueType == typeof(Int64) && type == typeof(Int32))
+            return Convert.ToInt32(value);
+        if(type == typeof(List<object>) && value is IEnumerable enumerable)
         {
-            var arrayType = typeof(T).GetElementType();
-            return ChangeListToArray(arrayType!, value, valueType);
+            List<object> result = new();
+            foreach (object item in enumerable)
+                result.Add(item);
+            return result;
         }
-        public static object ChangeListToArray(Type arrayType, IEnumerable value, Type valueType)
-        {
-            Logger.Instance.DLog("Change list to array");
-            List<object> list = new List<object>();
-            foreach (var o in value)
-                list.Add(o);
-            var array = Array.CreateInstance(arrayType, list.Count);
-            for (int i = 0; i < list.Count; i++)
-                array.SetValue(list[i], i);
-            return array;
-        }
-        // public static object ChangeArrayToList(Type listType, Array array)
-        // {
-        //     var genericListType = typeof(List<>).MakeGenericType(listType);
-        //     var genericList = Activator.CreateInstance(genericListType);
-        //     var addMethod = genericList.GetType().GetMethod("Add", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-        //     foreach (var o in array)
-        //         addMethod.Invoke(genericList, new object[] { o });
-        //     return genericList;
-        // }
+        return Convert.ChangeType(value, type);
+    }
+
+    /// <summary>
+    /// Converts a IEnumeable to an array
+    /// </summary>
+    /// <param name="value">The IEnumerable to convert</param>
+    /// <param name="valueType">The type of array to create</param>
+    /// <typeparam name="T">the type of the array to create</typeparam>
+    /// <returns>An array of the IEnumerable</returns>
+    public static object ChangeListToArray<T>(IEnumerable value, Type valueType)
+    {
+        var arrayType = typeof(T).GetElementType();
+        return ChangeListToArray(arrayType!, value, valueType);
+    }
+    
+    /// <summary>
+    /// Converts a IEnumeable to an list
+    /// </summary>
+    /// <param name="value">The IEnumerable to convert</param>
+    /// <param name="valueType">The type of array to create</param>
+    /// <typeparam name="T">the type of the array to create</typeparam>
+    /// <returns>An list of the IEnumerable</returns>
+    public static object ChangeListToArray(Type arrayType, IEnumerable value, Type valueType)
+    {
+        Logger.Instance.DLog("Change list to array");
+        List<object> list = new List<object>();
+        foreach (var o in value)
+            list.Add(o);
+        var array = Array.CreateInstance(arrayType, list.Count);
+        for (int i = 0; i < list.Count; i++)
+            array.SetValue(list[i], i);
+        return array;
     }
 }

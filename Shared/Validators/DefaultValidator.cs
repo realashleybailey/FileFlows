@@ -1,17 +1,20 @@
-namespace FileFlows.Shared.Validators
+namespace FileFlows.Shared.Validators;
+
+using System.Threading.Tasks;
+
+/// <summary>
+/// Used instead of null
+/// </summary>
+public class DefaultValidator : Validator
 {
-    using System.Threading.Tasks;
-
     /// <summary>
-    /// Used instead of null
+    /// Validates a value
     /// </summary>
-    public class DefaultValidator : Validator
+    /// <param name="value">the value to validate</param>
+    /// <returns>If the value is valid or not</returns>
+    public async override Task<bool> Validate(object value)
     {
-        public async override Task<bool> Validate(object value)
-        {
-            await Task.CompletedTask;
-            return true;
-        }
+        await Task.CompletedTask;
+        return true;
     }
-
 }

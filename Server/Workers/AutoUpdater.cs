@@ -1,7 +1,4 @@
-﻿using System.Security.Policy;
-using NPoco.Expressions;
-
-namespace FileFlows.Server.Workers;
+﻿namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
@@ -20,11 +17,15 @@ public class AutoUpdater : UpdaterWorker
     /// </summary>
     public AutoUpdater() : base("server-upgrade", 60)
     {
+    }
+
+    protected override void Initialize(ScheduleType schedule, int interval)
+    {
         if (int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) &&
             minutes > 0)
         {
             Logger.Instance?.DLog("Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
-            SetSchedule(ScheduleType.Minute, minutes);
+            interval = minutes;
         }
 
         var updateUrl = Environment.GetEnvironmentVariable("AutoUpdateUrl");
@@ -35,6 +36,8 @@ public class AutoUpdater : UpdaterWorker
             Logger.Instance?.DLog("Using Auto Update URL: " + updateUrl);
             UpdateUrl = updateUrl;
         }
+
+        base.Initialize(schedule, minutes);
     }
 
     protected override void QuitApplication()

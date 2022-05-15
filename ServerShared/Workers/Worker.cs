@@ -15,6 +15,11 @@
 
         public Worker(ScheduleType schedule, int interval)
         {
+            Initialize(schedule, interval);
+        }
+
+        protected virtual void Initialize(ScheduleType schedule, int interval)
+        {
             if (interval < 1)
                 interval = 1;
 
@@ -33,12 +38,15 @@
 
         private System.Timers.Timer timer;
 
+        /// <summary>
+        /// Start the worker
+        /// </summary>
         public virtual void Start()
         {
             if (timer != null)
             {
                 if (timer.Enabled)
-                    return; // arleady running
+                    return; // already running
                 timer.Start();
             }
             else
@@ -52,27 +60,10 @@
             }
         }
 
-        protected void SetSchedule(ScheduleType schedule, int interval)
-        {
-            if (interval < 1)
-                interval = 1;
 
-            if (schedule == ScheduleType.Minute)
-                interval *= 60;
-            if (schedule == ScheduleType.Hourly)
-                interval *= 60 * 60;
-            if (schedule == ScheduleType.Daily)
-                interval *= 60 * 60 * 24;
-
-            this.Schedule = schedule;
-            this.Seconds = interval;
-            if (timer != null)
-            {
-                Stop();
-                Start();
-            }
-        }
-
+        /// <summary>
+        /// Stop the worker
+        /// </summary>
         public virtual void Stop()
         {
             if (timer == null)

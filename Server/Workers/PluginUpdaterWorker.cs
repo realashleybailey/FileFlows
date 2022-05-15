@@ -1,56 +1,55 @@
-﻿namespace FileFlows.Server.Workers
+﻿namespace FileFlows.Server.Workers;
+
+using FileFlows.Server.Controllers;
+using FileFlows.ServerShared.Workers;
+using FileFlows.Shared.Helpers;
+
+public class PluginUpdaterWorker : Worker
 {
-    using FileFlows.Server.Controllers;
-    using FileFlows.ServerShared.Workers;
-    using FileFlows.Shared.Helpers;
-
-    public class PluginUpdaterWorker : Worker
+    public PluginUpdaterWorker() : base(ScheduleType.Hourly, 1)
     {
-        public PluginUpdaterWorker() : base(ScheduleType.Hourly, 1)
+        Trigger();
+    }
+
+    protected override void Execute()
+    {
+        var settings = new SettingsController().Get().Result;
+        if (settings?.AutoUpdatePlugins != true)
+            return;
+
+        Logger.Instance?.ILog("Plugin Updater started");
+        var controller = new PluginController();
+        var plugins = controller.GetDataList().Result;
+        var latestPackages = controller.GetPluginPackages().Result;
+
+        foreach(var plugin in plugins)
         {
-            Trigger();
-        }
-
-        protected override void Execute()
-        {
-            var settings = new SettingsController().Get().Result;
-            if (settings?.AutoUpdatePlugins != true)
-                return;
-
-            Logger.Instance?.ILog("Plugin Updater started");
-            var controller = new PluginController();
-            var plugins = controller.GetDataList().Result;
-            var latestPackages = controller.GetPluginPackages().Result;
-
-            foreach(var plugin in plugins)
+            try
             {
-                try
+                var package = latestPackages?.Where(x => x?.Package == plugin?.PackageName)?.FirstOrDefault();
+                if (package == null)
+                    continue; // no plugin, so no update
+
+                if (Version.Parse(package.Version) <= Version.Parse(plugin.Version))
                 {
-                    var package = latestPackages?.Where(x => x?.Package == plugin?.PackageName)?.FirstOrDefault();
-                    if (package == null)
-                        continue; // no plugin, so no update
-
-                    if (Version.Parse(package.Version) <= Version.Parse(plugin.Version))
-                    {
-                        // no new version, cannot update
-                        continue;
-                    }
-
-                    var dlResult = new PluginController().DownloadPluginFromRepository(package.Package);
-
-                    if (dlResult.Success == false)
-                    {
-                        Logger.Instance.WLog($"Failed to download package '{plugin.PackageName}' update");
-                        continue;
-                    }
-                    Helpers.PluginScanner.UpdatePlugin(package.Package, dlResult.Data);
+                    // no new version, cannot update
+                    continue;
                 }
-                catch(Exception ex)
+
+                var dlResult = new PluginController().DownloadPluginFromRepository(package.Package);
+
+                if (dlResult.Success == false)
                 {
-                    Logger.Instance.WLog($"Failed to update plugin '{plugin.PackageName}': " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    Logger.Instance.WLog($"Failed to download package '{plugin.PackageName}' update");
+                    continue;
                 }
+                Helpers.PluginScanner.UpdatePlugin(package.Package, dlResult.Data);
             }
-            Logger.Instance?.ILog("Plugin Updater finished");
+            catch(Exception ex)
+            {
+                Logger.Instance.WLog($"Failed to update plugin '{plugin.PackageName}': " + ex.Message + Environment.NewLine + ex.StackTrace);
+            }
         }
+        Logger.Instance?.ILog("Plugin Updater finished");
     }
 }

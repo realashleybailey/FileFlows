@@ -15,6 +15,9 @@ public class AutoUpdater : UpdaterWorker
 {
     private static string UpdateUrl = "https://fileflows.com/auto-update";
 
+    /// <summary>
+    /// Creates an instance of a worker to automatically update FileFlows Server
+    /// </summary>
     public AutoUpdater() : base("server-upgrade", 60)
     {
         if (int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) &&
@@ -121,8 +124,8 @@ public class AutoUpdater : UpdaterWorker
         using HttpClient httpClient = new();
         
         using HttpResponseMessage response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-        using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync(); 
-        using Stream streamToWriteTo = File.Open(file, FileMode.Create); 
+        await using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync();
+        await using Stream streamToWriteTo = File.Open(file, FileMode.Create); 
         await streamToReadFrom.CopyToAsync(streamToWriteTo);
     }
 }

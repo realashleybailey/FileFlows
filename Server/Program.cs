@@ -43,7 +43,7 @@ public class Program
             Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
             foreach (DictionaryEntry var in Environment.GetEnvironmentVariables())
             {
-                Logger.Instance.DLog($"ENV.{var.Key} = {var.Value} [{var.Value?.GetType()?.FullName ?? "null"}]");
+                Logger.Instance.DLog($"ENV.{var.Key} = {var.Value}");
             }
             
             Logger.Instance.ILog(new string('=', 50));

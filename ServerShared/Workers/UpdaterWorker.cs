@@ -75,8 +75,9 @@ public abstract class UpdaterWorker:Worker
             return true;
 #endif
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.Instance?.ELog($"{UpdaterName} Error: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return false;
         }
     }

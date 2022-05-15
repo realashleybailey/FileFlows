@@ -60,6 +60,7 @@ public abstract class Worker
     /// </summary>
     public virtual void Start()
     {
+        Logger.Instance?.ILog("Starting worker: " + this.GetType().Name);
         if (timer != null)
         {
             if (timer.Enabled)
@@ -83,6 +84,7 @@ public abstract class Worker
     /// </summary>
     public virtual void Stop()
     {
+        Logger.Instance?.ILog("Stopping worker: " + this.GetType().Name);
         if (timer == null)
             return;
         timer.Stop();

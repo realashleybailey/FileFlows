@@ -1,6 +1,4 @@
-﻿using Esprima.Ast;
-
-namespace FileFlows.Server.Workers;
+﻿namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
@@ -39,7 +37,7 @@ public class ServerUpdater : UpdaterWorker
             Logger.Instance?.DLog($"{UpdaterName}: Using Auto Update URL: " + updateUrl);
             UpdateUrl = updateUrl;
         }
-        base.Initialize(schedule, minutes);
+        base.Initialize(schedule, interval);
     }
 
     protected override void QuitApplication()
@@ -85,7 +83,7 @@ public class ServerUpdater : UpdaterWorker
         DownloadFile(onlineVersion.ToString(), file).Wait();
         if (File.Exists(file) == false)
         {
-            Logger.Instance.ILog($"{UpdaterName}: Download failed");
+            Logger.Instance.WLog($"{UpdaterName}: Download failed");
             return string.Empty;
         }
 

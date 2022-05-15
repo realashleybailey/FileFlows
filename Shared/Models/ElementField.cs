@@ -1,174 +1,296 @@
-namespace FileFlows.Shared.Models
+namespace FileFlows.Shared.Models;
+
+using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Text.Json.Serialization;
+using FileFlows.Plugin;
+
+/// <summary>
+/// An element field is a UI component that is displayed in the web browser
+/// </summary>
+public class ElementField
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Dynamic;
-    using System.Linq;
-    using System.Text.Json.Serialization;
-    using FileFlows.Plugin;
-    public class ElementField
+    /// <summary>
+    /// Gets or sets the order of which to display this filed
+    /// </summary>
+    public int Order { get; set; }
+    /// <summary>
+    /// Gets or sets the type of this field 
+    /// </summary>
+    public string Type { get; set; }
+    /// <summary>
+    /// Gets or sets the name of this field
+    /// </summary>
+    public string Name { get; set; }
+    /// <summary>
+    /// Gets or sets optional place holder text, this can be a translation key
+    /// </summary>
+    public string Placeholder { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the input type of this field
+    /// </summary>
+    public FormInputType InputType { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this field is only only a UI field
+    /// and value will not be saved
+    /// </summary>
+    public bool UiOnly { get; set; }
+
+    /// <summary>
+    /// Gets or sets the variables {} available to this field
+    /// </summary>
+    public Dictionary<string, object> Variables { get; set; }
+
+    /// <summary>
+    /// Gets or sets the parameters of the field
+    /// </summary>
+    public Dictionary<string, object> Parameters { get; set; }
+
+    /// <summary>
+    /// Gets or sets the validators for the field
+    /// </summary>
+    public List<Validators.Validator> Validators { get; set; }
+
+    /// <summary>
+    /// A delegate used when a value change event
+    /// </summary>
+    public delegate void ValueChangedEvent(object sender, object value);
+    /// <summary>
+    /// A event that is raised when the value changes
+    /// </summary>
+    public event ValueChangedEvent ValueChanged;
+
+    /// <summary>
+    /// A delegate used for the disabled change event
+    /// </summary>
+    public delegate void DisabledChangeEvent(bool state);
+    /// <summary>
+    /// An event that is raised when the disable state of the field is changed
+    /// </summary>
+    public event DisabledChangeEvent DisabledChange;
+
+    /// <summary>
+    /// A delegate for when the conditions of the field changes
+    /// </summary>
+    public delegate void ConditionsChangeEvent(bool state);
+    /// <summary>
+    /// An event that is raised when the conditions of the field changes
+    /// </summary>
+    public event ConditionsChangeEvent ConditionsChange;
+
+    /// <summary>
+    /// Invokes the value changed event
+    /// </summary>
+    /// <param name="sender">The sender of the invoker</param>
+    /// <param name="value">The value to invoke</param>
+    public void InvokeValueChanged(object sender, object value) => this.ValueChanged?.Invoke(sender, value);
+
+    private List<Condition> _DisabledConditions;
+    /// <summary>
+    /// Gets or sets the conditions used to disable this field
+    /// </summary>
+    public List<Condition> DisabledConditions
     {
-        public int Order { get; set; }
-        public string Type { get; set; }
-        public string Name { get; set; }
-        /// <summary>
-        /// Gets or sets optional place holder text, this can be a translation key
-        /// </summary>
-        public string Placeholder { get; set; }
-        public FormInputType InputType { get; set; }
-
-        public bool UiOnly { get; set; }
-
-        public Dictionary<string, object> Variables { get; set; }
-
-        public Dictionary<string, object> Parameters { get; set; }
-
-        public List<Validators.Validator> Validators { get; set; }
-
-        public delegate void ValueChangedEvent(object sender, object value);
-        public event ValueChangedEvent ValueChanged;
-
-        public delegate void DisabledChangeEvent(bool state);
-        public event DisabledChangeEvent DisabledChange;
-
-        public delegate void ConditionsChangeEvent(bool state);
-        public event ConditionsChangeEvent ConditionsChange;
-
-        public void InvokeValueChanged(object sender, object value) => this.ValueChanged?.Invoke(sender, value);
-
-        private List<Condition> _DisabledConditions;
-        public List<Condition> DisabledConditions
+        get => _DisabledConditions;
+        set
         {
-            get => _DisabledConditions;
-            set
-            {
-                _DisabledConditions = value ?? new List<Condition>();
-                foreach (var condition in _DisabledConditions)
-                    condition.Owner = this;
-            }
-        }
-
-        private List<Condition> _Conditions;
-        public List<Condition> Conditions
-        {
-            get => _Conditions;
-            set
-            {
-                _Conditions = value ?? new List<Condition>();
-                foreach (var condition in _Conditions)
-                    condition.Owner = this;
-            }
-        }
-
-        internal void InvokeChange(Condition condition, bool state)
-        {
-            if(this.DisabledConditions?.Any(x => x == condition) == true)
-                this.DisabledChange?.Invoke(state);
-            if (this.Conditions?.Any(x => x == condition) == true)
-                this.ConditionsChange?.Invoke(state == false); // state is the "disabled" state, for conditions we want the inverse
+            _DisabledConditions = value ?? new List<Condition>();
+            foreach (var condition in _DisabledConditions)
+                condition.Owner = this;
         }
     }
 
-    public class Condition
+    private List<Condition> _Conditions;
+    /// <summary>
+    /// Gets or sets the conditions used to show this field
+    /// </summary>
+    public List<Condition> Conditions
     {
-        [JsonIgnore]
-        public ElementField Field { get; private set; }
-        public string Property { get; set; }
-        public object Value { get; set; }
-        public bool IsNot { get; set; }
-
-        public bool IsMatch { get; set; }
-
-        [JsonIgnore]
-        public ElementField Owner { get; set; }
-
-        public Condition()
+        get => _Conditions;
+        set
         {
-
+            _Conditions = value ?? new List<Condition>();
+            foreach (var condition in _Conditions)
+                condition.Owner = this;
         }
+    }
 
-        public Condition(ElementField field, object initialValue, object value = null, bool isNot = false)
+    /// <summary>
+    /// Invokes a condition
+    /// </summary>
+    /// <param name="condition">the condition to invokte</param>
+    /// <param name="state">the condition state</param>
+    internal void InvokeChange(Condition condition, bool state)
+    {
+        if(this.DisabledConditions?.Any(x => x == condition) == true)
+            this.DisabledChange?.Invoke(state);
+        if (this.Conditions?.Any(x => x == condition) == true)
+            this.ConditionsChange?.Invoke(state == false); // state is the "disabled" state, for conditions we want the inverse
+    }
+}
+
+/// <summary>
+/// A condition that determines if a element field is shown or disabled
+/// </summary>
+public class Condition
+{
+    /// <summary>
+    /// Get or sets the Field this condition is attached to
+    /// </summary>
+    [JsonIgnore]
+    public ElementField Field { get; private set; }
+    /// <summary>
+    /// Gets or sets the property this condition evaluates
+    /// </summary>
+    public string Property { get; set; }
+    /// <summary>
+    /// Gets or sets the value used to when evaluating the condition
+    /// </summary>
+    public object Value { get; set; }
+    /// <summary>
+    /// Gets or sets if the match is inversed, ie is not the value
+    /// </summary>
+    public bool IsNot { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this condition is a match
+    /// </summary>
+    public bool IsMatch { get; set; }
+
+    /// <summary>
+    /// Gets or sets the owner who owns this conditoin
+    /// </summary>
+    [JsonIgnore]
+    public ElementField Owner { get; set; }
+
+    /// <summary>
+    /// Constructs a condition
+    /// </summary>
+    public Condition()
+    {
+
+    }
+
+    /// <summary>
+    /// Constructs a condition
+    /// </summary>
+    /// <param name="field">the field the condition is attached to</param>
+    /// <param name="initialValue">the initial value of the field</param>
+    /// <param name="value">the value to evaluate for</param>
+    /// <param name="isNot">if the condition should NOT match the value</param>
+    public Condition(ElementField field, object initialValue, object value = null, bool isNot = false)
+    {
+        this.Property = field.Name;
+        this.Value = value;
+        this.IsNot = isNot;
+        this.SetField(field, initialValue);
+    }
+
+    /// <summary>
+    /// Sets the field 
+    /// </summary>
+    /// <param name="field">the field</param>
+    /// <param name="initialValue">the fields initial value</param>
+    public void SetField(ElementField field, object initialValue)
+    {
+        this.Field = field;
+        this.Field.ValueChanged += Field_ValueChanged;
+        Field_ValueChanged(this, initialValue);
+    }
+
+    /// <summary>
+    /// Fired when the field value changes
+    /// </summary>
+    /// <param name="sender">the sender object</param>
+    /// <param name="value">the new field value</param>
+    private void Field_ValueChanged(object sender, object value)
+    {
+        bool matches = this.Matches(value);
+        matches = !matches; // reverse this as we matches mean enabled, so we want disabled
+        this.IsMatch = matches;
+        this.Owner?.InvokeChange(this, matches);
+    }
+
+    /// <summary>
+    /// Test if the condition matches the given object value
+    /// </summary>
+    /// <param name="value">the value to test the condition against</param>
+    /// <returns>true if the condition is matches</returns>
+    public virtual bool Matches(object value)
+    {
+        bool matches = Helpers.ObjectHelper.ObjectsAreSame(value, this.Value);
+        if (IsNot)
+            matches = !matches;
+        return matches;
+    }
+}
+
+/// <summary>
+/// Condition to test if a field is empty
+/// </summary>
+public class EmptyCondition : Condition
+{
+    /// <summary>
+    /// Constructs a empty condition
+    /// </summary>
+    /// <param name="field">the field this condition is attached to</param>
+    /// <param name="initialValue">the initial value of the field</param>
+    public EmptyCondition(ElementField field, object initialValue) : base(field, initialValue)
+    {
+
+    }
+
+    /// <summary>
+    /// Test if the condition matches the given object value
+    /// </summary>
+    /// <param name="value">the value to test the condition against</param>
+    /// <returns>true if the condition is matches</returns>
+    public override bool Matches(object value)
+    {
+        if (value == null)
         {
-            this.Property = field.Name;
-            this.Value = value;
-            this.IsNot = isNot;
-            this.SetField(field, initialValue);
+            return IsNot ? false : true;
         }
-
-        public void SetField(ElementField field, object initialValue)
+        else if (value is string str)
         {
-            this.Field = field;
-            this.Field.ValueChanged += Field_ValueChanged;
-            Field_ValueChanged(this, initialValue);
-        }
-
-        private void Field_ValueChanged(object sender, object value)
-        {
-            bool matches = this.Matches(value);
-            matches = !matches; // reverse this as we matches mean enabled, so we want disabled
-            this.IsMatch = matches;
-            this.Owner?.InvokeChange(this, matches);
-        }
-
-        public virtual bool Matches(object value)
-        {
-            bool matches = Helpers.ObjectHelper.ObjectsAreSame(value, this.Value);
+            bool empty = string.IsNullOrWhiteSpace(str);
             if (IsNot)
-                matches = !matches;
-            return matches;
+                empty = !empty;
+            return empty;
         }
-    }
-
-    public class EmptyCondition:Condition
-    {
-        public EmptyCondition(ElementField field, object initialValue):base(field, initialValue)
+        else if (value is IList list)
         {
-
+            bool empty = list.Count == 0;
+            if (IsNot)
+                empty = !empty;
+            return empty;
         }
-
-        public override bool Matches(object value)
+        else if (value.GetType().IsArray)
         {
-            if(value == null)
-            {
-                return IsNot ? false : true;
-            }
-            else if(value is string str)
-            {
-                bool empty = string.IsNullOrWhiteSpace(str);
-                if(IsNot)
-                    empty = !empty;
-                return empty;
-            }
-            else if(value is IList list)
-            {
-                bool empty = list.Count == 0;
-                if (IsNot)
-                    empty = !empty;
-                return empty;
-            }
-            else if (value.GetType().IsArray)
-            {
-                bool empty = ((Array)value).Length == 0;
-                if (IsNot)
-                    empty = !empty;
-                return empty;
-            }
-            else if(value is int iValue)
-            {
-                return IsNot ? iValue > 0 : iValue == 0;
-            }
-            else if (value is Int64 iValue64)
-            {
-                return IsNot ? iValue64 > 0 : iValue64 == 0;
-            }
-            else if (value is bool bValue)
-            {
-                if(IsNot)
-                    bValue = !bValue;
-                return bValue;
-            }
-            return base.Matches(value);
+            bool empty = ((Array)value).Length == 0;
+            if (IsNot)
+                empty = !empty;
+            return empty;
         }
-    }
+        else if (value is int iValue)
+        {
+            return IsNot ? iValue > 0 : iValue == 0;
+        }
+        else if (value is Int64 iValue64)
+        {
+            return IsNot ? iValue64 > 0 : iValue64 == 0;
+        }
+        else if (value is bool bValue)
+        {
+            if (IsNot)
+                bValue = !bValue;
+            return bValue;
+        }
 
+        return base.Matches(value);
+    }
 }

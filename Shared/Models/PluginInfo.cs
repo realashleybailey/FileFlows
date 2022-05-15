@@ -1,44 +1,93 @@
-namespace FileFlows.Shared.Models
+namespace FileFlows.Shared.Models;
+
+using System.Collections.Generic;
+
+
+/// <summary>
+/// Information about a plugin in FileFlows
+/// </summary>
+public class PluginInfo : FileFlowObject
 {
-    using System.Collections.Generic;
-    using System.Dynamic;
+    /// <summary>
+    /// Gets or sets if the plugin is enabled
+    /// </summary>
+    public bool Enabled { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the plugin version
+    /// </summary>
+    public string Version { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if the plugin is deleted
+    /// </summary>
+    public bool Deleted { get; set; }
 
-    public class PluginInfo : FileFlowObject
+    /// <summary>
+    /// Gets or sets if this plugin has settings
+    /// </summary>
+    public bool HasSettings { get; set; }
+
+    /// <summary>
+    /// Gets or sets the URL of this plugin
+    /// </summary>
+    public string Url { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the authors of the plugin
+    /// </summary>
+    public string Authors { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the description of the plugin
+    /// </summary>
+    public string Description { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the minimum version of FileFlows this plugin requires
+    /// </summary>
+    public string MinimumVersion { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the name of the package of this plugin.
+    /// The packages name is the .ffplugin file
+    /// </summary>
+    public string PackageName { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a list of settings elements used to construct the settings form
+    /// </summary>
+    public List<ElementField> Settings { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a list of elements/flowparts/nodes this plugin has
+    /// </summary>
+    public List<FlowElement> Elements { get; set; }
+}
+
+/// <summary>
+/// Gets or sets the model for plugin info
+/// </summary>
+public class PluginInfoModel : PluginInfo
+{
+    /// <summary>
+    /// Gets or sets the latest version of this plugin
+    /// </summary>
+    public string LatestVersion { get; set; }
+
+    /// <summary>
+    /// Gets if there is an update available for this plugin
+    /// </summary>
+    public bool UpdateAvailable
     {
-        public bool Enabled { get; set; }
-        public string Version { get; set; }
-        public bool Deleted { get; set; }
-
-        public bool HasSettings { get; set; }
-
-        public string Url { get; set; }
-        public string Authors { get; set; }
-        public string Description { get; set; }
-        public string MinimumVersion { get; set; }
-        public string PackageName { get; set; }
-
-        //public List<ElementField> Fields { get; set; }
-
-        public List<ElementField> Settings { get; set; }
-        
-        public List<FlowElement> Elements { get; set; }
-    }
-
-    public class PluginInfoModel : PluginInfo
-    {
-        public string LatestVersion { get; set; }
-
-        public bool UpdateAvailable
+        get
         {
-            get
-            {
-                System.Version latest, current;
-                if (string.IsNullOrEmpty(LatestVersion) || System.Version.TryParse(LatestVersion, out latest) == false)
-                    return false;
-                if (string.IsNullOrEmpty(Version) || System.Version.TryParse(Version, out current) == false)
-                    return false;
-                return current < latest;
-            }
+            System.Version latest, current;
+            if (string.IsNullOrEmpty(LatestVersion) || System.Version.TryParse(LatestVersion, out latest) == false)
+                return false;
+            if (string.IsNullOrEmpty(Version) || System.Version.TryParse(Version, out current) == false)
+                return false;
+            return current < latest;
         }
     }
 }

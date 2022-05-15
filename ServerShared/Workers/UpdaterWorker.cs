@@ -65,12 +65,16 @@ public abstract class UpdaterWorker:Worker
                 return false;
 
             UpdatePending = true;
+            PrepareApplicationShutdown();
+            Logger.Instance.ILog($"{UpdaterName} - Update pending installation");
             do
             {
+                Logger.Instance.ILog($"{UpdaterName}: Waiting to run update");
                 // sleep just in case something has just started
                 Thread.Sleep(10_000);
             } while (CanUpdate());
 
+            Logger.Instance.ILog($"{UpdaterName} - Update about to be installed");
             RunUpdateScript(updateScript);
             return true;
 #endif
@@ -80,6 +84,14 @@ public abstract class UpdaterWorker:Worker
             Logger.Instance?.ELog($"{UpdaterName} Error: {ex.Message}{Environment.NewLine}{ex.StackTrace}");
             return false;
         }
+    }
+
+    /// <summary>
+    /// Prepares the application to be shutdown
+    /// Called after the update has been downloaded, but before it has run
+    /// </summary>
+    protected virtual void PrepareApplicationShutdown()
+    {
     }
 
     private void RunUpdateScript(string updateScript)

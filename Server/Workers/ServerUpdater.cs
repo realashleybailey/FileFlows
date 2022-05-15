@@ -44,6 +44,7 @@ public class ServerUpdater : UpdaterWorker
 
     protected override void QuitApplication()
     {
+        Logger.Instance.ILog($"{nameof(ServerUpdater)} - Exiting Application to run update");
         WorkerManager.StopWorkers();
         Environment.Exit(99);
     }
@@ -58,6 +59,11 @@ public class ServerUpdater : UpdaterWorker
     {
         var workers = new WorkerController(null).GetAll();
         return workers?.Any() != true;
+    }
+
+    protected override void PrepareApplicationShutdown()
+    {
+        WorkerManager.StopWorkers();
     }
 
     protected override string DownloadUpdateBinary()

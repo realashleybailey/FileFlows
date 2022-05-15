@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace FileFlows.ServerShared.Workers;
 
 using System.Diagnostics;

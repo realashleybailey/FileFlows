@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Workers;
+﻿using FileFlows.Shared.Formatters;
+
+namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
@@ -24,7 +26,7 @@ public class ServerUpdater : UpdaterWorker
         if (int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) &&
             minutes > 0)
         {
-            Logger.Instance?.DLog($"{UpdaterName}: Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
+            Logger.Instance?.DLog($"{nameof(ServerUpdater)}: Using Auto Update Interval: " + minutes + " minute" + (minutes == 1 ? "" : "s"));
             interval = minutes;
             schedule = ScheduleType.Minute;
         }
@@ -34,7 +36,7 @@ public class ServerUpdater : UpdaterWorker
         {
             if (updateUrl.EndsWith("/"))
                 updateUrl = updateUrl[..^1];
-            Logger.Instance?.DLog($"{UpdaterName}: Using Auto Update URL: " + updateUrl);
+            Logger.Instance?.DLog($"{nameof(ServerUpdater)}: Using Auto Update URL: " + updateUrl);
             UpdateUrl = updateUrl;
         }
         base.Initialize(schedule, interval);
@@ -71,7 +73,8 @@ public class ServerUpdater : UpdaterWorker
         string file = Path.Combine(updateDirectory, $"FileFlows-{onlineVersion}.zip");
         if (File.Exists(file))
         {
-            Logger.Instance.ILog($"{UpdaterName}: Update already downloaded: " + file);
+            string size = FileSizeFormatter.Format(new FileInfo(file).Length);
+            Logger.Instance.ILog($"{UpdaterName}: Update already downloaded: {file} ({size}");
             return file;
         }
 
@@ -87,7 +90,8 @@ public class ServerUpdater : UpdaterWorker
             return string.Empty;
         }
 
-        Logger.Instance.ILog($"{UpdaterName}: Download complete: " + file);
+        string dlSize = FileSizeFormatter.Format(new FileInfo(file).Length);
+        Logger.Instance.ILog($"{UpdaterName}: Download complete: {file} ({dlSize})");
         return file;
     }
 

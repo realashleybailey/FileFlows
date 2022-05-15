@@ -16,6 +16,8 @@ public class TelemetryReporter: Worker
 
     protected override void Execute()
     {
+        if (Environment.GetEnvironmentVariable("DevBox") == "1")
+            return;
 #if (DEBUG)
         return;
 #else

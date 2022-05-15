@@ -1,51 +1,99 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using FileFlows.Server.Models;
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Server.Helpers
-{
-    public class DataConverter : JsonConverter<FileFlowObject>
+namespace FileFlows.Server.Helpers;
+
+
+/// <summary>
+/// Converts a FileFlowObject
+/// </summary>
+public class DataConverter : JsonConverter<FileFlowObject>
+{      
+    /// <summary>
+    /// Read and convert the JSON to T.
+    /// </summary>
+    /// <remarks>
+    /// A converter may throw any Exception, but should throw <cref>JsonException</cref> when the JSON is invalid.
+    /// </remarks>
+    /// <param name="reader">The <see cref="Utf8JsonReader"/> to read from.</param>
+    /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
+    /// <returns>The value that was converted.</returns>
+    /// <remarks>Note that the value of <seealso cref="HandleNull"/> determines if the converter handles null JSON tokens.</remarks>
+    public override FileFlowObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        public override FileFlowObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        throw new NotImplementedException();
+    }
+
+    
+    /// <summary>
+    /// Write the value as JSON.
+    /// </summary>
+    /// <remarks>
+    /// A converter may throw any Exception, but should throw <cref>JsonException</cref> when the JSON
+    /// cannot be created.
+    /// </remarks>
+    /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
+    /// <param name="value">The value to convert. Note that the value of <seealso cref="HandleNull"/> determines if the converter handles <see langword="null" /> values.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
+    public override void Write(Utf8JsonWriter writer, FileFlowObject value, JsonSerializerOptions options)
+    {
+        var properties = value.GetType().GetProperties();
+
+        writer.WriteStartObject();
+
+        foreach (var prop in properties)
         {
-            throw new NotImplementedException();
-        }
-
-        public override void Write(Utf8JsonWriter writer, FileFlowObject value, JsonSerializerOptions options)
-        {
-            var properties = value.GetType().GetProperties();
-
-            writer.WriteStartObject();
-
-            foreach (var prop in properties)
+            // dont write the properties that also exist on the DbObject
+            if ((prop.Name == "Uid" || prop.Name == "DateModified" || prop.Name == "DateCreated" || prop.Name == "Name") == false)
             {
-                // dont write the properties that also exist on the DbObject
-                if ((prop.Name == "Uid" || prop.Name == "DateModified" || prop.Name == "DateCreated" || prop.Name == "Name") == false)
-                {
-                    var propValue = prop.GetValue(value);
-                    if (propValue == null)
-                        continue; // dont write nulls
-                    if (prop.PropertyType.IsPrimitive && propValue == Activator.CreateInstance(prop.PropertyType))
-                        continue; // dont write defaults
-                    if (propValue as bool? == false)
-                        continue; // don't write default false booleans
+                var propValue = prop.GetValue(value);
+                if (propValue == null)
+                    continue; // dont write nulls
+                if (prop.PropertyType.IsPrimitive && propValue == Activator.CreateInstance(prop.PropertyType))
+                    continue; // dont write defaults
+                if (propValue as bool? == false)
+                    continue; // don't write default false booleans
 
-                    writer.WritePropertyName(prop.Name);
-                    JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);
-                }
+                writer.WritePropertyName(prop.Name);
+                JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);
             }
-
-            writer.WriteEndObject();
         }
-    }
 
-    public class BoolConverter : JsonConverter<bool>
-    {
-        public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-             => reader.GetInt32() == 1;
-
-        public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
-            => writer.WriteNumberValue(value ? 1 : 0);
+        writer.WriteEndObject();
     }
+}
+
+/// <summary>
+/// Boolean converter
+/// </summary>
+public class BoolConverter : JsonConverter<bool>
+{
+    /// <summary>
+    /// Read and convert the JSON to T.
+    /// </summary>
+    /// <remarks>
+    /// A converter may throw any Exception, but should throw <cref>JsonException</cref> when the JSON is invalid.
+    /// </remarks>
+    /// <param name="reader">The <see cref="Utf8JsonReader"/> to read from.</param>
+    /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
+    /// <returns>The value that was converted.</returns>
+    /// <remarks>Note that the value of <seealso cref="HandleNull"/> determines if the converter handles null JSON tokens.</remarks>
+    public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+         => reader.GetInt32() == 1;
+
+    
+    /// <summary>
+    /// Write the value as JSON.
+    /// </summary>
+    /// <remarks>
+    /// A converter may throw any Exception, but should throw <cref>JsonException</cref> when the JSON
+    /// cannot be created.
+    /// </remarks>
+    /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
+    /// <param name="value">The value to convert. Note that the value of <seealso cref="HandleNull"/> determines if the converter handles <see langword="null" /> values.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
+    public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+        => writer.WriteNumberValue(value ? 1 : 0);
 }

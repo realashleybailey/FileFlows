@@ -7,6 +7,9 @@ using FileFlows.ServerShared.Services;
 namespace FileFlows.Node;
 public class Program
 {
+    /// <summary>
+    /// Gets an instance of a node manager
+    /// </summary>
     internal static NodeManager? Manager { get; private set; }
 
     private static bool Exiting = false;

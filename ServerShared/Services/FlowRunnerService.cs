@@ -1,69 +1,112 @@
-﻿namespace FileFlows.ServerShared.Services
-{
-    using FileFlows.Shared.Helpers;
-    using FileFlows.Shared.Models;
+﻿namespace FileFlows.ServerShared.Services;
 
-    public interface IFlowRunnerService
+using FileFlows.Shared.Helpers;
+using FileFlows.Shared.Models;
+
+/// <summary>
+/// Interface for a Flow Runner, which is responsible for executing a flow and processing files
+/// </summary>
+public interface IFlowRunnerService
+{
+    /// <summary>
+    /// Called when a flow execution starts
+    /// </summary>
+    /// <param name="info">The information about the flow execution</param>
+    /// <returns>The updated information</returns>
+    Task<FlowExecutorInfo> Start(FlowExecutorInfo info);
+    /// <summary>
+    /// Called when the flow execution has completed
+    /// </summary>
+    /// <param name="info">The information about the flow execution</param>
+    /// <returns>a completed task</returns>
+    Task Complete(FlowExecutorInfo info);
+    /// <summary>
+    /// Called to update the status of the flow execution on the server
+    /// </summary>
+    /// <param name="info">The information about the flow execution</param>
+    /// <returns>a completed task</returns>
+    Task Update(FlowExecutorInfo info);
+}
+
+/// <summary>
+/// A flow runner which is responsible for executing a flow and processing files
+/// </summary>
+public class FlowRunnerService : Service, IFlowRunnerService
+{
+
+    /// <summary>
+    /// Gets or sets the function that will load the flow runner when Load is called
+    /// This is used in unit testing to mock this runner
+    /// </summary>
+    public static Func<IFlowRunnerService> Loader { get; set; }
+
+    /// <summary>
+    /// Loads a Flow Runner instance and returns it
+    /// </summary>
+    /// <returns>a flow runner instance</returns>
+    public static IFlowRunnerService Load()
     {
-        Task<FlowExecutorInfo> Start(FlowExecutorInfo info);
-        Task Complete(FlowExecutorInfo info);
-        Task Update(FlowExecutorInfo info);
+        if (Loader == null)
+            return new FlowRunnerService();
+        return Loader.Invoke();
     }
 
-    public class FlowRunnerService : Service, IFlowRunnerService
+    /// <summary>
+    /// Called when a flow execution starts
+    /// </summary>
+    /// <param name="info">The information about the flow execution</param>
+    /// <returns>The updated information</returns>
+    public async Task Complete(FlowExecutorInfo info)
     {
-
-        public static Func<IFlowRunnerService> Loader { get; set; }
-
-        public static IFlowRunnerService Load()
+        try
         {
-            if (Loader == null)
-                return new FlowRunnerService();
-            return Loader.Invoke();
+            var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/finish", info);
+            if (result.Success == false)
+                throw new Exception("Failed to finish work: " + result.Body);
         }
-
-        public async Task Complete(FlowExecutorInfo info)
+        catch (Exception ex)
         {
-            try
-            {
-                var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/finish", info);
-                if (result.Success == false)
-                    throw new Exception("Failed to finish work: " + result.Body);
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance?.WLog("Failed to finish work: " + ex.Message);
-            }
+            Logger.Instance?.WLog("Failed to finish work: " + ex.Message);
         }
+    }
 
-        public async Task<FlowExecutorInfo> Start(FlowExecutorInfo info)
+    /// <summary>
+    /// Called when the flow execution has completed
+    /// </summary>
+    /// <param name="info">The information about the flow execution</param>
+    /// <returns>a completed task</returns>
+    public async Task<FlowExecutorInfo> Start(FlowExecutorInfo info)
+    {
+        try
         {
-            try
-            {
-                var result = await HttpHelper.Post<FlowExecutorInfo>($"{ServiceBaseUrl}/api/worker/work/start", info);
-                if (result.Success == false)
-                    throw new Exception("Failed to start work: " + result.Body);
-                return result.Data;
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance?.WLog("Failed to start work: " + ex.Message);
-                return null;
-            }
+            var result = await HttpHelper.Post<FlowExecutorInfo>($"{ServiceBaseUrl}/api/worker/work/start", info);
+            if (result.Success == false)
+                throw new Exception("Failed to start work: " + result.Body);
+            return result.Data;
         }
-
-        public async Task Update(FlowExecutorInfo info)
+        catch (Exception ex)
         {
-            try
-            {
-                var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/update", info, noLog: true);
-                if (result.Success == false)
-                    throw new Exception("Failed to update work: " + result.Body);
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance?.WLog("Failed to update work: " + ex.Message);
-            }
+            Logger.Instance?.WLog("Failed to start work: " + ex.Message);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Called to update the status of the flow execution on the server
+    /// </summary>
+    /// <param name="info">The information about the flow execution</param>
+    /// <returns>a completed task</returns>
+    public async Task Update(FlowExecutorInfo info)
+    {
+        try
+        {
+            var result = await HttpHelper.Post($"{ServiceBaseUrl}/api/worker/work/update", info, noLog: true);
+            if (result.Success == false)
+                throw new Exception("Failed to update work: " + result.Body);
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance?.WLog("Failed to update work: " + ex.Message);
         }
     }
 }

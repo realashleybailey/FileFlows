@@ -1,3 +1,5 @@
+using FileFlows.Shared.Helpers;
+
 namespace FileFlows.ServerShared.Workers;
 
 using System.Diagnostics;
@@ -205,5 +207,20 @@ public abstract class UpdaterWorker:Worker
             Logger.Instance?.ELog($"{UpdaterName}: Failed making executable: " + file + " => " + ex.Message);
             return false;
         }
+    }
+
+    
+    /// <summary>
+    /// Downloads a file and saves it
+    /// </summary>
+    /// <param name="url">The url of the file to download</param>
+    /// <param name="file">the location to save the file</param>
+    /// <exception cref="Exception">throws if the file fails to download</exception>
+    protected async Task DownloadFile(string url, string file)
+    {
+        var result = await HttpHelper.Get<byte[]>(url);
+        if (result.Success == false)
+            throw new Exception("Failed to get update: " + result.Body);
+        await File.WriteAllBytesAsync(file, result.Data);
     }
 }

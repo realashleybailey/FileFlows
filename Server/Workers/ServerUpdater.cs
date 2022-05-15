@@ -83,7 +83,10 @@ public class ServerUpdater : UpdaterWorker
         Directory.CreateDirectory(updateDirectory);
 
         Logger.Instance.ILog($"{UpdaterName}: Downloading update: " + onlineVersion);
-        DownloadFile(onlineVersion.ToString(), file).Wait();
+        
+        
+        string url = $"{UpdateUrl}/download/{onlineVersion}?ts={DateTime.Now.Ticks}";
+        DownloadFile(url, file).Wait();
         if (File.Exists(file) == false)
         {
             Logger.Instance.WLog($"{UpdaterName}: Download failed");
@@ -108,7 +111,7 @@ public class ServerUpdater : UpdaterWorker
             if (result.Success == false)
             {
                 Logger.Instance.ILog($"{nameof(ServerUpdater)}: Failed to retrieve online version");
-                return (false, new Version(0,0,0,0));
+                return (false, new Version(0, 0, 0, 0));
             }
 
             Version current = Version.Parse(Globals.Version);
@@ -118,11 +121,14 @@ public class ServerUpdater : UpdaterWorker
                 Logger.Instance.ILog($"{nameof(ServerUpdater)}: Failed to parse online version: " + result.Data);
                 return (false, new Version(0, 0, 0, 0));
             }
+
             if (current >= onlineVersion)
             {
-                Logger.Instance.ILog($"{nameof(ServerUpdater)}: Current version '{current}' newer or same as online version '{onlineVersion}'");
+                Logger.Instance.ILog(
+                    $"{nameof(ServerUpdater)}: Current version '{current}' newer or same as online version '{onlineVersion}'");
                 return (false, onlineVersion);
             }
+
             return (true, onlineVersion);
         }
         catch (Exception ex)
@@ -130,17 +136,5 @@ public class ServerUpdater : UpdaterWorker
             Logger.Instance.ELog($"{nameof(ServerUpdater)}: Failed checking online version: " + ex.Message);
             return (false, new Version(0, 0, 0, 0));
         }
-    }
-    
-    private async Task DownloadFile(string version, string file)
-    {
-        string url = $"{UpdateUrl}/download/{version}?ts={DateTime.Now.Ticks}";
-
-        using HttpClient httpClient = new();
-        
-        using HttpResponseMessage response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-        await using Stream streamToReadFrom = await response.Content.ReadAsStreamAsync();
-        await using Stream streamToWriteTo = File.Open(file, FileMode.Create); 
-        await streamToReadFrom.CopyToAsync(streamToWriteTo);
     }
 }

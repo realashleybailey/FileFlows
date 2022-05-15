@@ -149,8 +149,8 @@ public class WebServer
             new PluginUpdaterWorker(),
             new LogPruner(),
             new LogConverter(),
-            new TelemetryReporter()//,
-            //isWindows ? new AutoUpdater() : null
+            new TelemetryReporter(),
+            new AutoUpdater()
         );
 
         app.MapHub<Hubs.FlowHub>("/flow");

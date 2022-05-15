@@ -37,7 +37,8 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
             
             Logger.Instance = new Server.Logger();
-            
+            ServerShared.Logger.Instance = Logger.Instance;
+
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
             if(Docker)

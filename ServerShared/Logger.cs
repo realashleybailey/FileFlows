@@ -61,5 +61,6 @@ public class Logger : Plugin.ILogger
                 _Instance = new Logger();
             return _Instance;
         }
+        set { _Instance = value; }
     }
 }

@@ -70,6 +70,7 @@ public class Program
 
 
             Logger.Instance = new ServerShared.FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
+            ServerShared.Logger.Instance = Logger.Instance;
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
             AppSettings.Init();

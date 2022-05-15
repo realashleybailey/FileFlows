@@ -23,7 +23,6 @@ public class SettingsService : Service, ISettingsService
 
     /// <summary>
     /// A loader to load an instance of the Settings
-    /// Note: This is used for unit testing and to mock the settings
     /// </summary>
     public static Func<ISettingsService> Loader { get; set; }
 

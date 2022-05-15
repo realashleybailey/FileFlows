@@ -120,45 +120,47 @@ public abstract class UpdaterWorker:Worker
             if(GetAutoUpdatesEnabled() == false)
                 return string.Empty;
 
+            Logger.Instance?.DLog("AutoUpdater: Checking for new update binary");
             string update = DownloadUpdateBinary();
             if (string.IsNullOrEmpty(update))
             {
-                Shared.Logger.Instance.DLog("AutoUpdater: No update available");
+                Logger.Instance?.DLog("AutoUpdater: No update available");
                 return string.Empty;
             }
+            Logger.Instance?.DLog("AutoUpdater: Downloaded update: " + update);
 
             var updateDir = new FileInfo(update).DirectoryName;
             
-            Logger.Instance.ILog("AutoUpdater: Extracting update to: " + updateDir);
+            Logger.Instance?.ILog("AutoUpdater: Extracting update to: " + updateDir);
             ZipFile.ExtractToDirectory(update, updateDir);
-            Logger.Instance.ILog("AutoUpdater: Extracted update to: " + updateDir);
+            Logger.Instance?.ILog("AutoUpdater: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);
-            Logger.Instance.ILog("AutoUpdater: Deleted update file: " + update);
+            Logger.Instance?.ILog("AutoUpdater: Deleted update file: " + update);
 
             var updateFile = Path.Combine(updateDir, UpgradeScriptPrefix + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
             {
-                Logger.Instance.WLog("AutoUpdater: No update script found: " + updateFile);
+                Logger.Instance?.WLog("AutoUpdater: No update script found: " + updateFile);
                 return string.Empty;
             }
-            Logger.Instance.ILog("AutoUpdater: Update script found: " + updateFile);
+            Logger.Instance?.ILog("AutoUpdater: Update script found: " + updateFile);
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
             {
-                Logger.Instance.WLog("AutoUpdater: Failed to make update script executable");
+                Logger.Instance?.WLog("AutoUpdater: Failed to make update script executable");
                 return string.Empty;
             }
 
-            Logger.Instance.ILog("AutoUpdater: Upgrade directory ready: " + updateDir);
-            Logger.Instance.ILog("AutoUpdater: Upgrade script ready: " + updateFile);
+            Logger.Instance?.ILog("AutoUpdater: Upgrade directory ready: " + updateDir);
+            Logger.Instance?.ILog("AutoUpdater: Upgrade script ready: " + updateFile);
 
             return updateFile;
         }
         catch (Exception ex) 
         {
-            if (ex.Message == "Object reference not set to an instance of an object")
-                return string.Empty; // just ignore this error, likely due ot it not being configured yet.
+            //if (ex.Message == "Object reference not set to an instance of an object")
+            //    return string.Empty; // just ignore this error, likely due ot it not being configured yet.
             Logger.Instance?.ELog("AutoUpdater: Failed checking for update: " + ex.Message);
             return string.Empty;
         }

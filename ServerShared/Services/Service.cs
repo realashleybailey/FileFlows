@@ -1,26 +1,29 @@
-﻿namespace FileFlows.ServerShared.Services
+﻿namespace FileFlows.ServerShared.Services;
+
+/// <summary>
+/// A service lets you communicate with the FileFLows server
+/// </summary>
+public class Service
 {
-    using FileFlows.ServerShared.Models;
-
-    public class Service
-    {
-        private static string _ServiceBaseUrl;
-        public static string ServiceBaseUrl 
-        { 
-            get => _ServiceBaseUrl;
-            set
+    private static string _ServiceBaseUrl;
+    /// <summary>
+    /// Gets or sets the Base URL of the FileFlows server
+    /// </summary>
+    public static string ServiceBaseUrl 
+    { 
+        get => _ServiceBaseUrl;
+        set
+        {
+            if(value == null)
             {
-                if(value == null)
-                {
-                    _ServiceBaseUrl = string.Empty;
-                    return;
-                }
-                if(value.EndsWith("/"))
-                    _ServiceBaseUrl = value.Substring(0, value.Length - 1); 
-                else
-                    _ServiceBaseUrl = value;
+                _ServiceBaseUrl = string.Empty;
+                return;
             }
+            if(value.EndsWith("/"))
+                _ServiceBaseUrl = value.Substring(0, value.Length - 1); 
+            else
+                _ServiceBaseUrl = value;
         }
-
     }
+
 }

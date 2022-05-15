@@ -48,7 +48,7 @@ public abstract class UpdaterWorker:Worker
     /// <returns>A update has been downloaded</returns>
     public bool RunCheck()
     {
-        Logger.Instance?.ILog("Checking for update");
+        Logger.Instance?.ILog("AutoUpdater: Checking for update");
         try
         {
 #if(DEBUG)
@@ -97,7 +97,7 @@ public abstract class UpdaterWorker:Worker
         }
         catch (Exception ex)
         {
-            Logger.Instance?.ELog("Failed running update script: " + ex.Message);
+            Logger.Instance?.ELog("AutoUpdater: Failed running update script: " + ex.Message);
         }
     }
 
@@ -126,21 +126,25 @@ public abstract class UpdaterWorker:Worker
             var updateDir = new FileInfo(update).DirectoryName;
             
             ZipFile.ExtractToDirectory(update, updateDir);
+            Logger.Instance.ILog("AutoUpdater: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);
 
             var updateFile = Path.Combine(updateDir, UpgradeScriptPrefix + (Globals.IsWindows ? ".bat" : ".sh"));
             if (File.Exists(updateFile) == false)
             {
-                Logger.Instance.WLog("No update script found: " + updateFile);
+                Logger.Instance.WLog("AutoUpdater: No update script found: " + updateFile);
                 return string.Empty;
             }
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
+            {
+                Logger.Instance.WLog("AutoUpdater: Failed to make update script executable");
                 return string.Empty;
+            }
 
-            Logger.Instance.ILog("Upgrade directory ready: " + updateDir);
-            Logger.Instance.ILog("Upgrade script ready: " + updateFile);
+            Logger.Instance.ILog("AutoUpdater: Upgrade directory ready: " + updateDir);
+            Logger.Instance.ILog("AutoUpdater: Upgrade script ready: " + updateFile);
 
             return updateFile;
         }
@@ -148,7 +152,7 @@ public abstract class UpdaterWorker:Worker
         {
             if (ex.Message == "Object reference not set to an instance of an object")
                 return string.Empty; // just ignore this error, likely due ot it not being configured yet.
-            Logger.Instance?.ELog("Failed checking for update: " + ex.Message);
+            Logger.Instance?.ELog("AutoUpdater: Failed checking for update: " + ex.Message);
             return string.Empty;
         }
     }
@@ -176,15 +180,15 @@ public abstract class UpdaterWorker:Worker
 
             if (process.ExitCode == 0)
                 return true;
-            Logger.Instance?.ELog("Failed making executable:" + process.StartInfo.FileName,
+            Logger.Instance?.ELog("AutoUpdater: Failed making executable:" + process.StartInfo.FileName,
                 process.StartInfo.Arguments + Environment.NewLine + output);
             if (string.IsNullOrWhiteSpace(error) == false)
-                Logger.Instance?.ELog("Error output:" + output);
+                Logger.Instance?.ELog("AutoUpdater: Error output:" + output);
             return false;
         }
         catch (Exception ex)
         {
-            Logger.Instance?.ELog("Failed making executable: " + file + " => " + ex.Message);
+            Logger.Instance?.ELog("AutoUpdater: Failed making executable: " + file + " => " + ex.Message);
             return false;
         }
     }

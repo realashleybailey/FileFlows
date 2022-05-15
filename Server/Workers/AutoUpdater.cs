@@ -81,6 +81,13 @@ public class AutoUpdater : UpdaterWorker
 
         Logger.Instance.ILog("AutoUpdater: Downloading update: " + onlineVersion);
         DownloadFile(onlineVersion.ToString(), file).Wait();
+        if (File.Exists(file) == false)
+        {
+            Logger.Instance.ILog("AutoUpdater: Download failed");
+            return string.Empty;
+        }
+
+        Logger.Instance.ILog("AutoUpdater: Download complete: " + file);
         return file;
     }
 

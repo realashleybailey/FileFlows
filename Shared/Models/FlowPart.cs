@@ -1,34 +1,94 @@
-namespace FileFlows.Shared.Models
+namespace FileFlows.Shared.Models;
+
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using FileFlows.Plugin;
+
+/// <summary>
+/// A flow part is a part/node of a flow that exeuctes
+/// </summary>
+public class FlowPart
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Dynamic;
-    using FileFlows.Plugin;
+    /// <summary>
+    /// Gets or sets the UID of the flow part
+    /// </summary>
+    public Guid Uid { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the name of the flow part
+    /// </summary>
+    public string Name { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the FlowElementUid this flow part is an instance of
+    /// This is the full name of the flow element, Namespace.TypeName
+    /// </summary>
+    public string FlowElementUid { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the x coordinate where this part appears on the canvas
+    /// </summary>
+    public float xPos { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the y coordinate where this part appears on the canvas
+    /// </summary>
+    public float yPos { get; set; }
 
-    public class FlowPart
-    {
-        public Guid Uid { get; set; }
-        public string Name { get; set; }
-        public string FlowElementUid { get; set; }
-        public float xPos { get; set; }
-        public float yPos { get; set; }
+    /// <summary>
+    /// Gets or sets the icon of the flow part
+    /// </summary>
+    public string Icon { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the label of this flow part
+    /// </summary>
+    public string Label { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of inputs this part has
+    /// </summary>
+    public int Inputs { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of outputs this part has
+    /// </summary>
+    public int Outputs { get; set; }
 
-        public string Icon { get; set; }
-        public string Label { get; set; }
-        public int Inputs { get; set; }
-        public int Outputs { get; set; }
+    /// <summary>
+    /// Gets or sets the output connections of this flow part
+    /// </summary>
+    public List<FlowConnection> OutputConnections { get; set; }
 
-        public List<FlowConnection> OutputConnections { get; set; }
+    /// <summary>
+    /// Gets or sets the type of the flow part
+    /// </summary>
+    public FlowElementType Type { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the model of this flow part
+    /// </summary>
+    public ExpandoObject Model { get; set; }
+}
 
-        public FlowElementType Type { get; set; }
-
-        public ExpandoObject Model { get; set; }
-    }
-
-    public class FlowConnection
-    {
-        public int Input { get; set; }
-        public int Output { get; set; }
-        public Guid InputNode { get; set; }
-    }
+/// <summary>
+/// A flow connection connects the input of a node to the output of another node
+/// </summary>
+public class FlowConnection
+{
+    /// <summary>
+    /// Gets or sets the Input number of the connecting node
+    /// </summary>
+    public int Input { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the Output number of the connecitng node
+    /// </summary>
+    public int Output { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the UID of input node this connection connects to
+    /// </summary>
+    public Guid InputNode { get; set; }
 }

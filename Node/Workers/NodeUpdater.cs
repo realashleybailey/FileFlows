@@ -4,19 +4,39 @@ using FileFlows.ServerShared.Workers;
 
 namespace FileFlows.Node.Workers;
 
+/// <summary>
+/// Worker to automatically download node updates from the FileFlows server
+/// </summary>
 public class NodeUpdater:UpdaterWorker
 {
+    
+    /// <summary>
+    /// Constructs an instance of the node updater worker
+    /// </summary>
     public NodeUpdater() : base("node-upgrade", 1)
     {
     }
 
+    
+    /// <summary>
+    /// Gets if an update can currently run
+    /// </summary>
+    /// <returns>true if the update can run, otherwise false</returns>
     protected override bool CanUpdate() => FlowWorker.HasActiveRunners == false;
 
+    /// <summary>
+    /// Quits the application so the update can be applied
+    /// </summary>
     protected override void QuitApplication()
     {
+        Logger.Instance?.ILog($"{UpdaterName}: Quiting Application");
         Program.Quit();
     }
 
+    /// <summary>
+    /// Downloads the binary update from the FileFlows server
+    /// </summary>
+    /// <returns>the downloaded binary filename</returns>
     protected override string DownloadUpdateBinary()
     {   
         var systemService = SystemService.Load();
@@ -43,6 +63,10 @@ public class NodeUpdater:UpdaterWorker
         return update;
     }
 
+    /// <summary>
+    /// Gets if automatic updates should be downloaded
+    /// </summary>
+    /// <returns>true if automatic updates are enabled</returns>
     protected override bool GetAutoUpdatesEnabled()
     {
         var settingsService = SettingsService.Load();

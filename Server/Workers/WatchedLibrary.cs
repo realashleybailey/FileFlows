@@ -51,17 +51,27 @@ public class WatchedLibrary:IDisposable
                 Logger.Instance.ILog($"{Library.Name} Dequeued: {fullpath}");
 
                 if (CheckExists(fullpath) == false)
+                {
+                    Logger.Instance.DLog($"{Library.Name} file does not exist: {fullpath}");
                     continue;
+                }
 
 
                 if (this.Library.ExcludeHidden)
                 {
                     if (FileIsHidden(fullpath))
+                    {
+                        Logger.Instance.DLog($"{Library.Name} file is hidden: {fullpath}");
                         continue;
+                    }
                 }
 
                 if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
+                {
+                    Logger.Instance.DLog($"{Library.Name} file does not match pattern or ends with _: {fullpath}");
                     continue;
+                }
+
                 if (fullpath.ToLower().StartsWith(Library.Path.ToLower()) == false)
                 {
                     Logger.Instance?.ILog($"Library file \"{fullpath}\" no longer belongs to library \"{Library.Path}\"");

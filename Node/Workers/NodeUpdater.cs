@@ -33,7 +33,7 @@ public class NodeUpdater:UpdaterWorker
             return string.Empty;
         }
 
-        var updateDir = Path.Combine(DirectoryHelper.BaseDirectory, "Update");
+        var updateDir = Path.Combine(DirectoryHelper.BaseDirectory, "NodeUpdate");
         if (Directory.Exists(updateDir)) // delete the update dir so we get a full fresh update
             Directory.Delete(updateDir, true);
         Directory.CreateDirectory(updateDir);

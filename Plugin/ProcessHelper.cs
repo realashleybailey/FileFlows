@@ -1,253 +1,359 @@
-﻿namespace FileFlows.Plugin
+﻿namespace FileFlows.Plugin;
+
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+/// <summary>
+/// The result of a process execution
+/// </summary>
+public struct ProcessResult
 {
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+    /// <summary>
+    /// If the processed completed, or if it was aborted
+    /// </summary>
+    public bool Completed;
+    /// <summary>
+    /// The exit code of the process
+    /// </summary>
+    public int? ExitCode;
+    /// <summary>
+    /// The output of the process
+    /// </summary>
+    public string Output;
 
+    /// <summary>
+    /// The standard output from the process
+    /// </summary>
+    public string StandardOutput;
+    /// <summary>
+    /// The error output from the process
+    /// </summary>
+    public string StandardError;
+}
 
-    public struct ProcessResult
+/// <summary>
+/// Basic arguments used to execute a process
+/// </summary>
+public class ExecuteBasicArgs
+{
+    /// <summary>
+    /// Gets or sets the command to execute
+    /// </summary>
+    public string Command { get; set; }
+    /// <summary>
+    /// Gets or sets the arguments of the command
+    /// </summary>
+    public string Arguments { get; set; }
+    /// <summary>
+    /// Gets or sets the arguments of the command as a list and will be correctly escaped
+    /// </summary>
+    public string[] ArgumentList { get; set; }
+    /// <summary>
+    /// Gets or sets the timeout in seconds of the process
+    /// </summary>
+    public int Timeout { get; set; }
+    /// <summary>
+    /// Gets or sets the working directory of the process
+    /// </summary>
+    public string WorkingDirectory { get; set; }
+}
+
+/// <summary>
+/// Arguments used to execute a process
+/// </summary>
+public class ExecuteArgs
+{
+    /// <summary>
+    /// Gets or sets the command to execute
+    /// </summary>
+    public string Command { get; set; }
+    /// <summary>
+    /// Gets or sets the arguments of the command
+    /// </summary>
+    public string Arguments { get; set; }
+    /// <summary>
+    /// Gets or sets the arguments of the command as a list and will be correctly escaped
+    /// </summary>
+    public string[] ArgumentList { get; set; }
+    /// <summary>
+    /// Gets or sets the timeout in seconds of the process
+    /// </summary>
+    public int Timeout { get; set; }
+    
+
+    /// <summary>
+    /// When silent, nothing will be logged
+    /// </summary>
+    public bool Silent { get; set; }
+    /// <summary>
+    /// Gets or sets the working directory of the process
+    /// </summary>
+    public string WorkingDirectory { get; set; }
+    /// <summary>
+    /// A delegate that is used when output is received from an executing process
+    /// </summary>
+    public delegate void OutputRecievedEvent(string output);
+    
+    /// <summary>
+    /// An event that is called when there is standard output from a process
+    /// </summary>
+    public event OutputRecievedEvent StandardOutput;
+    
+    /// <summary>
+    /// An event that is called when there is error output from a process
+    /// </summary>
+    public event OutputRecievedEvent ErrorOutput;
+
+    /// <summary>
+    /// Called when there is standard output received and invokes the StandardOutput event
+    /// </summary>
+    /// <param name="output">the output string received</param>\
+    internal void OnStandardOutput(string output) => StandardOutput?.Invoke(output);
+    
+    /// <summary>
+    /// Called when there is error output received and invokes the ErrorOutput event
+    /// </summary>
+    /// <param name="output">the error string received</param>
+    internal void OnErrorOutput(string output) => ErrorOutput?.Invoke(output);
+}
+
+/// <summary>
+/// A helper class that handles executing processes and reading their output
+/// </summary>
+public class ProcessHelper
+{
+    private Process process;
+    private readonly ILogger Logger;
+    private ExecuteArgs Args;
+
+    StringBuilder outputBuilder, errorBuilder;
+    TaskCompletionSource<bool> outputCloseEvent, errorCloseEvent;
+
+    private bool Fake;
+
+    /// <summary>
+    /// Constructs an instance of the process helper
+    /// </summary>
+    /// <param name="logger">the logger used in the process helper</param>
+    /// <param name="fake">if this is a fake process helper, used in unit test or a demo system</param>
+    public ProcessHelper(ILogger logger, bool fake)
     {
-        public bool Completed;
-        public int? ExitCode;
-        public string Output;
-
-        public string StandardOutput;
-        public string StandardError;
+        this.Logger = logger;
+        this.Fake = fake;
     }
-    public class ExecuteBasicArgs
+
+    /// <summary>
+    /// Cancels the running process
+    /// </summary>
+    public void Cancel()
     {
-        public string Command { get; set; }
-        public string Arguments { get; set; }
-        public string[] ArgumentList { get; set; }
-        public int Timeout { get; set; }
-        public string WorkingDirectory { get; set; }
-    }
-
-    public class ExecuteArgs
-    {
-        public string Command { get; set; } 
-        public string Arguments { get; set; }
-        public string[] ArgumentList { get; set; }
-        public int Timeout { get; set; }
-
-        /// <summary>
-        /// When silent, nothing will be logged
-        /// </summary>
-        public bool Silent { get; set; }
-        public string WorkingDirectory { get; set; }
-        public delegate void OutputRecievedEvent(string output);
-        public event OutputRecievedEvent StandardOutput;
-        public event OutputRecievedEvent ErrorOutput;
-
-        internal void OnStandardOutput(string output) => StandardOutput?.Invoke(output);
-        internal void OnErrorOutput(string output) => ErrorOutput?.Invoke(output);
-    }
-
-    public class ProcessHelper
-    {
-        private Process process;
-        private ILogger Logger;
-        private ExecuteArgs Args;
-
-        StringBuilder outputBuilder, errorBuilder;
-        TaskCompletionSource<bool> outputCloseEvent, errorCloseEvent;
-
-        private bool Fake;
-
-        public ProcessHelper(ILogger logger, bool fake)
+        if (Fake) return;
+        try
         {
-            this.Logger = logger;
-            this.Fake = fake;
+            if (this.process != null)
+            {
+                this.process.Kill();
+                this.process = null;
+            }
+
         }
+        catch (Exception) { }
+    }
 
-        public void Cancel()
+    /// <summary>
+    /// Executes a shell command
+    /// </summary>
+    /// <param name="args">the arguments of the shell command</param>
+    /// <returns>the processing result of the executed command</returns>
+    public async Task<ProcessResult> ExecuteShellCommand(ExecuteArgs args)
+    {
+        if (Fake) return new ProcessResult();  
+
+        var result = new ProcessResult();
+        this.Args = args;
+
+        using (var process = new Process())
         {
-            if (Fake) return;
+            this.process = process;
+
+            process.StartInfo.FileName = args.Command;                
+            if (args.ArgumentList?.Any() == true)
+            {
+                args.Arguments = String.Empty;
+                foreach (var arg in args.ArgumentList)
+                {
+                    process.StartInfo.ArgumentList.Add(arg);
+                    if (arg.IndexOf(" ") > 0)
+                        args.Arguments += "\"" + arg + "\" ";
+                    else
+                        args.Arguments += arg + " ";
+                }
+                args.Arguments = args.Arguments.Trim();
+            }
+            else if (string.IsNullOrEmpty(args.Arguments) == false)
+            {
+                process.StartInfo.Arguments = args.Arguments;
+            }
+
+            if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
+                process.StartInfo.WorkingDirectory = args.WorkingDirectory;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardInput = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.CreateNoWindow = true;
+
+            if (args.Silent == false)
+            {
+                Logger?.ILog(new string('=', 70));
+                Logger?.ILog($"Executing: {args.Command} {args.Arguments}");
+                if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
+                    Logger?.ILog($"Working Directory: {args.WorkingDirectory}");
+                Logger?.ILog(new string('=', 70));
+            }
+
+            outputBuilder = new StringBuilder();
+            outputCloseEvent = new TaskCompletionSource<bool>();
+
+            process.OutputDataReceived += OnOutputDataReceived;
+
+            errorBuilder = new StringBuilder();
+            errorCloseEvent = new TaskCompletionSource<bool>();
+
+            process.ErrorDataReceived += OnErrorDataReceived;
+
+            bool isStarted;
+
             try
             {
-                if (this.process != null)
-                {
-                    this.process.Kill();
-                    this.process = null;
-                }
-
+                isStarted = process.Start();
             }
-            catch (Exception) { }
-        }
-
-        public async Task<ProcessResult> ExecuteShellCommand(ExecuteArgs args)
-        {
-            if (Fake) return new ProcessResult();  
-
-            var result = new ProcessResult();
-            this.Args = args;
-
-            using (var process = new Process())
+            catch (Exception error)
             {
-                this.process = process;
+                // Usually it occurs when an executable file is not found or is not executable
 
-                process.StartInfo.FileName = args.Command;                
-                if (args.ArgumentList?.Any() == true)
+                result.Completed = true;
+                result.ExitCode = -1;
+                result.Output = error.Message;
+
+                isStarted = false;
+            }
+
+            if (isStarted)
+            {
+                // Reads the output stream first and then waits because deadlocks are possible
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                // Creates task to wait for process exit using timeout
+                var waitForExit = WaitForExitAsync(process, args.Timeout);
+
+                // Create task to wait for process exit and closing all output streams
+                var processTask = Task.WhenAll(waitForExit, outputCloseEvent.Task, errorCloseEvent.Task);
+
+                // Waits process completion and then checks it was not completed by timeout
+                if (
+                    (
+                        (args.Timeout > 0 && await Task.WhenAny(Task.Delay(args.Timeout), processTask) == processTask) ||
+                        (args.Timeout == 0 && await Task.WhenAny(processTask) == processTask)
+                    )
+                     && waitForExit.Result)
                 {
-                    args.Arguments = String.Empty;
-                    foreach (var arg in args.ArgumentList)
-                    {
-                        process.StartInfo.ArgumentList.Add(arg);
-                        if (arg.IndexOf(" ") > 0)
-                            args.Arguments += "\"" + arg + "\" ";
-                        else
-                            args.Arguments += arg + " ";
-                    }
-                    args.Arguments = args.Arguments.Trim();
-                }
-                else if (string.IsNullOrEmpty(args.Arguments) == false)
-                {
-                    process.StartInfo.Arguments = args.Arguments;
-                }
-
-                if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
-                    process.StartInfo.WorkingDirectory = args.WorkingDirectory;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardInput = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.CreateNoWindow = true;
-
-                if (args.Silent == false)
-                {
-                    Logger?.ILog(new string('=', 70));
-                    Logger?.ILog($"Executing: {args.Command} {args.Arguments}");
-                    if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
-                        Logger?.ILog($"Working Directory: {args.WorkingDirectory}");
-                    Logger?.ILog(new string('=', 70));
-                }
-
-                outputBuilder = new StringBuilder();
-                outputCloseEvent = new TaskCompletionSource<bool>();
-
-                process.OutputDataReceived += OnOutputDataReceived;
-
-                errorBuilder = new StringBuilder();
-                errorCloseEvent = new TaskCompletionSource<bool>();
-
-                process.ErrorDataReceived += OnErrorDataReceived;
-
-                bool isStarted;
-
-                try
-                {
-                    isStarted = process.Start();
-                }
-                catch (Exception error)
-                {
-                    // Usually it occurs when an executable file is not found or is not executable
-
                     result.Completed = true;
-                    result.ExitCode = -1;
-                    result.Output = error.Message;
+                    result.ExitCode = process.ExitCode;
 
-                    isStarted = false;
-                }
+                    result.StandardError = errorBuilder.ToString();
+                    result.StandardOutput = outputBuilder.ToString();    
 
-                if (isStarted)
-                {
-                    // Reads the output stream first and then waits because deadlocks are possible
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-
-                    // Creates task to wait for process exit using timeout
-                    var waitForExit = WaitForExitAsync(process, args.Timeout);
-
-                    // Create task to wait for process exit and closing all output streams
-                    var processTask = Task.WhenAll(waitForExit, outputCloseEvent.Task, errorCloseEvent.Task);
-
-                    // Waits process completion and then checks it was not completed by timeout
-                    if (
-                        (
-                            (args.Timeout > 0 && await Task.WhenAny(Task.Delay(args.Timeout), processTask) == processTask) ||
-                            (args.Timeout == 0 && await Task.WhenAny(processTask) == processTask)
-                        )
-                         && waitForExit.Result)
+                    // Adds process output if it was completed with error
+                    if (process.ExitCode != 0)
                     {
-                        result.Completed = true;
-                        result.ExitCode = process.ExitCode;
-
-                        result.StandardError = errorBuilder.ToString();
-                        result.StandardOutput = outputBuilder.ToString();    
-
-                        // Adds process output if it was completed with error
-                        if (process.ExitCode != 0)
-                        {
-                            result.Output = $"{outputBuilder}{errorBuilder}";
-                        }
-                        else
-                        {
-                            result.Output = outputBuilder.ToString();
-                        }
+                        result.Output = $"{outputBuilder}{errorBuilder}";
                     }
                     else
                     {
-                        try
-                        {
-                            // Kill hung process
-                            process.Kill();
-                        }
-                        catch
-                        {
-                        }
+                        result.Output = outputBuilder.ToString();
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        // Kill hung process
+                        process.Kill();
+                    }
+                    catch
+                    {
                     }
                 }
             }
-            process = null;
-
-            return result;
         }
+        process = null;
+
+        return result;
+    }
 
 
-        void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
+    /// <summary>
+    /// Called when a process received standard data in its output
+    /// </summary>
+    /// <param name="sender">the sender of the event</param>
+    /// <param name="e">the arguments for the event</param>
+    void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        // The output stream has been closed i.e. the process has terminated
+        if (e.Data == null)
         {
-            // The output stream has been closed i.e. the process has terminated
-            if (e.Data == null)
-            {
-                outputCloseEvent.SetResult(true);
-            }
-            else
-            {
-                Args?.OnStandardOutput(e.Data);
-                if(Args?.Silent != true)
-                    Logger.ILog(e.Data);
-                outputBuilder.AppendLine(e.Data);
-            }
+            outputCloseEvent.SetResult(true);
         }
-
-        void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
+        else
         {
-            // The error stream has been closed i.e. the process has terminated
-            if (e.Data == null)
-            {
-                errorCloseEvent.SetResult(true);
-            }
-            else
-            {
-                Args?.OnErrorOutput(e.Data);
-                if (Args?.Silent != true)
-                    Logger.ILog(e.Data);
-                outputBuilder.AppendLine(e.Data);
-            }
+            Args?.OnStandardOutput(e.Data);
+            if(Args?.Silent != true)
+                Logger.ILog(e.Data);
+            outputBuilder.AppendLine(e.Data);
         }
+    }
 
-
-        private static Task<bool> WaitForExitAsync(Process process, int timeout)
+    /// <summary>
+    /// Called when a process received error data in its output
+    /// </summary>
+    /// <param name="sender">the sender of the event</param>
+    /// <param name="e">the arguments for the event</param>
+    void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        // The error stream has been closed i.e. the process has terminated
+        if (e.Data == null)
         {
-            if (timeout > 0)
-                return Task.Run(() => process.WaitForExit(timeout));
-            return Task.Run(() =>
-            {
-                process.WaitForExit();
-                return Task.FromResult<bool>(true);
-            });
+            errorCloseEvent.SetResult(true);
         }
+        else
+        {
+            Args?.OnErrorOutput(e.Data);
+            if (Args?.Silent != true)
+                Logger.ILog(e.Data);
+            outputBuilder.AppendLine(e.Data);
+        }
+    }
+
+
+    /// <summary>
+    /// Waits for a process to exit
+    /// </summary>
+    /// <param name="process">the process to wait for</param>
+    /// <param name="timeout">how long to wait before failing</param>
+    /// <returns>if the process completed before the timeout</returns>
+    private static Task<bool> WaitForExitAsync(Process process, int timeout)
+    {
+        if (timeout > 0)
+            return Task.Run(() => process.WaitForExit(timeout));
+        return Task.Run(() =>
+        {
+            process.WaitForExit();
+            return Task.FromResult<bool>(true);
+        });
     }
 }

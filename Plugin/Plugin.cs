@@ -1,16 +1,30 @@
-namespace FileFlows.Plugin
+namespace FileFlows.Plugin;
+
+/// <summary>
+/// Interface used by plugins to FileFlows
+/// </summary>
+public interface IPlugin
 {
-    public interface IPlugin
-    {
-        string Name { get; }
+    /// <summary>
+    /// Gets the name of the plugin
+    /// </summary>
+    string Name { get; }
+    
+    /// <summary>
+    /// Gets the minimum support FileFlows version of this plugin
+    /// </summary>
+    string MinimumVersion { get; }
 
-        string MinimumVersion { get; }
+    /// <summary>
+    /// Initializes the plugin
+    /// </summary>
+    void Init();
+}
 
-        void Init();
-    }
+/// <summary>
+/// Interface used to specify that a plugin has settings associated with it
+/// </summary>
+public interface IPluginSettings
+{
 
-    public interface IPluginSettings
-    {
-
-    }
 }

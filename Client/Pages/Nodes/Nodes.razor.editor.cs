@@ -157,8 +157,20 @@ namespace FileFlows.Client.Pages
             });
             var efAllLibraries = new ElementField
             {
-                InputType = FormInputType.Switch,
-                Name = nameof(node.AllLibraries)
+                InputType = FormInputType.Select,
+                Name = nameof(node.AllLibraries),
+                Parameters = new Dictionary<string, object>
+                {
+                    { 
+                        nameof(InputChecklist.Options), 
+                        new List<ListOption>
+                        {
+                            new() { Label = "All", Value = ProcessingLibraries.All },
+                            new() { Label = "Only", Value = ProcessingLibraries.Only },
+                            new() { Label = "All Except", Value = ProcessingLibraries.AllExcept },
+                        } 
+                    }
+                }
             };
             fields.Add(efAllLibraries);
             fields.Add(new ElementField
@@ -171,7 +183,7 @@ namespace FileFlows.Client.Pages
                 },
                 Conditions = new List<Condition>
                 {
-                    new Condition(efAllLibraries, node.AllLibraries, value: false)
+                    new Condition(efAllLibraries, node.AllLibraries, value: ProcessingLibraries.All, isNot: true)
                 }
             });
             

@@ -65,7 +65,7 @@ public class ProcessingNode: FileFlowObject
     /// <summary>
     /// Gets or sets if this node can process all libraries
     /// </summary>
-    public bool AllLibraries { get; set; }
+    public ProcessingLibraries AllLibraries { get; set; }
     /// <summary>
     /// Gets or sets the libraries this node can process
     /// </summary>

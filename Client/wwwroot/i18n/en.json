@@ -295,7 +295,7 @@
         "Permissions-Help": "The file permissions to set on any newly created files.  If blank the default permissions of 777 will be used.",
         "ProcessingDescription": "This allows you to configure what this Processing Node can process.\n\nFor example, you could limit this node to only process certain libraries or a maximum file size if this node is a lower powered node.",
         "AllLibraries": "All Libraries",
-        "AllLibraries-Help": "When on this node will process all libraries",
+        "AllLibraries-Help": "Which libraries this node will process",
         "Libraries": "Libraries",
         "Libraries-Help": "Select which libraries this node can process",
         "MaxFileSizeMb": "Max File Size",

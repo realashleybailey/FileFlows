@@ -38,3 +38,22 @@ public enum FlowType
     Failure = 1
 }
 
+
+/// <summary>
+/// The available processing libraries options
+/// </summary>
+public enum ProcessingLibraries
+{
+    /// <summary>
+    /// Only process the libraries specified
+    /// </summary>
+    Only = 0,
+    /// <summary>
+    /// Process all libraries
+    /// </summary>
+    All = 1,
+    /// <summary>
+    /// Process all libraries except those specified
+    /// </summary>
+    AllExcept = 2
+}

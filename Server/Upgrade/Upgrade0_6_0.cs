@@ -1,4 +1,5 @@
 ﻿using FileFlows.Server.Controllers;
+using FileFlows.Shared;
 
 namespace FileFlows.Server.Upgrade;
 
@@ -34,7 +35,7 @@ public class Upgrade0_6_0
                     node.Mappings = newMappings;
             }
 
-            node.AllLibraries = true;
+            node.AllLibraries = ProcessingLibraries.All;
             node.MaxFileSizeMb = 0;
             
             Logger.Instance.ILog("Upgrading Node: " + node.Name);

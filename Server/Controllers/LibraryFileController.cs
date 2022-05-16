@@ -1,3 +1,5 @@
+using FileFlows.Shared;
+
 namespace FileFlows.Server.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -54,9 +56,17 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
                 string nodeName = node.Name == "FileFlowsServer" ? "Internal Processing Node" : node.Name;
 
-                if (node.AllLibraries == false)
+                if (node.AllLibraries == ProcessingLibraries.Only)
                 {
                     if (node.Libraries?.Any(x => x.Uid == item.Library?.Uid) != true)
+                    {
+                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")} not available for node '{nodeName}': " + item.Name);
+                        continue;
+                    }
+                }
+                else if (node.AllLibraries == ProcessingLibraries.AllExcept)
+                {
+                    if (node.Libraries?.Any(x => x.Uid == item.Library?.Uid) == true)
                     {
                         Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")} not available for node '{nodeName}': " + item.Name);
                         continue;

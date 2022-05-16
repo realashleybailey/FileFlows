@@ -260,7 +260,8 @@
         "FileFlowsServer": "Internal Processing Node",
         "Address": "Address",
         "Runners": "Runners",
-        "Version": "Version"
+        "Version": "Version",
+        "DownloadNode":"Download Node"
       },
       "Fields": {
         "FlowRunners": "Flow Runners",

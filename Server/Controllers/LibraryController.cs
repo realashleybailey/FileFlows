@@ -159,7 +159,8 @@ namespace FileFlows.Server.Controllers
                             Description = jst.Description,
                             Path = jst.Path,
                             Priority = jst.Priority,
-                            ScanInterval = jst.ScanInterval
+                            ScanInterval = jst.ScanInterval,
+                            ReprocessRecreatedFiles = jst.ReprocessRecreatedFiles
                         });
                     }
                 }

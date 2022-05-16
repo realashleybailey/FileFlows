@@ -74,6 +74,13 @@ public class Library : FileFlowObject
     /// </summary>
     public DateTime LastScanned { get; set; }
 
+    
+    /// <summary>
+    /// Gets or sets if recreated files (files with a different creation time) should be automatically reprocessed
+    /// This is helpful if you download the same file multiple times and want to reprocess it again
+    /// </summary>
+    public bool ReprocessRecreatedFiles { get; set; }
+
 
     /// <summary>
     /// The timespan of when this was last scanned

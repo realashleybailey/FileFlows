@@ -107,6 +107,17 @@ public class LibraryFile : FileFlowObject
             return ProcessingEnded.Subtract(ProcessingStarted);
         }
     }
+    
+    /// <summary>
+    /// Gets or sets when the file was created
+    /// </summary>
+    public DateTime CreationTime { get; set; }
+    
+    /// <summary>
+    /// Gets or sets when the file was written to
+    /// </summary>
+    public DateTime LastWriteTime { get; set; }
+    
 }
 
 /// <summary>

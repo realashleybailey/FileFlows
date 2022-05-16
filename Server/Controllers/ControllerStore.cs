@@ -45,8 +45,15 @@
             return newName;
         }
 
-        protected void ClearData() => Data = null;
+        /// <summary>
+        /// Clears the cached data 
+        /// </summary>
+        public void ClearData() => Data = null;
 
+        /// <summary>
+        /// Gets all the data indexed by the items UID
+        /// </summary>
+        /// <returns>all the data indexed by the items UID</returns>
         internal async Task<Dictionary<Guid, T>> GetData()
         {
             if (Data == null)

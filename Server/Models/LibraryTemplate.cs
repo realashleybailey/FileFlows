@@ -47,4 +47,10 @@ class LibraryTemplate
     /// Gets or sets the period to detect file size changes for this template
     /// </summary>
     public int FileSizeDetectionInterval { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if recreated files (files with a different creation time) should be automatically reprocessed
+    /// This is helpful if you download the same file multiple times and want to reprocess it again
+    /// </summary>
+    public bool ReprocessRecreatedFiles { get; set; }
 }

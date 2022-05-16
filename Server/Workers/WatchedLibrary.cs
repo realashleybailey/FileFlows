@@ -86,8 +86,22 @@ public class WatchedLibrary:IDisposable
                 var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
                                             .DistinctBy(x => x.Value.Fingerprint)
                                             .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
+                
+                FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
+                
                 if (knownFiles.ContainsKey(fullpath.ToLower()))
                 {
+                    var knownFileUid = knownFiles[fullpath.ToLower()];
+                    var knownFile = libFiles[knownFileUid];
+                    if(Library.ReprocessRecreatedFiles && fsInfo.CreationTime > knownFile.CreationTime)
+                    {
+                        Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file");
+                        knownFile.CreationTime = fsInfo.CreationTime;
+                        knownFile.LastWriteTime = fsInfo.LastWriteTime;
+                        knownFile.Status = FileStatus.Unprocessed;
+                        new LibraryFileController().Update(knownFile).Wait();
+                        continue;
+                    }
                     Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
                     continue;
                 }
@@ -100,7 +114,6 @@ public class WatchedLibrary:IDisposable
                 string type = Library.Folders ? "folder" : "file";
 
 
-                FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
 
                 if (Library.Folders && Library.WaitTimeSeconds > 0)
                 {
@@ -152,6 +165,8 @@ public class WatchedLibrary:IDisposable
                     IsDirectory = fsInfo is DirectoryInfo,
                     Fingerprint = string.Empty,
                     OriginalSize = size,
+                    CreationTime = fsInfo.CreationTime,
+                    LastWriteTime = fsInfo.LastWriteTime,
                     Library = new ObjectReference
                     {
                         Name = Library.Name,

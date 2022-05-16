@@ -198,6 +198,11 @@
             fields.Add(new ElementField
             {
                 InputType = FormInputType.Switch,
+                Name = nameof(library.ReprocessRecreatedFiles)
+            });
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Switch,
                 Name = nameof(library.UseFingerprinting),
                 Conditions = new List<Condition>
                 {

@@ -78,6 +78,7 @@ namespace FileFlows.Client.Pages
             SetModelProperty(nameof(template.Path), template.Path);
             SetModelProperty(nameof(template.Priority), template.Priority);
             SetModelProperty(nameof(template.ScanInterval), template.ScanInterval);
+            SetModelProperty(nameof(template.ReprocessRecreatedFiles), template.ReprocessRecreatedFiles);
             SetModelProperty(nameof(Library.Folders), false);
 
             void SetModelProperty(string property, object value)

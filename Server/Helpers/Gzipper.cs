@@ -81,7 +81,7 @@ public class Gzipper
         if (File.Exists(file))
             File.Delete(file);
 
-        var bytes = Encoding.Unicode.GetBytes(contents);
+        var bytes = Encoding.UTF8.GetBytes(contents);
         using var input = new MemoryStream(bytes);
         using FileStream compressedFileStream = File.Create(file);
         using var compressor = new GZipStream(compressedFileStream, CompressionMode.Compress);

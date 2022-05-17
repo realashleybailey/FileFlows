@@ -61,12 +61,6 @@ class ffFlowMouse {
             this.initialX = this.currentX;
             this.initialY = this.currentY;
             for(let part of document.querySelectorAll('.flow-part.selected')) {
-                // this.dragItem.style.transform = '';
-                // let xPos = parseInt(this.dragItem.style.left, 10) + ffFlow.translateCoord(this.currentX);
-                // let yPos = parseInt(this.dragItem.style.top, 10) + ffFlow.translateCoord(this.currentY);
-                // this.dragItem.style.left = xPos + 'px';
-                // this.dragItem.style.top = yPos + 'px';
-
                 part.style.transform = '';
                 let xPos = parseInt(part.style.left, 10) + ffFlow.translateCoord(this.currentX);
                 let yPos = parseInt(part.style.top, 10) + ffFlow.translateCoord(this.currentY);

@@ -26,7 +26,6 @@ public class LogConverter:Worker
     /// </summary>
     internal void Run()
     {
-
         bool compress = new SettingsController().Get().Result.CompressLibraryFileLogs = true;
         var files = new DirectoryInfo(DirectoryHelper.LibraryFilesLoggingDirectory).GetFiles();
         foreach (var file in files)

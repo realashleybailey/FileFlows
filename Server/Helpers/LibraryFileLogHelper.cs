@@ -65,9 +65,15 @@ public class LibraryFileLogHelper
         var compress  = (await new SettingsController().Get())?.CompressLibraryFileLogs != false;
 
         if (compress)
+        {
             Gzipper.CompressToFile(logFile + ".log.gz", content);
+            TryDeleteFile(logFile + ".log");
+        }
         else
+        {
             await File.WriteAllTextAsync(logFile + ".log", content);
+            TryDeleteFile(logFile + ".log.gz");
+        }
 
         if (saveHtml)
         {
@@ -121,13 +127,26 @@ public class LibraryFileLogHelper
     public static void DeleteLogs(Guid uid)
     {
         var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
-        if (File.Exists(logFile + ".log"))
-            File.Delete(logFile + ".log");
-        if (File.Exists(logFile + ".log.gz"))
-            File.Delete(logFile + ".log.gz");
-        if (File.Exists(logFile + ".html"))
-            File.Delete(logFile + ".html");
-        if (File.Exists(logFile + ".html.gz"))
-            File.Delete(logFile + ".html.gz");
+        TryDeleteFile(logFile + ".log");
+        TryDeleteFile(logFile + ".log.gz");
+        TryDeleteFile(logFile + ".html");
+        TryDeleteFile(logFile + ".html.gz");
+    }
+
+    /// <summary>
+    /// Try to delete a file,
+    /// checks if the file exists first
+    /// </summary>
+    /// <param name="file">the name of the file to delete</param>
+    private static void TryDeleteFile(string file)
+    {
+        try
+        {
+            if(File.Exists(file))
+                File.Delete(file);
+        }
+        catch (Exception)
+        {
+        }
     }
 }

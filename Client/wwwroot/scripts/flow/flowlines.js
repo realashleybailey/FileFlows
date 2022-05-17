@@ -252,6 +252,9 @@ class ffFlowLines {
                     let outputNode = line.output.getAttribute('x-output');
                     ffFlow.selectConnection(output, outputNode);
                     clearNode = false;
+                    event.stopImmediatePropagation();
+                    event.stopPropagation();
+                    event.preventDefault();
                 }
                 else {
                     ctx.strokeStyle = self.lineColor;

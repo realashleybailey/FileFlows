@@ -26,11 +26,11 @@
                         @Globals.lblName
                     </Header>
                     <Cell Context="item">
-                        @if (item.LastSeen < DateTime.Now.AddMinutes(-5))
+                        @if (item.Name != "Internal Processing Node" && item.LastSeen < DateTime.Now.AddMinutes(-5))
                         {
                             <i title="Disconnected" class="processing-node status-error fas fa-times-circle"></i>
                         }
-                        else if (item.LastSeen < DateTime.Now.AddMinutes(-1))
+                        else if (item.Name != "Internal Processing Node" && item.LastSeen < DateTime.Now.AddMinutes(-1))
                         {
                             <i title="Possibly disconnected" class="processing-node status-warning fas fa-exclamation-circle"></i>
                         }

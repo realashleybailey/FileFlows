@@ -270,7 +270,7 @@ ffmpeg version 4.1.8 Copyright (c) 2000-2021 the FFmpeg developers
             Blocker.Show();
             try
             {
-                await HttpHelper.Delete($"{ApIUrl}/{worker.LibraryFile.Uid}");
+                await HttpHelper.Delete($"{ApIUrl}/{worker.Uid}?libraryFileUid={worker.LibraryFile.Uid}");
                 await Task.Delay(1000);
                 await Refresh();
             }

@@ -221,16 +221,17 @@ namespace FileFlows.Server.Controllers
                 }
                 return;
             }
-            await Abort(executorId);
+            await Abort(executorId, uid);
         }
 
         /// <summary>
         /// Abort work 
         /// </summary>
-        /// <param name="uid">The UID of the client</param>
+        /// <param name="uid">The UID of the executor</param>
+        /// <param name="libraryFileUid">the UID of the library file</param>
         /// <returns>an awaited task</returns>
         [HttpDelete("{uid}")]
-        public async Task Abort(Guid uid)
+        public async Task Abort([FromRoute] Guid uid, [FromQuery] Guid libraryFileUid)
         {
             try
             {

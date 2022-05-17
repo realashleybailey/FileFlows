@@ -163,7 +163,7 @@ namespace FileFlows.Server.Controllers
             else
             {
                 // this updates the "LastSeen"
-                await DbHelper.UpdateLastModified(node.Uid);
+                await UpdateLastSeen(node.Uid);
             }
 
             node.SignalrUrl = "flow";
@@ -318,6 +318,17 @@ namespace FileFlows.Server.Controllers
             {
                 FileDownloadName = zipName
             };
+        }
+
+        /// <summary>
+        /// Updates the last seen to now for a node
+        /// </summary>
+        /// <param name="uid">The node to update</param>
+        internal async Task UpdateLastSeen(Guid uid)
+        {
+            var node = await GetByUid(uid);
+            node.DateModified = DateTime.Now;
+            await DbHelper.UpdateLastModified(node.Uid);
         }
     }
 

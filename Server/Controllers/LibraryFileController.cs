@@ -24,6 +24,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpPost("next-file")]
     public async Task<LibraryFile> GetNext([FromBody] NextLibraryFileArgs args)
     {
+        _ = new NodeController().UpdateLastSeen(args.NodeUid);
+        
         if (Workers.ServerUpdater.UpdatePending || args == null)
             return null; // if an update is pending, stop providing new files to process
 

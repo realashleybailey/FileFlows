@@ -35,7 +35,7 @@ namespace FileFlows.Server.Controllers
         [HttpPost("work/start")]
         public FlowExecutorInfo StartWork([FromBody] FlowExecutorInfo info)
         {
-            _ = DbHelper.UpdateLastModified(info.NodeUid);
+            _ = new NodeController().UpdateLastSeen(info.NodeUid);
             
             try
             {
@@ -58,7 +58,7 @@ namespace FileFlows.Server.Controllers
         [HttpPost("work/finish")]
         public async void FinishWork([FromBody] FlowExecutorInfo info)
         {
-            _ = DbHelper.UpdateLastModified(info.NodeUid);
+            _ = new NodeController().UpdateLastSeen(info.NodeUid);
             
             if (string.IsNullOrEmpty(info.Log) == false)
             {
@@ -106,7 +106,8 @@ namespace FileFlows.Server.Controllers
         [HttpPost("work/update")]
         public void UpdateWork([FromBody] FlowExecutorInfo info)
         {
-            _ = DbHelper.UpdateLastModified(info.NodeUid);
+            _ = new NodeController().UpdateLastSeen(info.NodeUid);
+            
             if (info.LibraryFile != null)
             {
                 var lfController = new LibraryFileController();

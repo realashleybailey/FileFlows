@@ -18,6 +18,9 @@ public class Program
     public static void Main(string[] args)
     {
         args ??= new string[] { };
+        #if(DEBUG)
+        args = new[] { "--no-gui" };
+        #endif
         if (args.Any(x => x.ToLower() == "--help" || x.ToLower() == "-?" || x.ToLower() == "/?" || x.ToLower() == "/help" || x.ToLower() == "-help"))
         {
             CommandLineOptions.PrintHelp();
@@ -133,8 +136,6 @@ public class Program
 
                 if (Globals.IsDocker == false)
                 {
-                    Shared.Logger.Instance?.ILog("Press Esc to quit");
-
                     try
                     {
                         Task.WhenAny(new[]
@@ -144,6 +145,7 @@ public class Program
                                 while (true)
                                 {
                                     var key = Console.ReadKey();
+                                    Console.WriteLine("Key: " + key);
                                     if (key.Key == ConsoleKey.Escape)
                                         break;
                                 }
@@ -153,7 +155,7 @@ public class Program
                                 while (Exiting == false)
                                     Thread.Sleep(100);
                             })
-                        });
+                        }).Wait();
                     }
                     catch (Exception)
                     {

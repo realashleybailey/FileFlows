@@ -8,7 +8,7 @@ public class Globals
     /// <summary>
     /// Gets the version of FileFlows
     /// </summary>
-    public static string Version = "0.2.1.367";
+    public static string Version = "0.7.1.367";
 
     /// <summary>
     /// Gets if this is running on Windows

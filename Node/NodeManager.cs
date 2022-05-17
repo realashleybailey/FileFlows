@@ -47,6 +47,7 @@ public class NodeManager
     {
         Shared.Logger.Instance?.ILog("Starting workers");
         var updater = new NodeUpdater();
+        
         if (updater.RunCheck())
             return;
         

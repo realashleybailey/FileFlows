@@ -57,7 +57,7 @@ public abstract class UpdaterWorker:Worker
         Logger.Instance?.ILog($"{UpdaterName}: Checking for update");
         try
         {
-#if(DEBUG && false)
+#if(DEBUG)
             return false; // disable during debugging
 #else       
             string updateScript = DownloadUpdate();

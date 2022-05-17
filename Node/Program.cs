@@ -134,39 +134,7 @@ public class Program
                 
                 Manager.Start();
 
-                if (Globals.IsDocker == false)
-                {
-                    try
-                    {
-                        Task.WhenAny(new[]
-                        {
-                            new Task(() =>
-                            {
-                                while (true)
-                                {
-                                    var key = Console.ReadKey();
-                                    Console.WriteLine("Key: " + key);
-                                    if (key.Key == ConsoleKey.Escape)
-                                        break;
-                                }
-                            }),
-                            new Task(() =>
-                            {
-                                while (Exiting == false)
-                                    Thread.Sleep(100);
-                            })
-                        }).Wait();
-                    }
-                    catch (Exception)
-                    {
-                        // can throw an exception if not run from console
-                        Thread.Sleep(-1);
-                    }
-                }
-                else
-                {
-                    Thread.Sleep(-1);
-                }
+                Thread.Sleep(-1);
 
                 Shared.Logger.Instance?.ILog("Stopping workers");
 

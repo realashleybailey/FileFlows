@@ -156,11 +156,16 @@ namespace FileFlows.Server.Controllers
                 return node;
 
             if (string.IsNullOrEmpty(version) == false && node.Version != version)
+            {
                 node.Version = version;
+                await Update(node);
+            }
+            else
+            {
+                // this updates the "LastSeen"
+                await DbHelper.UpdateLastModified(node.Uid);
+            }
 
-            node.LastSeen = DateTime.Now;
-            await Update(node);
-            
             node.SignalrUrl = "flow";
             return node;
         }

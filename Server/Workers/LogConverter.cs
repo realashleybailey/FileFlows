@@ -26,23 +26,16 @@ public class LogConverter:Worker
     /// </summary>
     internal void Run()
     {
-        bool compress = new SettingsController().Get().Result.CompressLibraryFileLogs = true;
         var files = new DirectoryInfo(DirectoryHelper.LibraryFilesLoggingDirectory).GetFiles();
         foreach (var file in files)
         {
             if(file.LastWriteTime > DateTime.Now.AddHours(-3))
                 continue; //file is too new, dont process it yet
             
-            if (file.Extension == ".log" && compress)
+            if (file.Extension == ".log")
             {
                 // need to create a gz file
                 Gzipper.CompressFile(file.FullName, file.FullName[..^4] + ".log.gz", true);
-                continue;
-            }
-            if (file.FullName.EndsWith(".log.gz") && compress == false)
-            {
-                // need to create a unzip it
-                Gzipper.DecompressFile(file.FullName, file.FullName[..^3], true);
                 continue;
             }
             

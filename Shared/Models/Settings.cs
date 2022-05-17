@@ -25,11 +25,6 @@ public class Settings : FileFlowObject
     /// </summary>
     public bool DisableTelemetry { get; set; }
     
-    /// <summary>
-    /// Gets or sets if the library file logs should be saved in a compressed format to reduce file size
-    /// </summary>
-    public bool CompressLibraryFileLogs { get; set; }
-
     private List<string> _PluginRepositoryUrls = new ();
     /// <summary>
     /// Gets or sets a list of available URLs to additional plugin repositories

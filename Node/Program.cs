@@ -25,6 +25,11 @@ public class Program
         }
 
         var options = CommandLineOptions.Parse(args);
+        if (Globals.IsLinux && options.InstallService)
+        {
+            Utils.SystemdService.Install();
+            return;
+        }
         Globals.IsDocker = options.Docker;
         ServerShared.Globals.IsDocker = options.Docker;
         

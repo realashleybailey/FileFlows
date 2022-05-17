@@ -33,6 +33,13 @@ class CommandLineOptions
     /// </summary>
     [CommandLineArg("If running inside a docker container", "true", "docker", true)]
     public bool Docker { get; set; }
+    
+    
+    /// <summary>
+    /// Gets or sets if running inside a docker container
+    /// </summary>
+    [CommandLineArg("Installs FileFlows Node as a systemd service", "", command: "systemd")]
+    public bool InstallService { get; set; }
 
     /// <summary>
     /// Parses the command line arguments
@@ -52,28 +59,54 @@ class CommandLineOptions
             if (ca == null)
                 continue;
             string key = ca.Command?.EmptyAsNull() ?? prop.Name.ToLower();
-            string strValue = GetArgValue("--" + key);
-            if (string.IsNullOrEmpty(strValue))
-                continue;
-            
-            if(prop.PropertyType == typeof(bool))
-                prop.SetValue(options, strValue.ToLower() == "true" || strValue == "1");
-            else 
+
+            if (prop.PropertyType == typeof(bool))
+            {
+                bool value = GetArgBooleanValue(args, "--" + key);
+                prop.SetValue(options, value);
+            }
+            else
+            {
+                string strValue = GetArgValue(args, "--" + key);
+                if (string.IsNullOrEmpty(strValue))
+                    continue;
                 prop.SetValue(options, strValue);
+            }
         }
 
         return options;
+    }
 
-        string GetArgValue(string key)
+    /// <summary>
+    /// Gets a string argument value
+    /// </summary>
+    /// <param name="key">the argument key</param>
+    /// <returns>the string value or an empty string if not found</returns>
+    static string GetArgValue(string[] args, string key)
+    {
+        for (int i = 0; i < args.Length - 1; i++)
         {
-            for (int i = 0; i < args.Length - 1; i++)
-            {
-                if (args[i].ToLower() == key)
-                    return args[i + 1];
-            }
-
-            return string.Empty;
+            if (args[i].ToLower() == key)
+                return args[i + 1];
         }
+
+        return string.Empty;
+    }
+        
+    /// <summary>
+    /// Gets a boolean argument value
+    /// </summary>
+    /// <param name="key">the argument key</param>
+    /// <returns>the boolean value</returns>
+    static bool GetArgBooleanValue(string[] args, string key)
+    {
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (args[i].ToLower() == key)
+                return args[i + 1].ToLower() != "false" && args[i + 1] != "0";
+        }
+
+        return args.Last().ToLower() == key;
     }
 
     /// <summary>
@@ -97,7 +130,8 @@ class CommandLineOptions
             string value = prop.PropertyType == typeof(bool) ? "true|false" : "value";
             Console.WriteLine($"--{key} [{value}]");
             Console.WriteLine($"\t{ca.Description}");
-            Console.WriteLine($"\teg --{key} {example}");
+            if(string.IsNullOrWhiteSpace(example) == false)
+                Console.WriteLine($"\teg --{key} {example}");
         }
     }
 }

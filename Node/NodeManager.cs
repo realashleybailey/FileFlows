@@ -13,6 +13,10 @@ using FileFlows.ServerShared.Helpers;
 
 namespace FileFlows.Node;
 
+
+/// <summary>
+/// A manager that handles registering a node with the FileFlows server
+/// </summary>
 public class NodeManager
 {
     /// <summary>
@@ -56,7 +60,7 @@ public class NodeManager
                 if (AppSettings.IsConfigured() == false)
                     return false;
 
-                var nodeService = new ServerShared.Services.NodeService();
+                var nodeService = new NodeService();
                 try
                 {
                     var settings = nodeService.GetByAddress(AppSettings.Instance.HostName).Result;

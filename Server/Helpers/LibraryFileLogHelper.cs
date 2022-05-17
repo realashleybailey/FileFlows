@@ -82,7 +82,6 @@ public class LibraryFileLogHelper
         }
     }
 
-    
     /// <summary>
     /// Appends a string to the log file
     /// </summary>

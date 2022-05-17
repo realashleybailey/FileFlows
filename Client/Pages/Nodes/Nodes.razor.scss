@@ -1,0 +1,13 @@
+.processing-node 
+{
+  margin-right:0.5rem;
+  &.status-error {
+    color: var(--danger);
+  }
+  &.status-warning {
+    color: var(--warning);
+  }
+  &.status-ok {
+    color: var(--success);
+  }
+}

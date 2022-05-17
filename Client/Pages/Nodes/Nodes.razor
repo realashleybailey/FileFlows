@@ -21,11 +21,23 @@
             </ToolBar>
 
             <Columns>
-                <FlowTableColumn TItem="ProcessingNode">
+                <FlowTableColumn TItem="ProcessingNode" Width="10rem">
                     <Header>
                         @Globals.lblName
                     </Header>
                     <Cell Context="item">
+                        @if (item.LastSeen < DateTime.Now.AddMinutes(-5))
+                        {
+                            <i title="Disconnected" class="processing-node status-error fas fa-times-circle"></i>
+                        }
+                        else if (item.LastSeen < DateTime.Now.AddMinutes(-1))
+                        {
+                            <i title="Possibly disconnected" class="processing-node status-warning fas fa-exclamation-circle"></i>
+                        }
+                        else
+                        {
+                            <i title="Running" class="processing-node status-ok fas fa-check-circle"></i>
+                        }
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>

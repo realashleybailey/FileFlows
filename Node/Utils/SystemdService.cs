@@ -10,9 +10,15 @@ public class SystemdService
     /// <summary>
     /// Installs the service
     /// </summary>
-    public static void Install()
+    /// <param name="dotnet">the location of dotnet</param>
+    public static void Install(string dotnet)
     {
-        SaveServiceFile();
+        if (string.IsNullOrWhiteSpace(dotnet))
+        {
+            Console.WriteLine("Dotnet location not supplied, you must supply this to install the service");
+            return;
+        }
+        SaveServiceFile(dotnet);
         RunService();
         Console.WriteLine("Run the following to check the status of the service: ");
         Console.WriteLine("sudo systemctl status fileflows-node.service ");
@@ -31,7 +37,8 @@ public class SystemdService
     /// <summary>
     /// Saves the service configuration file
     /// </summary>
-    private static void SaveServiceFile()
+    /// <param name="dotnet">the location of dotnet</param>
+    private static void SaveServiceFile(string dotnet)
     {
         string workingDir = Path.Combine(DirectoryHelper.BaseDirectory, "Node"); 
         string dll = Path.Combine(workingDir, "FileFlows.Node.dll");
@@ -39,7 +46,7 @@ public class SystemdService
 Description=FileFlows Node
 
 [Service]
-ExecStart=dotnet {dll} --no-gui
+ExecStart={dotnet} {dll} --no-gui
 SyslogIdentifier=FileFlows Node
 WorkingDirectory={workingDir}
 User=root

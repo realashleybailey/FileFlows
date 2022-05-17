@@ -266,22 +266,19 @@ namespace FileFlows.Server.Controllers
                         Logger.Instance?.ILog("Library file status doesnt need changing: " + libfile.Status + " => " + libfile.RelativePath);
                     }
                 }
-
-                _ = Task.Run(async () =>
+                
+                await Task.Delay(6_000);
+                lock (Executors)
                 {
-                    await Task.Delay(10_000);
-                    lock (Executors)
+                    if (Executors.TryGetValue(uid, out FlowExecutorInfo? info))
                     {
-                        if (Executors.TryGetValue(uid, out FlowExecutorInfo? info))
+                        if (info == null || info.LastUpdate < DateTime.Now.AddMinutes(-1))
                         {
-                            if (info == null || info.LastUpdate < DateTime.Now.AddMinutes(-1))
-                            {
-                                // its gone quiet, kill it
-                                Executors.Remove(uid);
-                            }
+                            // its gone quiet, kill it
+                            Executors.Remove(uid);
                         }
                     }
-                });
+                }
             }
             catch (Exception ex)
             {

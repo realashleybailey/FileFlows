@@ -51,7 +51,7 @@ SyslogIdentifier=FileFlows Node
 WorkingDirectory={workingDir}
 User=root
 Restart=always
-RestartSec=5
+RestartSec=30
 
 [Install]
 WantedBy=multi-user.target";

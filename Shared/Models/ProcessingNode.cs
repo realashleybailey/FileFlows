@@ -33,11 +33,6 @@ public class ProcessingNode: FileFlowObject
     public string Version { get; set; }
 
     /// <summary>
-    /// Gets when the node was last seen
-    /// </summary>
-    public DateTime LastSeen { get; set; }
-
-    /// <summary>
     /// Gets or sets the number of flow runners this node can run simultaneously 
     /// </summary>
     public int FlowRunners { get; set; }

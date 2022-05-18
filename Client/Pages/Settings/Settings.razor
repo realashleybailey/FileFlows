@@ -25,7 +25,6 @@
             
             <FlowTabs>
                 <FlowTab Title="@lblGeneral">
-                    <InputSwitch @bind-Value="@Model.CompressLibraryFileLogs" Label="Pages.Settings.Fields.CompressLibraryFileLogs"/>
                     <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry"/>
                     <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
                     <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins"/>

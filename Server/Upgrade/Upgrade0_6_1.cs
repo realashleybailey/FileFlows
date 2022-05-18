@@ -11,8 +11,6 @@ public class Upgrade0_6_1
     {
         Logger.Instance.ILog("Upgrade running, running 0.6.1 upgrade script");
         
-        settings.CompressLibraryFileLogs = true;
-        
         new LogConverter().Run();
 
         UpdateLibraryFileDates();

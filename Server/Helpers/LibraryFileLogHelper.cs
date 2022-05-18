@@ -62,19 +62,10 @@ public class LibraryFileLogHelper
     public static async Task SaveLog(Guid uid, string content, bool saveHtml = false)
     {
         var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
-        var compress  = (await new SettingsController().Get())?.CompressLibraryFileLogs != false;
 
-        if (compress)
-        {
-            Gzipper.CompressToFile(logFile + ".log.gz", content);
-            TryDeleteFile(logFile + ".log");
-        }
-        else
-        {
-            await File.WriteAllTextAsync(logFile + ".log", content);
-            TryDeleteFile(logFile + ".log.gz");
-        }
-
+        Gzipper.CompressToFile(logFile + ".log.gz", content);
+        TryDeleteFile(logFile + ".log");
+            
         if (saveHtml)
         {
             string html = LogToHtml.Convert(content);

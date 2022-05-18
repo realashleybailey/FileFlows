@@ -175,7 +175,7 @@ public class FlowWorker : Worker
                 }.Where(x => x != null).ToArray();
 #pragma warning restore CS8601 // Possible null reference assignment.
 
-#if (DEBUG && false)
+#if (DEBUG)
                 FileFlows.FlowRunner.Program.Main(parameters);
 #else
                 using (Process process = new Process())

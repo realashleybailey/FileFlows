@@ -345,6 +345,8 @@ public class Runner
                 int output = 0;
                 try
                 {
+                    if (CurrentNode.PreExecute(nodeParameters) == false)
+                        throw new Exception("PreExecute failed");
                     output = CurrentNode.Execute(nodeParameters);
                 }
                 catch(Exception)

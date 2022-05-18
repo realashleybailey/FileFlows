@@ -65,6 +65,13 @@ public class Node
     }
 
     /// <summary>
+    /// Called directly before Execute method
+    /// </summary>
+    /// <param name="args">the node parameter args</param>
+    /// <returns>true if pre-execute is successful, otherwise will exit the flow</returns>
+    public virtual bool PreExecute(NodeParameters args) => true;
+
+    /// <summary>
     /// Executes the node
     /// </summary>
     /// <param name="args">the arguments passed into the node</param>

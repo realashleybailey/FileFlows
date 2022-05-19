@@ -85,6 +85,38 @@ namespace FileFlows.Server.Controllers
 
 
         /// <summary>
+        /// Generates a template for of a flow
+        /// </summary>
+        /// <param name="uid">The Flow UID</param>
+        /// <returns>A download response of the flow template</returns>
+        [HttpGet("template/{uid}")]
+        public async Task<IActionResult> Template([FromRoute] Guid uid)
+        {
+            var flow = await GetByUid(uid);
+            if(flow == null)
+                return NotFound();
+            
+            string json = JsonSerializer.Serialize(flow, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            int count = 1;
+            foreach (var p in flow.Parts)
+            {
+                json = json.Replace(p.Uid.ToString(), $"00000000-0000-0000-0000-{count:000000000000}");
+                ++count;
+            }
+
+            json = json.Replace("OutputConnections", "connections");
+            json = json.Replace("InputNode", "node");
+            json = Regex.Replace(json, "\"FlowElementUid\": \"([\\w]+\\.)*([\\w]+)\"", "\"node\": \"$2\"");
+            json = Regex.Replace(json, "\"(Icon|Label|Inputs|Template|Type|Enabled|DateCreated|DateModified)\": [^,}]+,[\\s]*", string.Empty);
+            
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
+            return File(data, "application/octet-stream", flow.Name + ".json");
+        }
+        
+        /// <summary>
         /// Sets the enabled state of a flow
         /// </summary>
         /// <param name="uid">The flow UID</param>

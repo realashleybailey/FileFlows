@@ -6,8 +6,8 @@
     "description": "A blank Video template with a single \"Video File\" input node.",
     "parts": [
       {
-        "node": "VideoFile",
-        "uid": "00000000-0000-0000-0000-000000000001"
+        "Node": "VideoFile",
+        "Uid": "00000000-0000-0000-0000-000000000001"
       }
     ]
   }

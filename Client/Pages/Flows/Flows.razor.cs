@@ -26,6 +26,12 @@ namespace FileFlows.Client.Pages
 
         public override string ApiUrl => "/api/flow";
 
+        #if(DEBUG)
+        private bool DEBUG = true;
+        #else
+        private bool DEBUG = false;
+        #endif
+
 
 
 #if (DEMO)
@@ -491,6 +497,18 @@ namespace FileFlows.Client.Pages
 #endif
         }
 
+        private async Task Template()
+        {
+#if (DEBUG)
+
+            var item = Table.GetSelected()?.FirstOrDefault();
+            if (item == null)
+                return;
+            string url = $"/api/flow/template/{item.Uid}";
+            url = "http://localhost:6868" + url;
+            await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".json" });
+#endif
+        }
 
         private class TemplateSelectParameters
         {

@@ -20,6 +20,10 @@
                 {
                     <FlowTableButton TItem="ffFlow" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import" />
                     <FlowTableButton TItem="ffFlow" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export" />
+                    if (DEBUG)
+                    {
+                        <FlowTableButton TItem="ffFlow" Clicked=Template SelectedOne="true" Icon="fas fa-file-export" Label="Template"/>
+                    }
                 }
                 <FlowTableHelpButton TItem="ffFlow" HelpUrl="Flows" />
             </ToolBar>

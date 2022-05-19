@@ -6,7 +6,7 @@
         <span class="prefix">@Prefix</span>
     }
     <div class="range">
-        <input id=@Uid type="range" @bind-value="Value" @bind-value:event="oninput" min="@Min" max="@Max" />
+        <input id=@Uid type="range" @bind-value="Value" @bind-value:event="oninput" min="@Min" max="@Max" style="direction:@(Inverse ? "rtl" : "unset")" />
     </div>
 
     <div class="value">

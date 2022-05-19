@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace FileFlows.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;
@@ -113,26 +115,58 @@ namespace FileFlows.Client.Components.Inputs
         }
 
         protected T _Value;
-
+        private bool _ValueUpdating = false;
         [Parameter]
         public T Value
         {
             get => _Value;
             set
             {
-                if (_Value == null && value == null)
-                    return;
+                try
+                {
+                    _ValueUpdating = true;
 
-                if (_Value != null && value != null && _Value.Equals(value)) return;
+                    if (_Value == null && value == null)
+                        return;
 
-                bool areEqual = System.Text.Json.JsonSerializer.Serialize(_Value) == System.Text.Json.JsonSerializer.Serialize(value);
-                if (areEqual == false) // for lists/arrays if they havent really changed, empty to empty, dont clear validation
-                    ErrorMessage = ""; // clear the error
+                    if (_Value != null && value != null && _Value.Equals(value)) return;
 
-                _Value = value;
-                ValueUpdated();
-                ValueChanged.InvokeAsync(value);
-                Field?.InvokeValueChanged(this.Editor, value);
+                    bool areEqual = System.Text.Json.JsonSerializer.Serialize(_Value) ==
+                                    System.Text.Json.JsonSerializer.Serialize(value);
+                    if (areEqual ==
+                        false) // for lists/arrays if they havent really changed, empty to empty, dont clear validation
+                        ErrorMessage = ""; // clear the error
+
+                    _Value = value;
+                    ValueUpdated();
+                    ValueChanged.InvokeAsync(value);
+                    Field?.InvokeValueChanged(this.Editor, value);
+
+                    if (this.Field?.ChangeValues?.Any() == true)
+                    {
+                        foreach (var cv in this.Field.ChangeValues)
+                        {
+                            if (cv.Matches(value))
+                            {
+                                if (cv.Field == null)
+                                {
+                                    var field = Editor?.FindField(cv.Property);
+                                    if(field != null)
+                                        cv.Field = field;
+                                }
+
+                                if (cv.Field != null)
+                                {
+                                    cv.Field.InvokeValueChanged(this, cv.Value);
+                                }
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    _ValueUpdating = false;
+                }
             }
         }
 
@@ -167,7 +201,23 @@ namespace FileFlows.Client.Components.Inputs
                         visible &= condition.IsMatch == false; // conditions IsMatch stores the inverse for Disabled states, for condtions we want the inverse
                     this.Visible = visible;
                 }
+                
+                this.Field.ValueChanged += FieldOnValueChanged;
             }
+        }
+
+        private void FieldOnValueChanged(object sender, object value)
+        {
+            if (_ValueUpdating)
+                return;
+            if (value is JsonElement je)
+            {
+                if (typeof(T) == typeof(int))
+                    value = je.GetInt32();
+                else if (typeof(T) == typeof(string))
+                    value = je.GetString();
+            }
+            this.Value = (T)value;
         }
 
         private void Field_DisabledChange(bool state)

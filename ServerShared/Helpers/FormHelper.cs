@@ -34,7 +34,8 @@ public class FormHelper
                 InputType = attribute.InputType,
                 Type = prop.PropertyType.FullName,
                 Parameters = new Dictionary<string, object>(),
-                Validators = new List<Shared.Validators.Validator>()
+                Validators = new List<Shared.Validators.Validator>(),
+                ChangeValues = new ()
             };
 
             fields.Add(ef);
@@ -103,7 +104,6 @@ public class FormHelper
             if (prop.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RegularExpressionAttribute), false).FirstOrDefault() is System.ComponentModel.DataAnnotations.RegularExpressionAttribute exp)
                 ef.Validators.Add(new Shared.Validators.Pattern { Expression = exp.Pattern });
 
-
             var conditionEquals = prop.GetCustomAttributes(typeof(ConditionEqualsAttribute), false).FirstOrDefault() as ConditionEqualsAttribute;
             if (conditionEquals != null)
             {
@@ -113,6 +113,19 @@ public class FormHelper
                     Property = conditionEquals.Property,
                     Value = conditionEquals.Value,
                     IsNot = conditionEquals.Inverse
+                });
+            }
+
+
+            foreach (ChangeValueAttribute cva in prop.GetCustomAttributes(typeof(ChangeValueAttribute), false) ?? new ChangeValueAttribute[]{})
+            {
+                ef.ChangeValues ??= new ();
+                ef.ChangeValues.Add(new ()
+                {
+                    Property = cva.Property,
+                    Value = cva.Value,
+                    WhenValue = cva.WhenValue,
+                    WhenValueIsNot = cva.WhenValueIsNot
                 });
             }
 

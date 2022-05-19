@@ -317,10 +317,13 @@ public class PluginScanner
         {
             Logger.Instance.ELog("Error loading plugin json[1]:" + ex.Message + Environment.NewLine + ex.StackTrace);
         }
-        
+#if (DEBUG)
+        var dir = "wwwroot/i18n";
+#else
         var dir = Path.Combine(DirectoryHelper.BaseDirectory, "Server/wwwroot/i18n");
+#endif
 
-        if(Directory.Exists(dir) == false)
+        if (Directory.Exists(dir) == false)
             Directory.CreateDirectory(dir);
 
         File.WriteAllText(Path.Combine(dir, "plugins.en.json"), json);        

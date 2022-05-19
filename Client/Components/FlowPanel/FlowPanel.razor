@@ -45,8 +45,8 @@
         case FormInputType.LogView:
             {
                 var value = GetValue<string>(field.Name) ?? "";
-                var refreshUrl = GetParameter<string>(field, nameof(Components.Inputs.InputLogView.RefreshUrl)) ?? "";
-                var refreshSeconds = GetParameter<int>(field, nameof(Components.Inputs.InputLogView.RefreshSeconds));
+                var refreshUrl = GetParameter<string>(field, nameof(InputLogView.RefreshUrl)) ?? "";
+                var refreshSeconds = GetParameter<int>(field, nameof(InputLogView.RefreshSeconds));
                 <InputLogView Field=@field Label="@label" Value="@value" RefreshUrl="@refreshUrl"
     RefreshSeconds="@refreshSeconds" Placeholder="@field.Placeholder" HideLabel=@hideLabel />
             }
@@ -54,8 +54,12 @@
         case FormInputType.Int:
             {
                 var value = GetValue<int>(field.Name);
-                int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
-                int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
+                int min = GetParameter<int>(field, nameof(InputNumber.Min));
+                int max = GetParameter<int>(field, nameof(InputNumber.Max));
+                if (min == 0 && max == 0)
+                {
+                    (min, max) = GetRange(field);
+                }
                 <InputNumber Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
     Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
@@ -64,7 +68,7 @@
             {
                 var value = GetValue<List<object>>(field.Name);
                 var listOnly = GetParameter<bool>(field, "ListOnly");
-                var options = GetParameter<List<ListOption>>(field, nameof(Components.Inputs.InputChecklist.Options));
+                var options = GetParameter<List<ListOption>>(field, nameof(InputChecklist.Options));
                 <InputChecklist Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
     Validators=@field.Validators Options="@options" HideLabel=@hideLabel ListOnly=@listOnly OnSubmit=@OnSubmit OnClose=@OnClose />
             }
@@ -72,16 +76,21 @@
         case FormInputType.Slider:
             {
                 var value = GetValue<int>(field.Name);
-                int min = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Min));
-                int max = GetParameter<int>(field, nameof(Components.Inputs.InputNumber.Max));
+                int min = GetParameter<int>(field, nameof(InputSlider.Min));
+                int max = GetParameter<int>(field, nameof(InputSlider.Max));
+                bool inverse = GetParameter<bool>(field, nameof(InputSlider.Inverse));
+                if (min == 0 && max == 0)
+                {
+                    (min, max) = GetRange(field);
+                }
                 <InputSlider Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
-    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
+    Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" Inverse=@inverse HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
         case FormInputType.Switch:
             {
                 var value = GetValue<bool>(field.Name);
-                bool inverse = GetParameter<bool>(field, nameof(Components.Inputs.InputSwitch.Inverse));
+                bool inverse = GetParameter<bool>(field, nameof(InputSwitch.Inverse));
                 <InputSwitch Field=@field Label="@label" Value="@value" Inverse=@inverse ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
     Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
@@ -96,8 +105,8 @@
         case FormInputType.Select:
             {
                 var value = GetValue<object>(field.Name, "");
-                bool allowClear = GetParameter<bool>(field, nameof(Components.Inputs.InputSelect.AllowClear), true);
-                bool showDescription= GetParameter<bool>(field, nameof(Components.Inputs.InputSelect.ShowDescription), true);
+                bool allowClear = GetParameter<bool>(field, nameof(InputSelect.AllowClear), true);
+                bool showDescription= GetParameter<bool>(field, nameof(InputSelect.ShowDescription), true);
                 var options = GetParameter<List<FileFlows.Plugin.ListOption>>(field, "Options");
                 <InputSelect Field=@field Label="@label" Value="@value" ReadOnly=@readOnly Options=@options AllowClear=@allowClear
     ValueChanged="@(x => UpdateValue(field, x))" Placeholder="@field.Placeholder" ShowDescription=@showDescription HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />

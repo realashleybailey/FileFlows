@@ -28,6 +28,9 @@ namespace FileFlows.Client.Components
         public string HelpUrl { get; set; }
         public string Icon { get; set; }
 
+        /// <summary>
+        /// Get the name of the type this editor is editing
+        /// </summary>
         public string TypeName { get; set; }
         private bool IsSaving { get; set; }
 
@@ -233,6 +236,22 @@ namespace FileFlows.Client.Components
 
         }
 
+        /// <summary>
+        /// Finds a field by its name
+        /// </summary>
+        /// <param name="name">the name of the field</param>
+        /// <returns>the field if found, otherwise null</returns>
+        internal ElementField? FindField(string name)
+        {
+            var field = this.Fields?.Where(x => x.Name == name)?.FirstOrDefault();
+            return field;
+        }
+        
+        /// <summary>
+        /// Updates a value
+        /// </summary>
+        /// <param name="field">the field whose value is being updated</param>
+        /// <param name="value">the value of the field</param>
         internal void UpdateValue(ElementField field, object value)
         {
             if (field.UiOnly)
@@ -246,6 +265,14 @@ namespace FileFlows.Client.Components
                 dict.Add(field.Name, value);
         }
 
+        /// <summary>
+        /// Gets a parameter value for a field
+        /// </summary>
+        /// <param name="field">the field to get the value for</param>
+        /// <param name="parameter">the name of the parameter</param>
+        /// <param name="default">the default value if not found</param>
+        /// <typeparam name="T">the type of parameter</typeparam>
+        /// <returns>the parameter value</returns>
         internal T GetParameter<T>(ElementField field, string parameter, T @default = default(T))
         {
             var dict = field?.Parameters as IDictionary<string, object>;
@@ -279,7 +306,25 @@ namespace FileFlows.Client.Components
                 return @default;
             }
         }
+        
+        /// <summary>
+        /// Gets the minimum and maximum from a range validator (if exists)
+        /// </summary>
+        /// <param name="field">The field to get the range for</param>
+        /// <returns>the range</returns>
+        internal (int min, int max) GetRange(ElementField field)
+        {
+            var range = field?.Validators?.Where(x => x is FileFlows.Shared.Validators.Range)?.FirstOrDefault() as FileFlows.Shared.Validators.Range;
+            return range == null ? (0, 0) : (range.Minimum, range.Maximum);
+        }
 
+        /// <summary>
+        /// Gets a value for a field
+        /// </summary>
+        /// <param name="field">the field whose value to get</param>
+        /// <param name="default">the default value if none is found</param>
+        /// <typeparam name="T">the type of value to get</typeparam>
+        /// <returns>the value</returns>
         internal T GetValue<T>(string field, T @default = default(T))
         {
             if (Model == null)

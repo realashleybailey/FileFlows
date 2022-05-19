@@ -203,7 +203,7 @@
         "Priority": "Priority",
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
-        "Filter-Help": "An optional filter regular expression to run against matching files.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
+        "Filter-Help": "An optional filter regular expression to run against matching files.\nThis filter will be run against the full absolute filename of the file.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
         "ExcludeHidden": "Exclude Hidden",
         "ExcludeHidden-Help": "When enabled, hidden files and folders will not be scanned",
         "UseFingerprinting": "Use Fingerprinting",

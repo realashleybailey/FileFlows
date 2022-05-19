@@ -1,8 +1,7 @@
 [
   {
-    "name": "Convert and Move (FFMPEG Builder)",
+    "name": "Convert Video and Move (FFMPEG Builder)",
     "group": "Video",
-    "order": 1,
     "description": "A FFMPEG Builder based flow that will convert and move a file",
     "save": true,
     "Parts": [

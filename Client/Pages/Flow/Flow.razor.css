@@ -1,4 +1,4 @@
-﻿.flow-container {
+.flow-container {
   display: flex;
   flex-direction: row-reverse;
   position: absolute;
@@ -408,7 +408,7 @@ canvas {
 ::deep .flow-part.vertical .inputs, ::deep .flow-part.vertical .outputs {
   top: -1rem;
   bottom: unset;
-  left: 2rem;
+  left: 30px;
   right: 0;
   flex-direction: row;
   width: unset;
@@ -481,3 +481,5 @@ canvas {
   width: 18rem;
   white-space: nowrap;
 }
+
+/*# sourceMappingURL=Flow.razor.css.map */

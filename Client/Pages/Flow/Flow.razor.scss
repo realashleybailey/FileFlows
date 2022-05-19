@@ -380,13 +380,14 @@ canvas {
         .inputs, .outputs {
             top: -1rem;
             bottom: unset;
-            left: 2rem;
+            left: 30px;
             right: 0;
             flex-direction: row;
             width: unset;
             z-index:2;
         }
-
+        
+        
         .outputs {
             top: unset;
             bottom: -1rem;

@@ -265,28 +265,22 @@
       {
         "uid": "00000000-0000-0000-0000-000000000006",
         "type": "Select",
-        "name": "AudioCodec",
+        "name": "Codec",
         "label": "Audio Codec",
         "help": "The audio codec to use for encoding",
         "parameters": {
           "options": [
             {
               "label": "AC3",
-              "value": {
-                "Codec": "ac3"
-              }
+              "value": "ac3"
             },
             {
               "label": "AAC",
-              "value": {
-                "Codec": "aac"
-              }
+              "value": "aac"
             },
             {
               "label": "EAC3",
-              "value": {
-                "Codec": "eac3"
-              }
+              "value": "eac3"
             }
           ]
         }

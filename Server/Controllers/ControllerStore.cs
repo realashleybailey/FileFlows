@@ -48,7 +48,7 @@
         /// <summary>
         /// Clears the cached data 
         /// </summary>
-        public void ClearData() => Data = null;
+        internal void ClearData() => Data = null;
 
         /// <summary>
         /// Gets all the data indexed by the items UID

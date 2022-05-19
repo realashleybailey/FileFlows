@@ -76,7 +76,9 @@ namespace FileFlows.Server.Controllers
                 if (Executors.ContainsKey(info.Uid))
                     Executors.Remove(info.Uid);
                 else
-                    Logger.Instance?.DLog("Could not remove as not in list of Executors: " + info.Uid);
+                {
+                    Logger.Instance?.DLog("Could not remove as not in list of Executors: " + info.Uid + ", file: " + info.LibraryFile.Name);
+                }
             }
 
             if (info.LibraryFile != null)
@@ -93,6 +95,7 @@ namespace FileFlows.Server.Controllers
                     libfile.OutputPath = info.LibraryFile.OutputPath;
                     libfile.Fingerprint = info.LibraryFile.Fingerprint;
                     libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
+                    libfile.Status = info.LibraryFile.Status;
                     await libfileController.Update(libfile);
                 }
                 _ = new StatisticsController().RecordStatistics(info.LibraryFile);

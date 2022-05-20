@@ -1,6 +1,6 @@
 public class Globals 
 {
-    public const string MajorVersion = "0.6.1";
+    public const string MajorVersion = "0.6.2";
     public static int BuildNumber { get; set; }
 
     public static string Version => MajorVersion + "." + BuildNumber;

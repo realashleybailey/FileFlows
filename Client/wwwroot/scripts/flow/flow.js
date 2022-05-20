@@ -307,9 +307,20 @@ window.ffFlow = {
     },
 
     selectConnection: function (outputNode, output) {
+        
         if (!outputNode) {
             ffFlow.setInfo();
             return;
+        }
+        
+        if(this.SelectedParts?.length) {
+            console.log('Unselecting parts!');
+            this.unSelect();
+            this.redrawLines();
+            
+            // this is un-focuses a node so if the user presses delete, that node is not deleted
+            let canvas = document.querySelector('canvas');
+            canvas.focus();
         }
 
         let part = ffFlow.getPart(outputNode);

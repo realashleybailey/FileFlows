@@ -1,4 +1,6 @@
-﻿namespace FileFlows.FlowRunner;
+﻿using Microsoft.Extensions.Logging;
+
+namespace FileFlows.FlowRunner;
 
 using FileFlows.Plugin;
 using FileFlows.Plugin.Helpers;
@@ -65,6 +67,9 @@ public class Runner
             }
             catch(Exception ex)
             {
+                if (Info.LibraryFile?.Status == FileStatus.Processing)
+                    Info.LibraryFile.Status = FileStatus.ProcessingFailed;
+                
                 nodeParameters?.Logger?.ELog("Error in runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 throw;
             }
@@ -138,6 +143,7 @@ public class Runner
         nodeParameters?.Logger?.ILog("Final Size: " + Info.LibraryFile.FinalSize);
         Info.LibraryFile.OutputPath = Node.UnMap(nodeParameters.WorkingFile);
         nodeParameters?.Logger?.ILog("Output Path: " + Info.LibraryFile.OutputPath);
+        nodeParameters?.Logger?.ILog("Final Status: " + Info.LibraryFile.Status);
 
     }
 
@@ -212,6 +218,7 @@ public class Runner
             {
                 var service = FlowRunnerService.Load();
                 service.Update(Info);
+                Logger.Instance?.DLog("Set final status to: " + status);
                 return;
             }
             catch (Exception ex)

@@ -20,7 +20,9 @@ using System.Text.RegularExpressions;
 public class FlowWorker : Worker
 {
     /// <summary>
-    /// A unique identifier to identify the flow worker 
+    /// A unique identifier to identify the flow worker
+    /// This flow worker can have multiple executing processes so this do UID does
+    /// not match the UI of an executor in the UI
     /// </summary>
     public readonly Guid Uid = Guid.NewGuid();
 

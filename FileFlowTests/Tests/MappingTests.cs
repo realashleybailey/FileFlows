@@ -70,4 +70,21 @@ public class MappingTests
         string result2 = node.UnMap(result);
         Assert.AreEqual(result, result2);
     }
+    
+    [TestMethod]
+    public void Mapping_Map_LinuxToWindows()
+    {
+        var node = GetProcessingNode();
+        const string expected = @"\\192.168.10.27\Media\dvd\output";
+        const string unmapped = "/mnt/tempNAS/media/dvd/output";
+        node.Mappings = new List<KeyValuePair<string, string>>
+        {
+            new KeyValuePair<string, string>(unmapped, expected)
+        };
+        string result = node.Map("/mnt/tempNAS/media/dvd/output");
+        Assert.AreEqual(expected, result);
+
+        string result2 = node.UnMap(result);
+        Assert.AreEqual(unmapped, result2);
+    }
 }

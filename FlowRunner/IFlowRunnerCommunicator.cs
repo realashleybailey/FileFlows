@@ -124,6 +124,21 @@ public class FlowRunnerCommunicator : IFlowRunnerCommunicator
     }
 
     /// <summary>
+    /// Sends a hello to the server saying this runner is still executing
+    /// </summary>
+    /// <param name="runnerUid">the UID of the flow runner</param>
+    public async Task Hello(Guid runnerUid)
+    {
+        try
+        {
+            await connection.InvokeAsync("Hello", runnerUid, LibraryFileUid);
+        }
+        catch(Exception)
+        {
+        }
+    }
+
+    /// <summary>
     /// Loads an instance of the FlowRunnerCommunicator
     /// </summary>
     /// <param name="libraryFileUid">the UID of the library file being processed</param>

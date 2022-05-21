@@ -45,7 +45,8 @@ namespace FileFlows.Server.Controllers
             catch (Exception) { }
 
             info.LibraryFile?.ExecutedNodes?.Clear();
-            info.Uid = Guid.NewGuid();
+            if (info.Uid == Guid.Empty)
+                throw new Exception("No UID specified for flow execution info");
             info.LastUpdate = DateTime.Now;
             Executors.Add(info.Uid, info);
             return info;
@@ -293,6 +294,23 @@ namespace FileFlows.Server.Controllers
             {
                 Logger.Instance.WLog("Error aborting flow: " + ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Receives a hello from the flow runner, indicating its still alive and executing
+        /// </summary>
+        /// <param name="runnerUid">the UID of the flow runner</param>
+        /// <param name="libraryFileUid">the UID of the library file</param>
+        internal async Task Hello(Guid runnerUid, Guid libraryFileUid)
+        {
+            if (Executors.TryGetValue(runnerUid, out var executorInfo) == false)
+            {
+                Logger.Instance?.ILog("Unable to find executor from helloer: " + runnerUid);
+                return; // unknown executor
+            }
+
+            Logger.Instance?.ILog("Hello received from: " + runnerUid);
+            executorInfo.LastUpdate = DateTime.Now;
         }
     }
 }

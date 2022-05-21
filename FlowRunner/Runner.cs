@@ -58,15 +58,27 @@ public class Runner
             var updated = service.Start(Info).Result;
             if (updated == null)
                 return; // failed to update
-            Info.Uid = updated.Uid;
             var communicator = FlowRunnerCommunicator.Load(Info.LibraryFile.Uid);
             communicator.OnCancel += Communicator_OnCancel;
+            bool finished = false;
+            var task = Task.Run(async () =>
+            {
+                while (finished == false)
+                {
+                    if (finished == false)
+                        await communicator.Hello(Program.Uid);
+                    await Task.Delay(5_000);
+                }
+            });
             try
             {
                 RunActual(communicator);
             }
             catch(Exception ex)
             {
+                finished = true;
+                task.Wait();
+                
                 if (Info.LibraryFile?.Status == FileStatus.Processing)
                     Info.LibraryFile.Status = FileStatus.ProcessingFailed;
                 
@@ -75,6 +87,8 @@ public class Runner
             }
             finally
             {
+                finished = true;
+                task.Wait();
                 communicator.OnCancel -= Communicator_OnCancel;
                 communicator.Close();
             }
@@ -250,7 +264,7 @@ public class Runner
         Shared.Helpers.HttpHelper.Logger = nodeParameters.Logger;
 
         nodeParameters.Logger!.ILog("File: " + nodeParameters.FileName);
-        nodeParameters.Logger!.ILog("Excecuting Flow: " + Flow.Name);
+        nodeParameters.Logger!.ILog("Executing Flow: " + Flow.Name);
 
         DownloadPlugins();
 

@@ -173,6 +173,7 @@ namespace FileFlows.FlowRunner
 
             var info = new FlowExecutorInfo
             {
+                Uid = Program.Uid,
                 LibraryFile = libFile,
                 Log = String.Empty,
                 NodeUid = node.Uid,

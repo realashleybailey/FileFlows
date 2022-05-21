@@ -1,4 +1,5 @@
-﻿using FileFlows.Server.Helpers;
+﻿using FileFlows.Server.Controllers;
+using FileFlows.Server.Helpers;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FileFlows.Server.Hubs;
@@ -23,5 +24,15 @@ public class FlowHub : Hub
         catch (Exception)
         {
         }
+    }
+
+    /// <summary>
+    /// Receives a hello from the flow runner, indicating its still alive and executing
+    /// </summary>
+    /// <param name="runnerUid">the UID of the flow runner</param>
+    /// <param name="libraryFileUid">the UID of the library file</param>
+    public async Task Hello(Guid runnerUid, Guid libraryFileUid)
+    {
+        await (new WorkerController(null).Hello(runnerUid, libraryFileUid));
     }
 }

@@ -48,7 +48,7 @@ public class WatchedLibrary:IDisposable
                     Thread.Sleep(1000);
                     continue;
                 }
-                Logger.Instance.ILog($"{Library.Name} Dequeued: {fullpath}");
+                Logger.Instance.DLog($"{Library.Name} Dequeued: {fullpath}");
 
                 if (CheckExists(fullpath) == false)
                 {

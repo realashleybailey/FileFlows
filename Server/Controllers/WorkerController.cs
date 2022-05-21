@@ -301,16 +301,38 @@ namespace FileFlows.Server.Controllers
         /// </summary>
         /// <param name="runnerUid">the UID of the flow runner</param>
         /// <param name="libraryFileUid">the UID of the library file</param>
-        internal async Task Hello(Guid runnerUid, Guid libraryFileUid)
+        internal void Hello(Guid runnerUid, Guid libraryFileUid)
         {
-            if (Executors.TryGetValue(runnerUid, out var executorInfo) == false)
+            lock (Executors)
             {
-                Logger.Instance?.ILog("Unable to find executor from helloer: " + runnerUid);
-                return; // unknown executor
+                if (Executors.TryGetValue(runnerUid, out var executorInfo) == false)
+                {
+                    Logger.Instance?.ILog("Unable to find executor from helloer: " + runnerUid);
+                    return; // unknown executor
+                }
+                executorInfo.LastUpdate = DateTime.Now;
+            }
+        }
+
+        /// <summary>
+        /// Aborts any runners that have stopped communicating
+        /// </summary>
+        internal void AbortDisconnectedRunners()
+        {
+            FlowExecutorInfo[] executors;
+            lock (Executors)
+            {
+                executors = Executors?.Select(x => x.Value)?.ToArray() ?? new FlowExecutorInfo[] { };
             }
 
-            Logger.Instance?.ILog("Hello received from: " + runnerUid);
-            executorInfo.LastUpdate = DateTime.Now;
+            foreach (var executor in executors)
+            {
+                if (executor.LastUpdate < DateTime.Now.AddSeconds(-60))
+                {
+                    Logger.Instance?.ILog($"Aborting disconnected runner[{executor.NodeName}]: {executor.LibraryFile.Name}");
+                    Abort(executor.Uid, executor.LibraryFile.Uid).Wait();
+                }
+            }
         }
     }
 }

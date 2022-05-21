@@ -31,8 +31,9 @@ public class FlowHub : Hub
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
     /// <param name="libraryFileUid">the UID of the library file</param>
-    public async Task Hello(Guid runnerUid, Guid libraryFileUid)
+    public Task Hello(Guid runnerUid, Guid libraryFileUid)
     {
-        await (new WorkerController(null).Hello(runnerUid, libraryFileUid));
+        new WorkerController(null).Hello(runnerUid, libraryFileUid);
+        return Task.CompletedTask;
     }
 }

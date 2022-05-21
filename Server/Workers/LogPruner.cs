@@ -15,20 +15,35 @@ public class LogPruner:Worker
     {
     }
 
+    public void Run() => Execute();
+
     protected override void Execute()
     {
         var libFiles = new LibraryFileController().GetDataList().Result.Select(x => x.Uid.ToString()).ToList();
-        var files = Directory.GetFiles(DirectoryHelper.LibraryFilesLoggingDirectory);
+        var files = new DirectoryInfo(DirectoryHelper.LibraryFilesLoggingDirectory).GetFiles();
         foreach (var file in files)
         {
-            bool exists = file.IndexOf(".", StringComparison.Ordinal) > 0 
-                          && libFiles.Contains(file[..file.IndexOf(".", StringComparison.Ordinal)]);
+            // first check if the file is somewhat new, if it is, dont delete just yet
+            if (file.LastWriteTime > DateTime.Now.AddHours(-1))
+                continue;
+            
+            string shortName = file.Name;
+            if (file.Extension?.Length > 0)
+                shortName = shortName[..shortName.LastIndexOf(file.Extension, StringComparison.Ordinal)];
+            
+            // .html.gz, .log.gz
+            if (shortName.EndsWith(".html"))
+                shortName = shortName.Replace(".html", "");
+            if (shortName.EndsWith(".log"))
+                shortName = shortName.Replace(".log", "");
+            
+            bool exists = libFiles.Contains(shortName);
 
             if (exists)
                 continue;
             try
             {
-                File.Delete(file);
+                file.Delete();
                 Shared.Logger.Instance?.DLog("Deleted old unknown log file: " + file);
             }
             catch (Exception)

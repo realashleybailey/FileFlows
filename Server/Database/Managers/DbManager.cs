@@ -193,7 +193,8 @@ public abstract class DbManager
         Parallel.ForEach(dbObjects, x =>
         {
             var converted = Convert<T>(x);
-            results.Add(converted);
+            if(converted != null)
+                results.Add(converted);
         });
         results = results.OrderBy(x => x.Name).ToList();
         return results;

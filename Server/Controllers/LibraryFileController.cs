@@ -46,6 +46,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             await new NodeController().Update(node);
         }
 
+        return null;
+
         var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
         await _mutex.WaitAsync();
         try

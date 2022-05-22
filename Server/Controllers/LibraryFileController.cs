@@ -151,64 +151,67 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet]
     public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
     {
-        var dt = DateTime.Now;
-        var libraryFiles = await base.GetDataList();
-        Logger.Instance.ILog($"### LFDEBUG: Time taken to get library files: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms");
+        IEnumerable<LibraryFile> libraryFiles = new LibraryFile[] { };
+        Dictionary<Guid, Library> libraries = new Dictionary<Guid, Library>();
+        
+        await Task.WhenAll(new Task[]
+        {
+            Task.Run(async () => libraryFiles = await base.GetDataList()),
+            Task.Run(async () => libraries = await new LibraryController().GetData())
+        });
 
         if (status != null)
         {
-            FileStatus searchStatus = (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled) ? FileStatus.Unprocessed : status.Value;
-            libraryFiles = libraryFiles.Where(x => x.Status == searchStatus).ToList();
+            FileStatus searchStatus =
+                (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled)
+                    ? FileStatus.Unprocessed
+                    : status.Value;
+            libraryFiles = libraryFiles.Where(x => x.Status == searchStatus);
         }
-
-        dt = DateTime.Now;
-        var libraries = await new LibraryController().GetData();
-        Logger.Instance.ILog($"### LFDEBUG: Time taken to get libraries: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms");
 
 
         if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule)
         {
-            dt = DateTime.Now;
             var filteredResults = libraryFiles
-                          .Where(x =>
-                          {
-                              // unprocessed just show the enabled libraries
-                              if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
-                                  return false;
-                              var lib = libraries[x.Library.Uid];
-                              if (lib.Enabled == false)
-                                  return false;
-                              if (TimeHelper.InSchedule(lib.Schedule) == false)
-                                  return status == FileStatus.OutOfSchedule;
-                              return status == FileStatus.Unprocessed;
-                          })
-                          .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
-                          .ThenByDescending(x =>
-                          {
-                              // check the processing priority of the library
-                              if (x.Library != null && libraries.ContainsKey(x.Library.Uid))
-                              {
-                                  return (int)libraries[x.Library.Uid].Priority;
-                              }
-                              return (int)ProcessingPriority.Normal;
-                          })
-                          .ThenBy(x => x.DateCreated);
+                .Where(x =>
+                {
+                    // unprocessed just show the enabled libraries
+                    if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
+                        return false;
+                    var lib = libraries[x.Library.Uid];
+                    if (lib.Enabled == false)
+                        return false;
+                    if (TimeHelper.InSchedule(lib.Schedule) == false)
+                        return status == FileStatus.OutOfSchedule;
+                    return status == FileStatus.Unprocessed;
+                })
+                .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
+                .ThenByDescending(x =>
+                {
+                    // check the processing priority of the library
+                    if (x.Library != null && libraries.ContainsKey(x.Library.Uid))
+                    {
+                        return (int)libraries[x.Library.Uid].Priority;
+                    }
 
-            Logger.Instance.ILog($"### LFDEBUG: Time taken to get filtered results: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms");
+                    return (int)ProcessingPriority.Normal;
+                })
+                .ThenBy(x => x.DateCreated);
+
             return filteredResults;
         }
 
-        if(status == FileStatus.Disabled)
+        if (status == FileStatus.Disabled)
         {
             return libraryFiles
-                          .Where(x =>
-                          {
-                              // unprocessed just show the enabled libraries
-                              if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
-                                  return false;
-                              var lib = libraries[x.Library.Uid];
-                              return lib.Enabled == false;
-                          });
+                .Where(x =>
+                {
+                    // unprocessed just show the enabled libraries
+                    if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
+                        return false;
+                    var lib = libraries[x.Library.Uid];
+                    return lib.Enabled == false;
+                });
         }
 
         if (status == FileStatus.Processing)
@@ -218,7 +221,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
         if (skip > 0)
             results = results.Skip(skip);
-        if(top > 0)
+        if (top > 0)
             results = results.Take(top);
 
 

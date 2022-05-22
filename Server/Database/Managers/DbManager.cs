@@ -182,10 +182,14 @@ public abstract class DbManager
     {
         using var db = GetDb();
         DateTime start = DateTime.Now;
-        var dbObjects = await db.FetchAsync<DbObject>("where Type=@0 order by Name", typeof(T).FullName);
-        Logger.Instance?.ILog($"Time Taken to select objects<{typeof(T).FullName}>: {DateTime.Now.Subtract(start).TotalMilliseconds}ms");
-        var results = dbObjects.Select(x => Convert<T>(x));
-        Logger.Instance?.ILog($"Time Taken to convert objects<{typeof(T).FullName}>: {DateTime.Now.Subtract(start).TotalMilliseconds}ms");
+        var dbObjects = await db.FetchAsync<DbObject>("where Type=@0", typeof(T).FullName);
+        List<T> results = new();
+        Parallel.ForEach(dbObjects, x =>
+        {
+            var converted = Convert<T>(x);
+            results.Add(converted);
+        });
+        results = results.OrderBy(x => x.Name).ToList();
         return results;
     }
     
@@ -429,7 +433,7 @@ public abstract class DbManager
 
         // need to case obj to (ViObject) here so the DataConverter is used
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-        T result = System.Text.Json.JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
+        T result = JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
         result.Uid = Guid.Parse(dbObject.Uid);
         result.Name = dbObject.Name;

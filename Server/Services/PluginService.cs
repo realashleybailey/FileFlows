@@ -27,7 +27,7 @@ public class PluginService : IPluginService
     /// Get all plugin infos
     /// </summary>
     /// <returns>all plugin infos</returns>
-    public Task<List<PluginInfo>> GetAll() => new PluginController().GetDataList();
+    public Task<IEnumerable<PluginInfo>> GetAll() => new PluginController().GetDataList();
 
 
     /// <summary>

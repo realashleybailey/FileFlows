@@ -96,7 +96,7 @@ public class DbHelper
     /// <typeparam name="T">the type of item to select</typeparam>
     /// <returns>a single instance</returns>
     public static Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
-        => Manager.Single<T>();
+        => Manager.Single<T>(uid);
 
     /// <summary>
     /// Selects a single instance by its name

@@ -101,7 +101,12 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         return _Data;
     }
 
-    internal virtual async Task<List<T>> GetDataList() => (await GetData()).Values.ToList();
+    internal virtual async Task<IEnumerable<T>> GetDataList()
+    {
+        if(DbHelper.UseMemoryCache)
+            return (await GetData()).Values.ToList();
+        return await DbHelper.Select<T>();
+    } 
 
     protected async Task<T> GetByUid(Guid uid)
     {

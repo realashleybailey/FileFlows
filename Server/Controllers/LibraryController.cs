@@ -12,7 +12,7 @@ namespace FileFlows.Server.Controllers
     [Route("/api/library")]
     public class LibraryController : ControllerStore<Library>
     {
-        internal override async Task<List<Library>> GetDataList()
+        internal override async Task<IEnumerable<Library>> GetDataList()
         {
             return (await GetData()).Values.Select(x =>
             {

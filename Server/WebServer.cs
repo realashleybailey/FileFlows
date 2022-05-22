@@ -23,6 +23,17 @@ public class WebServer
 
     public static void Start(string[] args)
     {
+        Shared.Logger.Instance = Logger.Instance;
+        if (Helpers.DbHelper.Initialize().Result == false)
+        {
+            Logger.Instance.ELog("Failed initializing database");
+            return;
+        }
+        else
+        {
+            Logger.Instance.ILog("Database initialized");
+        }
+        
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -117,15 +128,9 @@ public class WebServer
             defaults: new { controller = "Home", action = "Index" }
         );
 
-        Shared.Logger.Instance = Logger.Instance;
 
         Services.InitServices.Init();
 
-        if (Helpers.DbHelper.Initialize().Result == false)
-        {
-            Logger.Instance.ELog("Failed initializing database");
-            return;
-        }
 #if(DEBUG)
         //Helpers.DbHelper.CleanDatabase().Wait();
 #endif

@@ -23,6 +23,7 @@ public class DbHelper
     /// </summary>
     internal static Task<bool> Initialize()
     {
+        Logger.Instance.ILog("Database Connection String: " + AppSettings.Instance.DatabaseConnection);
         Manager = DbManager.GetManager(AppSettings.Instance.DatabaseConnection);
         return Manager.CreateDb();
     }

@@ -151,7 +151,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet]
     public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
     {
+        var dt = DateTime.Now;
         var libraryFiles = await base.GetDataList();
+        Logger.Instance.ILog($"### LFDEBUG: Time taken to get library files: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms");
 
         if (status != null)
         {
@@ -159,12 +161,15 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             libraryFiles = libraryFiles.Where(x => x.Status == searchStatus).ToList();
         }
 
+        dt = DateTime.Now;
         var libraries = await new LibraryController().GetData();
+        Logger.Instance.ILog($"### LFDEBUG: Time taken to get libraries: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms");
 
 
         if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule)
         {
-            return libraryFiles
+            dt = DateTime.Now;
+            var filteredResults = libraryFiles
                           .Where(x =>
                           {
                               // unprocessed just show the enabled libraries
@@ -188,6 +193,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                               return (int)ProcessingPriority.Normal;
                           })
                           .ThenBy(x => x.DateCreated);
+
+            Logger.Instance.ILog($"### LFDEBUG: Time taken to get filtered results: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms");
+            return filteredResults;
         }
 
         if(status == FileStatus.Disabled)

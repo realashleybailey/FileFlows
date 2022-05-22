@@ -1,4 +1,5 @@
 using System.Text;
+using FileFlows.Plugin;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
@@ -494,6 +495,26 @@ public abstract class DbManager
         string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
         using var db = GetDb();
         await db.ExecuteAsync($"delete from {nameof(DbObject)} where Uid in ({strUids})");
+    }
+
+
+    /// <summary>
+    /// Finds an existing library file in the database
+    /// </summary>
+    /// <param name="fullPath">the full path of the library file</param>
+    /// <param name="fingerprint">the fingerprint of the file</param>
+    /// <returns>the result of the known library file</returns>
+    public async Task<LibraryFile> FindKnownLibraryFile(string fullPath, string fingerprint)
+    {
+        using var db = GetDb();
+
+        var dbObject = await db.FirstOrDefaultAsync<DbObject>(
+            "where Type=@0 and (name = @1 or JSON_EXTRACT(Data, '$.Fingerprint') = @2)", typeof(LibraryFile).FullName,
+            fullPath, fingerprint ?? string.Empty);
+        if (string.IsNullOrEmpty(dbObject?.Data))
+            return new LibraryFile();
+        
+        return Convert<LibraryFile>(dbObject);
     }
     
 #if (DEBUG)

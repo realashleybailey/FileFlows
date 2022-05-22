@@ -1,3 +1,4 @@
+using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
 using MySqlConnector;
 
@@ -155,6 +156,16 @@ public class DbHelper
     /// </summary>
     /// <param name="uids">the UIDs of the items to delete</param>
     public static Task Delete(params Guid[] uids) => Manager.Delete(uids);
+    
+    
+    /// <summary>
+    /// Finds an existing library file in the database
+    /// </summary>
+    /// <param name="fullPath">the full path of the library file</param>
+    /// <param name="fingerprint">the fingerprint of the file</param>
+    /// <returns>the result of the known file</returns>
+    public static Task<LibraryFile> FindKnownLibraryFile(string fullPath, string fingerprint) =>
+        Manager.FindKnownLibraryFile(fullPath, fingerprint);
     
 #if (DEBUG)
     /// <summary>

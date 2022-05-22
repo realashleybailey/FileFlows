@@ -39,9 +39,6 @@ public class WatchedLibrary:IDisposable
     {
         while (Disposed == false)
         {
-            // testing memory leak
-            Thread.Sleep(1000);
-            continue;
             try
             {
                 string? fullpath;
@@ -83,40 +80,13 @@ public class WatchedLibrary:IDisposable
                 StringBuilder scanLog = new StringBuilder(); 
                 DateTime dtTotal = DateTime.Now;
 
-                var libFiles = new LibraryFileController().GetData().Result;
-                var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
-                var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
-                var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
-                                            .DistinctBy(x => x.Value.Fingerprint)
-                                            .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
-                
                 FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
-                
-                if (knownFiles.ContainsKey(fullpath.ToLower()))
-                {
-                    var knownFileUid = knownFiles[fullpath.ToLower()];
-                    var knownFile = libFiles[knownFileUid];
-                    if(Library.ReprocessRecreatedFiles && fsInfo.CreationTime > knownFile.CreationTime)
-                    {
-                        Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file");
-                        knownFile.CreationTime = fsInfo.CreationTime;
-                        knownFile.LastWriteTime = fsInfo.LastWriteTime;
-                        knownFile.Status = FileStatus.Unprocessed;
-                        new LibraryFileController().Update(knownFile).Wait();
-                        continue;
-                    }
-                    Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
+
+                var (knownFile, fingerprint, duplicate) = IsKnownFile(fullpath, fsInfo).Result;
+                if (knownFile && duplicate == null)
                     continue;
-                }
-                if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
-                {
-                    Logger.Instance.DLog($"{Library.Name} skipping known output file '{fullpath}'");
-                    continue;
-                }
 
                 string type = Library.Folders ? "folder" : "file";
-
-
 
                 if (Library.Folders && Library.WaitTimeSeconds > 0)
                 {
@@ -164,12 +134,13 @@ public class WatchedLibrary:IDisposable
                 {
                     Name = fullpath,
                     RelativePath = relative,
-                    Status = FileStatus.Unprocessed,
+                    Status = duplicate != null ? FileStatus.Duplicate : FileStatus.Unprocessed,
                     IsDirectory = fsInfo is DirectoryInfo,
-                    Fingerprint = string.Empty,
+                    Fingerprint = fingerprint ?? string.Empty,
                     OriginalSize = size,
                     CreationTime = fsInfo.CreationTime,
                     LastWriteTime = fsInfo.LastWriteTime,
+                    Duplicate = duplicate,
                     Library = new ObjectReference
                     {
                         Name = Library.Name,
@@ -179,35 +150,10 @@ public class WatchedLibrary:IDisposable
                     Order = -1
                 };
 
-
-                if (Library.UseFingerprinting)
-                {
-                    string fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
-                    if (string.IsNullOrEmpty(fingerprint) == false)
-                    {
-                        lf.Fingerprint = fingerprint;   
-                        if (knownFingerprints.ContainsKey(fingerprint))
-                        {
-                            lf.Status = FileStatus.Duplicate;
-                            lf.Duplicate = knownFingerprints[fingerprint];
-                        }
-                    }
-                }
-
                 var result = new LibraryFileController().Add(lf).Result;
 
                 if(result != null && result.Uid != Guid.Empty)
                 {
-                    knownFiles.Add(fullpath.ToLower(), result.Uid);
-                    if(string.IsNullOrEmpty(result.Fingerprint) == false && knownFingerprints.ContainsKey(result.Fingerprint) == false)
-                    {
-                        knownFingerprints.Add(result.Fingerprint, new ObjectReference
-                        {
-                            Name = result.Name,
-                            Uid = result.Uid,
-                            Type = result.GetType()?.FullName ?? string.Empty
-                        });
-                    }
                     Logger.Instance.DLog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to successfully add new library file: \"{fullpath}\"");
                 }
                 else
@@ -222,6 +168,92 @@ public class WatchedLibrary:IDisposable
         }
     }
 
+    private async Task<(bool known, string fingerprint, ObjectReference? duplicate)> IsKnownFile(string fullpath, FileSystemInfo fsInfo)
+    {
+        if (DbHelper.UseMemoryCache)
+            return IsKnownFileInMemory(fullpath, fsInfo);
+        return await IsKnownFileInDb(fullpath, fsInfo);
+    }
+    
+    private (bool known, string fingerprint, ObjectReference? duplicate) IsKnownFileInMemory(string fullpath, FileSystemInfo fsInfo)
+    {
+
+        var libFiles = new LibraryFileController().GetData().Result;
+        var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
+        var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
+        var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
+                                    .DistinctBy(x => x.Value.Fingerprint)
+                                    .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
+
+        ObjectReference? duplicate = null;
+        string fingerprint = string.Empty;
+        if (Library.UseFingerprinting)
+        {
+            fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
+            if (string.IsNullOrEmpty(fingerprint) == false)
+            {   
+                if (knownFingerprints.ContainsKey(fingerprint))
+                {
+                    duplicate = knownFingerprints[fingerprint];
+                }
+            }
+        }
+        
+        if (knownFiles.ContainsKey(fullpath.ToLower()))
+        {
+            var knownFileUid = knownFiles[fullpath.ToLower()];
+            var knownFile = libFiles[knownFileUid];
+            if(Library.ReprocessRecreatedFiles && fsInfo.CreationTime > knownFile.CreationTime)
+            {
+                Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file");
+                knownFile.CreationTime = fsInfo.CreationTime;
+                knownFile.LastWriteTime = fsInfo.LastWriteTime;
+                knownFile.Status = FileStatus.Unprocessed;
+                new LibraryFileController().Update(knownFile).Wait();
+                return (true, fingerprint, duplicate);
+            }
+            Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
+            return (true, fingerprint, duplicate);
+        }
+        if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
+        {
+            Logger.Instance.DLog($"{Library.Name} skipping known output file '{fullpath}'");
+            return (true, fingerprint, duplicate);
+        }
+
+        return (false, fingerprint, duplicate);
+    }
+
+    private async Task<(bool known, string fingerprint, ObjectReference? duplicate)> IsKnownFileInDb(string fullPath, FileSystemInfo fsInfo)
+    {
+        string fingerprint = Library.UseFingerprinting == false
+            ? string.Empty
+            : ServerShared.Helpers.FileHelper.CalculateFingerprint(fullPath);
+        var existing = await DbHelper.FindKnownLibraryFile(fullPath, fingerprint);
+        if (string.IsNullOrEmpty(existing?.Name))
+            return (false, fingerprint, null);
+
+        if (existing.Name.ToLower() != fullPath.ToLower())
+        {
+            // duplicate
+            return (true, fingerprint,
+                new ObjectReference { Name = existing.Name, Uid = existing.Uid, Type = typeof(LibraryFile).FullName });
+        }
+        
+        if(Library.ReprocessRecreatedFiles && fsInfo.CreationTime > existing.CreationTime)
+        {
+            Logger.Instance.DLog($"{Library.Name} file '{fullPath}' creation time has changed, reprocessing file");
+            existing.CreationTime = fsInfo.CreationTime;
+            existing.LastWriteTime = fsInfo.LastWriteTime;
+            existing.Status = FileStatus.Unprocessed;
+            await DbHelper.Update(existing);
+            return (true, fingerprint, null);
+        }
+        
+        // known, and not a duplicate
+        return (true, fingerprint, null);
+    }
+    
     private bool CheckExists(string fullpath)
     {
         try

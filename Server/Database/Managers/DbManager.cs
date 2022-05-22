@@ -93,7 +93,7 @@ public abstract class DbManager
                 }
 
                 // migrated, we dont need to insert initial data
-                return true;
+                return false;
             }
         }
         

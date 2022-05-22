@@ -30,15 +30,24 @@ public class DbMigrater
 
         foreach (var obj in dbObjects)
         {
-            Logger.Instance?.DLog($"Migrating [{obj.Uid}][{obj.Type}]: {obj.Name ?? string.Empty}");
-            dest.Execute(
-                $"insert into {nameof(DbObject)} (Uid, Name, Type, DateCreated, DateModified, Data) values (@0, @1, @2, @3, @4, @5)",
-                obj.Uid.ToString(),
-                obj.Name,
-                obj.Type,
-                obj.DateCreated,
-                obj.DateModified,
-                obj.Data ?? string.Empty);
+            try
+            {
+                Logger.Instance?.DLog($"Migrating [{obj.Uid}][{obj.Type}]: {obj.Name ?? string.Empty}");
+
+                dest.Execute(
+                    $"insert into {nameof(DbObject)} (Uid, Name, Type, DateCreated, DateModified, Data) values (@0, @1, @2, @3, @4, @5)",
+                    obj.Uid.ToString(),
+                    obj.Name,
+                    obj.Type,
+                    obj.DateCreated,
+                    obj.DateModified,
+                    obj.Data ?? string.Empty);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed to migrate data: " + ex.Message);
+                return false;
+            }
         }
 
         Logger.Instance?.ILog("Database Migration complete");

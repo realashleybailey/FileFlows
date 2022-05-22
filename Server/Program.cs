@@ -120,7 +120,7 @@ public class Program
     /// </summary>
     private static void CleanDefaultTempDirectory()
     {
-        string tempDir = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+        string tempDir = Docker ? Path.Combine(DirectoryHelper.DataDirectory, "temp") : Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
         DirectoryHelper.CleanDirectory(tempDir);
     }
 

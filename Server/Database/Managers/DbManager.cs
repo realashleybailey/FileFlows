@@ -257,14 +257,14 @@ public abstract class DbManager
     public bool NameInUse<T>(Guid uid, string name)
     {
         using var db = GetDb();
-        string sql = $"Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name <> @2";
+        string sql = $"Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name = @2";
         if (UseTop)
-            sql = "select top 1 ";
+            sql = "select top 1 " + sql;
         else
-            sql += " limit 1";
+            sql = "select " + sql + " limit 1";
         
         string result = db.FirstOrDefault<string>(sql, typeof(T).FullName, uid.ToString(), name);
-        return string.IsNullOrEmpty(result);
+        return string.IsNullOrEmpty(result) == false;
     }
 
     /// <summary>

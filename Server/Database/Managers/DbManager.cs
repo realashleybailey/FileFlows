@@ -91,9 +91,9 @@ public abstract class DbManager
                 {
                     File.Move(SqliteDbFile, SqliteDbFile + ".migrated");
                 }
-
+                
                 // migrated, we dont need to insert initial data
-                return false;
+                return true;
             }
         }
         

@@ -11,12 +11,15 @@ public class Logger : FileFlows.Plugin.ILogger
 
     public Logger()
     {
-        this.LogFile = Path.Combine(DirectoryHelper.LoggingDirectory, DirectoryHelper.IsNode ? "FileFlowsNode.log" : "FileFlows.log");
+        string prefix = DirectoryHelper.IsNode ? "FileFlowsNode" : "FileFlows";
+        this.LogFile = Path.Combine(DirectoryHelper.LoggingDirectory, prefix + ".log");
         if (File.Exists(LogFile))
         {
             try
             {
-                File.Move(LogFile, LogFile + ".old", true);
+                var fi = new FileInfo(LogFile);
+                var dest = Path.Combine(DirectoryHelper.LoggingDirectory, $"{prefix}_{fi.CreationTime.ToString("yyyy-MM-dd hh-mm-ss")}.log");
+                File.Move(LogFile, dest, true);
             }
             catch (Exception) { }
 

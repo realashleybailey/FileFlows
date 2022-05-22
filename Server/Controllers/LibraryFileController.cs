@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using FileFlows.Shared;
 
 namespace FileFlows.Server.Controllers;
@@ -106,10 +107,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="status">The status to list</param>
     /// <returns>a slimmed down list of files with only needed information</returns>
     [HttpGet("list-all")]
-    public async Task<IEnumerable<LibaryFileListModel>> ListAll(FileStatus status)
+    public async Task<LibraryFileDatalistModel> ListAll(FileStatus status)
     {
-        var files = await GetAll(status);
-        return files.Select(x =>
+        var allData  = await GetAllComplete(status);
+        
+        var result = new LibraryFileDatalistModel();
+        result.Status = GetStatusData(allData.all, allData.libraries);
+        result.LibraryFiles = allData.results.Select(x =>
         {
             var item = new LibaryFileListModel
             {
@@ -139,6 +143,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             }
             return item;
         });
+
+        return result;
     }
 
     /// <summary>
@@ -149,17 +155,29 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="top">The amount of items to grab, 0 to grab all</param>
     /// <returns>A list of library files</returns>
     [HttpGet]
-    public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
+    public async Task<IEnumerable<LibraryFile>> GetAll([FromQuery] FileStatus? status, [FromQuery] int skip = 0,
+        [FromQuery] int top = 0)
     {
+        var result = await GetAllComplete(status, skip, top);
+        return result.results;
+    }
+    
+    
+    private async Task<(IEnumerable<LibraryFile> results, IEnumerable<LibraryFile> all, Dictionary<Guid, Library> libraries)> 
+        GetAllComplete([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
+    {
+        IEnumerable<LibraryFile> all = new LibraryFile[] { };
         IEnumerable<LibraryFile> libraryFiles = new LibraryFile[] { };
         Dictionary<Guid, Library> libraries = new Dictionary<Guid, Library>();
         
         await Task.WhenAll(new Task[]
         {
-            Task.Run(async () => libraryFiles = await base.GetDataList()),
+            Task.Run(async () => all = await base.GetDataList()),
             Task.Run(async () => libraries = await new LibraryController().GetData())
         });
 
+        libraryFiles = all;
+        
         if (status != null)
         {
             FileStatus searchStatus =
@@ -197,13 +215,12 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                     return (int)ProcessingPriority.Normal;
                 })
                 .ThenBy(x => x.DateCreated);
-
-            return filteredResults;
+            return (filteredResults, all, libraries);
         }
 
         if (status == FileStatus.Disabled)
         {
-            return libraryFiles
+            var filteredResults = libraryFiles
                 .Where(x =>
                 {
                     // unprocessed just show the enabled libraries
@@ -212,10 +229,11 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                     var lib = libraries[x.Library.Uid];
                     return lib.Enabled == false;
                 });
+            return (filteredResults, all, libraries);
         }
 
         if (status == FileStatus.Processing)
-            return libraryFiles;
+            return (libraryFiles, all, libraries);;
 
         IEnumerable<LibraryFile> results = libraryFiles.OrderByDescending(x => x.ProcessingEnded);
 
@@ -225,7 +243,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             results = results.Take(top);
 
 
-        return results;
+        return (results, all, libraries);
     }
 
     /// <summary>
@@ -270,6 +288,11 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     {
         var libraryFiles = await GetDataList();
         var libraries = await new LibraryController().GetData();
+        return GetStatusData(libraryFiles, libraries);
+    }
+    
+    private IEnumerable<LibraryStatus> GetStatusData(IEnumerable<LibraryFile> libraryFiles, IDictionary<Guid, Library> libraries)
+    {
         var statuses = libraryFiles.Select(x =>
         {
             if (x.Status != FileStatus.Unprocessed)
@@ -287,7 +310,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         });
 
         return statuses.Where(x => (int)x != -99).GroupBy(x => x)
-                       .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
+            .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 
     }
 

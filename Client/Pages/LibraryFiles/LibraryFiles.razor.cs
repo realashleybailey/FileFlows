@@ -87,12 +87,12 @@ namespace FileFlows.Client.Pages
                 this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length / 2) ?? 0))) + "ch" : "20ch";
             else
                 this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
-            await RefreshStatus();
+            //await RefreshStatus();
         }
-        protected override async Task PostDelete()
-        {
-            await RefreshStatus();
-        }
+        // protected override async Task PostDelete()
+        // {
+        //     await RefreshStatus();
+        // }
 
         protected override void OnInitialized()
         {
@@ -104,42 +104,45 @@ namespace FileFlows.Client.Pages
 
         }
 
-        private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
+//         private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
+//         {
+// #if (DEMO)
+//
+//             var results = new List<LibraryStatus>
+//             {
+//                 new LibraryStatus { Status = FileStatus.Unprocessed, Count = 10 },
+//                 new LibraryStatus { Status = FileStatus.Processing, Count = 1 },
+//                 new LibraryStatus { Status = FileStatus.Processed, Count = 10 },
+//                 new LibraryStatus { Status = FileStatus.ProcessingFailed, Count = 10 }
+//             };
+//             return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
+// #endif
+//             return await HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
+//         }
+
+        // private async Task RefreshStatus()
+        // {
+        //     var result = await GetStatus();
+        //     if (result.Success)
+        //         RefreshStatus(result.Data.ToList());
+        // }
+        
+        private void RefreshStatus(List<LibraryStatus> data)
         {
-#if (DEMO)
+           var order = new List<FileStatus> { FileStatus.Unprocessed, FileStatus.OutOfSchedule, FileStatus.Processing, FileStatus.Processed, FileStatus.FlowNotFound, FileStatus.ProcessingFailed };
+           foreach (var s in order)
+           {
+               if (data.Any(x => x.Status == s) == false && s != FileStatus.FlowNotFound)
+                   data.Add(new LibraryStatus { Status = s });
+           }
 
-            var results = new List<LibraryStatus>
-            {
-                new LibraryStatus { Status = FileStatus.Unprocessed, Count = 10 },
-                new LibraryStatus { Status = FileStatus.Processing, Count = 1 },
-                new LibraryStatus { Status = FileStatus.Processed, Count = 10 },
-                new LibraryStatus { Status = FileStatus.ProcessingFailed, Count = 10 }
-            };
-            return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
-#endif
-            return await HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
-        }
-
-        private async Task RefreshStatus()
-        {
-            var result = await GetStatus();
-            if (result.Success)
-            {
-                var order = new List<FileStatus> { FileStatus.Unprocessed, FileStatus.OutOfSchedule, FileStatus.Processing, FileStatus.Processed, FileStatus.FlowNotFound, FileStatus.ProcessingFailed };
-                foreach (var s in order)
-                {
-                    if (result.Data.Any(x => x.Status == s) == false && s != FileStatus.FlowNotFound)
-                        result.Data.Add(new LibraryStatus { Status = s });
-
-                }
-                foreach (var s in result.Data)
-                    s.Name = Translater.Instant("Enums.FileStatus." + s.Status.ToString());
-                Statuses.Clear();
-                Statuses.AddRange(result.Data.OrderBy(x => { int index = order.IndexOf(x.Status); return index >= 0 ? index : 100; }));
-
-                this.Count = Statuses.Where(x => x.Status == SelectedStatus).Select(x => x.Count).FirstOrDefault();
-            }
-        }
+           foreach (var s in data)
+               s.Name = Translater.Instant("Enums.FileStatus." + s.Status.ToString());
+           Statuses.Clear();
+           Statuses.AddRange(data.OrderBy(x => { int index = order.IndexOf(x.Status); return index >= 0 ? index : 100; }));
+                  this.Count = Statuses.Where(x => x.Status == SelectedStatus).Select(x => x.Count).FirstOrDefault();
+           
+       }
 
         public override async Task<bool> Edit(LibaryFileListModel item)
         {
@@ -224,6 +227,30 @@ namespace FileFlows.Client.Pages
             }
             await Refresh();
 #endif
+        }
+
+        protected override async Task<RequestResult<List<LibaryFileListModel>>> FetchData()
+        {
+            var request = await HttpHelper.Get<LibraryFileDatalistModel>(FetchUrl);
+
+            if (request.Success == false)
+            {
+                return new RequestResult<List<LibaryFileListModel>>
+                {
+                    Body = request.Body,
+                    Success = request.Success
+                };
+            }
+
+            if (request.Data.Status?.Any() == true)
+                RefreshStatus(request.Data.Status.ToList());
+            
+            return new RequestResult<List<LibaryFileListModel>>
+            {
+                Body = request.Body,
+                Success = request.Success,
+                Data = request.Data.LibraryFiles.ToList()
+            };
         }
     }
 }

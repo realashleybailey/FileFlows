@@ -13,14 +13,12 @@ taskkill /PID %2
 
 echo.
 echo Removing previous version
-rmdir /q /s Node
 rmdir /q /s Server
 rmdir /q /s FlowRunner
 
 echo.
 echo Copying Server update files
 move Update/FlowRunner FlowRunner
-move Update/Node Node
 move Update/Server Server
 rmdir /q /s Update
 

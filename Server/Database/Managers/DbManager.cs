@@ -74,7 +74,11 @@ public abstract class DbManager
         
         if (dbResult == DbCreateResult.AlreadyExisted)
             return true;
-
+        
+        if (CreateDatabaseStructure() == false)
+            return false;
+        
+        
         if (this is SqliteDbManager == false)
         {
             // not a sqlite database, check if one exists and migrate
@@ -87,11 +91,11 @@ public abstract class DbManager
                 {
                     File.Move(SqliteDbFile, SqliteDbFile + ".migrated");
                 }
+
+                // migrated, we dont need to insert initial data
+                return true;
             }
         }
-        
-        if (CreateDatabaseStructure() == false)
-            return false;
         
         return await CreateInitialData();
     }

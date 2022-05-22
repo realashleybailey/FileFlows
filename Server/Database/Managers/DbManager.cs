@@ -34,7 +34,12 @@ public abstract class DbManager
     /// <summary>
     /// Gets if the database manager should use a memory cache
     /// </summary>
-    public virtual bool UseMemoryCache => false; 
+    public virtual bool UseMemoryCache => false;
+
+    /// <summary>
+    /// Gets if this database uses TOP to limit queries, otherwise LIMIT will be used
+    /// </summary>
+    public virtual bool UseTop => false;
     
     /// <summary>
     /// Gets the database used by this configuration
@@ -252,8 +257,13 @@ public abstract class DbManager
     public bool NameInUse<T>(Guid uid, string name)
     {
         using var db = GetDb();
-        string result = db.FirstOrDefault<string>(
-            $"select Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name <> @2 LIMIT 1", typeof(T).FullName, uid.ToString(), name);
+        string sql = $"Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name <> @2";
+        if (UseTop)
+            sql = "select top 1 ";
+        else
+            sql += " limit 1";
+        
+        string result = db.FirstOrDefault<string>(sql, typeof(T).FullName, uid.ToString(), name);
         return string.IsNullOrEmpty(result);
     }
 

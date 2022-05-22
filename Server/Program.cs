@@ -51,6 +51,8 @@ public class Program
             
             Logger.Instance.ILog(new string('=', 50));
 
+            CleanDefaultTempDirectory();
+
             if (Docker == false)
             {
                 appMutex = new Mutex(true, appName, out bool createdNew);
@@ -111,6 +113,15 @@ public class Program
             catch (Exception) { }
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
+    }
+
+    /// <summary>
+    /// Clean the default temp directory on startup
+    /// </summary>
+    private static void CleanDefaultTempDirectory()
+    {
+        string tempDir = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+        DirectoryHelper.CleanDirectory(tempDir);
     }
 
 

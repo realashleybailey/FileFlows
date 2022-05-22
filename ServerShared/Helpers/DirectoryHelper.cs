@@ -230,4 +230,43 @@ public class DirectoryHelper
         }
         catch(Exception) { }
     }
+
+
+    /// <summary>
+    /// Deletes all files and folders from a directory
+    /// </summary>
+    /// <param name="path">the path of the directory</param>
+    public static void CleanDirectory(string path)
+    {
+        var dirInfo = new DirectoryInfo(path);
+        if (dirInfo.Exists == false)
+            return;
+        try
+        {
+            var subDirs = dirInfo.GetDirectories();
+            foreach (var sub in subDirs)
+            {
+                try
+                {
+                    sub.Delete(true);
+                }
+                catch
+                {
+                }
+            }
+
+            var files = dirInfo.GetFiles();
+            foreach (var file in files)
+            {
+                try
+                {
+                    file.Delete();
+                }
+                catch
+                {
+                }
+            }
+        } 
+        catch { }
+    }
 }

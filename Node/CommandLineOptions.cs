@@ -2,25 +2,25 @@ using System.Reflection;
 
 namespace FileFlows.Node;
 
-class CommandLineOptions 
+class CommandLineOptions
 {
     /// <summary>
     /// Gets or sets the FileFlows server
     /// </summary>
     [CommandLineArg("The FileFlows server", "http://tower:5000/")]
-    public string Server { get; set; }
+    public string Server { get; set; } = string.Empty;
     
     /// <summary>
     /// Gets or sets the name of this Node
     /// </summary>
     [CommandLineArg("The name of this Node", "WindowsNode")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     
     /// <summary>
     /// Gets or sets the temporary working directory this node will use
     /// </summary>
     [CommandLineArg("The temporary working directory this node will use", "DIR")]
-    public string Temp { get; set; }
+    public string Temp { get; set; } = string.Empty;
     
     /// <summary>
     /// Gets or sets the temporary working directory this node will use
@@ -45,7 +45,7 @@ class CommandLineOptions
     /// Gets or sets if running inside a docker container
     /// </summary>
     [CommandLineArg("The location of dotnet, used to install the systemd service", "/usr/john/.dotnet", command: "dotnet")]
-    public string DotNet { get; set; }
+    public string DotNet { get; set; } = string.Empty;
 
     /// <summary>
     /// Parses the command line arguments
@@ -149,7 +149,7 @@ class CommandLineArgAttribute:Attribute
     public string Example { get; set; }
     public bool Hidden { get; set; }
 
-    public CommandLineArgAttribute(string description, string example, string command = null, bool hidden = false)
+    public CommandLineArgAttribute(string description, string example, string? command = null, bool hidden = false)
     {
         this.Description = description;
         this.Example = example;

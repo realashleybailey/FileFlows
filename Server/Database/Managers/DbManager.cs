@@ -253,7 +253,7 @@ public abstract class DbManager
     {
         using var db = GetDb();
         string result = db.FirstOrDefault<string>(
-            $"select top 1 Name from {nameof(DbObject)} where Type=@0 and uid <> @1", name, uid.ToString());
+            $"select Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name <> @2 LIMIT 1", typeof(T).FullName, uid.ToString(), name);
         return string.IsNullOrEmpty(result);
     }
 

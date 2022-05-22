@@ -181,8 +181,12 @@ public abstract class DbManager
     public async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
     {
         using var db = GetDb();
+        DateTime start = DateTime.Now;
         var dbObjects = await db.FetchAsync<DbObject>("where Type=@0 order by Name", typeof(T).FullName);
-        return dbObjects.Select(x => Convert<T>(x));
+        Logger.Instance?.ILog($"Time Taken to select objects<{typeof(T).FullName}>: {DateTime.Now.Subtract(start).TotalMilliseconds}ms");
+        var results = dbObjects.Select(x => Convert<T>(x));
+        Logger.Instance?.ILog($"Time Taken to convert objects<{typeof(T).FullName}>: {DateTime.Now.Subtract(start).TotalMilliseconds}ms");
+        return results;
     }
     
     /// <summary>

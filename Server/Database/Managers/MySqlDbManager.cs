@@ -41,6 +41,8 @@ public class MySqlDbManager: DbManager
             .Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         db.Execute(createDbSql);
+
+        db.Execute("ALTER TABLE DbObject ADD INDEX (Type, Name);");
         return true;
     }
 }

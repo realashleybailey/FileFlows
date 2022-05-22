@@ -59,7 +59,7 @@ public class LibraryFileLogHelper
     /// <param name="content">the log file content to save</param>
     /// <param name="saveHtml">if the html version should also be saved</param>
     /// <returns>the plain text log file</returns>
-    public static async Task SaveLog(Guid uid, string content, bool saveHtml = false)
+    public static Task SaveLog(Guid uid, string content, bool saveHtml = false)
     {
         var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
 
@@ -71,6 +71,8 @@ public class LibraryFileLogHelper
             string html = LogToHtml.Convert(content);
             Gzipper.CompressToFile(logFile + ".html.gz", html);
         }
+
+        return Task.CompletedTask;
     }
 
     /// <summary>

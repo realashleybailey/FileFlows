@@ -129,7 +129,7 @@ namespace FileFlows.Server.Controllers
             if (enable != null)
             {
                 node.Enabled = enable.Value;
-                await DbManager.Update(node);
+                await DbHelper.Update(node);
             }
             return node;
         }

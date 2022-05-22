@@ -46,7 +46,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
 
         var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
-        _mutex.WaitOne();
+        await _mutex.WaitAsync();
         try
         {
             // iterate these in case, something starts processing
@@ -89,14 +89,14 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.Node = new ObjectReference { Uid = args.NodeUid, Name = args.NodeName };
                 item.WorkerUid = args.WorkerUid;
                 item.ProcessingStarted = DateTime.Now;
-                data[i] = await DbManager.Update(item);
+                data[i] = await DbHelper.Update(item);
                 return data[i];
             }
             return null;
         }
         finally
         {
-            _mutex.ReleaseMutex();
+            _mutex.Release();
         }
     }
 
@@ -421,13 +421,16 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         try
         {
             await DbHelper.AddMany(libraryFiles);
-            if (Data == null)
-                await GetData();
-
-            lock (Data)
+            if (DbHelper.UseMemoryCache)
             {
-                foreach (var lf in libraryFiles)
-                    Data.Add(lf.Uid, lf);
+                if (_Data == null)
+                    await GetData();
+
+                lock (_Data)
+                {
+                    foreach (var lf in libraryFiles)
+                        _Data.Add(lf.Uid, lf);
+                }
             }
         }
         catch (Exception ex)

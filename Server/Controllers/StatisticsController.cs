@@ -11,7 +11,7 @@ using FileFlows.Server.Helpers;
 public class StatisticsController : Controller
 {
     private static Statistics Instance;
-    private static Mutex _mutex = new Mutex();
+    private static SemaphoreSlim semaphore = new (1);
 
     /// <summary>
     /// Get the system settings
@@ -30,12 +30,12 @@ public class StatisticsController : Controller
 
         if (Instance != null)
             return Instance;
-        _mutex.WaitOne();
+        await semaphore.WaitAsync();
         try
         {
             if (Instance == null)
             {
-                Instance = await DbManager.Single<Statistics>();
+                Instance = await DbHelper.Single<Statistics>();
                 if (Instance.Uid == Guid.Empty)
                     await DbHelper.Update(Instance);
             }
@@ -43,7 +43,7 @@ public class StatisticsController : Controller
         }
         finally
         {
-            _mutex.ReleaseMutex();
+            semaphore.Release();
         }
     }
 
@@ -62,6 +62,6 @@ public class StatisticsController : Controller
             stats.RecordNode(node);
         }
 
-        await DbManager.Update(stats);
+        await DbHelper.Update(stats);
     }
 }

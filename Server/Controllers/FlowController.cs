@@ -131,7 +131,7 @@ namespace FileFlows.Server.Controllers
             if (enable != null)
             {
                 flow.Enabled = enable.Value;
-                await DbManager.Update(flow);
+                await DbHelper.Update(flow);
             }
             return flow;
         }

@@ -33,7 +33,7 @@ public class PluginService : IPluginService
     /// <summary>
     /// Gets the settings json for a plugin
     /// </summary>
-    /// <param name="pluginPackageName">the name of the plugin package</param>
+    /// <param name="pluginSettingsType">the name of the plugin package</param>
     /// <returns>the settings json</returns>
     public Task<string> GetSettingsJson(string pluginSettingsType) => new PluginController().GetPluginSettings(pluginSettingsType);
 

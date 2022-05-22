@@ -24,7 +24,7 @@ public class Upgrader
         if (settings.Version != Globals.Version)
         {
             settings.Version = Globals.Version;
-            DbManager.Update(settings).Wait();
+            DbHelper.Update(settings).Wait();
         }
     }
 }

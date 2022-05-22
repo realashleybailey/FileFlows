@@ -19,7 +19,6 @@ public class DataConverter : JsonConverter<FileFlowObject>
     /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     /// <returns>The value that was converted.</returns>
-    /// <remarks>Note that the value of <seealso cref="HandleNull"/> determines if the converter handles null JSON tokens.</remarks>
     public override FileFlowObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         throw new NotImplementedException();
@@ -34,7 +33,7 @@ public class DataConverter : JsonConverter<FileFlowObject>
     /// cannot be created.
     /// </remarks>
     /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
-    /// <param name="value">The value to convert. Note that the value of <seealso cref="HandleNull"/> determines if the converter handles <see langword="null" /> values.</param>
+    /// <param name="value">The value to convert. Note that the value of determines if the converter handles values.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     public override void Write(Utf8JsonWriter writer, FileFlowObject value, JsonSerializerOptions options)
     {
@@ -79,7 +78,6 @@ public class BoolConverter : JsonConverter<bool>
     /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     /// <returns>The value that was converted.</returns>
-    /// <remarks>Note that the value of <seealso cref="HandleNull"/> determines if the converter handles null JSON tokens.</remarks>
     public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
          => reader.GetInt32() == 1;
 
@@ -92,7 +90,7 @@ public class BoolConverter : JsonConverter<bool>
     /// cannot be created.
     /// </remarks>
     /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
-    /// <param name="value">The value to convert. Note that the value of <seealso cref="HandleNull"/> determines if the converter handles <see langword="null" /> values.</param>
+    /// <param name="value">The value to convert. Note that the value of determines if the converter handles values.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
         => writer.WriteNumberValue(value ? 1 : 0);

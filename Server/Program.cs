@@ -50,7 +50,6 @@ public class Program
             }
             
             Logger.Instance.ILog(new string('=', 50));
-            InitEncryptionKey();
 
             if (Docker == false)
             {
@@ -111,30 +110,6 @@ public class Program
             }
             catch (Exception) { }
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
-        }
-    }
-
-    /// <summary>
-    /// Init the encryption key, by making this a file in app data, it wont be included with the database if provided to for support
-    /// It wont be lost if inside a docker container and updated
-    /// </summary>
-    private static void InitEncryptionKey()
-    {
-        string encryptionFile = DirectoryHelper.EncryptionKeyFile;
-        if (File.Exists(encryptionFile))
-        {
-            string key = File.ReadAllText(encryptionFile);
-            if (string.IsNullOrEmpty(key) == false)
-            {
-                Helpers.Decrypter.EncryptionKey = key;
-                return;
-            }
-        }
-        else
-        {
-            string key = Guid.NewGuid().ToString();
-            File.WriteAllText(encryptionFile, key);
-            Helpers.Decrypter.EncryptionKey = key;
         }
     }
 

@@ -72,7 +72,7 @@ namespace FileFlows.Server.Controllers
             {
                 if (Instance == null)
                 {
-                    Instance = await DbManager.Single<Settings>();
+                    Instance = await DbHelper.Single<Settings>();
 
                 }
                 Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -102,7 +102,7 @@ namespace FileFlows.Server.Controllers
             model.IsDocker = Program.Docker;
             Instance = model;
             
-            return await DbManager.Update(model);
+            return await DbHelper.Update(model);
         }
     }
 

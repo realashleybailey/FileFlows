@@ -7,3 +7,5 @@ global using System.Threading.Tasks;
 global using System.IO;
 global using System.Net.Http;
 global using FileFlows.ServerShared.Helpers;
+
+global using FileFlows.Server.Models;

@@ -134,6 +134,7 @@ public class DirectoryHelper
         if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "fileflows.config")))
             File.Move(Path.Combine(Directory.GetCurrentDirectory(), "fileflows.config"), NodeConfigFile);
         
+        ServerConfigFile = Path.Combine(dir, "server.config");
 
         DatabaseDirectory = IsDocker == false ? dir : Path.Combine(dir, "Data");
         if (Directory.Exists(DatabaseDirectory) == false)
@@ -195,6 +196,11 @@ public class DirectoryHelper
     public static string NodeConfigFile { get; private set; }
 
 
+    /// <summary>
+    /// Gets the location of the server configuration file
+    /// </summary>
+    public static string ServerConfigFile { get; private set; }
+    
     private static void MoveDirectoryContent(string source, string destination)
     {
         if(Directory.Exists(destination) == false)

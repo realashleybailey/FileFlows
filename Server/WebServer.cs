@@ -121,7 +121,11 @@ public class WebServer
 
         Services.InitServices.Init();
 
-        Helpers.DbHelper.CreateDatabase().Wait();
+        if (Helpers.DbHelper.Initialize().Result == false)
+        {
+            Logger.Instance.ELog("Failed initializing database");
+            return;
+        }
 #if(DEBUG)
         //Helpers.DbHelper.CleanDatabase().Wait();
 #endif

@@ -39,6 +39,9 @@ public class WatchedLibrary:IDisposable
     {
         while (Disposed == false)
         {
+            // testing memory leak
+            Thread.Sleep(1000);
+            continue;
             try
             {
                 string? fullpath;

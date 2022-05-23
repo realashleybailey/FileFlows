@@ -31,12 +31,14 @@ public class MySqlDbManager: DbManager
         bool exists = string.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = @0", dbName)) == false;
         if (exists)
             return DbCreateResult.AlreadyExisted;
-        
+
+        Logger.Instance.ILog("Creating Database");
         return db.Execute("create database " + dbName) > 0 ? DbCreateResult.Created : DbCreateResult.Failed;
     }
 
     protected override void CreateStoredProcedures()
     {
+        Logger.Instance.ILog("Creating Stored Procedures");
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         string sqlGetNextLibraryFile = GetSqlScript("MySql", "GetNextLibraryFile.sql");
         if (string.IsNullOrEmpty(sqlGetNextLibraryFile) == false)
@@ -55,6 +57,8 @@ public class MySqlDbManager: DbManager
 
     protected override bool CreateDatabaseStructure()
     {
+        Logger.Instance.ILog("Creating Database Structure");
+
         string createDbSql = CreateDbScript.Replace("current_timestamp", "now()")
             .Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);

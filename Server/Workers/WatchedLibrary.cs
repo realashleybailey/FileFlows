@@ -487,6 +487,9 @@ public class WatchedLibrary:IDisposable
                 var files = GetFiles(new DirectoryInfo(Library.Path));
                 foreach (var file in files)
                 {
+                    if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
+                        continue;
+
                     if (QueuedFiles.Contains(file.FullName) == false)
                     {
                         Logger.Instance.DLog($"{Library.Name} queueing file for scan: {file.FullName}");

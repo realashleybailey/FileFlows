@@ -338,9 +338,9 @@ public class WorkerController : Controller
             executors = Executors?.Select(x => x.Value)?.ToArray() ?? new FlowExecutorInfo[] { };
         }
 
-        foreach (var executor in executors)
+        foreach (var executor in executors ?? new FlowExecutorInfo[] {})
         {
-            if (executor.LastUpdate < DateTime.Now.AddSeconds(-60))
+            if (executor != null && executor.LastUpdate < DateTime.Now.AddSeconds(-60))
             {
                 Logger.Instance?.ILog($"Aborting disconnected runner[{executor.NodeName}]: {executor.LibraryFile.Name}");
                 Abort(executor.Uid, executor.LibraryFile.Uid).Wait();

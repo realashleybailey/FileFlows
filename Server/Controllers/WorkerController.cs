@@ -315,10 +315,13 @@ public class WorkerController : Controller
         {
             if (Executors.TryGetValue(runnerUid, out var executorInfo) == false)
             {
-                Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
-                foreach(var executor in Executors.Values)
-                    Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
-                return; // unknown executor
+                if (Executors.TryAdd(runnerUid, executorInfo) == false)
+                {
+                    Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
+                    foreach (var executor in Executors.Values)
+                        Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
+                    return; // unknown executor
+                }
             }
             executorInfo.LastUpdate = DateTime.Now;
         }

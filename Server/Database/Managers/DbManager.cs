@@ -514,9 +514,8 @@ public abstract class DbManager
     /// Finds an existing library file in the database
     /// </summary>
     /// <param name="fullPath">the full path of the library file</param>
-    /// <param name="fingerprint">the fingerprint of the file</param>
     /// <returns>the result of the known library file</returns>
-    public async Task<LibraryFile> FindKnownLibraryFile(string fullPath, string fingerprint)
+    public async Task<LibraryFile> FindKnownLibraryFile(string fullPath)
     {
         using var db = GetDb();
 
@@ -526,20 +525,30 @@ public abstract class DbManager
         if (string.IsNullOrEmpty(dbObject?.Data) == false)
             return Convert<LibraryFile>(dbObject);
 
-        // then check fingerprint
-        // we do this second/separately so we dont return the duplicate instead of the actual
-        // if we returned duplicate, and actual existed we then would end up with another entry
-        // for the original, and so on and so on. 
-        if (string.IsNullOrEmpty(fingerprint) == false)
-        {
-            dbObject = await db.FirstOrDefaultAsync<DbObject>(
-                "where Type=@0 and JSON_EXTRACT(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName, fingerprint ?? string.Empty);
-
-            if (string.IsNullOrEmpty(dbObject?.Data) == false)
-                return Convert<LibraryFile>(dbObject);
-        }
         return new LibraryFile();
     }
+
+    /// <summary>
+    /// Finds an existing library file in the database by a fingerprint
+    /// </summary>
+    /// <param name="fingerprint">the fingerprint of the file</param>
+    /// <returns>the result of the known file</returns>
+    public async Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint)
+    {
+        if (string.IsNullOrEmpty(fingerprint))
+            return new LibraryFile();
+
+        using var db = GetDb();
+
+        var dbObject = await db.FirstOrDefaultAsync<DbObject>(
+                "where Type=@0 and JSON_EXTRACT(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName, fingerprint ?? string.Empty);
+
+        if (string.IsNullOrEmpty(dbObject?.Data) == false)
+            return Convert<LibraryFile>(dbObject);
+
+        return new LibraryFile();
+    }
+
 
     /// <summary>
     /// Gets the next library file to process

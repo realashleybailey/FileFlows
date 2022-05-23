@@ -166,6 +166,7 @@ namespace FileFlows.Client.Components.Common
                 this.NotifySelectionChanged();
             }
             string filter = this.FilterText.ToLowerExplicit();
+            Logger.Instance.ILog("Filter: " + filter);
             if (filter == string.Empty)
                 this.DisplayData = this.DataDictionary;
             else if (filter.StartsWith(CurrentFilter))

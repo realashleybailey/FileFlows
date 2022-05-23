@@ -162,10 +162,17 @@ public class DbHelper
     /// Finds an existing library file in the database
     /// </summary>
     /// <param name="fullPath">the full path of the library file</param>
+    /// <returns>the result of the known file</returns>
+    public static Task<LibraryFile> FindKnownLibraryFile(string fullPath) =>
+        Manager.FindKnownLibraryFile(fullPath);
+
+    /// <summary>
+    /// Finds an existing library file in the database by a fingerprint
+    /// </summary>
     /// <param name="fingerprint">the fingerprint of the file</param>
     /// <returns>the result of the known file</returns>
-    public static Task<LibraryFile> FindKnownLibraryFile(string fullPath, string fingerprint) =>
-        Manager.FindKnownLibraryFile(fullPath, fingerprint);
+    public static Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint) =>
+        Manager.FindKnownLibraryByFingerprint(fingerprint)
 
     /// <summary>
     /// Gets the next library file to process

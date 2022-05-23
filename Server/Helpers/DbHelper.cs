@@ -172,7 +172,7 @@ public class DbHelper
     /// <param name="fingerprint">the fingerprint of the file</param>
     /// <returns>the result of the known file</returns>
     public static Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint) =>
-        Manager.FindKnownLibraryByFingerprint(fingerprint)
+        Manager.FindKnownLibraryByFingerprint(fingerprint);
 
     /// <summary>
     /// Gets the next library file to process

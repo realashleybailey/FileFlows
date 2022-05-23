@@ -89,10 +89,11 @@ namespace FileFlows.Client.Pages
                 this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
             //await RefreshStatus();
         }
-        // protected override async Task PostDelete()
-        // {
-        //     await RefreshStatus();
-        // }
+
+        protected override async Task PostDelete()
+        {
+            await RefreshStatus();
+        }
 
         protected override void OnInitialized()
         {
@@ -104,28 +105,33 @@ namespace FileFlows.Client.Pages
 
         }
 
-//         private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
-//         {
-// #if (DEMO)
-//
-//             var results = new List<LibraryStatus>
-//             {
-//                 new LibraryStatus { Status = FileStatus.Unprocessed, Count = 10 },
-//                 new LibraryStatus { Status = FileStatus.Processing, Count = 1 },
-//                 new LibraryStatus { Status = FileStatus.Processed, Count = 10 },
-//                 new LibraryStatus { Status = FileStatus.ProcessingFailed, Count = 10 }
-//             };
-//             return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
-// #endif
-//             return await HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
-//         }
+        private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
+        {
+#if (DEMO)
 
-        // private async Task RefreshStatus()
-        // {
-        //     var result = await GetStatus();
-        //     if (result.Success)
-        //         RefreshStatus(result.Data.ToList());
-        // }
+             var results = new List<LibraryStatus>
+             {
+                 new LibraryStatus { Status = FileStatus.Unprocessed, Count = 10 },
+                 new LibraryStatus { Status = FileStatus.Processing, Count = 1 },
+                 new LibraryStatus { Status = FileStatus.Processed, Count = 10 },
+                 new LibraryStatus { Status = FileStatus.ProcessingFailed, Count = 10 }
+             };
+             return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
+#endif
+            return await HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
+        }
+
+        /// <summary>
+        /// Refreshes the top status bar
+        /// This is needed when deleting items, as the list will not be refreshed, just items removed from it
+        /// </summary>
+        /// <returns></returns>
+        private async Task RefreshStatus()
+        {
+            var result = await GetStatus();
+            if (result.Success)
+                RefreshStatus(result.Data.ToList());
+        }
         
         private void RefreshStatus(List<LibraryStatus> data)
         {

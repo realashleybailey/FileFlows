@@ -207,7 +207,7 @@ public abstract class DbManager
             if(converted != null)
                 results.Add(converted);
         });
-        results = results.OrderBy(x => x.Name).ToList();
+        results = results.Where(x => x != null).OrderBy(x => x?.Name ?? String.Empty).ToList();
         return results;
     }
     
@@ -520,13 +520,25 @@ public abstract class DbManager
     {
         using var db = GetDb();
 
+        // first see if this file exists by its name
         var dbObject = await db.FirstOrDefaultAsync<DbObject>(
-            "where Type=@0 and (name = @1 or JSON_EXTRACT(Data, '$.Fingerprint') = @2)", typeof(LibraryFile).FullName,
-            fullPath, fingerprint ?? string.Empty);
-        if (string.IsNullOrEmpty(dbObject?.Data))
-            return new LibraryFile();
-        
-        return Convert<LibraryFile>(dbObject);
+            "where Type=@0 and name = @1", typeof(LibraryFile).FullName, fullPath);
+        if (string.IsNullOrEmpty(dbObject?.Data) == false)
+            return Convert<LibraryFile>(dbObject);
+
+        // then check fingerprint
+        // we do this second/separately so we dont return the duplicate instead of the actual
+        // if we returned duplicate, and actual existed we then would end up with another entry
+        // for the original, and so on and so on. 
+        if (string.IsNullOrEmpty(fingerprint) == false)
+        {
+            dbObject = await db.FirstOrDefaultAsync<DbObject>(
+                "where Type=@0 and JSON_EXTRACT(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName, fingerprint ?? string.Empty);
+
+            if (string.IsNullOrEmpty(dbObject?.Data) == false)
+                return Convert<LibraryFile>(dbObject);
+        }
+        return new LibraryFile();
     }
 
     /// <summary>

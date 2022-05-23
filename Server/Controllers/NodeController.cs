@@ -79,7 +79,8 @@ namespace FileFlows.Server.Controllers
                 node.Libraries = node.Libraries.Where(x => libraries.ContainsKey(x.Uid)).Select(x => new Plugin.ObjectReference
                 {
                     Uid = x.Uid,
-                    Name = libraries[x.Uid]
+                    Name = libraries[x.Uid],
+                    Type = typeof(Library).FullName
                 }).DistinctBy(x => x.Uid).ToList();
             }
 
@@ -293,6 +294,7 @@ namespace FileFlows.Server.Controllers
             var node = data.Where(x => x.Value.Name == Globals.FileFlowsServer).Select(x => x.Value).FirstOrDefault();
             if (node == null)
             {
+                Logger.Instance.ILog("Adding Internal Processing Node");
                 bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);                
                 node = await Update(new ProcessingNode
                 {

@@ -18,7 +18,7 @@
         {
             if (Logger.Instance is Logger logger)
             {
-                string log = logger.GetTail(300, logLevel);
+                string log = logger.GetTail(1000, logLevel);
                 string html = LogToHtml.Convert(log);
                 return html;
             }

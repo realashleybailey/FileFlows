@@ -108,8 +108,8 @@ public class Logger : FileFlows.Plugin.ILogger
 
     internal string GetTail(int length = 50, Plugin.LogType logLevel = Plugin.LogType.Info)
     {
-        if (length <= 0 || length > 300)
-            length = 300;
+        if (length <= 0 || length > 1000)
+            length = 1000;
 
         mutex.WaitOne();
         //LogTailItem[] filtered;

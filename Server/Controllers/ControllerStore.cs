@@ -174,7 +174,6 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
                 _mutex.Release();
             }
         }
-
         return updated;
     }
     

@@ -333,7 +333,7 @@ public abstract class DbManager
     /// <param name="obj">The object being added or updated</param>
     /// <typeparam name="T">The type of object being added or updated</typeparam>
     /// <returns>The updated object</returns>
-    private static async Task<T> AddOrUpdateObject<T>(IDatabase db, T obj) where T : FileFlowObject
+    private async Task<T> AddOrUpdateObject<T>(IDatabase db, T obj) where T : FileFlowObject, new()
     {
         var serializerOptions = new JsonSerializerOptions
         {
@@ -371,6 +371,10 @@ public abstract class DbManager
             dbObject.Data = json;
             await db.UpdateAsync(dbObject);
         }
+
+        if (UseMemoryCache == false)
+            return await Single<T>(Guid.Parse(dbObject.Uid));
+        
         return obj;
     }
     

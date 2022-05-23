@@ -248,8 +248,7 @@ namespace FileFlows.Client.Pages
                 };
             }
 
-            if (request.Data.Status?.Any() == true)
-                RefreshStatus(request.Data.Status.ToList());
+            RefreshStatus(request.Data?.Status?.ToList() ?? new List<LibraryStatus>());
             
             return new RequestResult<List<LibaryFileListModel>>
             {

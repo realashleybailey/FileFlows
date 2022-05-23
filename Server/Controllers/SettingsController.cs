@@ -13,7 +13,7 @@ namespace FileFlows.Server.Controllers
     public class SettingsController : Controller
     {
         private static Settings Instance;
-        private static Mutex _mutex = new Mutex();
+        private static SemaphoreSlim semaphore = new SemaphoreSlim(1);
 
         /// <summary>
         /// Whether or not the system is configured
@@ -67,7 +67,7 @@ namespace FileFlows.Server.Controllers
         {
             if (Instance != null)
                 return Instance;
-            _mutex.WaitOne();
+            await semaphore.WaitAsync();
             try
             {
                 if (Instance == null)
@@ -81,7 +81,7 @@ namespace FileFlows.Server.Controllers
             }
             finally
             {
-                _mutex.ReleaseMutex();
+                semaphore.Release();
             }
         }
 

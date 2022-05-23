@@ -166,7 +166,17 @@ public class DbHelper
     /// <returns>the result of the known file</returns>
     public static Task<LibraryFile> FindKnownLibraryFile(string fullPath, string fingerprint) =>
         Manager.FindKnownLibraryFile(fullPath, fingerprint);
-    
+
+    /// <summary>
+    /// Gets the next library file to process
+    /// </summary>
+    /// <param name="node">the node executing this library file</param>
+    /// <param name="workerUid">the UID of the worker</param>
+    /// <returns>the next library file to process</returns>
+    public static Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid) =>
+        Manager.GetNextLibraryFile(node, workerUid);
+
+
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

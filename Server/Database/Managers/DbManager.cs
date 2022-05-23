@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using FileFlows.Plugin;
 using FileFlows.Server.Helpers;
@@ -64,8 +65,8 @@ public abstract class DbManager
     /// </summary>
     /// <returns>an instance of the IDatabase</returns>
     protected abstract IDatabase GetDb();
-    
-    
+
+
     #region Setup Code
 
     /// <summary>
@@ -77,14 +78,19 @@ public abstract class DbManager
         var dbResult = CreateDatabase();
         if (dbResult == DbCreateResult.Failed)
             return false;
-        
+
         if (dbResult == DbCreateResult.AlreadyExisted)
+        {
+            CreateStoredProcedures();
             return true;
+        }
         
         if (CreateDatabaseStructure() == false)
             return false;
-        
-        
+
+        CreateStoredProcedures();
+
+
         if (this is SqliteDbManager == false)
         {
             // not a sqlite database, check if one exists and migrate
@@ -116,6 +122,11 @@ public abstract class DbManager
     /// </summary>
     /// <returns>true if successfully created</returns>
     protected abstract bool CreateDatabaseStructure();
+
+    /// <summary>
+    /// Creates (or recreates) any stored procedures and functions used by this database
+    /// </summary>
+    protected virtual void CreateStoredProcedures() { }
 
     /// <summary>
     /// Inserts the initial data into the database
@@ -517,7 +528,57 @@ public abstract class DbManager
         
         return Convert<LibraryFile>(dbObject);
     }
-    
+
+    /// <summary>
+    /// Gets the next library file to process
+    /// </summary>
+    /// <param name="node">the node executing this library file</param>
+    /// <param name="workerUid">the UID of the worker</param>
+    /// <returns>the next library file to process</returns>
+    public async Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid)
+    {
+        int quarter = TimeHelper.GetCurrentQuarter();
+        string now = DateTime.Now.ToString("yyyy-MM-ddThh:MM:sszzz");
+        using var db = GetDb();
+
+        try
+        {
+
+            var result = await db.FirstOrDefaultAsync<LibraryFile>("call GetNextLibraryFile(@0, @1, @2, @3)", node.Uid, workerUid, quarter, now);
+            return result;
+        }
+        catch(Exception ex)
+        {
+            throw;
+        }
+    }
+
+
+    /// <summary>
+    /// Reads in a embedded SQL script
+    /// </summary>
+    /// <param name="dbType">The type of database this script is for</param>
+    /// <param name="script">The script name</param>
+    /// <returns>the sql script</returns>
+    public string GetSqlScript(string dbType, string script)
+    {
+        try
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"FileFlows.Server.Database.Scripts.{dbType}.{script}";
+
+            using Stream stream = assembly.GetManifestResourceStream(resourceName);
+            using StreamReader reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
+        catch (Exception ex) 
+        {
+            Logger.Instance.ELog($"Failed getting embedded SQL script '{dbType}.{script}': {ex.Message}");
+            return string.Empty; 
+        }
+    }
+
+
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

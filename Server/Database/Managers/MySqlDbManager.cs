@@ -35,6 +35,24 @@ public class MySqlDbManager: DbManager
         return db.Execute("create database " + dbName) > 0 ? DbCreateResult.Created : DbCreateResult.Failed;
     }
 
+    protected override void CreateStoredProcedures()
+    {
+        using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
+        string sqlGetNextLibraryFile = GetSqlScript("MySql", "GetNextLibraryFile.sql");
+        if (string.IsNullOrEmpty(sqlGetNextLibraryFile) == false)
+        {
+            try
+            {
+                sqlGetNextLibraryFile = sqlGetNextLibraryFile.Replace("@", "@@");
+                db.Execute(sqlGetNextLibraryFile);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+    }
+
     protected override bool CreateDatabaseStructure()
     {
         string createDbSql = CreateDbScript.Replace("current_timestamp", "now()")

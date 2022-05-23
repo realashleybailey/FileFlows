@@ -46,14 +46,22 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             await new NodeController().Update(node);
         }
 
-        return null;
+        if (DbHelper.UseMemoryCache)
+            return await GetNextMemoryCache(node, args.WorkerUid);
+        return await GetNextDb(node, args.WorkerUid);
 
+    }
+
+    private async Task<LibraryFile> GetNextDb(ProcessingNode node, Guid workerUid) => await DbHelper.GetNextLibraryFile(node, workerUid);
+
+    private async Task<LibraryFile> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
+    {
         var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
         await _mutex.WaitAsync();
         try
         {
             // iterate these in case, something starts processing
-            for(int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 var item = data[i];
                 if (item.Status != FileStatus.Unprocessed)
@@ -84,13 +92,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                     {
                         var nodeLimit = FileSizeFormatter.Format(node.MaxFileSizeMb * 1000L * 1000L);
                         Logger.Instance?.DLog($"File size '{FileSizeFormatter.Format(item.OriginalSize)} is over file size for node '{nodeName}'({nodeLimit}): " + item.Name);
-                        continue; 
+                        continue;
                     }
                 }
 
                 item.Status = FileStatus.Processing;
-                item.Node = new ObjectReference { Uid = args.NodeUid, Name = args.NodeName };
-                item.WorkerUid = args.WorkerUid;
+                item.Node = new ObjectReference { Uid = node.Uid, Name = node.Name };
+                item.WorkerUid = workerUid;
                 item.ProcessingStarted = DateTime.Now;
                 data[i] = await DbHelper.Update(item);
                 return data[i];

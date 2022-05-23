@@ -72,6 +72,17 @@ namespace FileFlows.Server.Controllers
         public async Task<ProcessingNode> Save([FromBody] ProcessingNode node)
         {
             // see if we are updating the internal node
+            if(node.Libraries?.Any() == true)
+            {
+                // remove any removed libraries and update any names
+                var libraries = (await new LibraryController().GetAll()).ToDictionary(x => x.Uid, x => x.Name);
+                node.Libraries = node.Libraries.Where(x => libraries.ContainsKey(x.Uid)).Select(x => new Plugin.ObjectReference
+                {
+                    Uid = x.Uid,
+                    Name = libraries[x.Uid]
+                }).DistinctBy(x => x.Uid).ToList();
+            }
+
             if(node.Address == Globals.FileFlowsServer)
             {
                 var internalNode = (await GetAll()).Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();

@@ -50,11 +50,10 @@ NextLibraryFile:BEGIN
 			on JSON_UNQUOTE(JSON_EXTRACT(DbObject.Data, '$.Library.Uid')) = tempLibraries.Uid
         where Type = 'FileFlows.Shared.Models.LibraryFile'
 		and JSON_EXTRACT(DbObject.Data, '$.Status') = 0
-        #and JSON_EXTRACT(DbObject.Data, '$.Order') > 0
 		order by 
 		case
 		when JSON_EXTRACT(DbObject.Data, '$.Order') > 0 then JSON_EXTRACT(Data, '$.Order')
-		else 1000000
+		else 10000 * -tempLibraries.Priority 
 		end asc, 
         tempLibraries.Priority desc,
         DbObject.DateCreated asc

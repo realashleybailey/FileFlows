@@ -193,7 +193,7 @@ namespace FileFlows.Server.Controllers
                 // try find basic node
                 var elements = await GetElements();
                 var info = elements.Where(x => x.Uid == "FileFlows.BasicNodes.File.InputFile").FirstOrDefault();
-                if (string.IsNullOrEmpty(info.Name) == false)
+                if (info != null && string.IsNullOrEmpty(info.Name) == false)
                 {
                     flow.Parts.Add(new FlowPart
                     {
@@ -460,7 +460,7 @@ namespace FileFlows.Server.Controllers
                 {
                     string json = System.IO.File.ReadAllText(tf.FullName);
                     json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
-                    var jsTemplates = JsonSerializer.Deserialize<FlowTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
+                    var jsTemplates = JsonSerializer.Deserialize<FlowTemplate[]>(json, new JsonSerializerOptions
                     {
                         AllowTrailingCommas = true,
                         PropertyNameCaseInsensitive = true

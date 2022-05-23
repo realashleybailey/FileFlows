@@ -70,7 +70,7 @@ NextLibraryFile:BEGIN
         
     set tData = (select Data from DbObject where Uid = tUid);
     
-    set tData = (select JSON_SET(tData, '$.Status', 1, '$.Node', JSON_OBJECT('NodeUid', NodeUid, 'Name', nodeName), '$.ProcessingStarted', StartDate, '$.WorkerUid', WorkerUid));
+    set tData = (select JSON_SET(tData, '$.Status', 2, '$.Node', JSON_OBJECT('NodeUid', NodeUid, 'Name', nodeName), '$.ProcessingStarted', StartDate, '$.WorkerUid', WorkerUid));
 	    
     update DbObject set Data = tData where Uid = tUid;
         

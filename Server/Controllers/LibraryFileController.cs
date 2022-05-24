@@ -355,9 +355,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         var existing = await GetByUid(file.Uid);
         if (existing == null)
             throw new Exception("Not found");
-        
-        Logger.Instance?.DLog($"Setting library file status to: {file.Status} - {file.Name}");
-        existing.Status = file.Status;
+
+        if (existing.Status != file.Status)
+        {
+            Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}");
+            existing.Status = file.Status;
+        }
+
         existing.Node = file.Node;
         if(existing.FinalSize == 0 || file.FinalSize > 0)
             existing.FinalSize = file.FinalSize;

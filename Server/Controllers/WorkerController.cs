@@ -52,6 +52,7 @@ public class WorkerController : Controller
             Logger.Instance.ILog($"Adding executor: {info.Uid} = {info.LibraryFile.Name}");
             Executors.Add(info.Uid, info);
         }
+        Logger.Instance.ILog($"Starting processing on {info.NodeName}: {info.LibraryFile.Name}");
         return info;
     }
 

@@ -37,6 +37,8 @@ public class Server : Component
         Utils.DeleteDirectoryIfExists(BuildOptions.TempPath + "/Server/Node/FlowRunner");
         
 
+        
+        Utils.CopyFiles(BuildOptions.TempPath + "/Plugins", BuildOptions.TempPath + "/Server/Plugins");
         Utils.CopyFiles(BuildOptions.TempPath + "/FlowRunner", BuildOptions.TempPath + "/Server/FlowRunner");
         Utils.DeleteFiles(BuildOptions.TempPath + "/Server/Server", "run-server.*");
         Utils.CopyFiles(ProjectDirectory, BuildOptions.TempPath + "/Server", false, @"run-server\.(bat|sh)$");

@@ -48,6 +48,7 @@ RUN wget https://dot.net/v1/dotnet-install.sh  && \
 
 # copy the deploy file into the app directory
 COPY /deploy /app
+COPY /deploy/Plugins /app/Server/Plugins
 COPY /docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # expose the ports we need

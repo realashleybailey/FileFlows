@@ -117,8 +117,6 @@ public class WorkerController : Controller
     {
         _ = new NodeController().UpdateLastSeen(info.NodeUid);
         
-        Logger.Instance.ILog($"Updating executor: {info.Uid} = {info.LibraryFile?.Name ?? string.Empty}");
-
         if (info.LibraryFile != null)
         {
             var lfController = new LibraryFileController();

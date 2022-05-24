@@ -143,7 +143,10 @@ public class Logger : FileFlows.Plugin.ILogger
         StreamReader reader = new StreamReader(LogFile);
         reader.BaseStream.Seek(0, SeekOrigin.End);
         int count = 0;
-        while ((count < length) && (reader.BaseStream.Position > 0))
+        int max = length;
+        if (logLevel != Plugin.LogType.Debug)
+            max = 5000;
+        while ((count < max) && (reader.BaseStream.Position > 0))
         {
             reader.BaseStream.Position--;
             int c = reader.BaseStream.ReadByte();
@@ -169,7 +172,7 @@ public class Logger : FileFlows.Plugin.ILogger
             if (logLevel < Plugin.LogType.Warning && x.Contains("WARN"))
                 return false;
             return true;
-        }).ToArray();
+        }).Take(length).ToArray();
         reader.Close();
         return string.Join("\n", arr);
     }

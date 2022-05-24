@@ -42,8 +42,8 @@ namespace FileFlows.Server.Controllers
         public async Task<string> CheckLatestVersion()
         {
             var settings = await new SettingsController().Get();
-            if (settings.IsWindows == true && settings.AutoUpdate == true)
-                return string.Empty; // we let the auto updater take care of this.
+            if (settings.DisableTelemetry != false)
+                return string.Empty; 
             try
             {
                 var result = Workers.ServerUpdater.GetLatestOnlineVersion();

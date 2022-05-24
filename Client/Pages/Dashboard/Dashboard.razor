@@ -1,11 +1,17 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
+@using FileFlows.Shared.Formatters
 
 @page "/"
 
 <PageView FullWidth=true>
 
     <Head>
+        @if (SystemInfo?.CpuUsage > 0 && SystemInfo?.MemoryUsage > 0)
+        {
+            <span>CPU Usage: @SystemInfo.CpuUsage.ToString("0.00") %</span>
+            <span>Memory Usage: @(FileSizeFormatter.Format(SystemInfo.MemoryUsage))</span>
+        }
     </Head>
 
     <Body>

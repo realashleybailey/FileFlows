@@ -264,23 +264,28 @@ public class WorkerController : Controller
             }
 
             Logger.Instance?.ILog("Sending AbortFlow " + uid);
-            await this.Context.Clients.All.SendAsync("AbortFlow", uid);
+            await this.Context?.Clients?.All?.SendAsync("AbortFlow", uid);
 
             if (flowinfo?.LibraryFile != null)
             {
                 Logger.Instance?.ILog("Sending AbortFlow " + flowinfo.LibraryFile.Uid);
-                await this.Context.Clients.All.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
+                await this.Context?.Clients?.All?.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
                 var libController = new LibraryFileController();
                 var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
-                if (libfile.Status == FileStatus.Processing)
+                if (libfile != null)
                 {
-                    libfile.Status = FileStatus.ProcessingFailed;
-                    Logger.Instance?.ILog("Library file setting status to failed: " + libfile.Status + " => " + libfile.RelativePath);
-                    await libController.Update(libfile);
-                }
-                else
-                {
-                    Logger.Instance?.ILog("Library file status doesnt need changing: " + libfile.Status + " => " + libfile.RelativePath);
+                    if (libfile.Status == FileStatus.Processing)
+                    {
+                        libfile.Status = FileStatus.ProcessingFailed;
+                        Logger.Instance?.ILog("Library file setting status to failed: " + libfile.Status + " => " +
+                                              libfile.RelativePath);
+                        await libController.Update(libfile);
+                    }
+                    else
+                    {
+                        Logger.Instance?.ILog("Library file status doesnt need changing: " + libfile.Status + " => " +
+                                              libfile.RelativePath);
+                    }
                 }
             }
             
@@ -299,7 +304,7 @@ public class WorkerController : Controller
         }
         catch (Exception ex)
         {
-            Logger.Instance.WLog("Error aborting flow: " + ex.Message);
+            Logger.Instance.WLog("Error aborting flow: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
     }
 

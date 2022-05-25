@@ -61,9 +61,10 @@ public class SystemController:Controller
     [HttpGet("info")]
     public async Task<SystemInfo> GetSystemInfo()
     {
-        Process proc = Process.GetCurrentProcess();
         SystemInfo info = new ();
-        info.MemoryUsage = proc.PrivateMemorySize64;
+        //Process proc = Process.GetCurrentProcess();
+        //info.MemoryUsage = proc.PrivateMemorySize64;
+        info.MemoryUsage = GC.GetTotalMemory(true);
         info.CpuUsage = await GetCpuPercentage();
         return info;
     }

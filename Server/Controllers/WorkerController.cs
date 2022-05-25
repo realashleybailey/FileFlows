@@ -252,8 +252,8 @@ public class WorkerController : Controller
     {
         try
         {
-            FlowExecutorInfo? flowinfo;
-            Executors.TryGetValue(uid, out flowinfo);
+            FlowExecutorInfo? flowinfo = null;
+            Executors?.TryGetValue(uid, out flowinfo);
             if(flowinfo == null)
             {
                 flowinfo = Executors.Values.Where(x => x.LibraryFile?.Uid == uid || x.Uid == uid || x.NodeUid == uid).FirstOrDefault();
@@ -264,16 +264,34 @@ public class WorkerController : Controller
             }
 
             Logger.Instance?.ILog("Sending AbortFlow " + uid);
-            await this.Context?.Clients?.All?.SendAsync("AbortFlow", uid);
+            try
+            {
+                await this.Context?.Clients?.All?.SendAsync("AbortFlow", uid);
+                Logger.Instance?.ILog("Sent AbortFlow " + uid);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.WLog("Failed sending AbortFlow " + uid + " => " + ex.Message);
+            }
 
             if (flowinfo?.LibraryFile != null)
             {
-                Logger.Instance?.ILog("Sending AbortFlow " + flowinfo.LibraryFile.Uid);
-                await this.Context?.Clients?.All?.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
+                Logger.Instance?.ILog("Sending AbortFlow to library file UID " + flowinfo.LibraryFile.Uid);
+                try
+                {
+                    await this.Context?.Clients?.All?.SendAsync("AbortFlow", flowinfo?.LibraryFile.Uid);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance?.WLog("Failed sending AbortFlowto library file UID " + uid + " => " + ex.Message);
+                }
+
+                Logger.Instance?.DLog("Getting library file to update processing status");
                 var libController = new LibraryFileController();
                 var libfile = await libController.Get(flowinfo.LibraryFile.Uid);
                 if (libfile != null)
                 {
+                    Logger.Instance?.DLog("Current library file processing status: " + libfile.Status);
                     if (libfile.Status == FileStatus.Processing)
                     {
                         libfile.Status = FileStatus.ProcessingFailed;
@@ -290,6 +308,7 @@ public class WorkerController : Controller
             }
             
             await Task.Delay(6_000);
+            Logger.Instance?.DLog("Removing from list of executors: " + uid);
             lock (Executors)
             {
                 if (Executors.TryGetValue(uid, out FlowExecutorInfo? info))
@@ -301,6 +320,7 @@ public class WorkerController : Controller
                     }
                 }
             }
+            Logger.Instance?.DLog("Abortion complete: " + uid);
         }
         catch (Exception ex)
         {

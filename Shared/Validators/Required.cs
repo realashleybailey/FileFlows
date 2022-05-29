@@ -13,25 +13,25 @@ public class Required : Validator
     /// </summary>
     /// <param name="value">The value to validate</param>
     /// <returns>true if the value has a propre value</returns>
-    public async override Task<bool> Validate(object value)
+    public async override Task<(bool Valid, string Error)> Validate(object value)
     {
         await Task.CompletedTask;
         if (value == null)
-            return false;
+            return (false, string.Empty);
         if (value is string str)
         {
             bool valid = string.IsNullOrWhiteSpace(str) == false;
             Logger.Instance.DLog("Validating required string: '" + str + "' = " + valid);
-            return valid;
+            return (valid, string.Empty);
 
         }
 
         if (value is Array array)
-            return array.Length > 0;
+            return (array.Length > 0, string.Empty);
 
         if (value is ICollection collection)
-            return collection.Count > 0;
+            return (collection.Count > 0, string.Empty);
 
-        return true;
+        return (true, string.Empty);
     }
 }

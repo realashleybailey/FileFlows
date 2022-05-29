@@ -327,6 +327,12 @@
       "Fields":{
       }
     },
+    "Script": {
+      "Title": "Script",
+      "Fields": {
+        "Code": "Code"
+      }
+    },
     "Settings": {
       "Title": "Settings",
       "Labels": {

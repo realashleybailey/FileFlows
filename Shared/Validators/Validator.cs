@@ -18,5 +18,5 @@ public abstract class Validator
     /// </summary>
     /// <param name="value">the value to validate</param>
     /// <returns>true if the value is valid, otherwise false</returns>
-    public virtual async Task<bool> Validate(object value) => await Task.FromResult(true);
+    public virtual async Task<(bool Valid, string Error)> Validate(object value) => await Task.FromResult((true, string.Empty));
 }

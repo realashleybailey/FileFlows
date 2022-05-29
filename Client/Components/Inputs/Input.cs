@@ -250,9 +250,10 @@ namespace FileFlows.Client.Components.Inputs
             bool isValid = string.IsNullOrEmpty(ErrorMessage);
             foreach (var val in this.Validators)
             {
-                if (await val.Validate(this.Value) == false)
+                var validResult = await val.Validate(this.Value);
+                if (validResult.Valid == false)
                 {
-                    ErrorMessage = Translater.Instant($"Validators.{val.Type}", val);
+                    ErrorMessage = validResult.Error?.EmptyAsNull() ?? Translater.Instant($"Validators.{val.Type}", val);
                     this.StateHasChanged();
                     if (isValid)
                         ValidStateChanged?.Invoke(this, false);

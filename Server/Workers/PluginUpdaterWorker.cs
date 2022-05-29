@@ -14,6 +14,9 @@ public class PluginUpdaterWorker : Worker
     protected override void Execute()
     {
         var settings = new SettingsController().Get().Result;
+#if (DEBUG)
+        settings = null;
+#endif
         if (settings?.AutoUpdatePlugins != true)
             return;
 

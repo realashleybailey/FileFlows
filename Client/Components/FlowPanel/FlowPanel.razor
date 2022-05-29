@@ -163,6 +163,20 @@
                 <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel />
             }
             break;
+        case FormInputType.Table:
+            {
+                <p>ADDING A TABLE</p>
+                var columns = GetParameter<List<InputTableColumn>>(field, nameof(InputTable.Columns), new List<InputTableColumn>());
+                var type = GetParameter<Type>(field, nameof(InputTable.TableType));
+                var oValue = GetValue(field.Name, type);
+                if(oValue == null)
+                {
+                    Type genericListType = typeof(List<>).MakeGenericType(type);
+                    oValue = Activator.CreateInstance(genericListType);
+                }
+                <InputTable Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel TableType=@type Columns=@columns />
+            }
+            break;
         case FormInputType.Label:
             {
                 <div class="input-label">

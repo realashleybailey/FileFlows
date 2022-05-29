@@ -42,7 +42,8 @@ namespace FileFlows.Client.Shared
                     new NavMenuItem("Pages.Flows.Title", "fas fa-sitemap", "flows"),
                     new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"),
 #if (!DEMO)
-                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes")
+                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes"),
+                    new NavMenuItem("Pages.Scripts.Title", "fas fa-scroll", "scripts")
 #endif
                 }
             });

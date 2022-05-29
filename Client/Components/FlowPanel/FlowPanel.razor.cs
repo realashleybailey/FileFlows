@@ -64,6 +64,14 @@ public partial class FlowPanel:ComponentBase
     protected T GetValue<T>(string field, T @default = default(T)) => Editor.GetValue<T>(field, @default);
 
     /// <summary>
+    /// Gets a value for a field
+    /// </summary>
+    /// <param name="field">the field whose value to get</param>
+    /// <param name="type">the type of value to get</param>
+    /// <returns>the value</returns>
+    protected object GetValue(string field, Type type) => Editor.GetValue(field, type);
+    
+    /// <summary>
     /// Get the name of the type this editor is editing
     /// </summary>
     protected string TypeName => Editor.TypeName;

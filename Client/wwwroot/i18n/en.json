@@ -322,6 +322,11 @@
         "Elements": "Nodes"
       }
     },
+    "Scripts":{
+      "Title":"Scripts",
+      "Fields":{
+      }
+    },
     "Settings": {
       "Title": "Settings",
       "Labels": {

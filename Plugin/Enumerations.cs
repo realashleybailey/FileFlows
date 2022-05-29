@@ -37,7 +37,8 @@ namespace FileFlows.Plugin
         Checklist = 19,
         TextLabel = 20,
         Password = 21,
-        ExecutedNodes = 22
+        ExecutedNodes = 22,
+        Table = 23
     }
 
 

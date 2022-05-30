@@ -103,6 +103,9 @@ canvas {
     &.Failure {
         border-color:var(--flow-failure);
     }
+    &.Script {
+        border-color:var(--flow-script);
+    }
 }
 .flow-element {
     padding: 0.25rem 0.25rem;
@@ -159,7 +162,9 @@ canvas {
     &.Failure .icon-wrapper {
         border-color: var(--flow-failure);
     }
-
+    &.Script .icon-wrapper {
+        border-color: var(--flow-script);
+    }
     .label {
         flex-grow: 1;
     }
@@ -332,6 +337,16 @@ canvas {
 
         .connected > div {
             background-color: var(--flow-failure) !important;
+        }
+    }
+    
+    &.Script:not(.selected) {
+        .icon-wrapper, .input > div, .output > div {
+            border-color: var(--flow-script) !important;
+        }
+
+        .connected > div {
+            background-color: var(--flow-script) !important;
         }
     }
 

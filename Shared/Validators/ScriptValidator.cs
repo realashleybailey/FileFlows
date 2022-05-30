@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FileFlows.Plugin;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 
@@ -19,11 +20,7 @@ public class ScriptValidator:Validator
         await Task.CompletedTask;
         try
         {
-            new ScriptParser().Parse(new Script
-            {
-                Name = "Validating",
-                Code = value as string
-            });
+            new ScriptParser().Parse("Validating", value as string);
             return (true, string.Empty);
         }
         catch (Exception ex)

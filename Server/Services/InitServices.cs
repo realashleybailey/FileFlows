@@ -19,5 +19,6 @@ internal class InitServices
         ServerShared.Services.FlowRunnerService.Loader = () => new FlowRunnerService();
         ServerShared.Services.LibraryService.Loader = () => new LibraryService();
         ServerShared.Services.LibraryFileService.Loader = () => new LibraryFileService();
+        ServerShared.Services.ScriptService.Loader = () => new ScriptService();
     }
 }

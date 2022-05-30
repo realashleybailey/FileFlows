@@ -1,3 +1,6 @@
+using FileFlows.Plugin.Models;
+using FileFlows.Shared.Helpers;
+
 namespace FileFlows.Server.Controllers
 {
     using System;
@@ -222,6 +225,9 @@ namespace FileFlows.Server.Controllers
             var plugins = await new PluginController().GetAll(includeElements: true);
             var results = plugins.Where(x => x.Elements != null).SelectMany(x => x.Elements)?.Where(x =>
             {
+                if (x.Name.EndsWith("ScriptNode"))
+                    return false; // special case, we never expose this, only the Runner can create an instance of this node
+                
                 if ((int)type == -1) // special case used by get variables, we want everything
                     return true;
                 if (type == FlowType.Failure)
@@ -234,8 +240,67 @@ namespace FileFlows.Server.Controllers
                     return false;
                 }
                 return true;
-            })?.ToArray();
-            return results ?? new FlowElement[] { };
+            })?.ToList();
+            
+            // get scripts 
+            var scripts = (await new ScriptController().GetAll())?
+                .Select(x => ScriptToFlowElement(x))
+                .Where(x => x != null); // can be null if failed to parse
+            results.AddRange(scripts);
+            
+            return results?.ToArray() ?? new FlowElement[] { };
+        }
+
+        /// <summary>
+        /// Converts a script into a flow element
+        /// </summary>
+        /// <param name="script"></param>
+        /// <returns></returns>
+        private FlowElement ScriptToFlowElement(Script script)
+        {
+            try
+            {
+                var sm = new ScriptParser().Parse(script?.Name, script?.Code);
+                FlowElement ele = new FlowElement();
+                ele.Name = script.Name;
+                ele.Uid = "Script." + script.Uid;
+                ele.Icon = "fas fa-scroll";
+                ele.Inputs = 1;
+                ele.Description = sm.Description;
+                ele.OutputLabels = sm.Outputs.Select(x => x.Description).ToList();
+                int count = 0;
+                IDictionary<string, object> model = new ExpandoObject();
+                ele.Fields = sm.Parameters.Select(x =>
+                {
+                    ElementField ef = new ElementField();
+                    ef.InputType = x.Type switch
+                    {
+                        ScriptArgumentType.Bool => FormInputType.Switch,
+                        ScriptArgumentType.Int => FormInputType.Int,
+                        ScriptArgumentType.String => FormInputType.Text
+                    };
+                    ef.Name = x.Name;
+                    ef.Order = ++count;
+                    ef.Description = x.Description;
+                    model.Add(ef.Name, x.Type switch
+                    {
+                        ScriptArgumentType.Bool => false,
+                        ScriptArgumentType.Int => 0,
+                        ScriptArgumentType.String => string.Empty,
+                        _ => null
+                    });
+                    return ef;
+                }).ToList();
+                ele.Group = "Scripts";
+                ele.Type = FlowElementType.Script;
+                ele.Outputs = sm.Outputs.Count;
+                ele.Model = (ExpandoObject)model;
+                return ele;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
-using FileFlows.Shared.Models;
+using System.Text.RegularExpressions;
+using FileFlows.Plugin.Models;
 
-namespace FileFlows.Shared.Helpers;
+namespace FileFlows.Plugin;
 
 /// <summary>
 /// Parses a script code block into a ScriptModel
@@ -13,15 +14,15 @@ public class ScriptParser
     /// <summary>
     /// Parses the code of a script and returns a ScriptModel
     /// </summary>
-    /// <param name="script">the script to parse</param>
+    /// <param name="name">the name of the script</param>
+    /// <param name="code">the script to parse</param>
     /// <returns>a parsed model</returns>
-    public ScriptModel Parse(Script script)
+    public ScriptModel Parse(string name, string code)
     {
-        string code = script.Code?.Trim() ?? string.Empty;
         if (string.IsNullOrEmpty(code))
             throw new Exception("No script found");
         var rgxComments = new Regex(@"^\/\*[^\/]+\/");
-        var matchComments = rgxComments.Match(code);
+        var matchComments = rgxComments.Match(code.Trim());
         if (matchComments.Success == false)
             throw new Exception("Failed to locate comment section.  A script must start with a comment block describing the script.");
         var comments = matchComments.Value.Trim()[1..^1];
@@ -31,7 +32,7 @@ public class ScriptParser
 
         ScriptModel model = new()
         {
-            Name = script.Name,
+            Name = name,
             Outputs = new (),
             Parameters = new()
         };
@@ -50,6 +51,8 @@ public class ScriptParser
             if (ParseArgument(model, line))
                 continue;
             if (ParseOutput(model, line))
+                continue;
+            if (line.StartsWith("@author ") || line.StartsWith("@version "))
                 continue;
             throw new Exception("Unexpected line: " + line);
         }

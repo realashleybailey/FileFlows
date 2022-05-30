@@ -203,6 +203,9 @@ namespace FileFlows.Client.Components.Inputs
                 }
                 
                 this.Field.ValueChanged += FieldOnValueChanged;
+
+                if (string.IsNullOrEmpty(Field.Description) == false)
+                    this.Help = Field.Description;
             }
         }
 

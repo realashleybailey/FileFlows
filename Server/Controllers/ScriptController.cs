@@ -26,6 +26,14 @@ public class ScriptController : ControllerStore<Script>
     public Task<Script> Get(Guid uid) => GetByUid(uid);
 
     /// <summary>
+    /// Gets the code for a script
+    /// </summary>
+    /// <param name="uid">The UID of the script</param>
+    /// <returns>the code for a script</returns>
+    [HttpGet("{uid}/code")]
+    public async Task<string> GetCode(Guid uid) => (await GetByUid(uid))?.Code ?? string.Empty;
+
+    /// <summary>
     /// Saves a script
     /// </summary>
     /// <param name="script">The script to save</param>

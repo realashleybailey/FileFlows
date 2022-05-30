@@ -1,6 +1,7 @@
 @namespace FileFlows.Client.Pages
 
 @page "/flows/{uid:guid}"
+@using FileFlows.Plugin
 
 @{
     bool isNew = Model == null || Model.Uid == System.Guid.Empty;
@@ -42,7 +43,7 @@
                             {
                                 <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ffFlow.Mouse.dragElementStart(event)">
                                     <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
-                                    @ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1)
+                                    @((ele.Type == FlowElementType.Script) ? ele.Name : ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1))
                                 </li>
                             }
                         }

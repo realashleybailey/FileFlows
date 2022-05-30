@@ -42,8 +42,7 @@ namespace FileFlows.Client.Shared
                     new NavMenuItem("Pages.Flows.Title", "fas fa-sitemap", "flows"),
                     new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"),
 #if (!DEMO)
-                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes"),
-                    new NavMenuItem("Pages.Scripts.Title", "fas fa-scroll", "scripts")
+                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes")
 #endif
                 }
             });
@@ -55,6 +54,7 @@ namespace FileFlows.Client.Shared
                 Icon = "fas fa-hdd",
                 Items = new List<NavMenuItem>
                 {
+                    new NavMenuItem("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
                     new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                     new NavMenuItem("Pages.Tools.Title", "fas fa-tools", "tools"),
                     new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings")

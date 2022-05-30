@@ -19,6 +19,11 @@ public class FlowElement
     /// </summary>
     public string Name { get; set; }
 
+    /// <summary>
+    /// Gets or sets a description for this element, only used by scripts where the description is user defined 
+    /// </summary>
+    public string Description { get; set; }
+
     static readonly Regex rgxFormatLabel = new Regex("(?<=[A-Za-z])(?=[A-Z][a-z])|(?<=[a-z0-9])(?=[0-9]?[A-Z])");
 
     private string _DisplayName;

@@ -153,7 +153,17 @@ public abstract class UpdaterWorker : Worker
             var updateDir = new FileInfo(update).DirectoryName;
 
             Logger.Instance?.ILog($"{UpdaterName}: Extracting update to: " + updateDir);
-            ZipFile.ExtractToDirectory(update, updateDir, true);
+            try
+            {
+                ZipFile.ExtractToDirectory(update, updateDir, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog($"{UpdaterName}: Failed extract update zip, file likely corrupt during download, deleting update");
+                File.Delete(update);
+                return string.Empty;
+            }
+
             Logger.Instance?.ILog($"{UpdaterName}: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);

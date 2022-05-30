@@ -176,6 +176,49 @@ function Script(MaxBitrateKbps)
     }
 
 
+    private Script Script_7ZipCompressToZip()
+    {
+	    return new Script
+	    {
+		    Name = "7Zip: Compress to Zip",
+		    Code =
+			    $@"
+/**
+ * Requires a 7Zip tool to be configured and will zip files
+ * @author John Andrews
+ * @version {Globals.Version}
+ * @param {{string}} ArchiveFile The name of hte zip file to create, if empty a random name will be used
+ * @param {{string}} Pattern The filename pattern to use, eg *.txt
+ * @param {{bool}} SetWorkingFileToZip If the working file in the flow should be set to the newly created zip file
+ * @output Zip file created
+ */
+function Script(ArchiveFile, Pattern, SetWorkingFileToZip)
+{{
+	let output = ArchiveFile || (Flow.TempPath + '/' + Flow.NewGuid() + '.zip');
+	    let sevenZip = Flow.GetToolPath('7zip');
+
+	    let process = Flow.Execute({{
+	    command: sevenZip,
+	    argumentList: [
+		    'a',
+		    output,
+		    Pattern
+		]
+    }});
+
+    if(process.exitCode !== 0){{
+	    Logger.ELog('Failed to zip: ' + process.exitCode);
+	    return -1;
+    }}
+
+    if(SetWorkingFileToZip)
+	    Flow.SetWorkingFile(output);
+    return 1;
+}}
+"
+	    };
+    }
+
     private List<Script> GetDefaultScripts()
     {
 	    var templates = new List<Script>();
@@ -183,6 +226,7 @@ function Script(MaxBitrateKbps)
 	    templates.Add(Script_VideoResolution());
 	    templates.Add(Script_VideoDownscaleGreaterThan1080p());
 	    templates.Add(Script_VideoBitrateGreaterThan());
+	    templates.Add(Script_7ZipCompressToZip());
 	    return templates;
     }
 }

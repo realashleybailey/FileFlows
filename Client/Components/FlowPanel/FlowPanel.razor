@@ -1,10 +1,13 @@
 ﻿@namespace FileFlows.Client.Components
 @using FileFlows.Plugin
 @using FileFlows.Shared
-
+@using FileFlows.Client.Helpers
+@{
+    bool isScript = Regex.IsMatch(TypeName, @"^Flow\.Parts\.([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})");
+}
 @foreach (var field in Fields.OrderBy(x => x.Order))
 {
-    string label = TypeName + ".Fields." + field.Name;
+    string label = isScript ? FlowHelper.FormatLabel(field.Name) : TypeName + ".Fields." + field.Name;
     if (string.IsNullOrWhiteSpace(field.Placeholder))
     {
         field.Placeholder = Translater.Instant(label + "-Placeholder").EmptyAsNull() ?? string.Empty;

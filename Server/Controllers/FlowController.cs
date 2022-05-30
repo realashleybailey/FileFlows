@@ -245,7 +245,8 @@ namespace FileFlows.Server.Controllers
             // get scripts 
             var scripts = (await new ScriptController().GetAll())?
                 .Select(x => ScriptToFlowElement(x))
-                .Where(x => x != null); // can be null if failed to parse
+                .Where(x => x != null)
+                .OrderBy(x => x.Name); // can be null if failed to parse
             results.AddRange(scripts);
             
             return results?.ToArray() ?? new FlowElement[] { };

@@ -131,7 +131,6 @@ namespace FileFlows.Client.Pages
         {
             HotKeyService.DeregisterHotkey("FlowFilter");
             NavigationService.UnRegisterNavigationCallback(NavigationCheck);
-
         }
 
         private async Task Init()

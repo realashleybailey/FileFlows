@@ -88,7 +88,7 @@ public class PluginScanner
                     continue;
                 }
 
-                var plugin = dbPluginInfos.FirstOrDefault(x => x.Name == pi.Name);
+                var plugin = dbPluginInfos.FirstOrDefault(x => x.PackageName == pi.PackageName);
                 bool isNew = plugin == null;
                 plugin ??= new();
                 installed.Add(pi.Name);

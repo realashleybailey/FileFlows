@@ -700,6 +700,9 @@ public class NodeParameters
     public ProcessResult Execute(ExecuteArgs args)
     {
         if (Fake) return new ProcessResult {  ExitCode = 0, Completed = true };
+        
+        Logger.ILog("Execute called!!!");
+        
         var result = Process.ExecuteShellCommand(args).Result;
         return result;
     }

@@ -195,9 +195,9 @@ function Script(MaxBitrateKbps)
 function Script(ArchiveFile, Pattern, SetWorkingFileToZip)
 {{
 	let output = ArchiveFile || (Flow.TempPath + '/' + Flow.NewGuid() + '.zip');
-	    let sevenZip = Flow.GetToolPath('7zip');
+    let sevenZip = Flow.GetToolPath('7zip');
 
-	    let process = Flow.Execute({{
+    let process = Flow.Execute({{
 	    command: sevenZip,
 	    argumentList: [
 		    'a',

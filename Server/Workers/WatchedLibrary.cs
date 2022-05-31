@@ -184,43 +184,54 @@ public class WatchedLibrary:IDisposable
                                     .DistinctBy(x => x.Value.Fingerprint)
                                     .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
 
-        ObjectReference? duplicate = null;
-        string fingerprint = string.Empty;
-        if (Library.UseFingerprinting)
-        {
-            fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
-            if (string.IsNullOrEmpty(fingerprint) == false)
-            {   
-                if (knownFingerprints.ContainsKey(fingerprint))
-                {
-                    duplicate = knownFingerprints[fingerprint];
-                }
-            }
-        }
         
         if (knownFiles.ContainsKey(fullpath.ToLower()))
         {
             var knownFileUid = knownFiles[fullpath.ToLower()];
             var knownFile = libFiles[knownFileUid];
-            if(Library.ReprocessRecreatedFiles && fsInfo.CreationTime > knownFile.CreationTime)
+            if(Library.ReprocessRecreatedFiles == false || fsInfo.CreationTime <= knownFile.CreationTime)
             {
-                Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file");
-                knownFile.CreationTime = fsInfo.CreationTime;
-                knownFile.LastWriteTime = fsInfo.LastWriteTime;
-                knownFile.Status = FileStatus.Unprocessed;
-                new LibraryFileController().Update(knownFile).Wait();
-                return (true, fingerprint, duplicate);
+                Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
+                // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
+                return (true, null, null);
             }
-            Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
-            return (true, fingerprint, duplicate);
+            Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file");
+            knownFile.CreationTime = fsInfo.CreationTime;
+            knownFile.LastWriteTime = fsInfo.LastWriteTime;
+            knownFile.Status = FileStatus.Unprocessed;
+            knownFile.Fingerprint = GetFingerprint().Fingerprint;
+            new LibraryFileController().Update(knownFile).Wait();
+            // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
+            return (true, null, null);
         }
         if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
         {
             Logger.Instance.DLog($"{Library.Name} skipping known output file '{fullpath}'");
-            return (true, fingerprint, duplicate);
+            return (true, null, null);
         }
 
-        return (false, fingerprint, duplicate);
+        var fingerprint = GetFingerprint();
+        return (false, fingerprint.Fingerprint, fingerprint.Duplicate);
+
+        (string Fingerprint, ObjectReference? Duplicate) GetFingerprint()
+        {
+            string fingerprint = string.Empty;
+            ObjectReference? duplicate = null;
+            if (Library.UseFingerprinting)
+            {
+                fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
+                if (string.IsNullOrEmpty(fingerprint) == false)
+                {   
+                    if (knownFingerprints.ContainsKey(fingerprint) && knownFingerprints[fingerprint]?.Name?.ToLower() != fullpath.ToLower())
+                    {
+                        duplicate = knownFingerprints[fingerprint];
+                    }
+                }
+            }
+
+            return (fingerprint, duplicate);
+
+        }
     }
 
     private async Task<(bool known, string fingerprint, ObjectReference? duplicate)> IsKnownFileInDb(string fullPath, FileSystemInfo fsInfo)

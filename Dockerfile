@@ -26,7 +26,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install ffmpeg from jellyfin
-ARG FFMPEG_URL="https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v4.4.1-4/jellyfin-ffmpeg_4.4.1-4-jammy"
+ARG FFMPEG_URL="https://github.com/jellyfin/jellyfin-ffmpeg/releases/download/v5.0.1-4/jellyfin-ffmpeg5_5.0.1-4-jammy"
 RUN ARCH=$(dpkg --print-architecture) && \
     wget "${FFMPEG_URL}_${ARCH}.deb" && \
     apt-get update && \

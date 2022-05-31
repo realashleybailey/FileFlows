@@ -9,7 +9,7 @@ public class Upgrade0_7_0
 {
     public void Run(Settings settings)
     {
-        Logger.Instance.ILog("Upgrade running, running 0.7.0 upgrade script");
+        Logger.Instance.ILog("Checking default Scripts");
 
         InsertScripts();
     }
@@ -18,10 +18,10 @@ public class Upgrade0_7_0
     {
 	    var scripts = GetDefaultScripts();
         var existing = DbHelper.Select<Script>().Result
-	        .Select(x => x.Name).ToList();
+	        .Select(x => x.Uid).ToList();
         foreach (var script in scripts)
         {
-	        if (existing.Contains(script.Name))
+	        if (existing.Contains(script.Uid))
 		        continue;
 
 	        // set these values to now so they wont trigger a reprocess
@@ -34,6 +34,7 @@ public class Upgrade0_7_0
     {
 	    return new Script
 	    {
+		    Uid = new Guid("83f5c662-8727-4e86-a09c-e3d585d0cd20"),
 		    Name = "Video: Resolution",
 		    Code =
 			    $@"
@@ -69,6 +70,7 @@ function Script()
     {
 	    return new Script
 	    {
+		    Uid = new Guid("2d8c9a03-4ed3-4406-a633-38d0e2eec806"),
 		    Name = "Video: Downscale greater than 1080P",
 		    Code =
 			    $@"
@@ -117,6 +119,7 @@ function Script()
     {
 	    return new Script
 	    {
+		    Uid = new Guid("2e192bb0-2110-49c9-b89e-af36affd88e6"),
 		    Name = "Video: Bitrate greater than",
 		    Code =
 			    $@"
@@ -180,6 +183,7 @@ function Script(MaxBitrateKbps)
     {
 	    return new Script
 	    {
+		    Uid = new Guid("81c89bec-74c3-4a6e-a321-29ec14587292"),
 		    Name = "7Zip: Compress to Zip",
 		    Code =
 			    $@"

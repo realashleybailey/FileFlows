@@ -396,9 +396,18 @@ namespace FileFlows.Client.Pages
                 return null;
             }
 
-            string typeName = part.FlowElementUid.Substring(part.FlowElementUid.LastIndexOf(".") + 1);
-            string typeDisplayName = part.Type == FlowElementType.Script ?
-                part.Label : Translater.TranslateIfHasTranslation($"Flow.Parts.{typeName}.Label", FlowHelper.FormatLabel(typeName));
+            string typeName;
+            string typeDisplayName;
+            if (part.Type == FlowElementType.Script)
+            {
+                typeName = "Script";
+                typeDisplayName = part.FlowElementUid[44..]; // 44 to remove Script:[Guid]:
+            }
+            else
+            {
+                typeName = part.FlowElementUid[(part.FlowElementUid.LastIndexOf(".") + 1)..];
+                typeDisplayName = Translater.TranslateIfHasTranslation($"Flow.Parts.{typeName}.Label", FlowHelper.FormatLabel(typeName));
+            }
 
             var fields = ObjectCloner.Clone(flowElement.Fields);
             // add the name to the fields, so a node can be renamed

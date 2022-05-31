@@ -169,8 +169,18 @@ namespace FileFlows.Server.Controllers
 
                 var elements = await GetElements();
 
+                var scripts = (await new ScriptController().GetAll()).ToDictionary(x => x.Uid.ToString(), x => x.Name);
                 foreach (var p in flow.Parts)
                 {
+                    if (p.Type == FlowElementType.Script && string.IsNullOrWhiteSpace(p.Name))
+                    {
+                        string feUid = p.FlowElementUid[7..43];
+                        // set the name to the script name
+                        if (scripts.ContainsKey(feUid))
+                            p.Name = scripts[feUid];
+                        else
+                            p.Name = "Missing Script";
+                    }
                     if (p.FlowElementUid.EndsWith("." + p.Name))
                         p.Name = string.Empty;
                     string icon = elements?.Where(x => x.Uid == p.FlowElementUid)?.Select(x => x.Icon)?.FirstOrDefault() ?? string.Empty;
@@ -264,7 +274,7 @@ namespace FileFlows.Server.Controllers
                 var sm = new ScriptParser().Parse(script?.Name, script?.Code);
                 FlowElement ele = new FlowElement();
                 ele.Name = script.Name;
-                ele.Uid = "Script." + script.Uid;
+                ele.Uid = $"Script:{script.Uid}:{script.Name}";
                 ele.Icon = "fas fa-scroll";
                 ele.Inputs = 1;
                 ele.Description = sm.Description;
@@ -316,7 +326,6 @@ namespace FileFlows.Server.Controllers
             if (model == null)
                 throw new Exception("No model");
 
-
             if (string.IsNullOrWhiteSpace(model.Name))
                 throw new Exception("ErrorMessages.NameRequired");
             model.Name = model.Name.Trim();
@@ -333,6 +342,16 @@ namespace FileFlows.Server.Controllers
 
             if (model.Parts?.Any() != true)
                 throw new Exception("Flow.ErrorMessages.NoParts");
+
+            foreach (var p in model.Parts)
+            {
+                if (Guid.TryParse(p.Name, out Guid guid))
+                    p.Name = string.Empty; // fixes issue with Scripts being saved as the Guids
+                if (string.IsNullOrEmpty(p.Name))
+                    continue;
+                if (p.FlowElementUid.ToLower().EndsWith("." + p.Name.Replace(" ", "").ToLower()))
+                    p.Name = string.Empty; // fixes issue with flow part being named after the display
+            }
 
             int inputNodes = model.Parts.Where(x => x.Type == FlowElementType.Input || x.Type == FlowElementType.Failure).Count();
             if (inputNodes == 0)

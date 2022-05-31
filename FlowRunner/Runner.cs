@@ -583,7 +583,7 @@ public class Runner
             propModel.SetValue(nodeScript, part.Model);
             
             var propCode = ntScript.GetProperty("Code", BindingFlags.Instance | BindingFlags.Public);
-            Guid guid = Guid.Parse(part.FlowElementUid["Script.".Length..]);
+            Guid guid = Guid.Parse(part.FlowElementUid[7..43]); // 7 to remove "Scripts." 43 since guids are 36 characters, + 7 == 43
             var script  = ScriptService.Load().Get(guid).Result;
             if (string.IsNullOrEmpty(script?.Code))
                 throw new Exception("Script not found");

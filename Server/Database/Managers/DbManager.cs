@@ -347,7 +347,8 @@ public abstract class DbManager
         var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid.ToString());
         if (dbObject == null)
         {
-            obj.Uid = Guid.NewGuid();
+            if(obj.Uid == Guid.Empty)
+                obj.Uid = Guid.NewGuid();
             obj.DateCreated = DateTime.Now;
             obj.DateModified = obj.DateCreated;
             // create new 

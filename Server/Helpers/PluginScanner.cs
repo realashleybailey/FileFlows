@@ -27,7 +27,7 @@ public class PluginScanner
             EnsureDefaultsExist(pluginDir);
 
         var controller = new PluginController();
-        var dbPluginInfos = controller.GetDataList().Result;
+        var dbPluginInfos = controller.GetDataList().Result.OrderBy(x => x.Name).ToList();
 
         List<string> installed = new List<string>();
         var options = new JsonSerializerOptions
@@ -88,7 +88,17 @@ public class PluginScanner
                     continue;
                 }
 
-                var plugin = dbPluginInfos.FirstOrDefault(x => x.PackageName == pi.PackageName || x.Name == pi.Name);
+                var plugin = dbPluginInfos.FirstOrDefault(x =>
+                {
+                    string xpn = x.PackageName.Replace(".ffplugin", string.Empty).ToLower();
+                    string pipn = pi.PackageName.Replace(".ffplugin", string.Empty).ToLower();
+                    if (xpn == pipn)
+                        return true;
+                    
+                    if(string.Equals(x.Name, pi.Name, StringComparison.CurrentCultureIgnoreCase))
+                        return true;
+                    return false;
+                });
                 bool isNew = plugin == null;
                 plugin ??= new();
                 installed.Add(pi.Name);

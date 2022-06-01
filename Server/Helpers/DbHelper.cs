@@ -24,8 +24,13 @@ public class DbHelper
     /// </summary>
     internal static Task<bool> Initialize()
     {
-        Logger.Instance.ILog("Initializing Database: " + AppSettings.Instance.DatabaseConnection);
-        Manager = DbManager.GetManager(AppSettings.Instance.DatabaseConnection);
+        string connstring = AppSettings.Instance.DatabaseConnection;
+        #if(DEBUG)
+        // argh i left my super secure password in the code for everyone to see!!!! 
+        connstring = "Server=192.168.1.6;Database=FileFlows;User Id=sa;Password=Password123;";
+        #endif
+        Logger.Instance.ILog("Initializing Database: " + connstring);
+        Manager = DbManager.GetManager(connstring);
         return Manager.CreateDb();
     }
 

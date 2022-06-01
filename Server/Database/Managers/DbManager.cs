@@ -44,6 +44,11 @@ public abstract class DbManager
     public virtual bool UseTop => false;
     
     /// <summary>
+    /// Method used by the manager to extract a json variable, mysql/mariadb use JSON_EXTRACT
+    /// </summary>
+    protected virtual string JsonExtractMethod => "JSON_EXTRACT";
+    
+    /// <summary>
     /// Gets the database used by this configuration
     /// </summary>
     /// <param name="connectionString">the connection string</param>
@@ -54,8 +59,9 @@ public abstract class DbManager
         
         if (connectionString.Contains(".sqlite"))
             return new SqliteDbManager(connectionString);
-        
-        return new MySqlDbManager(connectionString);
+
+        return new SqlServerDbManager(connectionString);
+        //return new MySqlDbManager(connectionString);
     }
 
     private static string SqliteDbFile => Path.Combine(DirectoryHelper.DatabaseDirectory, "FileFlows.sqlite");
@@ -276,7 +282,7 @@ public abstract class DbManager
         else
             sql = "select " + sql + " limit 1";
         
-        string result = db.FirstOrDefault<string>(sql, typeof(T).FullName, uid.ToString(), name);
+        string result = db.FirstOrDefault<string>(sql, typeof(T).FullName, uid, name);
         return string.IsNullOrEmpty(result) == false;
     }
 
@@ -304,7 +310,7 @@ public abstract class DbManager
     {
         using var db = GetDb();
         
-        var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid.ToString());
+        var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid);
         if (string.IsNullOrEmpty(dbObject?.Data))
             return new T();
         return Convert<T>(dbObject);
@@ -344,7 +350,7 @@ public abstract class DbManager
 
         var type = obj.GetType();
         obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
-        var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid.ToString());
+        var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid);
         if (dbObject == null)
         {
             if(obj.Uid == Guid.Empty)
@@ -354,7 +360,7 @@ public abstract class DbManager
             // create new 
             dbObject = new DbObject
             {
-                Uid = obj.Uid.ToString(),
+                Uid = obj.Uid,
                 Name = obj.Name,
                 DateCreated = obj.DateCreated,
                 DateModified = obj.DateModified,
@@ -374,7 +380,7 @@ public abstract class DbManager
         }
 
         if (UseMemoryCache == false)
-            return await Single<T>(Guid.Parse(dbObject.Uid));
+            return await Single<T>(dbObject.Uid);//return await Single<T>(Guid.Parse(dbObject.Uid));
         
         return obj;
     }
@@ -463,7 +469,8 @@ public abstract class DbManager
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         T result = JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-        result.Uid = Guid.Parse(dbObject.Uid);
+        //result.Uid = Guid.Parse(dbObject.Uid);
+        result.Uid = dbObject.Uid;
         result.Name = dbObject.Name;
         result.DateModified = dbObject.DateModified;
         result.DateCreated = dbObject.DateCreated;
@@ -546,7 +553,7 @@ public abstract class DbManager
         using var db = GetDb();
 
         var dbObject = await db.FirstOrDefaultAsync<DbObject>(
-                "where Type=@0 and JSON_EXTRACT(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName, fingerprint ?? string.Empty);
+                $"where Type=@0 and {JsonExtractMethod}(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName, fingerprint ?? string.Empty);
 
         if (string.IsNullOrEmpty(dbObject?.Data) == false)
             return Convert<LibraryFile>(dbObject);
@@ -555,13 +562,14 @@ public abstract class DbManager
     }
 
 
+
     /// <summary>
     /// Gets the next library file to process
     /// </summary>
     /// <param name="node">the node executing this library file</param>
     /// <param name="workerUid">the UID of the worker</param>
     /// <returns>the next library file to process</returns>
-    public async Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid)
+    public virtual async Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid)
     {
         int quarter = TimeHelper.GetCurrentQuarter();
         string now = DateTime.Now.ToString("yyyy-MM-ddThh:MM:sszzz");

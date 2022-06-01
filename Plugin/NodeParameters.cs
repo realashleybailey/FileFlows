@@ -1,3 +1,5 @@
+using FileFlows.Plugin.Models;
+
 namespace FileFlows.Plugin;
 
 using System.Collections.Generic;
@@ -34,6 +36,11 @@ public class NodeParameters
     /// Gets or sets the logger used by the flow during execution
     /// </summary>
     public ILogger? Logger { get; set; }
+    
+    /// <summary>
+    /// Gets or set s the script executor
+    /// </summary>
+    public IScriptExecutor ScriptExecutor { get; set; }
 
     /// <summary>
     /// Gets or sets the result of the flow

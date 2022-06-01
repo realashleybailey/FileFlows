@@ -269,6 +269,7 @@ public class Runner
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
         nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
+        nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecution.ScriptExecutor();
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;
         FileHelper.DontSetPermissions = Node.DontSetPermissions;
@@ -576,18 +577,14 @@ public class Runner
         if (part.Type == FlowElementType.Script)
         {
             // special type
-            var ntScript = GetNodeType("FileFlows.BasicNodes.ScriptNode");
-            var nodeScript = (Node)Activator.CreateInstance(ntScript);
-            
-            var propModel = ntScript.GetProperty("Model", BindingFlags.Instance | BindingFlags.Public);
-            propModel.SetValue(nodeScript, part.Model);
-            
-            var propCode = ntScript.GetProperty("Code", BindingFlags.Instance | BindingFlags.Public);
+            var nodeScript = new ScriptNode();
+            nodeScript.Model = part.Model;
             Guid guid = Guid.Parse(part.FlowElementUid[7..43]); // 7 to remove "Scripts." 43 since guids are 36 characters, + 7 == 43
             var script  = ScriptService.Load().Get(guid).Result;
             if (string.IsNullOrEmpty(script?.Code))
                 throw new Exception("Script not found");
-            propCode.SetValue(nodeScript, script.Code);
+            nodeScript.Code = script.Code;
+            
             if(string.IsNullOrWhiteSpace(part.Name))
                 part.Name = script.Name;
             return nodeScript;

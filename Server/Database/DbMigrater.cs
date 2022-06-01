@@ -19,6 +19,9 @@ public class DbMigrater
         Logger.Instance?.ILog("Database Migration started");
 
         using var source = GetDatabase(sourceConnection);
+
+        var destDbManager = DbManager.GetManager(destinationConnection);
+        destDbManager.CreateDb(insertInitialData: false).Wait();
         using var dest = GetDatabase(destinationConnection);
 
         var dbObjects = source.Fetch<DbObject>($"select * from {nameof(DbObject)}")?.ToArray();

@@ -86,10 +86,12 @@ public abstract class DbManager
     /// <summary>
     /// Creates the database and the initial data
     /// </summary>
+    /// <param name="recreate">if the database should be recreated if already exists</param>
+    /// <param name="insertInitialData">if the initial data should be inserted</param>
     /// <returns>if the database was successfully created or not</returns>
-    public async Task<bool> CreateDb()
+    public async Task<bool> CreateDb(bool recreate = false, bool insertInitialData = true)
     {
-        var dbResult = CreateDatabase();
+        var dbResult = CreateDatabase(recreate);
         if (dbResult == DbCreateResult.Failed)
             return false;
 
@@ -122,6 +124,9 @@ public abstract class DbManager
                 return true;
             }
         }
+
+        if (insertInitialData == false)
+            return true;
         
         return await CreateInitialData();
     }
@@ -129,8 +134,9 @@ public abstract class DbManager
     /// <summary>
     /// Creates the actual Database
     /// </summary>
+    /// <param name="recreate">if the database should be recreated if already exists</param>
     /// <returns>true if successfully created</returns>
-    protected abstract DbCreateResult CreateDatabase();
+    protected abstract DbCreateResult CreateDatabase(bool recreate);
     /// <summary>
     /// Creates the tables etc in the database
     /// </summary>

@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
 using FileFlows.Shared;
+using FileFlows.Shared.Models;
 using NPoco;
+using DatabaseType = FileFlows.Shared.Models.DatabaseType;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -9,6 +11,10 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class MySqlDbManager: DbManager
 {
+    /// <summary>
+    /// Creates an instance of a MySqlDbManager
+    /// </summary>
+    /// <param name="connectionString">a mysql connection string</param>
     public MySqlDbManager(string connectionString)
     {
         ConnectionString = connectionString;
@@ -21,7 +27,7 @@ public class MySqlDbManager: DbManager
             MySqlConnector.MySqlConnectorFactory.Instance);
     }
 
-    protected override DbCreateResult CreateDatabase()
+    protected override DbCreateResult CreateDatabase(bool recreate)
     {
         string connString = Regex.Replace(ConnectionString, "(^|;)Database=[^;]+", "");
         if (connString.StartsWith(";"))
@@ -31,7 +37,12 @@ public class MySqlDbManager: DbManager
         using var db = new NPoco.Database(connString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         bool exists = string.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = @0", dbName)) == false;
         if (exists)
-            return DbCreateResult.AlreadyExisted;
+        {
+            if(recreate == false)
+                return DbCreateResult.AlreadyExisted;
+            Logger.Instance.ILog("Dropping existing database");
+            db.Execute($"drop database {dbName};");
+        }
 
         Logger.Instance.ILog("Creating Database");
         return db.Execute("create database " + dbName) > 0 ? DbCreateResult.Created : DbCreateResult.Failed;
@@ -112,5 +123,20 @@ public class MySqlDbManager: DbManager
         builder["Uid"] = user;
         builder["Pwd"] = password;
         return builder.ConnectionString;
+    }
+
+    /// <summary>
+    /// Populates the database settings from a connection string
+    /// </summary>
+    /// <param name="settings">the settings to populate</param>
+    /// <param name="connectionString">the connection string to parse</param>
+    internal void PopulateSettings(Settings settings, string connectionString)
+    {
+        var builder = new MySqlConnector.MySqlConnectionStringBuilder(connectionString);
+        settings.DbType = DatabaseType.MySql;
+        settings.DbServer = builder["Server"].ToString();
+        settings.DbName = builder["Database"].ToString();
+        settings.DbUser = builder["Uid"].ToString();
+        settings.DbPassword = builder["Pwd"].ToString();
     }
 }

@@ -63,8 +63,9 @@ public class SqliteDbManager : DbManager
     /// <summary>
     /// Creates the actual Database
     /// </summary>
+    /// <param name="recreate">if the database should be recreated if already exists</param>
     /// <returns>true if successfully created</returns>
-    protected override DbCreateResult CreateDatabase()
+    protected override DbCreateResult CreateDatabase(bool recreate)
     {
         if (File.Exists(DbFilename) == false)
         {

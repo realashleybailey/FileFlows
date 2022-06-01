@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
 using NPoco;
+using DatabaseType = FileFlows.Shared.Models.DatabaseType;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -27,17 +28,23 @@ public class SqlServerDbManager: DbManager
             SqlClientFactory.Instance);
     }
 
-    protected override DbCreateResult CreateDatabase()
+    protected override DbCreateResult CreateDatabase(bool recreate)
     {
-        string connString = Regex.Replace(ConnectionString, "(^|;)Database=[^;]+", "");
-        if (connString.StartsWith(";"))
-            connString = connString[1..];
-        string dbName = Regex.Match(ConnectionString, @"(?<=(Database=))[a-zA-Z0-9_\-]+").Value;
+        var builder = new SqlConnectionStringBuilder(ConnectionString);
+        string dbName = builder["Database"].ToString();
+        builder["Database"] = null;
+
+        string connString = builder.ConnectionString;
         
         using var db = new NPoco.Database(connString, null, SqlClientFactory.Instance);
         bool exists = string.IsNullOrEmpty(db.ExecuteScalar<string>("select name from sys.databases where name = @0", dbName)) == false;
         if (exists)
-            return DbCreateResult.AlreadyExisted;
+        {
+            if(recreate == false)
+                return DbCreateResult.AlreadyExisted;
+            Logger.Instance.ILog("Dropping existing database");
+            db.Execute($"drop database {dbName}");
+        }
 
         Logger.Instance.ILog("Creating Database");
         db.Execute("create database " + dbName);
@@ -150,5 +157,20 @@ public class SqlServerDbManager: DbManager
         builder["User"] = user;
         builder["Password"] = password;
         return builder.ConnectionString;
+    }
+
+    /// <summary>
+    /// Populates the database settings from a connection string
+    /// </summary>
+    /// <param name="settings">the settings to populate</param>
+    /// <param name="connectionString">the connection string to parse</param>
+    internal void PopulateSettings(Settings settings, string connectionString)
+    {
+        var builder = new SqlConnectionStringBuilder(connectionString);
+        settings.DbType = DatabaseType.SqlServer;
+        settings.DbServer = builder["Server"].ToString();
+        settings.DbName = builder["Database"].ToString();
+        settings.DbUser = builder["User"].ToString();
+        settings.DbPassword = builder["Password"].ToString();
     }
 }

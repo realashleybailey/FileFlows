@@ -68,18 +68,24 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public async Task<Settings> Get()
         {
-            if (Instance != null)
-                return Instance;
             await semaphore.WaitAsync();
             try
             {
                 if (Instance == null)
                 {
                     Instance = await DbHelper.Single<Settings>();
-
                 }
                 Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 Instance.IsDocker = Program.Docker;
+
+                string dbConnStr = AppSettings.Instance.DatabaseConnection;
+                if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
+                    Instance.DbType = DatabaseType.Sqlite;
+                else if (dbConnStr.Contains(";Uid="))
+                    new MySqlDbManager(string.Empty).PopulateSettings(Instance, dbConnStr);
+                else
+                    new SqlServerDbManager(string.Empty).PopulateSettings(Instance, dbConnStr);
+                
                 return Instance;
             }
             finally
@@ -105,11 +111,12 @@ namespace FileFlows.Server.Controllers
             model.IsDocker = Program.Docker;
             Instance = model;
 
-            var newConnectionString = GetConnectionString(settings);
+            var newConnectionString = GetConnectionString(model);
             if (newConnectionString != AppSettings.Instance.DatabaseConnection)
             {
                 // need to migrate the database
                 AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
+                AppSettings.Instance.Save();
             }
             return await DbHelper.Update(model);
         }

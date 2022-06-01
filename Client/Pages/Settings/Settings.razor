@@ -37,7 +37,7 @@
                         <hr />
                         <InputSwitch @bind-Value="@InternalProcessingNode.Enabled" Label="Pages.Settings.Fields.InternalProcessingNode.Enabled" />
                         <InputNumber @bind-Value="@InternalProcessingNode.FlowRunners" Label="Pages.Settings.Fields.InternalProcessingNode.FlowRunners" Min=0 Max=100 />
-                        <InputFile @bind-Value="@InternalProcessingNode.TempPath" Directory="true" Validators=@DirectoryValidators
+                        <InputFile @bind-Value="@InternalProcessingNode.TempPath" Directory="true" Validators=@RequiredValidator
                             Label="Pages.Settings.Fields.InternalProcessingNode.TempPath" />
                         <hr />
                         <InputSchedule @bind-Value="@InternalProcessingNode.Schedule" Label="Pages.Settings.Fields.InternalProcessingNode.Schedule" />
@@ -46,6 +46,23 @@
                 <FlowTab Title="@lblAdvanced">
                     <InputTextAreaList @bind-Value="@Model.PluginRepositoryUrls" Label="Pages.Settings.Fields.PluginRepositoryUrls" />
                 </FlowTab>
+                @if (ShowExternalDatabase)
+                {
+                    <FlowTab Title="@lblDatabase">
+                        <p class="box info">@lblDbDescription</p>
+                        <InputSelect @bind-Value="@DbType" Options=@DbTypes Label="Pages.Settings.Fields.Database.Type"/>
+                        @if (Model.DbType != DatabaseType.Sqlite)
+                        {
+                            <InputText @bind-Value=@Model.DbServer Label="Pages.Settings.Fields.Database.Server" Validators=@RequiredValidator />
+                            <InputText @bind-Value=@Model.DbName Label="Pages.Settings.Fields.Database.Name" Validators=@RequiredValidator/>
+                            <InputText @bind-Value=@Model.DbUser Label="Pages.Settings.Fields.Database.User" Validators=@RequiredValidator/>
+                            <InputPassword @bind-Value=@Model.DbPassword Label="Pages.Settings.Fields.Database.Password" Validators=@RequiredValidator/>
+                            <div class="btn-test">
+                                <button class="btn" @onclick=@TestDbConnection>@lblTest</button>
+                            </div>
+                        }
+                    </FlowTab>
+                }
             </FlowTabs>
         </div>
     </Body>

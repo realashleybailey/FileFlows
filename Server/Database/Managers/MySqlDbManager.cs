@@ -67,4 +67,31 @@ public class MySqlDbManager: DbManager
         db.Execute("ALTER TABLE DbObject ADD INDEX (Type, Name);");
         return true;
     }
+
+    /// <summary>
+    /// Tests the connection to a database
+    /// </summary>
+    /// <param name="server">the server address</param>
+    /// <param name="name">the database name</param>
+    /// <param name="user">the connecting user</param>
+    /// <param name="password">the password to use</param>
+    /// <returns>any error or empty string if successful</returns>
+    public string Test(string server, string name, string user, string password)
+    {
+        try
+        {
+            var builder = new MySqlConnector.MySqlConnectionStringBuilder();
+            builder["Server"] = server;
+            builder["Uid"] = user;
+            builder["Pwd"] = password;
+            string connString = builder.ConnectionString;
+            using var db = new NPoco.Database(connString, null, MySqlConnector.MySqlConnectorFactory.Instance);
+            bool exists = string.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = @0", name)) == false;
+            return string.Empty;
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+    }
 }

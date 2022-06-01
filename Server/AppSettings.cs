@@ -16,6 +16,14 @@ internal class AppSettings
     /// Gets or sets the encryption key to use
     /// </summary>
     public string EncryptionKey { get; set; }
+    
+    
+    /// <summary>
+    /// Gets or sets the connection string of where to migrate the data to
+    /// This will be checked at startup and if found, the data will be migrated then this
+    /// setting will be reset
+    /// </summary>
+    public string DatabaseMigrateConnection { get; set; }
 
 
 

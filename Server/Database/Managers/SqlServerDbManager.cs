@@ -105,4 +105,31 @@ public class SqlServerDbManager: DbManager
             throw;
         }
     }
+
+    /// <summary>
+    /// Tests the connection to a database
+    /// </summary>
+    /// <param name="server">the server address</param>
+    /// <param name="name">the database name</param>
+    /// <param name="user">the connecting user</param>
+    /// <param name="password">the password to use</param>
+    /// <returns>any error or empty string if successful</returns>
+    public string Test(string server, string name, string user, string password)
+    {
+        try
+        {
+            var builder = new SqlConnectionStringBuilder();
+            builder["Server"] = server;
+            builder["User"] = user;
+            builder["Password"] = password;
+            string connString = builder.ConnectionString;
+            using var db = new NPoco.Database(connString, null, SqlClientFactory.Instance);
+            bool exists = string.IsNullOrEmpty(db.ExecuteScalar<string>("select name from sys.databases where name = @0", name)) == false;
+            return string.Empty;
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+    }
 }

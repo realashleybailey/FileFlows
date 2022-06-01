@@ -50,7 +50,8 @@
     "Node": "Node",
     "BaseCodeOn": "Use Code Template",
     "CopyToClipboard": "Copy to clipboard",
-    "CopiedToClipboard": "Copied ''{text}'' to clipboard."
+    "CopiedToClipboard": "Copied ''{text}'' to clipboard.",
+    "Test":"Test"
   },
   "Dialogs":{
     "FileBrowser": {
@@ -337,7 +338,17 @@
       "Title": "Settings",
       "Labels": {
         "General": "General",
-        "InternalProcessingNode": "Internal Node"
+        "InternalProcessingNode": "Internal Node",
+        "Database":"Database"
+      },
+      "Messages":{
+        "Database":{
+          "NoServer":"Server is required",
+          "NoDatabase":"Name is required",
+          "NoUser":"User is required",
+          "NoPassword":"Password is required",
+          "TestSuccess":"Successfully connected to database"
+        }
       },
       "Fields": {
         "Telemetry": "Telemetry",
@@ -362,6 +373,19 @@
           "FlowRunners-Help": "The number of flow runner instances available to execute a flow.",
           "Schedule": "Schedule",
           "Schedule-Help": "This allows you to configure when files can begin processing.  No files will begin processing outside of this schedule."
+        },
+        "Database":{
+          "Description":"Here you can configure what Database FileFlows will use.\nNote: Any changes here will require you to restart FileFlows so it can migrate your data and if necessary create the new database.",
+          "Type":"Type",
+          "Type-Help":"The type of database to use, the default type is SQLite which requires not additional setup or configuration",
+          "Server":"Server",
+          "Server-Help":"The address of the Database server and the port or named instance if required",
+          "Name":"Name",
+          "Name-Help":"The name of the database to created, if left blank ''FileFlows'' will be used",
+          "User":"User",
+          "User-Help":"The user used to connect to the database",
+          "Password": "Password",
+          "Password-Help":"The password of the user to connect to the database"
         }
       }
     },

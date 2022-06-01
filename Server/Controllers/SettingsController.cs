@@ -1,3 +1,6 @@
+using FileFlows.Server.Database.Managers;
+using FileFlows.Shared;
+
 namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -104,6 +107,53 @@ namespace FileFlows.Server.Controllers
             
             return await DbHelper.Update(model);
         }
+
+        /// <summary>
+        /// Tests a database connection
+        /// </summary>
+        /// <param name="model">The database connection info</param>
+        /// <returns>OK if successful, otherwise a failure message</returns>
+        [HttpPost("test-db-connection")]
+        public string TestDbConnection([FromBody] DbConnectionInfo model)
+        {
+            if (model == null)
+                throw new ArgumentException(nameof(model));
+
+            if (model.Type == DatabaseType.SqlServer)
+                return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+                    ?.EmptyAsNull() ?? "OK";
+            if (model.Type == DatabaseType.MySql)
+                return new MySqlDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+                    ?.EmptyAsNull() ?? "OK";
+            
+            return "Unsupported database type";
+        }
     }
 
+    /// <summary>
+    /// Database connection details
+    /// </summary>
+    public class DbConnectionInfo
+    {
+        /// <summary>
+        /// Gets or sets the server address
+        /// </summary>
+        public string Server { get; set; }
+        /// <summary>
+        /// Gets or sets the database name
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// Gets or sets the connecting user
+        /// </summary>
+        public string User { get; set; }
+        /// <summary>
+        /// Gets or sets the password used
+        /// </summary>
+        public string Password { get; set; }
+        /// <summary>
+        /// Gets or sets the database type
+        /// </summary>
+        public DatabaseType Type { get; set; }
+    }
 }

@@ -1,8 +1,14 @@
-﻿.settings {
+.settings {
   height: 100%;
 }
 .settings ::deep .content {
   margin: auto 1rem;
+}
+.settings ::deep .btn-test {
+  margin: 2rem 0 0 14rem;
+}
+.settings ::deep .btn-test .btn {
+  width: 8rem;
 }
 .settings ::deep .row + .row {
   margin-top: 1rem;
@@ -33,3 +39,15 @@
 .settings ::deep .flow-tabs hr {
   margin: 2rem 4rem 2rem 0;
 }
+
+@media (max-width: 577.9999px) {
+  .settings ::deep .btn-test {
+    text-align: center;
+    margin: 2rem 0 0;
+  }
+  .settings ::deep .btn-test .btn {
+    width: 100%;
+  }
+}
+
+/*# sourceMappingURL=Settings.razor.css.map */

@@ -1,4 +1,4 @@
-﻿.blocker {
+.blocker {
   background: rgba(var(--base-rgb), 0.9);
   z-index: 1000;
   position: absolute;
@@ -546,3 +546,19 @@ button .fas, button .far {
 hr {
   border-top-color: var(--border-color);
 }
+
+.box.info {
+  padding: 1rem 1rem 1rem 3rem;
+  color: var(--yellow);
+  position: relative;
+  border: dotted 1px var(--yellow);
+}
+.box.info::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: "\f071";
+  position: absolute;
+  left: 1rem;
+}
+
+/*# sourceMappingURL=app.css.map */

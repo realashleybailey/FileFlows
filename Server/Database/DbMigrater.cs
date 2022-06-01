@@ -65,8 +65,11 @@ public class DbMigrater
         if(connectionString.Contains(".sqlite"))
             return new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
         
-        return new NPoco.Database(connectionString,
-            null,
-            MySqlConnector.MySqlConnectorFactory.Instance);
+        if(connectionString.Contains(";Uid="))
+            return new NPoco.Database(connectionString,
+                null,
+                MySqlConnector.MySqlConnectorFactory.Instance);
+        
+        return new NPoco.Database(connectionString, null, System.Data.SqlClient.SqlClientFactory.Instance);
     }
 }

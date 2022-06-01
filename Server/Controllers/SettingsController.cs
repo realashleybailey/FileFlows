@@ -104,9 +104,27 @@ namespace FileFlows.Server.Controllers
             model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             model.IsDocker = Program.Docker;
             Instance = model;
-            
+
+            var newConnectionString = GetConnectionString(settings);
+            if (newConnectionString != AppSettings.Instance.DatabaseConnection)
+            {
+                // need to migrate the database
+                AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
+            }
             return await DbHelper.Update(model);
         }
+
+        private string GetConnectionString(Settings settings)
+        {
+            if (settings.DbType == DatabaseType.SqlServer)
+                return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+                    settings.DbPassword);
+            if (settings.DbType == DatabaseType.MySql)
+                return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+                    settings.DbPassword);
+            return string.Empty;
+        }
+        
 
         /// <summary>
         /// Tests a database connection

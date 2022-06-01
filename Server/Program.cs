@@ -1,5 +1,7 @@
 using System.Collections;
 using Avalonia;
+using FileFlows.Server.Database;
+using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Ui;
 
 namespace FileFlows.Server;
@@ -58,7 +60,7 @@ public class Program
                 appMutex = new Mutex(true, appName, out bool createdNew);
                 if (createdNew == false)
                 {
-                    // app is already running
+                    // app is already running;
                     if (noGui)
                     {
                         Console.WriteLine("An instance of FileFlows is already running");
@@ -74,6 +76,27 @@ public class Program
                     }
             
                     return;
+                }
+            }
+
+            if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
+            {
+                if (AppSettings.Instance.DatabaseConnection == AppSettings.Instance.DatabaseMigrateConnection)
+                {
+                    AppSettings.Instance.DatabaseMigrateConnection = null;
+                    AppSettings.Instance.Save();
+                }
+                else
+                {
+                    Console.WriteLine("Database migration starting");
+                    bool migrated = DbMigrater.Migrate(AppSettings.Instance.DatabaseConnection,
+                        AppSettings.Instance.DatabaseMigrateConnection);
+                    if (migrated)
+                        AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
+                    else
+                        Console.WriteLine("Database migration failed, reverting to previous database settings");
+                    AppSettings.Instance.DatabaseMigrateConnection = null;
+                    AppSettings.Instance.Save();
                 }
             }
 

@@ -60,12 +60,20 @@ public abstract class DbManager
         if (connectionString.Contains(".sqlite"))
             return new SqliteDbManager(connectionString);
 
+        if(connectionString.Contains(";Uid="))
+            return new MySqlDbManager(connectionString);
+        
         return new SqlServerDbManager(connectionString);
-        //return new MySqlDbManager(connectionString);
     }
 
     private static string SqliteDbFile => Path.Combine(DirectoryHelper.DatabaseDirectory, "FileFlows.sqlite");
 
+    /// <summary>
+    /// Gets the default database connection string using the Sqlite database file
+    /// </summary>
+    /// <returns>the default database connection string using the Sqlite database file</returns>
+    public static string GetDefaultConnectionString() => SqliteDbManager.GetConnetionString(SqliteDbFile);
+    
     /// <summary>
     /// Get an instance of the IDatabase
     /// </summary>
@@ -102,7 +110,7 @@ public abstract class DbManager
             // not a sqlite database, check if one exists and migrate
             if (File.Exists(SqliteDbFile))
             {
-                // migrate teh data
+                // migrate the data
                 bool migrated = DbMigrater.Migrate(SqliteDbManager.GetConnetionString(SqliteDbFile), this.ConnectionString);
 
                 if (migrated)

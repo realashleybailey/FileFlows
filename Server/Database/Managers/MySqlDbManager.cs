@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FileFlows.Shared;
 using NPoco;
 
 namespace FileFlows.Server.Database.Managers;
@@ -93,5 +94,23 @@ public class MySqlDbManager: DbManager
         {
             return ex.Message;
         }
+    }
+
+    /// <summary>
+    /// Gets a database connection string
+    /// </summary>
+    /// <param name="server">the database server</param>
+    /// <param name="database">the database name</param>
+    /// <param name="user">the connecting user</param>
+    /// <param name="password">the password for the connection</param>
+    /// <returns>the database connection string</returns>
+    public string GetConnectionString(string server, string database, string user, string password)
+    {
+        var builder = new MySqlConnector.MySqlConnectionStringBuilder();
+        builder["Server"] = server;
+        builder["Database"] = database?.EmptyAsNull() ?? "FileFlows";
+        builder["Uid"] = user;
+        builder["Pwd"] = password;
+        return builder.ConnectionString;
     }
 }

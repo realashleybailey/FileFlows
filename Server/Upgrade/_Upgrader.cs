@@ -18,8 +18,11 @@ public class Upgrader
             new Upgrade0_6_0().Run();
         if (currentVersion < new Version(0, 6, 1, 987))
             new Upgrade0_6_1().Run(settings);
-        if (currentVersion < new Version(0, 7, 1, 1000))
+        if (currentVersion < new Version(0, 7, 0, 1095))
             new Upgrade0_7_0().Run(settings);
+
+        // always check on default scripts
+        new DefaultScripts().Run(settings);
         
 
         // save the settings

@@ -158,6 +158,13 @@ public class DbHelper
     /// <param name="uids">the UIDs of the items to delete</param>
     public static Task Delete(params Guid[] uids) => Manager.Delete(uids);
     
+    /// <summary>
+    /// Delete items from a database
+    /// </summary>
+    /// <param name="andWhere">and where clause</param>
+    /// <param name="args">arguments for where clause</param>
+    /// <typeparam name="T">the type to delete</typeparam>
+    public static Task Delete<T>(string andWhere = "", params object[] args) => Manager.Delete<T>(andWhere, args);
     
     /// <summary>
     /// Finds an existing library file in the database

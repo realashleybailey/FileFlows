@@ -90,6 +90,8 @@ public class PluginScanner
 
                 var plugin = dbPluginInfos.FirstOrDefault(x =>
                 {
+                    if (x.Uid == pi.Uid)
+                        return true;
                     string xpn = x.PackageName.Replace(".ffplugin", string.Empty).ToLower();
                     string pipn = pi.PackageName.Replace(".ffplugin", string.Empty).ToLower();
                     if (xpn == pipn)
@@ -102,6 +104,7 @@ public class PluginScanner
                 bool isNew = plugin == null;
                 plugin ??= new();
                 installed.Add(pi.Name);
+                plugin.Uid = pi.Uid;
                 plugin.PackageName = pi.PackageName;
                 plugin.Version = pi.Version;
                 plugin.DateModified = DateTime.Now;
@@ -132,7 +135,6 @@ public class PluginScanner
                     plugin.DateCreated = DateTime.Now;
                     plugin.DateModified = DateTime.Now;
                     plugin.Enabled = true;
-                    plugin.Uid = Guid.NewGuid();
                     controller.Update(plugin).Wait();
                 }
             }

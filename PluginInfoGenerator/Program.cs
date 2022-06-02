@@ -50,6 +50,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
         {
             PluginBasicInfo info = new PluginBasicInfo();
             info.Name = plugin.Name;
+            info.Uid = plugin.Uid;
             info.Authors = plugin.Authors;
             info.Version = plugin.Version;
             info.Description = plugin.Description;
@@ -92,6 +93,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
             var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(dll.FullName);
             if (fvi == null)
                 return null;
+            info.Uid = plugin.Uid;
             info.Name = fvi.ProductName ?? dll.Name;
             info.Version = fvi?.FileVersion ?? string.Empty;
             info.Elements = GetElements(assembly);
@@ -176,6 +178,7 @@ namespace PluginInfoGenerator // Note: actual namespace depends on the project n
 
     class PluginBasicInfo
     {
+        public Guid Uid { get; set; }
         public string Name { get; set; } = String.Empty;
         public string Version { get; set; } = String.Empty;
         public string MinimumVersion { get; set; } = String.Empty;

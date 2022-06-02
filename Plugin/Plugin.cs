@@ -6,6 +6,11 @@ namespace FileFlows.Plugin;
 public interface IPlugin
 {
     /// <summary>
+    /// Gets the UID of the plugin
+    /// </summary>
+    Guid Uid { get; }
+    
+    /// <summary>
     /// Gets the name of the plugin
     /// </summary>
     string Name { get; }

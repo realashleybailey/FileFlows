@@ -1,3 +1,4 @@
+using System.Data;
 using System.Reflection;
 using System.Text;
 using FileFlows.Plugin;
@@ -543,6 +544,22 @@ public abstract class DbManager
         string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
         using var db = GetDb();
         await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type=@0 and Uid in ({strUids})", typeName);
+    }
+    
+    /// <summary>
+    /// Delete items from a database
+    /// </summary>
+    /// <param name="andWhere">and where clause</param>
+    /// <param name="args">arguments for where clause</param>
+    /// <typeparam name="T">the type to delete</typeparam>
+    public virtual async Task Delete<T>(string andWhere = "", params object[] args)
+    {
+        using var db = GetDb();
+        
+        if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
+            andWhere = " and " + andWhere;
+        args = new object[] { typeof(T).FullName }.Union(args ?? new object[] { }).ToArray();
+        await db.ExecuteAsync($"delete from  {nameof(DbObject)} where Type=@0 {andWhere}", args);
     }
     
     /// <summary>

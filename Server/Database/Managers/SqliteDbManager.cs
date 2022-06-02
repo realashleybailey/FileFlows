@@ -127,5 +127,10 @@ public class SqliteDbManager : DbManager
         throw new NotImplementedException();
     }
 
+    public override Task<Flow> GetFailureFlow(Guid libraryUid)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 }

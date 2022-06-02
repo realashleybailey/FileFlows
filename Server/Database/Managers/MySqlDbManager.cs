@@ -105,7 +105,24 @@ public class MySqlDbManager: DbManager
         var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1)", quarter, (int)status);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
-    
+
+    /// <summary>
+    /// Gets the failure flow for a particular library
+    /// </summary>
+    /// <param name="libraryUid">the UID of the library</param>
+    /// <returns>the failure flow</returns>
+    public override async Task<Flow> GetFailureFlow(Guid libraryUid)
+    {
+        using var db = GetDb();
+        var dbObject = await db.SingleAsync<DbObject>(
+            "select * from DbObject where Type = @0 " +
+            "and JSON_EXTRACT(Data,'$.Type') = @1 " +
+            "and JSON_EXTRACT(Data,'$.Enabled') = 1 ",
+            typeof(Flow).FullName, (int)
+            FlowType.Failure);
+        return ConvertFromDbObject<Flow>(dbObject);
+    }
+
     /// <summary>
     /// Tests the connection to a database
     /// </summary>

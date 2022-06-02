@@ -215,7 +215,7 @@ public abstract class DbManager
     /// </summary>
     /// <typeparam name="T">the type of objects to select</typeparam>
     /// <returns>a list of objects</returns>
-    public async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
+    public virtual async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
     {
         using var db = GetDb();
         DateTime start = DateTime.Now;
@@ -262,7 +262,7 @@ public abstract class DbManager
     /// <param name="arguments">the arguments for the select</param>
     /// <typeparam name="T">the type of object to select</typeparam>
     /// <returns>a list of objects</returns>
-    public async Task<IEnumerable<T>> Select<T>(string where, params object[] arguments) where T : FileFlowObject, new()
+    public virtual async Task<IEnumerable<T>> Select<T>(string where, params object[] arguments) where T : FileFlowObject, new()
     {
         using var db = GetDb();
         var dbObjects = await db.FetchAsync<DbObject>($"where Type=@0 and {where} order by Name", typeof(T).FullName, arguments);
@@ -276,7 +276,7 @@ public abstract class DbManager
     /// <param name="args">arguments for where clause</param>
     /// <typeparam name="T">the type to select</typeparam>
     /// <returns>a list of names</returns>
-    public async Task<IEnumerable<string>> GetNames<T>(string andWhere = "", params object[] args)
+    public virtual async Task<IEnumerable<string>> GetNames<T>(string andWhere = "", params object[] args)
     {
         using var db = GetDb();
         
@@ -294,7 +294,7 @@ public abstract class DbManager
     /// <param name="args">arguments for where clause</param>
     /// <typeparam name="T">the type to select</typeparam>
     /// <returns>a list of names</returns>
-    public async Task<Dictionary<Guid, string>> GetIndexedNames<T>(string andWhere = "", params object[] args)
+    public virtual async Task<Dictionary<Guid, string>> GetIndexedNames<T>(string andWhere = "", params object[] args)
     {
         using var db = GetDb();
         
@@ -311,7 +311,7 @@ public abstract class DbManager
     /// <param name="uid">the Uid of the item</param>
     /// <param name="name">the name of the item</param>
     /// <returns>true if name is in use</returns>
-    public bool NameInUse<T>(Guid uid, string name)
+    public virtual bool NameInUse<T>(Guid uid, string name)
     {
         using var db = GetDb();
         string sql = $"Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name = @2";
@@ -329,7 +329,7 @@ public abstract class DbManager
     /// </summary>
     /// <typeparam name="T">The type to select</typeparam>
     /// <returns>a single instance</returns>
-    public async Task<T> Single<T>() where T : FileFlowObject, new()
+    public virtual async Task<T> Single<T>() where T : FileFlowObject, new()
     {
         using var db = GetDb();
         var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0", typeof(T).FullName);
@@ -344,7 +344,7 @@ public abstract class DbManager
     /// <param name="uid">the UID of the item to select</param>
     /// <typeparam name="T">the type of item to select</typeparam>
     /// <returns>a single instance</returns>
-    public async Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
+    public virtual async Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
     {
         using var db = GetDb();
         
@@ -360,7 +360,7 @@ public abstract class DbManager
     /// <param name="name">the name of the item to select</param>
     /// <typeparam name="T">the type of object to select</typeparam>
     /// <returns>a single instance</returns>
-    public async Task<T> SingleByName<T>(string name) where T : FileFlowObject, new()
+    public virtual async Task<T> SingleByName<T>(string name) where T : FileFlowObject, new()
     {
         using var db = GetDb();
         
@@ -428,7 +428,7 @@ public abstract class DbManager
     /// Updates the last modified date of an object
     /// </summary>
     /// <param name="uid">the UID of the object to update</param>
-    internal async Task UpdateLastModified(Guid uid)
+    internal virtual  async Task UpdateLastModified(Guid uid)
     {
         using var db = GetDb();
         await db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
@@ -438,7 +438,7 @@ public abstract class DbManager
     /// This will batch insert many objects into thee database
     /// </summary>
     /// <param name="items">Items to insert</param>
-    internal async Task AddMany(FileFlowObject[] items)
+    internal virtual async Task AddMany(FileFlowObject[] items)
     {
         if (items?.Any() != true)
             return;
@@ -486,7 +486,7 @@ public abstract class DbManager
     /// <param name="args">any parameters to the select statement</param>
     /// <typeparam name="T">the type of object to select</typeparam>
     /// <returns>an single instance</returns>
-    public async Task<T> Single<T>(string andWhere, params object[] args) where T : FileFlowObject, new()
+    public virtual async Task<T> Single<T>(string andWhere, params object[] args) where T : FileFlowObject, new()
     {
         using var db = GetDb();
         args = new object[] { typeof(T).FullName }.Union(args).ToArray();
@@ -521,7 +521,7 @@ public abstract class DbManager
     /// <param name="obj">the object to update</param>
     /// <typeparam name="T">the object type</typeparam>
     /// <returns>the updated object</returns>
-    public async Task<T> Update<T>(T obj) where T : FileFlowObject, new()
+    public virtual async Task<T> Update<T>(T obj) where T : FileFlowObject, new()
     {
         if (obj == null)
             return new T();
@@ -565,7 +565,7 @@ public abstract class DbManager
     /// </summary>
     /// <param name="fullPath">the full path of the library file</param>
     /// <returns>the result of the known library file</returns>
-    public async Task<LibraryFile> FindKnownLibraryFile(string fullPath)
+    public virtual  async Task<LibraryFile> FindKnownLibraryFile(string fullPath)
     {
         using var db = GetDb();
 
@@ -583,7 +583,7 @@ public abstract class DbManager
     /// </summary>
     /// <param name="fingerprint">the fingerprint of the file</param>
     /// <returns>the result of the known file</returns>
-    public async Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint)
+    public virtual async Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint)
     {
         if (string.IsNullOrEmpty(fingerprint))
             return new LibraryFile();
@@ -685,7 +685,7 @@ public abstract class DbManager
     /// <param name="name">the name of the object</param>
     /// <typeparam name="T">the type to fetch</typeparam>
     /// <returns>the object if found</returns>
-    public async Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
+    public virtual async Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
     {
         using var db = GetDb();
 
@@ -697,6 +697,13 @@ public abstract class DbManager
 
         return new ();
     }
+    
+    /// <summary>
+    /// Gets the failure flow for a particular library
+    /// </summary>
+    /// <param name="libraryUid">the UID of the library</param>
+    /// <returns>the failure flow</returns>
+    public abstract Task<Flow> GetFailureFlow(Guid libraryUid);
     
 #if (DEBUG)
     /// <summary>

@@ -7,13 +7,13 @@ AS
 
 
 declare @libsDisabled as varchar(max)
-select @libsDisabled=STRING_AGG(cast([Uid] as varchar(36)),',') from DbObject
+select @libsDisabled=isnull(STRING_AGG(cast([Uid] as varchar(36)),','), '') from DbObject
 where type = 'FileFlows.Shared.Models.Library'
   and json_value([Data],'$.Enabled') = '0'
 
 
 declare @libsOutOfSchedule as varchar(max)
-select @libsOutOfSchedule=STRING_AGG(cast([Uid] as varchar(36)),',') from DbObject
+select @libsOutOfSchedule=isnull(STRING_AGG(cast([Uid] as varchar(36)),','), '') from DbObject
 where type = 'FileFlows.Shared.Models.Library'
   and (json_value([Data],'$.Schedule') = null or json_value([Data],'$.Schedule') = '' or
        substring(json_value([Data], '$.Schedule'), @IntervalIndex, 1) = '1')

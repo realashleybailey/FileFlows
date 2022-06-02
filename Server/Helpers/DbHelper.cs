@@ -99,7 +99,7 @@ public class DbHelper
     /// <returns>a single instance</returns>
     public static Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
         => Manager.Single<T>(uid);
-
+    
     /// <summary>
     /// Selects a single instance by its name
     /// </summary>
@@ -217,6 +217,14 @@ public class DbHelper
     /// <returns>an enumerable of library files</returns>
     public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status) => Manager.GetLibraryFiles(status);
 
+    /// <summary>
+    /// Gets the failure flow for a particular library
+    /// </summary>
+    /// <param name="libraryUid">the UID of the library</param>
+    /// <returns>the failure flow</returns>
+    public static Task<Flow> GetFailureFlow(Guid libraryUid)
+        => Manager.GetFailureFlow(libraryUid);
+    
     /// <summary>
     /// Gets an item from the database by it's name
     /// </summary>

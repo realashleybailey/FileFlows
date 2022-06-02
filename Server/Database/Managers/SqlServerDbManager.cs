@@ -139,6 +139,23 @@ public class SqlServerDbManager: DbManager
     }
 
     /// <summary>
+    /// Gets the failure flow for a particular library
+    /// </summary>
+    /// <param name="libraryUid">the UID of the library</param>
+    /// <returns>the failure flow</returns>
+    public override async Task<Flow> GetFailureFlow(Guid libraryUid)
+    {
+        using var db = GetDb();
+        var dbObject = await db.SingleAsync<DbObject>(
+            "select * from DbObject where Type = @0 " +
+            "and json_value(Data,'$.Type') = @1 " +
+            "and json_value(Data,'$.Enabled') = 1 ",
+            typeof(Flow).FullName, (int)
+            FlowType.Failure);
+        return ConvertFromDbObject<Flow>(dbObject);
+    }
+    
+    /// <summary>
     /// Tests the connection to a database
     /// </summary>
     /// <param name="server">the server address</param>

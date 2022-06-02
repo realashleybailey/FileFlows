@@ -679,6 +679,25 @@ public abstract class DbManager
     /// <returns>an enumerable of library files</returns>
     public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status);
 
+    /// <summary>
+    /// Gets an item from the database by it's name
+    /// </summary>
+    /// <param name="name">the name of the object</param>
+    /// <typeparam name="T">the type to fetch</typeparam>
+    /// <returns>the object if found</returns>
+    public async Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
+    {
+        using var db = GetDb();
+
+        // first see if this file exists by its name
+        var dbObject = await db.FirstOrDefaultAsync<DbObject>(
+            "where Type=@0 and name = @1", typeof(T).FullName, name);
+        if (string.IsNullOrEmpty(dbObject?.Data) == false)
+            return Convert<T>(dbObject);
+
+        return new ();
+    }
+    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

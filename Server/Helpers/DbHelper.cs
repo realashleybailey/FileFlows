@@ -217,6 +217,15 @@ public class DbHelper
     /// <returns>an enumerable of library files</returns>
     public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status) => Manager.GetLibraryFiles(status);
 
+    /// <summary>
+    /// Gets an item from the database by it's name
+    /// </summary>
+    /// <param name="name">the name of the object</param>
+    /// <typeparam name="T">the type to fetch</typeparam>
+    /// <returns>the object if found</returns>
+    public static Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
+        => Manager.GetByName<T>(name);
+
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data
@@ -224,5 +233,4 @@ public class DbHelper
     /// <returns>True if successful</returns>
     public Task<bool> CleanDatabase() => Manager.CleanDatabase();
 #endif
-
 }

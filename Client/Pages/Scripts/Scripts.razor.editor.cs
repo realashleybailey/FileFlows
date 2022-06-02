@@ -30,8 +30,10 @@ function Script(NumberParameter)
 {
     return 1;
 }
-".Trim();
+";
         }
+
+        item.Code = item.Code.Replace("\r\n", "\n").Trim();
 
         fields.Add(new ElementField
         {

@@ -48,7 +48,10 @@ public class WatchedLibrary:IDisposable
                     Thread.Sleep(1000);
                     continue;
                 }
-                Logger.Instance.DLog($"{Library.Name} Dequeued: {fullpath}");
+
+                var settings = new SettingsController().Get().Result;
+                if(settings.LogQueueMessages)
+                    Logger.Instance.DLog($"{Library.Name} Dequeued: {fullpath}");
 
                 if (CheckExists(fullpath) == false)
                 {
@@ -411,7 +414,9 @@ public class WatchedLibrary:IDisposable
 
         if (QueuedFiles.Contains(fullPath) == false)
         {
-            Logger.Instance.ILog($"{Library.Name} queueing file: {fullPath}");
+            var settings = new SettingsController().Get().Result;
+            if(settings.LogQueueMessages)
+                Logger.Instance.ILog($"{Library.Name} queueing file: {fullPath}");
             QueuedFiles.Enqueue(fullPath);
         }
     }
@@ -503,6 +508,7 @@ public class WatchedLibrary:IDisposable
             else 
             {
                 var files = GetFiles(new DirectoryInfo(Library.Path));
+                var settings = new SettingsController().Get().Result;
                 foreach (var file in files)
                 {
                     if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
@@ -510,7 +516,8 @@ public class WatchedLibrary:IDisposable
 
                     if (QueuedFiles.Contains(file.FullName) == false)
                     {
-                        Logger.Instance.DLog($"{Library.Name} queueing file for scan: {file.FullName}");
+                        if(settings.LogQueueMessages)
+                            Logger.Instance.DLog($"{Library.Name} queueing file for scan: {file.FullName}");
                         QueuedFiles.Enqueue(file.FullName);
                         ++count;
                     }

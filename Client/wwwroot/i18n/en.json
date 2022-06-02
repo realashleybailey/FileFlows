@@ -359,6 +359,8 @@
         "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "AutoUpdateNodes": "Auto Update Nodes",
         "AutoUpdateNodes-Help": "When enabled external nodes will automatically update when FileFlows server updates.  Meaning you will only have to update the FileFlows server instance in a distributed environment.",
+        "LogQueueMessages":"Log Queue Messages",
+        "LogQueueMessages-Help":"This will cause excessive logging of all files being queued/dequeued in the library watcher.\nTurn this if you are having issues with files not appearing, turn off again afterwards to avoid filling your log files with excessive logging.",
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
         "PluginRepositoryUrls": "Plugin Repositories",

@@ -36,6 +36,11 @@ public class Settings : FileFlowObject
     }
 
     /// <summary>
+    /// Gets or sets if the Queue messages should be logged
+    /// </summary>
+    public bool LogQueueMessages { get; set; }
+
+    /// <summary>
     /// Gets or sets if this is running on Windows
     /// </summary>
     public bool IsWindows { get; set; }

@@ -8,16 +8,18 @@ public class Upgrade0_7_0
 {
     public void Run(Settings settings)
     {
+        Logger.Instance.ILog("Upgrade running, running 0.7.0 upgrade script");
         settings.LogQueueMessages = false;
         RemovePluginsFromDatabase();
     }
 
     private void RemovePluginsFromDatabase()
     {
+        Logger.Instance.ILog("Upgrading plugins to version 0.7.0");
         // get the plugins we need 
         var pluginDir = PluginScanner.GetPluginDirectory();
         var plugins = new DirectoryInfo(pluginDir).GetFiles("*.ffplugin");
-        
+        Logger.Instance.ILog("Plugins found: " + plugins.Length);
         
 	    // we remove these as we now have constant UID for the plugins
 	    DbHelper.Delete<PluginInfo>("");

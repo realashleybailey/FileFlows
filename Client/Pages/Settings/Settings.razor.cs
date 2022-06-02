@@ -68,15 +68,12 @@ namespace FileFlows.Client.Pages
 
             RequiredValidator.Add(new Required());
             
-            #if(DEBUG)
-            ShowExternalDatabase = true;
-            #endif
-
 #if (!DEMO)
             var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
             if (response.Success)
             {
                 this.Model = response.Data;
+                this.ShowExternalDatabase = this.Model?.DbAllowed == true;
             }
 
             var nodesResponse = await HttpHelper.Get<ProcessingNode[]>("/api/node");

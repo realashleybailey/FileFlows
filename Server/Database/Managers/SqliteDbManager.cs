@@ -46,17 +46,27 @@ public class SqliteDbManager : DbManager
     /// Get an instance of the IDatabase
     /// </summary>
     /// <returns>an instance of the IDatabase</returns>
-    protected override IDatabase GetDb()
+    protected override IDatabase GetDb() => GetDb(this.ConnectionString);
+
+    /// <summary>
+    /// Gets a database instance
+    /// </summary>
+    /// <param name="connectionString">the connection of the database to open</param>
+    /// <returns>a database instance</returns>
+    internal static NPoco.Database GetDb(string connectionString)
     {
         try
         {
-            return new NPoco.Database(ConnectionString, null, SQLiteFactory.Instance);
+            var db = new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
+            db.Mappers.Add(new UidConverter());
+            return db;
         }
         catch (Exception ex)
         {
             Logger.Instance.ELog("Error loading database: " + ex.Message);
             throw;
         }
+        
     }
 
     #region setup code

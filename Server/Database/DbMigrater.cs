@@ -66,7 +66,7 @@ public class DbMigrater
     private static NPoco.Database GetDatabase(string connectionString)
     {
         if(connectionString.Contains(".sqlite"))
-            return new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
+            return SqliteDbManager.GetDb(connectionString);
         
         if(connectionString.Contains(";Uid="))
             return new NPoco.Database(connectionString,

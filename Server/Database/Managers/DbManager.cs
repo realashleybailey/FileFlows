@@ -25,7 +25,7 @@ public abstract class DbManager
     }
     protected readonly string CreateDbScript =
         @$"CREATE TABLE {nameof(DbObject)}(
-            Uid             VARCHAR(36)           NOT NULL          PRIMARY KEY,
+            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
             Name            VARCHAR(255)       NOT NULL,
             Type            VARCHAR(255)       NOT NULL,
             DateCreated     datetime           default           current_timestamp,

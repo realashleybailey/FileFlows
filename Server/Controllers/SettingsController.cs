@@ -78,6 +78,12 @@ namespace FileFlows.Server.Controllers
                 Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 Instance.IsDocker = Program.Docker;
 
+                #if(DEBUG)
+                Instance.DbAllowed = true;
+                #else
+                Instance.DbAllowed = Environment.GetEnvironmentVariable("DevTest") == "1";
+                #endif
+
                 string dbConnStr = AppSettings.Instance.DatabaseConnection;
                 if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
                     Instance.DbType = DatabaseType.Sqlite;

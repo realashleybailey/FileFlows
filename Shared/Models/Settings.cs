@@ -74,6 +74,11 @@ public class Settings : FileFlowObject
     /// Gets or sets the password used to connect to the database
     /// </summary>
     public string DbPassword { get; set; }
+
+    /// <summary>
+    /// Gets or sets if the user can change database settings
+    /// </summary>
+    public bool DbAllowed { get; set; }
 }
 
 /// <summary>

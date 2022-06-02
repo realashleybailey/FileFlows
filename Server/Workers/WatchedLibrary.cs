@@ -34,6 +34,17 @@ public class WatchedLibrary:IDisposable
         worker.DoWork += Worker_DoWork;
         worker.RunWorkerAsync();
     }
+
+    private void LogQueueMessage(string message, Settings settings = null)
+    {
+        if (settings == null)
+            settings = new SettingsController().Get().Result;
+
+        if (settings?.LogQueueMessages != true)
+            return;
+        
+        Logger.Instance.DLog(message);
+    }
     
     private void Worker_DoWork(object? sender, DoWorkEventArgs e)
     {
@@ -44,14 +55,12 @@ public class WatchedLibrary:IDisposable
                 string? fullpath;
                 if (QueuedFiles.TryDequeue(out fullpath) == false)
                 {
-                    Logger.Instance.DLog($"{Library.Name} nothing queued");
+                    LogQueueMessage($"{Library.Name} nothing queued");
                     Thread.Sleep(1000);
                     continue;
                 }
 
-                var settings = new SettingsController().Get().Result;
-                if(settings.LogQueueMessages)
-                    Logger.Instance.DLog($"{Library.Name} Dequeued: {fullpath}");
+                LogQueueMessage($"{Library.Name} Dequeued: {fullpath}");
 
                 if (CheckExists(fullpath) == false)
                 {
@@ -64,14 +73,14 @@ public class WatchedLibrary:IDisposable
                 {
                     if (FileIsHidden(fullpath))
                     {
-                        Logger.Instance.DLog($"{Library.Name} file is hidden: {fullpath}");
+                        LogQueueMessage($"{Library.Name} file is hidden: {fullpath}");
                         continue;
                     }
                 }
 
                 if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
                 {
-                    Logger.Instance.DLog($"{Library.Name} file does not match pattern or ends with _: {fullpath}");
+                    LogQueueMessage($"{Library.Name} file does not match pattern or ends with _: {fullpath}");
                     continue;
                 }
 
@@ -194,7 +203,7 @@ public class WatchedLibrary:IDisposable
             var knownFile = libFiles[knownFileUid];
             if(Library.ReprocessRecreatedFiles == false || fsInfo.CreationTime <= knownFile.CreationTime)
             {
-                Logger.Instance.DLog($"{Library.Name} skipping known file '{fullpath}'");
+                LogQueueMessage($"{Library.Name} skipping known file '{fullpath}'");
                 // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
                 return (true, null, null);
             }
@@ -209,7 +218,7 @@ public class WatchedLibrary:IDisposable
         }
         if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
         {
-            Logger.Instance.DLog($"{Library.Name} skipping known output file '{fullpath}'");
+            LogQueueMessage($"{Library.Name} skipping known output file '{fullpath}'");
             return (true, null, null);
         }
 
@@ -414,9 +423,7 @@ public class WatchedLibrary:IDisposable
 
         if (QueuedFiles.Contains(fullPath) == false)
         {
-            var settings = new SettingsController().Get().Result;
-            if(settings.LogQueueMessages)
-                Logger.Instance.ILog($"{Library.Name} queueing file: {fullPath}");
+            LogQueueMessage($"{Library.Name} queueing file: {fullPath}");
             QueuedFiles.Enqueue(fullPath);
         }
     }
@@ -516,15 +523,14 @@ public class WatchedLibrary:IDisposable
 
                     if (QueuedFiles.Contains(file.FullName) == false)
                     {
-                        if(settings.LogQueueMessages)
-                            Logger.Instance.DLog($"{Library.Name} queueing file for scan: {file.FullName}");
+                        LogQueueMessage($"{Library.Name} queueing file for scan: {file.FullName}", settings);
                         QueuedFiles.Enqueue(file.FullName);
                         ++count;
                     }
                 }
             }
 
-            Logger.Instance.DLog($"Files queued for '{Library.Name}': {count} / {QueuedFiles.Count}");
+            LogQueueMessage($"Files queued for '{Library.Name}': {count} / {QueuedFiles.Count}");
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
         }
         catch(Exception ex)
@@ -582,7 +588,7 @@ public class WatchedLibrary:IDisposable
         }
         finally
         {
-            Logger.Instance.DLog($"Time taken \"{(DateTime.Now.Subtract(now))}\" to test can access file: \"{file}\"");
+            LogQueueMessage($"Time taken \"{(DateTime.Now.Subtract(now))}\" to test can access file: \"{file}\"");
         }
     }
 

@@ -8,6 +8,7 @@ public class Upgrade0_7_0
 {
     public void Run(Settings settings)
     {
+        settings.LogQueueMessages = false;
         RemovePluginsFromDatabase();
     }
 

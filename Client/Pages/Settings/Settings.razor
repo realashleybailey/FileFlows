@@ -42,7 +42,7 @@
                 </FlowTab>
                 <FlowTab Title="@lblDatabase" Visible="@ShowExternalDatabase">
                     <p class="box info">@lblDbDescription</p>
-                    <InputSelect @bind-Value="@DbType" Options=@DbTypes Label="Pages.Settings.Fields.Database.Type"/>
+                    <InputSelect @bind-Value="@DbType" Options=@DbTypes Label="Pages.Settings.Fields.Database.Type" AllowClear="false" />
                     @if (Model.DbType != DatabaseType.Sqlite)
                     {
                         <InputText @bind-Value=@Model.DbServer Label="Pages.Settings.Fields.Database.Server" Validators=@RequiredValidator />

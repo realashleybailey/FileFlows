@@ -167,6 +167,18 @@
                 </FlowTableColumn>
             </Columns>
         </FlowTable>
+        @if (TotalItems > PageSize)
+        {
+            <div class="pager">
+                <ul>
+                @for (int i = 0; i < PageCount; i++)
+                {
+                    int page = i;
+                    <li class="@(page == PageIndex ? "current-page" : "")" @onclick=@(() => PageChange(page))>@(page + 1)</li>
+                }
+                </ul>
+            </div>
+        }
 
     </Body>
 

@@ -116,9 +116,11 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// Lists all of the library files, only intended for the UI
     /// </summary>
     /// <param name="status">The status to list</param>
+    /// <param name="page">The page to get</param>
+    /// <param name="pageSize">The number of items to fetch</param>
     /// <returns>a slimmed down list of files with only needed information</returns>
     [HttpGet("list-all")]
-    public async Task<LibraryFileDatalistModel> ListAll(FileStatus status)
+    public async Task<LibraryFileDatalistModel> ListAll([FromQuery] FileStatus status, [FromQuery] int page = 0, [FromQuery] int pageSize = 0)
     {
         if (DbHelper.UseMemoryCache == false)
         {
@@ -126,10 +128,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             var taskFiles = DbHelper.GetLibraryFiles(status);
             Task.WaitAll(taskOverview, taskFiles);
 
+            var libFiles = await OrderLibraryFiles(taskFiles.Result, status);
+
+            if (pageSize > 0)
+            {
+                int startIndex = page * pageSize;
+                if (libFiles.Count() < startIndex)
+                    libFiles = new List<LibraryFile>();
+                else
+                    libFiles = libFiles.Skip(startIndex).Take(pageSize);
+            }
+
             return new()
             {
                 Status = taskOverview.Result,
-                LibraryFiles = ConvertToListModel(taskFiles.Result, status)
+                LibraryFiles = ConvertToListModel(libFiles, status)
             };
         }
         
@@ -139,6 +152,17 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         var result = new LibraryFileDatalistModel();
         result.Status = GetStatusData(allData.all, allData.libraries);
         result.LibraryFiles = ConvertToListModel(allData.results, status);
+
+
+        if (pageSize > 0)
+        {
+            int startIndex = page * pageSize;
+            var libaryFileListModels = result.LibraryFiles.ToList();
+            if (libaryFileListModels.Count() < startIndex)
+                result.LibraryFiles = new LibaryFileListModel[] { };
+            else
+                result.LibraryFiles = libaryFileListModels.Skip(startIndex).Take(pageSize);
+        }
 
         return result;
     }
@@ -275,6 +299,33 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
 
         return (results, all, libraries);
+    }
+
+    private async Task<IEnumerable<LibraryFile>> OrderLibraryFiles(IEnumerable<LibraryFile> libraryFiles, FileStatus status)
+    {
+        Dictionary<Guid, Library> libraries = await new LibraryController().GetData();
+        
+        if (status is FileStatus.Unprocessed or FileStatus.OutOfSchedule)
+        {
+            return libraryFiles
+                .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
+                .ThenByDescending(x =>
+                {
+                    // check the processing priority of the library
+                    if (x.Library != null && libraries.ContainsKey(x.Library.Uid))
+                    {
+                        return (int)libraries[x.Library.Uid].Priority;
+                    }
+
+                    return (int)ProcessingPriority.Normal;
+                })
+                .ThenBy(x => x.DateCreated);
+        }
+
+        if (status == FileStatus.Processed)
+            return libraryFiles.OrderByDescending(x => x.ProcessingEnded);
+
+        return libraryFiles;
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿.status-picker {
+.status-picker {
   width: 100%;
   margin-top: -1rem;
   margin-bottom: 1rem;
@@ -79,3 +79,31 @@
     margin: auto auto 0.5rem !important;
   }
 }
+.pager {
+  text-align: right;
+  border: solid 1px var(--border-color);
+  border-top: none;
+}
+.pager ul {
+  margin: 0.5rem;
+  list-style: none;
+}
+.pager ul li {
+  display: inline-block;
+  width: 2rem;
+  border: solid 1px var(--accent);
+  text-align: center;
+  margin: 0 0.25rem;
+  cursor: pointer;
+  color: white;
+  filter: opacity(0.4);
+}
+.pager ul li:hover {
+  background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+  box-shadow: inset 0 -3px 0 0 var(--accent) !important;
+}
+.pager ul li.current-page {
+  filter: unset;
+}
+
+/*# sourceMappingURL=LibraryFiles.razor.css.map */

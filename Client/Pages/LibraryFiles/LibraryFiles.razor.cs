@@ -25,6 +25,21 @@ namespace FileFlows.Client.Pages
 
         private string Title;
         private string lblLibraryFiles, lblFileFlowsServer;
+        private int TotalItems;
+        private int PageSize = 1000;
+        private int PageIndex;
+        private int PageCount 
+        {
+            get
+            {
+                if (TotalItems == 0) return 0;
+                if (TotalItems <= PageSize) return 1;
+                int pages = TotalItems / PageSize;
+                if (TotalItems % PageSize > 0)
+                    ++pages;
+                return pages;
+            }
+        }
 
         private void SelectUnprocessed()
         {
@@ -38,6 +53,7 @@ namespace FileFlows.Client.Pages
 
         private void SetSelected(LibraryStatus status)
         {
+            this.PageIndex = 0;
             SelectedStatus = status.Status;
             Title = lblLibraryFiles + ": " + status.Name;
             _ = this.Refresh();
@@ -77,7 +93,7 @@ namespace FileFlows.Client.Pages
         }
 #endif
 
-        public override string FetchUrl => ApiUrl + "/list-all?status=" + SelectedStatus;
+        public override string FetchUrl => $"{ApiUrl}/list-all?status={SelectedStatus}&page={PageIndex}&pageSize={PageSize}";
 
         private string NameMinWidth = "20ch";
 
@@ -88,6 +104,7 @@ namespace FileFlows.Client.Pages
             else
                 this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
             //await RefreshStatus();
+            CheckPager();
         }
 
         protected override async Task PostDelete()
@@ -147,8 +164,9 @@ namespace FileFlows.Client.Pages
            Statuses.Clear();
            Statuses.AddRange(data.OrderBy(x => { int index = order.IndexOf(x.Status); return index >= 0 ? index : 100; }));
                   this.Count = Statuses.Where(x => x.Status == SelectedStatus).Select(x => x.Count).FirstOrDefault();
-           
-       }
+
+            CheckPager();
+        }
 
         public override async Task<bool> Edit(LibaryFileListModel item)
         {
@@ -256,6 +274,22 @@ namespace FileFlows.Client.Pages
                 Success = request.Success,
                 Data = request.Data.LibraryFiles.ToList()
             };
+        }
+
+        /// <summary>
+        /// Checks if the pager should be visible on the amount of data
+        /// </summary>
+        private void CheckPager()
+        {
+            var status = this.Statuses.FirstOrDefault(x => x.Status == this.SelectedStatus);
+            this.TotalItems = status?.Count ?? 0;
+            this.StateHasChanged();
+        }
+
+        private async Task PageChange(int index)
+        {
+            PageIndex = index;
+            await this.Refresh();
         }
     }
 }

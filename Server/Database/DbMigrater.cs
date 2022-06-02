@@ -16,24 +16,24 @@ public class DbMigrater
     /// <returns>if the migration was successful</returns>
     public static bool Migrate(string sourceConnection, string destinationConnection)
     {
-        Logger.Instance?.ILog("Database Migration started");
-
-        using var source = GetDatabase(sourceConnection);
-
-        var destDbManager = DbManager.GetManager(destinationConnection);
-        destDbManager.CreateDb(insertInitialData: false).Wait();
-        using var dest = GetDatabase(destinationConnection);
-
-        var dbObjects = source.Fetch<DbObject>($"select * from {nameof(DbObject)}")?.ToArray();
-        if (dbObjects?.Any() != true)
+        try
         {
-            Logger.Instance?.ILog("Database Migration finished with nothing to migrate");
-            return true;
-        }
+            Logger.Instance?.ILog("Database Migration started");
 
-        foreach (var obj in dbObjects)
-        {
-            try
+            using var source = GetDatabase(sourceConnection);
+
+            var destDbManager = DbManager.GetManager(destinationConnection);
+            destDbManager.CreateDb(insertInitialData: false).Wait();
+            using var dest = GetDatabase(destinationConnection);
+
+            var dbObjects = source.Fetch<DbObject>($"select * from {nameof(DbObject)}")?.ToArray();
+            if (dbObjects?.Any() != true)
+            {
+                Logger.Instance?.ILog("Database Migration finished with nothing to migrate");
+                return true;
+            }
+
+            foreach (var obj in dbObjects)
             {
                 Logger.Instance?.DLog($"Migrating [{obj.Uid}][{obj.Type}]: {obj.Name ?? string.Empty}");
 
@@ -46,16 +46,15 @@ public class DbMigrater
                     obj.DateModified,
                     obj.Data ?? string.Empty);
             }
-            catch (Exception ex)
-            {
-                Logger.Instance.ELog("Failed to migrate data: " + ex.Message);
-                return false;
-            }
+
+            Logger.Instance?.ILog("Database Migration complete");
+            return true;
         }
-
-        Logger.Instance?.ILog("Database Migration complete");
-
-        return true;
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Failed to migrate data: " + ex.Message);
+            return false;
+        }
     }
 
     /// <summary>

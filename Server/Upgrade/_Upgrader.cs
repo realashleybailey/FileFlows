@@ -18,7 +18,7 @@ public class Upgrader
             new Upgrade0_6_0().Run();
         if (currentVersion < new Version(0, 6, 1, 987))
             new Upgrade0_6_1().Run(settings);
-        if (currentVersion < new Version(0, 7, 0, 1075))
+        if (currentVersion < new Version(0, 7, 1, 1000))
             new Upgrade0_7_0().Run(settings);
         
 

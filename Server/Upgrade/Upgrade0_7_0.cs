@@ -24,10 +24,12 @@ public class Upgrade0_7_0
         // download the plugins we just deleted, this ensures they have the UID set
         foreach (var plugin in plugins)
         {
+            string name = plugin.Name;
+            Logger.Instance.ILog("Updating plugin: " + name);
             // first delete it
             plugin.Delete();
             // now download it
-            new PluginController().DownloadPluginFromRepository(plugin.Name);
+            new PluginController().DownloadPluginFromRepository(name);
         }
         
         // now scan the plugins again

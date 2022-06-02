@@ -65,6 +65,9 @@ public class DbMigrater
     /// <returns></returns>
     private static NPoco.Database GetDatabase(string connectionString)
     {
+        if(string.IsNullOrWhiteSpace(connectionString))
+            connectionString = DbManager.GetDefaultConnectionString();
+        
         if(connectionString.Contains(".sqlite"))
             return SqliteDbManager.GetDb(connectionString);
         

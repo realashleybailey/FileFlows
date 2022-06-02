@@ -1,5 +1,6 @@
 using System.Data.SQLite;
 using System.Text.RegularExpressions;
+using FileFlows.Shared.Models;
 using NPoco;
 
 namespace FileFlows.Server.Database.Managers;
@@ -115,5 +116,16 @@ public class SqliteDbManager : DbManager
 
         return true;// tables exist, all good
     }
+
+    public override Task<LibraryFileStatusOverview> GetLibraryFileOverview()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 }

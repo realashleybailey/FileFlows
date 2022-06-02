@@ -52,13 +52,15 @@ public class MySqlDbManager: DbManager
     {
         Logger.Instance.ILog("Creating Stored Procedures");
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
-        string sqlGetNextLibraryFile = GetSqlScript("MySql", "GetNextLibraryFile.sql");
-        if (string.IsNullOrEmpty(sqlGetNextLibraryFile) == false)
+        
+        
+        var scripts = GetStoredProcedureScripts("MySql");
+        foreach (var sql in scripts)
         {
             try
             {
-                sqlGetNextLibraryFile = sqlGetNextLibraryFile.Replace("@", "@@");
-                db.Execute(sqlGetNextLibraryFile);
+                var script  = sql.Replace("@", "@@");
+                db.Execute(script);
             }
             catch (Exception ex)
             {
@@ -80,6 +82,29 @@ public class MySqlDbManager: DbManager
         return true;
     }
 
+    /// <summary>
+    /// Gets the library file status  
+    /// </summary>
+    /// <returns></returns>
+    public override async Task<LibraryFileStatusOverview> GetLibraryFileOverview()
+    {
+        int quarter = TimeHelper.GetCurrentQuarter();
+        using var db = GetDb();
+        return await db.FirstOrDefaultAsync<LibraryFileStatusOverview>("call GetLibraryFileOverview(@0)", quarter);
+    }
+
+    /// <summary>
+    /// Gets the library file with the corresponding status
+    /// </summary>
+    /// <param name="status">the library file status</param>
+    /// <returns>an enumerable of library files</returns>
+    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status)
+    {
+        int quarter = TimeHelper.GetCurrentQuarter();
+        using var db = GetDb();
+        return await db.FetchAsync<LibraryFile>("call GetLibraryFiles(@0, @1)", quarter, (int)status);
+    }
+    
     /// <summary>
     /// Tests the connection to a database
     /// </summary>

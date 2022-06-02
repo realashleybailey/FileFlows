@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using FileFlows.Server.Database.Managers;
 using FileFlows.Shared;
 
 namespace FileFlows.Server.Controllers;
@@ -119,11 +120,48 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet("list-all")]
     public async Task<LibraryFileDatalistModel> ListAll(FileStatus status)
     {
+        if (DbHelper.UseMemoryCache == false)
+        {
+            var taskOverview = DbHelper.GetLibraryFileOverview();
+            var taskFiles = DbHelper.GetLibraryFiles(status);
+            Task.WaitAll(taskOverview, taskFiles);
+
+            var listLibStatus = new List<LibraryStatus>();
+            listLibStatus.Add(new () { Status = FileStatus.Unprocessed, Count = taskOverview.Result.Unprocessed});
+            listLibStatus.Add(new () { Status = FileStatus.Processing, Count = taskOverview.Result.Processing});
+            listLibStatus.Add(new () { Status = FileStatus.Processed, Count = taskOverview.Result.Processed});
+            listLibStatus.Add(new () { Status = FileStatus.ProcessingFailed, Count = taskOverview.Result.ProcessingFailed});
+            if(taskOverview.Result.Disabled > 0)
+                listLibStatus.Add(new () { Status = FileStatus.FlowNotFound, Count = taskOverview.Result.FlowNotFound});
+            if(taskOverview.Result.OutOfSchedule > 0)
+                listLibStatus.Add(new () { Status = FileStatus.OutOfSchedule, Count = taskOverview.Result.OutOfSchedule});
+            if(taskOverview.Result.Disabled > 0)
+                listLibStatus.Add(new () { Status = FileStatus.Disabled, Count = taskOverview.Result.Disabled});
+            if(taskOverview.Result.MappingIssue > 0)
+                listLibStatus.Add(new () { Status = FileStatus.MappingIssue, Count = taskOverview.Result.MappingIssue});
+            if(taskOverview.Result.Duplicate > 0)
+                listLibStatus.Add(new () { Status = FileStatus.Duplicate, Count = taskOverview.Result.Duplicate});
+            
+            return new()
+            {
+                Status = listLibStatus,
+                LibraryFiles = ConvertToListModel(taskFiles.Result, status)
+            };
+        }
+        
+        
         var allData  = await GetAllComplete(status);
         
         var result = new LibraryFileDatalistModel();
         result.Status = GetStatusData(allData.all, allData.libraries);
-        result.LibraryFiles = allData.results.Select(x =>
+        result.LibraryFiles = ConvertToListModel(allData.results, status);
+
+        return result;
+    }
+
+    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status)
+    {
+        return files.Select(x =>
         {
             var item = new LibaryFileListModel
             {
@@ -153,8 +191,6 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             }
             return item;
         });
-
-        return result;
     }
 
     /// <summary>

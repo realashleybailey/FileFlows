@@ -26,7 +26,7 @@ public abstract class DbManager
     protected readonly string CreateDbScript =
         @$"CREATE TABLE {nameof(DbObject)}(
             Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
-            Name            VARCHAR(255)       NOT NULL,
+            Name            VARCHAR(1024)      NOT NULL,
             Type            VARCHAR(255)       NOT NULL,
             DateCreated     datetime           default           current_timestamp,
             DateModified    datetime           default           current_timestamp,
@@ -608,7 +608,7 @@ public abstract class DbManager
     /// <param name="dbType">The type of database this script is for</param>
     /// <param name="script">The script name</param>
     /// <returns>the sql script</returns>
-    public string GetSqlScript(string dbType, string script)
+    public static string GetSqlScript(string dbType, string script)
     {
         try
         {
@@ -626,6 +626,34 @@ public abstract class DbManager
         }
     }
 
+    /// <summary>
+    /// Gets the sql scripts for a database
+    /// </summary>
+    /// <param name="dbType">the type of database</param>
+    /// <returns>a list of stored procedures</returns>
+    protected static List<string> GetStoredProcedureScripts(string dbType)
+    {
+        List<string> scripts = new();
+        foreach (string script in new[] { "GetNextLibraryFile", "GetLibraryFileOverview", "GetLibraryFiles" })
+        {
+            string sql = GetSqlScript(dbType, script + ".sql");
+            scripts.Add(sql);
+        }
+        return scripts;
+    }
+
+    /// <summary>
+    /// Gets the library file status  
+    /// </summary>
+    /// <returns>the overview of the library files</returns>
+    public abstract Task<LibraryFileStatusOverview> GetLibraryFileOverview();
+
+    /// <summary>
+    /// Gets the library file with the corresponding status
+    /// </summary>
+    /// <param name="status">the library file status</param>
+    /// <returns>an enumerable of library files</returns>
+    public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status);
 
 #if (DEBUG)
     /// <summary>

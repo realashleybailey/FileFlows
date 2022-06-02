@@ -184,6 +184,18 @@ public class DbHelper
     public static Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid) =>
         Manager.GetNextLibraryFile(node, workerUid);
 
+    /// <summary>
+    /// Gets the library file status  
+    /// </summary>
+    /// <returns>the overview of the library files</returns>
+    public static Task<LibraryFileStatusOverview> GetLibraryFileOverview() => Manager.GetLibraryFileOverview();
+    
+    /// <summary>
+    /// Gets the library file with the corresponding status
+    /// </summary>
+    /// <param name="status">the library file status</param>
+    /// <returns>an enumerable of library files</returns>
+    public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status) => Manager.GetLibraryFiles(status);
 
 #if (DEBUG)
     /// <summary>

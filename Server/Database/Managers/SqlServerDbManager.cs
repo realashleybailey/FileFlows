@@ -56,21 +56,22 @@ public class SqlServerDbManager: DbManager
     {
         Logger.Instance.ILog("Creating Stored Procedures");
         using var db = new NPoco.Database(ConnectionString, null, SqlClientFactory.Instance);
-        string sqlGetNextLibraryFile = GetSqlScript("SqlServer", "GetNextLibraryFile.sql");
-        if (string.IsNullOrEmpty(sqlGetNextLibraryFile) == false)
+
+        var scripts = GetStoredProcedureScripts("SqlServer");
+        foreach (var sql in scripts)
         {
-            try
+            foreach (string script in sql.Split(new string[] { "\nGO" },
+                         StringSplitOptions.RemoveEmptyEntries))
             {
-                foreach (string script in sqlGetNextLibraryFile.Split(new string[] { "\nGO" },
-                             StringSplitOptions.RemoveEmptyEntries))
+                try
                 {
                     var sqlScript = script.Replace("@", "@@").Trim();
                     db.Execute(sqlScript);
                 }
-            }
-            catch (Exception ex)
-            {
-                throw;
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
         }
     }
@@ -112,6 +113,29 @@ public class SqlServerDbManager: DbManager
         {
             throw;
         }
+    }
+
+    /// <summary>
+    /// Gets the library file status  
+    /// </summary>
+    /// <returns></returns>
+    public override async Task<LibraryFileStatusOverview> GetLibraryFileOverview()
+    {
+        int quarter = TimeHelper.GetCurrentQuarter();
+        using var db = GetDb();
+        return await db.FirstOrDefaultAsync<LibraryFileStatusOverview>("exec GetLibraryFileOverview @@IntervalIndex=@0", quarter);
+    }
+
+    /// <summary>
+    /// Gets the library file with the corresponding status
+    /// </summary>
+    /// <param name="status">the library file status</param>
+    /// <returns>an enumerable of library files</returns>
+    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status)
+    {
+        int quarter = TimeHelper.GetCurrentQuarter();
+        using var db = GetDb();
+        return await db.FetchAsync<LibraryFile>("exec GetLibraryFiles @@IntervalIndex=@0, @@Status=@1", quarter, (int)status);
     }
 
     /// <summary>

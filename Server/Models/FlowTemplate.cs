@@ -1,7 +1,6 @@
 ﻿using FileFlows.Shared;
 using System.Dynamic;
-
-namespace FileFlows.Server.Models;
+using FileFlows.Shared.Models;
 
 /// <summary>
 /// A flow template
@@ -31,7 +30,7 @@ class FlowTemplate
     /// <summary>
     /// Gets or sets the fields in this template
     /// </summary>
-    public List<Shared.Models.TemplateField> Fields { get; set; }
+    public List<TemplateField> Fields { get; set; }
     
     /// <summary>
     /// Gets or sets the order this template appears

@@ -188,7 +188,27 @@ public class DbHelper
     /// Gets the library file status  
     /// </summary>
     /// <returns>the overview of the library files</returns>
-    public static Task<LibraryFileStatusOverview> GetLibraryFileOverview() => Manager.GetLibraryFileOverview();
+    public static async Task<List<LibraryStatus>> GetLibraryFileOverview()
+    {
+        var overview = await Manager.GetLibraryFileOverview();
+        
+        var listLibStatus = new List<LibraryStatus>();
+        listLibStatus.Add(new () { Status = FileStatus.Unprocessed, Count = overview.Unprocessed});
+        listLibStatus.Add(new () { Status = FileStatus.Processing, Count = overview.Processing});
+        listLibStatus.Add(new () { Status = FileStatus.Processed, Count = overview.Processed});
+        listLibStatus.Add(new () { Status = FileStatus.ProcessingFailed, Count = overview.ProcessingFailed});
+        if(overview.Disabled > 0)
+            listLibStatus.Add(new () { Status = FileStatus.FlowNotFound, Count = overview.FlowNotFound});
+        if(overview.OutOfSchedule > 0)
+            listLibStatus.Add(new () { Status = FileStatus.OutOfSchedule, Count = overview.OutOfSchedule});
+        if(overview.Disabled > 0)
+            listLibStatus.Add(new () { Status = FileStatus.Disabled, Count = overview.Disabled});
+        if(overview.MappingIssue > 0)
+            listLibStatus.Add(new () { Status = FileStatus.MappingIssue, Count = overview.MappingIssue});
+        if(overview.Duplicate > 0)
+            listLibStatus.Add(new () { Status = FileStatus.Duplicate, Count = overview.Duplicate});
+        return listLibStatus;
+    } 
     
     /// <summary>
     /// Gets the library file with the corresponding status

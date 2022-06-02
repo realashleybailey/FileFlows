@@ -102,7 +102,8 @@ public class MySqlDbManager: DbManager
     {
         int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
-        return await db.FetchAsync<LibraryFile>("call GetLibraryFiles(@0, @1)", quarter, (int)status);
+        var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1)", quarter, (int)status);
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
     
     /// <summary>

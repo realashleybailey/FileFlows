@@ -104,10 +104,9 @@ public class SqlServerDbManager: DbManager
 
         try
         {
-
-            var result = await db.FirstOrDefaultAsync<LibraryFile>("exec GetNextLibraryFile @@NodeUid=@0, @@WorkerUid=@1, @@IntervalIndex=@2, @@StartDate=@3", 
+            var result = await db.FirstOrDefaultAsync<DbObject>("exec GetNextLibraryFile @@NodeUid=@0, @@WorkerUid=@1, @@IntervalIndex=@2, @@StartDate=@3", 
                 node.Uid, workerUid, quarter, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
-            return result;
+            return ConvertFromDbObject<LibraryFile>(result);
         }
         catch(Exception ex)
         {
@@ -135,7 +134,8 @@ public class SqlServerDbManager: DbManager
     {
         int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
-        return await db.FetchAsync<LibraryFile>("exec GetLibraryFiles @@IntervalIndex=@0, @@Status=@1", quarter, (int)status);
+        var dbObjects = await db.FetchAsync<DbObject>("exec GetLibraryFiles @@IntervalIndex=@0, @@Status=@1", quarter, (int)status);
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
 
     /// <summary>

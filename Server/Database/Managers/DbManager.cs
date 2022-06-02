@@ -220,6 +220,17 @@ public abstract class DbManager
         using var db = GetDb();
         DateTime start = DateTime.Now;
         var dbObjects = await db.FetchAsync<DbObject>("where Type=@0", typeof(T).FullName);
+        return ConvertFromDbObject<T>(dbObjects);
+    }
+
+    /// <summary>
+    /// Converts DbObjects into strong types
+    /// </summary>
+    /// <param name="dbObjects">a collection of DbObjects</param>
+    /// <typeparam name="T">The type to convert to</typeparam>
+    /// <returns>A converted list of objects</returns>
+    internal List<T> ConvertFromDbObject<T>(IEnumerable<DbObject> dbObjects) where T : FileFlowObject, new()
+    {
         List<T> results = new();
         Parallel.ForEach(dbObjects, x =>
         {
@@ -230,7 +241,20 @@ public abstract class DbManager
         results = results.Where(x => x != null).OrderBy(x => x?.Name ?? String.Empty).ToList();
         return results;
     }
-    
+
+    /// <summary>
+    /// Converts DbObject into strong type
+    /// </summary>
+    /// <param name="dbObject">the DbObject to convert</param>
+    /// <typeparam name="T">The type to convert to</typeparam>
+    /// <returns>A converted object</returns>
+    internal T ConvertFromDbObject<T>(DbObject dbObject)where T : FileFlowObject, new()
+    {
+        if(dbObject == null)
+            return default;
+        return Convert<T>(dbObject);
+    }
+
     /// <summary>
     /// Selects types from the database
     /// </summary>

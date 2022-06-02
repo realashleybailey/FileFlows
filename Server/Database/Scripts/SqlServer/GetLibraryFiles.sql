@@ -31,21 +31,21 @@ begin
 select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                          and json_value([Data], '$.Status') = 0
                          and charindex(json_value([Data], '$.Library.Uid'), @libsDisabled) > 0
-                         and charindex(json_value([Data], '$.Library.Uid'), @libsOutOfSchedule) < 1
+                         and charindex(json_value([Data], '$.Library.Uid'), @libsOutOfSchedule) is null
 end
 else if @Status = -1 -- out of schedule
 begin
 select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                          and json_value([Data], '$.Status') = 0
-                         and charindex(json_value([Data], '$.Library.Uid'), @libsDisabled) < 1
+                         and charindex(json_value([Data], '$.Library.Uid'), @libsDisabled) is null
                          and charindex(json_value([Data], '$.Library.Uid'), @libsOutOfSchedule) > 1
 end
 else
 begin
 select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                          and json_value([Data], '$.Status') = 0
-                         and charindex(json_value([Data], '$.Library.Uid'), @libsDisabled) < 1
-                         and charindex(json_value([Data], '$.Library.Uid'), @libsOutOfSchedule) < 1
+                         and charindex(json_value([Data], '$.Library.Uid'), @libsDisabled) is null
+                         and charindex(json_value([Data], '$.Library.Uid'), @libsOutOfSchedule) is null
 end
 end
 

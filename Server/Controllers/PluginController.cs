@@ -417,6 +417,11 @@ public class PluginController : ControllerStore<PluginInfo>
         return repos;
     }
 
+    /// <summary>
+    /// Downloads a plugin binary from the repository
+    /// </summary>
+    /// <param name="packageName">the package name of the plugin to download</param>
+    /// <returns>the download result</returns>
     internal (bool Success, byte[] Data) DownloadPluginFromRepository(string packageName)
     {
         var repos = GetRepositories();

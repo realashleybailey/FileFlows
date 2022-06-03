@@ -138,8 +138,6 @@ public class WebServer
         // do this so the settings object is loaded
         var settings = new Controllers.SettingsController().Get().Result;
 
-        // run any upgrade code that may need to be run
-        new Upgrade.Upgrader().Run(settings);
 
         // need to scan for plugins before initing the translater as that depends on the plugins directory
         Helpers.PluginScanner.Scan();

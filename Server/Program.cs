@@ -2,7 +2,9 @@ using System.Collections;
 using Avalonia;
 using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
+using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.Server;
 
@@ -99,6 +101,11 @@ public class Program
                     AppSettings.Instance.Save();
                 }
             }
+            
+            
+            // run any upgrade code that may need to be run
+            var settings = DbHelper.Single<Settings>().Result;
+            new Upgrade.Upgrader().Run(settings);
 
             if (Docker || noGui)
             {

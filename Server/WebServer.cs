@@ -23,7 +23,6 @@ public class WebServer
 
     public static void Start(string[] args)
     {
-        Shared.Logger.Instance = Logger.Instance;
         if (Helpers.DbHelper.Initialize().Result == false)
         {
             Logger.Instance.ELog("Failed initializing database");

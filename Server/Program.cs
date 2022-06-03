@@ -39,9 +39,9 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.bat"));
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
-            
-            Logger.Instance = new Server.Logger();
-            ServerShared.Logger.Instance = Logger.Instance;
+
+
+            InitializeLogger();
 
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
@@ -120,6 +120,13 @@ public class Program
             catch (Exception) { }
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
+    }
+
+    private static void InitializeLogger()
+    {
+        Logger.Instance = new Server.Logger();
+        Shared.Logger.Instance = Logger.Instance;
+        ServerShared.Logger.Instance = Logger.Instance;
     }
 
     private static bool PrepareDatabase()

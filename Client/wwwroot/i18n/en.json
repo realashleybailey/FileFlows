@@ -341,7 +341,8 @@
         "InternalProcessingNode": "Internal Node",
         "Database":"Database",
         "System":"System",
-        "Restart":"Restart FileFlows"
+        "Restart":"Restart FileFlows",
+        "Logging":"Logging"
       },
       "Messages":{
         "Database":{

@@ -29,7 +29,6 @@
                     <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
                     <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins"/>
                     <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdateNodes" Label="Pages.Settings.Fields.AutoUpdateNodes"/>
-                    <InputSwitch @bind-Value="@Model.LogQueueMessages" Inverse="@true" Label="Pages.Settings.Fields.LogQueueMessages"/>
                 </FlowTab>
                 <FlowTab Title="@lblNode" Visible="@ShowInternalProcessingNdoe">
                     <p>@lblInternalProcessingNodeDescription</p>
@@ -55,6 +54,9 @@
                             <button class="btn" @onclick=@Restart>@lblRestart</button>
                         </div>
                     }
+                </FlowTab>
+                <FlowTab Title=@lblLogging>
+                    <InputSwitch @bind-Value="@Model.LogQueueMessages" Inverse="@true" Label="Pages.Settings.Fields.LogQueueMessages"/>
                 </FlowTab>
                 <FlowTab Title="@lblAdvanced">
                     <InputTextAreaList @bind-Value="@Model.PluginRepositoryUrls" Label="Pages.Settings.Fields.PluginRepositoryUrls" />

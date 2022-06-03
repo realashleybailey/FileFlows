@@ -52,6 +52,7 @@
                         <InputPassword @bind-Value=@Model.DbPassword Label="Pages.Settings.Fields.Database.Password" Validators=@RequiredValidator/>
                         <div class="btn-test">
                             <button class="btn" @onclick=@TestDbConnection>@lblTest</button>
+                            <button class="btn" @onclick=@Restart>@lblRestart</button>
                         </div>
                     }
                 </FlowTab>

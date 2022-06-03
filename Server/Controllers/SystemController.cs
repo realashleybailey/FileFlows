@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using FileFlows.Server.Workers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,5 +89,15 @@ public class SystemController:Controller
 
         var cpuUsagePercentage = (float)(cpuUsageTotal * 100);
         return cpuUsagePercentage;
+    }
+
+    /// <summary>
+    /// Restarts FileFLow server
+    /// </summary>
+    [HttpPost("restart")]
+    public void Restart()
+    {
+        WorkerManager.StopWorkers();
+        Environment.Exit(99);
     }
 }

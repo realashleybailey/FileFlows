@@ -22,7 +22,8 @@ namespace FileFlows.Client.Pages
 
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblInternalProcessingNodeDescription, lblDbDescription, lblTest;
+        private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, 
+            lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblSystem, lblRestart;
 
         private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
 
@@ -64,6 +65,8 @@ namespace FileFlows.Client.Pages
             lblInternalProcessingNodeDescription = Translater.Instant("Pages.Settings.Fields.InternalProcessingNode.Description");
             lblDbDescription = Translater.Instant("Pages.Settings.Fields.Database.Description");
             lblTest = Translater.Instant(("Label.Test"));
+            lblSystem = Translater.Instant(("Pages.Settings.Labels.System"));
+            lblRestart= Translater.Instant(("Pages.Settings.Labels.Restart"));
             Blocker.Show("Loading Settings");
 
             RequiredValidator.Add(new Required());
@@ -164,7 +167,11 @@ namespace FileFlows.Client.Pages
             {
                 Blocker.Hide();
             }
+        }
 
+        async void Restart()
+        {
+            await HttpHelper.Post("/api/system/restart");
         }
     }
 }

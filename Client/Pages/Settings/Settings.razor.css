@@ -8,7 +8,10 @@
   margin: 2rem 0 0 14rem;
 }
 .settings ::deep .btn-test .btn {
-  width: 8rem;
+  width: 9rem;
+}
+.settings ::deep .btn-test .btn + .btn {
+  margin-left: 1rem;
 }
 .settings ::deep .row + .row {
   margin-top: 1rem;

@@ -11,6 +11,15 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class MySqlDbManager: DbManager
 {
+    protected readonly string CreateMySqlDbScript =
+        @$"CREATE TABLE {nameof(DbObject)}(
+            Uid             VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
+            Name            VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
+            Type            VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
+            DateCreated     datetime           default           now(),
+            DateModified    datetime           default           now(),
+            Data            MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
+        );";
     /// <summary>
     /// Creates an instance of a MySqlDbManager
     /// </summary>
@@ -73,13 +82,15 @@ public class MySqlDbManager: DbManager
     protected override bool CreateDatabaseStructure()
     {
         Logger.Instance.ILog("Creating Database Structure");
-
-        string createDbSql = CreateDbScript.Replace("current_timestamp", "now()")
-            .Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
+        
+        // string createDbSql = CreateDbScript.Replace("current_timestamp", "now()");
+        // createDbSql = createDbSql.Replace("NOT NULL", "COLLATE utf8_unicode_ci  NOT NULL");
+        // createDbSql = createDbSql.Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
-        db.Execute(createDbSql);
+        db.Execute(CreateMySqlDbScript);
 
-        db.Execute("ALTER TABLE DbObject ADD INDEX (Type, Name);");
+        db.Execute($"CREATE INDEX idx_DbObject_Type ON {nameof(DbObject)}(Type)");
+        db.Execute($"CREATE INDEX idx_DbObject_Name ON {nameof(DbObject)}(Name)");
         return true;
     }
 

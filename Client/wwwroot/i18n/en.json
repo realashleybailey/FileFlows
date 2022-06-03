@@ -339,7 +339,9 @@
       "Labels": {
         "General": "General",
         "InternalProcessingNode": "Internal Node",
-        "Database":"Database"
+        "Database":"Database",
+        "System":"System",
+        "Restart":"Restart FileFlows"
       },
       "Messages":{
         "Database":{

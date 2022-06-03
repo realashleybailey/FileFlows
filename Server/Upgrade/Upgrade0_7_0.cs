@@ -32,7 +32,7 @@ public class Upgrade0_7_0
             // first delete it
             plugin.Delete();
             // now download it
-            new PluginController().DownloadPluginFromRepository(name);
+            new PluginController().DownloadPluginFromRepository(name.Replace(plugin.Extension, ""));
         }
         
         // now scan the plugins again

@@ -424,6 +424,7 @@ public class PluginController : ControllerStore<PluginInfo>
     /// <returns>the download result</returns>
     internal (bool Success, byte[] Data) DownloadPluginFromRepository(string packageName)
     {
+        Logger.Instance.ILog("Downloading Plugin Package: " + packageName);
         var repos = GetRepositories();
         Version ffVersion = new Version(Globals.Version);
         foreach (string repo in repos)

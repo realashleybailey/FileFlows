@@ -53,7 +53,7 @@ public class PluginDownloader
                 if (dlResult.Success)
                     return (true, dlResult.Data);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
             }

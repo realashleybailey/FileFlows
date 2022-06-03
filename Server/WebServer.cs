@@ -143,8 +143,6 @@ public class WebServer
 
         Helpers.TranslaterHelper.InitTranslater();
 
-        Shared.Helpers.HttpHelper.Client = new HttpClient();
-
         ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{Port}";
 
 

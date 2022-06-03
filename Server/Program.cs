@@ -80,6 +80,9 @@ public class Program
                     return;
                 }
             }
+            
+            // create new client, this can be used by upgrade scripts, so do this before preparing database
+            Shared.Helpers.HttpHelper.Client = new HttpClient();
 
             if (PrepareDatabase() == false)
                 return;

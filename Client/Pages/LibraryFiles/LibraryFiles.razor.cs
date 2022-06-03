@@ -26,7 +26,7 @@ namespace FileFlows.Client.Pages
         private string Title;
         private string lblLibraryFiles, lblFileFlowsServer;
         private int TotalItems;
-        private int PageSize = 1000;
+        private int PageSize = 500;
         private int PageIndex;
         private int PageCount 
         {

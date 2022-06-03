@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS GetLibraryFileOverview;
 
 CREATE PROCEDURE GetLibraryFileOverview(IntervalIndex int)
 BEGIN
-    
+        
 declare cntDisabled int;
 declare cntOutOfSchedule int;
 declare cntUnprocessed int;
@@ -15,35 +15,42 @@ declare cntMappingIssue int;
 declare libsDisabled text;
 declare libsOutOfSchedule text;
 
-set libsDisabled = (
-    select GROUP_CONCAT(Uid,',') from DbObject
-    where type = 'FileFlows.Shared.Models.Library'
-    and JSON_EXTRACT(Data,'$.Enabled') = '0'
-);
 
-set libsOutOfSchedule = (
-    select GROUP_CONCAT(Uid,',') from DbObject
-    where type = 'FileFlows.Shared.Models.Library'
-    and (substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) = '0')
-);
+    set libsDisabled=(
+        select GROUP_CONCAT(Uid,',') from DbObject
+        where type = 'FileFlows.Shared.Models.Library'
+        and JSON_EXTRACT(Data,'$.Enabled') = '0'
+    );
+    if libsDisabled is null then
+        set libsDisabled  = '';
+end if;          
+    set libsOutOfSchedule = (
+        select GROUP_CONCAT(Uid,',') from DbObject
+        where type = 'FileFlows.Shared.Models.Library'
+        and (substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) = '0')
+    );
+    if libsOutOfSchedule is null then
+        set libsOutOfSchedule  = '';
+end if;
 
 set cntDisabled = (
     select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+    and length(libsDisabled) > 0
     and JSON_EXTRACT(Data, '$.Status') = 0
-    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) > 0
-    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1
+    and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%')
     );
 
 set cntOutOfSchedule = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+    and length(libsOutOfSchedule) > 0
     and JSON_EXTRACT(Data, '$.Status') = 0
-    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) > 1
+    and (length(libsDisabled) < 1 or libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%'))    
+    and libsOutOfSchedule like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%')
     );
 
 set cntUnprocessed = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 0
-    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1
+    and (length(libsDisabled) < 1 or libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%'))
+    and (length(libsOutOfSchedule) < 1 or libsOutOfSchedule not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%'))
     );
 
 

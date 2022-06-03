@@ -17,32 +17,34 @@ BEGIN
         where type = 'FileFlows.Shared.Models.Library'
       and JSON_EXTRACT(Data,'$.Enabled') = '0'
     );
-        
-    
-    
+    if libsDisabled is null then
+        set libsDisabled  = '';
+    end if;          
     set libsOutOfSchedule = (
         select GROUP_CONCAT(Uid,',') from DbObject
         where type = 'FileFlows.Shared.Models.Library'
       and (substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) = '0')
     );
+    if libsOutOfSchedule is null then
+        set libsOutOfSchedule  = '';
+    end if;
     
     if Status = -2 then -- disabled
     select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                              and JSON_EXTRACT(Data, '$.Status') = 0
-                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) > 0
-                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1;
+                             and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%');
     
     elseif Status = -1 then -- out of schedule
     select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                              and JSON_EXTRACT(Data, '$.Status') = 0
-                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) > 1;
+                             and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%')
+                             and libsOutOfSchedule like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%');
     
     else
     select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                              and JSON_EXTRACT(Data, '$.Status') = 0
-                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1;
+                             and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%')
+                             and libsOutOfSchedule not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%');
     end if;
     end if;
 

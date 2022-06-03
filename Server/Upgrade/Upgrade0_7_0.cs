@@ -41,7 +41,15 @@ public class Upgrade0_7_0
             // first delete it
             plugin.Delete();
             // now download it
-            pluginDownloader.Download(name.Replace(plugin.Extension, ""));
+            var result = pluginDownloader.Download(name);
+            if (result.Success == false)
+            {
+                Logger.Instance.WLog("Failed updating plugin");
+                continue;
+            }
+
+            File.WriteAllBytes(plugin.FullName, result.Data);
+            Shared.Logger.Instance.ILog("Successfully downloaded updated plugin: " + plugin.Name);
         }
         
         // now scan the plugins again

@@ -55,7 +55,7 @@ public class PluginDownloader
             }
             catch (Exception ex)
             {
-
+                Logger.Instance.WLog("Failed downloading plugin: " + ex.Message);
             }
         }
         return (false, new byte[0]);

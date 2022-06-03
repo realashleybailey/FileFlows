@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Workers;
+﻿using FileFlows.Server.Helpers;
+
+namespace FileFlows.Server.Workers;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
@@ -25,6 +27,8 @@ public class PluginUpdaterWorker : Worker
         var plugins = controller.GetDataList().Result;
         var latestPackages = controller.GetPluginPackages().Result;
 
+        var pluginDownloader = new PluginDownloader(controller.GetRepositories());
+        
         foreach(var plugin in plugins)
         {
             try
@@ -39,7 +43,7 @@ public class PluginUpdaterWorker : Worker
                     continue;
                 }
 
-                var dlResult = new PluginController().DownloadPluginFromRepository(package.Package);
+                var dlResult = pluginDownloader.Download(package.Package);
 
                 if (dlResult.Success == false)
                 {

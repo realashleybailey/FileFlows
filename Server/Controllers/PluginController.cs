@@ -17,7 +17,7 @@ using System.Text.Json;
 [Route("/api/plugin")]
 public class PluginController : ControllerStore<PluginInfo>
 {
-    private const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
+    internal const string PLUGIN_BASE_URL = "https://fileflows.com/api/plugin";
 
     /// <summary>
     /// Get a list of all plugins in the system
@@ -149,7 +149,8 @@ public class PluginController : ControllerStore<PluginInfo>
     {
         bool updated = false;
         var plugins = await GetPluginPackages();
-        
+
+        var pluginDownloader = new PluginDownloader(this.GetRepositories());
         foreach (var uid in model?.Uids ?? new Guid[] { })
         {
             var plugin = await Get(uid);
@@ -171,7 +172,7 @@ public class PluginController : ControllerStore<PluginInfo>
                 continue;
             }
 
-            var dlResult = DownloadPluginFromRepository(ppi.Package);
+            var dlResult = pluginDownloader.Download(ppi.Package);
             if (dlResult.Success == false)
             {
                 Logger.Instance.WLog("PluginUpdate: Failed to download plugin");
@@ -222,11 +223,12 @@ public class PluginController : ControllerStore<PluginInfo>
         if (model == null || model.Packages?.Any() != true)
             return; // nothing to delete
 
+        var pluginDownloader = new PluginDownloader(GetRepositories());
         foreach(var package in model.Packages)
         {
             try
             {
-                var dlResult = DownloadPluginFromRepository(package);
+                var dlResult = pluginDownloader.Download(package);
                 if (dlResult.Success)
                     PluginScanner.UpdatePlugin(package, dlResult.Data);
             }
@@ -409,53 +411,11 @@ public class PluginController : ControllerStore<PluginInfo>
         public List<string> Packages { get; set; }
     }
 
-    private List<string> GetRepositories()
+    internal List<string> GetRepositories()
     {
         var repos = new SettingsController().Get().Result.PluginRepositoryUrls?.Select(x => x)?.ToList() ?? new List<string>();
         if (repos.Contains(PLUGIN_BASE_URL) == false)
             repos.Add(PLUGIN_BASE_URL);
         return repos;
-    }
-
-    /// <summary>
-    /// Downloads a plugin binary from the repository
-    /// </summary>
-    /// <param name="packageName">the package name of the plugin to download</param>
-    /// <returns>the download result</returns>
-    internal (bool Success, byte[] Data) DownloadPluginFromRepository(string packageName)
-    {
-        Logger.Instance.ILog("Downloading Plugin Package: " + packageName);
-        var repos = GetRepositories();
-        Version ffVersion = new Version(Globals.Version);
-        foreach (string repo in repos)
-        {
-            try
-            {
-                var plugins = HttpHelper.Get<IEnumerable<PluginPackageInfo>>(repo + "?rand=" + DateTime.Now.ToFileTime()).Result;
-                if (plugins.Success == false)
-                    continue;
-                var plugin = plugins?.Data?.Where(x => x.Package == packageName)?.FirstOrDefault();
-                if (plugin == null)
-                    continue;
-
-                if(string.IsNullOrWhiteSpace(plugin.MinimumVersion) == false)
-                {
-                    if (ffVersion < Version.Parse(plugin.MinimumVersion))
-                        continue;
-                }
-
-                string url = repo + "/download/" + packageName;
-                if (url.EndsWith(".ffplugin") == false)
-                    url += ".ffplugin";
-                var dlResult = HttpHelper.Get<byte[]>(url).Result;
-                if (dlResult.Success)
-                    return (true, dlResult.Data);
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-        return (false, new byte[0]);
     }
 }

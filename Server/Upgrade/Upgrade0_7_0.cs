@@ -10,10 +10,10 @@ public class Upgrade0_7_0
     {
         Logger.Instance.ILog("Upgrade running, running 0.7.0 upgrade script");
         settings.LogQueueMessages = false;
-        RemovePluginsFromDatabase();
+        RemovePluginsFromDatabase(settings);
     }
 
-    private void RemovePluginsFromDatabase()
+    private void RemovePluginsFromDatabase(Settings settings)
     {
         Logger.Instance.ILog("Upgrading plugins to version 0.7.0");
         // get the plugins we need 
@@ -23,7 +23,16 @@ public class Upgrade0_7_0
         
 	    // we remove these as we now have constant UID for the plugins
 	    DbHelper.Delete<PluginInfo>("");
+
         
+        var repos = settings.PluginRepositoryUrls?.Select(x => x)?.ToList() ?? new List<string>();
+        if (repos.Contains(PluginController.PLUGIN_BASE_URL) == false)
+            repos.Add(PluginController.PLUGIN_BASE_URL);
+        
+        foreach(var repo in repos)
+            Logger.Instance.ILog("Plugin repository: " + repo);
+        
+        var pluginDownloader = new PluginDownloader(repos);
         // download the plugins we just deleted, this ensures they have the UID set
         foreach (var plugin in plugins)
         {
@@ -32,7 +41,7 @@ public class Upgrade0_7_0
             // first delete it
             plugin.Delete();
             // now download it
-            new PluginController().DownloadPluginFromRepository(name.Replace(plugin.Extension, ""));
+            pluginDownloader.Download(name.Replace(plugin.Extension, ""));
         }
         
         // now scan the plugins again

@@ -55,12 +55,13 @@ public class MySqlDbManager: DbManager
         
         
         var scripts = GetStoredProcedureScripts("MySql");
-        foreach (var sql in scripts)
+        foreach (var script in scripts)
         {
             try
             {
-                var script  = sql.Replace("@", "@@");
-                db.Execute(script);
+                Logger.Instance.ILog("Creating script: " + script.Key);
+                var sql = script.Value.Replace("@", "@@");
+                db.Execute(sql);
             }
             catch (Exception ex)
             {
@@ -124,6 +125,32 @@ public class MySqlDbManager: DbManager
     }
 
     /// <summary>
+    /// Gets the upcoming files to process
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the upcoming files to process</returns>
+    public override async Task<IEnumerable<LibraryFile>> GetUpcoming(int max)
+    {
+        using var db = GetDb();
+        int quarter = TimeHelper.GetCurrentQuarter();
+        var dbObjects = await db.FetchAsync<DbObject>("call GetUpcoming(@0, @1)", quarter, max);
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
+    }
+    
+    /// <summary>
+    /// Gets the recently finished files
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the recently finished files</returns>
+    public override async Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max)
+    {
+        using var db = GetDb();
+        var dbObjects =
+            await db.FetchAsync<DbObject>("call GetRecentlyFinished(@0)", max);
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
+    }
+
+    /// <summary>
     /// Tests the connection to a database
     /// </summary>
     /// <param name="server">the server address</param>
@@ -165,7 +192,9 @@ public class MySqlDbManager: DbManager
         builder["Database"] = database?.EmptyAsNull() ?? "FileFlows";
         builder["Uid"] = user;
         builder["Pwd"] = password;
-        return builder.ConnectionString;
+        string connstr = builder.ConnectionString;
+        connstr = connstr.Replace("User ID", "Uid");
+        return connstr;
     }
 
     /// <summary>

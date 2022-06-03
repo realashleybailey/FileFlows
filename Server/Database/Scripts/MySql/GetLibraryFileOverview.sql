@@ -15,61 +15,59 @@ declare cntMappingIssue int;
 declare libsDisabled text;
 declare libsOutOfSchedule text;
 
-set libsDisabled = (select STRING_AGG(Uid,',') from DbObject
-where type = 'FileFlows.Shared.Models.Library'
-  and JSON_EXTRACT(Data,'$.Enabled') = '0'
+set libsDisabled = (
+    select GROUP_CONCAT(Uid,',') from DbObject
+    where type = 'FileFlows.Shared.Models.Library'
+    and JSON_EXTRACT(Data,'$.Enabled') = '0'
 );
-
 
 set libsOutOfSchedule = (
-select STRING_AGG(Uid,',') from DbObject
-where type = 'FileFlows.Shared.Models.Library'
-  and (JSON_EXTRACT(Data,'$.Schedule') = null or JSON_EXTRACT(Data,'$.Schedule') = '' or
-       substring(JSON_EXTRACT(Data, '$.Schedule'), IntervalIndex, 1) = '1')
+    select GROUP_CONCAT(Uid,',') from DbObject
+    where type = 'FileFlows.Shared.Models.Library'
+    and (substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) = '0')
 );
 
-
 set cntDisabled = (
-    select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+    select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 0
-    and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) > 0
-    and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1
+    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) > 0
+    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1
     );
 
-set cntOutOfSchedule = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntOutOfSchedule = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 0
-    and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-    and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) > 1
+    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
+    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) > 1
     );
 
-set cntUnprocessed = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntUnprocessed = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 0
-    and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-    and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1
+    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
+    and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1
     );
 
 
-set cntProcessed = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntProcessed = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 1
     );
 
-set cntProcessing = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntProcessing = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 2
     );
 
-set cntFlowNotFound = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntFlowNotFound = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 3
     );
 
-set cntProcessingFailed = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntProcessingFailed = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 4
     );
 
-set cntDuplicate = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntDuplicate = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 5
     );
 
-set cntMappingIssue = (select count (Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
+set cntMappingIssue = (select count(Uid) from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
     and JSON_EXTRACT(Data, '$.Status') = 6
     );
 

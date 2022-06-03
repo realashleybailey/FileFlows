@@ -108,7 +108,7 @@ public abstract class DbManager
         CreateStoredProcedures();
 
 
-        if (this is SqliteDbManager == false)
+        if (recreate == false && this is SqliteDbManager == false)
         {
             // not a sqlite database, check if one exists and migrate
             if (File.Exists(SqliteDbFile))
@@ -672,13 +672,13 @@ public abstract class DbManager
     /// </summary>
     /// <param name="dbType">the type of database</param>
     /// <returns>a list of stored procedures</returns>
-    protected static List<string> GetStoredProcedureScripts(string dbType)
+    protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
     {
-        List<string> scripts = new();
-        foreach (string script in new[] { "GetNextLibraryFile", "GetLibraryFileOverview", "GetLibraryFiles" })
+        Dictionary<string, string> scripts = new();
+        foreach (string script in new[] { "GetNextLibraryFile", "GetLibraryFileOverview", "GetLibraryFiles", "GetUpcoming", "GetRecentlyFinished" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
-            scripts.Add(sql);
+            scripts.Add(script, sql);
         }
         return scripts;
     }
@@ -721,6 +721,21 @@ public abstract class DbManager
     /// <param name="libraryUid">the UID of the library</param>
     /// <returns>the failure flow</returns>
     public abstract Task<Flow> GetFailureFlow(Guid libraryUid);
+    
+    /// <summary>
+    /// Gets the upcoming files to process
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the upcoming files to process</returns>
+    public abstract Task<IEnumerable<LibraryFile>> GetUpcoming(int max);
+    
+    
+    /// <summary>
+    /// Gets the recently finished files
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the recently finished files</returns>
+    public abstract Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max);
     
 #if (DEBUG)
     /// <summary>

@@ -335,8 +335,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet("upcoming")]
     public async Task<IEnumerable<LibraryFile>> Upcoming()
     {
-        var libFiles = await GetAll(FileStatus.Unprocessed);
-        return libFiles.Take(10);
+        if (DbHelper.UseMemoryCache)
+        {
+            var libFiles = await GetAll(FileStatus.Unprocessed);
+            return libFiles.Take(10);
+        }
+
+        return await DbHelper.GetUpcoming(10);
     }
 
     /// <summary>
@@ -346,11 +351,16 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet("recently-finished")]
     public async Task<IEnumerable<LibraryFile>> RecentlyFinished()
     {
-        var libraryFiles = await GetDataList();
-        return libraryFiles
-                       .Where(x => x.Status == FileStatus.Processed)
-                       .OrderByDescending(x => x.ProcessingEnded)
-                       .Take(10);
+        if (DbHelper.UseMemoryCache)
+        {
+            var libraryFiles = await GetDataList();
+            return libraryFiles
+                .Where(x => x.Status == FileStatus.Processed)
+                .OrderByDescending(x => x.ProcessingEnded)
+                .Take(10);
+        }
+
+        return await DbHelper.GetRecentlyFinished(10);
     }
 
     internal async Task ResetProcessingStatus(Guid nodeUid)

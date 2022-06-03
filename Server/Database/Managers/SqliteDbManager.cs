@@ -132,5 +132,15 @@ public class SqliteDbManager : DbManager
         throw new NotImplementedException();
     }
 
+    public override Task<IEnumerable<LibraryFile>> GetUpcoming(int max)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 }

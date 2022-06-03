@@ -58,14 +58,16 @@ public class SqlServerDbManager: DbManager
         using var db = new NPoco.Database(ConnectionString, null, SqlClientFactory.Instance);
 
         var scripts = GetStoredProcedureScripts("SqlServer");
-        foreach (var sql in scripts)
+        foreach (var script in scripts)
         {
-            foreach (string script in sql.Split(new string[] { "\nGO" },
+            Logger.Instance.ILog("Creating script: " + script.Key);
+            
+            foreach (string sql in script.Value.Split(new string[] { "\nGO" },
                          StringSplitOptions.RemoveEmptyEntries))
             {
                 try
                 {
-                    var sqlScript = script.Replace("@", "@@").Trim();
+                    var sqlScript = sql.Replace("@", "@@").Trim();
                     db.Execute(sqlScript);
                 }
                 catch (Exception ex)
@@ -135,6 +137,33 @@ public class SqlServerDbManager: DbManager
         int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
         var dbObjects = await db.FetchAsync<DbObject>("exec GetLibraryFiles @@IntervalIndex=@0, @@Status=@1", quarter, (int)status);
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
+    }
+    
+    /// <summary>
+    /// Gets the upcoming files to process
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the upcoming files to process</returns>
+    public override async Task<IEnumerable<LibraryFile>> GetUpcoming(int max)
+    {
+        using var db = GetDb();
+        int quarter = TimeHelper.GetCurrentQuarter();
+        var dbObjects =
+            await db.FetchAsync<DbObject>("exec GetUpcoming @@IntervalIndex=@0, @@MaxItems=@1", quarter, max);
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
+    }
+
+    /// <summary>
+    /// Gets the recently finished files
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the recently finished files</returns>
+    public override async Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max)
+    {
+        using var db = GetDb();
+        var dbObjects =
+            await db.FetchAsync<DbObject>("exec GetRecentlyFinished @@MaxItems=@0", max);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
 

@@ -15,8 +15,11 @@ where type = 'FileFlows.Shared.Models.Library'
 declare @libsOutOfSchedule as varchar(max)
 select @libsOutOfSchedule=isnull(STRING_AGG(cast([Uid] as varchar(36)),','), '') from DbObject
 where type = 'FileFlows.Shared.Models.Library'
-  and (json_value([Data],'$.Schedule') = null or json_value([Data],'$.Schedule') = '' or
-       substring(json_value([Data], '$.Schedule'), @IntervalIndex, 1) = '1')
+  and not (
+            json_value([Data],'$.Schedule') = null or
+            json_value([Data],'$.Schedule') = '' or
+            substring(json_value([Data], '$.Schedule'), @IntervalIndex, 1) <> '0'
+    )
 
 
 declare @cntDisabled as int

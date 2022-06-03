@@ -12,33 +12,37 @@ BEGIN
     
     else
     
-    select libsDisabled=STRING_AGG(Uid,',') from DbObject
-    where type = 'FileFlows.Shared.Models.Library'
-      and JSON_EXTRACT(Data,'$.Enabled') = '0';
+    set libsDisabled=(
+        select GROUP_CONCAT(Uid,',') from DbObject
+        where type = 'FileFlows.Shared.Models.Library'
+      and JSON_EXTRACT(Data,'$.Enabled') = '0'
+    );
+        
     
     
-    select libsOutOfSchedule=STRING_AGG(Uid,',') from DbObject
-    where type = 'FileFlows.Shared.Models.Library'
-      and (JSON_EXTRACT(Data,'$.Schedule') = null or JSON_EXTRACT(Data,'$.Schedule') = '' or
-           substring(JSON_EXTRACT(Data, '$.Schedule'), IntervalIndex, 1) = '1');
+    set libsOutOfSchedule = (
+        select GROUP_CONCAT(Uid,',') from DbObject
+        where type = 'FileFlows.Shared.Models.Library'
+      and (substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) = '0')
+    );
     
     if Status = -2 then -- disabled
     select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                              and JSON_EXTRACT(Data, '$.Status') = 0
-                             and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) > 0
-                             and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1;
+                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) > 0
+                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1;
     
     elseif Status = -1 then -- out of schedule
     select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                              and JSON_EXTRACT(Data, '$.Status') = 0
-                             and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-                             and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) > 1;
+                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
+                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) > 1;
     
     else
     select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
                              and JSON_EXTRACT(Data, '$.Status') = 0
-                             and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
-                             and charindex(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1;
+                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsDisabled) < 1
+                             and instr(JSON_EXTRACT(Data, '$.Library.Uid'), libsOutOfSchedule) < 1;
     end if;
     end if;
 

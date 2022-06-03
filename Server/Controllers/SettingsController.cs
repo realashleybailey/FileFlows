@@ -1,3 +1,4 @@
+using System.Data;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared;
 
@@ -84,7 +85,7 @@ namespace FileFlows.Server.Controllers
                 Instance.DbAllowed = Environment.GetEnvironmentVariable("DevTest") == "1";
                 #endif
 
-                string dbConnStr = AppSettings.Instance.DatabaseConnection;
+                string dbConnStr = AppSettings.Instance.DatabaseMigrateConnection?.EmptyAsNull() ?? AppSettings.Instance.DatabaseConnection;
                 if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
                     Instance.DbType = DatabaseType.Sqlite;
                 else if (dbConnStr.Contains(";Uid="))
@@ -115,24 +116,24 @@ namespace FileFlows.Server.Controllers
             model.DateCreated = settings.DateCreated;
             model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             model.IsDocker = Program.Docker;
-            Instance = model;
 
-            var newConnectionString = GetConnectionString(model);
+            var newConnectionString = GetConnectionString(model, model.DbType);
             if (newConnectionString != AppSettings.Instance.DatabaseConnection)
             {
                 // need to migrate the database
                 AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
                 AppSettings.Instance.Save();
             }
+            Instance = model;
             return await DbHelper.Update(model);
         }
 
-        private string GetConnectionString(Settings settings)
+        private string GetConnectionString(Settings settings, DatabaseType dbType)
         {
-            if (settings.DbType == DatabaseType.SqlServer)
+            if (dbType == DatabaseType.SqlServer)
                 return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
                     settings.DbPassword);
-            if (settings.DbType == DatabaseType.MySql)
+            if (dbType == DatabaseType.MySql)
                 return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
                     settings.DbPassword);
             return string.Empty;

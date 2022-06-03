@@ -10,7 +10,9 @@ public class Upgrade0_7_0
     {
         Logger.Instance.ILog("Upgrade running, running 0.7.0 upgrade script");
         settings.LogQueueMessages = false;
+        #if(!DEBUG)
         RemovePluginsFromDatabase(settings);
+        #endif
     }
 
     private void RemovePluginsFromDatabase(Settings settings)

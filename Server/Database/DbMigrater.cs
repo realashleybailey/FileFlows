@@ -23,7 +23,7 @@ public class DbMigrater
             using var source = GetDatabase(sourceConnection);
 
             var destDbManager = DbManager.GetManager(destinationConnection);
-            destDbManager.CreateDb(insertInitialData: false).Wait();
+            destDbManager.CreateDb(recreate: true, insertInitialData: false).Wait();
             using var dest = GetDatabase(destinationConnection);
 
             var dbObjects = source.Fetch<DbObject>($"select * from {nameof(DbObject)}")?.ToArray();
@@ -37,14 +37,23 @@ public class DbMigrater
             {
                 Logger.Instance?.DLog($"Migrating [{obj.Uid}][{obj.Type}]: {obj.Name ?? string.Empty}");
 
-                dest.Execute(
-                    $"insert into {nameof(DbObject)} (Uid, Name, Type, DateCreated, DateModified, Data) values (@0, @1, @2, @3, @4, @5)",
-                    obj.Uid.ToString(),
-                    obj.Name,
-                    obj.Type,
-                    obj.DateCreated,
-                    obj.DateModified,
-                    obj.Data ?? string.Empty);
+                try
+                {
+                    dest.Execute(
+                        $"insert into {nameof(DbObject)} (Uid, Name, Type, DateCreated, DateModified, Data) values (@0, @1, @2, @3, @4, @5)",
+                        obj.Uid.ToString(),
+                        obj.Name,
+                        obj.Type,
+                        obj.DateCreated,
+                        obj.DateModified,
+                        obj.Data ?? string.Empty);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.ELog("Failed migrating: " +  ex.Message);
+                    Logger.Instance.ELog("Migration Object: " + JsonSerializer.Serialize(obj));
+                    throw;
+                }
             }
 
             Logger.Instance?.ILog("Database Migration complete");

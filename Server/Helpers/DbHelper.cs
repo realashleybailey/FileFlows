@@ -1,3 +1,4 @@
+using System.Data.Entity.Infrastructure;
 using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
 using MySqlConnector;
@@ -19,6 +20,7 @@ using System.Text;
 public class DbHelper
 {
     private static Server.Database.Managers.DbManager Manager;
+
     /// <summary>
     /// Initializes the DbHelper with an instance of a DbManager
     /// </summary>
@@ -33,7 +35,7 @@ public class DbHelper
     /// <summary>
     /// Gets if the database manager should use a memory cache
     /// </summary>
-    internal static bool UseMemoryCache => Manager.UseMemoryCache; 
+    internal static bool UseMemoryCache => Manager.UseMemoryCache;
 
 
     /// <summary>
@@ -73,7 +75,7 @@ public class DbHelper
     /// <returns>a list of names</returns>
     public static Task<Dictionary<Guid, string>> GetIndexedNames<T>(string andWhere = "", params object[] args) =>
         Manager.GetIndexedNames<T>(andWhere, args);
-    
+
     /// <summary>
     /// Checks to see if a name is in use
     /// </summary>
@@ -99,7 +101,7 @@ public class DbHelper
     /// <returns>a single instance</returns>
     public static Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
         => Manager.Single<T>(uid);
-    
+
     /// <summary>
     /// Selects a single instance by its name
     /// </summary>
@@ -157,7 +159,7 @@ public class DbHelper
     /// </summary>
     /// <param name="uids">the UIDs of the items to delete</param>
     public static Task Delete(params Guid[] uids) => Manager.Delete(uids);
-    
+
     /// <summary>
     /// Delete items from a database
     /// </summary>
@@ -165,7 +167,7 @@ public class DbHelper
     /// <param name="args">arguments for where clause</param>
     /// <typeparam name="T">the type to delete</typeparam>
     public static Task Delete<T>(string andWhere = "", params object[] args) => Manager.Delete<T>(andWhere, args);
-    
+
     /// <summary>
     /// Finds an existing library file in the database
     /// </summary>
@@ -198,25 +200,25 @@ public class DbHelper
     public static async Task<List<LibraryStatus>> GetLibraryFileOverview()
     {
         var overview = await Manager.GetLibraryFileOverview();
-        
+
         var listLibStatus = new List<LibraryStatus>();
-        listLibStatus.Add(new () { Status = FileStatus.Unprocessed, Count = overview.Unprocessed});
-        listLibStatus.Add(new () { Status = FileStatus.Processing, Count = overview.Processing});
-        listLibStatus.Add(new () { Status = FileStatus.Processed, Count = overview.Processed});
-        listLibStatus.Add(new () { Status = FileStatus.ProcessingFailed, Count = overview.ProcessingFailed});
-        if(overview.Disabled > 0)
-            listLibStatus.Add(new () { Status = FileStatus.FlowNotFound, Count = overview.FlowNotFound});
-        if(overview.OutOfSchedule > 0)
-            listLibStatus.Add(new () { Status = FileStatus.OutOfSchedule, Count = overview.OutOfSchedule});
-        if(overview.Disabled > 0)
-            listLibStatus.Add(new () { Status = FileStatus.Disabled, Count = overview.Disabled});
-        if(overview.MappingIssue > 0)
-            listLibStatus.Add(new () { Status = FileStatus.MappingIssue, Count = overview.MappingIssue});
-        if(overview.Duplicate > 0)
-            listLibStatus.Add(new () { Status = FileStatus.Duplicate, Count = overview.Duplicate});
+        listLibStatus.Add(new() { Status = FileStatus.Unprocessed, Count = overview.Unprocessed });
+        listLibStatus.Add(new() { Status = FileStatus.Processing, Count = overview.Processing });
+        listLibStatus.Add(new() { Status = FileStatus.Processed, Count = overview.Processed });
+        listLibStatus.Add(new() { Status = FileStatus.ProcessingFailed, Count = overview.ProcessingFailed });
+        if (overview.Disabled > 0)
+            listLibStatus.Add(new() { Status = FileStatus.FlowNotFound, Count = overview.FlowNotFound });
+        if (overview.OutOfSchedule > 0)
+            listLibStatus.Add(new() { Status = FileStatus.OutOfSchedule, Count = overview.OutOfSchedule });
+        if (overview.Disabled > 0)
+            listLibStatus.Add(new() { Status = FileStatus.Disabled, Count = overview.Disabled });
+        if (overview.MappingIssue > 0)
+            listLibStatus.Add(new() { Status = FileStatus.MappingIssue, Count = overview.MappingIssue });
+        if (overview.Duplicate > 0)
+            listLibStatus.Add(new() { Status = FileStatus.Duplicate, Count = overview.Duplicate });
         return listLibStatus;
-    } 
-    
+    }
+
     /// <summary>
     /// Gets the library file with the corresponding status
     /// </summary>
@@ -231,7 +233,7 @@ public class DbHelper
     /// <returns>the failure flow</returns>
     public static Task<Flow> GetFailureFlow(Guid libraryUid)
         => Manager.GetFailureFlow(libraryUid);
-    
+
     /// <summary>
     /// Gets an item from the database by it's name
     /// </summary>
@@ -241,6 +243,20 @@ public class DbHelper
     public static Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
         => Manager.GetByName<T>(name);
 
+    /// <summary>
+    /// Gets the upcoming files to process
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the upcoming files to process</returns>
+    public static Task<IEnumerable<LibraryFile>> GetUpcoming(int max) => Manager.GetUpcoming(max);
+
+    /// <summary>
+    /// Gets the recently finished files
+    /// </summary>
+    /// <param name="max">the maximum number to get</param>
+    /// <returns>the recently finished files</returns>
+    public static Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max) => Manager.GetRecentlyFinished(max);
+    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

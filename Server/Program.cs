@@ -81,31 +81,8 @@ public class Program
                 }
             }
 
-            if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
-            {
-                if (AppSettings.Instance.DatabaseConnection == AppSettings.Instance.DatabaseMigrateConnection)
-                {
-                    AppSettings.Instance.DatabaseMigrateConnection = null;
-                    AppSettings.Instance.Save();
-                }
-                else
-                {
-                    Console.WriteLine("Database migration starting");
-                    bool migrated = DbMigrater.Migrate(AppSettings.Instance.DatabaseConnection,
-                        AppSettings.Instance.DatabaseMigrateConnection);
-                    if (migrated)
-                        AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
-                    else
-                        Console.WriteLine("Database migration failed, reverting to previous database settings");
-                    AppSettings.Instance.DatabaseMigrateConnection = null;
-                    AppSettings.Instance.Save();
-                }
-            }
-            
-            
-            // run any upgrade code that may need to be run
-            var settings = DbHelper.Single<Settings>().Result;
-            new Upgrade.Upgrader().Run(settings);
+            if (PrepareDatabase() == false)
+                return;
 
             if (Docker || noGui)
             {
@@ -143,6 +120,44 @@ public class Program
             catch (Exception) { }
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
+    }
+
+    private static bool PrepareDatabase()
+    {
+        if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
+        {
+            if (AppSettings.Instance.DatabaseConnection == AppSettings.Instance.DatabaseMigrateConnection)
+            {
+                AppSettings.Instance.DatabaseMigrateConnection = null;
+                AppSettings.Instance.Save();
+            }
+            else
+            {
+                Console.WriteLine("Database migration starting");
+                bool migrated = DbMigrater.Migrate(AppSettings.Instance.DatabaseConnection,
+                    AppSettings.Instance.DatabaseMigrateConnection);
+                if (migrated)
+                    AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
+                else
+                    Console.WriteLine("Database migration failed, reverting to previous database settings");
+                AppSettings.Instance.DatabaseMigrateConnection = null;
+                AppSettings.Instance.Save();
+            }
+        }
+            
+        // initialize the database
+        if (DbHelper.Initialize().Result == false)
+        {
+            Logger.Instance.ELog("Failed initializing database");
+            return false;
+        }
+        Logger.Instance.ILog("Database initialized");
+            
+        // run any upgrade code that may need to be run
+        var settings = DbHelper.Single<Settings>().Result;
+        new Upgrade.Upgrader().Run(settings);
+        
+        return true;
     }
 
     /// <summary>

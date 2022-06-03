@@ -35,10 +35,17 @@ public class PluginDownloader
             {
                 var plugins = HttpHelper.Get<IEnumerable<PluginPackageInfo>>(repo + "?rand=" + DateTime.Now.ToFileTime()).Result;
                 if (plugins.Success == false)
+                {
+                    Logger.Instance.ILog("Plugin repository failed to download.");
                     continue;
-                var plugin = plugins?.Data?.Where(x => x.Package == packageName)?.FirstOrDefault();
+                }
+
+                var plugin = plugins?.Data?.Where(x => x.Package.Replace(".ffplugin", string.Empty).ToLower() == packageName.Replace(".ffplugin", string.Empty).ToLower())?.FirstOrDefault();
                 if (plugin == null)
+                {
+                    Logger.Instance.ILog("Plugin not found in repository: " + packageName);
                     continue;
+                }
 
                 if(string.IsNullOrWhiteSpace(plugin.MinimumVersion) == false)
                 {
@@ -49,9 +56,11 @@ public class PluginDownloader
                 string url = repo + "/download/" + packageName;
                 if (url.EndsWith(".ffplugin") == false)
                     url += ".ffplugin";
+                Logger.Instance.ILog("Downloading plugin from: " + url);
                 var dlResult = HttpHelper.Get<byte[]>(url).Result;
                 if (dlResult.Success)
                     return (true, dlResult.Data);
+                throw new Exception(dlResult.Body);
             }
             catch (Exception ex)
             {

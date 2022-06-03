@@ -84,9 +84,36 @@
   border: solid 1px var(--border-color);
   border-top: none;
 }
+.pager .page-size {
+  float: right;
+  margin: 0.3rem 0.25rem 0.25rem;
+  width: 4rem;
+  text-align: center;
+}
+.pager .page-size select {
+  background-color: transparent;
+  color: var(--color) !important;
+  border-color: transparent;
+}
+.pager .page-size select:focus {
+  outline: 1px solid var(--accent);
+}
+.pager .page-size select.select-one {
+  color: rgba(var(--color-rgb), 0.3) !important;
+}
+.pager .page-size select option {
+  background-color: var(--input-background) !important;
+}
+.pager .page-size select option:not(.select-one) {
+  color: var(--color) !important;
+}
+.pager .page-size select option:checked {
+  background-color: rgba(var(--accent-rgb), 0.3);
+}
 .pager ul {
   margin: 0.5rem;
   list-style: none;
+  padding: 0;
 }
 .pager ul li {
   display: inline-block;
@@ -104,6 +131,12 @@
 }
 .pager ul li.current-page {
   filter: unset;
+}
+
+@media (max-width: 576px) {
+  .pager .page-size {
+    width: 3.5rem;
+  }
 }
 
 /*# sourceMappingURL=LibraryFiles.razor.css.map */

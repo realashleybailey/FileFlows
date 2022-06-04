@@ -67,7 +67,7 @@ function Script()
 	    return new Script
 	    {
 		    Uid = new Guid("2d8c9a03-4ed3-4406-a633-38d0e2eec806"),
-		    Name = "Video: Downscale greater than 1080P",
+		    Name = "Video: Downscale greater than 1080p",
 		    Code =
 			    $@"
 /**
@@ -187,7 +187,7 @@ function Script(MaxBitrateKbps)
  * Requires a 7Zip tool to be configured and will zip files
  * @author John Andrews
  * @version {Globals.Version}
- * @param {{string}} ArchiveFile The name of hte zip file to create, if empty a random name will be used
+ * @param {{string}} ArchiveFile The name of the zip file to create, if empty a random name will be used
  * @param {{string}} Pattern The filename pattern to use, eg *.txt
  * @param {{bool}} SetWorkingFileToZip If the working file in the flow should be set to the newly created zip file
  * @output Zip file created

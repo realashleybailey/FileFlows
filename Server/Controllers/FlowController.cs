@@ -95,6 +95,25 @@ public class FlowController : ControllerStore<Flow>
 
 
     /// <summary>
+    /// Duplicates a flow
+    /// </summary>
+    /// <param name="uid">The UID of the flow</param>
+    /// <returns>The duplicated flow</returns>
+    [HttpGet("duplicate/{uid}")]
+    public async Task<Flow> Duplicate([FromRoute] Guid uid)
+    { 
+        var flow = await GetByUid(uid);
+        if (flow == null)
+            return null;
+        
+        string json = JsonSerializer.Serialize(flow, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        });
+        return await Import(json);
+    }
+
+    /// <summary>
     /// Generates a template for of a flow
     /// </summary>
     /// <param name="uid">The Flow UID</param>

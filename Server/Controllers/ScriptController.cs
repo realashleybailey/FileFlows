@@ -1,4 +1,5 @@
 using FileFlows.Plugin;
+using FileFlows.Server.Helpers;
 
 namespace FileFlows.Server.Controllers;
 
@@ -90,7 +91,25 @@ public class ScriptController : ControllerStore<Script>
         // will throw if any errors
         new ScriptParser().Parse(script.Name ?? string.Empty, script.Code);
         
-        // reparse with new UIDs
+        script.Uid = Guid.Empty;
+        script.DateModified = DateTime.Now;
+        script.DateCreated = DateTime.Now;
+        script.Name = await GetNewUniqueName(script.Name);
+        return await Update(script);
+    }
+
+    /// <summary>
+    /// Duplicates a script
+    /// </summary>
+    /// <param name="uid">The UID of the script</param>
+    /// <returns>The duplicated script</returns>
+    [HttpGet("duplicate/{uid}")]
+    public async Task<Script> Duplicate([FromRoute] Guid uid)
+    {
+        // use DbHelper to avoid the cache, otherwise we would update the in memory object 
+        var script = await DbHelper.Single<Script>(uid);
+        if (script == null)
+            return null;
         script.Uid = Guid.Empty;
         script.DateModified = DateTime.Now;
         script.DateCreated = DateTime.Now;

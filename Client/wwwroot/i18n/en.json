@@ -15,6 +15,7 @@
     "About": "About",
     "Add": "Add",
     "Edit": "Edit",
+    "Duplicate":"Duplicate",
     "Update": "Update",
     "Refresh": "Refresh",
     "Download": "Download",
@@ -182,7 +183,8 @@
         }
       },
       "Messages": {
-        "FlowImported": "Flow ''{name}'' imported"
+        "FlowImported": "Flow ''{name}'' imported",
+        "Duplicated": "Flow ''{name}'' duplicated"
       }
     },
     "Libraries": {
@@ -205,6 +207,8 @@
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
         "Filter-Help": "An optional filter regular expression to run against matching files.\nThis filter will be run against the full absolute filename of the file.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
+        "ExclusionFilter":"Exclusion Filter",
+        "ExclusionFilter-Help":"An optional filter regular expression to run against matching files.\nThis can simplify excluding specific file names from being processed.",
         "ExcludeHidden": "Exclude Hidden",
         "ExcludeHidden-Help": "When enabled, hidden files and folders will not be scanned",
         "UseFingerprinting": "Use Fingerprinting",
@@ -326,7 +330,8 @@
     "Scripts":{
       "Title":"Scripts",
       "Messages": {
-        "Imported": "Script ''{name}'' imported"
+        "Imported": "Script ''{name}'' imported",
+        "Duplicated":"Scripts ''{name}'' duplicated"
       },
       "Fields":{
       }

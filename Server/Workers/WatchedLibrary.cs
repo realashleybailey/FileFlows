@@ -369,7 +369,17 @@ public class WatchedLibrary:IDisposable
 
     private bool IsMatch(string input)
     {
-        if (string.IsNullOrEmpty(Library.Filter) == false)
+        if (string.IsNullOrWhiteSpace(Library.ExclusionFilter) == false)
+        {
+            try
+            {
+                if (new Regex(Library.Filter, RegexOptions.IgnoreCase).IsMatch(input))
+                    return false;
+            }
+            catch (Exception) { }
+        }
+        
+        if (string.IsNullOrWhiteSpace(Library.Filter) == false)
         {
             try
             {

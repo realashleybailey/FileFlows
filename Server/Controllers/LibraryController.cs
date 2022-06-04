@@ -155,6 +155,7 @@ namespace FileFlows.Server.Controllers
                             Enabled = true,
                             FileSizeDetectionInterval = jst.FileSizeDetectionInterval,
                             Filter = jst.Filter ?? string.Empty,
+                            ExclusionFilter = jst.ExclusionFilter ?? string.Empty,
                             Name = jst.Name,
                             Description = jst.Description,
                             Path = jst.Path,

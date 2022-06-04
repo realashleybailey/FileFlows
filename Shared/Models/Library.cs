@@ -21,7 +21,12 @@ public class Library : FileFlowObject
     /// Gets or sets the filter used to determine what files to add ot the library files
     /// </summary>
     public string Filter { get; set; }
-    
+
+    /// <summary>
+    /// Gets or sets filter to determine if a file should be excluded
+    /// </summary>
+    public string ExclusionFilter { get; set; }
+
     /// <summary>
     /// Gets or sets the template this library is based on
     /// </summary>

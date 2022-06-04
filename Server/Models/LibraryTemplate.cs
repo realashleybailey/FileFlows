@@ -29,6 +29,11 @@ class LibraryTemplate
     public string Filter { get; set; }
     
     /// <summary>
+    /// Gets or sets filter to determine if a file should be excluded
+    /// </summary>
+    public string ExclusionFilter { get; set; }
+    
+    /// <summary>
     /// Gets or sets the path for this template
     /// </summary>
     public string Path { get; set; }

@@ -86,16 +86,16 @@ public partial class Scripts : ListPage<Script>
         Blocker.Show();
         try
         {
-            var newFlow = await HttpHelper.Post<Script>("/api/script/import", json);
-            if (newFlow != null && newFlow.Success)
+            var newItem = await HttpHelper.Post<Script>("/api/script/import", json);
+            if (newItem != null && newItem.Success)
             {
                 await this.Refresh();
                 Toast.ShowSuccess(Translater.Instant("Pages.Script.Messages.Imported",
-                    new { name = newFlow.Data.Name }));
+                    new { name = newItem.Data.Name }));
             }
             else
             {
-                Toast.ShowError(newFlow.Body?.EmptyAsNull() ?? "Invalid script");
+                Toast.ShowError(newItem.Body?.EmptyAsNull() ?? "Invalid script");
             }
         }
         finally
@@ -105,4 +105,36 @@ public partial class Scripts : ListPage<Script>
 #endif
     }
 
+
+    private async Task Duplicate()
+    {
+#if (!DEMO)
+        Blocker.Show();
+        try
+        {
+            var item = Table.GetSelected()?.FirstOrDefault();
+            if (item == null)
+                return;
+            string url = $"/api/script/duplicate/{item.Uid}";
+#if (DEBUG)
+            url = "http://localhost:6868" + url;
+#endif
+            var newItem = await HttpHelper.Get<Script>(url);
+            if (newItem != null && newItem.Success)
+            {
+                await this.Refresh();
+                Toast.ShowSuccess(Translater.Instant("Pages.Script.Messages.Duplicated",
+                    new { name = newItem.Data.Name }));
+            }
+            else
+            {
+                Toast.ShowError(newItem.Body?.EmptyAsNull() ?? "Failed to duplicate");
+            }
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
+#endif
+    }
 }

@@ -617,32 +617,6 @@ public abstract class DbManager
     }
 
 
-
-    /// <summary>
-    /// Gets the next library file to process
-    /// </summary>
-    /// <param name="node">the node executing this library file</param>
-    /// <param name="workerUid">the UID of the worker</param>
-    /// <returns>the next library file to process</returns>
-    public virtual async Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid)
-    {
-        int quarter = TimeHelper.GetCurrentQuarter();
-        string now = DateTime.Now.ToString("yyyy-MM-ddThh:MM:sszzz");
-        using var db = GetDb();
-
-        try
-        {
-
-            var result = await db.FirstOrDefaultAsync<LibraryFile>("call GetNextLibraryFile(@0, @1, @2, @3)", node.Uid, workerUid, quarter, now);
-            return result;
-        }
-        catch(Exception ex)
-        {
-            throw;
-        }
-    }
-
-
     /// <summary>
     /// Reads in a embedded SQL script
     /// </summary>
@@ -675,7 +649,7 @@ public abstract class DbManager
     protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
     {
         Dictionary<string, string> scripts = new();
-        foreach (string script in new[] { "GetNextLibraryFile", "GetLibraryFileOverview", "GetLibraryFiles", "GetUpcoming", "GetRecentlyFinished" })
+        foreach (string script in new[] { "GetLibraryFiles" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
             scripts.Add(script, sql);
@@ -686,15 +660,19 @@ public abstract class DbManager
     /// <summary>
     /// Gets the library file status  
     /// </summary>
-    /// <returns>the overview of the library files</returns>
-    public abstract Task<LibraryFileStatusOverview> GetLibraryFileOverview();
+    /// <returns>the library file status counts</returns>
+    public abstract Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview();
 
     /// <summary>
     /// Gets the library file with the corresponding status
     /// </summary>
     /// <param name="status">the library file status</param>
+    /// <param name="start">the row to start at</param>
+    /// <param name="max">the maximum items to return</param>
+    /// <param name="quarter">the current quarter</param>
+    /// <param name="nodeUid">optional UID of node to limit results for</param>
     /// <returns>an enumerable of library files</returns>
-    public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status);
+    public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid);
 
     /// <summary>
     /// Gets an item from the database by it's name
@@ -722,20 +700,6 @@ public abstract class DbManager
     /// <returns>the failure flow</returns>
     public abstract Task<Flow> GetFailureFlow(Guid libraryUid);
     
-    /// <summary>
-    /// Gets the upcoming files to process
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the upcoming files to process</returns>
-    public abstract Task<IEnumerable<LibraryFile>> GetUpcoming(int max);
-    
-    
-    /// <summary>
-    /// Gets the recently finished files
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the recently finished files</returns>
-    public abstract Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max);
     
 #if (DEBUG)
     /// <summary>

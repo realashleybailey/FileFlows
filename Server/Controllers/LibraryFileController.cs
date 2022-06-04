@@ -53,7 +53,26 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
     }
 
-    private async Task<LibraryFile> GetNextDb(ProcessingNode node, Guid workerUid) => await DbHelper.GetNextLibraryFile(node, workerUid);
+    private async Task<LibraryFile> GetNextDb(ProcessingNode node, Guid workerUid)
+    {
+        await _mutex.WaitAsync();
+        try
+        {
+            var item = (await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, start:0, max:1, nodeUid: node.Uid)).FirstOrDefault();
+            if (item == null)
+                return null;
+            item.Status = FileStatus.Processing;
+            item.Node = new ObjectReference { Uid = node.Uid, Name = node.Name };
+            item.WorkerUid = workerUid;
+            item.ProcessingStarted = DateTime.Now;
+            await DbHelper.Update(item);
+            return item;
+        }
+        finally
+        {
+            _mutex.Release();
+        }
+    }
 
     private async Task<LibraryFile> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
     {
@@ -125,24 +144,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (DbHelper.UseMemoryCache == false)
         {
             var taskOverview = DbHelper.GetLibraryFileOverview();
-            var taskFiles = DbHelper.GetLibraryFiles(status);
+            var taskFiles = DbHelper.GetLibraryFiles(status, start: pageSize * page, max: pageSize);
             Task.WaitAll(taskOverview, taskFiles);
-
-            var libFiles = await OrderLibraryFiles(taskFiles.Result, status);
-
-            if (pageSize > 0)
-            {
-                int startIndex = page * pageSize;
-                if (libFiles.Count() < startIndex)
-                    libFiles = new List<LibraryFile>();
-                else
-                    libFiles = libFiles.Skip(startIndex).Take(pageSize);
-            }
 
             return new()
             {
                 Status = taskOverview.Result,
-                LibraryFiles = ConvertToListModel(libFiles, status)
+                LibraryFiles = ConvertToListModel(taskFiles.Result, status)
             };
         }
         
@@ -341,7 +349,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             return libFiles.Take(10);
         }
 
-        return await DbHelper.GetUpcoming(10);
+        return await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, max: 10);
     }
 
     /// <summary>
@@ -360,7 +368,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 .Take(10);
         }
 
-        return await DbHelper.GetRecentlyFinished(10);
+        return await DbHelper.GetLibraryFiles(FileStatus.Processed, max: 10);
     }
 
     internal async Task ResetProcessingStatus(Guid nodeUid)

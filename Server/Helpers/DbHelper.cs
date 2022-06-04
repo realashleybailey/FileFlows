@@ -184,47 +184,23 @@ public class DbHelper
     public static Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint) =>
         Manager.FindKnownLibraryByFingerprint(fingerprint);
 
-    /// <summary>
-    /// Gets the next library file to process
-    /// </summary>
-    /// <param name="node">the node executing this library file</param>
-    /// <param name="workerUid">the UID of the worker</param>
-    /// <returns>the next library file to process</returns>
-    public static Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid) =>
-        Manager.GetNextLibraryFile(node, workerUid);
 
     /// <summary>
     /// Gets the library file status  
     /// </summary>
     /// <returns>the overview of the library files</returns>
-    public static async Task<List<LibraryStatus>> GetLibraryFileOverview()
-    {
-        var overview = await Manager.GetLibraryFileOverview();
-
-        var listLibStatus = new List<LibraryStatus>();
-        listLibStatus.Add(new() { Status = FileStatus.Unprocessed, Count = overview.Unprocessed });
-        listLibStatus.Add(new() { Status = FileStatus.Processing, Count = overview.Processing });
-        listLibStatus.Add(new() { Status = FileStatus.Processed, Count = overview.Processed });
-        listLibStatus.Add(new() { Status = FileStatus.ProcessingFailed, Count = overview.ProcessingFailed });
-        if (overview.Disabled > 0)
-            listLibStatus.Add(new() { Status = FileStatus.FlowNotFound, Count = overview.FlowNotFound });
-        if (overview.OutOfSchedule > 0)
-            listLibStatus.Add(new() { Status = FileStatus.OutOfSchedule, Count = overview.OutOfSchedule });
-        if (overview.Disabled > 0)
-            listLibStatus.Add(new() { Status = FileStatus.Disabled, Count = overview.Disabled });
-        if (overview.MappingIssue > 0)
-            listLibStatus.Add(new() { Status = FileStatus.MappingIssue, Count = overview.MappingIssue });
-        if (overview.Duplicate > 0)
-            listLibStatus.Add(new() { Status = FileStatus.Duplicate, Count = overview.Duplicate });
-        return listLibStatus;
-    }
+    public static Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview() => Manager.GetLibraryFileOverview();
 
     /// <summary>
     /// Gets the library file with the corresponding status
     /// </summary>
     /// <param name="status">the library file status</param>
+    /// <param name="start">the row to start at</param>
+    /// <param name="max">the maximum items to return</param>
+    /// <param name="nodeUid">optional UID of node to limit results for</param>
     /// <returns>an enumerable of library files</returns>
-    public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status) => Manager.GetLibraryFiles(status);
+    public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start = 0, int max = 0, Guid? nodeUid = null) => 
+        Manager.GetLibraryFiles(status, start, max, TimeHelper.GetCurrentQuarter(), nodeUid);
 
     /// <summary>
     /// Gets the failure flow for a particular library
@@ -243,20 +219,6 @@ public class DbHelper
     public static Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
         => Manager.GetByName<T>(name);
 
-    /// <summary>
-    /// Gets the upcoming files to process
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the upcoming files to process</returns>
-    public static Task<IEnumerable<LibraryFile>> GetUpcoming(int max) => Manager.GetUpcoming(max);
-
-    /// <summary>
-    /// Gets the recently finished files
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the recently finished files</returns>
-    public static Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max) => Manager.GetRecentlyFinished(max);
-    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

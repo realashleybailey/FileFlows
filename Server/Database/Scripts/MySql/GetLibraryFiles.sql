@@ -1,51 +1,80 @@
 DROP PROCEDURE IF EXISTS GetLibraryFiles;
 
-CREATE PROCEDURE GetLibraryFiles(IntervalIndex int, Status int)
+CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem int, MaxItems int, NodeUid varchar(36), Overview bit)
 BEGIN
-    
-    declare libsDisabled text;
-    declare libsOutOfSchedule text;
-    
-    if Status > 0 then
-        select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
-                             and JSON_EXTRACT(Data, '$.Status') = Status;
-    
-    else
-    
-    set libsDisabled=(
-        select GROUP_CONCAT(Uid,',') from DbObject
-        where type = 'FileFlows.Shared.Models.Library'
-      and JSON_EXTRACT(Data,'$.Enabled') = '0'
+
+
+    declare sOrder varchar(500);
+    declare allLibraries int;
+    declare jsonLibraries text;
+
+drop table if exists tempLibraries;
+create temporary table tempLibraries
+select Uid, Name,
+       case when JSON_EXTRACT(Data, '$.Enabled') = 1 then 1
+            else 0 end
+                                                                                                                      as Enabled,
+       JSON_EXTRACT(Data, '$.Priority') as Priority,
+       case when substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) <> '0' then 0 else 1 end as Unscheduled
+from DbObject where Type = 'FileFlows.Shared.Models.Library';
+
+if NodeUid is not null and NodeUid <> '' then
+		# need to remove libraries not processed by this node
+		set allLibraries = (select JSON_EXTRACT(Data, '$.AllLibraries') from DbObject where Uid = NodeUid);
+		set jsonLibraries = (select JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Libraries[*].Uid')) from DbObject where Uid = NodeUid);
+        
+        SET SQL_SAFE_UPDATES = 0;
+delete from tempLibraries
+where not (
+            allLibraries = 1 or
+            (allLibraries = 0 and instr(jsonLibraries, Uid) > 1) or
+            (allLibraries = 2 and instr(jsonLibraries, Uid) < 1)
     );
-    if libsDisabled is null then
-        set libsDisabled  = '';
-    end if;          
-    set libsOutOfSchedule = (
-        select GROUP_CONCAT(Uid,',') from DbObject
-        where type = 'FileFlows.Shared.Models.Library'
-      and (substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) = '0')
-    );
-    if libsOutOfSchedule is null then
-        set libsOutOfSchedule  = '';
-    end if;
+SET SQL_SAFE_UPDATES = 1;
+
+end if;
+
+drop table if exists tempFiles;
+create temporary table tempFiles
+select tempLibraries.Uid as LibraryUid, DbObject.*,
+       case
+           when JSON_EXTRACT(Data, '$.Status') <> 0 then convert(JSON_EXTRACT(Data, '$.Status'), signed)
+           when tempLibraries.Enabled = 0 then -2
+           when tempLibraries.Unscheduled = 1 then -1
+           else 0
+           end as Status,
+       case
+           when JSON_EXTRACT(Data, '$.Order') <> -1 then JSON_EXTRACT(Data, '$.Order')
+           else  10000 - (tempLibraries.Priority * 100)
+           end as Priority
+from DbObject inner join tempLibraries on JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) = tempLibraries.Uid
+where Type = 'FileFlows.Shared.Models.LibraryFile';
+
+
+if Overview = 1 then
+
+select tempFiles.Status, Count(Uid) as Count from tempFiles
+group by tempFiles.Status;
+
+else
+		if FileStatus = 0 or FileStatus = -1 then
+		  set sOrder = ' order by Priority desc ';
+		elseif FileStatus = 2 then
+		  set sOrder = ' order by DateModified desc ';
+else
+		  set sOrder = ' order by DateCreated desc ';
+end if;
     
-    if Status = -2 then -- disabled
-    select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
-                             and JSON_EXTRACT(Data, '$.Status') = 0
-                             and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%');
-    
-    elseif Status = -1 then -- out of schedule
-    select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
-                             and JSON_EXTRACT(Data, '$.Status') = 0
-                             and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%')
-                             and libsOutOfSchedule like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%');
-    
-    else
-    select * from DbObject where type = 'FileFlows.Shared.Models.LibraryFile'
-                             and JSON_EXTRACT(Data, '$.Status') = 0
-                             and libsDisabled not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%')
-                             and libsOutOfSchedule not like ('%' + JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) + '%');
-    end if;
-    end if;
+		SET @queryString = CONCAT(
+			'select dblf.Uid, dblf.Name, dblf.Type, dblf.DateCreated, dblf.DateModified, dblf.Data from tempFiles dblf ',
+			' where dblf.Status = ', FileStatus,
+			' ', sOrder, ' limit ', StartItem, ', ', MaxItems, '; '
+		);
+prepare stmt from @queryString;
+execute stmt;
+deallocate prepare stmt;
+
+end if;
+
 
 END;

@@ -95,78 +95,35 @@ public class SqlServerDbManager: DbManager
 
 
     /// <summary>
-    /// Gets the next library file to process
-    /// </summary>
-    /// <param name="node">the node executing this library file</param>
-    /// <param name="workerUid">the UID of the worker</param>
-    /// <returns>the next library file to process</returns>
-    public override async Task<LibraryFile> GetNextLibraryFile(ProcessingNode node, Guid workerUid)
-    {
-        int quarter = TimeHelper.GetCurrentQuarter();
-        using var db = GetDb();
-
-        try
-        {
-            var result = await db.FirstOrDefaultAsync<DbObject>("exec GetNextLibraryFile @@NodeUid=@0, @@WorkerUid=@1, @@IntervalIndex=@2, @@StartDate=@3", 
-                node.Uid, workerUid, quarter, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"));
-            return ConvertFromDbObject<LibraryFile>(result);
-        }
-        catch(Exception ex)
-        {
-            throw;
-        }
-    }
-
-    /// <summary>
     /// Gets the library file status  
     /// </summary>
     /// <returns></returns>
-    public override async Task<LibraryFileStatusOverview> GetLibraryFileOverview()
+    public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
-        return await db.FirstOrDefaultAsync<LibraryFileStatusOverview>("exec GetLibraryFileOverview @@IntervalIndex=@0", quarter);
+        return await db.FetchAsync<LibraryStatus>(
+            "exec GetLibraryFiles @@Status=0, @@IntervalIndex=@0, @@MaxItems=0, @@Start=0, @@NodeUid=null, @@Overview=1",
+            quarter);
     }
 
     /// <summary>
     /// Gets the library file with the corresponding status
     /// </summary>
     /// <param name="status">the library file status</param>
+    /// <param name="start">the row to start at</param>
+    /// <param name="max">the maximum items to return</param>
+    /// <param name="quarter">the current quarter</param>
+    /// <param name="nodeUid">optional UID of node to limit results for</param>
     /// <returns>an enumerable of library files</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status)
+    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
     {
-        int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
-        var dbObjects = await db.FetchAsync<DbObject>("exec GetLibraryFiles @@IntervalIndex=@0, @@Status=@1", quarter, (int)status);
+        var dbObjects = await db.FetchAsync<DbObject>("exec GetLibraryFiles @@Status=@1, @@IntervalIndex=@1, @@MaxItems=@2, @@Start=@3, @@NodeUid=@4, @@Overview=0", 
+            (int)status, quarter, max, start, nodeUid);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
     
-    /// <summary>
-    /// Gets the upcoming files to process
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the upcoming files to process</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetUpcoming(int max)
-    {
-        using var db = GetDb();
-        int quarter = TimeHelper.GetCurrentQuarter();
-        var dbObjects =
-            await db.FetchAsync<DbObject>("exec GetUpcoming @@IntervalIndex=@0, @@MaxItems=@1", quarter, max);
-        return ConvertFromDbObject<LibraryFile>(dbObjects);
-    }
-
-    /// <summary>
-    /// Gets the recently finished files
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the recently finished files</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max)
-    {
-        using var db = GetDb();
-        var dbObjects =
-            await db.FetchAsync<DbObject>("exec GetRecentlyFinished @@MaxItems=@0", max);
-        return ConvertFromDbObject<LibraryFile>(dbObjects);
-    }
 
     /// <summary>
     /// Gets the failure flow for a particular library

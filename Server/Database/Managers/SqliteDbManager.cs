@@ -117,27 +117,17 @@ public class SqliteDbManager : DbManager
         return true;// tables exist, all good
     }
 
-    public override Task<LibraryFileStatusOverview> GetLibraryFileOverview()
+    public override Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         throw new NotImplementedException();
     }
 
-    public override Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status)
+    public override Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int max, int start, int quarter, Guid? nodeUid)
     {
         throw new NotImplementedException();
     }
 
     public override Task<Flow> GetFailureFlow(Guid libraryUid)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override Task<IEnumerable<LibraryFile>> GetUpcoming(int max)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max)
     {
         throw new NotImplementedException();
     }

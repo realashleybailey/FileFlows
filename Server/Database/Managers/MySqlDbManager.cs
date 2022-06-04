@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.RegularExpressions;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
@@ -60,7 +61,7 @@ public class MySqlDbManager: DbManager
     protected override void CreateStoredProcedures()
     {
         Logger.Instance.ILog("Creating Stored Procedures");
-        using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
+        using var db = new NPoco.Database(ConnectionString + ";Allow User Variables=True", null, MySqlConnector.MySqlConnectorFactory.Instance);
         
         
         var scripts = GetStoredProcedureScripts("MySql");
@@ -97,24 +98,29 @@ public class MySqlDbManager: DbManager
     /// <summary>
     /// Gets the library file status  
     /// </summary>
-    /// <returns></returns>
-    public override async Task<LibraryFileStatusOverview> GetLibraryFileOverview()
+    /// <returns>the library file status counts</returns>
+    public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
-        return await db.FirstOrDefaultAsync<LibraryFileStatusOverview>("call GetLibraryFileOverview(@0)", quarter);
+        string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
+        var results = (await db.FetchAsync<LibraryStatus>(sql)).ToList();
+        return results;
     }
 
     /// <summary>
     /// Gets the library file with the corresponding status
     /// </summary>
     /// <param name="status">the library file status</param>
+    /// <param name="start">the row to start at</param>
+    /// <param name="max">the maximum items to return</param>
+    /// <param name="quarter">the current quarter</param>
+    /// <param name="nodeUid">optional UID of node to limit results for</param>
     /// <returns>an enumerable of library files</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status)
+    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
     {
-        int quarter = TimeHelper.GetCurrentQuarter();
         using var db = GetDb();
-        var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1)", quarter, (int)status);
+        var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)", (int)status, quarter, start, max, nodeUid);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
 
@@ -135,31 +141,6 @@ public class MySqlDbManager: DbManager
         return ConvertFromDbObject<Flow>(dbObject);
     }
 
-    /// <summary>
-    /// Gets the upcoming files to process
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the upcoming files to process</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetUpcoming(int max)
-    {
-        using var db = GetDb();
-        int quarter = TimeHelper.GetCurrentQuarter();
-        var dbObjects = await db.FetchAsync<DbObject>("call GetUpcoming(@0, @1)", quarter, max);
-        return ConvertFromDbObject<LibraryFile>(dbObjects);
-    }
-    
-    /// <summary>
-    /// Gets the recently finished files
-    /// </summary>
-    /// <param name="max">the maximum number to get</param>
-    /// <returns>the recently finished files</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetRecentlyFinished(int max)
-    {
-        using var db = GetDb();
-        var dbObjects =
-            await db.FetchAsync<DbObject>("call GetRecentlyFinished(@0)", max);
-        return ConvertFromDbObject<LibraryFile>(dbObjects);
-    }
 
     /// <summary>
     /// Tests the connection to a database

@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using FileFlows.Server.Database.Managers;
+
 namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -289,9 +292,17 @@ namespace FileFlows.Server.Controllers
 
         internal async Task<ProcessingNode> GetServerNode()
         {
-            var data = await GetData();
-            var settings = await new SettingsController().Get();
-            var node = data.Where(x => x.Value.Uid == Globals.FileFlowsServerUid).Select(x => x.Value).FirstOrDefault();
+            ProcessingNode node;
+            if (DbHelper.UseMemoryCache)
+            {
+                var data = await GetData();
+                node = data.Where(x => x.Value.Uid == Globals.FileFlowsServerUid).Select(x => x.Value).FirstOrDefault();
+            }
+            else
+            {
+                node = await DbHelper.Single<ProcessingNode>(Globals.FileFlowsServerUid);
+            }
+
             if (node == null)
             {
                 Logger.Instance.ILog("Adding Internal Processing Node");

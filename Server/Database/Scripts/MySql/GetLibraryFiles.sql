@@ -4,6 +4,7 @@ CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem in
 BEGIN
 
 
+	
 
     declare sOrder varchar(500);
     declare allLibraries int;
@@ -15,7 +16,7 @@ select Uid, Name,
        case when JSON_EXTRACT(Data, '$.Enabled') = 1 then 1
             else 0 end
                                                                                                                       as Enabled,
-       JSON_EXTRACT(Data, '$.Priority') as Priority,
+       convert(JSON_EXTRACT(Data, '$.Priority'), signed) as Priority,
        case when substring(JSON_UNQUOTE(JSON_Extract(Data, '$.Schedule')), IntervalIndex, 1) <> '0' then 0 else 1 end as Unscheduled
 from DbObject where Type = 'FileFlows.Shared.Models.Library';
 
@@ -45,7 +46,7 @@ select tempLibraries.Uid as LibraryUid, DbObject.*,
            else 0
            end as Status,
        case
-           when JSON_EXTRACT(Data, '$.Order') <> -1 then JSON_EXTRACT(Data, '$.Order')
+           when JSON_EXTRACT(Data, '$.Order') <> -1 then convert(JSON_EXTRACT(Data, '$.Order'), signed)
            else  10000 - (tempLibraries.Priority * 100)
            end as Priority,
        convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 24), datetime) as ProcessingStarted,
@@ -61,7 +62,7 @@ group by tempFiles.Status;
 
 else
 	if FileStatus = 0 or FileStatus = -1 then
-	  set sOrder = ' order by Priority desc ';
+	  set sOrder = ' order by Priority asc ';
 	elseif FileStatus = 2 then
 		  set sOrder = ' order by ProcessingStarted asc ';
 	elseif FileStatus = 1 or FileStatus = 4 then
@@ -81,6 +82,8 @@ execute stmt;
 deallocate prepare stmt;
 
 end if;
+
+
 
 
 END;

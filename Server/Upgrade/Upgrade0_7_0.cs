@@ -13,6 +13,16 @@ public class Upgrade0_7_0
         #if(!DEBUG)
         RemovePluginsFromDatabase(settings);
         #endif
+        UpdateInternalProcessingNodeUid();
+    }
+
+    private void UpdateInternalProcessingNodeUid()
+    {
+        // we changed the internal processing node to use a constant UID
+        var node = DbHelper.GetByName<ProcessingNode>("FileFlowsServer").Result;
+        DbHelper.Delete<ProcessingNode>("Name = 'FileFlowsServer'");
+        node.Uid = Globals.FailFlowUid;
+        DbHelper.Update(node);
     }
 
     private void RemovePluginsFromDatabase(Settings settings)

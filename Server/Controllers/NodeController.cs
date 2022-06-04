@@ -291,13 +291,14 @@ namespace FileFlows.Server.Controllers
         {
             var data = await GetData();
             var settings = await new SettingsController().Get();
-            var node = data.Where(x => x.Value.Name == Globals.FileFlowsServer).Select(x => x.Value).FirstOrDefault();
+            var node = data.Where(x => x.Value.Uid == Globals.FileFlowsServerUid).Select(x => x.Value).FirstOrDefault();
             if (node == null)
             {
                 Logger.Instance.ILog("Adding Internal Processing Node");
                 bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);                
                 node = await Update(new ProcessingNode
                 {
+                    Uid = Globals.FileFlowsServerUid,
                     Name = Globals.FileFlowsServer,
                     Address = Globals.FileFlowsServer,
                     Schedule = new string('1', 672),

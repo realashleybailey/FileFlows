@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Pages;
 
@@ -17,6 +18,8 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
 {
     public override string ApiUrl => "/api/library-file";
     [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
+
+    [Inject] private IJSRuntime jsRuntime { get; set; }
 
     private FileFlows.Shared.Models.FileStatus SelectedStatus = FileFlows.Shared.Models.FileStatus.Unprocessed;
 
@@ -108,6 +111,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
             this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
         //await RefreshStatus();
         CheckPager();
+        await jsRuntime.InvokeVoidAsync("ff.scrollTableToTop");
     }
 
     protected override async Task PostDelete()

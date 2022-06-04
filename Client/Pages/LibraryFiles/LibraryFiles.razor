@@ -180,11 +180,15 @@
         {
             <ul>
                 @{
-                    int maxPages = App.Instance.IsMobile ? 7 : 21;
+                    int maxPages = App.Instance.IsMobile ? 7 : 15;
                     int start = PageIndex - (maxPages / 2);
                     if (start < 0)
                         start = 0;
                     int end = Math.Min(PageCount, start + maxPages);
+                    if (end == PageCount)
+                        start = end - maxPages;
+                    if (start < 0)
+                        start = 0;
                 }
                 @for (int i = start; i < end; i++)
                 {

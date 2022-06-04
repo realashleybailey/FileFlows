@@ -72,5 +72,8 @@ window.ff = {
                 document.body.removeChild(textarea);
             }
         }
+    },
+    scrollTableToTop: function(){
+        document.querySelector('.flowtable-body').scrollTop = 0;
     }
 };

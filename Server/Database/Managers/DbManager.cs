@@ -559,7 +559,8 @@ public abstract class DbManager
         if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
             andWhere = " and " + andWhere;
         args = new object[] { typeof(T).FullName }.Union(args ?? new object[] { }).ToArray();
-        await db.ExecuteAsync($"delete from  {nameof(DbObject)} where Type=@0 {andWhere}", args);
+        string sql = $"delete from {nameof(DbObject)} where Type=@0 {andWhere}";
+        await db.ExecuteAsync(sql, args);
     }
     
     /// <summary>

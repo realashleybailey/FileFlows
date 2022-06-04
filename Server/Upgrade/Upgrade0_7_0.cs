@@ -20,7 +20,10 @@ public class Upgrade0_7_0
     {
         // we changed the internal processing node to use a constant UID
         var node = DbHelper.GetByName<ProcessingNode>("FileFlowsServer").Result;
-        DbHelper.Delete<ProcessingNode>("Name = 'FileFlowsServer'");
+        if (node == null)
+            return;
+        Logger.Instance.ILog("Updating UID of Internal Processing Node");
+        DbHelper.Delete<ProcessingNode>("Name = @1", node.Name).Wait();
         node.Uid = Globals.FailFlowUid;
         DbHelper.Update(node);
     }

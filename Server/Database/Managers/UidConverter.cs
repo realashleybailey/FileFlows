@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Reflection;
 using NPoco;
 
@@ -20,5 +21,18 @@ public class UidConverter:DefaultMapper
         if (destType == typeof(Guid))
             return x => x.ToString();
         return base.GetToDbConverter(destType, sourceMemberInfo);
+    }
+
+    /// <summary>
+    /// Get the convert for converting an command arguments when executing against a database
+    /// </summary>
+    /// <param name="sourceType">the type of the object being used</param>
+    /// <param name="dbCommand">the command being executed</param>
+    /// <returns>the converter function to use</returns>
+    public override Func<object, object> GetParameterConverter(DbCommand dbCommand, Type sourceType)
+    {
+        if (sourceType == typeof(Guid))
+            return x => x.ToString();
+        return base.GetParameterConverter(dbCommand, sourceType);
     }
 }

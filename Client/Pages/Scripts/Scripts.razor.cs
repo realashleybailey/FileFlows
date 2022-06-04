@@ -1,3 +1,7 @@
+using FileFlows.Client.Components.Dialogs;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+
 namespace FileFlows.Client.Pages;
 
 using FileFlows.Client.Components;
@@ -12,6 +16,8 @@ public partial class Scripts : ListPage<Script>
     const string FileFlowsServer = "FileFlowsServer";
 
     private Script EditingItem = null;
+    [Inject] public IJSRuntime jsRuntime { get; set; }
+
 
 
     private async Task Add()
@@ -35,7 +41,7 @@ public partial class Scripts : ListPage<Script>
             var saveResult = await HttpHelper.Post<Script>($"{ApiUrl}", model);
             if (saveResult.Success == false)
             {
-                Toast.ShowError( saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
+                Toast.ShowError(saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));
                 return false;
             }
 
@@ -55,6 +61,48 @@ public partial class Scripts : ListPage<Script>
         }
 #endif
     }
-    
+
+    private async Task Export()
+    {
+#if (!DEMO)
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item == null)
+            return;
+        string url = $"/api/script/export/{item.Uid}";
+#if (DEBUG)
+        url = "http://localhost:6868" + url;
+#endif
+        await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".json" });
+#endif
+    }
+
+    private async Task Import()
+    {
+#if (!DEMO)
+        var json = await ImportDialog.Show();
+        if (string.IsNullOrEmpty(json))
+            return;
+
+        Blocker.Show();
+        try
+        {
+            var newFlow = await HttpHelper.Post<Script>("/api/script/import", json);
+            if (newFlow != null && newFlow.Success)
+            {
+                await this.Refresh();
+                Toast.ShowSuccess(Translater.Instant("Pages.Script.Messages.Imported",
+                    new { name = newFlow.Data.Name }));
+            }
+            else
+            {
+                Toast.ShowError(newFlow.Body?.EmptyAsNull() ?? "Invalid script");
+            }
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
+#endif
+    }
 
 }

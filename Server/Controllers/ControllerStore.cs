@@ -56,7 +56,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         if (DbHelper.UseMemoryCache)
             names = (await GetData()).Select(x => x.Value.Name.ToLower()).ToList();
         else
-            names = (await DbHelper.GetNames<T>()).ToList();
+            names = (await DbHelper.GetNames<T>()).Select(x => x.ToLower()).ToList();
         int count = 2;
         while (names.Contains(newName.ToLower()))
         {

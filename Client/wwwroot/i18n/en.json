@@ -325,6 +325,9 @@
     },
     "Scripts":{
       "Title":"Scripts",
+      "Messages": {
+        "Imported": "Script ''{name}'' imported"
+      },
       "Fields":{
       }
     },

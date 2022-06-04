@@ -12,7 +12,12 @@
             <ToolBar>            
                 <FlowTableButton TItem="Script" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
                 <FlowTableButton TItem="Script" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-                <FlowTableButton TItem="Script" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />                
+                <FlowTableButton TItem="Script" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />      
+                @if (App.Instance.IsMobile == false)
+                {
+                    <FlowTableButton TItem="Script" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import"/>
+                    <FlowTableButton TItem="Script" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export"/>
+                }
                 <FlowTableHelpButton TItem="Script" HelpUrl="Scripts" />
             </ToolBar>
 

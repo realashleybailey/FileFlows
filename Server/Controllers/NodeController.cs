@@ -22,8 +22,8 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public async Task<IEnumerable<ProcessingNode>> GetAll()
         {
-            var nodes = (await GetDataList()).OrderBy(x => x.Address == Globals.FileFlowsServer ? 0 : 1).ThenBy(x => x.Name);
-            var internalNode = nodes.Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();
+            var nodes = (await GetDataList()).OrderBy(x => x.Address == Globals.InternalNodeName ? 0 : 1).ThenBy(x => x.Name);
+            var internalNode = nodes.Where(x => x.Uid == Globals.InternalNodeUid).FirstOrDefault();
             if(internalNode != null)
             {
                 bool update = false;
@@ -87,9 +87,9 @@ namespace FileFlows.Server.Controllers
                 }).DistinctBy(x => x.Uid).ToList();
             }
 
-            if(node.Address == Globals.FileFlowsServer)
+            if(node.Uid == Globals.InternalNodeUid)
             {
-                var internalNode = (await GetAll()).Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault();
+                var internalNode = (await GetAll()).Where(x => x.Uid == Globals.InternalNodeUid).FirstOrDefault();
                 if(internalNode != null)
                 {
                     internalNode.Schedule = node.Schedule;
@@ -107,8 +107,8 @@ namespace FileFlows.Server.Controllers
                 else
                 {
                     // internal but doesnt exist
-                    node.Address = Globals.FileFlowsServer;
-                    node.Name = Globals.FileFlowsServer;
+                    node.Address = Globals.InternalNodeName;
+                    node.Name = Globals.InternalNodeName;
                     node.Mappings = null; // no mappings for internal
                 }
             }
@@ -123,7 +123,7 @@ namespace FileFlows.Server.Controllers
         [HttpDelete]
         public async Task Delete([FromBody] ReferenceModel model)
         {
-            var internalNode = (await this.GetAll()).Where(x => x.Address == Globals.FileFlowsServer).FirstOrDefault()?.Uid ?? Guid.Empty;
+            var internalNode = (await this.GetAll()).Where(x => x.Address == Globals.InternalNodeName).FirstOrDefault()?.Uid ?? Guid.Empty;
             if (model.Uids.Contains(internalNode))
                 throw new Exception("ErrorMessages.CannotDeleteInternalNode");
             await DeleteAll(model);
@@ -207,7 +207,7 @@ namespace FileFlows.Server.Controllers
             var settings = await new SettingsController().Get();
             // doesnt exist, register a new node.
             var tools = await new ToolController().GetAll();
-            bool isSystem = address == Globals.FileFlowsServer;
+            bool isSystem = address == Globals.InternalNodeName;
             var result = await Update(new ProcessingNode
             {
                 Name = address,
@@ -292,15 +292,17 @@ namespace FileFlows.Server.Controllers
 
         internal async Task<ProcessingNode> GetServerNode()
         {
-            ProcessingNode node;
+            ProcessingNode? node;
             if (DbHelper.UseMemoryCache)
             {
                 var data = await GetData();
-                node = data.Where(x => x.Value.Uid == Globals.FileFlowsServerUid).Select(x => x.Value).FirstOrDefault();
+                node = data.Where(x => x.Value.Uid == Globals.InternalNodeUid).Select(x => x.Value).FirstOrDefault();
             }
             else
             {
-                node = await DbHelper.Single<ProcessingNode>(Globals.FileFlowsServerUid);
+                node = await DbHelper.Single<ProcessingNode>(Globals.InternalNodeUid);
+                if (node?.Uid == Guid.Empty)
+                    node = null; // clear it so it can be inserted, DbHelper will return default
             }
 
             if (node == null)
@@ -309,9 +311,9 @@ namespace FileFlows.Server.Controllers
                 bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);                
                 node = await Update(new ProcessingNode
                 {
-                    Uid = Globals.FileFlowsServerUid,
-                    Name = Globals.FileFlowsServer,
-                    Address = Globals.FileFlowsServer,
+                    Uid = Globals.InternalNodeUid,
+                    Name = Globals.InternalNodeName,
+                    Address = Globals.InternalNodeName,
                     Schedule = new string('1', 672),
                     Enabled = true,
                     FlowRunners = 1,

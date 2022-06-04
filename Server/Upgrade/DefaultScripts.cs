@@ -17,13 +17,9 @@ public class DefaultScripts
     private void InsertScripts()
     {
 	    var scripts = GetDefaultScripts();
-        var existing = DbHelper.Select<Script>().Result
-	        .Select(x => x.Uid).ToList();
+	    // we always update the default scripts
         foreach (var script in scripts)
         {
-	        if (existing.Contains(script.Uid))
-		        continue;
-
 	        // set these values to now so they wont trigger a reprocess
 	        DbHelper.Update(script).Wait();
         }
@@ -198,7 +194,10 @@ function Script(MaxBitrateKbps)
  */
 function Script(ArchiveFile, Pattern, SetWorkingFileToZip)
 {{
-	let output = ArchiveFile || (Flow.TempPath + '/' + Flow.NewGuid() + '.zip');
+	let output = '' + ArchiveFile; // ensures ArchiveFile is a string
+	if(!output || output.trim().length == 0)
+		output = Flow.TempPath + '/' + Flow.NewGuid() + '.zip';
+	Logger.ILog('Output: ' + output);
     let sevenZip = Flow.GetToolPath('7zip');
 
     let process = Flow.Execute({{

@@ -4,6 +4,7 @@ CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem in
 BEGIN
 
 
+
     declare sOrder varchar(500);
     declare allLibraries int;
     declare jsonLibraries text;
@@ -46,7 +47,9 @@ select tempLibraries.Uid as LibraryUid, DbObject.*,
        case
            when JSON_EXTRACT(Data, '$.Order') <> -1 then JSON_EXTRACT(Data, '$.Order')
            else  10000 - (tempLibraries.Priority * 100)
-           end as Priority
+           end as Priority,
+       convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 24), datetime) as ProcessingStarted,
+       convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 24), datetime) as ProcessingEnded
 from DbObject inner join tempLibraries on JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) = tempLibraries.Uid
 where Type = 'FileFlows.Shared.Models.LibraryFile';
 
@@ -57,16 +60,19 @@ select tempFiles.Status, Count(Uid) as Count from tempFiles
 group by tempFiles.Status;
 
 else
-		if FileStatus = 0 or FileStatus = -1 then
-		  set sOrder = ' order by Priority desc ';
-		elseif FileStatus = 2 then
-		  set sOrder = ' order by DateModified desc ';
+	if FileStatus = 0 or FileStatus = -1 then
+	  set sOrder = ' order by Priority desc ';
+	elseif FileStatus = 2 then
+		  set sOrder = ' order by ProcessingStarted asc ';
+	elseif FileStatus = 1 or FileStatus = 4 then
+		  set sOrder = ' order by ProcessingEnded desc ';
 else
 		  set sOrder = ' order by DateCreated desc ';
 end if;
     
 		SET @queryString = CONCAT(
 			'select dblf.Uid, dblf.Name, dblf.Type, dblf.DateCreated, dblf.DateModified, dblf.Data from tempFiles dblf ',
+            #'select dblf.* from tempFiles dblf ',
 			' where dblf.Status = ', FileStatus,
 			' ', sOrder, ' limit ', StartItem, ', ', MaxItems, '; '
 		);

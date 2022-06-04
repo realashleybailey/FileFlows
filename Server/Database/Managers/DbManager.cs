@@ -186,8 +186,8 @@ public abstract class DbManager
 
         await AddOrUpdateObject(db, new ProcessingNode
         {
-            Name = Globals.FileFlowsServer,
-            Address = Globals.FileFlowsServer,
+            Name = Globals.InternalNodeName,
+            Address = Globals.InternalNodeName,
             Schedule = new string('1', 672),
             Enabled = true,
             FlowRunners = 1,
@@ -230,17 +230,17 @@ public abstract class DbManager
     /// <param name="dbObjects">a collection of DbObjects</param>
     /// <typeparam name="T">The type to convert to</typeparam>
     /// <returns>A converted list of objects</returns>
-    internal List<T> ConvertFromDbObject<T>(IEnumerable<DbObject> dbObjects) where T : FileFlowObject, new()
+    internal IEnumerable<T> ConvertFromDbObject<T>(IEnumerable<DbObject> dbObjects) where T : FileFlowObject, new()
     {
-        List<T> results = new();
-        Parallel.ForEach(dbObjects, x =>
+        var list = dbObjects.ToList();
+        T[] results = new T [list.Count];
+        Parallel.ForEach(list, (x, state, index) =>
         {
             var converted = Convert<T>(x);
             if(converted != null)
-                results.Add(converted);
+                results[index] = converted;
         });
-        results = results.Where(x => x != null).OrderBy(x => x?.Name ?? String.Empty).ToList();
-        return results;
+        return results.Where(x => x != null);
     }
 
     /// <summary>

@@ -59,6 +59,9 @@ public class ScriptExecutor:IScriptExecutor
                 tcode = Regex.Replace(tcode, keyRegex, "Variables['" + k + "']");
             }
 
+            tcode = tcode.Replace("Flow.Execute(", "Execute(");
+                
+
             var sb = new StringBuilder();
             var log = new
             {
@@ -91,7 +94,7 @@ public class ScriptExecutor:IScriptExecutor
              })
             .SetValue(nameof(FileInfo), new Func<string, FileInfo>((string file) => new FileInfo(file)))
             .SetValue(nameof(DirectoryInfo), new Func<string, DirectoryInfo>((string path) => new DirectoryInfo(path))); ;
-            foreach (var arg in execArgs.AdditionalArguments)
+            foreach (var arg in execArgs.AdditionalArguments ?? new ())
                 engine.SetValue(arg.Key, arg.Value);
 
             var result = int.Parse(engine.Evaluate(tcode).ToObject().ToString());

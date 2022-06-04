@@ -1,3 +1,7 @@
+using System.Data;
+using FileFlows.Server.Database.Managers;
+using FileFlows.Shared;
+
 namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -13,7 +17,7 @@ namespace FileFlows.Server.Controllers
     public class SettingsController : Controller
     {
         private static Settings Instance;
-        private static Mutex _mutex = new Mutex();
+        private static SemaphoreSlim semaphore = new SemaphoreSlim(1);
 
         /// <summary>
         /// Whether or not the system is configured
@@ -42,8 +46,8 @@ namespace FileFlows.Server.Controllers
         public async Task<string> CheckLatestVersion()
         {
             var settings = await new SettingsController().Get();
-            if (settings.IsWindows == true && settings.AutoUpdate == true)
-                return string.Empty; // we let the auto updater take care of this.
+            if (settings.DisableTelemetry != false)
+                return string.Empty; 
             try
             {
                 var result = Workers.ServerUpdater.GetLatestOnlineVersion();
@@ -65,23 +69,35 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public async Task<Settings> Get()
         {
-            if (Instance != null)
-                return Instance;
-            _mutex.WaitOne();
+            await semaphore.WaitAsync();
             try
             {
                 if (Instance == null)
                 {
-                    Instance = await DbManager.Single<Settings>();
-
+                    Instance = await DbHelper.Single<Settings>();
                 }
                 Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 Instance.IsDocker = Program.Docker;
+
+                #if(DEBUG)
+                Instance.DbAllowed = true;
+                #else
+                Instance.DbAllowed = Environment.GetEnvironmentVariable("DevTest") == "1";
+                #endif
+
+                string dbConnStr = AppSettings.Instance.DatabaseMigrateConnection?.EmptyAsNull() ?? AppSettings.Instance.DatabaseConnection;
+                if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
+                    Instance.DbType = DatabaseType.Sqlite;
+                else if (dbConnStr.Contains(";Uid="))
+                    new MySqlDbManager(string.Empty).PopulateSettings(Instance, dbConnStr);
+                else
+                    new SqlServerDbManager(string.Empty).PopulateSettings(Instance, dbConnStr);
+                
                 return Instance;
             }
             finally
             {
-                _mutex.ReleaseMutex();
+                semaphore.Release();
             }
         }
 
@@ -100,10 +116,76 @@ namespace FileFlows.Server.Controllers
             model.DateCreated = settings.DateCreated;
             model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             model.IsDocker = Program.Docker;
+
+            var newConnectionString = GetConnectionString(model, model.DbType);
+            if (newConnectionString != AppSettings.Instance.DatabaseConnection)
+            {
+                // need to migrate the database
+                AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
+                AppSettings.Instance.Save();
+            }
             Instance = model;
+            return await DbHelper.Update(model);
+        }
+
+        private string GetConnectionString(Settings settings, DatabaseType dbType)
+        {
+            if (dbType == DatabaseType.SqlServer)
+                return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+                    settings.DbPassword);
+            if (dbType == DatabaseType.MySql)
+                return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+                    settings.DbPassword);
+            return string.Empty;
+        }
+        
+
+        /// <summary>
+        /// Tests a database connection
+        /// </summary>
+        /// <param name="model">The database connection info</param>
+        /// <returns>OK if successful, otherwise a failure message</returns>
+        [HttpPost("test-db-connection")]
+        public string TestDbConnection([FromBody] DbConnectionInfo model)
+        {
+            if (model == null)
+                throw new ArgumentException(nameof(model));
+
+            if (model.Type == DatabaseType.SqlServer)
+                return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+                    ?.EmptyAsNull() ?? "OK";
+            if (model.Type == DatabaseType.MySql)
+                return new MySqlDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+                    ?.EmptyAsNull() ?? "OK";
             
-            return await DbManager.Update(model);
+            return "Unsupported database type";
         }
     }
 
+    /// <summary>
+    /// Database connection details
+    /// </summary>
+    public class DbConnectionInfo
+    {
+        /// <summary>
+        /// Gets or sets the server address
+        /// </summary>
+        public string Server { get; set; }
+        /// <summary>
+        /// Gets or sets the database name
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// Gets or sets the connecting user
+        /// </summary>
+        public string User { get; set; }
+        /// <summary>
+        /// Gets or sets the password used
+        /// </summary>
+        public string Password { get; set; }
+        /// <summary>
+        /// Gets or sets the database type
+        /// </summary>
+        public DatabaseType Type { get; set; }
+    }
 }

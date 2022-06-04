@@ -18,15 +18,39 @@ namespace FileFlows.Client.Pages
 
         private bool ShowInternalProcessingNdoe { get; set; }
 
+        private bool ShowExternalDatabase { get; set; }
+
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblInternalProcessingNodeDescription;
+        private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblLogging, 
+            lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblSystem, lblRestart;
 
         private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
 
-        private FileFlows.Shared.Models.ProcessingNode InternalProcessingNode { get; set; } 
+        private ProcessingNode InternalProcessingNode { get; set; } 
 
-        List<Validator> DirectoryValidators = new ();
+        List<Validator> RequiredValidator = new ();
+
+        private List<ListOption> DbTypes = new()
+        {
+            new() { Label = "SQLite", Value = DatabaseType.Sqlite },
+            new() { Label = "SQL Server", Value = DatabaseType.SqlServer },
+            new() { Label = "MySQL", Value = DatabaseType.MySql }
+        };
+
+        private object DbType
+        {
+            get => Model.DbType;
+            set
+            {
+                if (value is DatabaseType dbType)
+                {
+                    Model.DbType = dbType;
+                    if (dbType != DatabaseType.Sqlite && string.IsNullOrWhiteSpace(Model.DbName))
+                        Model.DbName = "FileFlows";
+                }
+            }
+        }
 
 
         protected override async Task OnInitializedAsync()
@@ -37,16 +61,23 @@ namespace FileFlows.Client.Pages
             lblAdvanced = Translater.Instant("Labels.Advanced");
             lblGeneral = Translater.Instant("Pages.Settings.Labels.General");
             lblNode = Translater.Instant("Pages.Settings.Labels.InternalProcessingNode");
+            lblDatabase = Translater.Instant("Pages.Settings.Labels.Database");
             lblInternalProcessingNodeDescription = Translater.Instant("Pages.Settings.Fields.InternalProcessingNode.Description");
+            lblDbDescription = Translater.Instant("Pages.Settings.Fields.Database.Description");
+            lblTest = Translater.Instant(("Label.Test"));
+            lblSystem = Translater.Instant(("Pages.Settings.Labels.System"));
+            lblRestart= Translater.Instant(("Pages.Settings.Labels.Restart"));
+            lblLogging= Translater.Instant(("Pages.Settings.Labels.Logging"));
             Blocker.Show("Loading Settings");
 
-            DirectoryValidators.Add(new Required());
-
+            RequiredValidator.Add(new Required());
+            
 #if (!DEMO)
             var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
             if (response.Success)
             {
                 this.Model = response.Data;
+                this.ShowExternalDatabase = this.Model?.DbAllowed == true;
             }
 
             var nodesResponse = await HttpHelper.Get<ProcessingNode[]>("/api/node");
@@ -84,9 +115,64 @@ namespace FileFlows.Client.Pages
 #endif
         }
 
-        private async void OpenHelp()
+        private async Task OpenHelp()
         {
             await jsRuntime.InvokeVoidAsync("open", "https://github.com/revenz/FileFlows/wiki/Settings", "_blank");
+        }
+
+        private async Task TestDbConnection()
+        {
+            string server = Model?.DbServer?.Trim();
+            string name = Model?.DbName?.Trim();
+            string user = Model?.DbUser?.Trim();
+            string password = Model?.DbPassword?.Trim();
+            if (string.IsNullOrWhiteSpace(server))
+            {
+                Toast.ShowError(Translater.Instant("Pages.Settings.Messages.Database.NoServer"));
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Toast.ShowError(Translater.Instant("Pages.Settings.Messages.Database.NoName"));
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(user))
+            {
+                Toast.ShowError(Translater.Instant("Pages.Settings.Messages.Database.NoUser"));
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                Toast.ShowError(Translater.Instant("Pages.Settings.Messages.Database.NoPassword"));
+                return;
+            }
+
+            Blocker.Show();
+            try
+            {
+                var result = await HttpHelper.Post<string>("/api/settings/test-db-connection", new
+                {
+                    server, name, user, password, Type = DbType
+                });
+                if (result.Success == false)
+                    throw new Exception(result.Body);
+                if(result.Data != "OK")
+                    throw new Exception(result.Data);
+                Toast.ShowSuccess(Translater.Instant("Pages.Settings.Messages.Database.TestSuccess"));
+            }
+            catch (Exception ex)
+            {
+                Toast.ShowError(ex.Message);
+            }
+            finally
+            {
+                Blocker.Hide();
+            }
+        }
+
+        async void Restart()
+        {
+            await HttpHelper.Post("/api/system/restart");
         }
     }
 }

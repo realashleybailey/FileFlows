@@ -27,7 +27,7 @@ public class PluginScanner
             EnsureDefaultsExist(pluginDir);
 
         var controller = new PluginController();
-        var dbPluginInfos = controller.GetDataList().Result;
+        var dbPluginInfos = controller.GetDataList().Result.OrderBy(x => x.Name).ToList();
 
         List<string> installed = new List<string>();
         var options = new JsonSerializerOptions
@@ -88,10 +88,23 @@ public class PluginScanner
                     continue;
                 }
 
-                var plugin = dbPluginInfos.FirstOrDefault(x => x.Name == pi.Name);
+                var plugin = dbPluginInfos.FirstOrDefault(x =>
+                {
+                    if (x.Uid == pi.Uid)
+                        return true;
+                    string xpn = x.PackageName.Replace(".ffplugin", string.Empty).ToLower();
+                    string pipn = pi.PackageName.Replace(".ffplugin", string.Empty).ToLower();
+                    if (xpn == pipn)
+                        return true;
+                    
+                    if(string.Equals(x.Name, pi.Name, StringComparison.CurrentCultureIgnoreCase))
+                        return true;
+                    return false;
+                });
                 bool isNew = plugin == null;
                 plugin ??= new();
                 installed.Add(pi.Name);
+                plugin.Uid = pi.Uid;
                 plugin.PackageName = pi.PackageName;
                 plugin.Version = pi.Version;
                 plugin.DateModified = DateTime.Now;
@@ -122,7 +135,6 @@ public class PluginScanner
                     plugin.DateCreated = DateTime.Now;
                     plugin.DateModified = DateTime.Now;
                     plugin.Enabled = true;
-                    plugin.Uid = Guid.NewGuid();
                     controller.Update(plugin).Wait();
                 }
             }

@@ -99,6 +99,9 @@ canvas {
 ::deep .flow-part.Failure, .flow-element.Failure {
   border-color: var(--flow-failure);
 }
+::deep .flow-part.Script, .flow-element.Script {
+  border-color: var(--flow-script);
+}
 
 .flow-element {
   padding: 0.25rem 0.25rem;
@@ -150,6 +153,9 @@ canvas {
 }
 .flow-element.Failure .icon-wrapper {
   border-color: var(--flow-failure);
+}
+.flow-element.Script .icon-wrapper {
+  border-color: var(--flow-script);
 }
 .flow-element .label {
   flex-grow: 1;
@@ -373,6 +379,12 @@ canvas {
 }
 ::deep .flow-part.Failure:not(.selected) .connected > div {
   background-color: var(--flow-failure) !important;
+}
+::deep .flow-part.Script:not(.selected) .icon-wrapper, ::deep .flow-part.Script:not(.selected) .input > div, ::deep .flow-part.Script:not(.selected) .output > div {
+  border-color: var(--flow-script) !important;
+}
+::deep .flow-part.Script:not(.selected) .connected > div {
+  background-color: var(--flow-script) !important;
 }
 ::deep .flow-part.selected .icon-wrapper, ::deep .flow-part.selected .input > div, ::deep .flow-part.selected .output > div {
   border-color: var(--accent) !important;

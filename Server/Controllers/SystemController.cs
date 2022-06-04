@@ -1,4 +1,7 @@
+using System.Diagnostics;
 using System.IO.Compression;
+using FileFlows.Server.Workers;
+using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FileFlows.Server.Controllers;
@@ -48,5 +51,53 @@ public class SystemController:Controller
             return new ContentResult();
 
         return File(System.IO.File.ReadAllBytes(updateFile), "application/zip");
+    }
+
+
+    /// <summary>
+    /// Gets the system information for the FileFlows server,
+    /// which includes memory and CPU usage
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("info")]
+    public async Task<SystemInfo> GetSystemInfo()
+    {
+        SystemInfo info = new ();
+        //Process proc = Process.GetCurrentProcess();
+        //info.MemoryUsage = proc.PrivateMemorySize64;
+        info.MemoryUsage = GC.GetTotalMemory(true);
+        info.CpuUsage = await GetCpuPercentage();
+        return info;
+    }
+
+    private async Task<float> GetCpuPercentage()
+    {
+        var startTime = DateTime.UtcNow;
+        var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+
+        await Task.Delay(100);
+
+        stopWatch.Stop();
+        var endTime = DateTime.UtcNow;
+        var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+
+        var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+        var totalMsPassed = (endTime - startTime).TotalMilliseconds;
+        var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+
+        var cpuUsagePercentage = (float)(cpuUsageTotal * 100);
+        return cpuUsagePercentage;
+    }
+
+    /// <summary>
+    /// Restarts FileFLow server
+    /// </summary>
+    [HttpPost("restart")]
+    public void Restart()
+    {
+        WorkerManager.StopWorkers();
+        Environment.Exit(99);
     }
 }

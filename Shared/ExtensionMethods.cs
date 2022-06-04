@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace FileFlows.Shared;
 
 /// <summary>
@@ -39,13 +41,23 @@ public static class ExtensionMethods
         match = regex.Match(input ?? string.Empty);
         return match.Success;
     }
-    
-    
+
+
 
     /// <summary>
     /// Lower cases UPPER case characters, but does not touch umlauts etc
     /// </summary>
     /// <param name="input">the string to lowercase</param>
     /// <returns>the lowercased string</returns>
-    public static string ToLowerExplicit(this string input) => Regex.Replace(input, @"\B[A-Z]", m => " " + m.ToString().ToLower());
+    public static string ToLowerExplicit(this string input)
+    {
+        var sb = new StringBuilder(input);
+        for(int i= 0; i < sb.Length; i++)   
+        {
+            var c = sb[i];
+            if (c >= 'A' && c <= 'Z')
+                sb[i] = c.ToString().ToLower()[0];
+        }
+        return sb.ToString();
+    }
 }

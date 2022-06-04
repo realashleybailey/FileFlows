@@ -36,6 +36,11 @@ public class Settings : FileFlowObject
     }
 
     /// <summary>
+    /// Gets or sets if the Queue messages should be logged
+    /// </summary>
+    public bool LogQueueMessages { get; set; }
+
+    /// <summary>
     /// Gets or sets if this is running on Windows
     /// </summary>
     public bool IsWindows { get; set; }
@@ -49,4 +54,53 @@ public class Settings : FileFlowObject
     /// Gets or sets the FileFlows version number
     /// </summary>
     public string Version { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of database to use
+    /// </summary>
+    public DatabaseType DbType { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the db server to use
+    /// </summary>
+    public string DbServer { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the name of the database
+    /// </summary>
+    public string DbName { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the user used to connect to the database
+    /// </summary>
+    public string DbUser { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the password used to connect to the database
+    /// </summary>
+    public string DbPassword { get; set; }
+
+    /// <summary>
+    /// Gets or sets if the user can change database settings
+    /// </summary>
+    public bool DbAllowed { get; set; }
+}
+
+/// <summary>
+/// The types of Databases supported
+/// </summary>
+public enum DatabaseType
+{
+    /// <summary>
+    /// SQLite Database
+    /// </summary>
+    Sqlite = 0,
+    /// <summary>
+    /// Microsoft SQL Server
+    /// </summary>
+    SqlServer = 1,
+    /// <summary>
+    /// MySql / MariaDB
+    /// </summary>
+    MySql = 2
 }

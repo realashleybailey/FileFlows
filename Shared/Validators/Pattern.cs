@@ -18,14 +18,14 @@ public class Pattern : Validator
     /// </summary>
     /// <param name="value">the value to validate</param>
     /// <returns>true if valid otherwise false</returns>
-    public async override Task<bool> Validate(object value)
+    public async override Task<(bool Valid, string Error)> Validate(object value)
     {
         await Task.CompletedTask;
 
         if (string.IsNullOrEmpty(Expression))
-            return true;
+            return (true, string.Empty);
 
         var regex = new Regex(Expression);
-        return regex.IsMatch(value as string ?? "");
+        return (regex.IsMatch(value as string ?? ""), string.Empty);
     }
 }

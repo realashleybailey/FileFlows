@@ -30,6 +30,12 @@ public class ElementField
     public string Placeholder { get; set; }
     
     /// <summary>
+    /// Gets or sets the description of the element, if this is set, this will be used instead of the HelpHint
+    /// Note: this is used by the Script which the user defines the description for
+    /// </summary>
+    public string Description { get; set; }
+    
+    /// <summary>
     /// Gets or sets the input type of this field
     /// </summary>
     public FormInputType InputType { get; set; }

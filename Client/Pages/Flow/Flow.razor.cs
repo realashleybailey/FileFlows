@@ -131,7 +131,6 @@ namespace FileFlows.Client.Pages
         {
             HotKeyService.DeregisterHotkey("FlowFilter");
             NavigationService.UnRegisterNavigationCallback(NavigationCheck);
-
         }
 
         private async Task Init()
@@ -260,10 +259,20 @@ namespace FileFlows.Client.Pages
         public object AddElement(string uid)
         {
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
-            string type = element.Uid.Substring(element.Uid.LastIndexOf(".") + 1);
-            string name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
-            if (name == "Label")
-                name = FlowHelper.FormatLabel(type);
+            string name;
+            if (element.Type == FlowElementType.Script)
+            {
+                // special type
+                name = element.Name;
+            }
+            else
+            {
+                string type = element.Uid.Substring(element.Uid.LastIndexOf(".") + 1);
+                name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
+                if (name == "Label")
+                    name = FlowHelper.FormatLabel(type);
+            }
+
             element.Name = name;
             return new { element, uid = Guid.NewGuid() };
         }
@@ -387,8 +396,18 @@ namespace FileFlows.Client.Pages
                 return null;
             }
 
-            string typeName = part.FlowElementUid.Substring(part.FlowElementUid.LastIndexOf(".") + 1);
-            string typeDisplayName = Translater.TranslateIfHasTranslation($"Flow.Parts.{typeName}.Label", FlowHelper.FormatLabel(typeName));
+            string typeName;
+            string typeDisplayName;
+            if (part.Type == FlowElementType.Script)
+            {
+                typeName = "Script";
+                typeDisplayName = part.FlowElementUid[44..]; // 44 to remove Script:[Guid]:
+            }
+            else
+            {
+                typeName = part.FlowElementUid[(part.FlowElementUid.LastIndexOf(".") + 1)..];
+                typeDisplayName = Translater.TranslateIfHasTranslation($"Flow.Parts.{typeName}.Label", FlowHelper.FormatLabel(typeName));
+            }
 
             var fields = ObjectCloner.Clone(flowElement.Fields);
             // add the name to the fields, so a node can be renamed
@@ -396,7 +415,7 @@ namespace FileFlows.Client.Pages
             {
                 Name = "Name",
                 Placeholder = typeDisplayName,
-                InputType = Plugin.FormInputType.Text
+                InputType = FormInputType.Text
             });
 
             bool isFunctionNode = flowElement.Uid == "FileFlows.BasicNodes.Functions.Function";

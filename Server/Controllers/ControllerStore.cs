@@ -1,146 +1,192 @@
-﻿namespace FileFlows.Server.Controllers
+﻿using FileFlows.Server.Helpers;
+using FileFlows.Shared.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+
+namespace FileFlows.Server.Controllers;
+
+
+/// <summary>
+/// A base controller that can store data if the database type requires
+/// </summary>
+/// <typeparam name="T">the type of data this controller stores</typeparam>
+public abstract class ControllerStore<T>:Controller where T : FileFlowObject, new()
 {
-    using FileFlows.Server.Helpers;
-    using FileFlows.Shared.Models;
-    using Microsoft.AspNetCore.Mvc;
+    protected static Dictionary<Guid, T> _Data;
+    protected static SemaphoreSlim _mutex = new SemaphoreSlim(1);
 
-    public abstract class ControllerStore<T>:Controller where T : FileFlowObject, new()
+    protected async Task<IEnumerable<string>> GetNames(Guid? uid = null)
     {
-        protected static Dictionary<Guid, T> Data;
-        protected static Mutex _mutex = new Mutex(false);
-
-        protected async Task<IEnumerable<string>> GetNames(Guid? uid = null)
+        if (DbHelper.UseMemoryCache)
         {
             var data = await GetData();
-            if(uid == null)
+            if (uid == null)
                 return data.Select(x => x.Value.Name);
             return data.Where(x => x.Key != uid.Value).Select(x => x.Value.Name);
         }
-
-
-        /// <summary>
-        /// Checks to see if a name is in use
-        /// </summary>
-        /// <param name="uid">the Uid of the item</param>
-        /// <param name="name">the name of the item</param>
-        /// <returns>true if name is in use</returns>
-        protected async Task<bool> NameInUse(Guid uid, string name)
+        else
         {
-            name = name.ToLower().Trim();
+            var data = await DbHelper.GetIndexedNames<T>();
+            if (uid == null)
+                return data.Select(x => x.Value);
+            return data.Where(x => x.Key != uid.Value).Select(x => x.Value);
+        }
+    }
+
+
+    /// <summary>
+    /// Checks to see if a name is in use
+    /// </summary>
+    /// <param name="uid">the Uid of the item</param>
+    /// <param name="name">the name of the item</param>
+    /// <returns>true if name is in use</returns>
+    protected async Task<bool> NameInUse(Guid uid, string name)
+    {
+        name = name.ToLower().Trim();
+        if(DbHelper.UseMemoryCache)
             return (await GetData()).Any(x => uid != x.Key && x.Value.Name.ToLower() == name);
-        }
+        
+        return await DbHelper.NameInUse<T>(uid, name);
+    }
 
-        protected async Task<string> GetNewUniqueName(string name)
+    protected async Task<string> GetNewUniqueName(string name)
+    {
+        string newName = name.Trim();
+        List<string> names;
+        if (DbHelper.UseMemoryCache)
+            names = (await GetData()).Select(x => x.Value.Name.ToLower()).ToList();
+        else
+            names = (await DbHelper.GetNames<T>()).Select(x => x.ToLower()).ToList();
+        int count = 2;
+        while (names.Contains(newName.ToLower()))
         {
-            string newName = name.Trim();
-            var names = (await GetData()).Select(x => x.Value.Name.ToLower()).ToList();
-            int count = 2;
-            while (names.Contains(newName.ToLower()))
-            {
-                newName = name + " (" + count + ")";
-                ++count;
-                if (count > 100)
-                    throw new Exception("Could not find unique name, aborting.");
-            }
-            return newName;
+            newName = name + " (" + count + ")";
+            ++count;
+            if (count > 100)
+                throw new Exception("Could not find unique name, aborting.");
         }
+        return newName;
+    }
 
-        /// <summary>
-        /// Clears the cached data 
-        /// </summary>
-        internal void ClearData() => Data = null;
+    /// <summary>
+    /// Clears the cached data 
+    /// </summary>
+    internal void ClearData() => _Data = null;
 
-        /// <summary>
-        /// Gets all the data indexed by the items UID
-        /// </summary>
-        /// <returns>all the data indexed by the items UID</returns>
-        internal async Task<Dictionary<Guid, T>> GetData()
+    /// <summary>
+    /// Gets all the data indexed by the items UID
+    /// </summary>
+    /// <returns>all the data indexed by the items UID</returns>
+    internal async Task<Dictionary<Guid, T>> GetData()
+    {
+        if (DbHelper.UseMemoryCache == false)
+            return (await DbHelper.Select<T>()).ToDictionary(x => x.Uid, x => x);
+        
+        if (_Data == null)
         {
-            if (Data == null)
+            await _mutex.WaitAsync();
+            try
             {
-                _mutex.WaitOne();
-                try
+                if (_Data == null) // make sure its still null after getting mutex
                 {
-                    if (Data == null) // make sure its still null after getting mutex
-                    {
-                        Data = (await DbHelper.Select<T>())
-                                             .ToDictionary(x => x.Uid, x => x);
-                    }
-                }
-                finally
-                {
-                    _mutex?.ReleaseMutex(); 
+                    _Data = (await DbHelper.Select<T>())
+                                         .ToDictionary(x => x.Uid, x => x);
                 }
             }
-            return Data;
+            finally
+            {
+                _mutex?.Release(); 
+            }
         }
+        return _Data;
+    }
 
-        internal virtual async Task<List<T>> GetDataList() => (await GetData()).Values.ToList();
+    internal virtual async Task<IEnumerable<T>> GetDataList()
+    {
+        if(DbHelper.UseMemoryCache)
+            return (await GetData()).Values.ToList();
+        return await DbHelper.Select<T>();
+    } 
 
-        protected async Task<T> GetByUid(Guid uid)
+    protected async Task<T> GetByUid(Guid uid)
+    {
+        if (DbHelper.UseMemoryCache)
         {
             var data = await GetData();
-            if(data.ContainsKey(uid))
+            if (data.ContainsKey(uid))
                 return data[uid];
             return default;
         }
 
-        protected async Task DeleteAll(ReferenceModel model)
-        {
-            if (model?.Uids?.Any() != true)
-                return;
-            await DeleteAll(model.Uids);
-        }
+        return await DbHelper.Single<T>(uid);
+    }
 
-        internal async Task DeleteAll(params Guid[] uids)
+    protected async Task DeleteAll(ReferenceModel model)
+    {
+        if (model?.Uids?.Any() != true)
+            return;
+        await DeleteAll(model.Uids);
+    }
+
+    internal async Task DeleteAll(params Guid[] uids)
+    {
+        if (DbHelper.UseMemoryCache)
         {
             var data = await GetData();
-            foreach(var uid in uids)
+            foreach (var uid in uids)
             {
-                _mutex.WaitOne();
+                await _mutex.WaitAsync();
                 try
                 {
-                    if (data.ContainsKey(uid))  
-                    data.Remove(uid);
+                    if (data.ContainsKey(uid))
+                        data.Remove(uid);
                 }
                 finally
                 {
-                    _mutex.ReleaseMutex();
+                    _mutex.Release();
                 }
             }
-            await DbManager.DeleteAll(uids);
         }
 
-        internal async Task<T> Update(T model, bool checkDuplicateName = false)
+        await DbHelper.Delete(uids);
+    }
+
+    internal async Task<T> Update(T model, bool checkDuplicateName = false)
+    {
+        if (checkDuplicateName)
         {
-            if (checkDuplicateName)
-            {
-                if(await NameInUse(model.Uid, model.Name))
-                    throw new Exception("ErrorMessages.NameInUse");
-            }
-            var updated = await DbManager.Update(model);
-            _mutex.WaitOne();
+            if(await NameInUse(model.Uid, model.Name))
+                throw new Exception("ErrorMessages.NameInUse");
+        }
+        var updated = await DbHelper.Update(model);
+        if (DbHelper.UseMemoryCache)
+        {
+            await _mutex.WaitAsync();
             try
             {
-                if (Data.ContainsKey(updated.Uid))
-                    Data[updated.Uid] = updated;
+                if (_Data.ContainsKey(updated.Uid))
+                    _Data[updated.Uid] = updated;
                 else
-                    Data.Add(updated.Uid, updated);
+                    _Data.Add(updated.Uid, updated);
             }
             finally
             {
-                _mutex.ReleaseMutex();
+                _mutex.Release();
             }
-            return updated;
         }
-        
-        internal async Task UpdateDateModified(Guid uid)
+        return updated;
+    }
+    
+    internal async Task UpdateDateModified(Guid uid)
+    {
+        if (DbHelper.UseMemoryCache)
         {
             var item = await GetByUid(uid);
             if (item == null)
                 return;
             item.DateModified = DateTime.Now;
-            DbManager.UpdateDateModified(item.Uid, item.DateModified);
         }
+
+        await DbHelper.UpdateLastModified(uid);
     }
 }

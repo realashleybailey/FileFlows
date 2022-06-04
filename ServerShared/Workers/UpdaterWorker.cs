@@ -8,18 +8,19 @@ using System.IO.Compression;
 /// <summary>
 /// Worker that will automatically update the system
 /// </summary>
-public abstract class UpdaterWorker:Worker
+public abstract class UpdaterWorker : Worker
 {
     /// <summary>
     /// Gets if there is an updated pending installation
     /// </summary>
     public static bool UpdatePending { get; private set; }
+
     protected Version CurrentVersion { get; init; }
 
-    protected readonly string UpdaterName; 
+    protected readonly string UpdaterName;
 
     private readonly string UpgradeScriptPrefix;
-    
+
     /// <summary>
     /// Constructs an instance of a Update Worker
     /// </summary>
@@ -47,7 +48,7 @@ public abstract class UpdaterWorker:Worker
     /// Quits the current application
     /// </summary>
     protected abstract void QuitApplication();
-    
+
     /// <summary>
     /// Runs a check for update and if found will download it 
     /// </summary>
@@ -59,7 +60,7 @@ public abstract class UpdaterWorker:Worker
         {
 #if(DEBUG)
             return false; // disable during debugging
-#else       
+#else
             string updateScript = DownloadUpdate();
             if (string.IsNullOrEmpty(updateScript))
                 return false;
@@ -99,7 +100,7 @@ public abstract class UpdaterWorker:Worker
         try
         {
             // if inside docker we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
-            if (Globals.IsDocker == false) 
+            if (Globals.IsDocker == false)
             {
                 Logger.Instance?.ILog($"{UpdaterName}About to execute upgrade script: " + updateScript);
                 var fi = new FileInfo(updateScript);
@@ -131,12 +132,12 @@ public abstract class UpdaterWorker:Worker
     /// </summary>
     /// <returns>if auto updates are enabled</returns>
     protected abstract bool GetAutoUpdatesEnabled();
-    
+
     private string DownloadUpdate()
     {
         try
         {
-            if(GetAutoUpdatesEnabled() == false)
+            if (GetAutoUpdatesEnabled() == false)
                 return string.Empty;
 
             Logger.Instance?.DLog($"{UpdaterName}: Checking for new update binary");
@@ -146,12 +147,23 @@ public abstract class UpdaterWorker:Worker
                 Logger.Instance?.DLog($"{UpdaterName}: No update available");
                 return string.Empty;
             }
+
             Logger.Instance?.DLog($"{UpdaterName}: Downloaded update: " + update);
 
             var updateDir = new FileInfo(update).DirectoryName;
-            
+
             Logger.Instance?.ILog($"{UpdaterName}: Extracting update to: " + updateDir);
-            ZipFile.ExtractToDirectory(update, updateDir, true);
+            try
+            {
+                ZipFile.ExtractToDirectory(update, updateDir, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance?.ELog($"{UpdaterName}: Failed extract update zip, file likely corrupt during download, deleting update");
+                File.Delete(update);
+                return string.Empty;
+            }
+
             Logger.Instance?.ILog($"{UpdaterName}: Extracted update to: " + updateDir);
             // delete the upgrade file after extraction
             File.Delete(update);
@@ -163,6 +175,7 @@ public abstract class UpdaterWorker:Worker
                 Logger.Instance?.WLog($"{UpdaterName}: No update script found: " + updateFile);
                 return string.Empty;
             }
+
             Logger.Instance?.ILog($"{UpdaterName}: Update script found: " + updateFile);
 
             if (Globals.IsLinux && MakeExecutable(updateFile) == false)
@@ -176,7 +189,7 @@ public abstract class UpdaterWorker:Worker
 
             return updateFile;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             //if (ex.Message == "Object reference not set to an instance of an object")
             //    return string.Empty; // just ignore this error, likely due ot it not being configured yet.
@@ -221,18 +234,4 @@ public abstract class UpdaterWorker:Worker
         }
     }
 
-    
-    /// <summary>
-    /// Downloads a file and saves it
-    /// </summary>
-    /// <param name="url">The url of the file to download</param>
-    /// <param name="file">the location to save the file</param>
-    /// <exception cref="Exception">throws if the file fails to download</exception>
-    protected async Task DownloadFile(string url, string file)
-    {
-        var result = await HttpHelper.Get<byte[]>(url);
-        if (result.Success == false)
-            throw new Exception("Failed to get update: " + result.Body);
-        await File.WriteAllBytesAsync(file, result.Data);
-    }
 }

@@ -11,7 +11,7 @@ internal class DbObject
     /// <summary>
     /// Gets or sets the UID of the object
     /// </summary>
-    public string Uid { get; set; }
+    public Guid Uid { get; set; }
     
     /// <summary>
     /// Gets or sets the name of the object

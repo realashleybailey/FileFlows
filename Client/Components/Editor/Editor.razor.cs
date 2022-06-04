@@ -283,7 +283,8 @@ namespace FileFlows.Client.Components
                 return @default;
             try
             {
-                T result = (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), val);
+                var converted = Converter.ConvertObject(typeof(T), val);
+                T result = (T)converted;
                 if(result is List<ListOption> options)
                 {
                     foreach(var option in options)
@@ -300,7 +301,7 @@ namespace FileFlows.Client.Components
 
                 return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Logger.Instance.ELog("Failed converted: " + parameter, val);
                 return @default;
@@ -318,6 +319,65 @@ namespace FileFlows.Client.Components
             return range == null ? (0, 0) : (range.Minimum, range.Maximum);
         }
 
+        /// <summary>
+        /// Gets the default of a specific type
+        /// </summary>
+        /// <param name="type">the type</param>
+        /// <returns>the default value</returns>
+        private object GetDefault(Type type)
+        {
+            if(type?.IsValueType == true)
+            {
+                return Activator.CreateInstance(type);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a value for a field
+        /// </summary>
+        /// <param name="field">the field whose value to get</param>
+        /// <param name="type">the type of value to get</param>
+        /// <returns>the value</returns>
+        internal object GetValue(string field, Type type)
+        {
+            if (Model == null)
+                return GetDefault(type);
+            
+            var dict = (IDictionary<string, object>)Model;
+            if (dict.ContainsKey(field) == false)
+                return GetDefault(type);
+            object value = dict[field];
+            if (value == null)
+                return GetDefault(type);
+
+            if (value is JsonElement je)
+            {
+                if (type == typeof(string))
+                    return je.GetString();
+                if (type== typeof(int))
+                    return je.GetInt32();
+                if (type == typeof(bool))
+                    return je.GetBoolean();
+                if (type == typeof(float))
+                    return (float)je.GetInt64();
+            }
+
+            if (value.GetType().IsAssignableTo(type))
+            {
+                return value;
+            }
+
+            try
+            {
+                return Converter.ConvertObject(type, value);
+            }
+            catch(Exception)
+            {
+                return GetDefault(type);
+            }
+        }
+        
         /// <summary>
         /// Gets a value for a field
         /// </summary>
@@ -340,7 +400,7 @@ namespace FileFlows.Client.Components
                 return @default;
             }
 
-            if (value is System.Text.Json.JsonElement je)
+            if (value is JsonElement je)
             {
                 if (typeof(T) == typeof(string))
                     return (T)(object)je.GetString();
@@ -359,11 +419,11 @@ namespace FileFlows.Client.Components
 
             try
             {
-                return (T)FileFlows.Shared.Converter.ConvertObject(typeof(T), value);
+                return (T)Converter.ConvertObject(typeof(T), value);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                return default(T);
+                return default;
             }
         }
 

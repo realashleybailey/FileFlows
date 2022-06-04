@@ -48,6 +48,8 @@ window.ffFlowPart = {
                 div.classList.add('Failure');
             else if (part.type == 8)
                 div.classList.add('Communication');
+            else if (part.type == 9)
+                div.classList.add('Script');
         }
 
         div.classList.add('size-' + Math.max(part.inputs, part.outputs));

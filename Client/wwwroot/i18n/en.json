@@ -15,6 +15,7 @@
     "About": "About",
     "Add": "Add",
     "Edit": "Edit",
+    "Duplicate":"Duplicate",
     "Update": "Update",
     "Refresh": "Refresh",
     "Download": "Download",
@@ -50,7 +51,8 @@
     "Node": "Node",
     "BaseCodeOn": "Use Code Template",
     "CopyToClipboard": "Copy to clipboard",
-    "CopiedToClipboard": "Copied ''{text}'' to clipboard."
+    "CopiedToClipboard": "Copied ''{text}'' to clipboard.",
+    "Test":"Test"
   },
   "Dialogs":{
     "FileBrowser": {
@@ -181,7 +183,8 @@
         }
       },
       "Messages": {
-        "FlowImported": "Flow ''{name}'' imported"
+        "FlowImported": "Flow ''{name}'' imported",
+        "Duplicated": "Flow ''{name}'' duplicated"
       }
     },
     "Libraries": {
@@ -204,6 +207,8 @@
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
         "Filter-Help": "An optional filter regular expression to run against matching files.\nThis filter will be run against the full absolute filename of the file.\nExample: \\.(mp4|mkv|avi|mpg|mov)$",
+        "ExclusionFilter":"Exclusion Filter",
+        "ExclusionFilter-Help":"An optional filter regular expression to run against matching files.\nThis can simplify excluding specific file names from being processed.",
         "ExcludeHidden": "Exclude Hidden",
         "ExcludeHidden-Help": "When enabled, hidden files and folders will not be scanned",
         "UseFingerprinting": "Use Fingerprinting",
@@ -219,7 +224,7 @@
         "FileSizeDetectionInterval-Help": "The amount of time in seconds to wait to recheck the file size during the library scanner.  Use this if another application maybe writing to a file in chunks, eg a PVR application writing parts of a recording every 20 seconds.",
         "Schedule": "Schedule",
         "Schedule-Help": "This schedule runs in the timezone configured under settings.",
-        "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any library files be processed outside of the schedule.\n",
+        "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any files be processed outside of the schedule.\n",
         "Scan": "Scan",
         "Scan-Help": "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected.",
         "ReprocessRecreatedFiles":"Reprocess Recreated Files",
@@ -244,7 +249,7 @@
       }
     },
     "LibraryFiles": {
-      "Title": "Library Files",
+      "Title": "Files",
       "Buttons": {
         "Ignore": "Ignore",
         "Process": "Process",
@@ -322,21 +327,51 @@
         "Elements": "Nodes"
       }
     },
+    "Scripts":{
+      "Title":"Scripts",
+      "Messages": {
+        "Imported": "Script ''{name}'' imported",
+        "Duplicated":"Scripts ''{name}'' duplicated"
+      },
+      "Fields":{
+      }
+    },
+    "Script": {
+      "Title": "Script",
+      "Fields": {
+        "Code": "Code"
+      }
+    },
     "Settings": {
       "Title": "Settings",
       "Labels": {
         "General": "General",
-        "InternalProcessingNode": "Internal Node"
+        "InternalProcessingNode": "Internal Node",
+        "Database":"Database",
+        "System":"System",
+        "Restart":"Restart FileFlows",
+        "Logging":"Logging"
+      },
+      "Messages":{
+        "Database":{
+          "NoServer":"Server is required",
+          "NoDatabase":"Name is required",
+          "NoUser":"User is required",
+          "NoPassword":"Password is required",
+          "TestSuccess":"Successfully connected to database"
+        }
       },
       "Fields": {
         "Telemetry": "Telemetry",
-        "Telemetry-Help": "Telemetry is useful to help know what devices we need to support, what Flow parts are the most used and where we should focus on the development.\nNo information about your library files or identify information is sent.",
+        "Telemetry-Help": "Telemetry is useful to help know what devices we need to support, what Flow parts are the most used and where we should focus on the development.\nNo information about your files or identify information is sent.",
         "AutoUpdate": "Auto Update",
         "AutoUpdate-Help": "When enabled FileFlows will routinely be checked for updates, and if an update is found, will automatically be downloaded and installed.",
         "AutoUpdatePlugins": "Auto Update Plugins",
         "AutoUpdatePlugins-Help": "When enabled plugins will routinely be checked for updates, and if any updates are found will automatically be downloaded.",
         "AutoUpdateNodes": "Auto Update Nodes",
         "AutoUpdateNodes-Help": "When enabled external nodes will automatically update when FileFlows server updates.  Meaning you will only have to update the FileFlows server instance in a distributed environment.",
+        "LogQueueMessages":"Log Queue Messages",
+        "LogQueueMessages-Help":"This will cause excessive logging of all files being queued/dequeued in the library watcher.\nTurn this if you are having issues with files not appearing, turn off again afterwards to avoid filling your log files with excessive logging.",
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
         "PluginRepositoryUrls": "Plugin Repositories",
@@ -351,6 +386,19 @@
           "FlowRunners-Help": "The number of flow runner instances available to execute a flow.",
           "Schedule": "Schedule",
           "Schedule-Help": "This allows you to configure when files can begin processing.  No files will begin processing outside of this schedule."
+        },
+        "Database":{
+          "Description":"Here you can configure what Database FileFlows will use.\nNote: Any changes here will require you to restart FileFlows so it can migrate your data and if necessary create the new database.",
+          "Type":"Type",
+          "Type-Help":"The type of database to use, the default type is SQLite which requires not additional setup or configuration",
+          "Server":"Server",
+          "Server-Help":"The address of the Database server and the port or named instance if required",
+          "Name":"Name",
+          "Name-Help":"The name of the database to created, if left blank ''FileFlows'' will be used",
+          "User":"User",
+          "User-Help":"The user used to connect to the database",
+          "Password": "Password",
+          "Password-Help":"The password of the user to connect to the database"
         }
       }
     },

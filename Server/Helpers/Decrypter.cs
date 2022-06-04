@@ -5,7 +5,7 @@ namespace FileFlows.Server.Helpers
 {
     public class Decrypter
     {
-        internal static string EncryptionKey { get; set; }
+        internal static string EncryptionKey => AppSettings.Instance.EncryptionKey;
 
         public static string Decrypt(string text)
         {

@@ -12,9 +12,9 @@ public class DefaultValidator : Validator
     /// </summary>
     /// <param name="value">the value to validate</param>
     /// <returns>If the value is valid or not</returns>
-    public async override Task<bool> Validate(object value)
+    public async override Task<(bool Valid, string Error)> Validate(object value)
     {
         await Task.CompletedTask;
-        return true;
+        return (true, string.Empty);
     }
 }

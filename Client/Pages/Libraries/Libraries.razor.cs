@@ -75,6 +75,7 @@ namespace FileFlows.Client.Pages
             SetModelProperty(nameof(template.Template), template.Name);
             SetModelProperty(nameof(template.FileSizeDetectionInterval), template.FileSizeDetectionInterval);
             SetModelProperty(nameof(template.Filter), template.Filter);
+            SetModelProperty(nameof(template.ExclusionFilter), template.ExclusionFilter);
             SetModelProperty(nameof(template.Path), template.Path);
             SetModelProperty(nameof(template.Priority), template.Priority);
             SetModelProperty(nameof(template.ScanInterval), template.ScanInterval);

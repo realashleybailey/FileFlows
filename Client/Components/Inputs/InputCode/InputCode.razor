@@ -7,6 +7,18 @@
         OnDidBlurEditorText="OnBlur" />
 </div>
 
+@{
+    bool invalid = string.IsNullOrEmpty(ErrorMessage) == false;
+}
+@if (invalid && Disabled != true)
+{
+    <div class="row mt-0 @(invalid ? "error" : "")">
+        <div class="input-label"></div>
+        <div class="input-value">
+            <span class="error-text">@ErrorMessage</span>
+        </div>
+    </div>
+}
 @if (string.IsNullOrEmpty(Help) == false)
 {
     <div class="row help">

@@ -33,6 +33,7 @@ namespace FileFlows.Client.Pages
         private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblWorkingFile, lblUid, lblLibrary;
         private Timer AutoRefreshTimer;
 
+        private SystemInfo SystemInfo = new SystemInfo();
         public delegate void Disposing();
         public event Disposing OnDisposing;
         protected override async Task OnInitializedAsync()
@@ -115,7 +116,14 @@ namespace FileFlows.Client.Pages
             Refreshing = true;
             try
             {
-                var result = await GetData();
+                RequestResult<List<FlowExecutorInfo>> result = null;
+                RequestResult<SystemInfo> systemInfoResult = null;
+                var tasks = new Task[]
+                {
+                    Task.Run(async () => result = await GetData()),
+                    Task.Run(async () => systemInfoResult = await GetSystemInfo()),
+                };
+                await Task.WhenAll(tasks);
                 if (result.Success)
                 {
                     this.Workers.Clear();
@@ -135,6 +143,12 @@ namespace FileFlows.Client.Pages
                     }
                     catch(Exception) { }
                 }
+
+                if (systemInfoResult.Success)
+                {
+                    this.SystemInfo = systemInfoResult.Data;
+                }
+                
             }
             catch (Exception)
             {
@@ -143,6 +157,16 @@ namespace FileFlows.Client.Pages
             {
                 Refreshing = false;
             }
+        }
+
+        async Task<RequestResult<SystemInfo>> GetSystemInfo()
+        {
+#if (DEMO)
+            var random = new Random(DateTime.Now.Millisecond);
+            return new SystemInfo { CpuUsage = random.Next() * 100f, MemoryUsage = random.Next() * 1_000_000_000 };
+#else
+            return await HttpHelper.Get<SystemInfo>("/api/system/info");
+#endif
         }
 
         async Task<RequestResult<List<FlowExecutorInfo>>> GetData()

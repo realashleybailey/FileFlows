@@ -1,3 +1,5 @@
+using FileFlows.Plugin.Models;
+
 namespace FileFlows.Plugin;
 
 using System.Collections.Generic;
@@ -34,6 +36,11 @@ public class NodeParameters
     /// Gets or sets the logger used by the flow during execution
     /// </summary>
     public ILogger? Logger { get; set; }
+    
+    /// <summary>
+    /// Gets or set s the script executor
+    /// </summary>
+    public IScriptExecutor ScriptExecutor { get; set; }
 
     /// <summary>
     /// Gets or sets the result of the flow
@@ -383,11 +390,12 @@ public class NodeParameters
         if (Fake) return true;
 
         FileInfo file = new FileInfo(destination);
-        if (string.IsNullOrEmpty(file.Extension) == false)
-        {
-            // just ensures extensions are lowercased
-            destination = new FileInfo(file.FullName.Substring(0, file.FullName.LastIndexOf(file.Extension)) + file.Extension.ToLower()).FullName;
-        }
+        // turning this of as per https://github.com/revenz/FileFlows/issues/79
+        // if (string.IsNullOrEmpty(file.Extension) == false)
+        // {
+        //     // just ensures extensions are lowercased
+        //     destination = new FileInfo(file.FullName.Substring(0, file.FullName.LastIndexOf(file.Extension)) + file.Extension.ToLower()).FullName;
+        // }
 
         Logger?.ILog("About to move file to: " + destination);
         destination = MapPath(destination);
@@ -700,6 +708,9 @@ public class NodeParameters
     public ProcessResult Execute(ExecuteArgs args)
     {
         if (Fake) return new ProcessResult {  ExitCode = 0, Completed = true };
+        
+        Logger.ILog("Execute called!!!");
+        
         var result = Process.ExecuteShellCommand(args).Result;
         return result;
     }

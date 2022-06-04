@@ -27,5 +27,13 @@
         {
             this.ActiveTab = tab;
         }
+
+        /// <summary>
+        /// Called when the visibility of a tab has changed
+        /// </summary>
+        internal void TabVisibilityChanged()
+        {
+            this.StateHasChanged();
+        }
     }
 }

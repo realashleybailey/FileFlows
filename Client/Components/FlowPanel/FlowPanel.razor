@@ -1,10 +1,13 @@
 ﻿@namespace FileFlows.Client.Components
 @using FileFlows.Plugin
 @using FileFlows.Shared
-
+@using FileFlows.Client.Helpers
+@{
+    bool isScript = Regex.IsMatch(TypeName, @"^Flow\.Parts\.([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})");
+}
 @foreach (var field in Fields.OrderBy(x => x.Order))
 {
-    string label = TypeName + ".Fields." + field.Name;
+    string label = isScript ? FlowHelper.FormatLabel(field.Name) : TypeName + ".Fields." + field.Name;
     if (string.IsNullOrWhiteSpace(field.Placeholder))
     {
         field.Placeholder = Translater.Instant(label + "-Placeholder").EmptyAsNull() ?? string.Empty;
@@ -161,6 +164,20 @@
             {
                 var oValue = GetValue<List<ExecutedNode>>(field.Name);
                 <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel />
+            }
+            break;
+        case FormInputType.Table:
+            {
+                <p>ADDING A TABLE</p>
+                var columns = GetParameter<List<InputTableColumn>>(field, nameof(InputTable.Columns), new List<InputTableColumn>());
+                var type = GetParameter<Type>(field, nameof(InputTable.TableType));
+                var oValue = GetValue(field.Name, type);
+                if(oValue == null)
+                {
+                    Type genericListType = typeof(List<>).MakeGenericType(type);
+                    oValue = Activator.CreateInstance(genericListType);
+                }
+                <InputTable Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel TableType=@type Columns=@columns />
             }
             break;
         case FormInputType.Label:

@@ -11,7 +11,8 @@ namespace FileFlows.Plugin
         BuildEnd,
         BuildPart,
         Failure,
-        Communication
+        Communication,
+        Script
     }
 
     public enum FormInputType
@@ -37,7 +38,8 @@ namespace FileFlows.Plugin
         Checklist = 19,
         TextLabel = 20,
         Password = 21,
-        ExecutedNodes = 22
+        ExecutedNodes = 22,
+        Table = 23
     }
 
 

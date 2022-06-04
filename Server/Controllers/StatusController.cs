@@ -14,8 +14,11 @@
         /// </summary>
         /// <returns>True if there is an update</returns>
         [HttpGet("update-available")]
-        public object UpdateAvailable()
+        public async Task<object> UpdateAvailable()
         {
+            var settings = await new SettingsController().Get();
+            if (settings?.DisableTelemetry != false)
+                return new { UpdateAvailable = false };
             var result = Workers.ServerUpdater.GetLatestOnlineVersion();
             return new { UpdateAvailable = result.updateAvailable };
         }

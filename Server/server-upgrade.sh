@@ -6,13 +6,11 @@ fi
 
 cd ..
 rm -rf Server
-rm -rf Node
 rm -rf FlowRunner
 rm run-node.sh
 rm run-server.sh
 
 mv Update/FlowRunner FlowRunner
-mv Update/Node Node
 mv Update/Server Server
 mv Update/run-node.sh run-node.sh
 mv Update/run-server.sh run-server.sh

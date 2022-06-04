@@ -1,6 +1,7 @@
 public class Server : Component
 {
     public override Type[] Dependencies => new [] { typeof(Client), typeof(FlowRunner), typeof(Node) };
+    
     protected override void Build()
     {        
         base.Build();
@@ -45,6 +46,7 @@ public class Server : Component
 
         Utils.Zip(BuildOptions.TempPath + "/Server", $"{BuildOptions.Output}/FileFlows-{Globals.Version}.zip");
     }
+
     public void MakeInstaller()
     {
         string nsisFile = BuildOptions.SourcePath + "/build/install/server.nsis";

@@ -26,8 +26,6 @@
             {
                 if (prop.Name == nameof(PluginInfo.Deleted))
                     continue;
-                if (prop.Name == nameof(PluginInfo.Uid))
-                    continue;
                 if (prop.Name == nameof(PluginInfo.DateCreated))
                     continue;
                 if (prop.Name == nameof(PluginInfo.DateModified))

@@ -192,6 +192,11 @@
             });
             fields.Add(new ElementField
             {
+                InputType = FormInputType.Text,
+                Name = nameof(library.ExclusionFilter)
+            });
+            fields.Add(new ElementField
+            {
                 InputType = FormInputType.Switch,
                 Name = nameof(library.ExcludeHidden)
             });

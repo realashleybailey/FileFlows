@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FileFlows.Client.Helpers;
 
 namespace FileFlows.Client.Components.Inputs
 {
@@ -63,7 +64,13 @@ namespace FileFlows.Client.Components.Inputs
                 if (_LabelOriginal == value)
                     return;
                 _LabelOriginal = value;
-                if (Translater.NeedsTranslating(_LabelOriginal))
+                if (_LabelOriginal.StartsWith("Flow.Parts.Script.Fields."))
+                {
+                    // special case, thee dont have translations
+                    _LabelOriginal = _LabelOriginal["Flow.Parts.Script.Fields.".Length..];
+                    _Label = FlowHelper.FormatLabel(_LabelOriginal);
+                }
+                else if (Translater.NeedsTranslating(_LabelOriginal))
                 {
                     _Label = Translater.Instant(_LabelOriginal);
                     if(string.IsNullOrEmpty(_Help))
@@ -203,6 +210,9 @@ namespace FileFlows.Client.Components.Inputs
                 }
                 
                 this.Field.ValueChanged += FieldOnValueChanged;
+
+                if (string.IsNullOrEmpty(Field.Description) == false)
+                    this.Help = Field.Description;
             }
         }
 
@@ -250,9 +260,10 @@ namespace FileFlows.Client.Components.Inputs
             bool isValid = string.IsNullOrEmpty(ErrorMessage);
             foreach (var val in this.Validators)
             {
-                if (await val.Validate(this.Value) == false)
+                var validResult = await val.Validate(this.Value);
+                if (validResult.Valid == false)
                 {
-                    ErrorMessage = Translater.Instant($"Validators.{val.Type}", val);
+                    ErrorMessage = validResult.Error?.EmptyAsNull() ?? Translater.Instant($"Validators.{val.Type}", val);
                     this.StateHasChanged();
                     if (isValid)
                         ValidStateChanged?.Invoke(this, false);

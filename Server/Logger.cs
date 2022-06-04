@@ -2,21 +2,24 @@ namespace FileFlows.Server;
 
 public class Logger : FileFlows.Plugin.ILogger
 {
-    Queue<LogTailItem> LogTailDebug = new (300);
-    Queue<LogTailItem> LogTailInfo = new (300);
-    Queue<LogTailItem> LogTailWarning = new (100);
-    Queue<LogTailItem> LogTailError = new (100);
+    //Queue<LogTailItem> LogTailDebug = new (300);
+    //Queue<LogTailItem> LogTailInfo = new (300);
+    //Queue<LogTailItem> LogTailWarning = new (100);
+    //Queue<LogTailItem> LogTailError = new (100);
 
     public string LogFile { get; private set; }
 
     public Logger()
     {
-        this.LogFile = Path.Combine(DirectoryHelper.LoggingDirectory, DirectoryHelper.IsNode ? "FileFlowsNode.log" : "FileFlows.log");
+        string prefix = DirectoryHelper.IsNode ? "FileFlowsNode" : "FileFlows";
+        this.LogFile = Path.Combine(DirectoryHelper.LoggingDirectory, prefix + ".log");
         if (File.Exists(LogFile))
         {
             try
             {
-                File.Move(LogFile, LogFile + ".old", true);
+                var fi = new FileInfo(LogFile);
+                var dest = Path.Combine(DirectoryHelper.LoggingDirectory, $"{prefix}_{fi.CreationTime.ToString("yyyy-MM-dd hh-mm-ss")}.log");
+                File.Move(LogFile, dest, true);
             }
             catch (Exception) { }
 
@@ -56,19 +59,19 @@ public class Logger : FileFlows.Plugin.ILogger
         try
         {
             Console.WriteLine(message);
-            var tail = type switch
-            {
-                LogType.Error => LogTailError,
-                LogType.Warning => LogTailWarning,
-                LogType.Info => LogTailInfo,
-                _ => LogTailDebug,
-            };
-            tail.Enqueue(new LogTailItem
-            {
-                Date = DateTime.Now,
-                Type = (byte)type,
-                Message = System.Text.Encoding.UTF8.GetBytes(message)
-            });
+            //var tail = type switch
+            //{
+            //    LogType.Error => LogTailError,
+            //    LogType.Warning => LogTailWarning,
+            //    LogType.Info => LogTailInfo,
+            //    _ => LogTailDebug,
+            //};
+            //tail.Enqueue(new LogTailItem
+            //{
+            //    Date = DateTime.Now,
+            //    Type = (byte)type,
+            //    Message = System.Text.Encoding.UTF8.GetBytes(message)
+            //});
 
             var fi = new FileInfo(LogFile);
             if(fi.Exists && fi.Length > 10_000_000)
@@ -105,34 +108,75 @@ public class Logger : FileFlows.Plugin.ILogger
 
     internal string GetTail(int length = 50, Plugin.LogType logLevel = Plugin.LogType.Info)
     {
-        if (length <= 0 || length > 300)
-            length = 300;
+        if (length <= 0 || length > 1000)
+            length = 1000;
 
         mutex.WaitOne();
-        LogTailItem[] filtered;
+        //LogTailItem[] filtered;
         try
         {
-            List<LogTailItem> tails = new();
-            tails.AddRange(LogTailError);
-            if((int)logLevel >= (int)Plugin.LogType.Warning)
-                tails.AddRange(LogTailWarning);
-            if((int)logLevel >= (int)Plugin.LogType.Info)
-                tails.AddRange(LogTailInfo);
-            if((int)logLevel >= (int)Plugin.LogType.Debug)
-                tails.AddRange(LogTailDebug);
-
-            filtered = tails.OrderBy(x => x.Date).ToArray();
+            return GetTailActual(length, logLevel);
+            //List<LogTailItem> tails = new();
+            //tails.AddRange(LogTailError);
+            //if((int)logLevel >= (int)Plugin.LogType.Warning)
+            //    tails.AddRange(LogTailWarning);
+            //if((int)logLevel >= (int)Plugin.LogType.Info)
+            //    tails.AddRange(LogTailInfo);
+            //if((int)logLevel >= (int)Plugin.LogType.Debug)
+            //    tails.AddRange(LogTailDebug);
+//
+            //filtered = tails.OrderBy(x => x.Date).ToArray();
         }
         finally
         {
             mutex.ReleaseMutex();
         }
 
-        bool all = filtered.Length <= length;
-        return string.Join(Environment.NewLine, 
-            (all ? filtered : filtered.Skip(filtered.Count() - length))
-            .Select(x => System.Text.Encoding.UTF8.GetString(x.Message)));
+        //bool all = filtered.Length <= length;
+        //return string.Join(Environment.NewLine, 
+        //    (all ? filtered : filtered.Skip(filtered.Count() - length))
+        //    .Select(x => System.Text.Encoding.UTF8.GetString(x.Message)));
     }
+
+    private string GetTailActual(int length, Plugin.LogType logLevel)
+    {
+        StreamReader reader = new StreamReader(LogFile);
+        reader.BaseStream.Seek(0, SeekOrigin.End);
+        int count = 0;
+        int max = length;
+        if (logLevel != Plugin.LogType.Debug)
+            max = 5000;
+        while ((count < max) && (reader.BaseStream.Position > 0))
+        {
+            reader.BaseStream.Position--;
+            int c = reader.BaseStream.ReadByte();
+            if (reader.BaseStream.Position > 0)
+                reader.BaseStream.Position--;
+            if (c == Convert.ToInt32('\n'))
+            {
+                ++count;
+            }
+        }
+
+        string str = reader.ReadToEnd();
+        if (logLevel == Plugin.LogType.Debug)
+            return str;
+        
+        string[] arr = str.Replace("\r", "").Split('\n');
+        arr = arr.Where(x =>
+        {
+            if (logLevel < Plugin.LogType.Debug && x.Contains("DBUG"))
+                return false;
+            if (logLevel < Plugin.LogType.Info && x.Contains("INFO"))
+                return false;
+            if (logLevel < Plugin.LogType.Warning && x.Contains("WARN"))
+                return false;
+            return true;
+        }).Take(length).ToArray();
+        reader.Close();
+        return string.Join("\n", arr);
+    }
+
 
     static FileFlows.Plugin.ILogger _Instance;
     public static FileFlows.Plugin.ILogger Instance

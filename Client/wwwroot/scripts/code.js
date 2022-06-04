@@ -1,7 +1,6 @@
 window.ffCode = {
 
     initModel: function (variables) {
-
         monaco.editor.createModel(
             "const Logger = { ILog: function(...any), DLog: function(...any), WLog: function(...any), ELog: function(...any) }",
             "javascript"
@@ -20,11 +19,28 @@ window.ffCode = {
             "NewGuid: function ():string," +
             "GetToolPath: function(name:string):string," + 
             "Execute: function(args:{command:string, arguments: string, argumentList:string[], timeout:number, workingDirectory:string}):{completed:bool, exitCode:number, output:string, standardOutput:string, starndardError:string}," +
-            "TempPath:string" +
+            "TempPath:string," +
+            "WorkingFile:string," +
+            "WorkingFileSize:number," +
+            "RelativeFile:string," +
+            "IsDirectory:bool" +
+            "LibraryPath:string," +
             "}",
             "javascript"
         );
-
+        
+        const funFileInfo = `declare function FileInfo(path: string): {
+   Exists: bool,
+   Length: number,
+   Name: string, 
+   DirectoryName: string, 
+   IsReadOnly: bool,
+   CreationTime: date,
+   LastWriteTime: date, 
+   LastAccessTime: date,
+   Extension: string
+};`;
+        monaco.languages.typescript.javascriptDefaults.addExtraLib(funFileInfo, 'ff.funFileInfo');
 
         if (variables) {
             var actualVaraibles = {};

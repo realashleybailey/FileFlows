@@ -14,9 +14,15 @@ public class LogPruner:Worker
     public LogPruner() : base(ScheduleType.Hourly, 3)
     {
     }
-
+    
+    /// <summary>
+    /// Run the log pruner
+    /// </summary>
     public void Run() => Execute();
 
+    /// <summary>
+    /// Executes the log pruner, Run calls this 
+    /// </summary>
     protected override void Execute()
     {
         var libFiles = new LibraryFileController().GetDataList().Result.Select(x => x.Uid.ToString()).ToList();

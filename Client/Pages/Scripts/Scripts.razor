@@ -1,0 +1,39 @@
+@namespace FileFlows.Client.Pages
+@using FileFlows.Shared.Models
+@inherits ListPage<Script>
+
+@page "/scripts"
+
+<PageView>
+
+    <Body>
+        <FlowTable @ref="Table" Data="@Data" TItem="Script" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="Script" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="Script" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="Script" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />      
+                @if (App.Instance.IsMobile == false)
+                {
+                    <FlowTableButton TItem="Script" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import"/>
+                    <FlowTableButton TItem="Script" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export"/>
+                    <FlowTableButton TItem="Script" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
+                }
+                <FlowTableHelpButton TItem="Script" HelpUrl="Scripts" />
+            </ToolBar>
+
+            <Columns>
+                <FlowTableColumn TItem="Script">
+                    <Header>
+                        @Globals.lblName
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
+
+    </Body>
+
+</PageView>

@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace FileFlows.Shared.Helpers;
 
 using System;
@@ -106,19 +108,52 @@ public class HttpHelper
     {
         return await MakeRequest<string>(HttpMethod.Delete, url, data);
     }
+
+
+    /// <summary>
+    /// Downloads a file from a URL
+    /// </summary>
+    /// <param name="url">the URL of the download</param>
+    /// <param name="destination">where the download should be saved</param>
+    /// <exception cref="Exception">throws if the file fails to download</exception>
+    public static async Task DownloadFile(string url, string destination)
+    {
+        try
+        {
+#if (DEBUG)
+            if (url.Contains("i18n") == false && url.StartsWith("http") == false)
+                url = "http://localhost:6868" + url;
+#endif
+
+            using HttpResponseMessage response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            await using var streamToReadFrom = await response.Content.ReadAsStreamAsync();
+            await using var streamToWriteTo = File.Open(destination, FileMode.Create);
+            await streamToReadFrom.CopyToAsync(streamToWriteTo);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error downloading file: " + ex.Message);
+        }
+    }
 #endif
 
     /// <summary>
     /// Logs a message to the log
     /// </summary>
     /// <param name="message">the message to log</param>
-    private static void Log(string message)
+    /// <param name="error">if the message is an error message or info</param>
+    private static void Log(string message, bool error = false)
     {
         var logger = Logger ?? Shared.Logger.Instance;
         if (logger != null)
-            logger.ILog(message);
+        {
+            if(error)
+                logger.ELog(message);
+            else
+                logger.ILog(message);
+        }
         else
-            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - INFO -> " + message);
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " - " + (error ? "ERRR" : "INFO") + " -> " + message);
     }
 
     /// <summary>

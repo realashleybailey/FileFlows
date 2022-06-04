@@ -10,6 +10,10 @@ using FileFlows.Shared.Models;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+/// <summary>
+/// A runner instance, this is called as a standalone application that is fired up when FileFlows needs to process a file
+/// it exits when done, free up any resources used by this process
+/// </summary>
 public class Runner
 {
     private FlowExecutorInfo Info;
@@ -19,6 +23,13 @@ public class Runner
     private bool Canceled = false;
     private string WorkingDir;
 
+    /// <summary>
+    /// Creates an instance of a Runner
+    /// </summary>
+    /// <param name="info">The execution info that is be run</param>
+    /// <param name="flow">The flow that is being executed</param>
+    /// <param name="node">The processing node that is executing this flow</param>
+    /// <param name="workingDir">the temporary working directory to use</param>
     public Runner(FlowExecutorInfo info, Flow flow, ProcessingNode node, string workingDir)
     {
         this.Info = info;
@@ -27,13 +38,19 @@ public class Runner
         this.WorkingDir = workingDir;
     }
 
+    /// <summary>
+    /// A delegate for the flow complete event
+    /// </summary>
     public delegate void FlowCompleted(Runner sender, bool success);
+    /// <summary>
+    /// An event that is called when the flow completes
+    /// </summary>
     public event FlowCompleted OnFlowCompleted;
     private NodeParameters nodeParameters;
 
     private Node CurrentNode;
 
-    private void RecordNodeExecution(string nodeName, string nodeUid, int output, TimeSpan duration)
+    private void RecordNodeExecution(string nodeName, string nodeUid, int output, TimeSpan duration, FlowPart part)
     {
         if (Info.LibraryFile == null)
             return;
@@ -42,12 +59,15 @@ public class Runner
         Info.LibraryFile.ExecutedNodes.Add(new ExecutedNode
         {
             NodeName = nodeName,
-            NodeUid = nodeUid,
+            NodeUid = part.Type == FlowElementType.Script ? "ScriptNode" : nodeUid,
             Output = output,
             ProcessingTime = duration,
         });
     }
 
+    /// <summary>
+    /// Starts the flow runner processing
+    /// </summary>
     public void Run()
     {
         var systemHelper = new SystemHelper();
@@ -249,6 +269,7 @@ public class Runner
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
         nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
+        nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecution.ScriptExecutor();
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;
         FileHelper.DontSetPermissions = Node.DontSetPermissions;
@@ -379,7 +400,7 @@ public class Runner
                 {
                     TimeSpan executionTime = DateTime.Now.Subtract(nodeStartTime);
                     if(failure == false)
-                        RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime);
+                        RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime, part);
                 }
 
                 if (gotoFlow != null)
@@ -432,8 +453,8 @@ public class Runner
                     part = outputNode == null ? null : flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
                     if (part == null)
                     {
-                        // couldnt find the connection, maybe bad data, but flow has now finished
-                        nodeParameters.Logger?.WLog("couldnt find output node, flow completed: " + outputNode?.Output);
+                        // couldn't find the connection, maybe bad data, but flow has now finished
+                        nodeParameters.Logger?.WLog("Couldn't find output node, flow completed: " + outputNode?.Output);
                         return FileStatus.Processed;
                     }
                 }
@@ -489,14 +510,14 @@ public class Runner
 
             string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
 
-            Plugin.Helpers.FileHelper.CreateDirectoryIfNotExists(nodeParameters.Logger, destDir);
+            FileHelper.CreateDirectoryIfNotExists(nodeParameters.Logger, destDir);
 
-            Plugin.Helpers.FileHelper.SaveFile(nodeParameters.Logger, file, data);
+            FileHelper.SaveFile(nodeParameters.Logger, file, data);
             
             nodeParameters.Logger?.ILog($"Time taken to download plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtDownload)));
 
             DateTime dtExtract = DateTime.Now;
-            Plugin.Helpers.FileHelper.ExtractFile(nodeParameters.Logger, file, destDir);
+            FileHelper.ExtractFile(nodeParameters.Logger, file, destDir);
             File.Delete(file);
 
             // check if there are runtime specific files that need to be moved
@@ -553,6 +574,22 @@ public class Runner
 
     private Node LoadNode(FlowPart part)
     {
+        if (part.Type == FlowElementType.Script)
+        {
+            // special type
+            var nodeScript = new ScriptNode();
+            nodeScript.Model = part.Model;
+            Guid guid = Guid.Parse(part.FlowElementUid[7..43]); // 7 to remove "Scripts." 43 since guids are 36 characters, + 7 == 43
+            var script  = ScriptService.Load().Get(guid).Result;
+            if (string.IsNullOrEmpty(script?.Code))
+                throw new Exception("Script not found");
+            nodeScript.Code = script.Code;
+            
+            if(string.IsNullOrWhiteSpace(part.Name))
+                part.Name = script.Name;
+            return nodeScript;
+        }
+        
         var nt = GetNodeType(part.FlowElementUid);
         if (nt == null)
             return new Node();

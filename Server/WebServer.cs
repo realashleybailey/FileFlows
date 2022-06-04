@@ -23,6 +23,16 @@ public class WebServer
 
     public static void Start(string[] args)
     {
+        if (Helpers.DbHelper.Initialize().Result == false)
+        {
+            Logger.Instance.ELog("Failed initializing database");
+            return;
+        }
+        else
+        {
+            Logger.Instance.ILog("Database initialized");
+        }
+        
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -117,11 +127,9 @@ public class WebServer
             defaults: new { controller = "Home", action = "Index" }
         );
 
-        Shared.Logger.Instance = Logger.Instance;
 
         Services.InitServices.Init();
 
-        Helpers.DbHelper.CreateDatabase().Wait();
 #if(DEBUG)
         //Helpers.DbHelper.CleanDatabase().Wait();
 #endif
@@ -129,15 +137,11 @@ public class WebServer
         // do this so the settings object is loaded
         var settings = new Controllers.SettingsController().Get().Result;
 
-        // run any upgrade code that may need to be run
-        new Upgrade.Upgrader().Run(settings);
 
         // need to scan for plugins before initing the translater as that depends on the plugins directory
         Helpers.PluginScanner.Scan();
 
         Helpers.TranslaterHelper.InitTranslater();
-
-        Shared.Helpers.HttpHelper.Client = new HttpClient();
 
         ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{Port}";
 

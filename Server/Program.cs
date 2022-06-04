@@ -1,6 +1,10 @@
 using System.Collections;
 using Avalonia;
+using FileFlows.Server.Database;
+using FileFlows.Server.Database.Managers;
+using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.Server;
 
@@ -35,9 +39,9 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.bat"));
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
-            
-            Logger.Instance = new Server.Logger();
-            ServerShared.Logger.Instance = Logger.Instance;
+
+
+            InitializeLogger();
 
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
@@ -50,14 +54,15 @@ public class Program
             }
             
             Logger.Instance.ILog(new string('=', 50));
-            InitEncryptionKey();
+
+            CleanDefaultTempDirectory();
 
             if (Docker == false)
             {
                 appMutex = new Mutex(true, appName, out bool createdNew);
                 if (createdNew == false)
                 {
-                    // app is already running
+                    // app is already running;
                     if (noGui)
                     {
                         Console.WriteLine("An instance of FileFlows is already running");
@@ -75,6 +80,12 @@ public class Program
                     return;
                 }
             }
+            
+            // create new client, this can be used by upgrade scripts, so do this before preparing database
+            Shared.Helpers.HttpHelper.Client = new HttpClient();
+
+            if (PrepareDatabase() == false)
+                return;
 
             if (Docker || noGui)
             {
@@ -114,28 +125,58 @@ public class Program
         }
     }
 
-    /// <summary>
-    /// Init the encryption key, by making this a file in app data, it wont be included with the database if provided to for support
-    /// It wont be lost if inside a docker container and updated
-    /// </summary>
-    private static void InitEncryptionKey()
+    private static void InitializeLogger()
     {
-        string encryptionFile = DirectoryHelper.EncryptionKeyFile;
-        if (File.Exists(encryptionFile))
+        Logger.Instance = new Server.Logger();
+        Shared.Logger.Instance = Logger.Instance;
+        ServerShared.Logger.Instance = Logger.Instance;
+    }
+
+    private static bool PrepareDatabase()
+    {
+        if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
         {
-            string key = File.ReadAllText(encryptionFile);
-            if (string.IsNullOrEmpty(key) == false)
+            if (AppSettings.Instance.DatabaseConnection == AppSettings.Instance.DatabaseMigrateConnection)
             {
-                Helpers.Decrypter.EncryptionKey = key;
-                return;
+                AppSettings.Instance.DatabaseMigrateConnection = null;
+                AppSettings.Instance.Save();
+            }
+            else
+            {
+                Console.WriteLine("Database migration starting");
+                bool migrated = DbMigrater.Migrate(AppSettings.Instance.DatabaseConnection,
+                    AppSettings.Instance.DatabaseMigrateConnection);
+                if (migrated)
+                    AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
+                else
+                    Console.WriteLine("Database migration failed, reverting to previous database settings");
+                AppSettings.Instance.DatabaseMigrateConnection = null;
+                AppSettings.Instance.Save();
             }
         }
-        else
+            
+        // initialize the database
+        if (DbHelper.Initialize().Result == false)
         {
-            string key = Guid.NewGuid().ToString();
-            File.WriteAllText(encryptionFile, key);
-            Helpers.Decrypter.EncryptionKey = key;
+            Logger.Instance.ELog("Failed initializing database");
+            return false;
         }
+        Logger.Instance.ILog("Database initialized");
+            
+        // run any upgrade code that may need to be run
+        var settings = DbHelper.Single<Settings>().Result;
+        new Upgrade.Upgrader().Run(settings);
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Clean the default temp directory on startup
+    /// </summary>
+    private static void CleanDefaultTempDirectory()
+    {
+        string tempDir = Docker ? Path.Combine(DirectoryHelper.DataDirectory, "temp") : Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+        DirectoryHelper.CleanDirectory(tempDir);
     }
 
 

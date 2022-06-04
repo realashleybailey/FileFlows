@@ -5,7 +5,16 @@
         .content {
             margin: auto 1rem;
         }
-
+        .btn-test {
+            margin:2rem 0 0 14rem;
+            .btn {
+                width:9rem;
+                + .btn {
+                    margin-left:1rem;
+                }
+            }
+        }
+        
         .row + .row {
             margin-top: 1rem;
         }
@@ -35,6 +44,18 @@
             }
             hr {
                 margin:2rem 4rem 2rem 0;
+            }
+        }
+    }
+}
+
+@media (max-width:577.9999px){
+    .settings ::deep {
+        .btn-test {
+            text-align: center;
+            margin:2rem 0 0;
+            .btn {
+                width:100%;
             }
         }
     }

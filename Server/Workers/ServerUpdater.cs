@@ -92,7 +92,7 @@ public class ServerUpdater : UpdaterWorker
         
         
         string url = $"{UpdateUrl}/download/{onlineVersion}?ts={DateTime.Now.Ticks}";
-        DownloadFile(url, file).Wait();
+        HttpHelper.DownloadFile(url, file).Wait();
         if (File.Exists(file) == false)
         {
             Logger.Instance.WLog($"{UpdaterName}: Download failed");

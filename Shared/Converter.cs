@@ -32,7 +32,9 @@ public class Converter
         }
         if (valueType == type)
             return value;
-
+        
+        if (type == typeof(Type))
+            return value;
 
         if (type.IsArray && typeof(IEnumerable).IsAssignableFrom(valueType))
             return ChangeListToArray(type.GetElementType()!, (IEnumerable)value, valueType);

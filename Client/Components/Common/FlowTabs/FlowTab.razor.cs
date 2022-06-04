@@ -6,6 +6,22 @@
     {
         [CascadingParameter] FlowTabs Tabs { get; set; }
 
+        private bool _Visible = true;
+
+        [Parameter]
+        public bool Visible
+        {
+            get => _Visible;
+            set
+            {
+                if(_Visible == value)
+                    return;
+                _Visible = value;
+                Tabs?.TabVisibilityChanged();
+                this.StateHasChanged();
+            }
+        }
+
         [Parameter] public string Title { get; set; }
 
         [Parameter]

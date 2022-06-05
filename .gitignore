@@ -41,3 +41,4 @@ Server/Nodes/
 Logs/
 Data/
 Server/appsettings.development.json
+*.map

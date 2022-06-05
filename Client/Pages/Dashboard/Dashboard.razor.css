@@ -222,12 +222,20 @@ h1, h2 {
     }
   }
 }
-@media screen and (min-width: 850px) and (max-height: 720px) {
+@media screen and (min-width: 850px) and (max-height: 678px) {
+  .not-configured-pointer.step-flows {
+    top: 131px;
+  }
+  .not-configured-pointer.step-library {
+    top: 169px;
+  }
+}
+@media screen and (min-width: 850px) and (min-height: 678.0001px) and (max-height: 856px) {
   .not-configured-pointer.step-flows {
     top: 217px;
   }
   .not-configured-pointer.step-library {
-    top: 265px;
+    top: 255px;
   }
 }
 @media screen and (min-width: 1250px) {
@@ -252,3 +260,5 @@ h1, h2 {
     display: none !important;
   }
 }
+
+/*# sourceMappingURL=Dashboard.razor.css.map */

@@ -186,6 +186,7 @@ public abstract class DbManager
 
         await AddOrUpdateObject(db, new ProcessingNode
         {
+            Uid = Globals.InternalNodeUid,
             Name = Globals.InternalNodeName,
             Address = Globals.InternalNodeName,
             Schedule = new string('1', 672),

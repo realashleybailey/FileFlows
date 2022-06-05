@@ -49,8 +49,8 @@ select tempLibraries.Uid as LibraryUid, DbObject.*,
            when JSON_EXTRACT(Data, '$.Order') <> -1 then convert(JSON_EXTRACT(Data, '$.Order'), signed)
            else  10000 - (tempLibraries.Priority * 100)
            end as Priority,
-       convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 24), datetime) as ProcessingStarted,
-       convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 24), datetime) as ProcessingEnded
+       convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 23), datetime) as ProcessingStarted,
+       convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 23), datetime) as ProcessingEnded
 from DbObject inner join tempLibraries on JSON_UNQUOTE(JSON_EXTRACT(Data, '$.Library.Uid')) = tempLibraries.Uid
 where Type = 'FileFlows.Shared.Models.LibraryFile';
 

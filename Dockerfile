@@ -1,7 +1,7 @@
 FROM lsiobase/ubuntu:jammy AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
-ENV PATH=$PATH:/root/.dotnet:/root/.dotnet/tools
+ENV PATH=/root/.dotnet:/root/.dotnet/tools:$PATH
 ENV DOTNET_ROOT=/root/.dotnet
 
 # Add intel hardware encoding support
@@ -36,29 +36,25 @@ RUN ARCH=$(dpkg --print-architecture) && \
     rm -rf /var/lib/apt/lists/* && \
     ffmpeg --help
 
-##########################################
-### actual FileFlows stuff happens now ###
-##########################################
-FROM base
-
 # Install dotnet SDK
 RUN wget https://dot.net/v1/dotnet-install.sh  && \
     bash dotnet-install.sh -c Current && \
     rm -f dotnet-install.sh
+
+##########################################
+### actual FileFlows stuff happens now ###
+##########################################
 
 # copy the deploy file into the app directory
 COPY /deploy /app
 COPY /deploy/Plugins /app/Server/Plugins
 COPY /docker-entrypoint.sh /app/docker-entrypoint.sh
 
-# expose the ports we need
-EXPOSE 5000
-
 RUN dos2unix /app/docker-entrypoint.sh && \
     chmod +x /app/docker-entrypoint.sh
 
-# add dotnet to path so can run dotnet anywhere
-ENV PATH="/root/.dotnet:${PATH}"
+# expose the ports we need
+EXPOSE 5000
 
 # set the working directory
 WORKDIR /app

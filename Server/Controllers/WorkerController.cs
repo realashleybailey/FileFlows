@@ -347,7 +347,8 @@ public class WorkerController : Controller
                     return; // unknown executor
                 }
             }
-            executorInfo.LastUpdate = DateTime.Now;
+            if(executorInfo != null)
+                executorInfo.LastUpdate = DateTime.Now;
         }
     }
 

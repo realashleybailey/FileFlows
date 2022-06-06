@@ -1,58 +1,77 @@
-namespace FileFlows.Client.Components.Inputs
+namespace FileFlows.Client.Components.Inputs;
+
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
+using System.Threading.Tasks;
+
+public partial class InputNumber<TItem> : Input<TItem>
 {
-    using Microsoft.AspNetCore.Components;
-    using Microsoft.AspNetCore.Components.Web;
-    using Microsoft.JSInterop;
-    using System.Threading.Tasks;
+    public override bool Focus() => FocusUid();
 
-    public partial class InputNumber : Input<int>
+    private TItem _Min, _Max;
+
+
+    [Parameter] public bool AllowFloat { get; set; }
+
+    [Parameter]
+    public TItem Min { get => _Min; set => _Min = value; }
+    [Parameter]
+    public TItem Max { get => _Max; 
+        set => _Max = value.Equals(0) ? (TItem)(object)int.MaxValue : value; 
+    }
+
+    protected override void OnInitialized()
     {
-        public override bool Focus() => FocusUid();
+        base.OnInitialized();
 
-        private int _Min = 0, _Max = int.MaxValue;
-
-        [Parameter]
-        public int Min { get => _Min; set => _Min = value; }
-        [Parameter]
-        public int Max { get => _Max; set => _Max = value == 0 ? int.MaxValue : value; }
-
-        private async Task ChangeValue(ChangeEventArgs e)
+        if (_Max.ToString() == "0")
         {
-            if (double.TryParse(e.Value?.ToString() ?? "", out double value))
-            {
-                if (value > int.MaxValue)
-                    value = int.MaxValue;
-                else if (value < int.MinValue)
-                    value = int.MinValue;
-                this.Value = (int)value;
-                if (this.Value > Max)
-                {
-                    this.Value = Max;
-                    await UpdateInputValue();
-                }
-                else if (this.Value < Min)
-                {
-                    this.Value = Min;
-                    await UpdateInputValue();
-                }
-            }
+            if (typeof(TItem) == typeof(float))
+                _Max = (TItem)Convert.ChangeType((float)int.MaxValue, typeof(TItem));
             else
+                _Max = (TItem)Convert.ChangeType(int.MaxValue, typeof(TItem));
+        }
+    }
+    
+
+    private async Task ChangeValue(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString() ?? "", out double value))
+        {
+            if (value > int.MaxValue)
+                value = int.MaxValue;
+            else if (value < int.MinValue)
+                value = int.MinValue;
+            this.Value = (TItem)Convert.ChangeType(value, typeof(TItem));
+            float fValue = Convert.ToSingle(Value);
+            if (fValue > Convert.ToSingle(Max) && Convert.ToSingle(Max) != 0)
             {
+                this.Value = Max;
                 await UpdateInputValue();
             }
-            this.ClearError();
+            else if (fValue < Convert.ToSingle(Min))
+            {
+                this.Value = Min;
+                await UpdateInputValue();
+            }
         }
+        else
+        {
+            await UpdateInputValue();
+        }
+        this.ClearError();
+    }
 
-        async Task UpdateInputValue()
-        {
-            await jsRuntime.InvokeVoidAsync("eval", new object[] { $"document.getElementById('{Uid}').value = " + this.Value });
-        }
-        private async Task OnKeyDown(KeyboardEventArgs e)
-        {
-            if (e.Code == "Enter")
-                await OnSubmit.InvokeAsync();
-            else if (e.Code == "Escape")
-                await OnClose.InvokeAsync();
-        }
+    async Task UpdateInputValue()
+    {
+        await jsRuntime.InvokeVoidAsync("eval", new object[] { $"document.getElementById('{Uid}').value = " + this.Value });
+    }
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter")
+            await OnSubmit.InvokeAsync();
+        else if (e.Code == "Escape")
+            await OnClose.InvokeAsync();
     }
 }

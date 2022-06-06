@@ -67,7 +67,10 @@ public abstract class DbManager
         return new SqlServerDbManager(connectionString);
     }
 
-    private static string SqliteDbFile => Path.Combine(DirectoryHelper.DatabaseDirectory, "FileFlows.sqlite");
+    /// <summary>
+    /// Gets the file of the default database
+    /// </summary>
+    public static string SqliteDbFile => Path.Combine(DirectoryHelper.DatabaseDirectory, "FileFlows.sqlite");
 
     /// <summary>
     /// Gets the default database connection string using the Sqlite database file
@@ -186,6 +189,7 @@ public abstract class DbManager
 
         await AddOrUpdateObject(db, new ProcessingNode
         {
+            Uid = Globals.InternalNodeUid,
             Name = Globals.InternalNodeName,
             Address = Globals.InternalNodeName,
             Schedule = new string('1', 672),

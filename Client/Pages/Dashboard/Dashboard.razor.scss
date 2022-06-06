@@ -239,7 +239,21 @@ h1, h2 {
     }
 }
 
-@media screen and (min-width:850px) and (max-height: 720px) 
+@media screen and (min-width:850px) and (max-height: 678px)
+{
+    .not-configured-pointer
+    {
+        &.step-flows {
+            top: 131px;
+        }
+
+        &.step-library {
+            top: 169px;
+        }
+    }
+}
+
+@media screen and (min-width:850px) and (min-height: 678.0001px) and (max-height: 856px) 
 {
     .not-configured-pointer 
     {
@@ -248,7 +262,7 @@ h1, h2 {
         }
 
         &.step-library {
-            top: 265px;
+            top: 255px;
         }
     }
 }

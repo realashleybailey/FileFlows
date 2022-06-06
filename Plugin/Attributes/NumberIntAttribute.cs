@@ -1,10 +1,9 @@
-namespace FileFlows.Plugin.Attributes
-{
-    using System;
-    using System.Collections.Generic;
+namespace FileFlows.Plugin.Attributes;
 
-    public class NumberIntAttribute : FormInputAttribute
-    {
-        public NumberIntAttribute(int order) : base(FormInputType.Int, order) { }
-    }
+/// <summary>
+/// A Input Number GUI element that will allow for integers to be entered
+/// </summary>
+public class NumberIntAttribute : FormInputAttribute
+{
+    public NumberIntAttribute(int order) : base(FormInputType.Int, order) { }
 }

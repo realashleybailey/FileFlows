@@ -409,7 +409,16 @@ namespace FileFlows.Client.Components
                 if (typeof(T) == typeof(bool))
                     return (T)(object)je.GetBoolean();
                 if (typeof(T) == typeof(float))
-                    return (T)(object)(float)je.GetInt64();
+                {
+                    try
+                    {
+                        return (T)(object)(float)je.GetInt64();
+                    }
+                    catch (Exception)
+                    {
+                        return (T)(object)(float.Parse(je.ToString()));
+                    }
+                }
             }
 
             if (value is T)

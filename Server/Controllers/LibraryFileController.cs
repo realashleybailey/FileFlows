@@ -93,7 +93,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 {
                     if (node.Libraries?.Any(x => x.Uid == item.Library?.Uid) != true)
                     {
-                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")} not available for node '{nodeName}': " + item.Name);
+                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")}' not available for node '{nodeName}': " + item.Name);
                         continue;
                     }
                 }
@@ -101,7 +101,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 {
                     if (node.Libraries?.Any(x => x.Uid == item.Library?.Uid) == true)
                     {
-                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")} not available for node '{nodeName}': " + item.Name);
+                        Logger.Instance?.DLog($"Library '{(item.Library?.Name ?? "UNKNOWN")}' not available for node '{nodeName}': " + item.Name);
                         continue;
                     }
                 }

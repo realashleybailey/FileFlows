@@ -1,15 +1,15 @@
 ---
 ---
 
+@import '_navigation';
+@import '_scrollbar';
 
 @font-face {
     font-family: 'Source Sans Pro';
     src:url('webfonts/SourceSansPro-Regular.woff') format('woff');
 }
 
-
-body
-{
+:root {
     --color: rgb(240, 240, 240);
     --color-rgb: 240, 240, 240;
     --color-darker: rgb(220, 220, 220);
@@ -30,24 +30,103 @@ body
     --primary: #0366d6;
     --error: #ff4d76;
 }
-html, body {
-    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 16px;
-    font-weight:400;
-    color: var(--color) !important;
-    background: var(--base) !important;
+
+html {
+    font-size: 14px;
+    font-family: "Source Sans Pro",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    position: relative;
+    min-height: 100%;
 }
 
-* {
-    scrollbar-color: rgba(var(--accent-rgb), 0.5) var(--base);
-    scrollbar-width: thin;
-}
-a, .btn-link {
-    color: var(--accent) !important;
+body {
+    margin: 0 0 60px;
 }
 
-.btn-primary {
+html,
+body {
     color: var(--color);
-    background-color: var(--primary);
-    border-color: var(--primary);
+    background: var(--base);
 }
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+        color: var(--accent);
+    }
+}
+
+.footer {
+    text-align: center;
+    font-size: 0.9rem;
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.page-content {
+    margin:8rem;
+}
+
+@media (min-width:768px) and (max-width:1000px) {
+    .container {
+        max-width:760px !important;
+    }
+}
+
+@media (min-width:768px) and (max-width:1200px) {
+    .nav-item.github {
+        display: none;
+    }
+}
+
+#services {
+    border-top:solid 1px rgba(var(--color-rgb), 0.1);
+    padding-top:5rem;
+    margin:5rem 5rem 0;
+}
+
+
+section.download-instructions {
+    .container > div {
+        display: none;
+
+        &:not(.no-border) h3 {
+            margin-top: 7rem;
+            padding-top: 5rem;
+            border-top: solid 1px rgba(var(--color-rgb), 0.1);
+        }
+    }
+
+    h5 {
+        margin-top: 2rem;
+    }
+
+    code {
+        white-space: pre;
+        text-align: left;
+        display: inline-block;
+        color: var(--color);
+        background: rgba(var(--color-rgb), 0.1);
+        width: 100%;
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    table {
+        th, td {
+            border: solid 1px;
+            padding: 0.5rem;
+        }
+
+        margin-bottom: 2rem;
+    }
+
+    margin-bottom: 3rem;
+}
+

@@ -1,10 +1,12 @@
 <div class="side-bar">
     this is a sample sidebar
     {% for plugin in site.plugins %}
-        <h2>{{ plugin.name }} </h2>
-        <p>{{ plugin.content | markdownify }}</p>
-        {% for node in plugin.nodes %}
-            <h4>{{ node.name | markdownify }}</h4>
-        {% endfor %}
+        {% if plugin.plugin %}
+            <h2>{{ plugin.name }} </h2>
+            <p>{{ plugin.content | markdownify }}</p>
+        {% else %}
+            <h4>{{ plugin.plugin }} - {{ plugin.name }}</h4>
+            <p>{{ plugin.content | markdownify }}</p>
+        {% endif %}
     {% endfor %}
 </div>

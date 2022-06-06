@@ -1,8 +1,7 @@
 ---
 name: Function Node
 description: Node that executes javascript functions
-nodes:
-    - Function
+plugin: Basic Nodes
 ---
 
 This a test function thing

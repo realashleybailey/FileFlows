@@ -8,17 +8,18 @@
             {% if plugin.sub and plugin.sub != current_sub %}
                 <!-- start sub list {{ plugin.sub }}-->
                 <ul>                
-            {% elsif plugin.sub == nil and current_sub %}
+            {% elsif plugin.sub == nil and current_sub %}                
                 </ul>
                 <!-- end sub list {{ current_sub }} -->
+                </li>
             {% endif %}
 
             {% if plugin.plugin %}
                 <li>
-                    <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }} [{{ plugin.sub }}]</a>
-                </li>
+                    <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }}</a>                
             {% else %}
                 {% if current_plugin  %}
+                    </li>
                 </ul>                
                 <!-- ending plugin list {{ current_plugin }} -->
                 {% endif %}
@@ -36,6 +37,7 @@
         <!-- end sub list {{ current_sub }} -->
         {% endif %}
         {% if current_plugin  %}
+        </li>
         </ul>
         <!-- ending plugin list {{ current_plugin }} -->
         {% endif %}

@@ -1,3 +1,7 @@
 <div class="side-bar">
     this is a sample sidebar
+    {% for plugin in site.plugins %}
+        <h2>{{ plugin.name }} </h2>
+        <p>{{ plugin.content | markdownify }}</p>
+    {% endfor %}
 </div>

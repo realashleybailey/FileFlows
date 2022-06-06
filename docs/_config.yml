@@ -5,3 +5,5 @@ description: Documentation for FileFlows
 collections:
   plugins:
     output: true
+    nodes:
+      output: true

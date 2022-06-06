@@ -1,8 +1,12 @@
 ---
 name: Video Nodes
 description: Index for Nodes for processing video files
-nodes:
-    - VideoEncode
 ---
 
+### Video Nodes
+
 Video Nodes process video files index
+
+- FFMPEG Builder Nodes
+- Video Has Stream
+- Video Encode

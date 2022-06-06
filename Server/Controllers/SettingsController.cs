@@ -1,4 +1,5 @@
 using System.Data;
+using Avalonia.Input;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared;
 
@@ -118,7 +119,7 @@ namespace FileFlows.Server.Controllers
             model.IsDocker = Program.Docker;
 
             var newConnectionString = GetConnectionString(model, model.DbType);
-            if (newConnectionString != AppSettings.Instance.DatabaseConnection)
+            if (IsConnectionSame(AppSettings.Instance.DatabaseConnection, newConnectionString) == false)
             {
                 // need to migrate the database
                 AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
@@ -126,6 +127,20 @@ namespace FileFlows.Server.Controllers
             }
             Instance = model;
             return await DbHelper.Update(model);
+        }
+
+        private bool IsConnectionSame(string original, string newConnection)
+        {
+            if (IsSqliteConnection(original) && IsSqliteConnection(newConnection))
+                return true;
+            return original == newConnection;
+        }
+
+        private bool IsSqliteConnection(string connString)
+        {
+            if (string.IsNullOrWhiteSpace(connString))
+                return true;
+            return connString.IndexOf("FileFlows.sqlite") > 0;
         }
 
         private string GetConnectionString(Settings settings, DatabaseType dbType)

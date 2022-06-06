@@ -57,15 +57,28 @@
         case FormInputType.Int:
             {
                 var value = GetValue<int>(field.Name);
-                int min = GetParameter<int>(field, nameof(InputNumber.Min));
-                int max = GetParameter<int>(field, nameof(InputNumber.Max));
+                var min = GetParameter<int>(field, "Min");
+                var max = GetParameter<int>(field, "Max");
                 if (min == 0 && max == 0)
                 {
                     (min, max) = GetRange(field);
                 }
-                <InputNumber Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
+                <InputNumber TItem="int" Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
     Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
+            break;
+        case FormInputType.Float:
+        {
+            var value = GetValue<float>(field.Name);
+            var min = GetParameter<int>(field, "Min");
+            var max = GetParameter<int>(field, "Max");
+            if (min == 0 && max == 0)
+            {
+                (min, max) = GetRange(field);
+            }
+            <InputNumber TItem="float" Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
+                         Validators=@field.Validators Placeholder="@field.Placeholder" Min="@((float)min)" Max="@((float)max)" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
+        }
             break;
         case FormInputType.Checklist:
             {

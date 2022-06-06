@@ -5,41 +5,28 @@
     </div>
     <div class="plugins">
         {% for plugin in site.plugins %}
-            {% if plugin.sub and plugin.sub != current_sub %}
-                <!-- start sub list {{ plugin.sub }}-->
-                <ul>                
-            {% elsif plugin.sub == nil and current_sub %}                
-                </ul>
-                <!-- end sub list {{ current_sub }} -->
-                </li>
-            {% endif %}
-
-            {% if plugin.plugin %}
-                <li>
-                    <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }}</a>                
-            {% else %}
-                {% if current_plugin  %}
-                    </li>
-                </ul>                
-                <!-- ending plugin list {{ current_plugin }} -->
-                {% endif %}
+            {% if plugin.plugin == nil  %}                
                 <a href="/plugins/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }} </a>
-                <!-- starting plugin list {{ plugin.name }}  -->
+            
                 <ul>
-                {% assign current_plugin = plugin.name %}
+                    {% for node in site.plugins %} 
+                        {% if node.plugin == plugin.name and node.sub == nil }
+                        <li>
+                            <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
+                            {% if node.subs % }
+                                <ul>
+                                {% for sub in site.plugins %} 
+                                    {% if sub.plugin == plugin.name and node.name == sub.sub %}
+                                        <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
+                                    {% endif %}
+                                {% endfor }
+                                </ul>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                    {% endfor }
+                </ul>
             {% endif %}
-
-            {% assign current_sub = plugin.sub %}
-        {% endfor %}
-
-        {% if current_sub  %}
-        </ul>
-        <!-- end sub list {{ current_sub }} -->
-        {% endif %}
-        {% if current_plugin  %}
-        </li>
-        </ul>
-        <!-- ending plugin list {{ current_plugin }} -->
-        {% endif %}
+        {% endfor }
     </div>
 </div>

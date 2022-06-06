@@ -2,7 +2,7 @@
 name: FFMPEG Builder
 layout: default
 plugin: Video Nodes
-sub: FFMPEG Builder
+subs: true
 ---
 
 The FFMPEG Builder is part of the Video Nodes plugin.

@@ -6,21 +6,24 @@
     <div class="plugins">
         {% for plugin in site.plugins %}
             {% if plugin.sub and plugin.sub != current_sub %}
-                <ul>
+                <!-- start sub list {{ plugin.sub }}-->
+                <ul>                
             {% elsif !plugin.sub and current_sub %}
                 </ul>
-                {% assign current_sub = '' %}
+                <!-- end sub list {{ current_sub }} -->
             {% endif %}
 
             {% if plugin.plugin %}
                 <li>
-                    <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }}</a>
+                    <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }} [{{ plugin.sub }}]</a>
                 </li>
             {% else %}
                 {% if current_plugin  %}
-                </ul>
+                </ul>                
+                <!-- ending plugin list {{ current_plugin }} -->
                 {% endif %}
                 <a href="/plugins/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }} </a>
+                <!-- starting plugin list {{ plugin.name }}  -->
                 <ul>
                 {% assign current_plugin = plugin.name %}
             {% endif %}
@@ -30,9 +33,11 @@
 
         {% if current_sub  %}
         </ul>
+        <!-- end sub list {{ current_sub }} -->
         {% endif %}
         {% if current_plugin  %}
         </ul>
+        <!-- ending plugin list {{ current_plugin }} -->
         {% endif %}
     </div>
 </div>

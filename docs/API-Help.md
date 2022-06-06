@@ -1,3 +1,7 @@
+layout: page
+title: "API Help"
+permalink: /api-help
+
 API Help for FileFlows can be found off http://[server]:[port]/api/help.   For example http://tower:5000/api/help
 
 This will show you an automatically generated swagger help document and let you view/test the API from this page.

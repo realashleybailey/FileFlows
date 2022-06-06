@@ -7,6 +7,25 @@
   max-width: 1400px;
 }
 
+.btn-pause {
+  margin-left: 1rem;
+  width: 12rem !important;
+}
+.btn-pause i {
+  margin-right: 0.5rem;
+}
+
+.mobile-view {
+  display: none;
+}
+
+@media screen and (max-width: 850px) {
+  .mobile-view {
+    display: block;
+    text-align: center;
+    margin: 0 0 1rem;
+  }
+}
 .waiting-icon {
   font-size: 2rem;
 }

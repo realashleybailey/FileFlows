@@ -30,7 +30,7 @@ namespace FileFlows.Client.Pages
 
         public IJSObjectReference jsFunctions;
 
-        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblWorkingFile, lblUid, lblLibrary;
+        private string lblLog, lblCancel, lblWaiting, lblCurrentStep, lblNode, lblFile, lblOverall, lblCurrent, lblProcessingTime, lblWorkingFile, lblUid, lblLibrary, lblPauseLabel;
         private Timer AutoRefreshTimer;
 
         private SystemInfo SystemInfo = new SystemInfo();
@@ -147,6 +147,8 @@ namespace FileFlows.Client.Pages
                 if (systemInfoResult.Success)
                 {
                     this.SystemInfo = systemInfoResult.Data;
+                    this.lblPauseLabel =
+                        Translater.Instant(systemInfoResult.Data.IsPaused ? "Labels.Resume" : "Labels.Pause");
                 }
                 
             }
@@ -303,6 +305,20 @@ ffmpeg version 4.1.8 Copyright (c) 2000-2021 the FFmpeg developers
                 Blocker.Hide();
             }
 #endif
+        }
+
+        private async Task TogglePaused()
+        {
+            bool paused = SystemInfo.IsPaused;
+            paused = !paused;
+            await HttpHelper.Post($"/api/system/pause" + (paused == false ? "?resume=true" : ""));
+            var systemInfoResult = await GetSystemInfo();
+            if (systemInfoResult.Success)
+            {
+                SystemInfo = systemInfoResult.Data;
+                this.lblPauseLabel = Translater.Instant(SystemInfo.IsPaused ? "Labels.Resume" : "Labels.Pause");
+                this.StateHasChanged();
+            }
         }
     }
 }

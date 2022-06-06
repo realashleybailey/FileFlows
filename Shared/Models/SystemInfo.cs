@@ -14,4 +14,9 @@ public class SystemInfo
     /// Gets the how much CPU is used by FileFlows
     /// </summary>
     public float CpuUsage { get; set; }
+
+    /// <summary>
+    /// Gets or sets if the system is paused
+    /// </summary>
+    public bool IsPaused { get; set; }
 }

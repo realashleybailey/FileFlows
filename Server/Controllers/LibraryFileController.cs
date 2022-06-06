@@ -31,6 +31,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (Workers.ServerUpdater.UpdatePending || args == null)
             return null; // if an update is pending, stop providing new files to process
 
+        var settings = await new SettingsController().Get();
+        if (settings.IsPaused)
+            return null;
+
         if (Version.TryParse(args.NodeVersion, out var nodeVersion) == false)
             return null;
 

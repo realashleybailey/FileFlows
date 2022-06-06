@@ -1,0 +1,53 @@
+---
+---
+
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    src:url('webfonts/SourceSansPro-Regular.woff') format('woff');
+}
+
+
+body
+{
+    --color: rgb(240, 240, 240);
+    --color-rgb: 240, 240, 240;
+    --color-darker: rgb(220, 220, 220);
+    --color-darke-rgb: 220, 220, 220;
+    --color-darkest: rgb(160, 160, 160);
+    --color-darkest-rgb: 160, 160, 160;
+    --base: rgb(17, 18, 20);
+    --base-rgb: 7, 18, 20;
+    --base-darker: rgb(6, 17, 19);
+    --base-darker-rgb: 6, 17, 19;
+    --base-darkest: rgb(4, 11, 12);
+    --base-darkest-rgb: 4, 11, 12;
+    --accent: rgb(255, 0, 144);
+    --accent-rgb: 255, 0, 144;
+    --border-color: rgba(var(--color-rgb), 0.1);
+    --input-background: rgb(49, 49, 49);
+    --input-background-rgb: 49, 49, 49;
+    --primary: #0366d6;
+    --error: #ff4d76;
+}
+html, body {
+    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    font-weight:400;
+    color: var(--color) !important;
+    background: var(--base) !important;
+}
+
+* {
+    scrollbar-color: rgba(var(--accent-rgb), 0.5) var(--base);
+    scrollbar-width: thin;
+}
+a, .btn-link {
+    color: var(--accent) !important;
+}
+
+.btn-primary {
+    color: var(--color);
+    background-color: var(--primary);
+    border-color: var(--primary);
+}

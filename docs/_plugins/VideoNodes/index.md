@@ -1,5 +1,6 @@
 ---
 name: Video Nodes
+layout: default
 description: Index for Nodes for processing video files
 ---
 

@@ -1,5 +1,6 @@
 ---
 name: Function
+layout: default
 description: Node that executes javascript functions
 plugin: Basic Nodes
 ---

@@ -136,12 +136,26 @@ section.download-instructions {
     .side-bar {
         width:14rem;
         border-right:solid 1px var(--border-color);
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+        a {
+            text-decoration: none;
+            color:#a3a3a3;
+            &:hover {
+                text-decoration: underline;
+                color:var(--accent);
+            }
+        }
     }
     > section {
         flex:1;
         margin: 0 2rem;
     }
 }
+
 footer {
     text-align: center;
     margin:1rem 0;

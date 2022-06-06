@@ -2,10 +2,10 @@
     this is a sample sidebar
     {% for plugin in site.plugins %}
         {% if plugin.plugin %}
-            <a href="plugins/{{ plugin.plugin }}/nodes/{{ plugin.name }}">{{ plugin.plugin }} - {{ plugin.name }}</h4>
+            <a href="plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.plugin }} - {{ plugin.name }}</a>
             <p>{{ plugin.content | markdownify }}</p>
         {% else %}
-            <a href="plugins/{{ plugin.name }}">{{ plugin.name }} </h2>
+            <a href="plugins/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }} </a>
             <p>{{ plugin.content | markdownify }}</p>
         {% endif %}
     {% endfor %}

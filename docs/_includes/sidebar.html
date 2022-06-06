@@ -24,6 +24,8 @@
                 <ul>
                 {% assign current_plugin = plugin.name %}
             {% endif %}
+
+            {% assign current_sub = plugin.sub %}
         {% endfor %}
 
         {% if current_sub  %}

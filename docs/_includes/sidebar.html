@@ -8,7 +8,7 @@
             {% if plugin.sub and plugin.sub != current_sub %}
                 <!-- start sub list {{ plugin.sub }}-->
                 <ul>                
-            {% elsif !plugin.sub and current_sub %}
+            {% elsif plugin.sub == nil and current_sub %}
                 </ul>
                 <!-- end sub list {{ current_sub }} -->
             {% endif %}

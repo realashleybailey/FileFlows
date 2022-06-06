@@ -1,9 +1,8 @@
 <div class="side-bar">
-    this is a sample sidebar
     {% for plugin in site.plugins %}
         {% if plugin.plugin %}
             <li>
-                <a href="plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.plugin }} - {{ plugin.name }}</a>
+                <a href="plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }}</a>
             </li>
         {% else %}
             {% if current_plugin  %}
@@ -14,5 +13,7 @@
             {% assign current_plugin = plugin.name %}
         {% endif %}
     {% endfor %}
+    {% if current_plugin  %}
     </ul>
+    {% endif %}
 </div>

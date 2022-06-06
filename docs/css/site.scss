@@ -41,7 +41,7 @@ html {
 }
 
 body {
-    margin: 0 0 60px;
+    margin: 60 0 0;
 }
 
 html,
@@ -126,12 +126,16 @@ section.download-instructions {
 
     margin-bottom: 3rem;
 }
+.main-wrapper {
+    display:flex;
+    min-height:calc(100vh - 60px);
+}
 
 .main {
     margin: 6rem 2rem 2rem;
     display: flex;
     flex-direction: row;
-    min-height:calc(100% - 10rem);
+    flex:1;
     .side-bar {
         width:14rem;
         border-right:solid 1px var(--border-color);

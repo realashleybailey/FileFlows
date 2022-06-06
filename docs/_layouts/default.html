@@ -43,15 +43,17 @@
         </div>
     </nav>
 
-    <div class="main">
-        {% include sidebar.html %}
-        <section>
-            <h1>{{ page.title }}</h1>
-            {{ content }}
-        </section>
+    <div class="main-wrapper">
+        <div class="main">
+            {% include sidebar.html %}
+            <section>
+                <h1>{{ page.title }}</h1>
+                {{ content }}
+            </section>
+        </div>
+        <footer>
+        &copy; 2022 FileFlows
+        </footer>
     </div>
-    <footer>
-      &copy; 2022 FileFlows
-    </footer>
   </body>
 </html>

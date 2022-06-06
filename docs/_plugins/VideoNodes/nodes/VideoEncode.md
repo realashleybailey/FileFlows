@@ -1,5 +1,5 @@
 ---
-name: Video Encode Node
+name: Video Encode
 description: Node that executes encodes a video
 plugin: Video Nodes
 ---

@@ -1,5 +1,5 @@
 ---
-name: Function Node
+name: Function
 description: Node that executes javascript functions
 plugin: Basic Nodes
 ---

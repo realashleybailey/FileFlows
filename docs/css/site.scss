@@ -127,3 +127,16 @@ section.download-instructions {
     margin-bottom: 3rem;
 }
 
+.main {
+    margin: 6rem 2rem 2rem;
+    display: flex;
+    flex-direction: row;
+    min-height:calc(100% - 9rem);
+    .side-bar {
+        width:14rem;
+        border-right:solid 1px var(--border-color);
+    }
+    > section {
+        flex:1;
+    }
+}

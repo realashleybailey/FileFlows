@@ -19,12 +19,12 @@
                                     {% if sub.plugin == plugin.name and node.name == sub.sub %}
                                         <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
                                     {% endif %}
-                                {% endfor }
+                                {% endfor %}
                                 </ul>
                             {% endif %}
                         </li>
                         {% endif %}
-                    {% endfor }
+                    {% endfor %}
                 </ul>
             {% endif %}
         {% endfor }

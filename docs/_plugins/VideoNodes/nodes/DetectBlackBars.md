@@ -1,3 +1,9 @@
+---
+name: Detect Black Bars
+layout: default
+plugin: Video Nodes
+---
+
 This node will scan the video for black bars and set the parameter "VideoCrop" if detected.
 
 Outputs

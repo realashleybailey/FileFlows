@@ -1,3 +1,10 @@
+---
+name: Audio Track Remover
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164949012-1520e929-ff4b-4002-847a-e57cdbc3b04f.png)
 
 This node will update "FFMPEG Builder" to remove all the matching audio tracks from the output file.  

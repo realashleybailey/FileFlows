@@ -1,3 +1,10 @@
+---
+name: Subtitle Track Remover
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164948691-00633079-f296-45c9-994f-b2457b7900a0.png)
 
 

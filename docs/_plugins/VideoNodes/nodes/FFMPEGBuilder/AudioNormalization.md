@@ -1,3 +1,10 @@
+---
+name: Audio Normalization
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164949449-fe4decb2-88ef-46bf-8cdc-1ef5fe77b260.png)
 
 This node will normalize audio against the matching tracks in the output file.

@@ -1,3 +1,10 @@
+---
+name: Video Encode
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/169502803-72777454-1f00-47ee-a0df-890eeb37079f.png)
 
 This node will ALWAYS encode a video to the quality level and codec specific.

@@ -1,3 +1,10 @@
+---
+name: Audio Add Track
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164948928-4efc18f8-281a-4c28-b5e8-6d69079b9cd8.png)
 
 This node will add a new audio track to "FFMPEG Builder".

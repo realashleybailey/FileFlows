@@ -1,3 +1,10 @@
+---
+name: Video Scaler
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164948275-51423d33-a095-49bf-8c9b-c734c5a0ce67.png)
 
 

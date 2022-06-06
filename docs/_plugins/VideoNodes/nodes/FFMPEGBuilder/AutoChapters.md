@@ -1,3 +1,10 @@
+---
+name: Auto Chapters
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164887715-2dc03279-6475-4483-9c69-8e460ea83f94.png)
 
 This node will first determine if the video file has chapters.   If it does, it will call Output 2 and exit.

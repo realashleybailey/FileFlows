@@ -1,3 +1,10 @@
+---
+name: Video 10 Bit
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164886419-10b9de48-fd85-4d43-a860-00188ca1cf9a.png)
 
 This node will add a parameter to the first video stream to encode in 10BIt.

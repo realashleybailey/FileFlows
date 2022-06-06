@@ -1,3 +1,9 @@
+---
+name: Video Codec
+layout: default
+plugin: Video Nodes
+---
+
 This is a logic processing node that will check if a video contains a specific codec.  This can be an video or audio codec
 
 Outputs

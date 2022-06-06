@@ -1,3 +1,10 @@
+---
+name: Subtitle Track Merge
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/167319466-3d4ca040-29b7-457b-ad80-806ba14411af.png)
 
 

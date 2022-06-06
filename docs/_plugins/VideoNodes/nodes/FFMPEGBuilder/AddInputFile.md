@@ -1,3 +1,10 @@
+---
+name: Add Input File
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/167319454-034444a2-f731-4453-8d16-566448ae3dce.png)
 
 

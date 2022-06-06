@@ -1,3 +1,10 @@
+---
+name: Audio Track Reorder
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164950111-dec71b15-3bcd-4bfb-a9c0-64ff9c8952d0.png)
 
 This node will reorder the audio tracks given the parameters and update the order in "FFMPEG Builder".  When "FFMPEG Builder: Executor" is run the audio will be written in the order specified.

@@ -1,3 +1,10 @@
+---
+name: FFMPEG Builder
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 The FFMPEG Builder is part of the Video Nodes plugin.
 
 This lets the user break down a complex FFMPEG command into easy to configure nodes and will build up a command that can be executed at once.

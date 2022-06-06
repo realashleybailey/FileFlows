@@ -1,3 +1,10 @@
+---
+name: HDR to SDR
+layout: default
+plugin: Video Nodes
+sub: FFMPEG Builder
+---
+
 ![image](https://user-images.githubusercontent.com/958400/164886367-225f9d0d-5f6c-4df3-b063-eabf57b50057.png)
 
 

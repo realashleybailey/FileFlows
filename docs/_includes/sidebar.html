@@ -1,6 +1,17 @@
 <div class="side-bar">
+    <div class="pages">
+        {% for page in site.pages %}
+        {% endfor %}
+    </div>
     <div class="plugins">
         {% for plugin in site.plugins %}
+            {% if plugin.sub and plugin.sub != current_sub %}
+                <ul>
+            {% elsif !plugin.sub and current_sub %}
+                </ul>
+                {% assign current_sub = '' %}
+            {% endif %}
+
             {% if plugin.plugin %}
                 <li>
                     <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }}</a>
@@ -14,6 +25,10 @@
                 {% assign current_plugin = plugin.name %}
             {% endif %}
         {% endfor %}
+
+        {% if current_sub  %}
+        </ul>
+        {% endif %}
         {% if current_plugin  %}
         </ul>
         {% endif %}

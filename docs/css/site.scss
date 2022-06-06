@@ -131,7 +131,7 @@ section.download-instructions {
     margin: 6rem 2rem 2rem;
     display: flex;
     flex-direction: row;
-    min-height:calc(100% - 9rem);
+    min-height:calc(100% - 10rem);
     .side-bar {
         width:14rem;
         border-right:solid 1px var(--border-color);
@@ -139,4 +139,8 @@ section.download-instructions {
     > section {
         flex:1;
     }
+}
+footer {
+    text-align: center;
+    margin:2rem 0;
 }

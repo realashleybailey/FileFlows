@@ -65,6 +65,7 @@
         }
     }
 }
+
 @media (min-width: 768px) and (max-width:1000px){
     #mainNav .nav-item .nav-link
     {
@@ -74,8 +75,8 @@
 
 @media (min-width: 768px) {
     #mainNav {
-        padding-top: 1.5rem;
-        padding-bottom: 1.5rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
         border: none;
         transition: padding-top 0.3s ease-in-out, padding-bottom 0.3s ease-in-out;
 

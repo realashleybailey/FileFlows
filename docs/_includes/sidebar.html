@@ -10,7 +10,7 @@
             
                 <ul>
                     {% for node in site.plugins %} 
-                        {% if node.plugin == plugin.name and node.sub == nil }
+                        {% if node.plugin == plugin.name and node.sub == nil %}
                         <li>
                             <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
                             {% if node.subs % }
@@ -27,6 +27,6 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-        {% endfor }
+        {% endfor %}
     </div>
 </div>

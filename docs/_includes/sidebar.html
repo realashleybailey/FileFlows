@@ -2,15 +2,19 @@
     <div class="pages">
         <ul>
         {% for page in site.pages %}
-            <li>{{page.name}}</li>
+            <li>
+                <a href="/pages/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
+            </li>
         {% endfor %}
         </ul>
     </div>
     <div class="guides">
         <h3>Guides</h3>
         <ul>
-        {% for page in site.guides %}
-            <li>{{page.name}}</li>
+        {% for page in site.guides %}            
+            <li>
+                <a href="/guides/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
+            </li>
         {% endfor %}
         </ul>
     </div>
@@ -30,7 +34,7 @@
                                 <label for="col-{{ plugin.name  | replace: " ", "" }}-{{ node.name  | replace: " ", "" }}" class="lbl-toggle">{{ node.name }}</label>   
                                 <ul class="plugin-node-subs collapsible-content">
                                     <li class="plugin-node-sub">
-                                        <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}"">{{ node.name }}</a>   
+                                        <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
                                     </li>
                                     {% for sub in site.plugins %} 
                                         {% if sub.plugin == plugin.name and node.name == sub.sub %}

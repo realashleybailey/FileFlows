@@ -12,6 +12,10 @@
     width:var(--sidebar-width);
     border-right:solid 1px var(--border-color);
 
+    > div + div {
+        margin-top:1.5rem;
+    }
+
     h3 {
         font-size: 1.2rem;
         text-transform: uppercase;

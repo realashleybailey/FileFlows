@@ -52,6 +52,7 @@
 
 
     --sidebar-width:16rem;
+    --max-width:1200px;
 }
 
 html {
@@ -74,12 +75,16 @@ body {
     max-height: 100vh;
 }
 .body-wrapper {
-    max-width:1200px;
-    margin:auto;
     height: 100vh;
     min-height: 100vh;
     max-height: 100vh;
     position:relative;
+    margin-left:calc(calc(100% - var(--max-width)) / 2);
+}
+@media screen and (max-width: var(--max-width)) {
+    .body-wrapper {
+        margin-left: unset;
+    }
 }
 
 a {
@@ -115,6 +120,7 @@ h1 {
 
 section.content {
     flex-grow:1;
+    max-width: calc(var(--max-width) - var(--sidebar-width) - 1rem);
     img {
         max-width: calc(100% - 2rem);
         display: block;

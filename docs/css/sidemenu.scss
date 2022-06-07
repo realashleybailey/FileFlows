@@ -3,7 +3,7 @@
 
 .side-bar {
  
-    overflow: auto;
+    overflow: hidden;
     position: absolute;
     left: 0;
     top: 6rem;
@@ -11,6 +11,10 @@
     padding: 0 2rem;
     width:var(--sidebar-width);
     border-right:solid 1px var(--border-color);
+
+    &:overlfow {
+        overflow: auto;
+    }
 
     > div + div {
         margin-top:1.5rem;

@@ -84,8 +84,20 @@ a {
 section.content {
     flex-grow:1;
     img {
-        max-width:80vw;
+        max-width: calc(100% - 2rem);
+        display: block;
+        margin: 1rem;
     }
+
+    h1, h2, h3, h4, h5 {
+        border: solid 1px rgb(88, 88, 88);
+    }
+    
+    h2, h3, h4, h5
+    {
+        margin-top:1rem;
+    }
+    
 }
 
 footer {
@@ -93,13 +105,4 @@ footer {
     margin:1rem 0;
     font-size: 0.9rem;
     opacity: 0.5;
-}
-
-h1, h2, h3, h4, h5 {
-    border: solid 1px rgb(88, 88, 88);
-}
-
-* + h1, * + h2, * + h3, * + h4, * + h5
-{
-    margin-top:1rem;
 }

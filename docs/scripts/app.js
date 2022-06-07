@@ -14,7 +14,7 @@ function checkToggle(chk)
     if(localStorage.getItem('collapse_' + id)){
         chk.checked = true;
 
-        let parent = chk.closest('input[type=checkbox]');
+        let parent = chk.parentNode.closest('input[type=checkbox]');
         if(parent)
             checkToggle(parent);
     }

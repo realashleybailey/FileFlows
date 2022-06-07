@@ -1,6 +1,8 @@
-layout: page
-title: "API Help"
-permalink: /api-help
+---
+title: API Help
+name: API Help
+layout: default
+---
 
 API Help for FileFlows can be found off http://[server]:[port]/api/help.   For example http://tower:5000/api/help
 

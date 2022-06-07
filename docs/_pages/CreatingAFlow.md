@@ -1,3 +1,9 @@
+---
+title: Creating A Flow
+name: Creating A Flow
+layout: default
+---
+
 A flow is the heart of File Flows, it a rule that defines what to do with a file as it is detected.
 This example we will create a Video flow that converts videos to H265/AC3 audio and moves that file from a "Downloads" directory into a "Converted" directory.  We always want to move video files and we want to delete the original folder if empty.  Eg. if you are using a download client like Sabnzbd which will extract videos into a parent directory that you no longer need after conversion.
 

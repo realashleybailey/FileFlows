@@ -1,3 +1,9 @@
+---
+title: Flows
+name: Flows
+layout: default
+---
+
 This is where you configure a Flow that file will be processed against.
 
 A Flow is a path/set of rules that will run against a File and can modify the file or take actions (based on Plugins) against the file.

@@ -1,3 +1,9 @@
+---
+title: Basic Setup
+name: Basic Setup
+layout: default
+---
+
 The basic setup of FileFlows requires
 
 1. [Creating a Flow](https://github.com/revenz/FileFlows/wiki/Creating-a-Flow)

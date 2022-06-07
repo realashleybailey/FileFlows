@@ -1,3 +1,9 @@
+---
+title: Dashboard
+name: Dashboard
+layout: default
+---
+
 The Dashboard will show you what is currently processing.
 What is upcoming in the processing queue.
 What has recently finished being processed.

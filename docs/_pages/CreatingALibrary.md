@@ -1,3 +1,9 @@
+---
+title: Creating A Library
+name: Creating A Library
+layout: default
+---
+
 A library is a folder that FileFlows will monitor and search for files to process.   
 
 Note: A Library must have a Flow associated with it.  Refer to [Creating a Flow](https://github.com/revenz/FileFlows/wiki/Creating-a-Flow) for an example.

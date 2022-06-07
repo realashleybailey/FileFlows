@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG Builder > Subtitle Track Merge
 name: Subtitle Track Merge
 layout: default
 plugin: Video Nodes

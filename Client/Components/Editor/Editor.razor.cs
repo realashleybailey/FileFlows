@@ -58,7 +58,9 @@ namespace FileFlows.Client.Components
         private bool _needsRendering = false;
 
         public delegate Task<bool> CancelDeletgate();
+        public delegate Task ClosedDeletgate();
         public event CancelDeletgate OnCancel;
+        public event ClosedDeletgate OnClosed;
 
 
         private RenderFragment _AdditionalFields;
@@ -214,6 +216,7 @@ namespace FileFlows.Client.Components
             this.Visible = false;
             this.Fields?.Clear();
             this.Tabs?.Clear();
+            this.OnClosed?.Invoke();
         }
 
         private async void Cancel()
@@ -233,7 +236,7 @@ namespace FileFlows.Client.Components
                 this.Tabs.Clear();
 
             await this.WaitForRender();
-
+            this.OnClosed?.Invoke();
         }
 
         /// <summary>

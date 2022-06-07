@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG Builder > Auto Chapters
 name: Auto Chapters
 layout: default
 plugin: Video Nodes

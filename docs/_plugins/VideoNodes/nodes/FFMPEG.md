@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG
 name: FFMPEG
 layout: default
 plugin: Video Nodes

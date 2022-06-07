@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > Video File
 name: Video File
 layout: default
 plugin: Video Nodes

@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG Builder > Video 10 Bit
 name: Video 10 Bit
 layout: default
 plugin: Video Nodes

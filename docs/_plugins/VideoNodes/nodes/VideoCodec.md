@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > Video Codec
 name: Video Codec
 layout: default
 plugin: Video Nodes

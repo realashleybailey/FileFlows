@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > Video Encode
 name: Video Encode
 layout: default
 plugin: Video Nodes

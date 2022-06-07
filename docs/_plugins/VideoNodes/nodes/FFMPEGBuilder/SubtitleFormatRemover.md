@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG Builder > Subtitle Format Remover
 name: Subtitle Format Remover
 layout: default
 plugin: Video Nodes

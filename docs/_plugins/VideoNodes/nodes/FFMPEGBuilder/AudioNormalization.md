@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG Builder > Audio Normalization
 name: Audio Normalization
 layout: default
 plugin: Video Nodes

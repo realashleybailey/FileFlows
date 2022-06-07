@@ -1,4 +1,5 @@
 ---
+title: Video Nodes > FFMPEG Builder > Subtitle Track Remover
 name: Subtitle Track Remover
 layout: default
 plugin: Video Nodes

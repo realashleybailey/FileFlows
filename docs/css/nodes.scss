@@ -1,11 +1,29 @@
 ---
 ---
 
-.flow-part, .flow-element {
+.flow-part {
     text-align: center;
     border-radius: 0.75rem;
     min-width:12rem;
     border:solid 3px transparent;
+    display: flex;
+    flex-direction: row;
+    outline: unset !important;
+    position:relative;
+
+
+    // flow colours
+    --flow-logic: var(--orange);
+    --flow-input: var(--indigo);
+    --flow-output: var(--green);
+    --flow-process: var(--cyan);
+    --flow-build-start: var(--teal);
+    --flow-build-end: var(--teal);
+    --flow-build-part: var(--blue);
+    --flow-communication: var(--yellow);
+    --flow-failure: var(--error);
+    --flow-script:#c14242;
+
     &.Logic {
         border-color:var(--flow-logic);
     }
@@ -36,13 +54,6 @@
     &.Script {
         border-color:var(--flow-script);
     }
-}
-
-
-.flow-part {
-    display: flex;
-    flex-direction: row;
-    outline: unset !important;
 
     .icon-wrapper {
         width: 2rem;

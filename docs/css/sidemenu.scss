@@ -18,7 +18,7 @@
         border-bottom: solid 1px var(--accent);
         padding-bottom: 0.25rem;
     }
-    
+
     ul {
         list-style: none;
         margin: 0 0 0 0.5rem;
@@ -35,6 +35,9 @@
 
     li {
         padding: 0.25rem 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
     .plugins > label {
         

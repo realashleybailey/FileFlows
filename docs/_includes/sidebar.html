@@ -5,10 +5,11 @@
     </div>
     <div class="plugins">
         {% for plugin in site.plugins %}
-            {% if plugin.plugin == nil  %}                
-                <a href="/plugins/{{ plugin.name | replace: " ", "" }}">{{ plugin.name }} </a>
+            {% if plugin.plugin == nil  %}        
+                <input id="col-{{ plugin.name  | replace: " ", "" }}" class="toggle" type="checkbox">
+                <label for="col-{{ plugin.name  | replace: " ", "" }}" class="lbl-toggle">{{ plugin.name }}</label>        
             
-                <ul class="plugin-nodes">
+                <ul class="plugin-nodes collapsible-content">
                     {% for node in site.plugins %} 
                         {% if node.plugin == plugin.name and node.sub == nil %}
                         <li class="plugin-node">

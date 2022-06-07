@@ -1,3 +1,9 @@
+---
+title: Scripts
+name: Scripts
+layout: default
+---
+
 Scripts allow you to define Javascript functions that can be re-used as user-created Nodes in a Flow.
 
 A script can be shared with the community to implement common or missing features not found in a plugin.

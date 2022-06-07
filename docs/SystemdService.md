@@ -1,3 +1,9 @@
+---
+title: Systemd Service
+name: Systemd Service
+layout: default
+---
+
 This is how you can configure FileFlows to run as a systemd service in linux.
 
 Service file

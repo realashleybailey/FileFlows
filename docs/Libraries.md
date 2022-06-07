@@ -1,3 +1,9 @@
+---
+title: Libraries
+name: Libraries
+layout: default
+---
+
 Libraries are where the files are stored in the system and the directories that will be scanned for files.
 
 Options 

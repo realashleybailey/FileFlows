@@ -1,3 +1,9 @@
+---
+title: Settings
+name: Settings
+layout: default
+---
+
 These are the general system settings
 
 ### General

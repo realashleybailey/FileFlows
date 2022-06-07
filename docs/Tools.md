@@ -1,3 +1,9 @@
+---
+title: Tools
+name: Tools
+layout: default
+---
+
 Tools are third party application installed in the system which plugin nodes can use to extend functionality.
 
 E.g "FFMPEG" is used by the "Video Nodes" to process videos.

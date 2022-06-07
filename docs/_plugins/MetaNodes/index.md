@@ -1,3 +1,9 @@
+---
+title: Meta Nodes
+name: Meta Nodes
+layout: default
+---
+
 Meta Nodes are nodes that will lookup/load meta information for a file
 
 Including

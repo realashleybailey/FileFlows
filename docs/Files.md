@@ -1,3 +1,9 @@
+---
+title: Files
+name: Files
+layout: default
+---
+
 This page contains a list of files found by the library scanner.
 
 * Unprocessed

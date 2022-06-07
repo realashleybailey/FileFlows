@@ -1,3 +1,9 @@
+---
+title: Plugins
+name: Plugins
+layout: default
+---
+
 Plugins are we you can extend the functionality of FileFlows.
 
 This page allows you to download and install additional plugins extending the functionality of FileFlows.

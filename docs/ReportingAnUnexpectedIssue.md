@@ -1,3 +1,9 @@
+---
+title: Reporting An Unexpected Issue
+name: Reporting An Unexpected Issue
+layout: default
+---
+
 If you ever come across this error message at the bottom of the page
 
 ![image](https://user-images.githubusercontent.com/958400/144675518-e4f3b1d4-b146-41c9-afa3-cda0d36ce3b6.png)

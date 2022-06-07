@@ -1,3 +1,9 @@
+---
+title: Processing Nodes
+name: Processing Nodes
+layout: default
+---
+
 Processing Nodes, or simply Nodes, are instances that actually execute a flow and process the library files.
 
 FileFlows Server (the main application) has an in-built processing node and this is all that is needed for FileFlows to work.  However, if you want to split the workload onto more machines or you don't want the server doing the processing; you can install additional nodes on other machines.

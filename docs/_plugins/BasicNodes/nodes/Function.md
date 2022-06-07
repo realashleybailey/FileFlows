@@ -5,6 +5,9 @@ description: Node that executes javascript functions
 plugin: Basic Nodes
 ---
 
+{% include node.html input=1 outputs=1 icon="fas fa-code" name="Function" type="Logic" %}
+
+
 The function node allows you to use custom javascript code to process within the flow.
 
 It can let you make decision paths based on previous nodes, compute variables for future nodes, log information, and many more features.

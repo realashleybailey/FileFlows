@@ -96,8 +96,9 @@ footer {
 }
 
 h1, h2, h3, h4, h5 {
-    border: solid 1px rgb(88 88 88);
+    border: solid 1px rgb(88, 88, 88);
 }
+
 * + h1, * + h2, * + h3, * + h4, * + h5
 {
     margin-top:1rem;

@@ -1,3 +1,11 @@
+---
+title: Unraid Intel Quicksync (SQV) Setup
+name: Unraid Intel Quicksync (SQV) Setup
+layout: default
+sub: Unraid
+---
+
+
 This guide details how to set up and configure Intel's Quick Sync (QSV) on Unraid.
 
 ### 1. Install "Intel-GPU-Top"

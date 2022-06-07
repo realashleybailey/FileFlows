@@ -1,7 +1,18 @@
 <div class="side-bar">
     <div class="pages">
+        <ul>
         {% for page in site.pages %}
+            <li>{{page.name}}</li>
         {% endfor %}
+        </ul>
+    </div>
+    <div class="guides">
+        <h3>Guides</h3>
+        <ul>
+        {% for page in site.guides %}
+            <li>{{page.name}}</li>
+        {% endfor %}
+        </ul>
     </div>
     <div class="plugins">
         <h3>Plugins</h3>

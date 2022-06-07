@@ -3,7 +3,11 @@ title: FileFlows Documentation
 description: Documentation for FileFlows
 
 collections:
+  pages:
+    output: true
   plugins:
     output: true
     nodes:
       output: true
+  guides:
+    output: true

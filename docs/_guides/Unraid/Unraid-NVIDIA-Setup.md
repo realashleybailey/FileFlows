@@ -1,3 +1,10 @@
+---
+title: Unraid NVIDIA Setup
+name: Unraid NVIDIA Setup
+layout: default
+sub: Unraid
+---
+
 To pass your NVIDIA GPU to the docker container you must do the following
 
 ## Get your GPU ID

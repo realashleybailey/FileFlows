@@ -49,6 +49,13 @@ body {
     height: 100vh;
     min-height: 100vh;
 }
+.body-wrapper {
+    max-width:1200px;
+    margin:auto;
+    height: 100vh;
+    min-height: 100vh;
+    position:relative;
+}
 
 a {
     color: var(--accent);

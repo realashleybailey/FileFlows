@@ -12,19 +12,21 @@
     
   </head>
   <body>
-    {% include header.html %}
-    
+      <div class="body-wrapper">
+          
+            {% include header.html %}            
 
-    {% include sidebar.html %}
+            {% include sidebar.html %}
 
-    <div class="main">
-        <h1>{{ page.title }}</h1>
-        <section class="content">
-            {{ content }}
-        </section>
-        <footer>
-            &copy; 2022 FileFlows
-        </footer>
-    </div>
+            <div class="main">
+                <h1>{{ page.title }}</h1>
+                <section class="content">
+                    {{ content }}
+                </section>
+                <footer>
+                    &copy; 2022 FileFlows
+                </footer>
+            </div>
+        </div>
   </body>
 </html>

@@ -5,6 +5,8 @@ layout: default
 plugin: Video Nodes
 ---
 
+{% include node.html input=1 outputs=2 icon="fas fa-film" name="Detect Black Bars" type="Logic" %}
+
 This node will scan the video for black bars and set the parameter "VideoCrop" if detected.
 
 Outputs

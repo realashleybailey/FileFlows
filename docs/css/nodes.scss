@@ -2,9 +2,17 @@
 ---
 
 .flow-part {
+    width: 14rem;
+    min-width:14rem;
+    float: right;
+    margin: 0 0 0rem 2rem;
+    position: relative;
+    top: -2rem;
+}
+
+.flow-part {
     text-align: center;
     border-radius: 0.75rem;
-    min-width:12rem;
     border:solid 3px transparent;
     display: flex;
     flex-direction: row;

@@ -5,6 +5,8 @@ layout: default
 plugin: Video Nodes
 ---
 
+{% include node.html input=1 outputs=1 icon="far fa-file-video" name="FFMPEG" type="Process" %}
+
 FFMPEG is a node that lets you run a custom FFMPEG command against the file.
 
 This is intended for advanced users, and the more user friendly specific video nodes should generally be used.

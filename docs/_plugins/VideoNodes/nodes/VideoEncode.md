@@ -5,6 +5,8 @@ layout: default
 plugin: Video Nodes
 ---
 
+{% include node.html input=1 outputs=2 icon="far fa-file-video" name="Video Encode" type="Process" %}
+
 This is a generic video encoding node which will encode a video using FFMPEG.
 
 For codecs/paraemeters refer to the [FFMPEG documentation](https://ffmpeg.org/ffmpeg.html)

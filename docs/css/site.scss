@@ -40,10 +40,11 @@ html {
     min-height: 100%;
 }
 
-html,
 body {
     color: var(--color);
     background: var(--base);
+    height: 100vh;
+    min-height: 100vh;
 }
 
 a {

@@ -14,17 +14,17 @@
   <body>
     {% include header.html %}
     
-    <div class="main">
-        
-        {% include sidebar.html %}
 
+    {% include sidebar.html %}
+
+    <div class="main">
+        <h1>{{ page.title }}</h1>
         <section class="content">
-            <h1>{{ page.title }}</h1>
             {{ content }}
-            <footer>
-            &copy; 2022 FileFlows
-            </footer>
         </section>
+        <footer>
+            &copy; 2022 FileFlows
+        </footer>
     </div>
   </body>
 </html>

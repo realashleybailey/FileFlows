@@ -13,9 +13,13 @@
                     {% for node in site.plugins %} 
                         {% if node.plugin == plugin.name and node.sub == nil %}
                         <li class="plugin-node">
-                            <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
                             {% if node.subs %}
-                                <ul class="plugin-node-subs">
+                                <input id="col-{{ plugin.name  | replace: " ", "" }}-{{ node.name  | replace: " ", "" }}" class="toggle" type="checkbox">
+                                <label for="col-{{ plugin.name  | replace: " ", "" }}-{{ node.name  | replace: " ", "" }}" class="lbl-toggle">{{ node.name }}</label>   
+                                <ul class="plugin-node-subs collapsible-content">
+                                    <li class="plugin-node-sub">
+                                        <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}"">{{ node.name }}</a>   
+                                    </li>
                                     {% for sub in site.plugins %} 
                                         {% if sub.plugin == plugin.name and node.name == sub.sub %}
                                             <li class="plugin-node-sub">
@@ -24,6 +28,8 @@
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
+                            {% else %}
+                                <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
                             {% endif %}
                         </li>
                         {% endif %}

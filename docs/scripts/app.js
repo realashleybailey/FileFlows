@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", function()
 function checkToggle(chk)
 {
     let id = chk.id;
-    console.log('toggle:', id);
-    console.log('collapse: ', localStorage.getItem('collapse_' + id));
-    if(localStorage.getItem('collapse_' + id)){
+    if(!!localStorage.getItem('collapse_' + id)){
         chk.checked = true;
+        console.log('toggle2:', id);
+        console.log('collapse2: ', localStorage.getItem('collapse_' + id));
 
         let parent = chk.parentNode.closest('input[type=checkbox]');
         if(parent)

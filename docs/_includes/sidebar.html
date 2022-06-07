@@ -15,11 +15,7 @@
                             <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
                             {% if node.subs % }
                                 <ul>
-                                {% for sub in site.plugins %} 
-                                    {% if sub.plugin == plugin.name and node.name == sub.sub %}
-                                        <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
-                                    {% endif %}
-                                {% endfor %}
+                                    test
                                 </ul>
                             {% endif %}
                         </li>

@@ -17,7 +17,9 @@
                                 <ul>
                                     {% for sub in site.plugins %} 
                                         {% if sub.plugin == plugin.name and node.name == sub.sub %}
-                                            <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
+                                            <li>
+                                                <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ sub.plugin | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
+                                            </li>
                                         {% endif %}
                                     {% endfor %}
                                 </ul>

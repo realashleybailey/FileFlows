@@ -12,12 +12,6 @@
                     {% for node in site.plugins %} 
                         {% if node.plugin == plugin.name and node.sub == nil %}
                         <li>
-                            <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
-                            {% if node.subs % }
-                                <ul>
-                                    test
-                                </ul>
-                            {% endif %}
                         </li>
                         {% endif %}
                     {% endfor %}

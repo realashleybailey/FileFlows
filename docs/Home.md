@@ -1,4 +1,9 @@
-# About FileFlows
+---
+title: About FileFlows
+name: About FileFlows
+layout: default
+---
+
 
 FileFlows is an application that lets you process a file through a Flow.
 

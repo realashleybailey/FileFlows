@@ -4,6 +4,7 @@
         {% endfor %}
     </div>
     <div class="plugins">
+        <h3>Plugins</h3>
         {% for plugin in site.plugins %}
             {% if plugin.plugin == nil  %}        
                 <input id="col-{{ plugin.name  | replace: " ", "" }}" class="toggle" type="checkbox">

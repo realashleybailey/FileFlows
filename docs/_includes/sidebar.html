@@ -13,7 +13,11 @@
         <ul>
         {% for page in site.guides %}            
             <li>
-                <a href="/guides/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
+                {% if page.sub %}
+                    <a href="/guides/{{ page.sub | replace: " ", "" }}/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
+                {% else %}
+                    <a href="/guides/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
+                {% endif %}
             </li>
         {% endfor %}
         </ul>

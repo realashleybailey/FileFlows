@@ -79,11 +79,6 @@ a {
     }
 }
 
-#services {
-    border-top:solid 1px rgba(var(--color-rgb), 0.1);
-    padding-top:5rem;
-    margin:5rem 5rem 0;
-}
 
 
 section.download-instructions {
@@ -123,17 +118,16 @@ section.download-instructions {
 
     margin-bottom: 3rem;
 }
-.main-wrapper {
-    display:flex;
-    min-height:100vh;
-    flex-direction:column;
-}
 
-.main {
-    margin: 6rem 2rem 0;
+.main { 
     display: flex;
-    flex-direction: row;
-    flex:1;
+    flex-direction: column;
+    flex: 1;
+    position: absolute;
+    top: 5rem;
+    left: 15rem;
+    bottom: 0;
+    overflow:auto;
     section.content {
         position: absolute;
         top: 4rem;

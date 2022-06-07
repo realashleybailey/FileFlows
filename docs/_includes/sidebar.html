@@ -12,13 +12,13 @@
                     {% for node in site.plugins %} 
                         {% if node.plugin == plugin.name and node.sub == nil %}
                         <li>
-                            <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
+                            <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
                             {% if node.subs %}
                                 <ul>
                                     {% for sub in site.plugins %} 
                                         {% if sub.plugin == plugin.name and node.name == sub.sub %}
                                             <li>
-                                                <a href="/plugins/{{ plugin.plugin | replace: " ", "" }}/nodes/{{ sub.plugin | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
+                                                <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
                                             </li>
                                         {% endif %}
                                     {% endfor %}

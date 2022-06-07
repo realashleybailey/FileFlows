@@ -124,18 +124,14 @@ section.download-instructions {
     flex-direction: column;
     flex: 1;
     position: absolute;
-    top: 5rem;
-    left: 15rem;
+    top: 4rem;
+    left: 14rem;
     bottom: 0;
-    overflow:auto;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
     section.content {
-        position: absolute;
-        top: 4rem;
-        left: 15rem;
-        right: 0;
-        bottom: 0;
-        overflow: auto;
-
+        flex-grow:1;
     }
 }
 

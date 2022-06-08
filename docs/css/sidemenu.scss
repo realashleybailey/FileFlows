@@ -3,7 +3,7 @@
 
 .side-bar {
  
-    overflow: hidden;
+    overflow: auto;
     position: absolute;
     left: 0;
     top: 6rem;
@@ -11,9 +11,9 @@
     padding: 0 2rem;
     width:var(--sidebar-width);
     border-right:solid 1px var(--border-color);
-
-    &:hover {
-        overflow: auto;
+    direction:rtl;
+    > div {
+        direction:ltr;
     }
 
     > div + div {

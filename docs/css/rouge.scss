@@ -3,27 +3,24 @@
 
 .highlighter-rouge {
     position:relative;
-    overflow: hidden;
     .copy-code {
         display:none;        
     }
     &:hover {
-        overflow: scroll;
         .copy-code {
             display:inline-block;
         }
-        pre {
-            overflow: auto;
-        }
     }
     .highlight {
-        padding:0.5rem 0 0.1rem;
+        padding:0;
     }
     pre {        
         max-height: 400px;
-        padding: 1rem 0;
-        margin: 0;
-        overflow: hidden;    
+        padding: 0;
+        margin: 0; 
+        code {
+            padding:1rem 0;
+        }
     }
 }
 

@@ -2,8 +2,12 @@
 ---
 
 * {
-    scrollbar-color: rgba(var(--accent-rgb), 0.5) var(--base);
+    scrollbar-color: transparent transparent;
     scrollbar-width: thin;
+    &:hover {
+        scrollbar-color: rgba(var(--accent-rgb), 0.5) var(--base);
+
+    }
 }
 
 ::-webkit-scrollbar {

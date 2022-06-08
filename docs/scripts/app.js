@@ -58,8 +58,8 @@ function addCopyCodeButton(){
 
 async function navigateTo(url){
     const html = await fetch(url);
-    let title = /<h1>(.*?)<\/h1>/.exec(html).groups[1];
-    html = /<!-- content start -->(.*?)<!-- content end -->/.exec(html).groups[1];
+    let title = /<h1>(.*?)<\/h1>/.exec(html)[1];
+    html = /<!-- content start -->(.*?)<!-- content end -->/.exec(html)[1];
     document.getElementById('main').innerHTML = html;
     window.history.pushState(null, title, url);
 }

@@ -45,6 +45,9 @@
         font-size: 1.5rem;
         color:#6c6c6c;
     }
+    &.copied::before {
+        content: '\f00c';
+    }
 }
 
 .highlight .hll { background-color: #49483e }

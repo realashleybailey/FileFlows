@@ -44,5 +44,14 @@ function addCopyCodeButton(){
         let ele = document.createElement('div');
         ele.className = 'copy-code';
         item.appendChild(ele);
+        ele.addEventListener('click', function() {
+
+            let pre = cb.querySelector('pre').innerText;
+            navigator.clipboard.writeText(pre);
+            ele.className = 'copy-code copied';
+            setTimeout(() => {
+                ele.className = 'copy-code';
+            }, 2000);
+        });
     }
 }

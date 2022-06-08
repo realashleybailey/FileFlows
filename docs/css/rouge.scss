@@ -12,9 +12,18 @@
         .copy-code {
             display:inline-block;
         }
+        pre {
+            overflow: auto;
+        }
     }
     .highlight {
         padding:0.5rem 0 0.1rem;
+    }
+    pre {        
+        max-height: 400px;
+        padding: 1rem 0;
+        margin: 0;
+        overflow: hidden;    
     }
 }
 

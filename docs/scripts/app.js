@@ -66,8 +66,9 @@ async function navigateTo(url){
 
 function captureLinks() {
     var links = document.querySelectorAll('a');
-    for(let a in links) {
-        if(a.href.startsWith('http') && a.href.indexOf('wiki.fileflows.com') < 0)
+    for(let a of links) {
+        
+        if(!a.href || (a.href.startsWith('http') && a.href.indexOf('wiki.fileflows.com') < 0))
             continue;
         a.addEventListener('click', function(event) {
             event.stopPropagation();

@@ -79,11 +79,11 @@ body {
     min-height: 100vh;
     max-height: 100vh;
     position:relative;
-    margin-left:calc(calc(100% - var(--max-width)) / 2);
 }
-@media screen and (max-width: 1200px) {
+
+@media screen and (min-width: 1201px) {
     .body-wrapper {
-        margin-left: unset;
+        margin-left:calc(calc(100% - var(--max-width)) / 2);
     }
 }
 

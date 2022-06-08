@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", function()
         checkToggle(chk);
     }
     prerpareMain();
+
+});
+
+window.addEventListener('popstate', (event) => {
+    let main = document.getElementById('main');
+    main.innerHTML = event.state;
+    main.scrollTop = 0;
 });
 
 function checkToggle(chk)
@@ -57,22 +64,22 @@ function addCopyCodeButton(){
 }
 
 async function navigateTo(url){
-    //try
+    try
     {
         const resp = await fetch(url);
         let html = await resp.text();
-        console.log('html', html);
         let title = /<h1>(.*?)<\/h1>/gs.exec(html)[1];
-        console.log('title', title);
         html = /<!-- content start -->(.*?)<!-- content end -->/gs.exec(html)[1];
-        console.log('html2', html);
-        document.getElementById('main').innerHTML = html;
-        window.history.pushState(null, title, url);
+        let main = document.getElementById('main');
+        let previous = main.innerHTML;
+        main.innerHTML = html;
+        main.scrollTop = 0;
+        window.history.pushState(previous, title, url);
     }
-    // catch(err) 
-    // {
-    //     window.location = url;
-    // }
+    catch(err) 
+    {
+        window.location = url;
+    }
 }
 
 function captureLinks() {

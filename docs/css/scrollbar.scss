@@ -24,7 +24,7 @@
     border-radius: 0 !important;
     background: transparent !important;
 }
-*:hover ::-webkit-scrollbar-thumb {
+*:hover::-webkit-scrollbar-thumb {
     border-radius: 0 !important;
 
     &:not(:hover) {

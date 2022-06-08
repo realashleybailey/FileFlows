@@ -60,7 +60,7 @@ async function navigateTo(url){
     //try
     {
         const resp = await fetch(url);
-        const html = await resp.text();
+        let html = await resp.text();
         console.log('html', html);
         let title = /<h1>(.*?)<\/h1>/gs.exec(html)[1];
         console.log('title', title);

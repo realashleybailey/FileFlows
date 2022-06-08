@@ -81,7 +81,7 @@ body {
     position:relative;
     margin-left:calc(calc(100% - var(--max-width)) / 2);
 }
-@media screen and (max-width: var(--max-width)) {
+@media screen and (max-width: 1200px) {
     .body-wrapper {
         margin-left: unset;
     }

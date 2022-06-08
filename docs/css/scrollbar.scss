@@ -22,9 +22,13 @@
 
 ::-webkit-scrollbar-thumb {
     border-radius: 0 !important;
+    background: transparent !important;
+}
+*:hover ::-webkit-scrollbar-thumb {
+    border-radius: 0 !important;
 
     &:not(:hover) {
-        background: transparent !important;
+        background: rgba(var(--accent-rgb), 0.5) !important;
     }
 
     &:hover {

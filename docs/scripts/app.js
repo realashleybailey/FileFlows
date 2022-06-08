@@ -62,9 +62,9 @@ async function navigateTo(url){
         const resp = await fetch(url);
         const html = await resp.text();
         console.log('html', html);
-        let title = /<h1>(.*?)<\/h1>/.exec(html)[1];
+        let title = /<h1>(.*?)<\/h1>/gs.exec(html)[1];
         console.log('title', title);
-        html = /<!-- content start -->(.*?)<!-- content end -->/.exec(html)[1];
+        html = /<!-- content start -->(.*?)<!-- content end -->/gs.exec(html)[1];
         console.log('html2', html);
         document.getElementById('main').innerHTML = html;
         window.history.pushState(null, title, url);

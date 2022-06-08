@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function()
     for(let chk of checkboxes){
         checkToggle(chk);
     }
-    addCopyCodeButton();
+    prerpareMain();
 });
 
 function checkToggle(chk)
@@ -54,4 +54,30 @@ function addCopyCodeButton(){
             }, 2000);
         });
     }
+}
+
+function navigateTo(url){
+    const html = await fetch(urL);
+    let title = /<h1>(.*?)<\/h1>/.exec(html).groups[1];
+    html = /<!-- content start -->(.*?)<!-- content end -->/.exec(html).groups[1];
+    document.getElementById('main').innerHTML = html;
+    window.history.pushState(null, title, url);
+}
+
+function captureLinks() {
+    var links = document.querySelectorAll('a');
+    for(let a in links) {
+        if(a.href.startsWith('http') && a.href.indexOf('wiki.fileflows.com') < 0)
+            continue;
+        a.addEventListener('click', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            navigateTo(a.href);
+        });
+    }
+}
+
+function prerpareMain(){
+    addCopyCodeButton();    
+    captureLinks();
 }

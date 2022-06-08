@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164886869-1175e5ae-d2f4-46e1-bb9e-03dc002da6d3.png)
+{% include node.html input=1 outputs=2 icon="far fa-file-video" name="FFMPEG Builder: Crop Black Bars" type="BuildPart" %}
 
 This node will scan the video file when first called and detect if black bars are present at intervals of 60 seconds, 120 seconds, 240 seconds, and 360  seconds.
 

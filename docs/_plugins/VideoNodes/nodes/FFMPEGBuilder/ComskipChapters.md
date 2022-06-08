@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164948735-09a8a643-2b0f-449a-ad4d-1296758c64fd.png)
+{% include node.html input=1 outputs=2 icon="far fa-file-video" name="FFMPEG Builder: Comskip Chapters" type="BuildPart" %}
 
 This node will look for a comskip .edl file matching the working file.   eg
 `

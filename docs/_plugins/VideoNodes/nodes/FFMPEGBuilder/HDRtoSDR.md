@@ -6,9 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164886367-225f9d0d-5f6c-4df3-b063-eabf57b50057.png)
-
-
+{% include node.html input=1 outputs=2 icon="far fa-file-video" name="FFMPEG Builder: HDR to SDR" type="BuildPart" %}
 
 This node will first check to see if the working file is HDR.
 

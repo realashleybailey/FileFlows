@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/167319466-3d4ca040-29b7-457b-ad80-806ba14411af.png)
+{% include node.html input=1 outputs=2 icon="fas fa-comment-medical" name="FFMPEG Builder: Subtitle Track Merge" type="BuildPart" %}
 
 
 This node will search for external subtitles and add them as input files to the FFMPEG Builder.  Then once run these external subtitles will be part of the output video file.

@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164886509-68dca015-59ae-443e-a484-ece9b5f37b7d.png)
+{% include node.html input=1 outputs=2 icon="far fa-file-video" name="FFMPEG Builder: Video Codec" type="BuildPart" %}
 
 This node will set all video streams in the file to encode using the video codec specified and the encoding parameters specified.
 

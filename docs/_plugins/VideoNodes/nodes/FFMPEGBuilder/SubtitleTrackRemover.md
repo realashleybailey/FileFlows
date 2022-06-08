@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164948691-00633079-f296-45c9-994f-b2457b7900a0.png)
+{% include node.html input=1 outputs=2 icon="fas fa-comment" name="FFMPEG Builder: Subtitle Track Remover" type="BuildPart" %}
 
 
 This node will remove subtitles based on a regular expression pattern, or the inverse if "Not Matching" is checked.   

@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164886419-10b9de48-fd85-4d43-a860-00188ca1cf9a.png)
+{% include node.html input=1 outputs=1 icon="far fa-file-video" name="FFMPEG Builder: Video 10 Bit" type="BuildPart" %}
 
 This node will add a parameter to the first video stream to encode in 10BIt.
 

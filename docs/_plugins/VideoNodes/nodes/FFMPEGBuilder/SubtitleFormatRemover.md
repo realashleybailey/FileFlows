@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164948397-ac74efa4-c496-456d-abcc-553d885fd0e1.png)
+{% include node.html input=1 outputs=2 icon="fas fa-comment" name="FFMPEG Builder: Subtitle Format Remover" type="BuildPart" %}
 
 This node will update the "FFMPEG Builder" to remove subtitles that are in the desired format,  or "All" if that is checked, in the final output file.
 

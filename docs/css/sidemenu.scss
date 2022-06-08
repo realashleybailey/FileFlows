@@ -8,7 +8,7 @@
     left: 0;
     top: 6rem;
     bottom: 1rem;
-    padding: 0 2rem;
+    padding: 0 0.5rem 0 2rem;
     width:var(--sidebar-width);
     border-right:solid 1px var(--border-color);
     direction:rtl;
@@ -25,6 +25,7 @@
         text-transform: uppercase;
         border-bottom: solid 1px var(--accent);
         padding-bottom: 0.25rem;
+        margin-right: 1rem;
     }
 
     ul {

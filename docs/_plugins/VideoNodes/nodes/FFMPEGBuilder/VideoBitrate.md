@@ -10,9 +10,8 @@ sub: FFMPEG Builder
 
 Sets FFMPEG Builder to encode the video given the bitrate
 
-### Parameters
 #### Bitrate
 The target bitrate of the video in kilobytes.   Or if Percent is checked, the percentage of the working file's bitrate.  For example, if set to 50% and the working file bitrate is 6000Kbps, the new files bitrate will be 3000Kbps.
 
-### Percent
+#### Percent
 When selected the bitrate will be calculated as a percentage of the current bitrate.

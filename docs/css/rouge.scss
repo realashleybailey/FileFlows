@@ -20,6 +20,7 @@
         margin: 0; 
         code {
             padding:1rem 0;
+            display: block;
         }
     }
 }
@@ -68,7 +69,7 @@
 .highlight .gs { font-weight: bold } 
 .highlight .gu { color: #75715e } 
 .highlight .kc { color: #66d9ef } 
-.highlight .kd { color: #66d9ef } 
+.highlight .kd { color: #ffce5b } 
 .highlight .kn { color: #f92672 } 
 .highlight .kp { color: #66d9ef } 
 .highlight .kr { color: #66d9ef } 
@@ -95,7 +96,7 @@
 .highlight .mb { color: #ae81ff } 
 .highlight .mf { color: #ae81ff } 
 .highlight .mh { color: #ae81ff } 
-.highlight .mi { color: #ae81ff } 
+.highlight .mi { color: #55bcff } 
 .highlight .mo { color: #ae81ff } 
 .highlight .sa { color: #e6db74 } 
 .highlight .sb { color: #e6db74 } 

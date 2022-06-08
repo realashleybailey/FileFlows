@@ -46,7 +46,7 @@ function addCopyCodeButton(){
         item.appendChild(ele);
         ele.addEventListener('click', function() {
 
-            let pre = cb.querySelector('pre').innerText;
+            let pre = item.querySelector('pre').innerText;
             navigator.clipboard.writeText(pre);
             ele.className = 'copy-code copied';
             setTimeout(() => {

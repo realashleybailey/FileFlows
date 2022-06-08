@@ -24,7 +24,7 @@
     border-radius: 0 !important;
 
     &:not(:hover) {
-        background: rgba(var(--accent-rgb), 0.5) !important;
+        background: transparent !important;
     }
 
     &:hover {

@@ -3,16 +3,23 @@
 
 .highlighter-rouge {
     position:relative;
+    .copy-code {
+        display:none;
+    }
+    &:hover {
+        .copy-code {
+            display:inline-block;
+        }
+    }
 }
 
 .copy-code {    
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 3rem;
-    height: 3rem;
+    top: .75rem;
+    right: .75rem;
+    width: 2rem;
+    height: 2rem;
     cursor: pointer;
-    display: inline-block;
     &::before{
         font-family: "Font Awesome 5 Free";
         font-weight: 900;
@@ -21,6 +28,7 @@
         font-variant: normal;
         text-rendering: auto;
         -webkit-font-smoothing: antialiased;
+        font-size: 1.5rem;
     }
 }
 

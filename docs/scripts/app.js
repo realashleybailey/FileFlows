@@ -57,19 +57,22 @@ function addCopyCodeButton(){
 }
 
 async function navigateTo(url){
-    try
+    //try
     {
         const resp = await fetch(url);
-        const text = await resp.text();
+        const html = await resp.text();
+        console.log('html', html);
         let title = /<h1>(.*?)<\/h1>/.exec(html)[1];
+        console.log('title', title);
         html = /<!-- content start -->(.*?)<!-- content end -->/.exec(html)[1];
+        console.log('html2', html);
         document.getElementById('main').innerHTML = html;
         window.history.pushState(null, title, url);
     }
-    catch(err) 
-    {
-        window.location = url;
-    }
+    // catch(err) 
+    // {
+    //     window.location = url;
+    // }
 }
 
 function captureLinks() {

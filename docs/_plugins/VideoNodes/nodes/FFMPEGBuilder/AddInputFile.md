@@ -6,8 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/167319454-034444a2-f731-4453-8d16-566448ae3dce.png)
-
+{% include node.html input=1 outputs=2 icon="fas fa-plus" name="FFMPEG Builder: Add Input File" type="BuildPart" %}
 
 This node will search for matching files and add them as input files to FFMPEG Builder.
 

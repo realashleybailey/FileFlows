@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164948928-4efc18f8-281a-4c28-b5e8-6d69079b9cd8.png)
+{% include node.html input=1 outputs=1 icon="fas fa-volume-off" name="FFMPEG Builder: Add Add Track" type="BuildPart" %}
 
 This node will add a new audio track to "FFMPEG Builder".
 

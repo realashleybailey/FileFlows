@@ -6,7 +6,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-![image](https://user-images.githubusercontent.com/958400/164949449-fe4decb2-88ef-46bf-8cdc-1ef5fe77b260.png)
+{% include node.html input=1 outputs=2 icon="fas fa-volume-up" name="FFMPEG Builder: Audio Normalization" type="BuildPart" %}
 
 This node will normalize audio against the matching tracks in the output file.
 

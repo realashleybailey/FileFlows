@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function()
     for(let chk of checkboxes){
         checkToggle(chk);
     }
+    addCopyCodeButton();
 });
 
 function checkToggle(chk)
@@ -26,12 +27,22 @@ function toggleCollapse(event){
     console.log('chk.id: ', chk.id);
     console.log('chk.checked: ', chk.checked);
     localStorage.setItem('collapse_' + id, chk.checked ? 1 : 0);
-    
+
     // close any below this one if checked
     if(event.target.checked == false){
         for(let sub of chk.querySelectorAll('input[type=checkbox]')){
             if(sub.checked)
                 toggleCollapse(sub);
         }
+    }
+}
+
+function addCopyCodeButton(){
+    var cb = document.querySelectorAll('.highlighter-rouge');
+    for(let item of cb)
+    {
+        let ele = document.createElement('div');
+        ele.className = 'copy-code';
+        item.appendChild(ele);
     }
 }

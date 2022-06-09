@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function()
     for(let chk of checkboxes){
         checkToggle(chk);
     }
+    console.log('DOMContentLoaded');
     prepareMain();
     setSelectedMenuLink();
 });
@@ -99,11 +100,13 @@ function captureLinks() {
 }
 
 function prepareMain(){
+    console.log('prepareMain');
     addCopyCodeButton();    
     captureLinks();
 }
 
 function setSelectedMenuLink(url) {
+    console.log('setSelectedMenuLink', url);
     if(!url)
     {
         url = /(http(s)?:\/\/)([^\?&]+)($|\?)/.exec(window.location.href)[3];
@@ -111,6 +114,7 @@ function setSelectedMenuLink(url) {
             return;
     }
     url = url.toLowerCase();
+    console.log('setSelectedMenuLink2', url);
 
     var links = Array.prototype.slice.call(document.querySelectorAll('.side-bar a'), 0);
     links.sort((a,b) => {

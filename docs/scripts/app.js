@@ -117,7 +117,7 @@ function setSelectedMenuLink(url) {
             continue;
         let li = a.closest('li');
         li.classList.remove('selected');
-        if(url.contains(a.href.toLowerCase())){
+        if(url.indexOf(a.href.toLowerCase()) >= 0){
             console.log('selected page found!', a);
             li.classList.add('selected');
         }

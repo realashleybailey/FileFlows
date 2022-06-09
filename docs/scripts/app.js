@@ -150,10 +150,7 @@ function setSelectedMenuLink(url) {
     }
 }
 
-function tocLink(link){
-    if(!link)
-        return;
-    let href = link.getAttribute('href');
+function tocLink(href){
     if(!href)
         return;
     let ele = document.getElementById(href.substring(1));

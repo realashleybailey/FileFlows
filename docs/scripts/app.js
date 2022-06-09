@@ -111,15 +111,22 @@ function setSelectedMenuLink(url) {
     }
     url = url.toLowerCase();
 
-    var links = document.querySelectorAll('.side-bar a');
+    var links = Array.prototype.slice.call(document.querySelectorAll('.side-bar a'), 0);
+    links.sort((a,b) => {
+        if(!b.href || !a.href)
+            return 0;
+        return b.href.length - a.href.length;
+    });
+    let found = false;
     for(let a of links){
         if(!a.href)
             continue;
         let li = a.closest('li');
         li.classList.remove('selected');
-        if(url.indexOf(a.href.toLowerCase()) >= 0){
+        if(!found && url.indexOf(a.href.toLowerCase()) >= 0){
             console.log('selected page found!', a);
             li.classList.add('selected');
+            found = true;
         }
     }
 

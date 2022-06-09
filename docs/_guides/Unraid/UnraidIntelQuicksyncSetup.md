@@ -1,6 +1,6 @@
 ---
-title: Unraid Intel Quicksync (SQV) Setup
-name: Unraid Intel Quicksync (SQV) Setup
+title: Unraid Intel Quicksync (QSV) Setup
+name: Unraid Intel Quicksync Setup
 layout: default
 sub: Unraid
 ---

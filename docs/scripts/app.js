@@ -45,8 +45,10 @@ function toggleCollapse(event){
     }
 }
 
-function addCopyCodeButton(){
-    var cb = document.querySelectorAll('.highlighter-rouge');
+function addCopyCodeButton(container){
+    if(!container)
+        container = document;
+    var cb = container.querySelectorAll('.highlighter-rouge');
     for(let item of cb)
     {
         let ele = document.createElement('div');
@@ -85,8 +87,10 @@ async function navigateTo(url){
     }
 }
 
-function captureLinks() {
-    var links = document.querySelectorAll('a');
+function captureLinks(container) {
+    if(!container)
+        container = document;
+    var links = container.querySelectorAll('a');
     for(let a of links) {
         
         if(!a.href || (a.href.startsWith('http') && a.href.indexOf('wiki.fileflows.com') < 0))
@@ -100,9 +104,9 @@ function captureLinks() {
 }
 
 function prepareMain(){
-    console.log('prepareMain');
-    addCopyCodeButton();    
-    captureLinks();
+    let main = document.getElementById('main');
+    addCopyCodeButton(main);    
+    captureLinks(main);
 }
 
 function setSelectedMenuLink(url) {

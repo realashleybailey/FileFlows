@@ -153,7 +153,8 @@ function setSelectedMenuLink(url) {
 function tocLink(href){
     if(!href)
         return;
-    let ele = document.getElementById(href.substring(1));
+    href = href.substring(href.lastIndexOf('#') + 1);
+    let ele = document.getElementById(href);
     if(!ele)
         return;
     ele.scrollIntoView({behavior: "smooth", inline: "nearest"});

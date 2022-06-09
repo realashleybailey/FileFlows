@@ -7,9 +7,6 @@ plugin: Basic Nodes
 toc: true
 ---
 
-* auto-gen TOC:
-{:toc}
-
 {% include node.html input=1 outputs=1 icon="fas fa-code" name="Function" type="Logic" %}
 
 

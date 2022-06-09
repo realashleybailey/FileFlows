@@ -26,13 +26,13 @@
                 <section class="content">
                     {{ content }}
                 </section>
+                <div class="toc">
+                  {% include toc.html html=content %}
+                </div>
                 <footer>
                     &copy; 2022 FileFlows
                 </footer>
                 <!-- content end -->
-            </div>
-            <div class="toc">
-              {% include toc.html html=content %}
             </div>
         </div>
 

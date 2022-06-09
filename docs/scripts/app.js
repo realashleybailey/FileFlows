@@ -93,8 +93,14 @@ function captureLinks(container) {
     var links = container.querySelectorAll('a');
     for(let a of links) 
     {
-        if(a.closest('.toc'))
+        if(a.closest('.toc')){
+            a.addEventListener('click', function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                tocLink(a.href);
+            });
             return;   
+        }
         if(!a.href || (a.href.startsWith('http') && a.href.indexOf('docs.fileflows.com') < 0))
             continue;
         a.addEventListener('click', function(event) {
@@ -142,5 +148,17 @@ function setSelectedMenuLink(url) {
             found = true;
         }
     }
+}
+
+function tocLink(link){
+    if(!link)
+        return;
+    let href = link.getAttribute('href');
+    if(!href)
+        return;
+    let ele = document.getElementById(href.substring(1));
+    if(!ele)
+        return;
+    ele.scrollIntoView({behavior: "smooth", inline: "nearest"});
 
 }

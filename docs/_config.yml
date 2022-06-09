@@ -1,7 +1,5 @@
 title: FileFlows Documentation
 description: Documentation for FileFlows
-plugins:
-  - jekyll-toc
 
 collections:
   pages:

@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Auto Chapters
+permalink: /plugins/video-nodes/ffmpeg-builder/auto-chapters
 name: Auto Chapters
 layout: default
 plugin: Video Nodes

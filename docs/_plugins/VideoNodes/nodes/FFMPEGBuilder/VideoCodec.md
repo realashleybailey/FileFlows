@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Video Codec
+permalink: /plugins/video-nodes/ffmpeg-builder/video-codec
 name: Video Codec
 layout: default
 plugin: Video Nodes

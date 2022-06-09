@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > HDR to SDR
+permalink: /plugins/video-nodes/ffmpeg-builder/hdr-to-sdr
 name: HDR to SDR
 layout: default
 plugin: Video Nodes

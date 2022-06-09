@@ -1,6 +1,7 @@
 ---
 title: Flows
 name: Flows
+permalink: /flows
 layout: default
 ---
 

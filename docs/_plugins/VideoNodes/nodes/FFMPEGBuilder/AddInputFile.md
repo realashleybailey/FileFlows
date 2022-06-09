@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Add Input File
+permalink: /plugins/video-nodes/ffmpeg-builder/add-input-file
 name: Add Input File
 layout: default
 plugin: Video Nodes

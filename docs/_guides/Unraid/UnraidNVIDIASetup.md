@@ -1,6 +1,7 @@
 ---
 title: Unraid NVIDIA Setup
 name: Unraid NVIDIA Setup
+permalink: /guides/unraid/nvidia-setup
 layout: default
 sub: Unraid
 ---

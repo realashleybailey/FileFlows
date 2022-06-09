@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Audio Set Language
+permalink: /plugins/video-nodes/ffmpeg-builder/audio-set-language
 name: Audio Set Language
 layout: default
 plugin: Video Nodes

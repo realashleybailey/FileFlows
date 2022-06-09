@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Video Encode
+permalink: /plugins/video-nodes/ffmpeg-builder/video-encode
 name: Video Encode
 layout: default
 plugin: Video Nodes

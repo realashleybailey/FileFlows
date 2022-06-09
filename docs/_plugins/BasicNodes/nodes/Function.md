@@ -1,5 +1,6 @@
 ---
 name: Function
+permalink: /plugins/basic-nodes/function
 layout: default
 description: Node that executes javascript functions
 plugin: Basic Nodes

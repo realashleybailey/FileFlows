@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Remux To MKV
+permalink: /plugins/video-nodes/ffmpeg-builder/remux-to-mkv
 name: Remux To MKV
 layout: default
 plugin: Video Nodes

@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Audio Track Reorder
+permalink: /plugins/video-nodes/ffmpeg-builder/audio-track-reorder
 name: Audio Track Reorder
 layout: default
 plugin: Video Nodes

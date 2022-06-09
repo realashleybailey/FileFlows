@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Crop Black Bars
+permalink: /plugins/video-nodes/ffmpeg-builder/crop-black-bars
 name: Crop Black Bars
 layout: default
 plugin: Video Nodes

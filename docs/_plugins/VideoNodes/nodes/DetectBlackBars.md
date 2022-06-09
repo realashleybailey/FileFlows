@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > Detect Black Bars
+permalink: /plugins/video-nodes/detect-black-bars
 name: Detect Black Bars
 layout: default
 plugin: Video Nodes

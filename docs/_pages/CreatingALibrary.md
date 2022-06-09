@@ -1,6 +1,7 @@
 ---
 title: Creating A Library
 name: Creating A Library
+permalink: /creating-a-library
 layout: default
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG
+permalink: /plugins/video-nodes/ffmpeg
 name: FFMPEG
 layout: default
 plugin: Video Nodes

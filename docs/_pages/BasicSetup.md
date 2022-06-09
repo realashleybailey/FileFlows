@@ -1,6 +1,7 @@
 ---
 title: Basic Setup
 name: Basic Setup
+permalink: /basic-setup
 layout: default
 ---
 

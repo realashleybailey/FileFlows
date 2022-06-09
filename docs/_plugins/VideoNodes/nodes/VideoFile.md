@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > Video File
+permalink: /plugins/video-nodes/video-file
 name: Video File
 layout: default
 plugin: Video Nodes

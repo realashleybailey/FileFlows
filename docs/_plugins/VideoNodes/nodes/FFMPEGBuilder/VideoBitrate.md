@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Video Bitrate
+permalink: /plugins/video-nodes/ffmpeg-builder/video-bitrate
 name: Video Bitrate
 layout: default
 plugin: Video Nodes

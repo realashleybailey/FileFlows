@@ -1,6 +1,7 @@
 ---
 title: Dashboard
 name: Dashboard
+permalink: /dashboard
 layout: default
 ---
 

@@ -4,7 +4,7 @@
         <ul>
         {% for page in site.pages %}
             <li>
-                <a href="/pages/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
+                <a href="{{ page.permalink }}">{{ page.name }}</a>
             </li>
         {% endfor %}
         </ul>
@@ -14,11 +14,7 @@
         <ul>
         {% for page in site.guides %}            
             <li>
-                {% if page.sub %}
-                    <a href="/guides/{{ page.sub | replace: " ", "" }}/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
-                {% else %}
-                    <a href="/guides/{{ page.name | replace: " ", "" }}">{{ page.name }}</a>
-                {% endif %}
+                <a href="{{ page.permalink }}">{{ page.name }}</a>
             </li>
         {% endfor %}
         </ul>
@@ -38,12 +34,12 @@
                                 <label for="col-{{ plugin.name  | replace: " ", "" }}-{{ node.name  | replace: " ", "" }}" class="lbl-toggle">{{ node.name }}</label>   
                                 <ul class="plugin-node-subs collapsible-content">
                                     <li class="plugin-node-sub">
-                                        <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
+                                        <a href="{{ node.permalink }}">{{ node.name }}</a>   
                                     </li>
                                     {% for sub in site.plugins %} 
                                         {% if sub.plugin == plugin.name and node.name == sub.sub %}
                                             <li class="plugin-node-sub">
-                                                <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}/{{ sub.name | replace: " ", "" }}">{{ sub.name }}</a>   
+                                                <a href="{{ sub.permalink }}">{{ sub.name }}</a>   
                                             </li>
                                         {% endif %}
                                     {% endfor %}
@@ -54,7 +50,7 @@
                     {% for node in site.plugins %} 
                         {% if node.plugin == plugin.name and node.sub == nil and node.subs == nil %}
                         <li class="plugin-node">
-                            <a href="/plugins/{{ plugin.name | replace: " ", "" }}/nodes/{{ node.name | replace: " ", "" }}">{{ node.name }}</a>   
+                            <a href="{{ node.permalink }}">{{ node.name }}</a>   
                         </li>
                         {% endif %}
                     {% endfor %}

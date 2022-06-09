@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder
+permalink: /plugins/video-nodes/ffmpeg-builder
 name: FFMPEG Builder
 layout: default
 plugin: Video Nodes

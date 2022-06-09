@@ -1,6 +1,7 @@
 ---
 title: API Help
 name: API Help
+permalink: /api-help
 layout: default
 ---
 

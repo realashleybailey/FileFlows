@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Comskip Chapters
+permalink: /plugins/video-nodes/ffmpeg-builder/comskip-chapters
 name: Comskip Chapters
 layout: default
 plugin: Video Nodes

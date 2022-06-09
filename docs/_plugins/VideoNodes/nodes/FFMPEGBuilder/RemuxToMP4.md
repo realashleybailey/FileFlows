@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Remux To MP4
+permalink: /plugins/video-nodes/ffmpeg-builder/remux-to-mp4
 name: Remux To MP4
 layout: default
 plugin: Video Nodes

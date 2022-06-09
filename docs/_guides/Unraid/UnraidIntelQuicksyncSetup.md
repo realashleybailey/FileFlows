@@ -1,6 +1,7 @@
 ---
 title: Unraid Intel Quicksync (QSV) Setup
 name: Unraid Intel Quicksync Setup
+permalink: /guides/unraid/intel-quicksync-setup
 layout: default
 sub: Unraid
 ---

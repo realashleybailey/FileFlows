@@ -1,5 +1,6 @@
 ---
 title: Video Nodes > FFMPEG Builder > Audio Track Remover
+permalink: /plugins/video-nodes/ffmpeg-builder/audio-track-remover
 name: Audio Track Remover
 layout: default
 plugin: Video Nodes

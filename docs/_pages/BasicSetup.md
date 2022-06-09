@@ -17,4 +17,4 @@ The princiapl is the same
 3. Clean up / moving file to final destination
 
 ## Support
-You can contact me on the [support forum](https://forums.fileflows.com). 
+You can contact me on the [support forum](https://forum.fileflows.com). 

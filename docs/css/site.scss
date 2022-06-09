@@ -92,7 +92,7 @@ body {
         margin-left:0;
     }
     section.content {
-        max-width: calc(100vw - var(--sidebar-width) - 10rem);
+        max-width: calc(100vw - var(--sidebar-width) - 12rem) !important;
     }
     .toc{
         left:unset !important;

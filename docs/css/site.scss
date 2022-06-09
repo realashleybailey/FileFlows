@@ -81,15 +81,22 @@ body {
     position:relative;
 }
 
-@media screen and (min-width: 1201px) {
+@media screen and (min-width: 1450.001px) {
     .body-wrapper {
         margin-left:calc(calc(100vw - var(--max-width)) / 2 - 2rem);
     }
 }
 
-@media screen and (min-width:720px) and (max-width:1400px){
+@media screen and (max-width:1450px){
+    .body-wrapper {
+        margin-left:0;
+    }
     section.content {
-        width: calc(100vw - var(--sidebar-width) - 10rem);
+        max-width: calc(100vw - var(--sidebar-width) - 10rem);
+    }
+    .toc{
+        left:unset !important;
+        right:1rem !important;
     }
 }
 

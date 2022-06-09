@@ -83,7 +83,13 @@ body {
 
 @media screen and (min-width: 1201px) {
     .body-wrapper {
-        margin-left:calc(calc(100% - var(--max-width)) / 2);
+        margin-left:calc(calc(100vw - var(--max-width)) / 2 - 2rem);
+    }
+}
+
+@media screen and (min-width:720px) and (max-width:1400px){
+    section.content {
+        width: calc(100vw - var(--sidebar-width) - 10rem);
     }
 }
 
@@ -147,4 +153,13 @@ footer {
     margin:1rem 0;
     font-size: 0.9rem;
     opacity: 0.5;
+}
+
+.toc {
+    position: fixed;
+    top: 7rem;
+    left:calc(50vw + (var(--max-width) / 2) + 3rem);
+    ul {
+        list-style: none;
+    }
 }

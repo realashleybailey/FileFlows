@@ -372,13 +372,24 @@ window.ffFlow = {
             console.error("Failed to find element: " + part.flowElementUid);
             return;
         }
-        ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Outputs.${output}`, part.model).then(result => {
-            if (!part.OutputLabels) part.OutputLabels = {};
-            part.OutputLabels[output] = result;
-            let outputNode = document.getElementById(part.uid + '-output-' + output);
-            if (outputNode)
-                outputNode.setAttribute('title', result);
-        });
+        if(part.flowElementUid.startsWith('Script:'))
+        {
+            let labels = element.outputLabels || element.OutputLabels;
+            part.OutputLabels = {};
+            for(let i=0;i<labels.length;i++) {
+                part.OutputLabels[i+1] = `Output ${i + 1}: ${labels[i]}`;
+            }
+        }
+        else 
+        {
+            ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Outputs.${output}`, part.model).then(result => {
+                if (!part.OutputLabels) part.OutputLabels = {};
+                part.OutputLabels[output] = result;
+                let outputNode = document.getElementById(part.uid + '-output-' + output);
+                if (outputNode)
+                    outputNode.setAttribute('title', result);
+            });
+        }
     },
     initOutputHints(part) {
         if (!part || !part.outputs)

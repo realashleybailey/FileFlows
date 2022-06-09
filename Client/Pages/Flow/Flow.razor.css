@@ -71,6 +71,7 @@ canvas {
   border-radius: 0.75rem;
   min-width: 12rem;
   border: solid 3px transparent;
+  background: var(--base);
 }
 ::deep .flow-part.Logic, .flow-element.Logic {
   border-color: var(--flow-logic);
@@ -446,7 +447,7 @@ canvas {
   border-right: solid 3px var(--accent);
   border-top-right-radius: 54px;
   background: var(--base);
-  max-width: min(60rem, 90% - 250px - 21vw);
+  max-width: min(60rem, calc(90% - 250px - 21vw));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -493,5 +494,3 @@ canvas {
   width: 18rem;
   white-space: nowrap;
 }
-
-/*# sourceMappingURL=Flow.razor.css.map */

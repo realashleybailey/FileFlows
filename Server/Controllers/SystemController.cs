@@ -53,6 +53,23 @@ public class SystemController:Controller
         return File(System.IO.File.ReadAllBytes(updateFile), "application/zip");
     }
 
+    /// <summary>
+    /// Pauses the system
+    /// </summary>
+    /// <param name="resume">if true, resumes the system</param>
+    [HttpPost("pause")]
+    public async Task Pause([FromQuery] bool resume = false)
+    {
+        var controller = new SettingsController();
+        var settings = await controller.Get();
+        bool pause = resume == false;
+        if (settings.IsPaused == pause)
+            return; // nothing to do
+
+        settings.IsPaused = pause;
+        await controller.Save(settings);
+    }
+
 
     /// <summary>
     /// Gets the system information for the FileFlows server,
@@ -67,6 +84,7 @@ public class SystemController:Controller
         //info.MemoryUsage = proc.PrivateMemorySize64;
         info.MemoryUsage = GC.GetTotalMemory(true);
         info.CpuUsage = await GetCpuPercentage();
+        info.IsPaused = (await new SettingsController().Get()).IsPaused;
         return info;
     }
 

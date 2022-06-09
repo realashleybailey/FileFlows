@@ -1,6 +1,7 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
 @using FileFlows.Shared.Formatters
+@using System.ComponentModel.DataAnnotations
 
 @page "/"
 
@@ -12,108 +13,140 @@
             <span>CPU Usage: @SystemInfo.CpuUsage.ToString("0.00") %</span>
             <span>Memory Usage: @(FileSizeFormatter.Format(SystemInfo.MemoryUsage))</span>
         }
+        @if (string.IsNullOrEmpty(lblPauseLabel) == false)
+        {
+            <button @onclick=@TogglePaused class="btn btn-pause">
+                @if (SystemInfo.IsPaused)
+                {
+                    <i class="fas fa-play"></i>
+                }
+                else
+                {
+                    <i class="fas fa-pause"></i>
+                }
+                @lblPauseLabel
+            </button>
+        }
     </Head>
 
     <Body>
 
-        <CascadingValue Value="this" IsFixed="true">
-            @if(ConfiguredStatus < 2)
+    <CascadingValue Value="this" IsFixed="true">
+        @if (ConfiguredStatus < 2)
+        {
+            <h1>Not Yet Configured</h1>
+            <p>You have not yet configured any Flows or Libraries.</p><br/>
+
+            <h2>Step 1. Creating a Flow </h2>
+            <p>To use FileFlows a Flow must first be created.</p>
+            <p>A Flow can be thought of as a processing rule that is run against files.</p>
+            <p>You can have as many Flows as you like, ranging from many tasks.</p>
+            <p>For example, you can configure a Flow to convert video files from one format into another. Or a Flow to move pictures into folders based on the date they were taken.</p>
+
+            @if (ConfiguredStatus == 0)
             {
-                <h1>Not Yet Configured</h1>
-                <p>You have not yet configured any Flows or Libraries.</p><br/>
-
-                <h2>Step 1. Creating a Flow </h2>
-                <p>To use FileFlows a Flow must first be created.</p>
-                <p>A Flow can be thought of as a processing rule that is run against files.</p>
-                <p>You can have as many Flows as you like, ranging from many tasks.</p>
-                <p>For example, you can configure a Flow to convert video files from one format into another.  Or a Flow to move pictures into folders based on the date they were taken.</p>
-
-                @if (ConfiguredStatus == 0)
-                {
-                    <div class="not-configured-pointer step-flows">Step 1</div>
-                }
-                <br />
-
-                <h2>Step 2. Creating a Library</h2>
-                <p>FileFlows needs one or more Libraries to monitor for files.</p>
-                <p>These can be directories or drives.</p>
-                <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
-                @if (ConfiguredStatus == 1)
-                {
-                    <div class="not-configured-pointer step-library">Step 2</div>
-                }
+                <div class="not-configured-pointer step-flows">Step 1</div>
             }
-            else
+            <br/>
+
+            <h2>Step 2. Creating a Library</h2>
+            <p>FileFlows needs one or more Libraries to monitor for files.</p>
+            <p>These can be directories or drives.</p>
+            <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
+            @if (ConfiguredStatus == 1)
             {
-                <div class="dashboard-wrapper">
-                    <div class="dashboard">
-                        @if(Workers?.Any() != true)
-                        {                            
-                            <div class="worker-wrapper waiting portlet">
+                <div class="not-configured-pointer step-library">Step 2</div>
+            }
+        }
+        else
+        {
+            <div class="dashboard-wrapper">
+                <div class="dashboard">
+    
+                    <div class="mobile-view">
+                        @if (string.IsNullOrEmpty(lblPauseLabel) == false)
+                        {
+                            <button @onclick=@TogglePaused class="btn btn-pause">
+                                @if (SystemInfo.IsPaused)
+                                {
+                                    <i class="fas fa-play"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-pause"></i>
+                                }
+                                @lblPauseLabel
+                            </button>
+                        }
+                    </div>
+                    
+                    @if (Workers?.Any() != true)
+                    {
+                        <div class="worker-wrapper waiting portlet">
+                            <div class="chart-wrapper">
+                                <div class="chart chart-0 waiting"></div>
+                            </div>
+                            <div class="worker-info">
+                                <span class="waiting-icon"><i class="fas fa-bed"></i></span>
+                                <span class="waiting-message">@lblWaiting</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        for (int i = 0; i < Workers.Count; i++)
+                        {
+                            var worker = Workers[i];
+                            <div class="worker-wrapper portlet">
                                 <div class="chart-wrapper">
-                                    <div class="chart chart-0 waiting"></div>
+                                    <div class="chart chart-@i"></div>
                                 </div>
                                 <div class="worker-info">
-                                    <span class="waiting-icon"><i class="fas fa-bed"></i></span>
-                                    <span class="waiting-message">@lblWaiting</span>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            for (int i = 0; i < Workers.Count; i++)
-                            {
-                                var worker = Workers[i];
-                                <div class="worker-wrapper portlet">
-                                    <div class="chart-wrapper">
-                                        <div class="chart chart-@i"></div>
-                                    </div>
-                                    <div class="worker-info">
-                                        <span class="label-value current">
-                                            <span class="label">@lblNode</span>
-                                            <span class="value">@worker.NodeName</span>
-                                        </span>
-                                        <span class="label-value current">
-                                            <span class="label">@lblFile</span>
-                                            <span class="value">@worker.RelativeFile</span>
-                                        </span>
-                                        <span class="label-value working-file">
-                                            <span class="label">@lblWorkingFile</span>
-                                            <span class="value">@worker.WorkingFile</span>
-                                        </span>
-                                        <span class="label-value library">
-                                            <span class="label">@lblLibrary</span>
-                                            <span class="value">@worker.Library.Name</span>
-                                        </span>
-                                        <span class="label-value current-step">
-                                            <span class="label">@lblCurrentStep</span>
-                                            <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
-                                        </span>
-                                        <span class="label-value processing-time">
-                                            <span class="label">@lblProcessingTime</span>
-                                            <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
-                                        </span>
-                                        <div class="actions-wrapper">
-                                            <div class="actions">
-                                                <button @onclick="() => LogClicked(worker)">@lblLog</button>
-                                                <button @onclick="() => CancelClicked(worker)">@lblCancel</button>
-                                            </div>
+                                    <span class="label-value current">
+                                        <span class="label">@lblNode</span>
+                                        <span class="value">@worker.NodeName</span>
+                                    </span>
+                                    <span class="label-value current">
+                                        <span class="label">@lblFile</span>
+                                        <span class="value">@worker.RelativeFile</span>
+                                    </span>
+                                    <span class="label-value working-file">
+                                        <span class="label">@lblWorkingFile</span>
+                                        <span class="value">@worker.WorkingFile</span>
+                                    </span>
+                                    <span class="label-value library">
+                                        <span class="label">@lblLibrary</span>
+                                        <span class="value">@worker.Library.Name</span>
+                                    </span>
+                                    <span class="label-value current-step">
+                                        <span class="label">@lblCurrentStep</span>
+                                        <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
+                                    </span>
+                                    <span class="label-value processing-time">
+                                        <span class="label">@lblProcessingTime</span>
+                                        <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
+                                    </span>
+                                    <div class="actions-wrapper">
+                                        <div class="actions">
+                                            <button @onclick="() => LogClicked(worker)">@lblLog</button>
+                                            <button @onclick="() => CancelClicked(worker)">@lblCancel</button>
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            </div>
                         }
+                    }
 
-                        <FileFlows.Client.Components.Dashboard.ShrinkageBar />
-                        
-                        <FileFlows.Client.Components.Dashboard.LibraryFilesSummary />
-                        <FileFlows.Client.Components.Dashboard.LibraryFilesSummary Completed=@true />
+                    <FileFlows.Client.Components.Dashboard.ShrinkageBar/>
+
+                    <FileFlows.Client.Components.Dashboard.LibraryFilesSummary/>
+                    <FileFlows.Client.Components.Dashboard.LibraryFilesSummary Completed=@true />
 
 
-                        <div class="spacer"></div>
-                    </div>
+                    <div class="spacer"></div>
                 </div>
-            }
-        </CascadingValue>
+            </div>
+        }
+    </CascadingValue>
     </Body>
 </PageView>

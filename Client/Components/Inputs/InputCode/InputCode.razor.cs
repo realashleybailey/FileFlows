@@ -47,7 +47,15 @@ namespace FileFlows.Client.Components.Inputs
         {
             this.InitialValue = Value;
             this.Editor.OnCancel += Editor_OnCancel;
+            this.Editor.OnClosed += Editor_Closed;
             base.OnInitialized();
+        }
+
+        private Task Editor_Closed()
+        {
+            this.Editor.OnCancel -= Editor_OnCancel;
+            this.Editor.OnClosed -= Editor_Closed;
+            return Task.CompletedTask;
         }
 
         private async Task<bool> Editor_OnCancel()

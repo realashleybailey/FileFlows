@@ -21,7 +21,7 @@ public class ScriptParser
     {
         if (string.IsNullOrEmpty(code))
             throw new Exception("No script found");
-        var rgxComments = new Regex(@"^\/\*[^\/]+\/");
+        var rgxComments = new Regex(@"^\/\*(\*)?(.*?)\*\/", RegexOptions.Singleline);
         var matchComments = rgxComments.Match(code.Trim());
         if (matchComments.Success == false)
             throw new Exception("Failed to locate comment section.  A script must start with a comment block describing the script.");

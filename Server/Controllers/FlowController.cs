@@ -271,10 +271,6 @@ public class FlowController : ControllerStore<Flow>
         var plugins = await new PluginController().GetAll(includeElements: true);
         var results = plugins.Where(x => x.Elements != null).SelectMany(x => x.Elements)?.Where(x =>
         {
-            if (x.Name.EndsWith("ScriptNode"))
-                return
-                    false; // special case, we never expose this, only the Runner can create an instance of this node
-
             if ((int)type == -1) // special case used by get variables, we want everything
                 return true;
             if (type == FlowType.Failure)

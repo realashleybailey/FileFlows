@@ -76,6 +76,7 @@ canvas {
     border-radius: 0.75rem;
     min-width:12rem;
     border:solid 3px transparent;
+    background: var(--base);
     &.Logic {
         border-color:var(--flow-logic);
     }

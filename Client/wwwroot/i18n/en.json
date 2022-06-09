@@ -13,6 +13,8 @@
     "No": "No",
     "Ok": "OK",
     "About": "About",
+    "Pause": "Pause Processing",
+    "Resume": "Resume Processing",
     "Add": "Add",
     "Edit": "Edit",
     "Duplicate":"Duplicate",

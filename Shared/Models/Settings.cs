@@ -56,6 +56,11 @@ public class Settings : FileFlowObject
     public string Version { get; set; }
 
     /// <summary>
+    /// Gets or sets if the system is paused
+    /// </summary>
+    public bool IsPaused { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of database to use
     /// </summary>
     public DatabaseType DbType { get; set; }

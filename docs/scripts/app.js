@@ -105,7 +105,7 @@ function prerpareMain(){
 function setSelectedMenuLink(url) {
     if(!url)
     {
-        let url = /(http(s)?:\/\/)([^\?&]+)($|\?)/.exec(window.location.href)[3];
+        url = /(http(s)?:\/\/)([^\?&]+)($|\?)/.exec(window.location.href)[3];
         if(!url)
             return;
     }

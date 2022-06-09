@@ -93,6 +93,9 @@ function captureLinks(container) {
     var links = container.querySelectorAll('a');
     for(let a of links) 
     {
+        if(a.closest('#markdown-toc'))
+            continue;
+            
         if(a.closest('.toc')){
             a.addEventListener('click', function(event) {
                 event.stopPropagation();

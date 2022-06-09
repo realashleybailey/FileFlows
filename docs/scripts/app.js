@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function()
         checkToggle(chk);
     }
     console.log('DOMContentLoaded');
-    prepareMain();
+    prepareContainer();
     setSelectedMenuLink();
 });
 
@@ -79,7 +79,7 @@ async function navigateTo(url){
         main.innerHTML = html;
         main.scrollTop = 0;
         window.history.pushState(previous, title, url);
-        prepareMain();
+        prepareContainer(main);
     }
     catch(err) 
     {
@@ -103,10 +103,9 @@ function captureLinks(container) {
     }
 }
 
-function prepareMain(){
-    let main = document.getElementById('main');
-    addCopyCodeButton(main);    
-    captureLinks(main);
+function prepareContainer(container){
+    addCopyCodeButton(container);    
+    captureLinks(container);
 }
 
 function setSelectedMenuLink(url) {

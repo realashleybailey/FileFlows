@@ -129,7 +129,7 @@ function setSelectedMenuLink(url) {
     for(let a of links){
         if(!a.href)
             continue;
-        let ahref = /http(s)?:\/\/[^\/]+\/(.*?)$/.exec(href)[2];
+        let ahref = /http(s)?:\/\/[^\/]+\/(.*?)$/.exec(a.href)[2];
         if(!ahref)
             continue;
         let li = a.closest('li');

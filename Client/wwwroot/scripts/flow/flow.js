@@ -385,7 +385,6 @@ window.ffFlow = {
             ffFlow.csharp.invokeMethodAsync("Translate", `Flow.Parts.${element.name}.Outputs.${output}`, part.model).then(result => {
                 if (!part.OutputLabels) part.OutputLabels = {};
                 part.OutputLabels[output] = result;
-                console.log('part.OutputLabels', part.OutputLabels);
                 let outputNode = document.getElementById(part.uid + '-output-' + output);
                 if (outputNode)
                     outputNode.setAttribute('title', result);

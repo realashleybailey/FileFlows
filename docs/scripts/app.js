@@ -129,9 +129,12 @@ function setSelectedMenuLink(url) {
     for(let a of links){
         if(!a.href)
             continue;
+        let ahref = /http(s)?:\/\/[^\/]+\/(.*?)$/.exec(href)[2];
+        if(!ahref)
+            continue;
         let li = a.closest('li');
         li.classList.remove('selected');
-        if(!found && url.indexOf(a.href.toLowerCase()) >= 0){
+        if(!found && url.indexOf(ahref.toLowerCase()) >= 0){
             console.log('selected page found!', a, li);
             li.classList.add('selected');
             found = true;

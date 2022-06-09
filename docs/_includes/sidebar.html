@@ -2,7 +2,8 @@
     <div class="pages">
         <h3>General</h3>
         <ul>
-        {% for page in site.pages %}
+        {% assign sorted_pages = site.pages | sort:"order" %}
+        {% for page in sorted_pages %}
             <li>
                 <a href="{{ page.permalink }}">{{ page.name }}</a>
             </li>
@@ -12,7 +13,8 @@
     <div class="guides">
         <h3>Guides</h3>
         <ul>
-        {% for page in site.guides %}            
+        {% assign sorted_guides = site.guides | sort:"order" %}
+        {% for page in sorted_guides %}            
             <li>
                 <a href="{{ page.permalink }}">{{ page.name }}</a>
             </li>

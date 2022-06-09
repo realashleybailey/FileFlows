@@ -3,7 +3,7 @@ title: Creating A Flow
 name: Creating A Flow
 permalink: /creating-a-flow
 layout: default
-toc: true
+order: 20
 ---
 
 A flow is the heart of File Flows, it a rule that defines what to do with a file as it is detected.

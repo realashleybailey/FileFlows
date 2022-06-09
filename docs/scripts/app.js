@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function()
         checkToggle(chk);
     }
     prerpareMain();
-
+    setSelectedMenuLink();
 });
 
 window.addEventListener('popstate', (event) => {
@@ -66,6 +66,7 @@ function addCopyCodeButton(){
 async function navigateTo(url){
     try
     {
+        setSelectedMenuLink(url);
         const resp = await fetch(url);
         let html = await resp.text();
         let title = /<h1>(.*?)<\/h1>/gs.exec(html)[1];
@@ -99,4 +100,27 @@ function captureLinks() {
 function prerpareMain(){
     addCopyCodeButton();    
     captureLinks();
+}
+
+function setSelectedMenuLink(url) {
+    if(!url)
+    {
+        let url = /(http(s)?:\/\/)([^\?&]+)($|\?)/.exec(window.location.href)[3];
+        if(!url)
+            return;
+    }
+    url = url.toLowerCase();
+
+    var links = document.querySelectorAll('.side-bar a');
+    for(let a of links){
+        if(!a.href)
+            continue;
+        let li = a.closest('li');
+        li.classList.remove('selected');
+        if(url.contains(a.href.toLowerCase())){
+            console.log('selected page found!', a);
+            li.classList.add('selected');
+        }
+    }
+
 }

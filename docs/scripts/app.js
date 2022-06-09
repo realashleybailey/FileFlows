@@ -91,8 +91,10 @@ function captureLinks(container) {
     if(!container)
         container = document;
     var links = container.querySelectorAll('a');
-    for(let a of links) {
-        
+    for(let a of links) 
+    {
+        if(a.closest('.toc'))
+            return;   
         if(!a.href || (a.href.startsWith('http') && a.href.indexOf('docs.fileflows.com') < 0))
             continue;
         a.addEventListener('click', function(event) {

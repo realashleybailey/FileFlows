@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function()
     for(let chk of checkboxes){
         checkToggle(chk);
     }
-    prerpareMain();
+    prepareMain();
     setSelectedMenuLink();
 });
 
@@ -76,6 +76,7 @@ async function navigateTo(url){
         main.innerHTML = html;
         main.scrollTop = 0;
         window.history.pushState(previous, title, url);
+        prepareMain();
     }
     catch(err) 
     {
@@ -97,7 +98,7 @@ function captureLinks() {
     }
 }
 
-function prerpareMain(){
+function prepareMain(){
     addCopyCodeButton();    
     captureLinks();
 }

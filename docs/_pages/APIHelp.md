@@ -3,6 +3,7 @@ title: API Help
 name: API Help
 permalink: /api-help
 layout: default
+toc: true
 ---
 
 API Help for FileFlows can be found off http://[server]:[port]/api/help.   

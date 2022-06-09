@@ -3,6 +3,7 @@ title: Flows
 name: Flows
 permalink: /flows
 layout: default
+toc: true
 ---
 
 This is where you configure a Flow that file will be processed against.

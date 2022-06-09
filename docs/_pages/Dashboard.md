@@ -3,6 +3,7 @@ title: Dashboard
 name: Dashboard
 permalink: /dashboard
 layout: default
+toc: true
 ---
 
 The Dashboard will show you what is currently processing.

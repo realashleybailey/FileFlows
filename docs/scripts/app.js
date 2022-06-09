@@ -99,7 +99,7 @@ function captureLinks(container) {
                 event.preventDefault();
                 tocLink(a.href);
             });
-            return;   
+            continue;   
         }
         if(!a.href || (a.href.startsWith('http') && a.href.indexOf('docs.fileflows.com') < 0))
             continue;

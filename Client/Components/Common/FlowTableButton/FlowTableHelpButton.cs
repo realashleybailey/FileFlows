@@ -24,9 +24,9 @@ namespace FileFlows.Client.Components.Common
         {
             string url = this.HelpUrl;            
             if (string.IsNullOrEmpty(HelpUrl))
-                url = "https://github.com/revenz/FileFlows/wiki";
+                url = "https://docs.fileflows.com";
             else if (url.ToLower().StartsWith("http") == false)
-                url = "https://github.com/revenz/FileFlows/wiki/" + url;
+                url = "https://docs.fileflows.com/" + url;
             await jsRuntime.InvokeVoidAsync("open", url, "_blank");
         }
     }

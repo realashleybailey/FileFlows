@@ -3,7 +3,7 @@ title: Dashboard
 name: Dashboard
 permalink: /dashboard
 layout: default
-order: 40
+order: 100
 ---
 
 The Dashboard will show you what is currently processing.

@@ -57,7 +57,7 @@ function Script(NumberParameter)
         });
 
         var result = await Editor.Open("Pages.Script", "Pages.Script.Title", fields, item, large: true,
-            saveCallback: Save, helpUrl: "https://github.com/revenz/FileFlows/wiki/Scripts");
+            saveCallback: Save, helpUrl: "https://docs.fileflows.com/scripts");
         
         return false;
     }

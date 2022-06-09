@@ -117,7 +117,7 @@ namespace FileFlows.Client.Pages
 
         private async Task OpenHelp()
         {
-            await jsRuntime.InvokeVoidAsync("open", "https://github.com/revenz/FileFlows/wiki/Settings", "_blank");
+            await jsRuntime.InvokeVoidAsync("open", "https://docs.fileflows.com/settings", "_blank");
         }
 
         private async Task TestDbConnection()

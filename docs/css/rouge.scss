@@ -33,7 +33,7 @@
     width: 2rem;
     height: 2rem;
     cursor: pointer;
-    &::before{
+    &:not(.copied)::before{
         font-family: "Font Awesome 5 Free";
         font-weight: 900;
         content: '\f0c5';
@@ -46,8 +46,20 @@
     }
     &.copied {        
         display: inline-block !important;
-        &::before {
+        &::after {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
             content: '\f00c';
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-size: 1.5rem;
+            color:#6c6c6c;
+
+        }
+        &::before {
+            content: 'Copied ';
         }
     }
 }

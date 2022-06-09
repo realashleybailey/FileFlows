@@ -1,9 +1,10 @@
 ---
 title: Video Nodes > Detect Black Bars
-permalink: /plugins/video-nodes/detect-black-bars
+permalink: /plugins/video-nodes/logical-nodes/detect-black-bars
 name: Detect Black Bars
 layout: default
 plugin: Video Nodes
+sub: Logical Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-film" name="Detect Black Bars" type="Logic" %}

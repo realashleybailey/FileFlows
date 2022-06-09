@@ -46,6 +46,8 @@
     }
     &.copied {        
         display: inline-block !important;
+        width:6rem;
+        color:#6c6c6c;
         &::after {
             font-family: "Font Awesome 5 Free";
             font-weight: 900;
@@ -59,7 +61,11 @@
 
         }
         &::before {
-            content: 'Copied ';
+            content: 'COPIED ';
+            margin-right: 0.5rem;
+            font-size:0.8rem;
+            position: relative;
+            bottom: 0.25rem;
         }
     }
 }

@@ -1,6 +1,7 @@
-remote_theme: jekyll-theme-midnight
 title: FileFlows Documentation
 description: Documentation for FileFlows
+plugins:
+  - jekyll-toc
 
 collections:
   pages:

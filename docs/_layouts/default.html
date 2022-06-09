@@ -24,10 +24,10 @@
                 <!-- content start -->
                 <h1>{{ page.title }}</h1>
                 <section class="content">
-                    {{ content }}
+                  {{ content | inject_anchors }}
                 </section>
                 <div class="toc">
-                  {% include toc.html html=content %}
+                  {{ content | toc_only }}
                 </div>
                 <footer>
                     &copy; 2022 FileFlows

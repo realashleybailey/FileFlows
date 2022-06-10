@@ -14,6 +14,6 @@ where
         dbFile.Type = 'FileFlows.Shared.Models.LibraryFile'
   and
         JSON_EXTRACT(dbFile.Data, '$.Status') = 1
-group by dbLib.Name
+group by dbLib.Name;
 
 END;

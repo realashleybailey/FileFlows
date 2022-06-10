@@ -16,8 +16,8 @@ if [[ "$FFNODE" == 'true' || "$FFNODE" == '1' || "$1" = '--node' ]]; then
 
     printf "Launching node\n"
     cd /app/Node
-    exec dotnet FileFlows.Node.dll --docker true
-
+    exec /root/.dotnet/dotnet FileFlows.Node.dll --docker true
+    
 else
 
     # check if there is an upgrade to apply
@@ -31,5 +31,5 @@ else
 
     printf "Launching server\n"
     cd /app/Server
-    exec dotnet FileFlows.Server.dll --urls=http://*:5000 --docker
+    exec /root/.dotnet/dotnet FileFlows.Server.dll --urls=http://*:5000 --docker
 fi

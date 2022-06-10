@@ -75,7 +75,7 @@ function Script(ArchiveFile, Pattern, SetWorkingFileToZip)
     let process = Flow.Execute({
         command: sevenZip,
 	argumentList: [
-	    a',
+	    'a',
 	    output,
 	    Pattern
     	]

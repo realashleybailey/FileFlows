@@ -177,5 +177,16 @@ footer {
     left:calc(50vw + (var(--max-width) / 2) + 3rem);
     ul {
         list-style: none;
+        margin:0;
+        padding:0;
+        a {
+            color:#808080;      
+            &:hover {
+                text-decoration: none;
+                color:var(--accent);
+                font-weight:bold;
+            }      
+        }
+
     }
 }

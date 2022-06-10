@@ -3,7 +3,7 @@ title: Basic Setup
 name: Basic Setup
 permalink: /basic-setup
 layout: default
-order: 10
+order: 510
 ---
 
 The basic setup of FileFlows requires

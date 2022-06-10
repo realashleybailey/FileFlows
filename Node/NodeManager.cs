@@ -98,10 +98,11 @@ public class NodeManager
 
         List<RegisterModelMapping> mappings = new List<RegisterModelMapping>
             {
-                new RegisterModelMapping
+                new()
                 {
                     Server = "ffmpeg",
-                    Local = windows ? Path.Combine(path, "Tools", "ffmpeg.exe") : "/usr/bin/ffmpeg"
+                    Local =  Globals.IsDocker ? "/usr/local/bin/ffmpeg" :
+                             windows ? Path.Combine(path, "Tools", "ffmpeg.exe") : "/usr/local/bin/ffmpeg"
                 }
             };
 

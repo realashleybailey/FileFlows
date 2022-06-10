@@ -3,7 +3,7 @@ title: Creating A Library
 name: Creating A Library
 permalink: /creating-a-library
 layout: default
-order: 30
+order: 530
 ---
 
 A library is a folder that FileFlows will monitor and search for files to process.   

@@ -672,33 +672,15 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet("shrinkage-groups")]
     public async Task<Dictionary<string, ShrinkageData>> ShrinkageGroups()
     {
-        var files = await GetDataList();
-        Dictionary<string, ShrinkageData> libraries = new ();
+        var libraries = DbHelper.UseMemoryCache ? await ShrinkageGroupsInMemory() : await ShrinkageGroupsDb();
         ShrinkageData total = new ShrinkageData();
-        foreach (var file in files)
+        foreach (var lib in libraries)
         {
-            if (file.Status != FileStatus.Processed || file.OriginalSize == 0 || file.FinalSize == 0)
-                continue;
-            total.FinalSize += file.FinalSize;
-            total.OriginalSize += file.OriginalSize;
-            total.Items++;
-            if (libraries.ContainsKey(file.Library.Name) == false)
-            {
-                libraries.Add(file.Library.Name, new ShrinkageData()
-                {
-                    FinalSize = file.FinalSize,
-                    OriginalSize = file.OriginalSize
-                });
-            }
-            else
-            {
-
-                libraries[file.Library.Name].OriginalSize += file.OriginalSize;
-                libraries[file.Library.Name].FinalSize += file.FinalSize;
-                libraries[file.Library.Name].Items++;
-            }
+            total.FinalSize += lib.Value.FinalSize;
+            total.OriginalSize += lib.Value.OriginalSize;
+            total.Items += lib.Value.Items;
         }
-
+        
         if (libraries.Count > 5)
         {
             ShrinkageData other = new ShrinkageData();
@@ -711,6 +693,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 other.OriginalSize += sd.Value.OriginalSize;
                 libraries.Remove(sd.Key);
             }
+
             libraries.Add("###OTHER###", other);
         }
 #if (DEBUG)
@@ -733,10 +716,47 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             }
         }
 #endif
-        if(libraries.ContainsKey("###TOTAL###") == false) // so unlikely, only if they named a library this, but just incase they did
+        if (libraries.ContainsKey("###TOTAL###") ==
+            false) // so unlikely, only if they named a library this, but just incase they did
             libraries.Add("###TOTAL###", total);
         return libraries;
     }
+
+    /// <summary>
+    /// Get ShrinkageGroup data from a stored procedure
+    /// </summary>
+    /// <returns>the shrinkage group date</returns>
+    private Task<Dictionary<string, ShrinkageData>> ShrinkageGroupsDb() => DbHelper.GetShrinkageGroups();
+
+    private async Task<Dictionary<string, ShrinkageData>> ShrinkageGroupsInMemory()
+    {
+        var files = await GetDataList();
+        Dictionary<string, ShrinkageData> libraries = new();
+        foreach (var file in files)
+        {
+            if (file.Status != FileStatus.Processed || file.OriginalSize == 0 || file.FinalSize == 0)
+                continue;
+            if (libraries.ContainsKey(file.Library.Name) == false)
+            {
+                libraries.Add(file.Library.Name, new ShrinkageData()
+                {
+                    FinalSize = file.FinalSize,
+                    OriginalSize = file.OriginalSize
+                });
+            }
+            else
+            {
+
+                libraries[file.Library.Name].OriginalSize += file.OriginalSize;
+                libraries[file.Library.Name].FinalSize += file.FinalSize;
+                libraries[file.Library.Name].Items++;
+            }
+        }
+
+        return libraries;
+
+    }
+
     internal async Task UpdateFlowName(Guid uid, string name)
     {
         var libraryFiles = await GetDataList();

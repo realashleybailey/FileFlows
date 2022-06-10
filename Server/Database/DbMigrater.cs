@@ -22,6 +22,11 @@ public class DbMigrater
 
             using var source = GetDatabase(sourceConnection);
 
+            if (destinationConnection.Contains("sqlite"))
+            {
+                // move the db if it exists so we can create a new one
+                SqliteDbManager.MoveFileFromConnectionString(destinationConnection);
+            }
             var destDbManager = DbManager.GetManager(destinationConnection);
             destDbManager.CreateDb(recreate: true, insertInitialData: false).Wait();
             using var dest = GetDatabase(destinationConnection);

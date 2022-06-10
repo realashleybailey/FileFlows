@@ -203,6 +203,16 @@ public class DbHelper
         Manager.GetLibraryFiles(status, start, max, TimeHelper.GetCurrentQuarter(), nodeUid);
 
     /// <summary>
+    /// Gets the shrinkage group data
+    /// </summary>
+    /// <returns>the shrinkage group data</returns>
+    public static async Task<Dictionary<string, ShrinkageData>> GetShrinkageGroups()
+    {
+        var data = await Manager.GetShrinkageGroups();
+        return data.OrderByDescending(x => x.OriginalSize).ToDictionary(x => x.Library, x => x);
+    }
+
+    /// <summary>
     /// Gets the failure flow for a particular library
     /// </summary>
     /// <param name="libraryUid">the UID of the library</param>

@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Controllers
+﻿using FileFlows.Server.Helpers;
+
+namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using FileFlows.Shared.Models;
@@ -31,9 +33,19 @@
         public async Task<StatusModel> Get()
         {
             var status = new StatusModel();
-            var lfController = new LibraryFileController();
-            status.queue = (await lfController.GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
-            status.processed = (await lfController.GetAll(FileStatus.Processed))?.Count() ?? 0;
+            if (DbHelper.UseMemoryCache)
+            {
+                var lfController = new LibraryFileController();
+                status.queue = (await lfController.GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
+                status.processed = (await lfController.GetAll(FileStatus.Processed))?.Count() ?? 0;
+            }
+            else
+            {
+                var lfOverview = await DbHelper.GetLibraryFileOverview();
+                status.queue = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Unprocessed)?.Count ?? 0;
+                status.processed = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Processed)?.Count ?? 0;
+            }
+
             var workerController = new WorkerController(null);
             var executors = workerController.GetAll()?.ToList() ?? new List<FlowExecutorInfo>();
             status.processing = executors.Count;

@@ -20,7 +20,19 @@ public class SqliteDbManager : DbManager
     {
         // Data Source={DbFilename};Version=3;
         ConnectionString = connectionString;
-        DbFilename = Regex.Match(connectionString, @"(?<=(Data Source=))[^;]+").Value;
+        DbFilename = GetFilenameFromConnectionString(connectionString);
+    }
+
+    /// <summary>
+    /// Gets the filename from a connection string
+    /// </summary>
+    /// <param name="connectionString">the connection string</param>
+    /// <returns>the filename</returns>
+    private static string GetFilenameFromConnectionString(string connectionString)
+    {
+        if (string.IsNullOrWhiteSpace(connectionString))
+            return string.Empty;
+        return Regex.Match(connectionString, @"(?<=(Data Source=))[^;]+")?.Value ?? string.Empty;
     }
 
     /// <summary>
@@ -35,7 +47,7 @@ public class SqliteDbManager : DbManager
     /// </summary>
     /// <param name="dbFile">the filename of the sqlite db file</param>
     /// <returns>a sqlite connection string</returns>
-    public static string GetConnetionString(string dbFile) => $"Data Source={dbFile};Version=3";
+    public static string GetConnetionString(string dbFile) => $"Data Source={dbFile};Version=3;PRAGMA journal_mode=WAL;";
 
     /// <summary>
     /// Gets if the database manager should use a memory cache
@@ -95,7 +107,7 @@ public class SqliteDbManager : DbManager
     /// <returns>true if successfully created</returns>
     protected override bool CreateDatabaseStructure()
     {
-        using var con = new SQLiteConnection($"Data Source={DbFilename};Version=3;");
+        using var con = new SQLiteConnection(GetConnetionString(DbFilename));
         con.Open();
         try
         {
@@ -132,5 +144,27 @@ public class SqliteDbManager : DbManager
         throw new NotImplementedException();
     }
 
+    public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
+
+    /// <summary>
+    /// Looks to see if the file in the specified connection string exists, and if so, moves it
+    /// </summary>
+    /// <param name="connectionString">The connection string</param>
+    public static void MoveFileFromConnectionString(string connectionString)
+    {
+        string filename = GetFilenameFromConnectionString(connectionString);
+        if (string.IsNullOrWhiteSpace(filename))
+            return;
+        
+        if (File.Exists(filename) == false)
+            return;
+        
+        string dest = filename + ".backup";
+        File.Move(filename, dest, true);
+    }
 }

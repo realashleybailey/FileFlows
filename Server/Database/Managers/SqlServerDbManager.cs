@@ -124,6 +124,14 @@ public class SqlServerDbManager: DbManager
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
     
+    /// <summary>
+    /// Gets the shrinkage group data
+    /// </summary>
+    /// <returns>the shrinkage group data</returns>
+    public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
+    {
+        throw new NotImplementedException();
+    }
 
     /// <summary>
     /// Gets the failure flow for a particular library

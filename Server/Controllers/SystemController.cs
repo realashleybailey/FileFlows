@@ -110,11 +110,29 @@ public class SystemController:Controller
     }
 
     /// <summary>
-    /// Restarts FileFLow server
+    /// Restarts FileFlows server
     /// </summary>
     [HttpPost("restart")]
     public void Restart()
     {
+        if (Program.Docker == false)
+        {
+            string script = Path.Combine(DirectoryHelper.BaseDirectory, "Server",
+                "restart." + (Globals.IsWindows ? "bat" : "sh"));
+            if (Globals.IsLinux)
+                FileHelper.MakeExecutable(script);
+            
+            var psi = new ProcessStartInfo(script);
+            psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
+            psi.WorkingDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Server");
+            psi.UseShellExecute = true;
+            psi.CreateNoWindow = true;
+#if(!DEBUG)
+            Process.Start(psi);
+#endif
+        }
+
+        // docker is easy, just stop it and it should auto restart
         WorkerManager.StopWorkers();
         Environment.Exit(99);
     }

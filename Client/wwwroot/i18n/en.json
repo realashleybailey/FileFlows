@@ -361,6 +361,10 @@
           "NoUser":"User is required",
           "NoPassword":"Password is required",
           "TestSuccess":"Successfully connected to database"
+        },
+        "Restart":{
+          "Title":"Restart FileFlows",
+          "Message":"Are you sure you want to restart FileFlows?\n\nEnsure you have saved your settings and no flows are executing."
         }
       },
       "Fields": {

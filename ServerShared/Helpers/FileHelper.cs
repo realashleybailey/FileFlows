@@ -1,4 +1,6 @@
-﻿namespace FileFlows.ServerShared.Helpers;
+﻿using System.Diagnostics;
+
+namespace FileFlows.ServerShared.Helpers;
 
 /// <summary>
 /// A helper for interacting with files 
@@ -59,6 +61,48 @@ public class FileHelper
         finally
         {
             GC.Collect();
+        }
+    }
+    
+    
+    /// <summary>
+    /// Makes a file executable on linux
+    /// </summary>
+    /// <param name="file">the file to make executable</param>
+    /// <returns>if successful or not</returns>
+    public static bool MakeExecutable(string file)
+    {
+        try
+        {
+            var fi = new FileInfo(file);
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo("/bin/bash", $"-c \"chmod +x {fi.Name}\"")
+            {
+                WorkingDirectory = fi.DirectoryName,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            process.Start();
+            string output = process.StandardError.ReadToEnd();
+            Console.WriteLine(output);
+            string error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (process.ExitCode == 0)
+                return true;
+            Logger.Instance?.ELog($"Failed making executable:" + process.StartInfo.FileName,
+                process.StartInfo.Arguments + Environment.NewLine + output);
+            if (string.IsNullOrWhiteSpace(error) == false)
+                Logger.Instance?.ELog($"Making Executable error output:" + output);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance?.ELog($"Failed making executable: " + file + " => " + ex.Message);
+            return false;
         }
     }
 }

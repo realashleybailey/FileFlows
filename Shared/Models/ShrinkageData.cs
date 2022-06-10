@@ -6,6 +6,11 @@
 public class ShrinkageData
 {
     /// <summary>
+    /// Gets or sets the name of the library for this data
+    /// </summary>
+    public string Library { get; set; }
+
+    /// <summary>
     /// Gets or sets the original size of the library files
     /// in the library
     /// </summary>

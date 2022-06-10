@@ -49,11 +49,14 @@
                         <InputText @bind-Value=@Model.DbName Label="Pages.Settings.Fields.Database.Name" Validators=@RequiredValidator/>
                         <InputText @bind-Value=@Model.DbUser Label="Pages.Settings.Fields.Database.User" Validators=@RequiredValidator/>
                         <InputPassword @bind-Value=@Model.DbPassword Label="Pages.Settings.Fields.Database.Password" Validators=@RequiredValidator/>
-                        <div class="btn-test">
-                            <button class="btn" @onclick=@TestDbConnection>@lblTest</button>
-                            <button class="btn" @onclick=@Restart>@lblRestart</button>
-                        </div>
                     }
+                    <div class="btn-test">
+                        @if (Model.DbType != DatabaseType.Sqlite)
+                        {
+                            <button class="btn" @onclick=@TestDbConnection>@lblTest</button>
+                        }
+                        <button class="btn" @onclick=@Restart>@lblRestart</button>
+                    </div>
                 </FlowTab>
                 <FlowTab Title=@lblLogging>
                     <InputSwitch @bind-Value="@Model.LogQueueMessages" Label="Pages.Settings.Fields.LogQueueMessages"/>

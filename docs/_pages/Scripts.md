@@ -3,7 +3,7 @@ title: Scripts
 name: Scripts
 permalink: /scripts
 layout: default
-order: 150
+order: 160
 ---
 
 Scripts allow you to define Javascript functions that can be re-used as user-created Nodes in a Flow.

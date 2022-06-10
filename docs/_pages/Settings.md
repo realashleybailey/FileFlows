@@ -3,7 +3,7 @@ title: Settings
 name: Settings
 permalink: /settings
 layout: default
-order: 180
+order: 190
 ---
 
 These are the general system settings

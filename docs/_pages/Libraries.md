@@ -3,7 +3,7 @@ title: Libraries
 name: Libraries
 permalink: /libraries
 layout: default
-order: 130
+order: 140
 ---
 
 Libraries are where the files are stored in the system and the directories that will be scanned for files.

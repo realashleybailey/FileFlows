@@ -3,7 +3,7 @@ title: Flows
 name: Flows
 permalink: /flows
 layout: default
-order: 50
+order: 130
 ---
 
 This is where you configure a Flow that file will be processed against.

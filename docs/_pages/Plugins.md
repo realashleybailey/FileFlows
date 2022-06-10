@@ -3,7 +3,7 @@ title: Plugins
 name: Plugins
 permalink: /plugins
 layout: default
-order: 160
+order: 170
 ---
 
 Plugins are we you can extend the functionality of FileFlows.

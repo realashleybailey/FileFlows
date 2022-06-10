@@ -3,7 +3,7 @@ title: Tools
 name: Tools
 permalink: /tools
 layout: default
-order: 170
+order: 180
 ---
 
 Tools are third party application installed in the system which plugin nodes can use to extend functionality.

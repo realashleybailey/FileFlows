@@ -1,3 +1,5 @@
+using FileFlows.Client.Components.Dialogs;
+
 namespace FileFlows.Client.Pages
 {
     using FileFlows.Shared.Helpers;
@@ -34,7 +36,7 @@ namespace FileFlows.Client.Pages
         private List<ListOption> DbTypes = new()
         {
             new() { Label = "SQLite", Value = DatabaseType.Sqlite },
-            new() { Label = "SQL Server", Value = DatabaseType.SqlServer },
+            //new() { Label = "SQL Server", Value = DatabaseType.SqlServer }, // not finished yet
             new() { Label = "MySQL", Value = DatabaseType.MySql }
         };
 
@@ -172,7 +174,12 @@ namespace FileFlows.Client.Pages
 
         async void Restart()
         {
-            await HttpHelper.Post("/api/system/restart");
+            var confirmed = await Confirm.Show(
+                Translater.Instant("Pages.Settings.Messages.Restart.Title"),
+                Translater.Instant("Pages.Settings.Messages.Restart.Message")
+            );
+            if(confirmed)
+                await HttpHelper.Post("/api/system/restart");
         }
     }
 }

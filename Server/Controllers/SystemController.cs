@@ -115,6 +115,22 @@ public class SystemController:Controller
     [HttpPost("restart")]
     public void Restart()
     {
+        if (Program.Docker == false)
+        {
+            string script = Path.Combine(DirectoryHelper.BaseDirectory,
+                "restart." + (Globals.IsWindows ? "bat" : "sh"));
+            if (Globals.IsLinux)
+                FileHelper.MakeExecutable(script);
+            
+            var psi = new ProcessStartInfo(script);
+            psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
+            psi.WorkingDirectory = DirectoryHelper.BaseDirectory;
+            psi.UseShellExecute = true;
+            psi.CreateNoWindow = true;
+            Process.Start(psi);
+        }
+
+        // docker is easy, just stop it and it should auto restart
         WorkerManager.StopWorkers();
         Environment.Exit(99);
     }

@@ -1,3 +1,4 @@
+using FileFlows.ServerShared.Helpers;
 using FileFlows.Shared.Helpers;
 
 namespace FileFlows.ServerShared.Workers;
@@ -178,7 +179,7 @@ public abstract class UpdaterWorker : Worker
 
             Logger.Instance?.ILog($"{UpdaterName}: Update script found: " + updateFile);
 
-            if (Globals.IsLinux && MakeExecutable(updateFile) == false)
+            if (Globals.IsLinux && FileHelper.MakeExecutable(updateFile) == false)
             {
                 Logger.Instance?.WLog($"{UpdaterName}: Failed to make update script executable");
                 return string.Empty;
@@ -195,42 +196,6 @@ public abstract class UpdaterWorker : Worker
             //    return string.Empty; // just ignore this error, likely due ot it not being configured yet.
             Logger.Instance?.ELog($"{UpdaterName}: Failed checking for update: " + ex.Message);
             return string.Empty;
-        }
-    }
-
-    private bool MakeExecutable(string file)
-    {
-        try
-        {
-            var fi = new FileInfo(file);
-            using var process = new Process();
-            process.StartInfo = new ProcessStartInfo("/bin/bash", $"-c \"chmod +x {fi.Name}\"")
-            {
-                WorkingDirectory = fi.DirectoryName,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            process.Start();
-            string output = process.StandardError.ReadToEnd();
-            Console.WriteLine(output);
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            if (process.ExitCode == 0)
-                return true;
-            Logger.Instance?.ELog($"{UpdaterName}: Failed making executable:" + process.StartInfo.FileName,
-                process.StartInfo.Arguments + Environment.NewLine + output);
-            if (string.IsNullOrWhiteSpace(error) == false)
-                Logger.Instance?.ELog($"{UpdaterName}: Error output:" + output);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance?.ELog($"{UpdaterName}: Failed making executable: " + file + " => " + ex.Message);
-            return false;
         }
     }
 

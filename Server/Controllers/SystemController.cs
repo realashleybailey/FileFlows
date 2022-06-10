@@ -127,7 +127,9 @@ public class SystemController:Controller
             psi.WorkingDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Server");
             psi.UseShellExecute = true;
             psi.CreateNoWindow = true;
+#if(!DEBUG)
             Process.Start(psi);
+#endif
         }
 
         // docker is easy, just stop it and it should auto restart

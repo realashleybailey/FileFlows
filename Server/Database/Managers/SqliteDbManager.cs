@@ -47,7 +47,7 @@ public class SqliteDbManager : DbManager
     /// </summary>
     /// <param name="dbFile">the filename of the sqlite db file</param>
     /// <returns>a sqlite connection string</returns>
-    public static string GetConnetionString(string dbFile) => $"Data Source={dbFile};Version=3";
+    public static string GetConnetionString(string dbFile) => $"Data Source={dbFile};Version=3;PRAGMA journal_mode=WAL;";
 
     /// <summary>
     /// Gets if the database manager should use a memory cache
@@ -107,7 +107,7 @@ public class SqliteDbManager : DbManager
     /// <returns>true if successfully created</returns>
     protected override bool CreateDatabaseStructure()
     {
-        using var con = new SQLiteConnection($"Data Source={DbFilename};Version=3;");
+        using var con = new SQLiteConnection(GetConnetionString(DbFilename));
         con.Open();
         try
         {

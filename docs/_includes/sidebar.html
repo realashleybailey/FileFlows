@@ -35,9 +35,11 @@
                                 <input id="col-{{ plugin.name  | replace: " ", "" }}-{{ node.name  | replace: " ", "" }}" class="toggle" type="checkbox" onchange="toggleCollapse(event)">
                                 <label for="col-{{ plugin.name  | replace: " ", "" }}-{{ node.name  | replace: " ", "" }}" class="lbl-toggle">{{ node.name }}</label>   
                                 <ul class="plugin-node-subs collapsible-content">
+                                    {% if node.nocontent != true %}
                                     <li class="plugin-node-sub">
                                         <a href="{{ node.permalink }}">{{ node.name }}</a>   
                                     </li>
+                                    {% endif %}
                                     {% for sub in site.plugins %} 
                                         {% if sub.plugin == plugin.name and node.name == sub.sub %}
                                             <li class="plugin-node-sub">

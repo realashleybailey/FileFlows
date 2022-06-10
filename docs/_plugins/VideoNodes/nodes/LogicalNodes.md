@@ -4,4 +4,5 @@ name: Logical Nodes
 layout: default
 plugin: Video Nodes
 nocontent: true
+subs: true
 ---

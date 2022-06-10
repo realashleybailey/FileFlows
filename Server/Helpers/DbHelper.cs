@@ -208,7 +208,6 @@ public class DbHelper
     /// <returns>the shrinkage group data</returns>
     public static async Task<Dictionary<string, ShrinkageData>> GetShrinkageGroups()
     {
-        Logger.Instance.ILog("Getting Shrinkage Group from Stored Procedure");
         var data = await Manager.GetShrinkageGroups();
         return data.OrderByDescending(x => x.OriginalSize).ToDictionary(x => x.Library, x => x);
     }

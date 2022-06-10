@@ -11,7 +11,6 @@ taskkill /PID %2
 
 echo.
 echo Starting FileFlows Server
-cd Server
 start dotnet FileFlows.Server.dll
 
 :Done

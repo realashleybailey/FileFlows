@@ -4,4 +4,4 @@ if [ "$1" != "docker" ]; then
   kill %1
 fi
 
-./run-server.sh
+../run-server.sh

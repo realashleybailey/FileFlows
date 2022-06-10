@@ -110,21 +110,21 @@ public class SystemController:Controller
     }
 
     /// <summary>
-    /// Restarts FileFLow server
+    /// Restarts FileFlows server
     /// </summary>
     [HttpPost("restart")]
     public void Restart()
     {
         if (Program.Docker == false)
         {
-            string script = Path.Combine(DirectoryHelper.BaseDirectory,
+            string script = Path.Combine(DirectoryHelper.BaseDirectory, "Server",
                 "restart." + (Globals.IsWindows ? "bat" : "sh"));
             if (Globals.IsLinux)
                 FileHelper.MakeExecutable(script);
             
             var psi = new ProcessStartInfo(script);
             psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
-            psi.WorkingDirectory = DirectoryHelper.BaseDirectory;
+            psi.WorkingDirectory = Path.Combine(DirectoryHelper.BaseDirectory, "Server");
             psi.UseShellExecute = true;
             psi.CreateNoWindow = true;
             Process.Start(psi);

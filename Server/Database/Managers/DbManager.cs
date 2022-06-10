@@ -654,7 +654,7 @@ public abstract class DbManager
     protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
     {
         Dictionary<string, string> scripts = new();
-        foreach (string script in new[] { "GetLibraryFiles" })
+        foreach (string script in new[] { "GetLibraryFiles", "GetShrinkageData" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
             scripts.Add(script, sql);
@@ -678,6 +678,13 @@ public abstract class DbManager
     /// <param name="nodeUid">optional UID of node to limit results for</param>
     /// <returns>an enumerable of library files</returns>
     public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid);
+
+
+    /// <summary>
+    /// Gets the shrinkage group data
+    /// </summary>
+    /// <returns>the shrinkage group data</returns>
+    public abstract Task<IEnumerable<ShrinkageData>> GetShrinkageGroups();
 
     /// <summary>
     /// Gets an item from the database by it's name

@@ -125,6 +125,16 @@ public class MySqlDbManager: DbManager
     }
 
     /// <summary>
+    /// Gets the shrinkage group data
+    /// </summary>
+    /// <returns>the shrinkage group data</returns>
+    public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
+    {
+        using var db = GetDb();
+        return await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
+    }
+
+    /// <summary>
     /// Gets the failure flow for a particular library
     /// </summary>
     /// <param name="libraryUid">the UID of the library</param>

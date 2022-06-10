@@ -1,7 +1,7 @@
 ---
 title: Files
 name: Files
-permalink: /files
+permalink: /library-files
 layout: default
 order: 120
 ---

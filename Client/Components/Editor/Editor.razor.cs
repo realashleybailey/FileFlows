@@ -443,7 +443,7 @@ namespace FileFlows.Client.Components
         {
             if (string.IsNullOrWhiteSpace(HelpUrl))
                 return;
-            _ = jsRuntime.InvokeVoidAsync("open", HelpUrl, "_blank");
+            _ = jsRuntime.InvokeVoidAsync("open", HelpUrl.ToLower(), "_blank");
         }
     }
 }

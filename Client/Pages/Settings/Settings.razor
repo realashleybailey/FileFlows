@@ -24,8 +24,7 @@
         <div class="settings">
             
             <FlowTabs>
-                <FlowTab Title="@lblGeneral">
-                    <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry"/>
+                <FlowTab Title="@lblUpdates" Visible="@LicensedFor("AutoUpdates")">
                     @if (LicensedFor("AutoUpdates"))
                     {
                         <InputButton Label="Pages.Settings.Fields.CheckForUpdateNow" Text="@lblCheckNow"  OnClick=@CheckForUpdateNow />
@@ -45,6 +44,10 @@
                     <hr />
                     <InputSchedule @bind-Value="@InternalProcessingNode.Schedule" Label="Pages.Settings.Fields.InternalProcessingNode.Schedule" />
                 </FlowTab>
+                <FlowTab Title=@lblLogging>
+                    <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry"/>
+                    <InputSwitch @bind-Value="@Model.LogQueueMessages" Label="Pages.Settings.Fields.LogQueueMessages"/>
+                </FlowTab>
                 <FlowTab Title="@lblDatabase" Visible="@ShowExternalDatabase">
                     <p class="box info">@lblDbDescription</p>
                     <InputSelect @bind-Value="@DbType" Options=@DbTypes Label="Pages.Settings.Fields.Database.Type" AllowClear="false" />
@@ -63,10 +66,7 @@
                         <button class="btn" @onclick=@Restart>@lblRestart</button>
                     </div>
                 </FlowTab>
-                <FlowTab Title=@lblLogging>
-                    <InputSwitch @bind-Value="@Model.LogQueueMessages" Label="Pages.Settings.Fields.LogQueueMessages"/>
-                </FlowTab>
-                <FlowTab Title="@lblAdvanced">
+                <FlowTab Title="@lblAdvanced" Visible="@IsLicensed">
                     <InputTextAreaList @bind-Value="@Model.PluginRepositoryUrls" Label="Pages.Settings.Fields.PluginRepositoryUrls" />
                 </FlowTab>
                 <FlowTab Title="@lblLicense">

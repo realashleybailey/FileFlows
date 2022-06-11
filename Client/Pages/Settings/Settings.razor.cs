@@ -24,7 +24,7 @@ public partial class Settings : ComponentBase
     private bool IsSaving { get; set; }
 
     private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblLogging, 
-        lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblRestart, lblLicense, 
+        lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblRestart, lblLicense, lblUpdates, 
         lblCheckNow;
 
     private SettingsUiModel Model { get; set; } = new ();
@@ -64,6 +64,7 @@ public partial class Settings : ComponentBase
         lblLicense = Translater.Instant("Labels.License");
         lblGeneral = Translater.Instant("Pages.Settings.Labels.General");
         lblNode = Translater.Instant("Pages.Settings.Labels.InternalProcessingNode");
+        lblUpdates = Translater.Instant("Pages.Settings.Labels.Updates");
         lblDatabase = Translater.Instant("Pages.Settings.Labels.Database");
         lblInternalProcessingNodeDescription = Translater.Instant("Pages.Settings.Fields.InternalProcessingNode.Description");
         lblDbDescription = Translater.Instant("Pages.Settings.Fields.Database.Description");
@@ -191,8 +192,10 @@ public partial class Settings : ComponentBase
             Translater.Instant("Pages.Settings.Messages.Restart.Title"),
             Translater.Instant("Pages.Settings.Messages.Restart.Message")
         );
-        if(confirmed)
-            await HttpHelper.Post("/api/system/restart");
+        if (confirmed == false)
+            return;
+        await Save();
+        await HttpHelper.Post("/api/system/restart");
     }
 
     private bool IsLicensed => string.IsNullOrEmpty(Model?.LicenseStatus) == false && Model.LicenseStatus != "Unlicensed" && Model.LicenseStatus != "Invalid";

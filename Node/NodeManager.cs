@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using FileFlows.ServerShared.Helpers;
+using FileFlows.ServerShared.Workers;
 
 namespace FileFlows.Node;
 
@@ -82,7 +83,7 @@ public class NodeManager
                 }
                 return false;
             }
-        }, updater);
+        }, updater, new LogFileCleaner());
     }
 
     

@@ -71,11 +71,6 @@ public class Settings : FileFlowObject
     public string LicenseKey { get; set; }
 
     /// <summary>
-    /// Gets or sets the license code
-    /// </summary>
-    public string LicenseCode { get; set; }
-
-    /// <summary>
     /// Gets the license flags for the user
     /// </summary>
     public string LicenseFlags { get; set; }

@@ -1,3 +1,4 @@
+using FileFlows.Server;
 using FileFlows.Server.Controllers;
 
 namespace FileFlows.ServerShared.Helpers;
@@ -22,8 +23,7 @@ class LicenseHelper
         {
             try
             {
-                var settings = new SettingsController().Get().Result;
-                licenseCode = settings?.LicenseCode;
+                licenseCode = AppSettings.Instance.LicenseCode;
             }
             catch (Exception)
             {
@@ -44,8 +44,7 @@ class LicenseHelper
     /// <returns>the amount of nodes this user is licensed for</returns>
     internal static int GetLicensedProcessingNodes()
     {
-        var settings = new SettingsController().Get().Result;
-        var license = License.FromCode(settings?.LicenseCode);
+        var license = License.FromCode(AppSettings.Instance.LicenseCode);
         if (license == null)
             return 2;
         if (license.ExpirationDateUtc < DateTime.UtcNow)

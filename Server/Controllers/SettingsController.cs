@@ -68,14 +68,12 @@ public class SettingsController : Controller
     public async Task<Settings> GetUi()
     {
         var settings = await Get();
-        var license = License.FromCode(settings.LicenseCode);
+        var license = License.FromCode(AppSettings.Instance.LicenseCode);
         if (license.Status == LicenseStatus.Unlicensed && string.IsNullOrWhiteSpace(settings.LicenseKey) == false)
             license.Status = LicenseStatus.Invalid;
         // clone it so we can remove some properties we dont want passed to the UI
         string json = JsonSerializer.Serialize(settings);
         var cloned = JsonSerializer.Deserialize<Settings>(json);
-        cloned.LicenseCode = null;
-        
         await SetLicenseFields(cloned, license);
         return cloned;
     }
@@ -116,7 +114,7 @@ public class SettingsController : Controller
     private async Task SetLicenseFields(Settings settings, License license)
     {
         settings.LicenseFlags = license.Flags.ToString();
-        settings.LicenseProcessingNodes = await License_ProcessingNodes(license);
+        settings.LicenseProcessingNodes = LicenseHelper.GetLicensedProcessingNodes();
         settings.LicenseExpiryDate = license.ExpirationDateUtc.ToLocalTime();
         settings.LicenseStatus = license.Status.ToString();
     }
@@ -136,16 +134,15 @@ public class SettingsController : Controller
         model.DateCreated = settings.DateCreated;
         model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         model.IsDocker = Program.Docker;
-        if (model.LicenseEmail?.EmptyAsNull() != settings.LicenseCode?.EmptyAsNull() ||
-            model.LicenseKey?.EmptyAsNull() != settings.LicenseKey?.EmptyAsNull())
+        if (model.LicenseEmail?.EmptyAsNull() != AppSettings.Instance.LicenseEmail?.EmptyAsNull() ||
+            model.LicenseKey?.EmptyAsNull() != AppSettings.Instance.LicenseKey?.EmptyAsNull())
         {
             // new license, validate it
             var licResult = await LicenseValidatorWorker.ValidateLicense(model.LicenseEmail, model.LicenseKey);
-            model.LicenseCode = licResult.LicenseCode;
-        }
-        else
-        {
-            model.LicenseCode = settings.LicenseCode;
+            AppSettings.Instance.LicenseKey = model.LicenseKey;
+            AppSettings.Instance.LicenseEmail = model.LicenseEmail;
+            AppSettings.Instance.LicenseCode = licResult.LicenseCode;
+            AppSettings.Instance.Save();
         }
 
         var newConnectionString = GetConnectionString(model, model.DbType);
@@ -204,44 +201,6 @@ public class SettingsController : Controller
                 ?.EmptyAsNull() ?? "OK";
         
         return "Unsupported database type";
-    }
-
-    /// <summary>
-    /// Gets if licensed to use an external database
-    /// </summary>
-    /// <param name="license">[Optional] license to use</param>
-    /// <returns>if licensed to use an external database</returns>
-    internal async Task<bool> License_ExternalDatabase(License license = null)
-    {
-        if (license == null)
-        {
-            var settings = await Get();
-             license = License.FromCode(settings.LicenseCode);
-        }
-
-        if (license?.Status != LicenseStatus.Valid || license.ExpirationDateUtc < DateTime.UtcNow)
-            return false;
-        return (license.Flags & LicenseFlags.ExternalDatabase) == LicenseFlags.ExternalDatabase;
-    }
-
-    /// <summary>
-    /// Gets how many processing nodes the user is licensed for
-    /// </summary>
-    /// <param name="license">[Optional] license to use</param>
-    /// <returns>how many processing nodes the user is licensed for</returns>
-    internal async Task<int> License_ProcessingNodes(License license = null)
-    {
-        if (license == null)
-        {
-            var settings = await Get();
-            license = License.FromCode(settings.LicenseCode);
-        }
-
-        if (license?.Status != LicenseStatus.Valid || license.ExpirationDateUtc < DateTime.UtcNow)
-            return 2;
-        if (license?.ProcessingNodes < 2)
-            return 2;
-        return license.ProcessingNodes;
     }
 
     /// <summary>

@@ -26,12 +26,12 @@ class LicenseValidatorWorker : Worker
     {
         var controller = new SettingsController();
         var settings = controller.Get().Result;
-        ValidateLicense(settings.LicenseEmail, settings.LicenseKey);
-
-        if (string.IsNullOrEmpty(settings.LicenseCode))
+        var result = ValidateLicense(settings.LicenseEmail, settings.LicenseKey).Result;
+        if (AppSettings.Instance.LicenseCode != result.LicenseCode)
         {
+            AppSettings.Instance.LicenseCode = result.LicenseCode;
+            AppSettings.Instance.Save();
         }
-        //controller.UpdateLicenseCode(string.Empty);
     }
     
     /// <summary>

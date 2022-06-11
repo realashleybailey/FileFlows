@@ -138,8 +138,7 @@ public class Program
             AppSettings.Instance.DatabaseConnection.Contains(".sqlite") == false)
         {
             // get license code from current database, need to load the license
-            var currentDb = DbManager.GetManager(AppSettings.Instance.DatabaseConnection);
-            var code = currentDb.Single<Settings>().Result?.LicenseCode;
+            var code = AppSettings.Instance.LicenseCode;
             
             // check if licensed for external db, if not force migrate to sqlite
             if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase, code ?? string.Empty) == false)

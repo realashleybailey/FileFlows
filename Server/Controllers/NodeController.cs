@@ -234,7 +234,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     /// <param name="enabled">optional status of the node state</param>
     private async Task CheckLicensedNodes(Guid nodeUid, bool enabled)
     {
-        var licensedNodes = await new SettingsController().License_ProcessingNodes();
+        var licensedNodes = LicenseHelper.GetLicensedProcessingNodes();
         var nodes = await GetAll();
         int current = 0;
         foreach (var node in nodes.OrderBy(x => x.Uid == nodeUid ? 1 : 2).ThenBy(x => x.Name))

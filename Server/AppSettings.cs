@@ -16,8 +16,23 @@ internal class AppSettings
     /// Gets or sets the encryption key to use
     /// </summary>
     public string EncryptionKey { get; set; }
-    
-    
+
+    /// <summary>
+    /// Gets or sets the license email
+    /// </summary>
+    public string LicenseEmail { get; set; }
+
+    /// <summary>
+    /// Gets or sets the licensed key
+    /// </summary>
+    public string LicenseKey { get; set; }
+
+    /// <summary>
+    /// Gets or sets the license code
+    /// </summary>
+    public string LicenseCode { get; set; }
+
+
     /// <summary>
     /// Gets or sets the connection string of where to migrate the data to
     /// This will be checked at startup and if found, the data will be migrated then this

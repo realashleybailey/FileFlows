@@ -20,8 +20,15 @@ class LicenseHelper
         // would fail as it would try to connect to the database which has not been initialized
         if (licenseCode == null)
         {
-            var settings = new SettingsController().Get().Result;
-            licenseCode = settings?.LicenseCode;
+            try
+            {
+                var settings = new SettingsController().Get().Result;
+                licenseCode = settings?.LicenseCode;
+            }
+            catch (Exception)
+            {
+                licenseCode = string.Empty;
+            }
         }
         var license = License.FromCode(licenseCode);
         if (license == null)

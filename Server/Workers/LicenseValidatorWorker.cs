@@ -56,6 +56,7 @@ class LicenseValidatorWorker : Worker
             string requestCode = LicenseEncryption.Encrypt(LicenseRequest_EncryptionKey, json);
 
             const string licenseUrl = "https://fileflows.com/licensing/validate";
+            //const string licenseUrl = "https://localhost:7197/licensing/validate";
             var result = await HttpHelper.Post(licenseUrl, new { Code = requestCode });
             if (result.Success == false)
                 throw new Exception("Unlicensed");

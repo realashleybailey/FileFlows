@@ -142,7 +142,7 @@ public class Program
             var code = currentDb.Single<Settings>().Result?.LicenseCode;
             
             // check if licensed for external db, if not force migrate to sqlite
-            if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase, code) == false)
+            if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase, code ?? string.Empty) == false)
             {
                 Logger.Instance.WLog("No longer licensed for external database, migrating to SQLite database.");
                 AppSettings.Instance.DatabaseMigrateConnection = SqliteDbManager.GetDefaultConnectionString();

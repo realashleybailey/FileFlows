@@ -83,7 +83,7 @@ public partial class Settings : ComponentBase
         if(blocker)
             Blocker.Show();
 #if (!DEMO)
-        var response = await HttpHelper.Get<SettingsUiModel>("/api/settings");
+        var response = await HttpHelper.Get<SettingsUiModel>("/api/settings/ui-settings");
         if (response.Success)
         {
             this.Model = response.Data;
@@ -113,7 +113,7 @@ public partial class Settings : ComponentBase
         this.IsSaving = true;
         try
         {
-            await HttpHelper.Put<string>("/api/settings", this.Model);
+            await HttpHelper.Put<string>("/api/settings/ui-settings", this.Model);
 
             if (this.InternalProcessingNode != null)
             {

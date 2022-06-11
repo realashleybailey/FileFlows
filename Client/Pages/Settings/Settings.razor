@@ -39,7 +39,11 @@
                 <FlowTab Title=@lblLogging>
                     <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry"/>
                     <InputSwitch @bind-Value="@Model.LogQueueMessages" Label="Pages.Settings.Fields.LogQueueMessages"/>
-                </FlowTab>
+                    @if (IsLicensed)
+                    {
+                        <InputNumber @bind-Value="@Model.LogFileRetention" Label="Pages.Settings.Fields.LogFileRetention" Min=1 Max=100 />
+                    }
+                    </FlowTab>
                 <FlowTab Title="@lblUpdates" Visible="@LicensedFor("AutoUpdates")">
                     @if (LicensedFor("AutoUpdates"))
                     {

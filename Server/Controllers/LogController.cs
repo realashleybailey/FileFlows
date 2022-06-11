@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Controllers
+﻿using FileFlows.ServerShared;
+
+namespace FileFlows.Server.Controllers
 {
     using FileFlows.Shared.Helpers;
     using Microsoft.AspNetCore.Mvc;
@@ -16,7 +18,7 @@
         [HttpGet]
         public string Get([FromQuery] Plugin.LogType logLevel = Plugin.LogType.Info)
         {
-            if (Logger.Instance is Logger logger)
+            if (Logger.Instance is FileLogger logger)
             {
                 string log = logger.GetTail(1000, logLevel);
                 string html = LogToHtml.Convert(log);
@@ -32,10 +34,12 @@
         [HttpGet("download")]
         public IActionResult Download()
         {
-            if (Logger.Instance is Logger logger)
+            if (Logger.Instance is FileLogger logger)
             {
-                byte[] content = System.IO.File.ReadAllBytes(logger.LogFile);
-                return File(content, "application/octet-stream", "FileFlows.log");
+                string filename = logger.GetLogFilename();
+                byte[] content = System.IO.File.ReadAllBytes(filename);
+                
+                return File(content, "application/octet-stream", new FileInfo(filename).Name);
             }
             
             string log = Logger.Instance.GetTail(10_000);

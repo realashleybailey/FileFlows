@@ -64,7 +64,7 @@ public class SettingsController : Controller
     /// Get the system settings
     /// </summary>
     /// <returns>The system settings</returns>
-    [HttpGet]
+    [HttpGet("ui-settings")]
     public async Task<SettingsUiModel> GetUiModel()
     {
         var settings = await Get();
@@ -93,7 +93,8 @@ public class SettingsController : Controller
     /// Get the system settings
     /// </summary>
     /// <returns>The system settings</returns>
-    internal async Task<Settings> Get()
+    [HttpGet]
+    public async Task<Settings> Get()
     {
         await semaphore.WaitAsync();
         try
@@ -104,6 +105,11 @@ public class SettingsController : Controller
             }
             Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             Instance.IsDocker = Program.Docker;
+
+            if (LicenseHelper.IsLicensed() == false)
+            {
+                Instance.LogFileRetention = 2;
+            }
             
             return Instance;
         }
@@ -128,7 +134,7 @@ public class SettingsController : Controller
     /// </summary>
     /// <param name="model">the system settings to save</param>
     /// <returns>The saved system settings</returns>
-    [HttpPut]
+    [HttpPut("ui-settings")]
     public async Task SaveUiModel([FromBody] SettingsUiModel model)
     {
         if (model == null)
@@ -137,6 +143,7 @@ public class SettingsController : Controller
         Save(new ()
         {
             IsPaused = model.IsPaused,
+            LogFileRetention = model.LogFileRetention,
             AutoUpdate = model.AutoUpdate,
             DisableTelemetry = model.DisableTelemetry,
             AutoUpdateNodes = model.AutoUpdateNodes,

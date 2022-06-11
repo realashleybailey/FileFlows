@@ -127,7 +127,6 @@ public class Program
 
     private static void InitializeLogger()
     {
-        Logger.Instance = new Server.Logger();
         Shared.Logger.Instance = Logger.Instance;
         ServerShared.Logger.Instance = Logger.Instance;
     }

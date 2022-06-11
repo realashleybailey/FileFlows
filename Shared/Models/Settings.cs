@@ -59,6 +59,11 @@ public class Settings : FileFlowObject
     /// Gets or sets if the system is paused
     /// </summary>
     public bool IsPaused { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of log files to keep
+    /// </summary>
+    public int LogFileRetention { get; set; }
 }
 
 /// <summary>

@@ -31,13 +31,38 @@ class LicenseHelper
             }
         }
         var license = License.FromCode(licenseCode);
-        if (license == null)
+        if (license?.Status != LicenseStatus.Valid)
             return false;
         if (license.ExpirationDateUtc < DateTime.UtcNow)
             return false;
         return (license.Flags & feature) == feature;
     }
 
+    
+    /// <summary>
+    /// Checks if the user is licensed 
+    /// </summary>
+    /// <returns>true if licensed, otherwise false</returns>
+    internal static bool IsLicensed()
+    {
+        string licenseCode = null;
+        try
+        {
+            licenseCode = AppSettings.Instance.LicenseCode;
+        }
+        catch (Exception)
+        {
+            licenseCode = string.Empty;
+        }
+        var license = License.FromCode(licenseCode);
+        if (license?.Status != LicenseStatus.Valid)
+            return false;
+        if (license.ExpirationDateUtc < DateTime.UtcNow)
+            return false;
+        return true;
+    }
+
+    
     /// <summary>
     /// Gets the amount of nodes this user is licensed for
     /// </summary>
@@ -45,7 +70,7 @@ class LicenseHelper
     internal static int GetLicensedProcessingNodes()
     {
         var license = License.FromCode(AppSettings.Instance.LicenseCode);
-        if (license == null)
+        if (license?.Status != LicenseStatus.Valid)
             return 2;
         if (license.ExpirationDateUtc < DateTime.UtcNow)
             return 2;

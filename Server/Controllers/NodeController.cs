@@ -102,6 +102,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 internalNode.AllLibraries = node.AllLibraries;
                 internalNode.MaxFileSizeMb = node.MaxFileSizeMb;
                 internalNode.Libraries = node.Libraries;
+                await CheckLicensedNodes(internalNode.Uid, internalNode.Enabled);
                 return await Update(internalNode, checkDuplicateName: true);
             }
             else

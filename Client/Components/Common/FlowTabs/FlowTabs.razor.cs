@@ -18,9 +18,6 @@
                 Tabs.Add(tab);
                 this.StateHasChanged();
             }
-
-            if (ActiveTab == null)
-                ActiveTab = tab;
         }
 
         private void SelectTab(FlowTab tab)
@@ -35,5 +32,13 @@
         {
             this.StateHasChanged();
         }
+
+        protected override Task OnParametersSetAsync()
+        {
+            if(ActiveTab == null)
+                ActiveTab = Tabs.FirstOrDefault(x => x.Visible);
+            return Task.CompletedTask;
+        }
+
     }
 }

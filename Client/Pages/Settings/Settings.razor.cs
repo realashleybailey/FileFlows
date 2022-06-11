@@ -17,8 +17,6 @@ public partial class Settings : ComponentBase
     [CascadingParameter] Blocker Blocker { get; set; }
     [Inject] IJSRuntime jsRuntime { get; set; }
 
-    private bool ShowInternalProcessingNode { get; set; }
-
     private bool ShowExternalDatabase => LicensedFor("ExternalDatabase");
 
     private bool IsSaving { get; set; }
@@ -26,6 +24,8 @@ public partial class Settings : ComponentBase
     private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblLogging, 
         lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblRestart, lblLicense, lblUpdates, 
         lblCheckNow;
+    
+    
 
     private SettingsUiModel Model { get; set; } = new ();
 
@@ -96,8 +96,7 @@ public partial class Settings : ComponentBase
         var nodesResponse = await HttpHelper.Get<ProcessingNode[]>("/api/node");
         if (nodesResponse.Success)
         {
-            this.InternalProcessingNode = nodesResponse.Data.FirstOrDefault(x => x.Address == "FileFlowsServer");
-            this.ShowInternalProcessingNode = this.InternalProcessingNode != null;
+            this.InternalProcessingNode = nodesResponse.Data.FirstOrDefault(x => x.Address == "FileFlowsServer") ?? new ();
         }
         this.StateHasChanged();
 #endif
@@ -116,7 +115,7 @@ public partial class Settings : ComponentBase
         {
             await HttpHelper.Put<string>("/api/settings", this.Model);
 
-            if (ShowInternalProcessingNode && this.InternalProcessingNode != null)
+            if (this.InternalProcessingNode != null)
             {
                 await HttpHelper.Post("/api/node", this.InternalProcessingNode);
             }

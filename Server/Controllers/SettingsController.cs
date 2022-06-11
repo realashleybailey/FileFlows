@@ -65,17 +65,28 @@ public class SettingsController : Controller
     /// </summary>
     /// <returns>The system settings</returns>
     [HttpGet]
-    public async Task<Settings> GetUi()
+    public async Task<SettingsUiModel> GetUiModel()
     {
         var settings = await Get();
         var license = License.FromCode(AppSettings.Instance.LicenseCode);
-        if (license.Status == LicenseStatus.Unlicensed && string.IsNullOrWhiteSpace(settings.LicenseKey) == false)
+        if (license.Status == LicenseStatus.Unlicensed && string.IsNullOrWhiteSpace(AppSettings.Instance.LicenseKey) == false)
             license.Status = LicenseStatus.Invalid;
         // clone it so we can remove some properties we dont want passed to the UI
         string json = JsonSerializer.Serialize(settings);
-        var cloned = JsonSerializer.Deserialize<Settings>(json);
-        await SetLicenseFields(cloned, license);
-        return cloned;
+        var uiModel = JsonSerializer.Deserialize<SettingsUiModel>(json);
+        await SetLicenseFields(uiModel, license);
+        
+
+
+        string dbConnStr = AppSettings.Instance.DatabaseMigrateConnection?.EmptyAsNull() ?? AppSettings.Instance.DatabaseConnection;
+        if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
+            uiModel.DbType = DatabaseType.Sqlite;
+        else if (dbConnStr.Contains(";Uid="))
+            new MySqlDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
+        else
+            new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
+        
+        return uiModel;
     }
 
     /// <summary>
@@ -93,15 +104,6 @@ public class SettingsController : Controller
             }
             Instance.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             Instance.IsDocker = Program.Docker;
-
-
-            string dbConnStr = AppSettings.Instance.DatabaseMigrateConnection?.EmptyAsNull() ?? AppSettings.Instance.DatabaseConnection;
-            if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
-                Instance.DbType = DatabaseType.Sqlite;
-            else if (dbConnStr.Contains(";Uid="))
-                new MySqlDbManager(string.Empty).PopulateSettings(Instance, dbConnStr);
-            else
-                new SqlServerDbManager(string.Empty).PopulateSettings(Instance, dbConnStr);
             
             return Instance;
         }
@@ -111,8 +113,10 @@ public class SettingsController : Controller
         }
     }
 
-    private async Task SetLicenseFields(Settings settings, License license)
+    private async Task SetLicenseFields(SettingsUiModel settings, License license)
     {
+        settings.LicenseKey = AppSettings.Instance.LicenseKey;
+        settings.LicenseEmail  = AppSettings.Instance.LicenseEmail;
         settings.LicenseFlags = license.Flags.ToString();
         settings.LicenseProcessingNodes = LicenseHelper.GetLicensedProcessingNodes();
         settings.LicenseExpiryDate = license.ExpirationDateUtc.ToLocalTime();
@@ -125,33 +129,53 @@ public class SettingsController : Controller
     /// <param name="model">the system settings to save</param>
     /// <returns>The saved system settings</returns>
     [HttpPut]
-    public async Task Save([FromBody] Settings model)
+    public async Task SaveUiModel([FromBody] SettingsUiModel model)
     {
         if (model == null)
             return;
-        var settings = await Get() ?? model;
-        model.Uid = settings.Uid;
-        model.DateCreated = settings.DateCreated;
-        model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        model.IsDocker = Program.Docker;
-        if (model.LicenseEmail?.EmptyAsNull() != AppSettings.Instance.LicenseEmail?.EmptyAsNull() ||
-            model.LicenseKey?.EmptyAsNull() != AppSettings.Instance.LicenseKey?.EmptyAsNull())
+
+        Save(new ()
         {
-            // new license, validate it
-            var licResult = await LicenseValidatorWorker.ValidateLicense(model.LicenseEmail, model.LicenseKey);
-            AppSettings.Instance.LicenseKey = model.LicenseKey;
-            AppSettings.Instance.LicenseEmail = model.LicenseEmail;
-            AppSettings.Instance.LicenseCode = licResult.LicenseCode;
-            AppSettings.Instance.Save();
-        }
+            IsPaused = model.IsPaused,
+            AutoUpdate = model.AutoUpdate,
+            DisableTelemetry = model.DisableTelemetry,
+            AutoUpdateNodes = model.AutoUpdateNodes,
+            AutoUpdatePlugins = model.AutoUpdatePlugins,
+            LogQueueMessages = model.LogQueueMessages,
+            PluginRepositoryUrls = model.PluginRepositoryUrls
+        });
+        
+        // validate license it
+        var licResult = await LicenseValidatorWorker.ValidateLicense(model.LicenseEmail, model.LicenseKey);
+        AppSettings.Instance.LicenseKey = model.LicenseKey;
+        AppSettings.Instance.LicenseEmail = model.LicenseEmail;
+        AppSettings.Instance.LicenseCode = licResult.LicenseCode;
 
         var newConnectionString = GetConnectionString(model, model.DbType);
         if (IsConnectionSame(AppSettings.Instance.DatabaseConnection, newConnectionString) == false)
         {
             // need to migrate the database
             AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
-            AppSettings.Instance.Save();
         }
+        // save AppSettings with updated license and db migration if set
+        AppSettings.Instance.Save();
+    }
+    /// <summary>
+    /// Save the system settings
+    /// </summary>
+    /// <param name="model">the system settings to save</param>
+    /// <returns>The saved system settings</returns>
+    internal async Task Save(Settings model)
+    {
+        if (model == null)
+            return;
+        var settings = await Get() ?? model;
+        model.Name = settings.Name;
+        model.Uid = settings.Uid;
+        model.Version = Globals.Version;
+        model.DateCreated = settings.DateCreated;
+        model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        model.IsDocker = Program.Docker;
         Instance = model;
         await DbHelper.Update(model);
     }
@@ -170,7 +194,7 @@ public class SettingsController : Controller
         return connString.IndexOf("FileFlows.sqlite") > 0;
     }
 
-    private string GetConnectionString(Settings settings, DatabaseType dbType)
+    private string GetConnectionString(SettingsUiModel settings, DatabaseType dbType)
     {
         if (dbType == DatabaseType.SqlServer)
             return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,

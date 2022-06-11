@@ -1,9 +1,7 @@
-using System.ComponentModel;
-using FileFlows.Client.Components.Dialogs;
-using FileFlows.Client.Helpers;
-
 namespace FileFlows.Client.Pages;
 
+using FileFlows.Client.Components.Dialogs;
+using FileFlows.Client.Helpers;
 using FileFlows.Shared.Helpers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -17,7 +15,6 @@ using FileFlows.Plugin;
 public partial class Settings : ComponentBase
 {
     [CascadingParameter] Blocker Blocker { get; set; }
-    [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] IJSRuntime jsRuntime { get; set; }
 
     private bool ShowInternalProcessingNode { get; set; }
@@ -27,16 +24,16 @@ public partial class Settings : ComponentBase
     private bool IsSaving { get; set; }
 
     private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblLogging, 
-        lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblSystem, lblRestart, lblLicense, 
+        lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblRestart, lblLicense, 
         lblCheckNow;
 
-    private FileFlows.Shared.Models.Settings Model { get; set; } = new FileFlows.Shared.Models.Settings();
+    private SettingsUiModel Model { get; set; } = new ();
 
-    private ProcessingNode InternalProcessingNode { get; set; } 
+    private ProcessingNode InternalProcessingNode { get; set; }
 
-    List<Validator> RequiredValidator = new ();
+    readonly List<Validator> RequiredValidator = new ();
 
-    private List<ListOption> DbTypes = new()
+    private readonly List<ListOption> DbTypes = new()
     {
         new() { Label = "SQLite", Value = DatabaseType.Sqlite },
         //new() { Label = "SQL Server", Value = DatabaseType.SqlServer }, // not finished yet
@@ -71,7 +68,6 @@ public partial class Settings : ComponentBase
         lblInternalProcessingNodeDescription = Translater.Instant("Pages.Settings.Fields.InternalProcessingNode.Description");
         lblDbDescription = Translater.Instant("Pages.Settings.Fields.Database.Description");
         lblTest = Translater.Instant("Labels.Test");
-        lblSystem = Translater.Instant("Pages.Settings.Labels.System");
         lblRestart= Translater.Instant("Pages.Settings.Labels.Restart");
         lblLogging= Translater.Instant("Pages.Settings.Labels.Logging");
         lblCheckNow = Translater.Instant("Pages.Settings.Labels.CheckNow");
@@ -86,20 +82,20 @@ public partial class Settings : ComponentBase
         if(blocker)
             Blocker.Show();
 #if (!DEMO)
-        var response = await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings");
+        var response = await HttpHelper.Get<SettingsUiModel>("/api/settings");
         if (response.Success)
         {
             this.Model = response.Data;
             var flags = this.Model.LicenseFlags?.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries) ??
                            new string[] { };
             // humanize the flags
-            this.Model.LicenseFlags = string.Join(", ", flags.OrderBy(x => x).Select(x => FlowHelper.FormatLabel(x)));
+            this.Model.LicenseFlags = string.Join(", ", flags.OrderBy(x => x).Select(FlowHelper.FormatLabel));
         }
 
         var nodesResponse = await HttpHelper.Get<ProcessingNode[]>("/api/node");
         if (nodesResponse.Success)
         {
-            this.InternalProcessingNode = nodesResponse.Data.Where(x => x.Address == "FileFlowsServer").FirstOrDefault();
+            this.InternalProcessingNode = nodesResponse.Data.FirstOrDefault(x => x.Address == "FileFlowsServer");
             this.ShowInternalProcessingNode = this.InternalProcessingNode != null;
         }
         this.StateHasChanged();

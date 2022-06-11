@@ -200,7 +200,7 @@ public class SqlServerDbManager: DbManager
     /// </summary>
     /// <param name="settings">the settings to populate</param>
     /// <param name="connectionString">the connection string to parse</param>
-    internal void PopulateSettings(Settings settings, string connectionString)
+    internal void PopulateSettings(SettingsUiModel settings, string connectionString)
     {
         var builder = new SqlConnectionStringBuilder(connectionString);
         settings.DbType = DatabaseType.SqlServer;

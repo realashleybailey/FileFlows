@@ -24,9 +24,7 @@ class LicenseValidatorWorker : Worker
 
     protected override void Execute()
     {
-        var controller = new SettingsController();
-        var settings = controller.Get().Result;
-        var result = ValidateLicense(settings.LicenseEmail, settings.LicenseKey).Result;
+        var result = ValidateLicense(AppSettings.Instance.LicenseEmail, AppSettings.Instance.LicenseKey).Result;
         if (AppSettings.Instance.LicenseCode != result.LicenseCode)
         {
             AppSettings.Instance.LicenseCode = result.LicenseCode;
@@ -69,7 +67,7 @@ class LicenseValidatorWorker : Worker
         {
             return (new License
             {
-                Status = LicenseStatus.Invalid,
+                Status = ex.Message == "Unlicensed" ? LicenseStatus.Unlicensed : LicenseStatus.Invalid,
                 ProcessingNodes = 2,
             }, string.Empty);
         }

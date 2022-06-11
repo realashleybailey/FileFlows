@@ -27,6 +27,7 @@
     "Browse": "Browse",
     "Rescan": "Rescan",
     "Help": "Help",
+    "License":"License",
     "Name": "Name",
     "Advanced": "Advanced",
     "Filter": "Filter",
@@ -352,7 +353,8 @@
         "Database":"Database",
         "System":"System",
         "Restart":"Restart FileFlows",
-        "Logging":"Logging"
+        "Logging":"Logging",
+        "CheckNow":"Check Now",
       },
       "Messages":{
         "Database":{
@@ -365,7 +367,9 @@
         "Restart":{
           "Title":"Restart FileFlows",
           "Message":"Are you sure you want to restart FileFlows?\n\nEnsure you have saved your settings and no flows are executing."
-        }
+        },
+        "CheckUpdateSuccess":"Successfully triggered a check for update.\nNote this may take a few minutes to download if available.",
+        "CheckUpdateFailed":"Failed to check for an update"
       },
       "Fields": {
         "Telemetry": "Telemetry",
@@ -382,6 +386,8 @@
         "LoggingPath-Help": "This is where log files will be created.",
         "PluginRepositoryUrls": "Plugin Repositories",
         "PluginRepositoryUrls-Help": "A line separated list of plugin repository URLs to use when searching for plugins.\nThe order is important, if multiple repositories contain the same plugin, the first repository will be used as it''s source.\nThe default repository will always be added to the end of this list.",
+        "CheckForUpdateNow":"Checks for Update",
+        "CheckForUpdateNow-Help":"Checks for an update now and if found will download the update and install it when no Flows are executing.",
         "InternalProcessingNode": {
           "Description": "Here you can configure the Internal Processing Node of FileFlows.   A Processing Node is what executes a Flow and processes Files.",
           "Enabled": "Enabled",
@@ -405,6 +411,14 @@
           "User-Help":"The user used to connect to the database",
           "Password": "Password",
           "Password-Help":"The password of the user to connect to the database"
+        },
+        "License": {
+          "Key": "License Key",
+          "Email": "License Email",
+          "Status": "Status",
+          "ProcessingNodes":"Processing Nodes",
+          "Flags":"Flags",
+          "ExpiryDate":"Expiry Date"
         }
       }
     },

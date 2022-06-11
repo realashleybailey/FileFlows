@@ -40,7 +40,7 @@ public class NodeUpdater:UpdaterWorker
     protected override string DownloadUpdateBinary()
     {   
         var systemService = SystemService.Load();
-        var serverVersion = systemService.GetVersion().Result;
+        var serverVersion = systemService.GetNodeUpdateVersion().Result;
         if (serverVersion <= CurrentVersion)
             return string.Empty;
 

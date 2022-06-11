@@ -148,6 +148,7 @@ public class WebServer
 
         LibraryWorker.ResetProcessing();
         WorkerManager.StartWorkers(
+            new LicenseValidatorWorker(),
             new LibraryWorker(),
             new FlowWorker(string.Empty, isServer: true),
             new PluginUpdaterWorker(),

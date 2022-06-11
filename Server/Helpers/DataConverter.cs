@@ -44,7 +44,9 @@ public class DataConverter : JsonConverter<FileFlowObject>
         foreach (var prop in properties)
         {
             // dont write the properties that also exist on the DbObject
-            if ((prop.Name == "Uid" || prop.Name == "DateModified" || prop.Name == "DateCreated" || prop.Name == "Name" || prop.Name == "DbType" || prop.Name == "DbServer" || prop.Name == "DbName" || prop.Name == "DbUser" || prop.Name == "DbPassword" || prop.Name == "DbAllowed") == false)
+            if ((prop.Name == "Uid" || prop.Name == "DateModified" || prop.Name == "DateCreated" || prop.Name == "Name" 
+                 || prop.Name == "LicenseFlags" || prop.Name == "LicenseExpiryDateUtc" || prop.Name == "LicenseProcessingNodes"|| prop.Name == "LicenseStatus"
+                 || prop.Name == "DbType" || prop.Name == "DbServer" || prop.Name == "DbName" || prop.Name == "DbUser" || prop.Name == "DbPassword") == false)
             {
                 var propValue = prop.GetValue(value);
                 if (propValue == null)

@@ -26,11 +26,16 @@
             <FlowTabs>
                 <FlowTab Title="@lblGeneral">
                     <InputSwitch @bind-Value="@Model.DisableTelemetry" Inverse="@true" Label="Pages.Settings.Fields.Telemetry"/>
-                    <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
-                    <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins"/>
-                    <InputSwitch Disabled="@Model.DisableTelemetry" @bind-Value="@Model.AutoUpdateNodes" Label="Pages.Settings.Fields.AutoUpdateNodes"/>
+                    @if (LicensedFor("AutoUpdates"))
+                    {
+                        <InputButton Label="Pages.Settings.Fields.CheckForUpdateNow" Text="@lblCheckNow"  OnClick=@CheckForUpdateNow />
+                        
+                        <InputSwitch @bind-Value="@Model.AutoUpdate" Label="Pages.Settings.Fields.AutoUpdate"/>
+                        <InputSwitch @bind-Value="@Model.AutoUpdatePlugins" Label="Pages.Settings.Fields.AutoUpdatePlugins"/>
+                        <InputSwitch @bind-Value="@Model.AutoUpdateNodes" Label="Pages.Settings.Fields.AutoUpdateNodes"/>
+                    }
                 </FlowTab>
-                <FlowTab Title="@lblNode" Visible="@ShowInternalProcessingNdoe">
+                <FlowTab Title="@lblNode" Visible="@ShowInternalProcessingNode">
                     <p>@lblInternalProcessingNodeDescription</p>
                     <hr />
                     <InputSwitch @bind-Value="@InternalProcessingNode.Enabled" Label="Pages.Settings.Fields.InternalProcessingNode.Enabled" />
@@ -46,9 +51,9 @@
                     @if (Model.DbType != DatabaseType.Sqlite)
                     {
                         <InputText @bind-Value=@Model.DbServer Label="Pages.Settings.Fields.Database.Server" Validators=@RequiredValidator />
-                        <InputText @bind-Value=@Model.DbName Label="Pages.Settings.Fields.Database.Name" Validators=@RequiredValidator/>
-                        <InputText @bind-Value=@Model.DbUser Label="Pages.Settings.Fields.Database.User" Validators=@RequiredValidator/>
-                        <InputPassword @bind-Value=@Model.DbPassword Label="Pages.Settings.Fields.Database.Password" Validators=@RequiredValidator/>
+                        <InputText @bind-Value=@Model.DbName Label="Pages.Settings.Fields.Database.Name" Validators=@RequiredValidator />
+                        <InputText @bind-Value=@Model.DbUser Label="Pages.Settings.Fields.Database.User" Validators=@RequiredValidator />
+                        <InputPassword @bind-Value=@Model.DbPassword Label="Pages.Settings.Fields.Database.Password" Validators=@RequiredValidator />
                     }
                     <div class="btn-test">
                         @if (Model.DbType != DatabaseType.Sqlite)
@@ -63,6 +68,20 @@
                 </FlowTab>
                 <FlowTab Title="@lblAdvanced">
                     <InputTextAreaList @bind-Value="@Model.PluginRepositoryUrls" Label="Pages.Settings.Fields.PluginRepositoryUrls" />
+                </FlowTab>
+                <FlowTab Title="@lblLicense">
+                    <p class="box info">Here you can enter your license key to enable additional features
+See <a href="https://fileflows.com/pricing" target="_blank" rel="noreferrer">FileFlows.com</a> for more information.</p>
+                    <InputText @bind-Value=@Model.LicenseEmail Label="Pages.Settings.Fields.License.Email"  />
+                    <InputText @bind-Value=@Model.LicenseKey Label="Pages.Settings.Fields.License.Key" />
+                    <hr />
+                    <InputText @bind-Value=@Model.LicenseStatus Label="Pages.Settings.Fields.License.Status" ReadOnly="true" />
+                    <InputText Value=@Model.LicenseProcessingNodes.ToString() Label="Pages.Settings.Fields.License.ProcessingNodes" ReadOnly="true" />
+                    @if (IsLicensed)
+                    {
+                        <InputText Value=@Model.LicenseExpiryDate.ToLongDateString() Label="Pages.Settings.Fields.License.ExpiryDate" ReadOnly="true"/>
+                        <InputText @bind-Value=@Model.LicenseFlags Label="Pages.Settings.Fields.License.Flags" ReadOnly="true"/>
+                    }
                 </FlowTab>
             </FlowTabs>
         </div>

@@ -202,4 +202,9 @@ input[type=file]{
         position:absolute;
         left:1rem;
     }
+    a {
+        color: var(--yellow) !important;
+        font-weight: bold;
+        text-decoration: underline;
+    }
 }

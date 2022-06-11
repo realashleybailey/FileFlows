@@ -57,6 +57,7 @@ public partial class Nodes : ListPage<ProcessingNode>
         try
         {
             await HttpHelper.Put<ProcessingNode>($"{ApiUrl}/state/{node.Uid}?enable={enabled}");
+            await Refresh();
         }
         finally
         {

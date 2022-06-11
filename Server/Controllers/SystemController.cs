@@ -17,6 +17,18 @@ public class SystemController:Controller
     /// </summary>
     [HttpGet("version")]
     public string GetVersion() => Globals.Version;
+
+    /// <summary>
+    /// Gets the version an node update available
+    /// </summary>
+    /// <returns>the version an node update available</returns>
+    [HttpGet("node-update-version")]
+    public string GetNodeUpdateVersion()
+    {
+        if (LicenseHelper.IsLicensed(LicenseFlags.AutoUpdates) == false)
+            return string.Empty;
+        return Globals.Version;;
+    }
     
     /// <summary>
     /// Gets an node update available
@@ -27,6 +39,8 @@ public class SystemController:Controller
     [HttpGet("node-updater-available")]
     public IActionResult GetNodeUpdater([FromQuery]string version, [FromQuery] bool windows)
     {
+        if (LicenseHelper.IsLicensed(LicenseFlags.AutoUpdates) == false)
+            return new ContentResult();
         if (string.IsNullOrWhiteSpace(version))
             return new ContentResult();
         var current = new Version(Globals.Version);
@@ -45,6 +59,9 @@ public class SystemController:Controller
     [HttpGet("node-updater")]
     public IActionResult GetNodeUpdater([FromQuery] bool windows)
     {
+        if (LicenseHelper.IsLicensed(LicenseFlags.AutoUpdates) == false)
+            return new ContentResult();
+        
         string updateFile = Path.Combine(DirectoryHelper.BaseDirectory, "Server", "Nodes",
             $"FileFlows-Node-{Globals.Version}.zip");
         if (System.IO.File.Exists(updateFile) == false)

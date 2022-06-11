@@ -1,7 +1,6 @@
-using System.Text.Json;
-using FileFlows.ServerShared.Helpers;
+using FileFlows.Server.Helpers;
 
-namespace FileFlows.ServerShared.Models;
+namespace FileFlows.Server.Models;
 
 class License
 {
@@ -9,12 +8,12 @@ class License
     public DateTime ExpirationDateUtc { get; set; }
     public LicenseFlags Flags { get; set; }
 
-    public int ProcessNodes { get; set; }
+    public int ProcessingNodes { get; set; }
 
     internal static License DefaultLicense() => new License
     {
         Status = LicenseStatus.Unlicensed,
-        ProcessNodes = 2,
+        ProcessingNodes = 2
     };
 
     internal static License FromCode(string code)

@@ -134,6 +134,21 @@ public class Program
 
     private static bool PrepareDatabase()
     {
+        if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseConnection) == false &&
+            AppSettings.Instance.DatabaseConnection.Contains(".sqlite") == false)
+        {
+            // get license code from current database, need to load the license
+            var currentDb = DbManager.GetManager(AppSettings.Instance.DatabaseConnection);
+            var code = currentDb.Single<Settings>().Result?.LicenseCode;
+            
+            // check if licensed for external db, if not force migrate to sqlite
+            if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase, code) == false)
+            {
+                Logger.Instance.WLog("No longer licensed for external database, migrating to SQLite database.");
+                AppSettings.Instance.DatabaseMigrateConnection = SqliteDbManager.GetDefaultConnectionString();
+            }
+        }
+        
         if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
         {
             if (AppSettings.Instance.DatabaseConnection == AppSettings.Instance.DatabaseMigrateConnection)

@@ -3,7 +3,7 @@
 @if(UpdateAvailable && Dismissed == false){
     <div class="update-available">
         @lblUpdateAvailable
-        <a target="_blank" href="https://fileflows.com/downloads">@LatestVersion.ToString()</a>
+        <a target="_blank" href="https://fileflows.com/downloads" rel="noreferrer">@LatestVersion.ToString()</a>
         @lblUpdateAvailableSuffix
         <span class="dismiss fas fa-times" @onclick="Dismiss"></span>
     </div>

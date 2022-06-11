@@ -1,4 +1,4 @@
-namespace FileFlows.ServerShared.Helpers;
+namespace FileFlows.Server.Helpers;
 
 using System.Security.Cryptography;
 using System.Text;

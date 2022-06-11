@@ -560,5 +560,10 @@ hr {
   position: absolute;
   left: 1rem;
 }
+.box.info a {
+  color: var(--yellow) !important;
+  font-weight: bold;
+  text-decoration: underline;
+}
 
 /*# sourceMappingURL=app.css.map */

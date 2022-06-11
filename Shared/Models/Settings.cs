@@ -61,6 +61,38 @@ public class Settings : FileFlowObject
     public bool IsPaused { get; set; }
 
     /// <summary>
+    /// Gets or sets the license email
+    /// </summary>
+    public string LicenseEmail { get; set; }
+
+    /// <summary>
+    /// Gets or sets the licensed key
+    /// </summary>
+    public string LicenseKey { get; set; }
+
+    /// <summary>
+    /// Gets or sets the license code
+    /// </summary>
+    public string LicenseCode { get; set; }
+
+    /// <summary>
+    /// Gets the license flags for the user
+    /// </summary>
+    public string LicenseFlags { get; set; }
+    /// <summary>
+    /// Gets the license expiry date for the user
+    /// </summary>
+    public DateTime LicenseExpiryDate { get; set; }
+    /// <summary>
+    /// Gets the licensed processing nodes for the user
+    /// </summary>
+    public int LicenseProcessingNodes { get; set; }
+    /// <summary>
+    /// Gets the licensed status for the user
+    /// </summary>
+    public string LicenseStatus { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of database to use
     /// </summary>
     public DatabaseType DbType { get; set; }
@@ -84,11 +116,6 @@ public class Settings : FileFlowObject
     /// Gets or sets the password used to connect to the database
     /// </summary>
     public string DbPassword { get; set; }
-
-    /// <summary>
-    /// Gets or sets if the user can change database settings
-    /// </summary>
-    public bool DbAllowed { get; set; }
 }
 
 /// <summary>

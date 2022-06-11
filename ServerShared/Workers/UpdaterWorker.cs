@@ -51,11 +51,20 @@ public abstract class UpdaterWorker : Worker
     protected abstract void QuitApplication();
 
     /// <summary>
+    /// Pre-check to run before executing
+    /// </summary>
+    /// <returns>if false, no update will be checked for</returns>
+    protected virtual bool PreCheck() => false;
+    
+    /// <summary>
     /// Runs a check for update and if found will download it 
     /// </summary>
     /// <returns>A update has been downloaded</returns>
     public bool RunCheck()
     {
+        if (PreCheck() == false)
+            return false;
+        
         Logger.Instance?.ILog($"{UpdaterName}: Checking for update");
         try
         {

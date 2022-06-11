@@ -13,14 +13,23 @@ using FileFlows.Shared.Helpers;
 public class ServerUpdater : UpdaterWorker
 {
     private static string UpdateUrl = "https://fileflows.com/auto-update";
+
+    internal static ServerUpdater Instance;
     
     /// <summary>
     /// Creates an instance of a worker to automatically update FileFlows Server
     /// </summary>
     public ServerUpdater() : base("server-upgrade", 60)
     {
+        Instance = this;
     }
 
+    /// <summary>
+    /// Pre-check to run before executing
+    /// </summary>
+    /// <returns>if false, no update will be checked for</returns>
+    protected override bool PreCheck() => LicenseHelper.IsLicensed(LicenseFlags.AutoUpdates);
+    
     protected override void Initialize(ScheduleType schedule, int interval)
     {
         if (int.TryParse(Environment.GetEnvironmentVariable("AutoUpdateInterval") ?? string.Empty, out int minutes) &&

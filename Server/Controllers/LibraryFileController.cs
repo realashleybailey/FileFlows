@@ -40,7 +40,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
         if (nodeVersion < Globals.MinimumNodeVersion)
         {
-            Logger.Instance.ILog($"Node '{args.NodeName}' version is less than minimum supported version '{Globals.MinimumNodeVersion}'");
+            Logger.Instance.ILog($"Node '{args.NodeName}' version '{nodeVersion} is less than minimum supported version '{Globals.MinimumNodeVersion}'");
             return null;
         }
 

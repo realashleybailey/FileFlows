@@ -28,7 +28,7 @@ public class SystemController:Controller
     {
         if (LicenseHelper.IsLicensed(LicenseFlags.AutoUpdates) == false)
             return string.Empty;
-        return Globals.Version;;
+        return Globals.Version;
     }
     
     /// <summary>

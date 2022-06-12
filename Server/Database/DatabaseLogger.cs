@@ -15,13 +15,21 @@ public class DatabaseLogger:ILogWriter
     {
         Logger.Instance.RegisterWriter(this);
     }
-    
+
     /// <summary>
     /// Logs a message
     /// </summary>
     /// <param name="type">the type of log message</param>
     /// <param name="args">the arguments for the log message</param>
-    public async Task Log(LogType type, params object[] args)
+    public Task Log(LogType type, params object[] args) => Log(Guid.Empty, type, args);
+    
+    /// <summary>
+    /// Logs a message
+    /// </summary>
+    /// <param name="clientUid">The UID of the client logging this message</param>
+    /// <param name="type">the type of log message</param>
+    /// <param name="args">the arguments for the log message</param>
+    public async Task Log(Guid clientUid, LogType type, params object[] args)
     {
         if (DbHelper.UseMemoryCache)
             return; // dont write
@@ -31,6 +39,6 @@ public class DatabaseLogger:ILogWriter
             x.GetType().IsPrimitive ? x.ToString() :
             x is string ? x.ToString() :
             System.Text.Json.JsonSerializer.Serialize(x)));
-        await DbHelper.Log(Guid.Empty, type, message);
+        await DbHelper.Log(clientUid, type, message);
     }
 }

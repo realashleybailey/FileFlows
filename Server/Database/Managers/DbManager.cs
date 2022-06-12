@@ -699,6 +699,14 @@ public abstract class DbManager
     /// </summary>
     /// <param name="maxLogs">the maximum number of log messages to keep</param>
     public virtual Task PruneOldLogs(int maxLogs) => Task.CompletedTask;
+
+    /// <summary>
+    /// Searches the log using the given filter
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>the messages found in the log</returns>
+    public virtual Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter) =>
+        Task.FromResult((IEnumerable<DbLogMessage>)new DbLogMessage[] { });
     
     /// <summary>
     /// Gets an item from the database by it's name

@@ -1,3 +1,5 @@
+using FileFlows.Plugin;
+
 namespace FileFlows.Client.Pages
 {
     using FileFlows.Shared.Helpers;
@@ -12,14 +14,33 @@ namespace FileFlows.Client.Pages
         [CascadingParameter] Blocker Blocker { get; set; }
         [Inject] NavigationManager NavigationManager { get; set; }
         private string LogText { get; set; }
-        private string lblDownload;
+        private string lblDownload, lblSearch;
         private string DownloadUrl;
 
+        private SettingsUiModel Settings;
         private LogType LogLevel { get; set; } = LogType.Info;
 
-#if (!DEMO)
-        protected override void OnInitialized()
+        private bool SearchVisible;
+
+        private readonly LogSearchModel SearchModel = new()
         {
+            Message = string.Empty,
+            Type = null,
+            ClientUid = null,
+            FromDate = DateTime.Today,
+            ToDate = DateTime.Today.AddDays(1)
+        };
+
+        private bool UsingDatabase =>
+            Settings?.DbType == DatabaseType.MySql || Settings?.DbType == DatabaseType.SqlServer; 
+
+#if (!DEMO)
+        protected override async Task OnInitializedAsync()
+        {
+            Settings = (await HttpHelper.Get<SettingsUiModel>("/api/settings/ui-settings")).Data ?? new();
+
+
+            this.lblSearch = Translater.Instant("Labels.Search");
             this.lblDownload = Translater.Instant("Labels.Download");
 #if (DEBUG)
             this.DownloadUrl = "http://localhost:6868/api/log/download";
@@ -59,12 +80,26 @@ namespace FileFlows.Client.Pages
 
         async Task Refresh()
         {
-            var response = await HttpHelper.Get<string>("/api/log?logLevel=" + LogLevel);
-            if (response.Success)
+            Blocker?.Show();
+            if (UsingDatabase)
             {
-                this.LogText = response.Data;
-                this.StateHasChanged();
+                var response = await HttpHelper.Post<string>("/api/log/search", SearchModel);
+                if (response.Success)
+                {
+                    this.LogText = response.Data;
+                    this.StateHasChanged();
+                }
             }
+            else
+            {
+                var response = await HttpHelper.Get<string>("/api/log?logLevel=" + LogLevel);
+                if (response.Success)
+                {
+                    this.LogText = response.Data;
+                    this.StateHasChanged();
+                }
+            }
+            Blocker?.Hide();
         }
 #endif
 
@@ -75,6 +110,12 @@ namespace FileFlows.Client.Pages
 #endif
             this.LogLevel = (LogType)int.Parse(args.Value.ToString());
             await Refresh();
+        }
+
+        void ToggleSearch()
+        {
+            SearchVisible = !SearchVisible;
+            this.StateHasChanged();
         }
     }
 }

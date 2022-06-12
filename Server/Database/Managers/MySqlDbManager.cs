@@ -174,7 +174,27 @@ public class MySqlDbManager: DbManager
             
         }
     }
-    
+
+    /// <summary>
+    /// Searches the log using the given filter
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>the messages found in the log</returns>
+    public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
+    {
+        using var db = GetDb();
+        string sql = $"select * from {nameof(DbLogMessage)} " +
+                     $"where ({nameof(DbLogMessage.LogDate)} between @0 and @1) " +
+                     (filter.ClientUid != null ? $" and {nameof(DbLogMessage.ClientUid)} = @2 " : "") +
+                     (filter.Type != null ? $" and {nameof(DbLogMessage.Type)} = @3 " : "") +
+                     (filter.Message?.EmptyAsNull() != null ? $" and {nameof(DbLogMessage.Message)} like @4 " : "") +
+                     $" order by {nameof(DbLogMessage.LogDate)} desc " +
+                     " limit 1000";
+        return await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
+            filter.ClientUid?.ToString() ?? string.Empty,
+            filter.Type == null ? 0 : (int)filter.Type,
+            filter.Message ?? string.Empty);
+    }
 
     /// <summary>
     /// Gets the failure flow for a particular library

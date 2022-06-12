@@ -47,7 +47,7 @@ public class FileLog : ILogWriter
                 _ => ""
             };
 
-            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " [" + prefix + "]-> " + string.Join(
+            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " [" + prefix + "] -> " + string.Join(
                 ", ", args.Select(x =>
                     x == null ? "null" :
                     x.GetType().IsPrimitive ? x.ToString() :

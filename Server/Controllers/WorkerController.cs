@@ -167,7 +167,7 @@ public class WorkerController : Controller
     {
         lock (Executors)
         {
-            Logger.Instance.ELog("Clearing workers");
+            Logger.Instance.ILog("Clearing workers");
             var toRemove = Executors.Where(x => x.Value.NodeUid == nodeUid).ToArray();
             foreach (var item in toRemove)
                 Executors.Remove(item.Key);

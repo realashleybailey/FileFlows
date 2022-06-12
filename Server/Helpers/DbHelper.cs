@@ -216,6 +216,13 @@ public class DbHelper
     public static Task PruneOldLogs(int maxLogs) => Manager.PruneOldLogs(maxLogs);
 
     /// <summary>
+    /// Searches the log using the given filter
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>the messages found in the log</returns>
+    public static Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter) => Manager.SearchLog(filter);
+    
+    /// <summary>
     /// Gets the failure flow for a particular library
     /// </summary>
     /// <param name="libraryUid">the UID of the library</param>

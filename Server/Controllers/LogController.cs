@@ -1,4 +1,7 @@
-﻿using FileFlows.ServerShared;
+﻿using FileFlows.Plugin;
+using FileFlows.Server.Helpers;
+using FileFlows.ServerShared;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Controllers
 {
@@ -25,6 +28,37 @@ namespace FileFlows.Server.Controllers
                 return html;
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Searches the log using the given filter
+        /// </summary>
+        /// <param name="filter">the search filter</param>
+        /// <returns>the messages found in the log</returns>
+        [HttpPost("search")]
+        public async Task<string> Search([FromBody] LogSearchModel filter)
+        {
+            if (string.IsNullOrEmpty(filter.Message) && filter.ClientUid == null && filter.Type != LogType.Warning && filter.Type != LogType.Error)
+                return Get(filter.Type ?? LogType.Info);
+            
+            if (DbHelper.UseMemoryCache)
+                return "Not using external database, cannot search";
+            var messages = await DbHelper.SearchLog(filter);
+            string log = string.Join("\n", messages.Select(x =>
+            {
+                string prefix = x.Type switch
+                {
+                    LogType.Info => "INFO",
+                    LogType.Error => "ERRR",
+                    LogType.Warning => "WARN",
+                    LogType.Debug => "DBUG",
+                    _ => ""
+                };
+
+                return x.LogDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + " [" + prefix + "] -> " + x.Message;
+            }));
+            string html = LogToHtml.Convert(log);
+            return html;
         }
 
         /// <summary>

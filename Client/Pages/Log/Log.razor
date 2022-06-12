@@ -4,21 +4,59 @@
 
 <PageView FullWidth=true>
     <Head>
-        <select class="btn-select" @onchange="ChangeLogType">
-            <option value=@((int)LogType.Error)>Error</option>
-            <option value=@((int)LogType.Warning)>Warning</option>
-            <option selected value=@((int)LogType.Info)>Info</option>
-            <option value=@((int)LogType.Debug)>Debug</option>
-        </select>
+        @if (UsingDatabase)
+        {
+            <button class="btn" @onclick=@ToggleSearch>@lblSearch</button>
+        }
+        else
+        {
+            <select class="btn-select" @onchange="ChangeLogType">
+                <option value=@((int)LogType.Error)>Error</option>
+                <option value=@((int)LogType.Warning)>Warning</option>
+                <option selected value=@((int)LogType.Info)>Info</option>
+                <option value=@((int)LogType.Debug)>Debug</option>
+            </select>
+        }
         @if (String.IsNullOrEmpty(DownloadUrl) == false)
         {
             <a href="@DownloadUrl" class="btn" target="_blank"><span>@lblDownload</span></a>
         }
     </Head>
     <Body>
-        <div class="log html-log">
-            @((MarkupString)LogText)
-        </div>
+    <div class="log html-log">
+        @((MarkupString)LogText)
+    </div>
     </Body>
 
 </PageView>
+
+<form class="search-pane @(SearchVisible ? "visible" : "hidden")" @onsubmit=@Refresh>
+    <div class="search-head">
+        <span class="title">@lblSearch</span>
+        <span class="close" @onclick=@ToggleSearch></span>
+    </div>
+    <div class="search-fields">
+        <div class="search-field input">
+            <div class="label">Type</div>
+            <div class="value">
+                <select @bind="SearchModel.Type">
+                    <option>Any</option>
+                    <option value=@LogType.Error>Error</option>
+                    <option value=@LogType.Warning>Warning</option>
+                    <option value=@LogType.Info>Info</option>
+                    <option value=@LogType.Debug>Debug</option>
+                </select>
+            </div>
+        </div>
+        <div class="search-field input">
+            <div class="label">Text</div>
+            <div class="value">
+                <input type="text" @bind="SearchModel.Message">
+            </div>
+        </div>
+    </div>
+
+    <div class="search-submit">
+        <button class="btn">@lblSearch</button>
+    </div>
+</form>

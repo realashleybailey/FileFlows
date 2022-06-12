@@ -44,16 +44,22 @@ public class Program
             InitializeLoggers();
 
             Logger.Instance.ILog(new string('=', 50));
+            Thread.Sleep(1); // so log message can be written
             Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
+            Thread.Sleep(1); // so log message can be written
             if(Docker)
                 Logger.Instance.ILog("Running inside docker container");
+            Thread.Sleep(1); // so log message can be written
             Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
+            Thread.Sleep(1); // so log message can be written
             foreach (DictionaryEntry var in Environment.GetEnvironmentVariables())
             {
                 Logger.Instance.DLog($"ENV.{var.Key} = {var.Value}");
+                Thread.Sleep(1); // so log message can be written
             }
-            
+            Thread.Sleep(1); // so log message can be written
             Logger.Instance.ILog(new string('=', 50));
+            Thread.Sleep(1); // so log message can be written
 
             CleanDefaultTempDirectory();
 

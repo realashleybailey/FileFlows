@@ -154,9 +154,9 @@ public class SettingsController : Controller
         });
         
         // validate license it
-        var licResult = await LicenseValidatorWorker.ValidateLicense(model.LicenseEmail, model.LicenseKey);
-        AppSettings.Instance.LicenseKey = model.LicenseKey;
-        AppSettings.Instance.LicenseEmail = model.LicenseEmail;
+        var licResult = await LicenseValidatorWorker.ValidateLicense(model.LicenseEmail?.Trim(), model.LicenseKey?.Trim());
+        AppSettings.Instance.LicenseKey = model.LicenseKey?.Trim();
+        AppSettings.Instance.LicenseEmail = model.LicenseEmail?.Trim();
         AppSettings.Instance.LicenseCode = licResult.LicenseCode;
 
         var newConnectionString = GetConnectionString(model, model.DbType);

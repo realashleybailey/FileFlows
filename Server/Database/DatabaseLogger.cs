@@ -38,7 +38,9 @@ public class DatabaseLogger:ILogWriter
             x == null ? "null" :
             x.GetType().IsPrimitive ? x.ToString() :
             x is string ? x.ToString() :
-            System.Text.Json.JsonSerializer.Serialize(x)));
+            JsonSerializer.Serialize(x)));
+        if (message.StartsWith("\"") && message.EndsWith("\""))
+            message = message[1..^1];
         await DbHelper.Log(clientUid, type, message);
     }
 }

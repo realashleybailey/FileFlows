@@ -1,0 +1,1 @@
+p{margin-bottom:1rem;white-space:pre-line}select{background:var(--input-background);color:var(--color);width:100%;display:block;border:solid 1px var(--border-color);padding:.25rem}select:focus{outline:solid 1px var(--accent)}select option:active,select option:focus,select option:hover{background:var(--accent);color:var(--color)}

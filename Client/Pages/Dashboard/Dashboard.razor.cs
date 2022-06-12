@@ -310,8 +310,16 @@ ffmpeg version 4.1.8 Copyright (c) 2000-2021 the FFmpeg developers
         private async Task TogglePaused()
         {
             bool paused = SystemInfo.IsPaused;
+            int duration = 0;
+            if (paused == false)
+            {
+                duration = await PausePrompt.Show();
+                if (duration < 1)
+                    return;
+                
+            }
             paused = !paused;
-            await HttpHelper.Post($"/api/system/pause" + (paused == false ? "?resume=true" : ""));
+            await HttpHelper.Post($"/api/system/pause?duration=" + duration);
             var systemInfoResult = await GetSystemInfo();
             if (systemInfoResult.Success)
             {

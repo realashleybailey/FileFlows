@@ -142,7 +142,7 @@ public class SettingsController : Controller
 
         await Save(new ()
         {
-            IsPaused = model.IsPaused,
+            PausedUntil = model.PausedUntil,
             LogFileRetention = model.LogFileRetention,
             LogDatabaseRetention = model.LogDatabaseRetention,
             AutoUpdate = model.AutoUpdate,

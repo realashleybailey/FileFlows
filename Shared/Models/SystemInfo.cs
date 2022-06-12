@@ -19,4 +19,9 @@ public class SystemInfo
     /// Gets or sets if the system is paused
     /// </summary>
     public bool IsPaused { get; set; }
+
+    /// <summary>
+    /// Gets or sets when the system is paused until
+    /// </summary>
+    public DateTime PausedUntil { get; set; }
 }

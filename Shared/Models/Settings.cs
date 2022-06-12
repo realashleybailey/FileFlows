@@ -56,9 +56,14 @@ public class Settings : FileFlowObject
     public string Version { get; set; }
 
     /// <summary>
-    /// Gets or sets if the system is paused
+    /// Gets or sets if when the system is paused until
     /// </summary>
-    public bool IsPaused { get; set; }
+    public DateTime PausedUntil { get; set; } = DateTime.MinValue;
+
+    /// <summary>
+    /// Gets if the system is paused
+    /// </summary>
+    public bool IsPaused => DateTime.Now < PausedUntil;
 
     /// <summary>
     /// Gets or sets the number of log files to keep

@@ -178,6 +178,7 @@ a.btn span {
     left: 50%;
     transform: translate(-50%, -50%);
     min-width: min(28rem, 80vw);
+    max-width: min(40rem, 80vw);
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base-rgb), 0.9);
   }
@@ -647,6 +648,19 @@ hr {
   border: solid 1px transparent !important;
 }
 
+.daterangeinput {
+  background: var(--input-background);
+  color: var(--color);
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid var(--border-color);
+}
+.daterangeinput .fa-chevron-down {
+  font-size: 0.65rem;
+  position: relative;
+  top: 0.45rem;
+}
+
 .daterangepicker {
   background: var(--input-background) !important;
   border: solid 1px var(--border-color) !important;
@@ -685,15 +699,6 @@ hr {
 .daterangepicker .ranges li:hover {
   background: rgba(var(--accent-rgb), 0.5) !important;
   color: var(--color) !important;
-}
-
-
-.daterangeinput {
-  background: var(--input-background);
-  color: var(--color);
-  cursor: pointer;
-  padding: 0.1rem 0.25rem;
-  border: 1px solid var(--border-color);
 }
 
 /*# sourceMappingURL=app.css.map */

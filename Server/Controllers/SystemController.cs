@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Diagnostics;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Workers;
@@ -74,17 +75,17 @@ public class SystemController:Controller
     /// <summary>
     /// Pauses the system
     /// </summary>
-    /// <param name="resume">if true, resumes the system</param>
+    /// <param name="duration">duration in minutes to pause for, any number less than 1 will resume</param>
     [HttpPost("pause")]
-    public async Task Pause([FromQuery] bool resume = false)
+    public async Task Pause([FromQuery] int duration)
     {
         var controller = new SettingsController();
         var settings = await controller.Get();
-        bool pause = resume == false;
-        if (settings.IsPaused == pause)
-            return; // nothing to do
-
-        settings.IsPaused = pause;
+        if (duration < 1)
+            settings.PausedUntil = DateTime.MinValue;
+        else
+            settings.PausedUntil = DateTime.Now.AddMinutes(duration);
+        
         await controller.Save(settings);
     }
 
@@ -102,7 +103,9 @@ public class SystemController:Controller
         //info.MemoryUsage = proc.PrivateMemorySize64;
         info.MemoryUsage = GC.GetTotalMemory(true);
         info.CpuUsage = await GetCpuPercentage();
-        info.IsPaused = (await new SettingsController().Get()).IsPaused;
+        var settings = await new SettingsController().Get();
+        info.IsPaused = settings.IsPaused;
+        info.PausedUntil = settings.PausedUntil;
         return info;
     }
 

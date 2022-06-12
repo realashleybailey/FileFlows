@@ -74,6 +74,11 @@
     "Import": {
       "Title": "Import Flow",
       "Message": "Select an exported flow to import into the system."
+    },
+    "PauseDialog":
+    {
+      "Title":"Pause Processing",
+      "Message":"Select the amount of time to pause processing for.\nNote: The current flows will continue to execute, but no other flows will be executed until his time is up."
     }
   },
   "Enums": {

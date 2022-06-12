@@ -1,0 +1,20 @@
+@namespace FileFlows.Client.Components.Dialogs
+
+<Modal Title="@Title" Visible="Visible">
+
+    <Body>
+        <p>
+            @Message
+        </p>
+        <select @bind="Value" id="@Uid">
+            @foreach (var dur in Durations)
+            {
+                <option value=@dur.Key>@dur.Value</option>
+            }
+        </select>
+    </Body>
+    <Footer>
+        <button @onclick=@Accept>@lblOk</button>
+        <button @onclick=@Cancel>@lblCancel</button>
+    </Footer>
+</Modal>

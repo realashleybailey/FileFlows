@@ -64,9 +64,9 @@ public class LogService:Service, ILogService
     {
         try
         {
-            await HttpHelper.Post($"{ServiceBaseUrl}/api/log/message", message);
+            await HttpHelper.Post($"{ServiceBaseUrl}/api/log/message", message, noLog: true);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // silent fail
         }

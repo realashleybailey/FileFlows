@@ -39,8 +39,10 @@ public class NodeUpdater:UpdaterWorker
     /// <returns>the downloaded binary filename</returns>
     protected override string DownloadUpdateBinary()
     {   
+        Logger.Instance.DLog("Checking for auto update");
         var systemService = SystemService.Load();
         var serverVersion = systemService.GetNodeUpdateVersion().Result;
+        Logger.Instance.DLog("Checking for auto update: " + serverVersion);
         if (serverVersion <= CurrentVersion)
             return string.Empty;
 

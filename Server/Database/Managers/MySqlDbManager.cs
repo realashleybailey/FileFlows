@@ -164,7 +164,6 @@ public class MySqlDbManager: DbManager
         }
         catch (Exception)
         {
-            
         }
     }
 
@@ -178,7 +177,7 @@ public class MySqlDbManager: DbManager
         using var db = GetDb();
         string sql = $"select * from {nameof(DbLogMessage)} " +
                      $"where ({nameof(DbLogMessage.LogDate)} between @0 and @1) " +
-                     (filter.ClientUid != null ? $" and {nameof(DbLogMessage.ClientUid)} = @2 " : "") +
+                     $" and {nameof(DbLogMessage.ClientUid)} = @2 " +
                      (filter.Type != null ?
                          $" and {nameof(DbLogMessage.Type)} {(filter.TypeIncludeHigherSeverity ? "<=" : "=")} @3" 
                      : "") +
@@ -186,7 +185,7 @@ public class MySqlDbManager: DbManager
                      $" order by {nameof(DbLogMessage.LogDate)} desc " +
                      " limit 1000";
         var results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
-            filter.ClientUid?.ToString() ?? string.Empty,
+            filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString(),
             filter.Type == null ? 0 : (int)filter.Type,
             string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
         // need to reverse them as they're ordered newest at top

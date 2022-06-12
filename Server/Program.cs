@@ -41,7 +41,7 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
 
 
-            InitializeLogger();
+            InitializeLoggers();
 
             Logger.Instance.ILog(new string('=', 50));
             Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
@@ -125,10 +125,10 @@ public class Program
         }
     }
 
-    private static void InitializeLogger()
+    private static void InitializeLoggers()
     {
-        Shared.Logger.Instance = Logger.Instance;
-        ServerShared.Logger.Instance = Logger.Instance;
+        new ServerShared.FileLog(DirectoryHelper.LoggingDirectory, "FileFlows");
+        new ConsoleLogger();
     }
 
     private static bool PrepareDatabase()
@@ -179,6 +179,8 @@ public class Program
         // run any upgrade code that may need to be run
         var settings = DbHelper.Single<Settings>().Result;
         new Upgrade.Upgrader().Run(settings);
+
+        new DatabaseLogger();
         
         return true;
     }

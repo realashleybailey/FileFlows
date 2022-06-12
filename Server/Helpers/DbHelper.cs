@@ -1,18 +1,8 @@
-using System.Data.Entity.Infrastructure;
 using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
-using MySqlConnector;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Helpers;
-
-using System;
-using System.Collections.Generic;
-using NPoco;
-using FileFlows.Server.Models;
-using System.Data.SQLite;
-using FileFlows.Shared;
-using FileFlows.Shared.Models;
-using System.Text;
 
 /// <summary>
 /// Database helper for communicating with the database
@@ -211,6 +201,19 @@ public class DbHelper
         var data = await Manager.GetShrinkageGroups();
         return data.OrderByDescending(x => x.OriginalSize).ToDictionary(x => x.Library, x => x);
     }
+
+    /// <summary>
+    /// Logs a message to the database
+    /// </summary>
+    /// <param name="clientUid">The UID of the client, use Guid.Empty for the server</param>
+    /// <param name="type">the type of log message</param>
+    /// <param name="message">the message to log</param>
+    public static Task Log(Guid clientUid, LogType type, string message) => Manager.Log(clientUid, type, message);
+    /// <summary>
+    /// Prune old logs from the database
+    /// </summary>
+    /// <param name="maxLogs">the maximum number of log messages to keep</param>
+    public static Task PruneOldLogs(int maxLogs) => Manager.PruneOldLogs(maxLogs);
 
     /// <summary>
     /// Gets the failure flow for a particular library

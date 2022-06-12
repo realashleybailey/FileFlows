@@ -18,7 +18,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet]
         public string Get([FromQuery] Plugin.LogType logLevel = Plugin.LogType.Info)
         {
-            if (Logger.Instance is FileLogger logger)
+            if (Logger.Instance.TryGetLogger(out FileLog logger))
             {
                 string log = logger.GetTail(1000, logLevel);
                 string html = LogToHtml.Convert(log);
@@ -34,7 +34,7 @@ namespace FileFlows.Server.Controllers
         [HttpGet("download")]
         public IActionResult Download()
         {
-            if (Logger.Instance is FileLogger logger)
+            if (Logger.Instance.TryGetLogger(out FileLog logger))
             {
                 string filename = logger.GetLogFilename();
                 byte[] content = System.IO.File.ReadAllBytes(filename);

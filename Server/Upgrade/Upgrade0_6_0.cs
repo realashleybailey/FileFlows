@@ -3,8 +3,15 @@ using FileFlows.Shared;
 
 namespace FileFlows.Server.Upgrade;
 
+/// <summary>
+/// Upgrade to FileFlows v0.6.0
+/// </summary>
 public class Upgrade0_6_0
 {
+    /// <summary>
+    /// Runs the update
+    /// </summary>
+    /// <param name="settings">the settings</param>
     public void Run()
     {
         Logger.Instance.ILog("Upgrade running, running 0.6.0 upgrade script");

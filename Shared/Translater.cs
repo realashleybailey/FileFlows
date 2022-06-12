@@ -18,13 +18,9 @@ public class Translater
     private static Dictionary<string, string> Language { get; set; } = new Dictionary<string, string>();
     private static Regex rgxNeedsTranslating = new Regex(@"^([\w\d_\-]+\.)+[\w\d_\-]+$");
 
-    /// <summary>
-    /// Gets or sets the logger used by the translater when there are any translation issues
-    /// </summary>
-    public static ILogger Logger { get; set; }
 
     /// <summary>
-    /// Translates a string if the string needs trnslating
+    /// Translates a string if the string needs translating
     /// </summary>
     /// <param name="value">The string to translate if needed</param>
     /// <returns>The translated string if needed, otherwise the original string</returns>
@@ -73,7 +69,7 @@ public class Translater
             catch (Exception) { }
         }
 
-        Logger?.DLog("Language keys found: " + Language.Keys.Count);
+        Logger.Instance.DLog("Language keys found: " + Language.Keys.Count);
     }
     
     /// <summary>
@@ -130,7 +126,7 @@ public class Translater
 
         string result = possibleKeys?.FirstOrDefault() ?? "";
         if(supressWarnings == false)
-            Logger?.WLog("Failed to lookup key: " + result);
+            Logger.Instance.WLog("Failed to lookup key: " + result);
         result = result.Substring(result.LastIndexOf(".") + 1);
 
         return result;
@@ -169,7 +165,7 @@ public class Translater
         catch (Exception ex)
         {
             if(supressWarnings == false)
-                Logger?.WLog("Failed to translating key: " + possibleKeys[0] + ", " + ex.Message);
+                Logger.Instance.WLog("Failed to translating key: " + possibleKeys[0] + ", " + ex.Message);
             return possibleKeys[0];
         }
     }

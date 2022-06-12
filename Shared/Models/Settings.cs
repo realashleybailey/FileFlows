@@ -64,6 +64,11 @@ public class Settings : FileFlowObject
     /// Gets or sets the number of log files to keep
     /// </summary>
     public int LogFileRetention { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of log entries to keep
+    /// </summary>
+    public int LogDatabaseRetention { get; set; }
 }
 
 /// <summary>

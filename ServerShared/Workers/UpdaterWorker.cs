@@ -1,10 +1,7 @@
-using FileFlows.ServerShared.Helpers;
-using FileFlows.Shared.Helpers;
-
-namespace FileFlows.ServerShared.Workers;
-
 using System.Diagnostics;
 using System.IO.Compression;
+
+namespace FileFlows.ServerShared.Workers;
 
 /// <summary>
 /// Worker that will automatically update the system

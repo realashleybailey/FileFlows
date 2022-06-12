@@ -654,7 +654,7 @@ public abstract class DbManager
     protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
     {
         Dictionary<string, string> scripts = new();
-        foreach (string script in new[] { "GetLibraryFiles", "GetShrinkageData" })
+        foreach (string script in new[] { "GetLibraryFiles", "GetShrinkageData", "DeleteOldLogs" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
             scripts.Add(script, sql);
@@ -686,6 +686,20 @@ public abstract class DbManager
     /// <returns>the shrinkage group data</returns>
     public abstract Task<IEnumerable<ShrinkageData>> GetShrinkageGroups();
 
+    /// <summary>
+    /// Logs a message to the database
+    /// </summary>
+    /// <param name="clientUid">The UID of the client, use Guid.Empty for the server</param>
+    /// <param name="type">the type of log message</param>
+    /// <param name="message">the message to log</param>
+    public virtual Task Log(Guid clientUid, LogType type, string message) => Task.CompletedTask;
+    
+    /// <summary>
+    /// Prune old logs from the database
+    /// </summary>
+    /// <param name="maxLogs">the maximum number of log messages to keep</param>
+    public virtual Task PruneOldLogs(int maxLogs) => Task.CompletedTask;
+    
     /// <summary>
     /// Gets an item from the database by it's name
     /// </summary>

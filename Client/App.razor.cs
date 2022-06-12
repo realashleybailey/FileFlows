@@ -44,9 +44,7 @@ namespace FileFlows.Client
         protected override async Task OnInitializedAsync()
         {
             Instance = this;
-            Logger.jsRuntime = jsRuntime;
-            Translater.Logger = Logger.Instance;
-            FileFlows.Shared.Logger.Instance = Logger.Instance;
+            ClientConsoleLogger.jsRuntime = jsRuntime;
             HttpHelper.Client = Client;
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;

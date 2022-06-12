@@ -22,6 +22,8 @@ public class LogFileCleaner:Worker
     protected sealed override void Execute()
     {
         var settings = new SettingsService().Get().Result;
+        if (settings == null || settings.LogFileRetention < 1)
+            return; // not yet ready
         var dir = DirectoryHelper.LoggingDirectory;
         int count = 0;
         foreach (var file in new DirectoryInfo(dir).GetFiles("FileFlows*.log").OrderByDescending(x => x.LastWriteTime))

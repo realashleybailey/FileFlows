@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Avalonia;
 using FileFlows.Node.Ui;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 
@@ -80,8 +81,9 @@ public class Program
                 AppSettings.ForcedHostName = options.Name;
 
 
-            Logger.Instance = new ServerShared.FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
-            ServerShared.Logger.Instance = Logger.Instance;
+            new ServerShared.FileLog(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
+            new ConsoleLogger();
+            
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
             AppSettings.Init();

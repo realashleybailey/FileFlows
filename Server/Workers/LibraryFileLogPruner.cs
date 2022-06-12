@@ -6,12 +6,12 @@ namespace FileFlows.Server.Workers;
 /// <summary>
 /// Worker that will automatically delete logs for non existing library files
 /// </summary>
-public class LogPruner:Worker
+public class LibraryFileLogPruner:Worker
 {
     /// <summary>
     /// Constructor for the log pruner
     /// </summary>
-    public LogPruner() : base(ScheduleType.Hourly, 3)
+    public LibraryFileLogPruner() : base(ScheduleType.Hourly, 3)
     {
     }
     

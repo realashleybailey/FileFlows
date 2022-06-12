@@ -116,6 +116,18 @@ public class NodeManager
                              windows ? Path.Combine(path, "Tools", "ffmpeg.exe") : "/usr/local/bin/ffmpeg"
                 }
             };
+        if (AppSettings.EnvironmentalMappings?.Any() == true)
+        {
+            Logger.Instance.ILog("Environmental mappings found, adding those");
+            mappings.AddRange(AppSettings.EnvironmentalMappings);
+        }
+
+        if (AppSettings.EnvironmentalRunnerCount != null)
+            AppSettings.Instance.Runners = AppSettings.EnvironmentalRunnerCount.Value;
+
+        if (AppSettings.EnvironmentalEnabled != null)
+            AppSettings.Instance.Enabled = AppSettings.EnvironmentalEnabled.Value; 
+                
 
         var settings = AppSettings.Instance;
         var nodeService = new NodeService();

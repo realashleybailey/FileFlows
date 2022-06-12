@@ -1,10 +1,13 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Avalonia;
 using FileFlows.Node.Ui;
 using FileFlows.Node.Utils;
 using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
+using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace FileFlows.Node;
 public class Program
@@ -64,9 +67,7 @@ public class Program
         
         try
         {
-            AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
-            AppSettings.ForcedTempPath = Environment.GetEnvironmentVariable("TempPath");
-            AppSettings.ForcedHostName = Environment.GetEnvironmentVariable("NodeName");
+            LoadEnvironmentalVaraibles();
             
             Service.ServiceBaseUrl = AppSettings.Load().ServerUrl;
             #if(DEBUG)
@@ -149,6 +150,36 @@ public class Program
         catch (Exception ex)
         {
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+        }
+    }
+
+    private static void LoadEnvironmentalVaraibles()
+    {
+        AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
+        AppSettings.ForcedTempPath = Environment.GetEnvironmentVariable("TempPath");
+        AppSettings.ForcedHostName = Environment.GetEnvironmentVariable("NodeName");
+
+        string mappings = Environment.GetEnvironmentVariable("NodeMappings");
+        if (string.IsNullOrWhiteSpace(mappings) == false)
+        {
+            try
+            {
+                var mappingsArray = JsonSerializer.Deserialize<List<RegisterModelMapping>>(mappings);
+                if (mappingsArray?.Any() == true)
+                    AppSettings.EnvironmentalMappings = mappingsArray;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        if (int.TryParse(Environment.GetEnvironmentVariable("NodeRunnerCount") ?? string.Empty, out int runnerCount))
+        {
+            AppSettings.EnvironmentalRunnerCount = runnerCount;
+        }
+        if (bool.TryParse(Environment.GetEnvironmentVariable("NodeEnabled") ?? string.Empty, out bool enabled))
+        {
+            AppSettings.EnvironmentalEnabled = enabled;
         }
     }
 

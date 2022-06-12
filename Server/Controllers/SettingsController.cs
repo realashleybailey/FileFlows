@@ -68,7 +68,7 @@ public class SettingsController : Controller
     public async Task<SettingsUiModel> GetUiModel()
     {
         var settings = await Get();
-        var license = License.FromCode(AppSettings.Instance.LicenseCode);
+        var license = LicenseHelper.GetLicense();
         if (license.Status == LicenseStatus.Unlicensed && string.IsNullOrWhiteSpace(AppSettings.Instance.LicenseKey) == false)
             license.Status = LicenseStatus.Invalid;
         // clone it so we can remove some properties we dont want passed to the UI
@@ -154,10 +154,9 @@ public class SettingsController : Controller
         });
         
         // validate license it
-        var licResult = await LicenseValidatorWorker.ValidateLicense(model.LicenseEmail?.Trim(), model.LicenseKey?.Trim());
         AppSettings.Instance.LicenseKey = model.LicenseKey?.Trim();
         AppSettings.Instance.LicenseEmail = model.LicenseEmail?.Trim();
-        AppSettings.Instance.LicenseCode = licResult.LicenseCode;
+        await LicenseHelper.Update();
 
         var newConnectionString = GetConnectionString(model, model.DbType);
         if (IsConnectionSame(AppSettings.Instance.DatabaseConnection, newConnectionString) == false)

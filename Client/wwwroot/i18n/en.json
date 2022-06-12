@@ -30,6 +30,8 @@
     "License":"License",
     "Name": "Name",
     "Advanced": "Advanced",
+    "Search": "Search",
+    "Searching": "Searching",
     "Filter": "Filter",
     "FilterPlaceholder": "Filter (/)",
     "Log": "Log",
@@ -55,7 +57,13 @@
     "BaseCodeOn": "Use Code Template",
     "CopyToClipboard": "Copy to clipboard",
     "CopiedToClipboard": "Copied ''{text}'' to clipboard.",
-    "Test":"Test"
+    "Test":"Test",
+    "DateRanges":{
+      "Today":"Today",
+      "Yesterday":"Yesterday",
+      "Last24Hours":"Last 24 Hours",
+      "Last3Days":"Last 3 Days"
+    }
   },
   "Dialogs":{
     "FileBrowser": {
@@ -262,7 +270,10 @@
       }
     },
     "Log": {
-      "Title": "Log"
+      "Title": "Log",
+      "Labels":{
+        "AutoRefresh":"Auto Refresh"
+      }
     },
     "Nodes": {
       "Title": "Nodes",

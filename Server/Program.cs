@@ -4,6 +4,7 @@ using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
+using FileFlows.Server.Workers;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server;
@@ -90,6 +91,8 @@ public class Program
             // create new client, this can be used by upgrade scripts, so do this before preparing database
             Shared.Helpers.HttpHelper.Client = new HttpClient();
 
+            CheckLicense();
+
             if (PrepareDatabase() == false)
                 return;
 
@@ -131,6 +134,11 @@ public class Program
         }
     }
 
+    private static void CheckLicense()
+    {
+        LicenseHelper.Update().Wait();
+    }
+
     private static void InitializeLoggers()
     {
         new ServerShared.FileLog(DirectoryHelper.LoggingDirectory, "FileFlows");
@@ -142,12 +150,16 @@ public class Program
         if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseConnection) == false &&
             AppSettings.Instance.DatabaseConnection.Contains(".sqlite") == false)
         {
-            // get license code from current database, need to load the license
-            var code = AppSettings.Instance.LicenseCode;
-            
             // check if licensed for external db, if not force migrate to sqlite
-            if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase, code ?? string.Empty) == false)
+            if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase) == false)
             {
+                #if(DEBUG)
+                // twice for debugging so we can step into it and see why
+                if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase) == false)
+                {
+                }
+                #endif
+
                 Logger.Instance.WLog("No longer licensed for external database, migrating to SQLite database.");
                 AppSettings.Instance.DatabaseMigrateConnection = SqliteDbManager.GetDefaultConnectionString();
             }

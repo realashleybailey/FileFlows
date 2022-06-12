@@ -193,7 +193,7 @@ public class MySqlDbManager: DbManager
         return await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
             filter.ClientUid?.ToString() ?? string.Empty,
             filter.Type == null ? 0 : (int)filter.Type,
-            filter.Message ?? string.Empty);
+            string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
     }
 
     /// <summary>

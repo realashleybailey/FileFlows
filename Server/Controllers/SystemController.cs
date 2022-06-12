@@ -1,8 +1,9 @@
 using System.Diagnostics;
-using System.IO.Compression;
+using FileFlows.Server.Helpers;
 using FileFlows.Server.Workers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using FileHelper = FileFlows.ServerShared.Helpers.FileHelper;
 
 namespace FileFlows.Server.Controllers;
 

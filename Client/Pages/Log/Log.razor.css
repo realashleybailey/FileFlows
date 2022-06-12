@@ -1,4 +1,4 @@
-﻿.log ::deep .row {
+.log ::deep .row {
   white-space: pre;
   font-family: monospace;
   position: absolute;
@@ -9,3 +9,11 @@
   padding: 1rem;
   overflow: auto;
 }
+
+.auto-refresh {
+  margin-right: 1rem;
+  position: relative;
+  top: 3px;
+}
+
+/*# sourceMappingURL=Log.razor.css.map */

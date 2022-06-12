@@ -1,4 +1,4 @@
-﻿.vi-container {
+.vi-container {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -47,9 +47,16 @@
   width: 7rem;
   padding: unset;
 }
+.top-row .other ::deep a {
+  width: 7rem;
+  text-align: center;
+  display: inline-block;
+  padding-top: 0.5rem;
+  cursor: pointer;
+}
 .top-row ::deep a, .top-row .btn-link {
   white-space: nowrap;
-  margin-left: 1.5rem;
+  margin-left: 0.5rem;
 }
 .top-row a:first-child {
   overflow: hidden;
@@ -82,3 +89,5 @@
 .bottom-buttons ::deep button + button {
   margin-left: 1rem;
 }
+
+/*# sourceMappingURL=ViContainer.razor.css.map */

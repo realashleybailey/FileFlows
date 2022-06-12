@@ -6,7 +6,12 @@
     <Head>
         @if (UsingDatabase)
         {
-            <button class="btn" @onclick=@ToggleSearch>@lblSearch</button>
+            <span class="auto-refresh">
+                <FlowSwitch @bind-Value="@AutoRefresh" />
+                @lblAutoRefresh
+            </span>
+            
+            <a class="btn" @onclick=@ToggleSearch>@lblSearch</a>
         }
         else
         {
@@ -30,12 +35,18 @@
 
 </PageView>
 
-<form class="search-pane @(SearchVisible ? "visible" : "hidden")" @onsubmit=@Refresh>
+<form class="search-pane @(SearchVisible ? "visible" : "hidden")" @onsubmit=@Search>
     <div class="search-head">
         <span class="title">@lblSearch</span>
         <span class="close" @onclick=@ToggleSearch></span>
     </div>
     <div class="search-fields">
+        <div class="search-field input">
+            <div class="label">Date</div>
+            <div class="value">
+                <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRanges TimePicker="true" TimePicker24Hour="true"  DateFormat="@($"d MMM HH:mm")"/>
+            </div>
+        </div>
         <div class="search-field input">
             <div class="label">Type</div>
             <div class="value">

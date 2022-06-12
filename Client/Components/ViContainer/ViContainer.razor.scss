@@ -50,11 +50,18 @@
             width:7rem;
             padding:unset;
         }
+        ::deep a {
+            width: 7rem;
+            text-align: center;
+            display: inline-block;
+            padding-top: 0.5rem;
+            cursor:pointer;
+        }
     }
 
     ::deep a, .btn-link {
         white-space: nowrap;
-        margin-left: 1.5rem;
+        margin-left: .5rem;
     }
 
     a:first-child {

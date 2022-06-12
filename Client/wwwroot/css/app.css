@@ -582,6 +582,7 @@ hr {
 }
 .search-pane.visible {
   display: unset;
+  z-index: 10000;
 }
 .search-pane .search-head {
   font-size: 1.25rem;
@@ -644,6 +645,46 @@ hr {
   color: var(--color);
   padding: 2px;
   border: solid 1px transparent !important;
+}
+
+.daterangepicker {
+  background: var(--input-background) !important;
+  border: solid 1px var(--border-color) !important;
+}
+.daterangepicker .calendar-table {
+  background: var(--base) !important;
+  color: var(--color) !important;
+  border: solid 1px var(--border-color) !important;
+}
+.daterangepicker td.off {
+  background: var(--base-darkest) !important;
+}
+.daterangepicker td:hover {
+  background: var(--accent) !important;
+  color: var(--color) !important;
+}
+.daterangepicker td.active {
+  background-color: rgba(var(--accent-rgb), 0.5) !important;
+  color: var(--color) !important;
+}
+.daterangepicker td.in-range:not(.start-date):not(.end-date) {
+  background-color: var(--input-background) !important;
+  color: var(--color) !important;
+}
+.daterangepicker select {
+  background: var(--input-background) !important;
+  border: solid 1px var(--border-color) !important;
+}
+.daterangepicker .applyBtn:disabled {
+  display: none !important;
+}
+.daterangepicker .ranges li.active {
+  background: var(--accent) !important;
+  color: var(--color) !important;
+}
+.daterangepicker .ranges li:hover {
+  background: rgba(var(--accent-rgb), 0.5) !important;
+  color: var(--color) !important;
 }
 
 /*# sourceMappingURL=app.css.map */

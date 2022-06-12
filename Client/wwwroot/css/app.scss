@@ -215,6 +215,7 @@ input[type=file]{
 .search-pane {    
     &.visible {
         display:unset;
+        z-index:10000;
     }
     display: none;
     position: fixed;
@@ -291,5 +292,48 @@ input[type=file]{
         color:var(--color);
         padding: 2px;
         border: solid 1px transparent !important;
+    }
+}
+
+.daterangepicker  {
+
+    background: var(--input-background) !important;
+    border: solid 1px var(--border-color) !important;;
+    .calendar-table{
+        background: var(--base) !important;;
+        color: var(--color) !important;;
+        border: solid 1px var(--border-color) !important;;
+    }
+    td.off {
+        background: var(--base-darkest) !important;;
+    }
+    td:hover {
+        background: var(--accent) !important;
+        color: var(--color) !important;
+    }
+    td.active {
+        background-color:rgba(var(--accent-rgb), 0.5) !important;;
+        color:var(--color) !important;
+    }
+    td.in-range:not(.start-date):not(.end-date) {
+        background-color: var(--input-background) !important;
+        color:var(--color) !important;
+    }
+    select {
+        background: var(--input-background) !important;
+        border: solid 1px var(--border-color) !important;
+    }
+    .applyBtn:disabled {
+        display: none !important;
+    }
+    .ranges li.active
+    {
+        background:var(--accent) !important;
+        color: var(--color) !important;
+    }
+    .ranges li:hover
+    {
+        background:rgba(var(--accent-rgb), 0.5) !important;
+        color: var(--color) !important;
     }
 }

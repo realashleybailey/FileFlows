@@ -51,7 +51,7 @@ public abstract class UpdaterWorker : Worker
     /// Pre-check to run before executing
     /// </summary>
     /// <returns>if false, no update will be checked for</returns>
-    protected virtual bool PreCheck() => false;
+    protected virtual bool PreCheck() => true;
     
     /// <summary>
     /// Runs a check for update and if found will download it 
@@ -61,7 +61,7 @@ public abstract class UpdaterWorker : Worker
     {
         if (PreCheck() == false)
             return false;
-        
+
         Logger.Instance?.ILog($"{UpdaterName}: Checking for update");
         try
         {

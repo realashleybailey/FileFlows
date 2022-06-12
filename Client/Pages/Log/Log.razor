@@ -60,6 +60,12 @@
             </div>
         </div>
         <div class="search-field input">
+            <div class="label">
+                <FlowSwitch @bind-Value=@SearchModel.TypeIncludeHigherSeverity />
+                Include Higher Severity
+            </div>
+        </div>
+        <div class="search-field input">
             <div class="label">Text</div>
             <div class="value">
                 <input type="text" @bind="SearchModel.Message">

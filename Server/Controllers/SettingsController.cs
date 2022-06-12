@@ -74,7 +74,7 @@ public class SettingsController : Controller
         // clone it so we can remove some properties we dont want passed to the UI
         string json = JsonSerializer.Serialize(settings);
         var uiModel = JsonSerializer.Deserialize<SettingsUiModel>(json);
-        await SetLicenseFields(uiModel, license);
+        SetLicenseFields(uiModel, license);
         
 
 
@@ -119,7 +119,7 @@ public class SettingsController : Controller
         }
     }
 
-    private async Task SetLicenseFields(SettingsUiModel settings, License license)
+    private void SetLicenseFields(SettingsUiModel settings, License license)
     {
         settings.LicenseKey = AppSettings.Instance.LicenseKey;
         settings.LicenseEmail  = AppSettings.Instance.LicenseEmail;
@@ -140,7 +140,7 @@ public class SettingsController : Controller
         if (model == null)
             return;
 
-        Save(new ()
+        await Save(new ()
         {
             IsPaused = model.IsPaused,
             LogFileRetention = model.LogFileRetention,
@@ -251,6 +251,7 @@ public class SettingsController : Controller
             await Task.Delay(1);
             return ServerUpdater.Instance.RunCheck();
         });
+        await Task.CompletedTask;
     }
     
 }

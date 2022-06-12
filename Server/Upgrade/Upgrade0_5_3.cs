@@ -10,7 +10,6 @@ public class Upgrade0_5_3
     /// <summary>
     /// Runs the update
     /// </summary>
-    /// <param name="settings">the settings</param>
     public void Run()
     {
         Logger.Instance.ILog("Upgrade running, running 0.5.3 upgrade script");

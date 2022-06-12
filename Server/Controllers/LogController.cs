@@ -38,9 +38,6 @@ namespace FileFlows.Server.Controllers
         [HttpPost("search")]
         public async Task<string> Search([FromBody] LogSearchModel filter)
         {
-            if (string.IsNullOrEmpty(filter.Message) && filter.ClientUid == null && filter.Type != LogType.Warning && filter.Type != LogType.Error)
-                return Get(filter.Type ?? LogType.Info);
-            
             if (DbHelper.UseMemoryCache)
                 return "Not using external database, cannot search";
             var messages = await DbHelper.SearchLog(filter);

@@ -16,11 +16,6 @@ public class LibraryFileLogPruner:Worker
     }
     
     /// <summary>
-    /// Run the log pruner
-    /// </summary>
-    public void Run() => Execute();
-
-    /// <summary>
     /// Executes the log pruner, Run calls this 
     /// </summary>
     protected override void Execute()

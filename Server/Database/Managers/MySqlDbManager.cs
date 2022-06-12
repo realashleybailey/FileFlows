@@ -77,16 +77,9 @@ public class MySqlDbManager: DbManager
         var scripts = GetStoredProcedureScripts("MySql");
         foreach (var script in scripts)
         {
-            try
-            {
-                Logger.Instance.ILog("Creating script: " + script.Key);
-                var sql = script.Value.Replace("@", "@@");
-                db.Execute(sql);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            Logger.Instance.ILog("Creating script: " + script.Key);
+            var sql = script.Value.Replace("@", "@@");
+            db.Execute(sql);
         }
     }
 
@@ -169,7 +162,7 @@ public class MySqlDbManager: DbManager
             using var db = GetDb();
             await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             
         }
@@ -186,14 +179,19 @@ public class MySqlDbManager: DbManager
         string sql = $"select * from {nameof(DbLogMessage)} " +
                      $"where ({nameof(DbLogMessage.LogDate)} between @0 and @1) " +
                      (filter.ClientUid != null ? $" and {nameof(DbLogMessage.ClientUid)} = @2 " : "") +
-                     (filter.Type != null ? $" and {nameof(DbLogMessage.Type)} = @3 " : "") +
+                     (filter.Type != null ?
+                         $" and {nameof(DbLogMessage.Type)} {(filter.TypeIncludeHigherSeverity ? "<=" : "=")} @3" 
+                     : "") +
                      (filter.Message?.EmptyAsNull() != null ? $" and {nameof(DbLogMessage.Message)} like @4 " : "") +
                      $" order by {nameof(DbLogMessage.LogDate)} desc " +
                      " limit 1000";
-        return await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
+        var results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
             filter.ClientUid?.ToString() ?? string.Empty,
             filter.Type == null ? 0 : (int)filter.Type,
             string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
+        // need to reverse them as they're ordered newest at top
+        results.Reverse();
+        return results;
     }
 
     /// <summary>

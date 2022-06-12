@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
@@ -17,7 +18,8 @@ public class DbHelper
     internal static Task<bool> Initialize()
     {
         string connstring = AppSettings.Instance.DatabaseConnection;
-        Logger.Instance.ILog("Initializing Database: " + connstring);
+        string logConnection = Regex.Replace(connstring, "(?<=(Password=))[^;]+(;|$)", "#PASSWORD#");
+        Logger.Instance.ILog("Initializing Database: " + logConnection);
         Manager = DbManager.GetManager(connstring);
         return Manager.CreateDb();
     }

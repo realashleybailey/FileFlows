@@ -248,7 +248,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 if (current >= licensedNodes)
                 {
                     node.Enabled = false;
-                    Update(node);
+                    await Update(node);
                 }
                 else
                 {

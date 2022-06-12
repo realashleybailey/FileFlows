@@ -22,6 +22,11 @@ public class LogSearchModel
     /// Gets or sets what log type to search for
     /// </summary>
     public LogType? Type { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if the search results should include log messages greater than the specified type
+    /// </summary>
+    public bool TypeIncludeHigherSeverity { get; set; }
 
     /// <summary>
     /// Gets or sets the from date to search

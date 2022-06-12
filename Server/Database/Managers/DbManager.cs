@@ -635,7 +635,7 @@ public abstract class DbManager
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = $"FileFlows.Server.Database.Scripts.{dbType}.{script}";
 
-            using Stream stream = assembly.GetManifestResourceStream(resourceName);
+            using Stream? stream = assembly.GetManifestResourceStream(resourceName);
             using StreamReader reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }

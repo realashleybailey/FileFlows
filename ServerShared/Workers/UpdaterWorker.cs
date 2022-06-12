@@ -164,7 +164,7 @@ public abstract class UpdaterWorker : Worker
             {
                 ZipFile.ExtractToDirectory(update, updateDir, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Logger.Instance?.ELog($"{UpdaterName}: Failed extract update zip, file likely corrupt during download, deleting update");
                 File.Delete(update);

@@ -314,7 +314,7 @@ public class FlowController : ControllerStore<Flow>
             ele.Description = sm.Description;
             ele.OutputLabels = sm.Outputs.Select(x => x.Description).ToList();
             int count = 0;
-            IDictionary<string, object> model = new ExpandoObject();
+            IDictionary<string, object> model = new ExpandoObject()!;
             ele.Fields = sm.Parameters.Select(x =>
             {
                 ElementField ef = new ElementField();
@@ -322,7 +322,8 @@ public class FlowController : ControllerStore<Flow>
                 {
                     ScriptArgumentType.Bool => FormInputType.Switch,
                     ScriptArgumentType.Int => FormInputType.Int,
-                    ScriptArgumentType.String => FormInputType.Text
+                    ScriptArgumentType.String => FormInputType.Text,
+                    _ => throw new ArgumentOutOfRangeException()
                 };
                 ef.Name = x.Name;
                 ef.Order = ++count;
@@ -339,10 +340,10 @@ public class FlowController : ControllerStore<Flow>
             ele.Group = "Scripts";
             ele.Type = FlowElementType.Script;
             ele.Outputs = sm.Outputs.Count;
-            ele.Model = (ExpandoObject)model;
+            ele.Model = model as ExpandoObject;
             return ele;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

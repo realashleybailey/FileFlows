@@ -15,11 +15,6 @@ public class DbLogPruner:Worker
     public DbLogPruner() : base(ScheduleType.Minute, 1)
     {
     }
-    
-    /// <summary>
-    /// Run the log pruner
-    /// </summary>
-    public void Run() => Execute();
 
     /// <summary>
     /// Executes the log pruner, Run calls this 

@@ -31,7 +31,7 @@ public class SqlServerDbManager: DbManager
     protected override DbCreateResult CreateDatabase(bool recreate)
     {
         var builder = new SqlConnectionStringBuilder(ConnectionString);
-        string dbName = builder["Database"].ToString();
+        string dbName = builder["Database"].ToString()?.EmptyAsNull() ?? "FileFlows";
         builder["Database"] = null;
 
         string connString = builder.ConnectionString;
@@ -65,15 +65,8 @@ public class SqlServerDbManager: DbManager
             foreach (string sql in script.Value.Split(new string[] { "\nGO" },
                          StringSplitOptions.RemoveEmptyEntries))
             {
-                try
-                {
-                    var sqlScript = sql.Replace("@", "@@").Trim();
-                    db.Execute(sqlScript);
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+                var sqlScript = sql.Replace("@", "@@").Trim();
+                db.Execute(sqlScript);
             }
         }
     }
@@ -128,7 +121,7 @@ public class SqlServerDbManager: DbManager
     /// Gets the shrinkage group data
     /// </summary>
     /// <returns>the shrinkage group data</returns>
-    public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
+    public override Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
     {
         throw new NotImplementedException();
     }

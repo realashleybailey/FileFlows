@@ -13,7 +13,7 @@ public class LogFileCleaner:Worker
     /// </summary>
     public LogFileCleaner() : base(ScheduleType.Hourly, 1)
     {
-        Execute();
+        Trigger();
     }
 
     /// <summary>
@@ -26,7 +26,8 @@ public class LogFileCleaner:Worker
             return; // not yet ready
         var dir = DirectoryHelper.LoggingDirectory;
         int count = 0;
-        foreach (var file in new DirectoryInfo(dir).GetFiles("FileFlows*.log").OrderByDescending(x => x.LastWriteTime))
+        foreach (var file in new DirectoryInfo(dir).GetFiles("FileFlows*.log")
+                     .OrderByDescending(x => x.LastWriteTime))
         {
             if (++count > settings.LogFileRetention)
             {

@@ -30,8 +30,9 @@ namespace FileFlows.Client.Pages
         private readonly LogSearchModel SearchModel = new()
         {
             Message = string.Empty,
-            Type = null,
             ClientUid = null,
+            Type = LogType.Info,
+            TypeIncludeHigherSeverity = true,
             FromDate = DateTime.Today,
             ToDate = DateTime.Today.AddDays(1)
         };

@@ -59,6 +59,7 @@
     "CopiedToClipboard": "Copied ''{text}'' to clipboard.",
     "Test":"Test",
     "DateRanges":{
+      "Live": "Live",
       "Today":"Today",
       "Yesterday":"Yesterday",
       "Last24Hours":"Last 24 Hours",

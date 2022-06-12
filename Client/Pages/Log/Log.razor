@@ -5,12 +5,7 @@
 <PageView FullWidth=true>
     <Head>
         @if (UsingDatabase)
-        {
-            <span class="auto-refresh">
-                <FlowSwitch @bind-Value="@AutoRefresh" />
-                @lblAutoRefresh
-            </span>
-            
+        {   
             <a class="btn" @onclick=@ToggleSearch>@lblSearch</a>
         }
         else
@@ -44,7 +39,27 @@
         <div class="search-field input">
             <div class="label">Date</div>
             <div class="value">
-                <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRanges TimePicker="true" TimePicker24Hour="true"  DateFormat="@($"d MMM HH:mm")"/>
+                <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRanges TimePicker="true" TimePicker24Hour="true" DateFormat="@($"d MMM HH:mm")">
+                      <PickerTemplate>
+                            <div id="@context.Id" @onclick="context.Toggle" class="daterangeinput">
+                                <i class="fas fa-calendar"></i>
+                                <span>
+                                    @if ((context.TStartDate == null && context.TEndDate == null) ||
+                                         (context.TStartDate == LiveStart && context.TEndDate == LiveEnd) )
+                                    {
+                                        <span>Live Data</span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            @context.FormattedRange
+                                        </span>
+                                    }
+                                </span>
+                                <i class="fas fa-chevron-down float-right"></i>
+                            </div>
+                        </PickerTemplate>
+                </DateRangePicker>
             </div>
         </div>
         <div class="search-field input">

@@ -294,6 +294,19 @@ input[type=file]{
         border: solid 1px transparent !important;
     }
 }
+.daterangeinput {
+    background: var(--input-background);
+    color: var(--color);
+    cursor: pointer;
+    padding: 0.1rem 0.25rem;
+    border: 1px solid var(--border-color);
+    .fa-chevron-down
+    {
+        font-size: 0.65rem;
+        position: relative;
+        top: 0.45rem;
+    }
+}
 
 .daterangepicker  {
 

@@ -1,3 +1,4 @@
+using System.Reflection;
 using BlazorDateRangePicker;
 using FileFlows.Plugin;
 using Microsoft.AspNetCore.Components;
@@ -12,10 +13,12 @@ public partial class Log : ComponentBase
     [CascadingParameter] Blocker Blocker { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     private string LogText { get; set; }
-    private string lblDownload, lblSearch, lblSearching, lblAutoRefresh;
+    private string lblDownload, lblSearch, lblSearching;
     private string DownloadUrl;
 
-    private bool AutoRefresh { get; set; } = true;
+    private DateTime LiveStart = DateTime.Today.AddDays(-7);
+    private DateTime LiveEnd = DateTime.Today.AddDays(7);
+
 
     private SettingsUiModel Settings;
     private LogType LogLevel { get; set; } = LogType.Info;
@@ -31,9 +34,7 @@ public partial class Log : ComponentBase
         Message = string.Empty,
         ClientUid = null,
         Type = LogType.Info,
-        TypeIncludeHigherSeverity = true,
-        FromDate = DateTime.Today,
-        ToDate = DateTime.Today.AddDays(1)
+        TypeIncludeHigherSeverity = true
     };
 
     private bool UsingDatabase =>
@@ -42,6 +43,9 @@ public partial class Log : ComponentBase
 #if (!DEMO)
     protected override async Task OnInitializedAsync()
     {
+        SearchModel.FromDate = LiveStart;
+        SearchModel.ToDate = LiveEnd;
+        
         Settings = (await HttpHelper.Get<SettingsUiModel>("/api/settings/ui-settings")).Data ?? new();
 
         var nodeResult = await HttpHelper.Get<List<ProcessingNode>>("/api/node");
@@ -50,6 +54,13 @@ public partial class Log : ComponentBase
                 x => x.Name);
 
         DateRanges = new Dictionary<string, DateRange> {
+            { 
+                Translater.Instant("Labels.DateRanges.Live"), new DateRange
+                {
+                    Start = LiveStart,
+                    End =  LiveEnd
+                }
+            },
             { 
                 Translater.Instant("Labels.DateRanges.Today"), new DateRange
                 {
@@ -83,7 +94,6 @@ public partial class Log : ComponentBase
         this.lblSearch = Translater.Instant("Labels.Search");
         this.lblSearching = Translater.Instant("Labels.Searching");
         this.lblDownload = Translater.Instant("Labels.Download");
-        this.lblAutoRefresh = Translater.Instant("Pages.Log.Labels.AutoRefresh");
 #if (DEBUG)
         this.DownloadUrl = "http://localhost:6868/api/log/download";
 #else
@@ -117,8 +127,11 @@ public partial class Log : ComponentBase
     }
     void AutoRefreshTimerElapsed(object sender, ElapsedEventArgs e)
     {
-        if (AutoRefresh == false)
-            return;
+        if (UsingDatabase)
+        {
+            if (SearchModel.ToDate != LiveEnd || SearchModel.FromDate != LiveStart)
+                return;
+        }
         
         _ = Refresh();
     }

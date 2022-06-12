@@ -687,4 +687,13 @@ hr {
   color: var(--color) !important;
 }
 
+
+.daterangeinput {
+  background: var(--input-background);
+  color: var(--color);
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid var(--border-color);
+}
+
 /*# sourceMappingURL=app.css.map */

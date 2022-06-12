@@ -175,18 +175,19 @@ public class MySqlDbManager: DbManager
     public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
     {
         using var db = GetDb();
+        string clientUid = filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString();
+        string from = filter.FromDate.ToString("yyyy-MM-dd HH:mm:ss");
+        string to = filter.ToDate.ToString("yyyy-MM-dd HH:mm:ss");
         string sql = $"select * from {nameof(DbLogMessage)} " +
-                     $"where ({nameof(DbLogMessage.LogDate)} between @0 and @1) " +
-                     $" and {nameof(DbLogMessage.ClientUid)} = @2 " +
+                     $"where ({nameof(DbLogMessage.LogDate)} between '{from}' and '{to}') " +
+                     $" and {nameof(DbLogMessage.ClientUid)} = '{clientUid}' " +
                      (filter.Type != null ?
-                         $" and {nameof(DbLogMessage.Type)} {(filter.TypeIncludeHigherSeverity ? "<=" : "=")} @3" 
+                         $" and {nameof(DbLogMessage.Type)} {(filter.TypeIncludeHigherSeverity ? "<=" : "=")} {(int)filter.Type}" 
                      : "") +
-                     (filter.Message?.EmptyAsNull() != null ? $" and {nameof(DbLogMessage.Message)} like @4 " : "") +
+                     (filter.Message?.EmptyAsNull() != null ? $" and {nameof(DbLogMessage.Message)} like @2 " : "") +
                      $" order by {nameof(DbLogMessage.LogDate)} desc " +
                      " limit 1000";
         var results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
-            filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString(),
-            filter.Type == null ? 0 : (int)filter.Type,
             string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
         // need to reverse them as they're ordered newest at top
         results.Reverse();

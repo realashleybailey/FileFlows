@@ -141,7 +141,7 @@ public class Program
 
     private static void InitializeLoggers()
     {
-        new ServerShared.FileLog(DirectoryHelper.LoggingDirectory, "FileFlows");
+        new ServerShared.FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows");
         new ConsoleLogger();
     }
 

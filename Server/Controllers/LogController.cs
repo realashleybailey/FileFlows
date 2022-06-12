@@ -21,7 +21,7 @@ public class LogController : Controller
     [HttpGet]
     public string Get([FromQuery] Plugin.LogType logLevel = Plugin.LogType.Info)
     {
-        if (Logger.Instance.TryGetLogger(out FileLog logger))
+        if (Logger.Instance.TryGetLogger(out FileLogger logger))
         {
             string log = logger.GetTail(1000, logLevel);
             string html = LogToHtml.Convert(log);
@@ -65,7 +65,7 @@ public class LogController : Controller
     [HttpGet("download")]
     public IActionResult Download()
     {
-        if (Logger.Instance.TryGetLogger(out FileLog logger))
+        if (Logger.Instance.TryGetLogger(out FileLogger logger))
         {
             string filename = logger.GetLogFilename();
             byte[] content = System.IO.File.ReadAllBytes(filename);

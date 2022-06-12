@@ -83,7 +83,7 @@ public class Program
 
 
             new ServerLogger();
-            new ServerShared.FileLog(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
+            new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
             new ConsoleLogger();
             
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);

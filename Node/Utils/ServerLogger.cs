@@ -9,6 +9,14 @@ namespace FileFlows.Node.Utils;
 public class ServerLogger:ILogWriter
 {
     /// <summary>
+    /// Constructs a server logger
+    /// </summary>
+    public ServerLogger()
+    {
+        Logger.Instance.RegisterWriter(this);
+    }
+    
+    /// <summary>
     /// Logs a message
     /// </summary>
     /// <param name="type">the type of log message</param>

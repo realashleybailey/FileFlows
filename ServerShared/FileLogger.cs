@@ -6,7 +6,7 @@ namespace FileFlows.ServerShared;
 /// <summary>
 /// A Logger that writes its output to file
 /// </summary>
-public class FileLog : ILogWriter
+public class FileLogger : ILogWriter
 {
     private string LogPrefix;
     private string LoggingPath;
@@ -20,7 +20,7 @@ public class FileLog : ILogWriter
     /// </summary>
     /// <param name="loggingPath">The path where to save the log file to</param>
     /// <param name="logPrefix">The prefix to use for the log file name</param>
-    public FileLog(string loggingPath, string logPrefix)
+    public FileLogger(string loggingPath, string logPrefix)
     {
         this.LoggingPath = loggingPath;
         this.LogPrefix = logPrefix;

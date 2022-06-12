@@ -21,6 +21,7 @@ public class WorkerManager
         {
             if (worker == null)
                 continue;
+            Logger.Instance.ILog("Starting worker: " + worker.GetType().Name);
             Workers.Add(worker);
             worker.Start();
         }
@@ -35,6 +36,7 @@ public class WorkerManager
         {
             if (worker == null)
                 continue;
+            Logger.Instance.ILog("Stopping worker: " + worker.GetType().Name);
             worker.Stop();
         }
         Workers.Clear();

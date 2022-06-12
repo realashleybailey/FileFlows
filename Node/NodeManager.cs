@@ -51,16 +51,22 @@ public class NodeManager
         
         if (updater.RunCheck())
             return;
-        
-        WorkerManager.StartWorkers(new FlowWorker(AppSettings.Instance.HostName)
+
+        var flowWorker = new FlowWorker(AppSettings.Instance.HostName)
         {
             IsEnabledCheck = () =>
             {
                 if (this.Registered == false)
+                {
+                    Logger.Instance.ILog($"Node not registered, Flow Worker skip running.");
                     return false;
-                
+                }
+
                 if (AppSettings.IsConfigured() == false)
+                {
+                    Logger.Instance.ILog($"Node not configured, Flow Worker skip running.");
                     return false;
+                }
 
                 var nodeService = new NodeService();
                 try
@@ -76,14 +82,18 @@ public class NodeManager
                 }
                 catch (Exception ex)
                 {
-                    if(ex.Message?.Contains("502 Bad Gateway") == true)
+                    if (ex.Message?.Contains("502 Bad Gateway") == true)
                         Logger.Instance?.ELog("Failed checking enabled: Unable to reach FileFlows Server.");
                     else
-                        Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                        Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine +
+                                              ex.StackTrace);
                 }
+
                 return false;
             }
-        }, updater, new LogFileCleaner());
+        };
+        
+        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner());
     }
 
     

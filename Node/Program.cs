@@ -28,6 +28,7 @@ public class Program
             CommandLineOptions.PrintHelp();
             return;
         }
+        Shared.Helpers.HttpHelper.Client = new HttpClient();
 
         var options = CommandLineOptions.Parse(args);
         if (Globals.IsLinux && options.InstallService)
@@ -82,9 +83,9 @@ public class Program
                 AppSettings.ForcedHostName = options.Name;
 
 
-            new ServerLogger();
-            new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
             new ConsoleLogger();
+            new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
+            new ServerLogger();
             
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
@@ -94,8 +95,6 @@ public class Program
             bool showUi = options.Docker == false && options.NoGui == false;
 
             Manager = new ();
-            Shared.Helpers.HttpHelper.Client = new HttpClient();
-            
             
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat"));

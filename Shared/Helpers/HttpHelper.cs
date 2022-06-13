@@ -214,7 +214,9 @@ public class HttpHelper
                     PropertyNameCaseInsensitive = true,
                     Converters = { new FileFlows.Shared.Json.ValidatorConverter() }
                 };
+#pragma warning disable CS8600
                 T result = string.IsNullOrEmpty(body) ? default(T) : typeof(T) == typeof(string) ? (T)(object)body : JsonSerializer.Deserialize<T>(body, options);
+#pragma warning restore CS8600
                 return new RequestResult<T> { Success = true, Body = body, Data = result };
             }
             else

@@ -1,5 +1,8 @@
 namespace FileFlows.Shared.Models;
 
+/// <summary>
+/// Model for the settings in the UI, differs from the actual settings model as this some combined settings
+/// </summary>
 public class SettingsUiModel:Settings
 {
 

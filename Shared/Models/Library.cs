@@ -140,6 +140,9 @@ public enum ProcessingPriority
     Highest = 10
 }
 
+/// <summary>
+/// Processing order for a library
+/// </summary>
 public enum ProcessingOrder
 {
     /// <summary>

@@ -85,14 +85,14 @@ public class Translater
             AllowTrailingCommas = true,
             Converters = { new LanguageConverter() }
         };
-        dynamic d = JsonSerializer.Deserialize<ExpandoObject>(json, options);
+        dynamic d = JsonSerializer.Deserialize<ExpandoObject>(json, options) ?? throw new InvalidOperationException();
         FillDictionaryFromExpando(dict, d, "");
         return dict;
     }
 
     private static void FillDictionaryFromExpando(Dictionary<string, string> dict, ExpandoObject expando, string prefix)
     {
-        var dictExpando = (IDictionary<string, object>)expando;
+        IDictionary<string, object> dictExpando = (IDictionary<string, object>)expando;
         foreach (string key in dictExpando.Keys)
         {
             if (dictExpando[key] is ExpandoObject eo)
@@ -157,7 +157,7 @@ public class Translater
             string msg = Lookup(possibleKeys, supressWarnings: supressWarnings);
             if (msg == "")
                 return "";
-            if (parameters is IDictionary<string, object> dict)
+            if (parameters is IDictionary<string, object?> dict)
                 return Formatter.FormatMessage(msg, dict);
 
             return Formatter.FormatMessage(msg, parameters ?? new { });
@@ -185,7 +185,7 @@ public class Translater
             string msg = Language[key];
             return Formatter.FormatMessage(msg, new { });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return @default;
         }

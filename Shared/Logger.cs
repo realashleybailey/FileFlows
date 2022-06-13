@@ -58,10 +58,14 @@ public class Logger : ILogger
 
     private readonly List<ILogWriter> Writers = new ();
 
-    public void RegisterWriter(ILogWriter log)
+    /// <summary>
+    /// Register a writer with the logger
+    /// </summary>
+    /// <param name="writer">the writer</param>
+    public void RegisterWriter(ILogWriter writer)
     {
-        if(Writers.Contains(log) == false)
-            Writers.Add(log);
+        if(Writers.Contains(writer) == false)
+            Writers.Add(writer);
     }
 
     /// <summary>

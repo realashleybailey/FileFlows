@@ -226,7 +226,7 @@
         "Enabled": "Enabled",
         "Flow": "Flow",
         "Folders": "Folders",
-        "Folders-Help": "If this library processes Folders instead of Files.\nThis does not mean to scan subfolders, a library will already do this.\nThis means a Folder object will be processed instead of individual files.",
+        "Folders-Help": "If this library processes Folders instead of Files.\nThis does not mean to scan sub folders, a library will already do this.\nThis means a Folder object will be processed instead of individual files.",
         "Priority": "Priority",
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",

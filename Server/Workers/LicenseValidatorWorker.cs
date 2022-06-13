@@ -12,7 +12,7 @@ class LicenseValidatorWorker : Worker
     /// <summary>
     /// Creates a new instance of the license validator worker
     /// </summary>
-    public LicenseValidatorWorker() : base(ScheduleType.Daily, 1)
+    public LicenseValidatorWorker() : base(ScheduleType.Hourly, 3)
     {
     }
 

@@ -89,7 +89,7 @@
                     <InputText Value=@Model.LicenseProcessingNodes.ToString() Label="Pages.Settings.Fields.License.ProcessingNodes" ReadOnly="true"/>
                     @if (IsLicensed)
                     {
-                        <InputText Value=@Model.LicenseExpiryDate.ToLongDateString() Label="Pages.Settings.Fields.License.ExpiryDate" ReadOnly="true"/>
+                        <InputText Value=@Model.LicenseExpiryDate.ToString("f") Label="Pages.Settings.Fields.License.ExpiryDate" ReadOnly="true"/>
                         <InputText @bind-Value=@Model.LicenseFlags Label="Pages.Settings.Fields.License.Flags" ReadOnly="true"/>
                     }
                 </FlowTab>

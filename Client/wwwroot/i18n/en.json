@@ -109,6 +109,13 @@
       "Duplicate": "Duplicate",
       "MappingIssue": "Mapping Issue"
     },
+    "ProcessingOrder":{
+      "AsFound": "As Found (Default)",
+      "LargestFirst":"Largest First",
+      "NewestFirst":"Newest First",
+      "Random":"Random",
+      "SmallestFirst":"Smallest First"
+    },
     "ProcessingPriority": {
       "Lowest": "Lowest",
       "Low": "Low",
@@ -219,7 +226,7 @@
         "Enabled": "Enabled",
         "Flow": "Flow",
         "Folders": "Folders",
-        "Folders-Help": "If this library monitors folders.  If off, the default, the library will monitor files.\nOnly use this to process a directory in flow.",
+        "Folders-Help": "If this library processes Folders instead of Files.\nThis does not mean to scan subfolders, a library will already do this.\nThis means a Folder object will be processed instead of individual files.",
         "Priority": "Priority",
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
@@ -245,7 +252,9 @@
         "Scan": "Scan",
         "Scan-Help": "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected.",
         "ReprocessRecreatedFiles":"Reprocess Recreated Files",
-        "ReprocessRecreatedFiles-Help":"When enabled if a file is re-detected with a different creation time than that is recorded, the file will be automatically set to reprocess.\nThis is helpful on a library of downloaded files, where you may download the same file multiple times and wish to process it each time."
+        "ReprocessRecreatedFiles-Help":"When enabled if a file is re-detected with a different creation time than that is recorded, the file will be automatically set to reprocess.\nThis is helpful on a library of downloaded files, where you may download the same file multiple times and wish to process it each time.",
+        "ProcessingOrder":"Processing Order",
+        "ProcessingOrder-Help": "The order in which files will be processed by this library."
       }
     },
     "LibraryFile": {

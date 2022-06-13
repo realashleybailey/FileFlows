@@ -253,7 +253,19 @@ public class SettingsController : Controller
         });
         await Task.CompletedTask;
     }
-    
+
+    /// <summary>
+    /// Gets if the the system is using an external database
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("using-external-database")]
+    public bool UsingExternalDatabase()
+    {
+        string dbConnStr = AppSettings.Instance.DatabaseConnection;
+        if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
+            return false;
+        return true;
+    }
 }
 
 /// <summary>

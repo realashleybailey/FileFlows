@@ -7,7 +7,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-{% include node.html input=1 outputs=2 icon="fas fa-volume-off" name="FFMPEG Builder: Audio Track Reorder" type="BuildPart" %}
+{% include node.html input=1 outputs=2 icon="fas fa-sort-alpha-down" name="FFMPEG Builder: Track Reorder" type="BuildPart" %}
 
 This node will reorder the audio and subtitles tracks given the parameters and update the order in "FFMPEG Builder".  When "FFMPEG Builder: Executor" is run the tracks will be written in the order specified.
 

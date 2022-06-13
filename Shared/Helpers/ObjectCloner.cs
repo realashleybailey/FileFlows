@@ -29,6 +29,8 @@ namespace FileFlows.Shared.Helpers
         /// <returns>a cloned instance</returns>
         public static T Clone<T>(T original)
         {
+            if (original == null)
+                return original;
             return (T)Clone((object)original);
         }
 #pragma warning restore CS8604

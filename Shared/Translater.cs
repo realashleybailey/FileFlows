@@ -92,7 +92,7 @@ public class Translater
 
     private static void FillDictionaryFromExpando(Dictionary<string, string> dict, ExpandoObject expando, string prefix)
     {
-        IDictionary<string, object> dictExpando = (IDictionary<string, object>)expando;
+        IDictionary<string, object> dictExpando = expando as IDictionary<string, object>;
         foreach (string key in dictExpando.Keys)
         {
             if (dictExpando[key] is ExpandoObject eo)

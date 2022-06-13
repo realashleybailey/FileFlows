@@ -112,6 +112,11 @@ class LicenseHelper
             if (license == null)
                 return;
 
+            // only save the license if its valid, or if its been revoked
+            // any other, let them use the remainder of their existing license
+            if (license.Status != LicenseStatus.Valid && license.Status != LicenseStatus.Revoked)
+                return;
+
             // code is good, save it
             AppSettings.Instance.LicenseCode = licenseCode;
             AppSettings.Instance.Save();

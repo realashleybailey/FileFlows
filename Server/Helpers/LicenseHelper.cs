@@ -112,9 +112,9 @@ class LicenseHelper
             if (license == null)
                 return;
 
-            // only save the license if its valid, or if its been revoked
+            // only save the license if its valid, expired or if its been revoked
             // any other, let them use the remainder of their existing license
-            if (license.Status != LicenseStatus.Valid && license.Status != LicenseStatus.Revoked)
+            if (license.Status != LicenseStatus.Valid && license.Status != LicenseStatus.Revoked && license.Status != LicenseStatus.Expired)
                 return;
 
             // code is good, save it

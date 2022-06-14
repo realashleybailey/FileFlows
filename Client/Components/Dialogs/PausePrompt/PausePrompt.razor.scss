@@ -1,0 +1,22 @@
+p {
+  margin-bottom:1rem;
+  white-space: pre-line;
+}
+
+select {
+  background:var(--input-background);
+  color:var(--color);
+  width:100%;
+  display: block;
+  border: solid 1px var(--border-color);
+  padding: 0.25rem;
+  &:focus {
+    outline: solid 1px var(--accent);
+  }
+  option:focus, option:active, option:hover {
+    background: var(--accent);
+    color:var(--color);
+  }
+  
+  
+}

@@ -24,7 +24,6 @@ namespace FileFlows.Server.Helpers
             {
                 json.Add(File.ReadAllText(file.FullName));
             }
-            Translater.Logger = Logger.Instance;
             Translater.Init(json.ToArray());
         }
     }

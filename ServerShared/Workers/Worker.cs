@@ -96,10 +96,11 @@ public abstract class Worker
 
     private void TimerElapsed(object? sender, System.Timers.ElapsedEventArgs e) => Trigger();
 
-    protected void Trigger()
+    public void Trigger()
     {
         if (Executing)
             return; // dont let run twice
+        Logger.Instance.ILog("Triggering worker: " + this.GetType().Name);
 
         _ = Task.Run(() =>
         {

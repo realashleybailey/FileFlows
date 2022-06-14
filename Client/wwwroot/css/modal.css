@@ -1,4 +1,4 @@
-﻿.flow-modal-background-overlay {
+.flow-modal-background-overlay {
   z-index: 10 !important;
 }
 
@@ -13,7 +13,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 20rem;
+    min-width: min(28rem, 80vw);
+    max-width: min(40rem, 80vw);
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base-rgb), 0.9);
   }
@@ -68,3 +69,5 @@
 .flow-modal-body {
   margin: 1rem 0;
 }
+
+/*# sourceMappingURL=modal.css.map */

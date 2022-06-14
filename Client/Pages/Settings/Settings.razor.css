@@ -19,9 +19,6 @@
 .settings ::deep .flow-tabs {
   height: 100%;
 }
-.settings ::deep .flow-tabs p {
-  white-space: pre-wrap;
-}
 .settings ::deep .flow-tabs .row {
   margin-right: 0;
   margin-left: 0;

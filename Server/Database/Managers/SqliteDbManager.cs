@@ -144,7 +144,7 @@ public class SqliteDbManager : DbManager
         throw new NotImplementedException();
     }
 
-    public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
+    public override Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
     {
         throw new NotImplementedException();
     }

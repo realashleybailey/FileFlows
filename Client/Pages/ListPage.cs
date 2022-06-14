@@ -18,12 +18,18 @@ namespace FileFlows.Client.Pages
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] public Editor Editor { get; set; }
         public string lblAdd, lblEdit, lblDelete, lblDeleting, lblRefresh;
+        
 
         public abstract string ApiUrl { get; }
         private bool _needsRendering = false;
 
         protected bool Loaded { get; set; }
         protected bool HasData { get; set; }
+
+        /// <summary>
+        /// Gets if the system is using an external database
+        /// </summary>
+        protected bool UsingExternalDatabase { get; private set; }
 
 
 
@@ -74,6 +80,7 @@ namespace FileFlows.Client.Pages
         public virtual async Task Load(Guid? selectedUid = null)
         {
             Blocker.Show();
+            this.UsingExternalDatabase = (await HttpHelper.Get<bool>("/api/settings/using-external-database")).Data;
             await this.WaitForRender();
             try
             {

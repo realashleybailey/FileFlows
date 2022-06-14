@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .blocker {
   background: rgba(var(--base-rgb), 0.9);
   z-index: 1000;
@@ -176,7 +177,8 @@ a.btn span {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 20rem;
+    min-width: min(28rem, 80vw);
+    max-width: min(40rem, 80vw);
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base-rgb), 0.9);
   }
@@ -552,6 +554,7 @@ hr {
   color: var(--yellow);
   position: relative;
   border: dotted 1px var(--yellow);
+  white-space: pre-line !important;
 }
 .box.info::before {
   font-family: "Font Awesome 5 Free";
@@ -559,6 +562,143 @@ hr {
   content: "\f071";
   position: absolute;
   left: 1rem;
+}
+.box.info a {
+  color: var(--yellow) !important;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.search-pane {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 16rem;
+  z-index: 2;
+  background: var(--base-darker);
+  padding: 0 1rem;
+  border-right: solid 1px var(--border-color);
+}
+.search-pane.visible {
+  display: unset;
+  z-index: 10000;
+}
+.search-pane .search-head {
+  font-size: 1.25rem;
+  padding: 0.75rem 0 0.5rem;
+  text-transform: uppercase;
+  border-bottom: solid 1px var(--accent);
+  margin-bottom: 0.5rem;
+}
+.search-pane .search-fields .search-field {
+  display: block;
+  margin-bottom: 1rem;
+}
+.search-pane .search-fields .search-field .label, .search-pane .search-fields .search-field .value {
+  text-align: unset;
+  width: 100%;
+  display: block;
+}
+.search-pane .search-fields .search-field .label {
+  margin-bottom: 0.25rem;
+}
+.search-pane .search-fields .search-field.inline-switch {
+  display: flex;
+  margin: 0 0 1rem;
+}
+.search-pane .search-fields .search-field.inline-switch .value {
+  width: 4rem;
+  padding-top: 1px;
+  text-align: right;
+}
+.search-pane .search-submit {
+  text-align: right;
+}
+.search-pane .close {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.75rem;
+  height: 1.5rem;
+  width: 1.5rem;
+  cursor: pointer;
+  text-align: center;
+}
+.search-pane .close:after {
+  display: inline-block;
+  content: "×";
+  /* This will render the 'X' */
+  color: white;
+}
+.search-pane .input .value.range {
+  width: 100%;
+}
+.search-pane .input .value.range input {
+  display: inline-block;
+  width: calc(50% - 0.9rem);
+}
+.search-pane input[type=text], .search-pane select {
+  width: 100%;
+}
+.search-pane select {
+  background: var(--input-background);
+  color: var(--color);
+  padding: 2px;
+  border: solid 1px transparent !important;
+}
+
+.daterangeinput {
+  background: var(--input-background);
+  color: var(--color);
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid var(--border-color);
+}
+.daterangeinput .fa-chevron-down {
+  font-size: 0.65rem;
+  position: relative;
+  top: 0.45rem;
+}
+
+.daterangepicker {
+  background: var(--input-background) !important;
+  border: solid 1px var(--border-color) !important;
+}
+.daterangepicker .calendar-table {
+  background: var(--base) !important;
+  color: var(--color) !important;
+  border: solid 1px var(--border-color) !important;
+}
+.daterangepicker td.off {
+  background: var(--base-darkest) !important;
+}
+.daterangepicker td:hover {
+  background: var(--accent) !important;
+  color: var(--color) !important;
+}
+.daterangepicker td.active {
+  background-color: rgba(var(--accent-rgb), 0.5) !important;
+  color: var(--color) !important;
+}
+.daterangepicker td.in-range:not(.start-date):not(.end-date) {
+  background-color: var(--input-background) !important;
+  color: var(--color) !important;
+}
+.daterangepicker select {
+  background: var(--input-background) !important;
+  border: solid 1px var(--border-color) !important;
+}
+.daterangepicker .applyBtn:disabled {
+  display: none !important;
+}
+.daterangepicker .ranges li.active {
+  background: var(--accent) !important;
+  color: var(--color) !important;
+}
+.daterangepicker .ranges li:hover {
+  background: rgba(var(--accent-rgb), 0.5) !important;
+  color: var(--color) !important;
 }
 
 /*# sourceMappingURL=app.css.map */

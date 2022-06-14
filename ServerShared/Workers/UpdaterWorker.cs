@@ -1,10 +1,7 @@
-using FileFlows.ServerShared.Helpers;
-using FileFlows.Shared.Helpers;
-
-namespace FileFlows.ServerShared.Workers;
-
 using System.Diagnostics;
 using System.IO.Compression;
+
+namespace FileFlows.ServerShared.Workers;
 
 /// <summary>
 /// Worker that will automatically update the system
@@ -51,11 +48,20 @@ public abstract class UpdaterWorker : Worker
     protected abstract void QuitApplication();
 
     /// <summary>
+    /// Pre-check to run before executing
+    /// </summary>
+    /// <returns>if false, no update will be checked for</returns>
+    protected virtual bool PreCheck() => true;
+    
+    /// <summary>
     /// Runs a check for update and if found will download it 
     /// </summary>
     /// <returns>A update has been downloaded</returns>
     public bool RunCheck()
     {
+        if (PreCheck() == false)
+            return false;
+
         Logger.Instance?.ILog($"{UpdaterName}: Checking for update");
         try
         {
@@ -158,7 +164,7 @@ public abstract class UpdaterWorker : Worker
             {
                 ZipFile.ExtractToDirectory(update, updateDir, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Logger.Instance?.ELog($"{UpdaterName}: Failed extract update zip, file likely corrupt during download, deleting update");
                 File.Delete(update);

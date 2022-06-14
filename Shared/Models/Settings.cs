@@ -56,39 +56,24 @@ public class Settings : FileFlowObject
     public string Version { get; set; }
 
     /// <summary>
-    /// Gets or sets if the system is paused
+    /// Gets or sets if when the system is paused until
     /// </summary>
-    public bool IsPaused { get; set; }
+    public DateTime PausedUntil { get; set; } = DateTime.MinValue;
 
     /// <summary>
-    /// Gets or sets the type of database to use
+    /// Gets if the system is paused
     /// </summary>
-    public DatabaseType DbType { get; set; }
-    
-    /// <summary>
-    /// Gets or sets the db server to use
-    /// </summary>
-    public string DbServer { get; set; }
-    
-    /// <summary>
-    /// Gets or sets the name of the database
-    /// </summary>
-    public string DbName { get; set; }
-    
-    /// <summary>
-    /// Gets or sets the user used to connect to the database
-    /// </summary>
-    public string DbUser { get; set; }
-    
-    /// <summary>
-    /// Gets or sets the password used to connect to the database
-    /// </summary>
-    public string DbPassword { get; set; }
+    public bool IsPaused => DateTime.Now < PausedUntil;
 
     /// <summary>
-    /// Gets or sets if the user can change database settings
+    /// Gets or sets the number of log files to keep
     /// </summary>
-    public bool DbAllowed { get; set; }
+    public int LogFileRetention { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of log entries to keep
+    /// </summary>
+    public int LogDatabaseRetention { get; set; }
 }
 
 /// <summary>

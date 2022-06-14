@@ -40,7 +40,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
         if (nodeVersion < Globals.MinimumNodeVersion)
         {
-            Logger.Instance.ILog($"Node '{args.NodeName}' version is less than minimum supported version '{Globals.MinimumNodeVersion}'");
+            Logger.Instance.ILog($"Node '{args.NodeName}' version '{nodeVersion}' is less than minimum supported version '{Globals.MinimumNodeVersion}'");
             return null;
         }
 
@@ -51,10 +51,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             await new NodeController().Update(node);
         }
 
+        if (await NodeEnabled(node) == false)
+            return null;
+
         if (DbHelper.UseMemoryCache)
             return await GetNextMemoryCache(node, args.WorkerUid);
         return await GetNextDb(node, args.WorkerUid);
 
+    }
+
+    private async Task<bool> NodeEnabled(ProcessingNode node)
+    {
+        var licensedNodes = LicenseHelper.GetLicensedProcessingNodes();
+        var enabledNodes = (await new NodeController().GetAll()).OrderBy(x => x.Name).Select(x => x.Uid)
+            .Take(licensedNodes).ToArray();
+        return enabledNodes.Contains(node.Uid);
     }
 
     private async Task<LibraryFile> GetNextDb(ProcessingNode node, Guid workerUid)

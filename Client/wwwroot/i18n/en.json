@@ -27,8 +27,11 @@
     "Browse": "Browse",
     "Rescan": "Rescan",
     "Help": "Help",
+    "License":"License",
     "Name": "Name",
     "Advanced": "Advanced",
+    "Search": "Search",
+    "Searching": "Searching",
     "Filter": "Filter",
     "FilterPlaceholder": "Filter (/)",
     "Log": "Log",
@@ -54,7 +57,14 @@
     "BaseCodeOn": "Use Code Template",
     "CopyToClipboard": "Copy to clipboard",
     "CopiedToClipboard": "Copied ''{text}'' to clipboard.",
-    "Test":"Test"
+    "Test":"Test",
+    "DateRanges":{
+      "Live": "Live",
+      "Today":"Today",
+      "Yesterday":"Yesterday",
+      "Last24Hours":"Last 24 Hours",
+      "Last3Days":"Last 3 Days"
+    }
   },
   "Dialogs":{
     "FileBrowser": {
@@ -64,6 +74,11 @@
     "Import": {
       "Title": "Import Flow",
       "Message": "Select an exported flow to import into the system."
+    },
+    "PauseDialog":
+    {
+      "Title":"Pause Processing",
+      "Message":"Select the amount of time to pause processing for.\nNote: The current flows will continue to execute, but no other flows will be executed until his time is up."
     }
   },
   "Enums": {
@@ -93,6 +108,13 @@
       "ProcessingFailed": "Processing Failed",
       "Duplicate": "Duplicate",
       "MappingIssue": "Mapping Issue"
+    },
+    "ProcessingOrder":{
+      "AsFound": "As Found (Default)",
+      "LargestFirst":"Largest First",
+      "NewestFirst":"Newest First",
+      "Random":"Random",
+      "SmallestFirst":"Smallest First"
     },
     "ProcessingPriority": {
       "Lowest": "Lowest",
@@ -204,7 +226,7 @@
         "Enabled": "Enabled",
         "Flow": "Flow",
         "Folders": "Folders",
-        "Folders-Help": "If this library monitors folders.  If off, the default, the library will monitor files.\nOnly use this to process a directory in flow.",
+        "Folders-Help": "If this library processes Folders instead of Files.\nThis does not mean to scan sub folders, a library will already do this.\nThis means a Folder object will be processed instead of individual files.",
         "Priority": "Priority",
         "Priority-Help": "The priority with which files should be processed. If a higher priority library has files waiting to be processed, those will be done first.",
         "Filter": "Filter",
@@ -230,7 +252,9 @@
         "Scan": "Scan",
         "Scan-Help": "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected.",
         "ReprocessRecreatedFiles":"Reprocess Recreated Files",
-        "ReprocessRecreatedFiles-Help":"When enabled if a file is re-detected with a different creation time than that is recorded, the file will be automatically set to reprocess.\nThis is helpful on a library of downloaded files, where you may download the same file multiple times and wish to process it each time."
+        "ReprocessRecreatedFiles-Help":"When enabled if a file is re-detected with a different creation time than that is recorded, the file will be automatically set to reprocess.\nThis is helpful on a library of downloaded files, where you may download the same file multiple times and wish to process it each time.",
+        "ProcessingOrder":"Processing Order",
+        "ProcessingOrder-Help": "The order in which files will be processed by this library."
       }
     },
     "LibraryFile": {
@@ -261,7 +285,10 @@
       }
     },
     "Log": {
-      "Title": "Log"
+      "Title": "Log",
+      "Labels":{
+        "AutoRefresh":"Auto Refresh"
+      }
     },
     "Nodes": {
       "Title": "Nodes",
@@ -352,7 +379,9 @@
         "Database":"Database",
         "System":"System",
         "Restart":"Restart FileFlows",
-        "Logging":"Logging"
+        "Logging":"Logging",
+        "CheckNow":"Check Now",
+        "Updates": "Updates"
       },
       "Messages":{
         "Database":{
@@ -364,8 +393,10 @@
         },
         "Restart":{
           "Title":"Restart FileFlows",
-          "Message":"Are you sure you want to restart FileFlows?\n\nEnsure you have saved your settings and no flows are executing."
-        }
+          "Message":"Are you sure you want to restart FileFlows?\n\nYour settings will be automatically saved first.\n\nNote: Ensure there are no flows executing."
+        },
+        "CheckUpdateSuccess":"Successfully triggered a check for update.\nNote this may take a few minutes to download if available.",
+        "CheckUpdateFailed":"Failed to check for an update"
       },
       "Fields": {
         "Telemetry": "Telemetry",
@@ -380,8 +411,16 @@
         "LogQueueMessages-Help":"This will cause excessive logging of all files being queued/dequeued in the library watcher.\nTurn this if you are having issues with files not appearing, turn off again afterwards to avoid filling your log files with excessive logging.",
         "LoggingPath": "Logging Directory",
         "LoggingPath-Help": "This is where log files will be created.",
+        "LogFileRetention": "Log File Retention",
+        "LogFileRetention-Suffix": "Files",
+        "LogFileRetention-Help": "How many log files to keep before deleting older log files.\nEach log file is up to 10MB in size.p",
+        "LogDatabaseRetention":"Log Database Retention",
+        "LogDatabaseRetention-Suffix": "Records",
+        "LogDatabaseRetention-Help":"The maximum number of records to keep when the database log pruner executes.\nNote the table is not limited to this number, as it can grow after the pruner runs, but when the pruner runs only this amount will be kept.",
         "PluginRepositoryUrls": "Plugin Repositories",
         "PluginRepositoryUrls-Help": "A line separated list of plugin repository URLs to use when searching for plugins.\nThe order is important, if multiple repositories contain the same plugin, the first repository will be used as it''s source.\nThe default repository will always be added to the end of this list.",
+        "CheckForUpdateNow":"Checks for Update",
+        "CheckForUpdateNow-Help":"Checks for an update now and if found will download the update and install it when no Flows are executing.",
         "InternalProcessingNode": {
           "Description": "Here you can configure the Internal Processing Node of FileFlows.   A Processing Node is what executes a Flow and processes Files.",
           "Enabled": "Enabled",
@@ -405,6 +444,14 @@
           "User-Help":"The user used to connect to the database",
           "Password": "Password",
           "Password-Help":"The password of the user to connect to the database"
+        },
+        "License": {
+          "Key": "License Key",
+          "Email": "License Email",
+          "Status": "Status",
+          "ProcessingNodes":"Processing Nodes",
+          "Flags":"Flags",
+          "ExpiryDate":"Expiry Date"
         }
       }
     },

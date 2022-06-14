@@ -180,14 +180,14 @@ public class WatchedLibrary:IDisposable
         }
     }
 
-    private async Task<(bool known, string fingerprint, ObjectReference? duplicate)> IsKnownFile(string fullpath, FileSystemInfo fsInfo)
+    private async Task<(bool known, string? fingerprint, ObjectReference? duplicate)> IsKnownFile(string fullpath, FileSystemInfo fsInfo)
     {
         if (DbHelper.UseMemoryCache)
             return IsKnownFileInMemory(fullpath, fsInfo);
         return await IsKnownFileInDb(fullpath, fsInfo);
     }
     
-    private (bool known, string fingerprint, ObjectReference? duplicate) IsKnownFileInMemory(string fullpath, FileSystemInfo fsInfo)
+    private (bool known, string? fingerprint, ObjectReference? duplicate) IsKnownFileInMemory(string fullpath, FileSystemInfo fsInfo)
     {
         var libFiles = new LibraryFileController().GetData().Result;
         var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);

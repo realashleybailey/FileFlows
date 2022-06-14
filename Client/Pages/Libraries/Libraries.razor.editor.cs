@@ -31,10 +31,9 @@ public partial class Libraries : ListPage<Library>
 
         var tabs = new Dictionary<string, List<ElementField>>();
         var tabGeneral = await TabGeneral(library, flowOptions);
-        var efFolders = tabGeneral.Where(x => x.Name == nameof(Library.Folders)).First();
         tabs.Add("General", tabGeneral);
         tabs.Add("Schedule", TabSchedule(library));
-        tabs.Add("Advanced", TabAdvanced(library, efFolders));
+        tabs.Add("Advanced", TabAdvanced(library));
         var result = await Editor.Open("Pages.Library", "Pages.Library.Title", null, library, saveCallback: Save, tabs: tabs);
         if (efTemplate != null)
         {
@@ -123,11 +122,6 @@ public partial class Libraries : ListPage<Library>
         });
         fields.Add(new ElementField
         {
-            InputType = FormInputType.Switch,
-            Name = nameof(library.Folders)
-        });
-        fields.Add(new ElementField
-        {
             InputType = FormInputType.Select,
             Name = nameof(library.Flow),
             Parameters = new Dictionary<string, object>{
@@ -145,14 +139,33 @@ public partial class Libraries : ListPage<Library>
             Parameters = new Dictionary<string, object>{
                 { "AllowClear", false },
                 { "Options", new List<ListOption> {
-                    new ListOption { Value = ProcessingPriority.Lowest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Lowest)}" },
-                    new ListOption { Value = ProcessingPriority.Low, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Low)}" },
-                    new ListOption { Value = ProcessingPriority.Normal, Label =$"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Normal)}" },
-                    new ListOption { Value = ProcessingPriority.High, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.High)}" },
-                    new ListOption { Value = ProcessingPriority.Highest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Highest)}" }
+                    new () { Value = ProcessingPriority.Lowest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Lowest)}" },
+                    new () { Value = ProcessingPriority.Low, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Low)}" },
+                    new () { Value = ProcessingPriority.Normal, Label =$"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Normal)}" },
+                    new () { Value = ProcessingPriority.High, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.High)}" },
+                    new () { Value = ProcessingPriority.Highest, Label = $"Enums.{nameof(ProcessingPriority)}.{nameof(ProcessingPriority.Highest)}" }
                 } }
             }
         });
+        
+        if(UsingExternalDatabase)
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Select,
+                Name = nameof(library.ProcessingOrder),
+                Parameters = new Dictionary<string, object>{
+                    { "AllowClear", false },
+                    { "Options", new List<ListOption> {
+                        new () { Value = ProcessingOrder.AsFound, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.AsFound)}" },
+                        new () { Value = ProcessingOrder.LargestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.LargestFirst)}" },
+                        new () { Value = ProcessingOrder.NewestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.NewestFirst)}" },
+                        new () { Value = ProcessingOrder.Random, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.Random)}" },
+                        new () { Value = ProcessingOrder.SmallestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.SmallestFirst)}" },
+                    } }
+                }
+            });
+        }
         fields.Add(new ElementField
         {
             InputType = FormInputType.Switch,
@@ -182,7 +195,7 @@ public partial class Libraries : ListPage<Library>
         return fields;
     }
 
-    private List<ElementField> TabAdvanced(Library library, ElementField efFolders)
+    private List<ElementField> TabAdvanced(Library library)
     {
         List<ElementField> fields = new List<ElementField>();
         fields.Add(new ElementField
@@ -200,6 +213,12 @@ public partial class Libraries : ListPage<Library>
             InputType = FormInputType.Switch,
             Name = nameof(library.ExcludeHidden)
         });
+        ElementField efFolders = new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.Folders)
+        };
+        fields.Add(efFolders);
         fields.Add(new ElementField
         {
             InputType = FormInputType.Switch,

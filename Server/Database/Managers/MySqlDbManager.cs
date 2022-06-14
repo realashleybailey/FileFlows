@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.RegularExpressions;
+using FileFlows.Plugin;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
 using NPoco;
@@ -20,7 +21,16 @@ public class MySqlDbManager: DbManager
             DateCreated     datetime           default           now(),
             DateModified    datetime           default           now(),
             Data            MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
-        );";
+        );
+
+        CREATE TABLE {nameof(DbLogMessage)}(
+            ClientUid       VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL,
+            LogDate         datetime           default           now(),
+            Type            int                NOT NULL,            
+            Message         TEXT               COLLATE utf8_unicode_ci      NOT NULL
+        );
+
+";
     /// <summary>
     /// Creates an instance of a MySqlDbManager
     /// </summary>
@@ -30,7 +40,7 @@ public class MySqlDbManager: DbManager
         ConnectionString = connectionString;
     }
     
-    protected override IDatabase GetDb()
+    protected override NPoco.Database GetDb()
     {
         return new NPoco.Database(ConnectionString,
             null,
@@ -67,16 +77,9 @@ public class MySqlDbManager: DbManager
         var scripts = GetStoredProcedureScripts("MySql");
         foreach (var script in scripts)
         {
-            try
-            {
-                Logger.Instance.ILog("Creating script: " + script.Key);
-                var sql = script.Value.Replace("@", "@@");
-                db.Execute(sql);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            Logger.Instance.ILog("Creating script: " + script.Key);
+            var sql = script.Value.Replace("@", "@@");
+            db.Execute(sql);
         }
     }
 
@@ -132,6 +135,63 @@ public class MySqlDbManager: DbManager
     {
         using var db = GetDb();
         return await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
+    }
+
+    /// <summary>
+    /// Logs a message to the database
+    /// </summary>
+    /// <param name="clientUid">The UID of the client, use Guid.Empty for the server</param>
+    /// <param name="type">the type of log message</param>
+    /// <param name="message">the message to log</param>
+    public override async Task Log(Guid clientUid, LogType type, string message)
+    {
+        using var db = GetDb();
+        await db.ExecuteAsync(
+            $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
+            $" values (@0, @1, @2)", clientUid, type, message);
+    }
+
+    /// <summary>
+    /// Prune old logs from the database
+    /// </summary>
+    /// <param name="maxLogs">the maximum number of log messages to keep</param>
+    public override async Task PruneOldLogs(int maxLogs)
+    {
+        try
+        {
+            using var db = GetDb();
+            await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Searches the log using the given filter
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>the messages found in the log</returns>
+    public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
+    {
+        using var db = GetDb();
+        string clientUid = filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString();
+        string from = filter.FromDate.ToString("yyyy-MM-dd HH:mm:ss");
+        string to = filter.ToDate.ToString("yyyy-MM-dd HH:mm:ss");
+        string sql = $"select * from {nameof(DbLogMessage)} " +
+                     $"where ({nameof(DbLogMessage.LogDate)} between '{from}' and '{to}') " +
+                     $" and {nameof(DbLogMessage.ClientUid)} = '{clientUid}' " +
+                     (filter.Type != null ?
+                         $" and {nameof(DbLogMessage.Type)} {(filter.TypeIncludeHigherSeverity ? "<=" : "=")} {(int)filter.Type}" 
+                     : "") +
+                     (filter.Message?.EmptyAsNull() != null ? $" and {nameof(DbLogMessage.Message)} like @2 " : "") +
+                     $" order by {nameof(DbLogMessage.LogDate)} desc " +
+                     " limit 1000";
+        var results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
+            string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
+        // need to reverse them as they're ordered newest at top
+        results.Reverse();
+        return results;
     }
 
     /// <summary>
@@ -204,7 +264,7 @@ public class MySqlDbManager: DbManager
     /// </summary>
     /// <param name="settings">the settings to populate</param>
     /// <param name="connectionString">the connection string to parse</param>
-    internal void PopulateSettings(Settings settings, string connectionString)
+    internal void PopulateSettings(SettingsUiModel settings, string connectionString)
     {
         var builder = new MySqlConnector.MySqlConnectionStringBuilder(connectionString);
         settings.DbType = DatabaseType.MySql;

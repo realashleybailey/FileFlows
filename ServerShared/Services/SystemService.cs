@@ -15,6 +15,12 @@ public interface ISystemService
     /// </summary>
     /// <returns>the server version</returns>
     Task<Version> GetVersion();
+
+    /// <summary>
+    /// Gets the version the node can update to
+    /// </summary>
+    /// <returns>the version the node can update to</returns>
+    Task<Version> GetNodeUpdateVersion();
     /// <summary>
     /// Gets the node updater binary
     /// </summary>
@@ -69,7 +75,29 @@ public class SystemService : Service, ISystemService
             return new Version(0, 0, 0, 0);
         }
     }
-    
+
+    /// <summary>
+    /// Gets the version the node can update to
+    /// </summary>
+    /// <returns>the version the node can update to</returns>
+    public async Task<Version> GetNodeUpdateVersion()
+    {
+        try
+        {
+            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/system/node-update-version");
+            if (result.Success == false)
+                throw new Exception("Failed to get node update version: " + result.Body);
+            if (string.IsNullOrWhiteSpace(result.Data))
+                return new Version();
+            return Version.Parse(result.Data);
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance?.WLog("Failed to get node update version: " + ex.Message);
+            return new Version(0, 0, 0, 0);
+        }
+    }
+
     /// <summary>
     /// Gets the node updater binary
     /// </summary>

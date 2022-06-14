@@ -4,6 +4,7 @@ using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
+using FileFlows.Server.Workers;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server;
@@ -41,19 +42,25 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
 
 
-            InitializeLogger();
+            InitializeLoggers();
 
             Logger.Instance.ILog(new string('=', 50));
+            Thread.Sleep(1); // so log message can be written
             Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
+            Thread.Sleep(1); // so log message can be written
             if(Docker)
                 Logger.Instance.ILog("Running inside docker container");
+            Thread.Sleep(1); // so log message can be written
             Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
+            Thread.Sleep(1); // so log message can be written
             foreach (DictionaryEntry var in Environment.GetEnvironmentVariables())
             {
                 Logger.Instance.DLog($"ENV.{var.Key} = {var.Value}");
+                Thread.Sleep(1); // so log message can be written
             }
-            
+            Thread.Sleep(1); // so log message can be written
             Logger.Instance.ILog(new string('=', 50));
+            Thread.Sleep(1); // so log message can be written
 
             CleanDefaultTempDirectory();
 
@@ -83,6 +90,8 @@ public class Program
             
             // create new client, this can be used by upgrade scripts, so do this before preparing database
             Shared.Helpers.HttpHelper.Client = new HttpClient();
+
+            CheckLicense();
 
             if (PrepareDatabase() == false)
                 return;
@@ -125,15 +134,37 @@ public class Program
         }
     }
 
-    private static void InitializeLogger()
+    private static void CheckLicense()
     {
-        Logger.Instance = new Server.Logger();
-        Shared.Logger.Instance = Logger.Instance;
-        ServerShared.Logger.Instance = Logger.Instance;
+        LicenseHelper.Update().Wait();
+    }
+
+    private static void InitializeLoggers()
+    {
+        new ServerShared.FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows");
+        new ConsoleLogger();
     }
 
     private static bool PrepareDatabase()
     {
+        if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseConnection) == false &&
+            AppSettings.Instance.DatabaseConnection.Contains(".sqlite") == false)
+        {
+            // check if licensed for external db, if not force migrate to sqlite
+            if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase) == false)
+            {
+                #if(DEBUG)
+                // twice for debugging so we can step into it and see why
+                if (LicenseHelper.IsLicensed(LicenseFlags.ExternalDatabase) == false)
+                {
+                }
+                #endif
+
+                Logger.Instance.WLog("No longer licensed for external database, migrating to SQLite database.");
+                AppSettings.Instance.DatabaseMigrateConnection = SqliteDbManager.GetDefaultConnectionString();
+            }
+        }
+        
         if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
         {
             if (AppSettings.Instance.DatabaseConnection == AppSettings.Instance.DatabaseMigrateConnection)
@@ -166,6 +197,8 @@ public class Program
         // run any upgrade code that may need to be run
         var settings = DbHelper.Single<Settings>().Result;
         new Upgrade.Upgrader().Run(settings);
+
+        new DatabaseLogger();
         
         return true;
     }

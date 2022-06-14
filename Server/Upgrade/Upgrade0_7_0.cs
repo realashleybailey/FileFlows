@@ -4,8 +4,15 @@ using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Upgrade;
 
+/// <summary>
+/// Upgrade to FileFlows v0.7.0
+/// </summary>
 public class Upgrade0_7_0
 {
+    /// <summary>
+    /// Runs the update
+    /// </summary>
+    /// <param name="settings">the settings</param>
     public void Run(Settings settings)
     {
         Logger.Instance.ILog("Upgrade running, running 0.7.0 upgrade script");

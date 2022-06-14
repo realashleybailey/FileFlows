@@ -19,7 +19,7 @@ public class LanguageConverter : JsonConverter<object>
     /// cannot be created.
     /// </remarks>
     /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
-    /// <param name="value">The value to convert. Note that the value of <seealso cref="HandleNull"/> determines if the converter handles <see langword="null" /> values.</param>
+    /// <param name="value">The value to convert.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
     {
@@ -44,7 +44,6 @@ public class LanguageConverter : JsonConverter<object>
     /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     /// <returns>The value that was converted.</returns>
-    /// <remarks>Note that the value of <seealso cref="HandleNull"/> determines if the converter handles null JSON tokens.</remarks>
     public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         switch (reader.TokenType)
@@ -96,5 +95,5 @@ public class LanguageConverter : JsonConverter<object>
     /// Creates an IDictionary instance
     /// </summary>
     /// <returns>an IDictionary instance</returns>
-    protected virtual IDictionary<string, object> CreateDictionary() => new ExpandoObject();
+    protected virtual IDictionary<string, object> CreateDictionary() => new ExpandoObject() as IDictionary<string, object>;
 }

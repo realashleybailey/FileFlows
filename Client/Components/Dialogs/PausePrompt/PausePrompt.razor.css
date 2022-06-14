@@ -1,0 +1,22 @@
+p {
+  margin-bottom: 1rem;
+  white-space: pre-line;
+}
+
+select {
+  background: var(--input-background);
+  color: var(--color);
+  width: 100%;
+  display: block;
+  border: solid 1px var(--border-color);
+  padding: 0.25rem;
+}
+select:focus {
+  outline: solid 1px var(--accent);
+}
+select option:focus, select option:active, select option:hover {
+  background: var(--accent);
+  color: var(--color);
+}
+
+/*# sourceMappingURL=PausePrompt.razor.css.map */

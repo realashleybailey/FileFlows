@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using FileFlows.ServerShared.Helpers;
+using FileFlows.ServerShared.Workers;
 
 namespace FileFlows.Node;
 
@@ -50,16 +51,22 @@ public class NodeManager
         
         if (updater.RunCheck())
             return;
-        
-        WorkerManager.StartWorkers(new FlowWorker(AppSettings.Instance.HostName)
+
+        var flowWorker = new FlowWorker(AppSettings.Instance.HostName)
         {
             IsEnabledCheck = () =>
             {
                 if (this.Registered == false)
+                {
+                    Logger.Instance.ILog($"Node not registered, Flow Worker skip running.");
                     return false;
-                
+                }
+
                 if (AppSettings.IsConfigured() == false)
+                {
+                    Logger.Instance.ILog($"Node not configured, Flow Worker skip running.");
                     return false;
+                }
 
                 var nodeService = new NodeService();
                 try
@@ -75,14 +82,18 @@ public class NodeManager
                 }
                 catch (Exception ex)
                 {
-                    if(ex.Message?.Contains("502 Bad Gateway") == true)
+                    if (ex.Message?.Contains("502 Bad Gateway") == true)
                         Logger.Instance?.ELog("Failed checking enabled: Unable to reach FileFlows Server.");
                     else
-                        Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                        Logger.Instance?.ELog("Failed checking enabled: " + ex.Message + Environment.NewLine +
+                                              ex.StackTrace);
                 }
+
                 return false;
             }
-        }, updater);
+        };
+        
+        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner());
     }
 
     
@@ -105,6 +116,18 @@ public class NodeManager
                              windows ? Path.Combine(path, "Tools", "ffmpeg.exe") : "/usr/local/bin/ffmpeg"
                 }
             };
+        if (AppSettings.EnvironmentalMappings?.Any() == true)
+        {
+            Logger.Instance.ILog("Environmental mappings found, adding those");
+            mappings.AddRange(AppSettings.EnvironmentalMappings);
+        }
+
+        if (AppSettings.EnvironmentalRunnerCount != null)
+            AppSettings.Instance.Runners = AppSettings.EnvironmentalRunnerCount.Value;
+
+        if (AppSettings.EnvironmentalEnabled != null)
+            AppSettings.Instance.Enabled = AppSettings.EnvironmentalEnabled.Value; 
+                
 
         var settings = AppSettings.Instance;
         var nodeService = new NodeService();

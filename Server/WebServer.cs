@@ -3,6 +3,7 @@ using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
 using System.Runtime.InteropServices;
+using FileFlows.ServerShared.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -148,10 +149,13 @@ public class WebServer
 
         LibraryWorker.ResetProcessing();
         WorkerManager.StartWorkers(
+            new LicenseValidatorWorker(),
             new LibraryWorker(),
+            new LogFileCleaner(),
+            new DbLogPruner(),
             new FlowWorker(string.Empty, isServer: true),
             new PluginUpdaterWorker(),
-            new LogPruner(),
+            new LibraryFileLogPruner(),
             new LogConverter(),
             new TelemetryReporter(),
             new ServerUpdater(),

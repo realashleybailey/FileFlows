@@ -29,6 +29,8 @@ namespace FileFlows.Shared.Helpers
         /// <returns>a cloned instance</returns>
         public static T Clone<T>(T original)
         {
+            if (original == null)
+                return original;
             return (T)Clone((object)original);
         }
 #pragma warning restore CS8604
@@ -38,11 +40,11 @@ namespace FileFlows.Shared.Helpers
         /// </summary>
         /// <param name="originalObject">the object to clone</param>
         /// <returns>A cloned instance</returns>
-        public static object Clone(object originalObject)
+        public static object Clone(object? originalObject)
         {
-            return InternalCopy(originalObject, new Dictionary<Object, Object>(new ReferenceEqualityComparer()));
+            return InternalCopy(originalObject, new Dictionary<object, object>(new ReferenceEqualityComparer()));
         }
-        private static Object InternalCopy(object? originalObject, IDictionary<object, object> visited)
+        private static object InternalCopy(object? originalObject, IDictionary<object, object> visited)
         {
             if (originalObject == null) return null;
             var typeToReflect = originalObject.GetType();
@@ -55,7 +57,7 @@ namespace FileFlows.Shared.Helpers
                 var arrayType = typeToReflect.GetElementType();
                 if (IsPrimitive(arrayType) == false)
                 {
-                    Array clonedArray = (Array)cloneObject;
+                    Array? clonedArray = cloneObject as Array;
                     clonedArray.ForEach((array, indices) => array.SetValue(InternalCopy(clonedArray.GetValue(indices), visited), indices));
                 }
 
@@ -127,7 +129,7 @@ namespace FileFlows.Shared.Helpers
             /// </summary>
             /// <param name="array">the array to foreach</param>
             /// <param name="action">the action to perform on each item</param>
-            public static void ForEach(this Array array, Action<Array, int[]> action)
+            public static void ForEach(this Array? array, Action<Array, int[]> action)
             {
                 if (array.LongLength == 0) return;
                 ArrayTraverse walker = new ArrayTraverse(array);
@@ -151,7 +153,7 @@ namespace FileFlows.Shared.Helpers
             /// Transfers an array
             /// </summary>
             /// <param name="array">the array to transverse</param>
-            public ArrayTraverse(Array array)
+            public ArrayTraverse(Array? array)
             {
                 maxLengths = new int[array.Rank];
                 for (int i = 0; i < array.Rank; ++i)

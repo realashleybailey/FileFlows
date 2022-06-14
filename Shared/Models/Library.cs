@@ -106,6 +106,11 @@ public class Library : FileFlowObject
     /// Gets or sets the processing priority of this library
     /// </summary>
     public ProcessingPriority Priority { get; set; }
+
+    /// <summary>
+    /// Gets or sets the order this library will process its files
+    /// </summary>
+    public ProcessingOrder ProcessingOrder { get; set; }
 }
 
 /// <summary>
@@ -133,4 +138,31 @@ public enum ProcessingPriority
     /// Highest priority
     /// </summary>
     Highest = 10
+}
+
+/// <summary>
+/// Processing order for a library
+/// </summary>
+public enum ProcessingOrder
+{
+    /// <summary>
+    /// Default order, as they are found
+    /// </summary>
+    AsFound = 0,
+    /// <summary>
+    /// Randomly
+    /// </summary>
+    Random = 1,
+    /// <summary>
+    /// Smallest files first
+    /// </summary>
+    SmallestFirst = 2,
+    /// <summary>
+    /// Largest files first
+    /// </summary>
+    LargestFirst = 3,
+    /// <summary>
+    /// Newest files first
+    /// </summary>
+    NewestFirst = 4,
 }

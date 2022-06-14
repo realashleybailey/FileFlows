@@ -1,12 +1,27 @@
-﻿namespace FileFlows.ServerShared;
+﻿using FileFlows.Plugin;
+using FileFlows.Shared;
+
+namespace FileFlows.ServerShared;
 
 /// <summary>
 /// A logger that outputs to the console
 /// </summary>
-public class ConsoleLogger : Plugin.ILogger
+public class ConsoleLogger : ILogWriter
 {
-    private enum LogType { Error, Warning, Debug, Info }
-    private void Log(LogType type, object[] args)
+    /// <summary>
+    /// Creates an instance of a console logger
+    /// </summary>
+    public ConsoleLogger()
+    {
+        Shared.Logger.Instance.RegisterWriter(this);
+    }
+    
+    /// <summary>
+    /// Logs a message
+    /// </summary>
+    /// <param name="type">the type of log message</param>
+    /// <param name="args">the arguments for the log message</param>
+    public Task Log(LogType type, params object[] args)
     {
         string message = type + " -> " + string.Join(", ", args.Select(x =>
             x == null ? "null" :
@@ -14,49 +29,6 @@ public class ConsoleLogger : Plugin.ILogger
             x is string ? x.ToString() :
             System.Text.Json.JsonSerializer.Serialize(x)));
         Console.WriteLine(message);
-    }
-
-    /// <summary>
-    /// Logs an information message
-    /// </summary>
-    /// <param name="args">Any arguments for the log message</param>
-    public void ILog(params object[] args) => Log(LogType.Info, args);
-    /// <summary>
-    /// Logs an debug message
-    /// </summary>
-    /// <param name="args">Any arguments for the log message</param>
-    public void DLog(params object[] args) => Log(LogType.Debug, args);
-    /// <summary>
-    /// Logs an warning message
-    /// </summary>
-    /// <param name="args">Any arguments for the log message</param>
-    public void WLog(params object[] args) => Log(LogType.Warning, args);
-    /// <summary>
-    /// Logs an error message
-    /// </summary>
-    /// <param name="args">Any arguments for the log message</param>
-    public void ELog(params object[] args) => Log(LogType.Error, args);
-
-    /// <summary>
-    /// Gets a tail of the log
-    /// NOTE: NOT IMPLEMENTED
-    /// </summary>
-    /// <param name="length">The number of lines to fetch</param>
-    /// <returns>NOT IMPLEMENTED</returns>
-    public string GetTail(int length = 50) => "Not implemented";
-
-    static FileFlows.Plugin.ILogger _Instance;
-    
-    /// <summary>
-    /// Gets the instance of the ILogger being used
-    /// </summary>
-    public static FileFlows.Plugin.ILogger Instance
-    {
-        get
-        {
-            if (_Instance == null)
-                _Instance = new Logger();
-            return _Instance;
-        }
+        return Task.CompletedTask;
     }
 }

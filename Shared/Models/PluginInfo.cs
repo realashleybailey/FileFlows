@@ -82,10 +82,9 @@ public class PluginInfoModel : PluginInfo
     {
         get
         {
-            System.Version latest, current;
-            if (string.IsNullOrEmpty(LatestVersion) || System.Version.TryParse(LatestVersion, out latest) == false)
+            if (string.IsNullOrEmpty(LatestVersion) || System.Version.TryParse(LatestVersion, out Version? latest) == false)
                 return false;
-            if (string.IsNullOrEmpty(Version) || System.Version.TryParse(Version, out current) == false)
+            if (string.IsNullOrEmpty(Version) || System.Version.TryParse(Version, out Version? current) == false)
                 return false;
             return current < latest;
         }

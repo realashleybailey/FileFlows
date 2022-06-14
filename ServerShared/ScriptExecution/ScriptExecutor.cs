@@ -72,8 +72,9 @@ public class ScriptExecutor:IScriptExecutor
             };
             var engine = new Engine(options =>
             {
-                options.LimitMemory(4_000_000);
-                options.MaxStatements(500);
+                // remove limits due to issue reported on discord
+                //options.LimitMemory(4_000_000);
+                //options.MaxStatements(500);
             })
             .SetValue("Logger", args.Logger)
             .SetValue("Variables", args.Variables)
@@ -115,7 +116,7 @@ public class ScriptExecutor:IScriptExecutor
         }
         catch (Exception ex)
         {
-            args.Logger?.ELog("Failed executing function: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            args.Logger?.ELog("Failed executing script: " + ex.Message + Environment.NewLine + ex.StackTrace);
             return -1;
         }
     }

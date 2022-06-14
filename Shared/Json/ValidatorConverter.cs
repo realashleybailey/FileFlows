@@ -32,7 +32,6 @@ public class ValidatorConverter : JsonConverter<Validators.Validator>
     /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     /// <returns>The value that was converted.</returns>
-    /// <remarks>Note that the value of <seealso cref="HandleNull"/> determines if the converter handles null JSON tokens.</remarks>
     public override Validator? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         using (var jsonDocument = JsonDocument.ParseValue(ref reader))
@@ -77,7 +76,7 @@ public class ValidatorConverter : JsonConverter<Validators.Validator>
     /// cannot be created.
     /// </remarks>
     /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
-    /// <param name="value">The value to convert. Note that the value of <seealso cref="HandleNull"/> determines if the converter handles <see langword="null" /> values.</param>
+    /// <param name="value">The value to convert.</param>
     /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
     public override void Write(Utf8JsonWriter writer, Validator value, JsonSerializerOptions options)
     {

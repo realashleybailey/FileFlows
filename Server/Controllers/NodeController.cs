@@ -102,6 +102,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 internalNode.AllLibraries = node.AllLibraries;
                 internalNode.MaxFileSizeMb = node.MaxFileSizeMb;
                 internalNode.Libraries = node.Libraries;
+                await CheckLicensedNodes(internalNode.Uid, internalNode.Enabled);
                 return await Update(internalNode, checkDuplicateName: true);
             }
             else
@@ -112,7 +113,9 @@ public class NodeController : ControllerStore<ProcessingNode>
                 node.Mappings = null; // no mappings for internal
             }
         }
-        return await Update(node, checkDuplicateName: true);
+        var result = await Update(node, checkDuplicateName: true);
+        await CheckLicensedNodes(result.Uid, result.Enabled);
+        return await GetByUid(result.Uid);
     }
 
     /// <summary>
@@ -146,7 +149,8 @@ public class NodeController : ControllerStore<ProcessingNode>
             node.Enabled = enable.Value;
             await DbHelper.Update(node);
         }
-        return node;
+        await CheckLicensedNodes(uid, enable == true);
+        return await GetByUid(uid);;
     }
 
     /// <summary>
@@ -220,7 +224,38 @@ public class NodeController : ControllerStore<ProcessingNode>
             ).ToList()
         });
         result.SignalrUrl = "flow";
-        return result;
+        await CheckLicensedNodes(Guid.Empty, false);
+        return await GetByUid(result.Uid);
+    }
+
+    /// <summary>
+    /// Ensure the user does not exceed their licensed node count
+    /// </summary>
+    /// <param name="nodeUid">optional UID of a node that should be checked first</param>
+    /// <param name="enabled">optional status of the node state</param>
+    private async Task CheckLicensedNodes(Guid nodeUid, bool enabled)
+    {
+        var licensedNodes = LicenseHelper.GetLicensedProcessingNodes();
+        var nodes = await GetAll();
+        int current = 0;
+        foreach (var node in nodes.OrderBy(x => x.Uid == nodeUid ? 1 : 2).ThenBy(x => x.Name))
+        {
+            if (node.Uid == nodeUid)
+                node.Enabled = enabled;
+            
+            if (node.Enabled)
+            {
+                if (current >= licensedNodes)
+                {
+                    node.Enabled = false;
+                    await Update(node);
+                }
+                else
+                {
+                    ++current;
+                }
+            }
+        }
     }
 
 

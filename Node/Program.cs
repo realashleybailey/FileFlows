@@ -1,8 +1,13 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Avalonia;
 using FileFlows.Node.Ui;
+using FileFlows.Node.Utils;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
+using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace FileFlows.Node;
 public class Program
@@ -26,6 +31,7 @@ public class Program
             CommandLineOptions.PrintHelp();
             return;
         }
+        Shared.Helpers.HttpHelper.Client = new HttpClient();
 
         var options = CommandLineOptions.Parse(args);
         if (Globals.IsLinux && options.InstallService)
@@ -61,9 +67,7 @@ public class Program
         
         try
         {
-            AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
-            AppSettings.ForcedTempPath = Environment.GetEnvironmentVariable("TempPath");
-            AppSettings.ForcedHostName = Environment.GetEnvironmentVariable("NodeName");
+            LoadEnvironmentalVaraibles();
             
             Service.ServiceBaseUrl = AppSettings.Load().ServerUrl;
             #if(DEBUG)
@@ -80,8 +84,10 @@ public class Program
                 AppSettings.ForcedHostName = options.Name;
 
 
-            Logger.Instance = new ServerShared.FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
-            ServerShared.Logger.Instance = Logger.Instance;
+            new ConsoleLogger();
+            new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");
+            new ServerLogger();
+            
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
 
             AppSettings.Init();
@@ -90,8 +96,6 @@ public class Program
             bool showUi = options.Docker == false && options.NoGui == false;
 
             Manager = new ();
-            Shared.Helpers.HttpHelper.Client = new HttpClient();
-            
             
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat"));
@@ -146,6 +150,36 @@ public class Program
         catch (Exception ex)
         {
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+        }
+    }
+
+    private static void LoadEnvironmentalVaraibles()
+    {
+        AppSettings.ForcedServerUrl = Environment.GetEnvironmentVariable("ServerUrl");
+        AppSettings.ForcedTempPath = Environment.GetEnvironmentVariable("TempPath");
+        AppSettings.ForcedHostName = Environment.GetEnvironmentVariable("NodeName");
+
+        string mappings = Environment.GetEnvironmentVariable("NodeMappings");
+        if (string.IsNullOrWhiteSpace(mappings) == false)
+        {
+            try
+            {
+                var mappingsArray = JsonSerializer.Deserialize<List<RegisterModelMapping>>(mappings);
+                if (mappingsArray?.Any() == true)
+                    AppSettings.EnvironmentalMappings = mappingsArray;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        if (int.TryParse(Environment.GetEnvironmentVariable("NodeRunnerCount") ?? string.Empty, out int runnerCount))
+        {
+            AppSettings.EnvironmentalRunnerCount = runnerCount;
+        }
+        if (bool.TryParse(Environment.GetEnvironmentVariable("NodeEnabled") ?? string.Empty, out bool enabled))
+        {
+            AppSettings.EnvironmentalEnabled = enabled;
         }
     }
 

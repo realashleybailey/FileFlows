@@ -70,11 +70,11 @@ public class Converter
     }
     
     /// <summary>
-    /// Converts a IEnumeable to an list
+    /// Converts a IEnumerable to an list
     /// </summary>
+    /// <param name="arrayType">the type of the array to create</param>
     /// <param name="value">The IEnumerable to convert</param>
     /// <param name="valueType">The type of array to create</param>
-    /// <typeparam name="T">the type of the array to create</typeparam>
     /// <returns>An list of the IEnumerable</returns>
     public static object ChangeListToArray(Type arrayType, IEnumerable value, Type valueType)
     {

@@ -13,6 +13,11 @@ This node will update "FFMPEG Builder" to remove all the matching tracks from th
 
 It will only mark the current tracks in the "FFMPEG Builder" for removal, so any tracks added later will NOT be affected.
 
+
+#### Tip: Remove Images
+You can have this node remove images from a video file but setting the type to "Video" and the remove after index to "1".  
+This will keep the first video track, but then remove the rest.   FFMPEG treats images as a video track.
+
 ### Type
 The type of tracks that should be reordered
 

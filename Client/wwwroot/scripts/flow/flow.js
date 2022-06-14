@@ -148,6 +148,8 @@ window.ffFlow = {
 
 
         ffFlow.csharp.invokeMethodAsync("AddElement", uid).then(result => {
+            if(!result)
+                return; // can happen if adding a obsolete node and user declines it
             let element = result.element;
             if (!element) {
                 console.warn('element was null');

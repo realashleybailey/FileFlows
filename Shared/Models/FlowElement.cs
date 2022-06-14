@@ -115,4 +115,14 @@ public class FlowElement
     /// Gets or sets the model for this element
     /// </summary>
     public ExpandoObject Model { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this node is obsolete and should be phased out
+    /// </summary>
+    public virtual bool Obsolete { get; set; }
+
+    /// <summary>
+    /// Gets or sets a message to show when the user tries to use this obsolete node
+    /// </summary>
+    public virtual string ObsoleteMessage { get; set; }
 }

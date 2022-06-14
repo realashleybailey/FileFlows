@@ -256,7 +256,7 @@ namespace FileFlows.Client.Pages
         }
 
         [JSInvokable]
-        public object AddElement(string uid)
+        public async Task<object> AddElement(string uid)
         {
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
             string name;
@@ -271,6 +271,18 @@ namespace FileFlows.Client.Pages
                 name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
                 if (name == "Label")
                     name = FlowHelper.FormatLabel(type);
+            }
+
+            if (element.Obsolete)
+            {
+                string msg = element.ObsoleteMessage?.EmptyAsNull() ?? Translater.Instant("Labels.ObsoleteConfirm.Message");
+                string confirmMessage = Translater.Instant("Labels.ObsoleteConfirm.Question");
+                string title = Translater.Instant("Labels.ObsoleteConfirm.Title");
+
+                msg += "\n\n" + confirmMessage;
+                var confirmed = await Confirm.Show(title, msg);
+                if (confirmed == false)
+                    return null;
             }
 
             element.Name = name;

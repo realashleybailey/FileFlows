@@ -11,6 +11,16 @@ public class Node
     public virtual FlowElementType Type { get; }
 
     /// <summary>
+    /// Gets if this node is obsolete and should be phased out
+    /// </summary>
+    public virtual bool Obsolete => false;
+
+    /// <summary>
+    /// Gets a message to show when the user tries to use this obsolete node
+    /// </summary>
+    public virtual string ObsoleteMessage => null;
+
+    /// <summary>
     /// Gets the number of inputs this node has
     /// </summary>
     public virtual int Inputs { get; }

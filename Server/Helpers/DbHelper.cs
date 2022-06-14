@@ -18,8 +18,12 @@ public class DbHelper
     internal static Task<bool> Initialize()
     {
         string connstring = AppSettings.Instance.DatabaseConnection;
-        string logConnection = Regex.Replace(connstring, "(?<=(Password=))[^;]+(;|$)", "#PASSWORD#");
-        Logger.Instance.ILog("Initializing Database: " + logConnection);
+        if (string.IsNullOrWhiteSpace(connstring) == false)
+        {
+            string logConnection = Regex.Replace(connstring, "(?<=(Password=))[^;]+(;|$)", "#PASSWORD#");
+            Logger.Instance.ILog("Initializing Database: " + logConnection);
+        }
+
         Manager = DbManager.GetManager(connstring);
         return Manager.CreateDb();
     }

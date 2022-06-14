@@ -6,6 +6,37 @@ layout: default
 order: 800
 ---
 
+## Version 0.8.0
+
+#### New
+- External Database Support (MySQL / Maria)
+  - Library Process Order: As Found (default), Random, Newest, Smallest, Largest
+  - Enhanced logging, can view and search Server logs and Node logs all from the web console
+- "Pause" / "Resume" button now prompts for duration to pause for
+- Logging now logs to rolling log files which are kept for a configured amount of days
+- Links now have "noreferrer" on them
+- WAL mode is now used for SQLite database connections
+- Node: [FFMPEG Builder: Custom Parameters](https://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/custom-parameters)
+- Node: [FFMPEG Builder: Video Tag](http://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/video-tag)
+- Node: [FFMPEG Builder: Set Language](http://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/set-language)
+  - This node was the "FFMPEG Build: Audio Set Language" but has been renamed and extended to support subtitles
+- Node: [FFMPEG Builder: Track Reorder](http://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/track-reorder)
+  - This node was the "FFMPEG Build: Audio Track Reorder" but has been renamed and extended to support subtitles
+- Node now looks for additional Environmental variables for settings: NodeMappings, NodeRunnerCount, NodeEnabled
+
+#### Fixed
+- Node: [FFMPEG Builder: Video 10 Bit](http://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/video-10-bit) and [FFMPEG Builder: Video Encode](http://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/video-encode) updated 10 Bit parameters to use p010le
+
+#### Patreon Only Features
+- External database support
+- Enhanced Logging
+- Auto Updates
+- Up to 10 Processing Nodes
+
+
+---
+
+
 ## Version 0.7.1
 
 #### New

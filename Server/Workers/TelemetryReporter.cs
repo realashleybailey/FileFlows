@@ -1,4 +1,11 @@
 ﻿using FileFlows.ServerShared.Workers;
+#if(!DEBUG)
+using System.Runtime.InteropServices;
+using FileFlows.Server.Controllers;
+using FileFlows.Shared.Helpers;
+using FileFlows.Shared.Models;
+#endif
+
 namespace FileFlows.Server.Workers;
 
 public class TelemetryReporter: Worker

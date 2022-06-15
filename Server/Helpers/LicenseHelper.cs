@@ -121,12 +121,14 @@ class LicenseHelper
             AppSettings.Instance.LicenseCode = licenseCode;
             AppSettings.Instance.Save();
         }
+#if(DEBUG)
         catch (Exception ex)
         {
-            #if(DEBUG)
             Logger.Instance.ELog("Failed validating license: " + ex.Message + "\n" + ex.Message);
-            #endif
         }
+#else
+        catch (Exception) { }
+#endif
     }
     
     class LicenseValidationModel

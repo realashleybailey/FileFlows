@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS GetLibraryFiles;
 
-CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem int, MaxItems int, NodeUid varchar(36), Overview bit)
+CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem int, MaxItems int, NodeUid varchar(36) COLLATE utf8_unicode_ci, Overview bit)
 BEGIN
 
 

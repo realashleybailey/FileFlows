@@ -3,6 +3,7 @@ using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
 using System.Runtime.InteropServices;
+using FileFlows.Server.Middleware;
 using FileFlows.ServerShared.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -109,6 +110,7 @@ public class WebServer
         });
 
         app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddleware<LoggingMiddleware>();
         app.UseRouting();
 
 

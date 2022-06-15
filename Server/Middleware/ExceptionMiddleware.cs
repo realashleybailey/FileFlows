@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace FileFlows.Server;
+namespace FileFlows.Server.Middleware;
 
 /// <summary>
 /// A middleware used to capture all exceptions

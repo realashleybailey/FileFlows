@@ -41,6 +41,7 @@
                     <InputSwitch @bind-Value="@Model.LogQueueMessages" Label="Pages.Settings.Fields.LogQueueMessages"/>
                     @if (IsLicensed)
                     {
+                        <InputSwitch @bind-Value="@Model.LogEveryRequest" Label="Pages.Settings.Fields.LogEveryRequest"/>
                         <InputNumber @bind-Value="@Model.LogFileRetention" Label="Pages.Settings.Fields.LogFileRetention" Min=1 Max=100 />
                         @if (Model.DbType != DatabaseType.Sqlite)
                         {

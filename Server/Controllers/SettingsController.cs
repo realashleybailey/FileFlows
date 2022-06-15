@@ -145,6 +145,7 @@ public class SettingsController : Controller
             PausedUntil = model.PausedUntil,
             LogFileRetention = model.LogFileRetention,
             LogDatabaseRetention = model.LogDatabaseRetention,
+            LogEveryRequest = model.LogEveryRequest,
             AutoUpdate = model.AutoUpdate,
             DisableTelemetry = model.DisableTelemetry,
             AutoUpdateNodes = model.AutoUpdateNodes,

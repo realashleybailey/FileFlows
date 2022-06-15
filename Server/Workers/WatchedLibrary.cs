@@ -10,6 +10,9 @@ using Microsoft.Extensions.FileProviders;
 
 namespace FileFlows.Server.Workers;
 
+/// <summary>
+/// A watched library is a folder that imports files into FileFlows
+/// </summary>
 public class WatchedLibrary:IDisposable
 {
     private FileSystemWatcher Watcher;
@@ -26,6 +29,10 @@ public class WatchedLibrary:IDisposable
     private BackgroundWorker worker;
     private System.Timers.Timer QueueTimer;
 
+    /// <summary>
+    /// Constructs a instance of a Watched Library
+    /// </summary>
+    /// <param name="library">The library to watch</param>
     public WatchedLibrary(Library library)
     {
         this.Library = library;
@@ -67,7 +74,7 @@ public class WatchedLibrary:IDisposable
         }
         finally
         {
-            if (Disposed && QueuedFiles?.Any() == true)
+            if (Disposed == false && QueuedFiles?.Any() == true)
             {
                 QueueTimer.Start();
             }

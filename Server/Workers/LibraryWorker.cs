@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Esprima.Ast;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
@@ -12,6 +13,8 @@ namespace FileFlows.Server.Workers;
 /// </summary>
 public class LibraryWorker : Worker
 {
+    private static LibraryWorker Instance;
+    
     private Dictionary<string, WatchedLibrary> WatchedLibraries = new ();
 
     /// <summary>
@@ -20,6 +23,7 @@ public class LibraryWorker : Worker
     public LibraryWorker() : base(ScheduleType.Second, 10)
     {
         Trigger();
+        Instance = this;
     }
 
     public override void Start()
@@ -30,6 +34,14 @@ public class LibraryWorker : Worker
     public override void Stop()
     {
         base.Stop();
+    }
+
+    /// <summary>
+    /// Triggers a scan now
+    /// </summary>
+    public static void ScanNow()
+    {
+        Instance?.Trigger();
     }
 
     private void Watch(params Library[] libraries)
@@ -57,6 +69,17 @@ public class LibraryWorker : Worker
     {
         var libController = new LibraryController();
         var libraries = libController.GetAll().Result;
+        bool scannedLibraries = libraries.Any(x => x.Scan);
+        if (scannedLibraries)
+        {
+            this.Interval = 30;
+            this.Schedule = ScheduleType.Second;
+        }
+        else
+        {
+            this.Interval = 1;
+            this.Schedule = ScheduleType.Hourly;
+        }
         var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();            
 
 

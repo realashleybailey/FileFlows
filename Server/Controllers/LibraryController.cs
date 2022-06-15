@@ -1,3 +1,5 @@
+using FileFlows.Server.Workers;
+
 namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -99,8 +101,13 @@ namespace FileFlows.Server.Controllers
                     continue;
                 item.LastScanned = DateTime.MinValue;
                 await Update(item);
-
             }
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(1);
+                LibraryWorker.ScanNow();
+            });
         }
 
         internal async Task UpdateFlowName(Guid uid, string name)

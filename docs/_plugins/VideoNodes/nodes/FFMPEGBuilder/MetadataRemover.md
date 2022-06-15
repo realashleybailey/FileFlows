@@ -7,7 +7,7 @@ plugin: Video Nodes
 sub: FFMPEG Builder
 ---
 
-{% include node.html input=1 outputs=2 icon="fas fa-remove-format" name="FFMPEG Builder: Metadata Remover" type="BuildPart" %}
+{% include node.html input=1 outputs=1 icon="fas fa-remove-format" name="FFMPEG Builder: Metadata Remover" type="BuildPart" %}
 
 Removes metadata from the FFMPEG Builder so when the file is processed the selected metadata will be removed.
 
@@ -17,10 +17,10 @@ Note: Only the metadata when this node is effected, if metadata is added after t
 ### Fields
 
 #### Video
-If video tracks should have this metadata removed",
+If video tracks should have this metadata removed
 
 #### Audio
-If audio tracks should have this metadata removed",
+If audio tracks should have this metadata removed
 
 #### Subtitle
 If subtitle tracks should have this metadata removed

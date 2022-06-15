@@ -25,7 +25,6 @@ If audio tracks should have this metadata removed",
 #### Subtitle
 If subtitle tracks should have this metadata removed
 
-
 #### RemoveImages
 If any images found in the metadata should be removed
 

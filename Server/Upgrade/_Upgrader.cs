@@ -29,7 +29,6 @@ public class Upgrader
                 new Upgrade0_8_1().Run(settings);
         }
         
-
         // always check on default scripts
         new DefaultScripts().Run(settings);
         

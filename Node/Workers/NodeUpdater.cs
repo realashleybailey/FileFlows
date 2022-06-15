@@ -9,12 +9,24 @@ namespace FileFlows.Node.Workers;
 /// </summary>
 public class NodeUpdater:UpdaterWorker
 {
+    private static NodeUpdater Instance;
     
     /// <summary>
     /// Constructs an instance of the node updater worker
     /// </summary>
-    public NodeUpdater() : base("node-upgrade", 1)
+    public NodeUpdater() : base("node-upgrade", ScheduleType.Daily, 3)
     {
+        Instance = this;
+    }
+
+    /// <summary>
+    /// Checks for an update now
+    /// </summary>
+    internal static void CheckForUpdate()
+    {
+        if (Instance == null)
+            return;
+        Instance.Trigger();
     }
 
     

@@ -17,13 +17,13 @@ public abstract class Worker
     }
 
     /// <summary>
-    /// Gets or sets the amount seconds between each execution of this worker
+    /// Gets or sets the interval for the schedule
     /// </summary>
-    private int Seconds { get; set; }
+    protected int Interval { get; set; }
     /// <summary>
     /// Gets or sets the schedule of this worker
     /// </summary>
-    private ScheduleType Schedule { get; set; }
+    protected ScheduleType Schedule { get; set; }
 
     /// <summary>
     /// Creates an instance of a worker
@@ -37,18 +37,8 @@ public abstract class Worker
 
     protected virtual void Initialize(ScheduleType schedule, int interval)
     {
-        if (interval < 1)
-            interval = 1;
-
-        if (schedule == ScheduleType.Minute)
-            interval *= 60;
-        if (schedule == ScheduleType.Hourly)
-            interval *= 60 * 60;
-        if (schedule == ScheduleType.Daily)
-            interval *= 60 * 60 * 24;
-
         this.Schedule = schedule;
-        this.Seconds = interval;
+        this.Interval = interval;
     }
 
     static readonly List<Worker> Workers = new List<Worker>();
@@ -72,8 +62,8 @@ public abstract class Worker
             timer = new System.Timers.Timer();
             timer.Elapsed += TimerElapsed;
             timer.SynchronizingObject = null;
-            timer.Interval = Seconds * 1_000;
-            timer.AutoReset = true;
+            timer.Interval = ScheduleNext() * 1_000;
+            timer.AutoReset = false;
             timer.Start();
         }
     }
@@ -94,7 +84,22 @@ public abstract class Worker
 
     private bool Executing = false;
 
-    private void TimerElapsed(object? sender, System.Timers.ElapsedEventArgs e) => Trigger();
+    private void TimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        try
+        {
+            Trigger();
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {               
+            timer.Interval = ScheduleNext() * 1_000;
+            timer.AutoReset = false;
+            timer.Start();
+        }
+    }
 
     public void Trigger()
     {
@@ -123,4 +128,54 @@ public abstract class Worker
     protected virtual void Execute()
     {
     }
+
+    private int ScheduleNext()
+    {
+        switch (this.Schedule)
+        {
+            case ScheduleType.Daily: return ScheduleDaily();
+            case ScheduleType.Hourly: return ScheduleHourly();
+            case ScheduleType.Minute: return ScheduleMinute();
+        }
+
+        // seconds
+        return Interval;
+    }
+
+    /// <summary>
+    /// Gets how many how many seconds until specified hour
+    /// </summary>
+    /// <returns>how many seconds until specified hour</returns>
+    private int ScheduleDaily()
+    {
+        DateTime now = DateTime.Now;
+        DateTime next = DateTime.Today.AddDays(this.Interval < now.Hour ? 1 : 0).AddHours(this.Interval);
+        return SecondsUntilNext(next);
+    }
+
+    /// <summary>
+    /// Gets how many how many seconds until specified hour
+    /// </summary>
+    /// <returns>how many seconds until specified hour</returns>
+    private int ScheduleHourly()
+    {
+        DateTime now = DateTime.Now.AddMinutes(3); // some padding
+        DateTime next = DateTime.Today;
+        while (next < now)
+            next = next.AddHours(this.Interval);
+        return SecondsUntilNext(next);
+    }
+    /// <summary>
+    /// Gets how many how many seconds until specified minute
+    /// </summary>
+    /// <returns>how many seconds until specified minute</returns>
+    private int ScheduleMinute()
+    {
+        DateTime now = DateTime.Now.AddSeconds(30); // some padding
+        DateTime next = DateTime.Today;
+        while (next < now)
+            next = next.AddMinutes(this.Interval);
+        return SecondsUntilNext(next);
+    }
+    private int SecondsUntilNext(DateTime next) => (int)Math.Ceiling((next - DateTime.Now).TotalSeconds);
 }

@@ -4,14 +4,14 @@ using FileFlows.ServerShared.Services;
 namespace FileFlows.ServerShared.Workers;
 
 /// <summary>
-/// Worker to clean up old log files
+/// Worker to clean up temporary files
 /// </summary>
-public class LogFileCleaner:Worker
+public class TempFileCleaner:Worker
 {
     /// <summary>
-    /// Constructs a log file cleaner
+    /// Constructs a temp file cleaner
     /// </summary>
-    public LogFileCleaner() : base(ScheduleType.Daily, 5)
+    public TempFileCleaner() : base(ScheduleType.Daily, 5)
     {
         Trigger();
     }

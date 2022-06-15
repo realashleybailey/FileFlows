@@ -12,7 +12,7 @@ public class DbLogPruner:Worker
     /// <summary>
     /// Constructor for the log pruner
     /// </summary>
-    public DbLogPruner() : base(ScheduleType.Minute, 1)
+    public DbLogPruner() : base(ScheduleType.Daily, 5)
     {
     }
 

@@ -52,6 +52,8 @@ public class NodeManager
         if (updater.RunCheck())
             return;
 
+        Version nodeVersion = Version.Parse(Globals.Version);
+
         var flowWorker = new FlowWorker(AppSettings.Instance.HostName)
         {
             IsEnabledCheck = () =>
@@ -77,6 +79,14 @@ public class NodeManager
                     AppSettings.Instance.Runners = settings.FlowRunners;
                     AppSettings.Instance.TempPath = settings.TempPath;
                     AppSettings.Instance.Save();
+
+                    var serverVersion = new SystemService().GetVersion().Result;
+                    if (serverVersion != nodeVersion)
+                    {
+                        Logger.Instance?.ILog($"Node version '{nodeVersion}' does not match server version '{serverVersion}'");
+                        NodeUpdater.CheckForUpdate();
+                        return false;
+                    }
 
                     return AppSettings.Instance.Enabled;
                 }

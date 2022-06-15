@@ -20,7 +20,7 @@ public class ServerUpdater : UpdaterWorker
     /// <summary>
     /// Creates an instance of a worker to automatically update FileFlows Server
     /// </summary>
-    public ServerUpdater() : base("server-upgrade", 60)
+    public ServerUpdater() : base("server-upgrade", ScheduleType.Daily, 4) 
     {
         Instance = this;
     }

@@ -1,4 +1,3 @@
-using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 
 namespace FileFlows.ServerShared.Workers;
@@ -8,11 +7,15 @@ namespace FileFlows.ServerShared.Workers;
 /// </summary>
 public class TempFileCleaner:Worker
 {
+    private string nodeAddress;
+    
     /// <summary>
     /// Constructs a temp file cleaner
+    /// <param name="nodeAddress">The name of the node</param>
     /// </summary>
-    public TempFileCleaner() : base(ScheduleType.Daily, 5)
+    public TempFileCleaner(string nodeAddress) : base(ScheduleType.Daily, 5)
     {
+        this.nodeAddress = nodeAddress;
         Trigger();
     }
 
@@ -21,24 +24,29 @@ public class TempFileCleaner:Worker
     /// </summary>
     protected sealed override void Execute()
     {
-        var settings = new SettingsService().Get().Result;
-        if (settings == null || settings.LogFileRetention < 1)
-            return; // not yet ready
-        var dir = DirectoryHelper.LoggingDirectory;
-        int count = 0;
-        foreach (var file in new DirectoryInfo(dir).GetFiles("FileFlows*.log")
-                     .OrderByDescending(x => x.LastWriteTime))
+        var service = NodeService.Load();
+        var node = string.IsNullOrWhiteSpace(nodeAddress)
+            ? service.GetServerNode().Result
+            : service.GetByAddress(nodeAddress).Result;
+        if (string.IsNullOrWhiteSpace(node?.TempPath))
+            return;
+        var tempDir = new DirectoryInfo(node.TempPath);
+        if (tempDir.Exists == false)
+            return;
+        
+        Logger.Instance?.ILog("About to clean temporary directory: " + tempDir.FullName);
+        foreach (var dir in tempDir.GetDirectories())
         {
-            if (++count > settings.LogFileRetention)
+            if (dir.CreationTime < DateTime.Now.AddDays(-1))
             {
                 try
                 {
-                    file.Delete();
-                    Logger.Instance.ILog("Deleted log file: " + file.Name);
+                    dir.Delete();
+                    Logger.Instance.ILog($"Deleted directory '{dir.Name}' from temp directory");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // ignored
+                    Logger.Instance.WLog($"Failed to delete directory '{dir.Name}' from temp directory: " + ex.Message);
                 }
             }
         }

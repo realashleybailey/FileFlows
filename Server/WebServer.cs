@@ -159,6 +159,7 @@ public class WebServer
             new LogConverter(),
             new TelemetryReporter(),
             new ServerUpdater(),
+            new TempFileCleaner(string.Empty),
             new FlowRunnerMonitor()
         );
 

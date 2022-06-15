@@ -103,7 +103,7 @@ public class NodeManager
             }
         };
         
-        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner());
+        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner(), new TempFileCleaner(AppSettings.Instance.HostName));
     }
 
     

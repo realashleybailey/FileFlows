@@ -5,6 +5,7 @@ using FileFlows.Shared.Models;
 using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.FileProviders;
 
 namespace FileFlows.Server.Workers;
 
@@ -509,6 +510,8 @@ public class WatchedLibrary:IDisposable
             }
 
             Logger.Instance.DLog($"Scan started on '{Library.Name}': {Library.Path}");
+            
+            
             int count = 0;
             if (Library.Folders)
             {
@@ -524,12 +527,28 @@ public class WatchedLibrary:IDisposable
             }
             else 
             {
+                var libFiles = new LibraryFileController().GetData().Result;
+                var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
+                var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
+
                 var files = GetFiles(new DirectoryInfo(Library.Path));
                 var settings = new SettingsController().Get().Result;
                 foreach (var file in files)
                 {
                     if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
                         continue;
+                
+                    if (knownFiles.ContainsKey(file.FullName.ToLower()))
+                    {
+                        var knownFileUid = knownFiles[file.FullName.ToLower()];
+                        var knownFile = libFiles[knownFileUid];
+                        if (Library.ReprocessRecreatedFiles == false ||
+                            file.CreationTime <= knownFile.CreationTime)
+                        {
+                            continue; // known file that hasn't changed, skip it
+                        }
+                    }
+
 
                     if (QueuedFiles.Contains(file.FullName) == false)
                     {

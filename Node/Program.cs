@@ -101,6 +101,10 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat"));
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.sh")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.sh"));
+            
+            #if(DEBUG)
+            showUi = true;
+            #endif
 
             if (showUi)
             {

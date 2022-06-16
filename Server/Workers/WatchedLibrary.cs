@@ -26,7 +26,7 @@ public class WatchedLibrary:IDisposable
 
     private Queue<string> QueuedFiles = new Queue<string>();
 
-    private BackgroundWorker worker;
+    //private BackgroundWorker worker;
     private System.Timers.Timer QueueTimer;
 
     /// <summary>
@@ -377,7 +377,8 @@ public class WatchedLibrary:IDisposable
     {
         Disposed = true;            
         DisposeWatcher();
-        worker.Dispose();
+        //worker.Dispose();
+        QueueTimer?.Dispose();
     }
 
     void SetupWatcher()

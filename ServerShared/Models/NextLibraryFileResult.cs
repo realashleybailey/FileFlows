@@ -17,19 +17,6 @@ public class NextLibraryFileResult
     /// Gets or sets the status of the call
     /// </summary>
     public NextLibraryFileStatus Status { get; set; }
-
-    /// <summary>
-    /// Constructs a next library file result
-    /// <param name="status">the status of the call</param>
-    /// <param name="file">the library file to process</param>
-    /// </summary>
-    public NextLibraryFileResult( NextLibraryFileStatus? status = null, LibraryFile file = null)
-    {
-        if (status != null)
-            this.Status = status.Value;
-        this.File = file;
-    }
-    
 }
 
 /// <summary>

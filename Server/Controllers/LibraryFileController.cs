@@ -23,7 +23,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// Gets the next library file for processing, and puts it into progress
     /// </summary>
     /// <param name="args">The arguments for the call</param>
-    /// <returns>the next library file to prDirectoryHelper new FileInfo(typeocess</returns>
+    /// <returns>the next library file to process</returns>
     [HttpPost("next-file")]
     public async Task<NextLibraryFileResult> GetNext([FromBody] NextLibraryFileArgs args)
     {
@@ -40,19 +40,19 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         _ = new NodeController().UpdateLastSeen(args.NodeUid);
         
         if (Workers.ServerUpdater.UpdatePending || args == null)
-            return new (NextLibraryFileStatus.UpdatePending); // if an update is pending, stop providing new files to process
+            return NextFileResult (NextLibraryFileStatus.UpdatePending); // if an update is pending, stop providing new files to process
 
         var settings = await new SettingsController().Get();
         if (settings.IsPaused)
-            return new(NextLibraryFileStatus.SystemPaused);
+            return NextFileResult(NextLibraryFileStatus.SystemPaused);
 
         if (Version.TryParse(args.NodeVersion, out var nodeVersion) == false)
-            return new(NextLibraryFileStatus.InvalidVersion);
+            return NextFileResult(NextLibraryFileStatus.InvalidVersion);
 
         if (nodeVersion < Globals.MinimumNodeVersion)
         {
             Logger.Instance.ILog($"Node '{args.NodeName}' version '{nodeVersion}' is less than minimum supported version '{Globals.MinimumNodeVersion}'");
-            return new(NextLibraryFileStatus.VersionMismatch);
+            return NextFileResult(NextLibraryFileStatus.VersionMismatch);
         }
 
         var node = (await new NodeController().Get(args.NodeUid));
@@ -63,7 +63,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
 
         if (await NodeEnabled(node) == false)
-            return new(NextLibraryFileStatus.NodeNotEnabled);
+            return NextFileResult(NextLibraryFileStatus.NodeNotEnabled);
 
         if (DbHelper.UseMemoryCache)
             return await GetNextMemoryCache(node, args.WorkerUid);
@@ -87,13 +87,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         {
             var item = (await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, start:0, max:1, nodeUid: node.Uid)).FirstOrDefault();
             if (item == null)
-                return new( NextLibraryFileStatus.NoFile, null);
+                return NextFileResult( NextLibraryFileStatus.NoFile, null);
             item.Status = FileStatus.Processing;
             item.Node = new ObjectReference { Uid = node.Uid, Name = node.Name };
             item.WorkerUid = workerUid;
             item.ProcessingStarted = DateTime.Now;
             await DbHelper.Update(item);
-            return new (NextLibraryFileStatus.Success, item);
+            return NextFileResult(NextLibraryFileStatus.Success, item);
         }
         finally
         {
@@ -101,6 +101,20 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
     }
 
+    /// <summary>
+    /// Constructs a next library file result
+    /// <param name="status">the status of the call</param>
+    /// <param name="file">the library file to process</param>
+    /// </summary>
+    private NextLibraryFileResult NextFileResult(NextLibraryFileStatus? status = null, LibraryFile file = null)
+    {
+        NextLibraryFileResult result = new();
+        if (status != null)
+            result.Status = status.Value;
+        result.File = file;
+        return result;
+    }
+    
     private async Task<NextLibraryFileResult> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
     {
         var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
@@ -148,9 +162,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.WorkerUid = workerUid;
                 item.ProcessingStarted = DateTime.Now;
                 data[i] = await DbHelper.Update(item);
-                return new (NextLibraryFileStatus.Success, data[i]);
+                return NextFileResult (NextLibraryFileStatus.Success, data[i]);
             }
-            return new (NextLibraryFileStatus.NoFile, null);
+            return NextFileResult (NextLibraryFileStatus.NoFile, null);
         }
         finally
         {

@@ -10,7 +10,7 @@ public class Globals
     /// <summary>
     /// Gets the version of FileFlows
     /// </summary>
-    internal static string Version = "0.5.2.734";
+    internal static string Version = "0.8.1.1427";
 
     /// <summary>
     /// Gets if this is running on Windows

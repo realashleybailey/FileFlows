@@ -115,7 +115,7 @@
       "Model": {
         "MoveFolder": true,
         "DeleteOriginal": true,
-        "DestinationPath": "D:\\videos\\converted"
+        "DestinationPath": "/media"
       }
     },
     {
@@ -259,7 +259,7 @@
   },
 
     {
-      "uid": "00000000-0000-0000-0000-000000000006",
+      "uid": "00000000-0000-0000-0000-000000000005",
       "type": "Select",
       "name": "Codec",
       "label": "Audio Codec",

@@ -316,6 +316,8 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     private string DateString(DateTime? date)
     {
         if (date == null) return string.Empty;
-        return date.Humanize();
+        var localDate = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, date.Value.Hour,
+            date.Value.Minute, date.Value.Second);
+        return localDate.ToUniversalTime().Humanize();
     }
 }

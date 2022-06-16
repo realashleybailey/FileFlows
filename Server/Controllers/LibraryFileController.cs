@@ -74,9 +74,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     private async Task<bool> NodeEnabled(ProcessingNode node)
     {
         var licensedNodes = LicenseHelper.GetLicensedProcessingNodes();
-        var enabledNodes = (await new NodeController().GetAll()).OrderBy(x => x.Name).Select(x => x.Uid)
-            .Take(licensedNodes).ToArray();
-        return enabledNodes.Contains(node.Uid);
+        var allNodes = await new NodeController().GetAll();
+        var enabledNodes = allNodes.Where(x => x.Enabled).OrderBy(x => x.Name).Take(licensedNodes).ToArray();
+        var enabledNodeUids = enabledNodes.Select(x => x.Uid).ToArray();
+        return enabledNodeUids.Contains(node.Uid);
     }
 
     private async Task<NextLibraryFileResult> GetNextDb(ProcessingNode node, Guid workerUid)

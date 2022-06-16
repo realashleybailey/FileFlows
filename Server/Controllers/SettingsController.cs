@@ -69,7 +69,7 @@ public class SettingsController : Controller
     {
         var settings = await Get();
         var license = LicenseHelper.GetLicense();
-        if (license.Status == LicenseStatus.Unlicensed && string.IsNullOrWhiteSpace(AppSettings.Instance.LicenseKey) == false)
+        if ((license == null || license.Status == LicenseStatus.Unlicensed) && string.IsNullOrWhiteSpace(AppSettings.Instance.LicenseKey) == false)
             license.Status = LicenseStatus.Invalid;
         // clone it so we can remove some properties we dont want passed to the UI
         string json = JsonSerializer.Serialize(settings);
@@ -123,10 +123,10 @@ public class SettingsController : Controller
     {
         settings.LicenseKey = AppSettings.Instance.LicenseKey;
         settings.LicenseEmail  = AppSettings.Instance.LicenseEmail;
-        settings.LicenseFlags = license.Flags.ToString();
+        settings.LicenseFlags = license == null ? string.Empty : license.Flags.ToString();
         settings.LicenseProcessingNodes = LicenseHelper.GetLicensedProcessingNodes();
-        settings.LicenseExpiryDate = license.ExpirationDateUtc.ToLocalTime();
-        settings.LicenseStatus = license.Status.ToString();
+        settings.LicenseExpiryDate = license == null ? DateTime.MinValue : license.ExpirationDateUtc.ToLocalTime();
+        settings.LicenseStatus = (license == null ? LicenseStatus.Unlicensed : license.Status).ToString();
     }
 
     /// <summary>

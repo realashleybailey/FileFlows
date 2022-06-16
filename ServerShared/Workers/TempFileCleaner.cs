@@ -41,7 +41,7 @@ public class TempFileCleaner:Worker
             {
                 try
                 {
-                    dir.Delete();
+                    dir.Delete(recursive: true);
                     Logger.Instance.ILog($"Deleted directory '{dir.Name}' from temp directory");
                 }
                 catch (Exception ex)

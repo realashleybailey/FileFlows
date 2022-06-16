@@ -27,6 +27,16 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpPost("next-file")]
     public async Task<NextLibraryFileResult> GetNext([FromBody] NextLibraryFileArgs args)
     {
+        var result = await GetNextActual(args);
+        if (result == null)
+            return result;
+        Logger.Instance.ILog($"GetNextFile for ['{args.NodeName}']({args.NodeUid}): {result.Status}");
+        return result;
+    }
+    
+    
+    async Task<NextLibraryFileResult> GetNextActual([FromBody] NextLibraryFileArgs args)
+    {
         _ = new NodeController().UpdateLastSeen(args.NodeUid);
         
         if (Workers.ServerUpdater.UpdatePending || args == null)

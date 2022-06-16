@@ -6,7 +6,7 @@ plugin: Basic Nodes
 toc: true
 ---
 
-{% include node.html input=1 outputs=1 icon="fas fa-font" name="Function" type="Process" %}
+{% include node.html input=1 outputs=1 icon="fas fa-font" name="Renamer" type="Process" %}
 
 
 Renames the working file.

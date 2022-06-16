@@ -33,3 +33,7 @@ If the title should be removed from the tracks
 
 #### Remove Language
 If the language should be removed from the tracks
+
+#### Remove Additional Metadata
+If additional metadata should be removed.  
+Additional metadata is non-standard metadata that may have been added to a video file, eg by iTunes.

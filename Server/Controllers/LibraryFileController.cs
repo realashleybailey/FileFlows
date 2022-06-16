@@ -242,6 +242,11 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.Date = x.ProcessingStarted;
             }
 
+            if (status == FileStatus.ProcessingFailed)
+            {
+                item.Date = x.ProcessingEnded;
+            }
+
             if (status == FileStatus.Duplicate)
                 item.Duplicate = x.Duplicate?.Name;
 

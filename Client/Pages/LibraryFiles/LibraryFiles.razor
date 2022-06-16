@@ -158,7 +158,7 @@
                         }
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Duplicate)" MobileWidth="5rem">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing) == false)" MobileWidth="5rem">
                     <Header>
                         Time
                     </Header>

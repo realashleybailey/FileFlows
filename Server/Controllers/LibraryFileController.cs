@@ -216,10 +216,16 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 Name = x.Name
             };
 
+            if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.Disabled)
+            {
+                item.Date = x.DateCreated;
+            }
+
             if (status == FileStatus.Processing)
             {
                 item.Node = x.Node?.Name;
                 item.ProcessingTime = x.ProcessingTime;
+                item.Date = x.ProcessingStarted;
             }
 
             if (status == FileStatus.Duplicate)
@@ -231,7 +237,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.OriginalSize = x.OriginalSize;
                 item.OutputPath = x.OutputPath;
                 item.ProcessingTime = x.ProcessingTime;
-
+                item.Date = x.ProcessingEnded;
             }
             return item;
         });

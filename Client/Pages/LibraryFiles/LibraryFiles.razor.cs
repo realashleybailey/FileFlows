@@ -1,3 +1,4 @@
+using Humanizer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -310,5 +311,11 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
         this.PageSize = pageSize;
         this.PageIndex = 0;
         await this.Refresh();
+    }
+
+    private string DateString(DateTime? date)
+    {
+        if (date == null) return string.Empty;
+        return date.Humanize();
     }
 }

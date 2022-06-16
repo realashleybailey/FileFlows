@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using FileFlows.Server.Database.Managers;
+using FileFlows.ServerShared.Models;
 using FileFlows.Shared;
 
 namespace FileFlows.Server.Controllers;
@@ -24,24 +25,24 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="args">The arguments for the call</param>
     /// <returns>the next library file to prDirectoryHelper new FileInfo(typeocess</returns>
     [HttpPost("next-file")]
-    public async Task<LibraryFile> GetNext([FromBody] NextLibraryFileArgs args)
+    public async Task<NextLibraryFileResult> GetNext([FromBody] NextLibraryFileArgs args)
     {
         _ = new NodeController().UpdateLastSeen(args.NodeUid);
         
         if (Workers.ServerUpdater.UpdatePending || args == null)
-            return null; // if an update is pending, stop providing new files to process
+            return new (NextLibraryFileStatus.UpdatePending); // if an update is pending, stop providing new files to process
 
         var settings = await new SettingsController().Get();
         if (settings.IsPaused)
-            return null;
+            return new(NextLibraryFileStatus.SystemPaused);
 
         if (Version.TryParse(args.NodeVersion, out var nodeVersion) == false)
-            return null;
+            return new(NextLibraryFileStatus.InvalidVersion);
 
         if (nodeVersion < Globals.MinimumNodeVersion)
         {
             Logger.Instance.ILog($"Node '{args.NodeName}' version '{nodeVersion}' is less than minimum supported version '{Globals.MinimumNodeVersion}'");
-            return null;
+            return new(NextLibraryFileStatus.VersionMismatch);
         }
 
         var node = (await new NodeController().Get(args.NodeUid));
@@ -52,7 +53,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
 
         if (await NodeEnabled(node) == false)
-            return null;
+            return new(NextLibraryFileStatus.NodeNotEnabled);
 
         if (DbHelper.UseMemoryCache)
             return await GetNextMemoryCache(node, args.WorkerUid);
@@ -68,20 +69,20 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         return enabledNodes.Contains(node.Uid);
     }
 
-    private async Task<LibraryFile> GetNextDb(ProcessingNode node, Guid workerUid)
+    private async Task<NextLibraryFileResult> GetNextDb(ProcessingNode node, Guid workerUid)
     {
         await _mutex.WaitAsync();
         try
         {
             var item = (await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, start:0, max:1, nodeUid: node.Uid)).FirstOrDefault();
             if (item == null)
-                return null;
+                return new( NextLibraryFileStatus.NoFile, null);
             item.Status = FileStatus.Processing;
             item.Node = new ObjectReference { Uid = node.Uid, Name = node.Name };
             item.WorkerUid = workerUid;
             item.ProcessingStarted = DateTime.Now;
             await DbHelper.Update(item);
-            return item;
+            return new (NextLibraryFileStatus.Success, item);
         }
         finally
         {
@@ -89,7 +90,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
     }
 
-    private async Task<LibraryFile> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
+    private async Task<NextLibraryFileResult> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
     {
         var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
         await _mutex.WaitAsync();
@@ -136,9 +137,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.WorkerUid = workerUid;
                 item.ProcessingStarted = DateTime.Now;
                 data[i] = await DbHelper.Update(item);
-                return data[i];
+                return new (NextLibraryFileStatus.Success, data[i]);
             }
-            return null;
+            return new (NextLibraryFileStatus.NoFile, null);
         }
         finally
         {

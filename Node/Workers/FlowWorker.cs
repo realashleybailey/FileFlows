@@ -1,4 +1,6 @@
 ﻿using System.Threading;
+using FileFlows.ServerShared.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Node.Workers;
 
@@ -155,9 +157,15 @@ public class FlowWorker : Worker
         }
         
         var libFileService = LibraryFileService.Load();
-        var libFile = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
-        if (libFile == null)
+        var libFileResult = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
+        if (libFileResult?.Status != NextLibraryFileStatus.Success)
+        {
+            Logger.Instance.ILog("No file found to process, status from server: " + (libFileResult?.Status.ToString() ?? "UNKNOWN"));
+            return;
+        }
+        if (libFileResult?.File == null)
             return; // nothing to process
+        var libFile = libFileResult.File;
 
         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         Guid processUid = Guid.NewGuid();

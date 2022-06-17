@@ -6,6 +6,45 @@ layout: default
 order: 800
 ---
 
+## Version 0.8.1
+
+#### New
+- Video Legacy Nodes
+  - Moved old legacy Video Nodes into a separate plugin
+  - This plugin will be downloaded if upgrading from an earlier version, not if a clean install
+- New "Obsolete" indicator on obsolete nodes in the flow editor.  And a warning will be shown if adding one of these nodes to the flow.
+  - Note: These nodes will eventually be deleted for good, so upgrade your flows.
+- Flow Templates updated to use FFMPEG Builder 
+- Added "Date" to "Files" to show when the file was seen, processed, etc in relative time
+- Workers now run at set times instead of [x] minutes since starting.
+  This change should reduce the load on the CPU
+  - Database Log Pruner - 5am
+  - Library File Log Pruner - 5am
+  - Library Worker
+    - Every 30 seconds
+    - On the hour if no libraries are set to "Scan"
+  - Log Cleaner - 3am
+  - Plugin Updater - 5am
+  - Server Auto Updater - 4am
+  - Telemetry Report - 5am
+- Watched Library 
+  - Now uses a Timer than can be stopped/started when a file is added to the load queue
+  - Will now check known files before adding to the load queue
+  - When the queue is empty, the timer is stopped.  When a file system event adds a new file, the timer is started    
+- Get Next Library File now returns more information to the processing node to diagnose why nothing is being processed
+- Added option to log every request made to the server, this is helpful for debugging and understanding the load on the server
+- Updated order of hardware decoders to be: cuda, qsv, dxva2, d3d11va, opencl
+- New Node [FFMPEG Builder: Metadata Remover](https://docs.fileflows.com/plugins/video-nodes/ffmpeg-builder/metadata-remover)
+- MySQL: Get Library Files now orders unprocessed by date added to the library
+
+#### Fixed
+- Issue where only the first two processing nodes could be used even if those were not enabled if the system was unlicensed.
+- FFMPEG Builder: 10 Bit was using the wrong 10bit pixel format for libx265 
+- Fixed "Video Has Stream" would always fail on language matches as it was using the codec value to perform the check
+
+
+---
+
 ## Version 0.8.0
 
 #### New

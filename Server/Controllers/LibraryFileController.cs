@@ -815,17 +815,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
     }
 
-#if (DEBUG)
-    //[HttpGet("stream")]
-    //public async Task<IActionResult> StreamFile([FromQuery] string file)
-    //{
-    //    // this method is testing if streaming a file to a node is doable
-    //    // instead of having to setup mappings
-    //    // ffmpeg handles it, but not every node would. so maybe have to bake in to the input node somehow...
-    //    // but doing that VideoInput can stream the file to get the info, thats a lot of data to stream over
-    //    // then its still on server, then when VideoEncode executes, we have to read the entire file again
-    //    // thats less than ideal... so maybe just delete this code...
-    //    return File(System.IO.File.OpenRead(file), "applicaiton/octet-stream");
-    //}
-#endif
+    /// <summary>
+    /// Deletes all the library files from the specified libraries
+    /// </summary>
+    /// <param name="libraryUids">the UIDs of the libraries</param>
+    public async Task DeleteFromLibraries(Guid[] libraryUids)
+    {
+        if (DbHelper.UseMemoryCache)
+        {
+            var allFiles = await base.GetDataList();
+            var libFiles = allFiles.Where(x => x.Library?.Uid != null && libraryUids.Contains(x.Library.Uid)).Select(x => x.Uid).ToArray();
+            await DeleteAll(libFiles);
+        }
+        else
+        {
+            await DbHelper.DeleteLibraryFilesFromLibraries(libraryUids);
+        }
+    }
 }

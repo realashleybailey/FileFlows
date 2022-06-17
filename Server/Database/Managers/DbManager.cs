@@ -734,6 +734,12 @@ public abstract class DbManager
     /// <returns>the failure flow</returns>
     public abstract Task<Flow> GetFailureFlow(Guid libraryUid);
     
+    /// <summary>
+    /// Deletes all the library files from the specified libraries
+    /// </summary>
+    /// <param name="libraryUids">the UIDs of the libraries</param>
+    /// <returns>the task to await</returns>
+    public virtual Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids) => Task.CompletedTask;
     
 #if (DEBUG)
     /// <summary>

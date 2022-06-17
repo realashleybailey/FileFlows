@@ -170,7 +170,7 @@ namespace FileFlows.Client.Pages
 
         protected virtual string DeleteMessage => "Labels.DeleteItems";
 
-        public async Task Delete()
+        public virtual async Task Delete()
         {
             var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
             if (uids.Length == 0)

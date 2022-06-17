@@ -106,21 +106,35 @@ public class MySqlDbManager: DbManager
     /// </summary>
     public void AddVirtualColumns()
     {
-        string sql = @"ALTER TABLE DbObject
-ADD COLUMN js_Status int GENERATED ALWAYS AS (json_extract(Data,'$.Status')) VIRTUAL,
-ADD COLUMN js_Order int GENERATED ALWAYS AS (json_extract(Data,'$.Order')) VIRTUAL,
-ADD COLUMN js_OriginalSize bigint GENERATED ALWAYS AS (convert(json_extract(Data,'$.OriginalSize'), signed)) VIRTUAL,
-ADD COLUMN js_ProcessingStarted datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 23), datetime)) VIRTUAL,
-ADD COLUMN js_ProcessingEnded datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 23), datetime)) VIRTUAL,
-ADD COLUMN js_LibraryUid varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Library.Uid'))) VIRTUAL,
-
-ADD COLUMN js_Enabled boolean GENERATED ALWAYS AS (convert(json_extract(Data,'$.Enabled'), signed)) VIRTUAL,
-ADD COLUMN js_Priority int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.Priority')), signed)) VIRTUAL,
-ADD COLUMN js_ProcessingOrder int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.ProcessingOrder')), signed)) VIRTUAL,
-ADD COLUMN js_Schedule varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL
-;";
-        
         using var db = GetDb();
+        var existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}';");
+        
+        var columns = new []{
+            new []{"js_Status", "ADD COLUMN js_Status int GENERATED ALWAYS AS (json_extract(Data,'$.Status')) VIRTUAL"},
+            new []{"js_Order", "ADD COLUMN js_Order int GENERATED ALWAYS AS (json_extract(Data,'$.Order')) VIRTUAL"},
+            new []{"js_OriginalSize", "ADD COLUMN js_OriginalSize bigint GENERATED ALWAYS AS (convert(json_extract(Data,'$.OriginalSize'), signed)) VIRTUAL"},
+            new []{"js_ProcessingStarted", "ADD COLUMN js_ProcessingStarted datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 23), datetime)) VIRTUAL"},
+            new []{"js_ProcessingEnded", "ADD COLUMN js_ProcessingEnded datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 23), datetime)) VIRTUAL"},
+            new []{"js_LibraryUid", "ADD COLUMN js_LibraryUid varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Library.Uid'))) VIRTUAL"},
+            new []{"js_Enabled", "ADD COLUMN js_Enabled boolean GENERATED ALWAYS AS (convert(json_extract(Data,'$.Enabled'), signed)) VIRTUAL"},
+            new []{"js_Priority", "ADD COLUMN js_Priority int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.Priority')), signed)) VIRTUAL"},
+            new []{"js_ProcessingOrder", "ADD COLUMN js_ProcessingOrder int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.ProcessingOrder')), signed)) VIRTUAL"},
+            new []{"js_Schedule", "ADD COLUMN js_Schedule varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL"}
+        };
+
+        string sql = "";
+        foreach (var column in columns)
+        {
+            string colName = column[0];
+            if (existingColumns.Contains(colName))
+                continue;
+            sql += colName[1] + "\n";
+        }
+
+        if (string.IsNullOrEmpty(sql))
+            return;
+
+        sql = @"ALTER TABLE DbObject " + sql + ";";
         db.Execute(sql);
     }
     
@@ -152,6 +166,23 @@ ADD COLUMN js_Schedule varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extrac
         db.OneTimeCommandTimeout = 120;
         var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)", (int)status, quarter, start, max, nodeUid);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
+    }
+
+    /// <summary>
+    /// Deletes all the library files from the specified libraries
+    /// </summary>
+    /// <param name="libraryUids">the UIDs of the libraries</param>
+    /// <returns>the task to await</returns>
+    public override async Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids)
+    {
+        string sql = "";
+        foreach (var uid in libraryUids ?? new Guid[] { })
+            sql += $"delete from {nameof(DbObject)} where js_LibraryUid = '{uid}';\n";
+        if (sql == "")
+            return;
+        using var db = GetDb();
+        await db.ExecuteAsync(sql);
+
     }
 
     /// <summary>

@@ -245,6 +245,13 @@ public class DbHelper
     public static Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
         => Manager.GetByName<T>(name);
 
+    /// <summary>
+    /// Deletes all the library files from the specified libraries
+    /// </summary>
+    /// <param name="libraryUids">the UIDs of the libraries</param>
+    /// <returns>the task to await</returns>
+    public static Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids) =>
+        Manager.DeleteLibraryFilesFromLibraries(libraryUids);
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

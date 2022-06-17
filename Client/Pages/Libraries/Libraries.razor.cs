@@ -1,4 +1,5 @@
 using FileFlows.Client.Components;
+using FileFlows.Client.Components.Dialogs;
 
 namespace FileFlows.Client.Pages;
 
@@ -155,6 +156,47 @@ public partial class Libraries : ListPage<Library>
             Blocker.Hide();
             this.StateHasChanged();
         }
+    }
+    
+    
+    public override async Task Delete()
+    {
+#if (!DEMO)
+        var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+        if (uids.Length == 0)
+            return; // nothing to delete
+        var confirmResult = await Confirm.Show("Labels.Delete",
+            Translater.Instant("Pages.Libraries.Messages.DeleteConfirm", new { count = uids.Length }),
+            "Pages.Libraries.Messages.DeleteLibraryFiles"
+        );
+        if (confirmResult.Confirmed == false)
+            return; // rejected the confirm
+
+        Blocker.Show();
+        this.StateHasChanged();
+
+        try
+        {
+            var deleteResult = await HttpHelper.Delete($"{ApiUrl}?deleteLibraryFiles={confirmResult.SwitchState}", new ReferenceModel { Uids = uids });
+            if (deleteResult.Success == false)
+            {
+                if(Translater.NeedsTranslating(deleteResult.Body))
+                    Toast.ShowError( Translater.Instant(deleteResult.Body));
+                else
+                    Toast.ShowError( Translater.Instant("ErrorMessages.DeleteFailed"));
+                return;
+            }
+
+            this.Data = this.Data.Where(x => uids.Contains(x.Uid) == false).ToList();
+
+            await PostDelete();
+        }
+        finally
+        {
+            Blocker.Hide();
+            this.StateHasChanged();
+        }
+#endif
     }
 }
 

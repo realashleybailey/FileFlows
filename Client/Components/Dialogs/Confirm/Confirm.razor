@@ -3,7 +3,14 @@
 <Modal Title="@Title" Visible="Visible">
 
     <Body>
-        <span class="confirm-message">@Message</span>
+    <span class="confirm-message">@Message</span>
+    @if (ShowSwitch)
+    {
+        <div class="switch">
+            <FlowSwitch @bind-Value=@SwitchState />
+            <span>@SwitchMessage</span>
+        </div>
+    }
     </Body>
     <Footer>
         <button @onclick=@Yes>@lblYes</button>

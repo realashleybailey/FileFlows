@@ -86,9 +86,19 @@ namespace FileFlows.Server.Controllers
         /// Delete libraries from the system
         /// </summary>
         /// <param name="model">A reference model containing UIDs to delete</param>
-        /// <returns>an awaited task</returns>
+        /// <param name="deleteLibraryFiles">[Optional] if libraries files should also be deleted for this library</param>
+        /// <returns>an awaited task,</returns>
         [HttpDelete]
-        public Task Delete([FromBody] ReferenceModel model) => DeleteAll(model);
+        public async Task Delete([FromBody] ReferenceModel model, [FromQuery] bool deleteLibraryFiles = false)
+        {
+            if (model?.Uids?.Any() != true)
+                return;
+            await DeleteAll(model);
+            if (deleteLibraryFiles)
+            {
+                await new LibraryFileController().DeleteFromLibraries(model.Uids);
+            }
+        }
 
         /// <summary>
         /// Rescans libraries

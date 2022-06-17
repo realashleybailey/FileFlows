@@ -123,6 +123,7 @@ public class MySqlDbManager: DbManager
     public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
     {
         using var db = GetDb();
+        db.OneTimeCommandTimeout = 120;
         var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)", (int)status, quarter, start, max, nodeUid);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }

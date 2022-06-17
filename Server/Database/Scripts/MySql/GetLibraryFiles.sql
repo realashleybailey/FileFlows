@@ -4,7 +4,8 @@ CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem in
 BEGIN
 
 
-    declare sOrder varchar(500);
+    declare sOrder varchar(1000);
+    declare sWhere varchar(500);
     declare allLibraries int;
     declare jsonLibraries text;
 
@@ -32,50 +33,57 @@ BEGIN
 
     end if;
 
-    drop table if exists tempFiles;
-    create temporary table tempFiles
-    select tempLibraries.Uid as LibraryUid, DbObject.*,
-           case
-               when js_Status <> 0 then js_Status
-               when tempLibraries.Enabled = false then -2
-               when tempLibraries.Unscheduled = 1 then -1
-               else 0
-               end as Status,
-           case
-               when js_Order <> -1 then js_Order
-               when tempLibraries.ProcessingOrder = 1 then FLOOR(RAND()*(10000)+1000) # random
-               when tempLibraries.ProcessingOrder = 2 then 1000 + (js_OriginalSize / 1000000) #smallest first
-               when tempLibraries.ProcessingOrder = 3 then 10000000 - (js_OriginalSize / 10000)  #largest first
-               when tempLibraries.ProcessingOrder = 4 then now() - DateCreated #newest first
-               else 10000
-               end as Priority,
-           tempLibraries.Priority as LibraryPriority,
-           js_ProcessingStarted as ProcessingStarted,
-           js_ProcessingEnded as ProcessingEnded
-    from DbObject inner join tempLibraries on js_LibraryUid = tempLibraries.Uid
-    where Type = 'FileFlows.Shared.Models.LibraryFile';
 
     if Overview = 1 then
 
-        select tempFiles.Status, Count(Uid) as Count from tempFiles
-        group by tempFiles.Status;
+        select Status, count(Uid) as Count
+        from (
+                 select case
+                            when js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0 then 0
+                            when js_Status = 0 and tempLibraries.Enabled = false then -1
+                            when js_Status = 0 then -2
+                            else js_Status end as Status, DbObject.Uid
+                 from DbObject inner join tempLibraries on js_LibraryUid = tempLibraries.Uid
+                 where Type = 'FileFlows.Shared.Models.LibraryFile'
+             ) as tbl
+        group by Status;
 
     else
+
+        if FileStatus = 0 then
+            set sWhere = ' and js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0';
+        elseif FileStatus = -1 then -- out of schedule
+            set sWhere = ' and js_Status  = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0';
+        elseif FileStatus = -2 then -- disabled
+            set sWhere = ' and js_Status  = 0 and tempLibraries.Enabled = false';
+        else
+            set sWhere = CONCAT(' and js_Status = ', FileStatus);
+        end if;
+
         if FileStatus = 0 or FileStatus = -1 then
-            set sOrder = ' order by LibraryPriority asc, Priority asc ';
+            set sOrder = ' order by tempLibraries.Priority asc, 
+		  case
+			   when js_Status > 0 then 0
+				when js_Order <> -1 then js_Order
+				when tempLibraries.ProcessingOrder = 1 then FLOOR(RAND()*(10000)+1000) # random
+				when tempLibraries.ProcessingOrder = 2 then 1000 + (js_OriginalSize / 1000000) #smallest first
+				when tempLibraries.ProcessingOrder = 3 then 10000000 - (js_OriginalSize / 10000)  #largest first
+				when tempLibraries.ProcessingOrder = 4 then now() - DateCreated #newest first
+				else 10000
+				end';
         elseif FileStatus = 2 then
-            set sOrder = ' order by ProcessingStarted asc ';
+            set sOrder = ' order by js_ProcessingStarted asc ';
         elseif FileStatus = 1 or FileStatus = 4 then
-            set sOrder = ' order by ProcessingEnded desc ';
+            set sOrder = ' order by js_ProcessingEnded desc ';
         else
             set sOrder = ' order by DateCreated desc ';
         end if;
 
         SET @queryString = CONCAT(
-                'select dblf.Uid, dblf.Name, dblf.Type, dblf.DateCreated, dblf.DateModified, dblf.Data from tempFiles dblf ',
-            #'select dblf.*, js_OriginalSize as OriginalSize from tempFiles dblf ',
-                ' where dblf.Status = ', FileStatus,
-                ' ', sOrder, ' limit ', StartItem, ', ', MaxItems, '; '
+                'select DbObject.Uid, DbObject.Name, DbObject.Type, DbObject.DateCreated, DbObject.DateModified, DbObject.Data ',
+                ' from DbObject inner join tempLibraries on js_LibraryUid = tempLibraries.Uid ',
+                ' where Type = ''FileFlows.Shared.Models.LibraryFile'' ',
+                sWhere, ' ', sOrder, ' limit ', StartItem, ', ', MaxItems, '; '
             );
 
         prepare stmt from @queryString;
@@ -83,6 +91,7 @@ BEGIN
         deallocate prepare stmt;
 
     end if;
+
 
 
 END;

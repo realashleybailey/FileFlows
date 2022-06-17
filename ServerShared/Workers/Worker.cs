@@ -149,7 +149,9 @@ public abstract class Worker
     private int ScheduleDaily()
     {
         DateTime now = DateTime.Now;
-        DateTime next = DateTime.Today.AddDays(this.Interval < now.Hour ? 1 : 0).AddHours(this.Interval);
+        DateTime next = DateTime.Today.AddHours(this.Interval);
+        if (next < now)
+            next = next.AddDays(1);
         return SecondsUntilNext(next);
     }
 

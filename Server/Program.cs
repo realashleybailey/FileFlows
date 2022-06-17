@@ -4,7 +4,6 @@ using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
-using FileFlows.Server.Workers;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server;

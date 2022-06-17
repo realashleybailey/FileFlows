@@ -64,7 +64,7 @@ group by tempFiles.Status;
 
 else
 	if FileStatus = 0 or FileStatus = -1 then
-	  set sOrder = ' order by LibraryPriority asc, Priority asc ';
+	  set sOrder = ' order by LibraryPriority asc, Priority asc, DateCreated asc ';
 	elseif FileStatus = 2 then
 		  set sOrder = ' order by ProcessingStarted asc ';
 	elseif FileStatus = 1 or FileStatus = 4 then
@@ -74,8 +74,8 @@ else
 end if;
     
 		SET @queryString = CONCAT(
-			#'select dblf.Uid, dblf.Name, dblf.Type, dblf.DateCreated, dblf.DateModified, dblf.Data from tempFiles dblf ',
-            'select dblf.*, JSON_EXTRACT(dblf.Data, ''$.OriginalSize'') as OriginalSize from tempFiles dblf ',
+			'select dblf.Uid, dblf.Name, dblf.Type, dblf.DateCreated, dblf.DateModified, dblf.Data from tempFiles dblf ',
+            #'select dblf.*, JSON_EXTRACT(dblf.Data, ''$.OriginalSize'') as OriginalSize from tempFiles dblf ',
 			' where dblf.Status = ', FileStatus,
 			' ', sOrder, ' limit ', StartItem, ', ', MaxItems, '; '
 		);

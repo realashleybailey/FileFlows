@@ -11,7 +11,7 @@ public class LibraryFileLogPruner:Worker
     /// <summary>
     /// Constructor for the log pruner
     /// </summary>
-    public LibraryFileLogPruner() : base(ScheduleType.Hourly, 3)
+    public LibraryFileLogPruner() : base(ScheduleType.Daily, 5)
     {
     }
     

@@ -5,9 +5,14 @@ using FileFlows.Shared.Models;
 using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Timers;
+using Microsoft.Extensions.FileProviders;
 
 namespace FileFlows.Server.Workers;
 
+/// <summary>
+/// A watched library is a folder that imports files into FileFlows
+/// </summary>
 public class WatchedLibrary:IDisposable
 {
     private FileSystemWatcher Watcher;
@@ -21,8 +26,13 @@ public class WatchedLibrary:IDisposable
 
     private Queue<string> QueuedFiles = new Queue<string>();
 
-    private BackgroundWorker worker;
+    //private BackgroundWorker worker;
+    private System.Timers.Timer QueueTimer;
 
+    /// <summary>
+    /// Constructs a instance of a Watched Library
+    /// </summary>
+    /// <param name="library">The library to watch</param>
     public WatchedLibrary(Library library)
     {
         this.Library = library;
@@ -30,10 +40,16 @@ public class WatchedLibrary:IDisposable
         if(UseScanner == false)
             SetupWatcher();
 
-        worker = new BackgroundWorker();
-        worker.DoWork += Worker_DoWork;
-        worker.RunWorkerAsync();
+        // worker = new BackgroundWorker();
+        // worker.DoWork += Worker_DoWork;
+        // worker.RunWorkerAsync();
+        QueueTimer = new();
+        QueueTimer.Elapsed += QueueTimerOnElapsed;
+        QueueTimer.AutoReset = false;
+        QueueTimer.Interval = 1;
+        QueueTimer.Start();
     }
+
 
     private void LogQueueMessage(string message, Settings settings = null)
     {
@@ -45,138 +61,170 @@ public class WatchedLibrary:IDisposable
         
         Logger.Instance.DLog(message);
     }
-    
+
+    private void QueueTimerOnElapsed(object? sender, ElapsedEventArgs e)
+    {
+        try
+        {
+            Logger.Instance.ILog("Processing Timer Queue: " + this.Library.Name);
+            ProcessQueuedItem();
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            if (Disposed == false && QueuedFiles?.Any() == true)
+            {
+                QueueTimer.Start();
+            }
+        }
+    }
+
     private void Worker_DoWork(object? sender, DoWorkEventArgs e)
     {
         while (Disposed == false)
         {
-            try
+            ProcessQueuedItem();
+            if(QueuedFiles?.Any() != true)
             {
-                string? fullpath;
-                if (QueuedFiles.TryDequeue(out fullpath) == false)
+                LogQueueMessage($"{Library.Name} nothing queued");
+                Thread.Sleep(1000);
+            }
+        }
+    }
+
+    private void ProcessQueuedItem()
+    {
+        try
+        {
+            string? fullpath;
+            if (QueuedFiles.TryDequeue(out fullpath) == false)
+                return;
+
+            LogQueueMessage($"{Library.Name} Dequeued: {fullpath}");
+
+            if (CheckExists(fullpath) == false)
+            {
+                Logger.Instance.DLog($"{Library.Name} file does not exist: {fullpath}");
+                return;
+            }
+
+
+            if (this.Library.ExcludeHidden)
+            {
+                if (FileIsHidden(fullpath))
                 {
-                    LogQueueMessage($"{Library.Name} nothing queued");
-                    Thread.Sleep(1000);
-                    continue;
+                    LogQueueMessage($"{Library.Name} file is hidden: {fullpath}");
+                    return;
                 }
+            }
 
-                LogQueueMessage($"{Library.Name} Dequeued: {fullpath}");
+            if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
+            {
+                LogQueueMessage($"{Library.Name} file does not match pattern or ends with _: {fullpath}");
+                return;
+            }
 
-                if (CheckExists(fullpath) == false)
+            if (fullpath.ToLower().StartsWith(Library.Path.ToLower()) == false)
+            {
+                Logger.Instance?.ILog($"Library file \"{fullpath}\" no longer belongs to library \"{Library.Path}\"");
+                return; // library was changed
+            }
+
+            StringBuilder scanLog = new StringBuilder();
+            DateTime dtTotal = DateTime.Now;
+
+            FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
+
+            var (knownFile, fingerprint, duplicate) = IsKnownFile(fullpath, fsInfo).Result;
+            if (knownFile && duplicate == null)
+                return;
+
+            string type = Library.Folders ? "folder" : "file";
+
+            if (Library.Folders && Library.WaitTimeSeconds > 0)
+            {
+                DirectoryInfo di = (DirectoryInfo)fsInfo;
+                try
                 {
-                    Logger.Instance.DLog($"{Library.Name} file does not exist: {fullpath}");
-                    continue;
-                }
-
-
-                if (this.Library.ExcludeHidden)
-                {
-                    if (FileIsHidden(fullpath))
+                    var files = di.GetFiles("*.*", SearchOption.AllDirectories);
+                    if (files.Any())
                     {
-                        LogQueueMessage($"{Library.Name} file is hidden: {fullpath}");
-                        continue;
-                    }
-                }
-
-                if (IsMatch(fullpath) == false || fullpath.EndsWith("_"))
-                {
-                    LogQueueMessage($"{Library.Name} file does not match pattern or ends with _: {fullpath}");
-                    continue;
-                }
-
-                if (fullpath.ToLower().StartsWith(Library.Path.ToLower()) == false)
-                {
-                    Logger.Instance?.ILog($"Library file \"{fullpath}\" no longer belongs to library \"{Library.Path}\"");
-                    continue; // library was changed
-                }
-                StringBuilder scanLog = new StringBuilder(); 
-                DateTime dtTotal = DateTime.Now;
-
-                FileSystemInfo fsInfo = Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
-
-                var (knownFile, fingerprint, duplicate) = IsKnownFile(fullpath, fsInfo).Result;
-                if (knownFile && duplicate == null)
-                    continue;
-
-                string type = Library.Folders ? "folder" : "file";
-
-                if (Library.Folders && Library.WaitTimeSeconds > 0)
-                {
-                    DirectoryInfo di = (DirectoryInfo)fsInfo;
-                    try 
-                    {
-                        var files = di.GetFiles("*.*", SearchOption.AllDirectories);
-                        if (files.Any())
+                        var lastWriteTime = files.Select(x => x.LastWriteTime).Max();
+                        if (lastWriteTime > DateTime.Now.AddSeconds(-Library.WaitTimeSeconds))
                         {
-                            var lastWriteTime = files.Select(x => x.LastWriteTime).Max();
-                            if (lastWriteTime > DateTime.Now.AddSeconds(-Library.WaitTimeSeconds))
-                            {
-                                Logger.Instance.ILog($"Changes recently written to folder '{di.FullName}' cannot add to library yet");
-                                Thread.Sleep(2000);
-                                QueuedFiles.Enqueue(fullpath);
-                                continue;
-                            }
+                            Logger.Instance.ILog(
+                                $"Changes recently written to folder '{di.FullName}' cannot add to library yet");
+                            Thread.Sleep(2000);
+                            QueueItem(fullpath);
+                            return;
                         }
                     }
-                    catch(Exception ex)
-                    {
-                        Logger.Instance.ILog($"Error reading folder '{di.FullName}' cannot add to library yet, will try again: " + ex.Message);
-                        Thread.Sleep(2000);
-                        QueuedFiles.Enqueue(fullpath);
-                        continue;
-                    }
                 }
-
-                Logger.Instance.DLog($"New unknown {type}: {fullpath}");
-
-                if (Library.Folders == false && CanAccess((FileInfo)fsInfo, Library.FileSizeDetectionInterval).Result == false)
+                catch (Exception ex)
                 {
-                    Logger.Instance.DLog($"Cannot access file: " + fullpath);
-                    continue;
-                }
-
-                int skip = Library.Path.Length;
-                if(Library.Path.EndsWith("/") == false && Library.Path.EndsWith("\\") == false)
-                    ++skip;
-                    
-                long size = Library.Folders ? 0 : ((FileInfo)fsInfo).Length;
-
-                string relative = fullpath.Substring(skip);
-                var lf = new LibraryFile
-                {
-                    Name = fullpath,
-                    RelativePath = relative,
-                    Status = duplicate != null ? FileStatus.Duplicate : FileStatus.Unprocessed,
-                    IsDirectory = fsInfo is DirectoryInfo,
-                    Fingerprint = fingerprint ?? string.Empty,
-                    OriginalSize = size,
-                    CreationTime = fsInfo.CreationTime,
-                    LastWriteTime = fsInfo.LastWriteTime,
-                    Duplicate = duplicate,
-                    Library = new ObjectReference
-                    {
-                        Name = Library.Name,
-                        Uid = Library.Uid,
-                        Type = Library.GetType()?.FullName ?? string.Empty
-                    },
-                    Order = -1
-                };
-
-                var result = new LibraryFileController().Add(lf).Result;
-
-                if(result != null && result.Uid != Guid.Empty)
-                {
-                    Logger.Instance.DLog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to successfully add new library file: \"{fullpath}\"");
-                }
-                else
-                {
-                    Logger.Instance.ELog($"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to fail to add new library file: \"{fullpath}\"");
+                    Logger.Instance.ILog(
+                        $"Error reading folder '{di.FullName}' cannot add to library yet, will try again: " +
+                        ex.Message);
+                    Thread.Sleep(2000);
+                    QueueItem(fullpath);
+                    return;
                 }
             }
-            catch (Exception ex)
+
+            Logger.Instance.DLog($"New unknown {type}: {fullpath}");
+
+            if (Library.Folders == false &&
+                CanAccess((FileInfo)fsInfo, Library.FileSizeDetectionInterval).Result == false)
             {
-                Logger.Instance.ELog("Error in queue: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                Logger.Instance.DLog($"Cannot access file: " + fullpath);
+                return;
             }
+
+            int skip = Library.Path.Length;
+            if (Library.Path.EndsWith("/") == false && Library.Path.EndsWith("\\") == false)
+                ++skip;
+
+            long size = Library.Folders ? 0 : ((FileInfo)fsInfo).Length;
+
+            string relative = fullpath.Substring(skip);
+            var lf = new LibraryFile
+            {
+                Name = fullpath,
+                RelativePath = relative,
+                Status = duplicate != null ? FileStatus.Duplicate : FileStatus.Unprocessed,
+                IsDirectory = fsInfo is DirectoryInfo,
+                Fingerprint = fingerprint ?? string.Empty,
+                OriginalSize = size,
+                CreationTime = fsInfo.CreationTime,
+                LastWriteTime = fsInfo.LastWriteTime,
+                Duplicate = duplicate,
+                Library = new ObjectReference
+                {
+                    Name = Library.Name,
+                    Uid = Library.Uid,
+                    Type = Library.GetType()?.FullName ?? string.Empty
+                },
+                Order = -1
+            };
+
+            var result = new LibraryFileController().Add(lf).Result;
+
+            if (result != null && result.Uid != Guid.Empty)
+            {
+                Logger.Instance.DLog(
+                    $"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to successfully add new library file: \"{fullpath}\"");
+            }
+            else
+            {
+                Logger.Instance.ELog(
+                    $"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to fail to add new library file: \"{fullpath}\"");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Error in queue: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
     }
 
@@ -329,7 +377,8 @@ public class WatchedLibrary:IDisposable
     {
         Disposed = true;            
         DisposeWatcher();
-        worker.Dispose();
+        //worker.Dispose();
+        QueueTimer?.Dispose();
     }
 
     void SetupWatcher()
@@ -434,7 +483,7 @@ public class WatchedLibrary:IDisposable
         if (QueuedFiles.Contains(fullPath) == false)
         {
             LogQueueMessage($"{Library.Name} queueing file: {fullPath}");
-            QueuedFiles.Enqueue(fullPath);
+            QueueItem(fullPath);
         }
     }
 
@@ -509,6 +558,8 @@ public class WatchedLibrary:IDisposable
             }
 
             Logger.Instance.DLog($"Scan started on '{Library.Name}': {Library.Path}");
+            
+            
             int count = 0;
             if (Library.Folders)
             {
@@ -517,24 +568,40 @@ public class WatchedLibrary:IDisposable
                 {
                     if (QueuedFiles.Contains(dir.FullName) == false)
                     {
-                        QueuedFiles.Enqueue(dir.FullName);
+                        QueueItem(dir.FullName);
                         ++count;
                     }
                 }
             }
             else 
             {
+                var libFiles = new LibraryFileController().GetData().Result;
+                var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
+                var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
+
                 var files = GetFiles(new DirectoryInfo(Library.Path));
                 var settings = new SettingsController().Get().Result;
                 foreach (var file in files)
                 {
                     if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
                         continue;
+                
+                    if (knownFiles.ContainsKey(file.FullName.ToLower()))
+                    {
+                        var knownFileUid = knownFiles[file.FullName.ToLower()];
+                        var knownFile = libFiles[knownFileUid];
+                        if (Library.ReprocessRecreatedFiles == false ||
+                            file.CreationTime <= knownFile.CreationTime)
+                        {
+                            continue; // known file that hasn't changed, skip it
+                        }
+                    }
+
 
                     if (QueuedFiles.Contains(file.FullName) == false)
                     {
                         LogQueueMessage($"{Library.Name} queueing file for scan: {file.FullName}", settings);
-                        QueuedFiles.Enqueue(file.FullName);
+                        QueueItem(file.FullName);
                         ++count;
                     }
                 }
@@ -615,5 +682,11 @@ public class WatchedLibrary:IDisposable
         }
         catch (Exception) { }
         return files;
+    }
+
+    private void QueueItem(string fullPath)
+    {
+        QueuedFiles.Enqueue(fullPath);
+        QueueTimer.Start();
     }
 }

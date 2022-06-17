@@ -1,4 +1,6 @@
 ﻿using System.Threading;
+using FileFlows.ServerShared.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Node.Workers;
 
@@ -34,6 +36,8 @@ public class FlowWorker : Worker
     private readonly Mutex mutex = new Mutex();
     private readonly List<Guid> ExecutingRunners = new ();
 
+    private const int DEFAULT_INTERVAL = 10;
+
     
     /// <summary>
     /// If this flow worker is running on the server or an external processing node
@@ -53,7 +57,7 @@ public class FlowWorker : Worker
     /// </summary>
     /// <param name="hostname">the host name of the processing node</param>
     /// <param name="isServer">if this flow worker is running on the server or an external processing node</param>
-    public FlowWorker(string hostname, bool isServer = false) : base(ScheduleType.Second, 10)
+    public FlowWorker(string hostname, bool isServer = false) : base(ScheduleType.Second, DEFAULT_INTERVAL)
     {
         FlowWorker.Instance = this;
         this.isServer = isServer;
@@ -97,7 +101,7 @@ public class FlowWorker : Worker
         if (FirstExecute)
         {
             FirstExecute = false;
-            // tell the server to kill any flow executors from this node, incase this node was restarted
+            // tell the server to kill any flow executors from this node, in case this node was restarted
             nodeService.ClearWorkers(node.Uid);
         }
 
@@ -118,8 +122,12 @@ public class FlowWorker : Worker
         if(string.IsNullOrEmpty(node?.Schedule) == false && TimeHelper.InSchedule(node.Schedule) == false)
         {
             Logger.Instance?.DLog($"Node '{nodeName}' is out of schedule");
+            Interval = 300; // slow interval down to 5minus
             return;
         }
+
+        if (Interval == 300)
+            Interval = DEFAULT_INTERVAL;
 
         if (node?.FlowRunners <= ExecutingRunners.Count)
         {
@@ -149,9 +157,15 @@ public class FlowWorker : Worker
         }
         
         var libFileService = LibraryFileService.Load();
-        var libFile = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
-        if (libFile == null)
+        var libFileResult = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
+        if (libFileResult?.Status != NextLibraryFileStatus.Success)
+        {
+            Logger.Instance.ILog("No file found to process, status from server: " + (libFileResult?.Status.ToString() ?? "UNKNOWN"));
+            return;
+        }
+        if (libFileResult?.File == null)
             return; // nothing to process
+        var libFile = libFileResult.File;
 
         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         Guid processUid = Guid.NewGuid();

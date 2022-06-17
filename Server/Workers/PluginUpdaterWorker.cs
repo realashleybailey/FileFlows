@@ -8,7 +8,7 @@ using FileFlows.Shared.Helpers;
 
 public class PluginUpdaterWorker : Worker
 {
-    public PluginUpdaterWorker() : base(ScheduleType.Hourly, 1)
+    public PluginUpdaterWorker() : base(ScheduleType.Daily, 5)
     {
         Trigger();
     }

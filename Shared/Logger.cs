@@ -81,18 +81,24 @@ public class Logger : ILogger
 
     private void Log(LogType type, params object[] args)
     {
-        foreach(var writer in Writers)
+        try
         {
-            _ = Task.Run(async () =>
+            foreach (var writer in Writers)
             {
-                try
+                _ = Task.Run(async () =>
                 {
-                    await writer.Log(type, args);
-                }
-                catch (Exception)
-                {
-                }
-            });
+                    try
+                    {
+                        await writer.Log(type, args);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                });
+            }
+        }
+        catch (Exception) // so cant crash
+        {
         }
     }
 }

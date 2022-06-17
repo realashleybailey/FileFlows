@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using FileFlows.Server.Database.Managers;
+using FileFlows.ServerShared.Models;
 using FileFlows.Shared;
 
 namespace FileFlows.Server.Controllers;
@@ -22,26 +23,36 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// Gets the next library file for processing, and puts it into progress
     /// </summary>
     /// <param name="args">The arguments for the call</param>
-    /// <returns>the next library file to prDirectoryHelper new FileInfo(typeocess</returns>
+    /// <returns>the next library file to process</returns>
     [HttpPost("next-file")]
-    public async Task<LibraryFile> GetNext([FromBody] NextLibraryFileArgs args)
+    public async Task<NextLibraryFileResult> GetNext([FromBody] NextLibraryFileArgs args)
+    {
+        var result = await GetNextActual(args);
+        if (result == null)
+            return result;
+        Logger.Instance.ILog($"GetNextFile for ['{args.NodeName}']({args.NodeUid}): {result.Status}");
+        return result;
+    }
+    
+    
+    async Task<NextLibraryFileResult> GetNextActual([FromBody] NextLibraryFileArgs args)
     {
         _ = new NodeController().UpdateLastSeen(args.NodeUid);
         
         if (Workers.ServerUpdater.UpdatePending || args == null)
-            return null; // if an update is pending, stop providing new files to process
+            return NextFileResult (NextLibraryFileStatus.UpdatePending); // if an update is pending, stop providing new files to process
 
         var settings = await new SettingsController().Get();
         if (settings.IsPaused)
-            return null;
+            return NextFileResult(NextLibraryFileStatus.SystemPaused);
 
         if (Version.TryParse(args.NodeVersion, out var nodeVersion) == false)
-            return null;
+            return NextFileResult(NextLibraryFileStatus.InvalidVersion);
 
         if (nodeVersion < Globals.MinimumNodeVersion)
         {
             Logger.Instance.ILog($"Node '{args.NodeName}' version '{nodeVersion}' is less than minimum supported version '{Globals.MinimumNodeVersion}'");
-            return null;
+            return NextFileResult(NextLibraryFileStatus.VersionMismatch);
         }
 
         var node = (await new NodeController().Get(args.NodeUid));
@@ -52,7 +63,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
 
         if (await NodeEnabled(node) == false)
-            return null;
+            return NextFileResult(NextLibraryFileStatus.NodeNotEnabled);
 
         if (DbHelper.UseMemoryCache)
             return await GetNextMemoryCache(node, args.WorkerUid);
@@ -63,25 +74,26 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     private async Task<bool> NodeEnabled(ProcessingNode node)
     {
         var licensedNodes = LicenseHelper.GetLicensedProcessingNodes();
-        var enabledNodes = (await new NodeController().GetAll()).OrderBy(x => x.Name).Select(x => x.Uid)
-            .Take(licensedNodes).ToArray();
-        return enabledNodes.Contains(node.Uid);
+        var allNodes = await new NodeController().GetAll();
+        var enabledNodes = allNodes.Where(x => x.Enabled).OrderBy(x => x.Name).Take(licensedNodes).ToArray();
+        var enabledNodeUids = enabledNodes.Select(x => x.Uid).ToArray();
+        return enabledNodeUids.Contains(node.Uid);
     }
 
-    private async Task<LibraryFile> GetNextDb(ProcessingNode node, Guid workerUid)
+    private async Task<NextLibraryFileResult> GetNextDb(ProcessingNode node, Guid workerUid)
     {
         await _mutex.WaitAsync();
         try
         {
             var item = (await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, start:0, max:1, nodeUid: node.Uid)).FirstOrDefault();
             if (item == null)
-                return null;
+                return NextFileResult( NextLibraryFileStatus.NoFile, null);
             item.Status = FileStatus.Processing;
             item.Node = new ObjectReference { Uid = node.Uid, Name = node.Name };
             item.WorkerUid = workerUid;
             item.ProcessingStarted = DateTime.Now;
             await DbHelper.Update(item);
-            return item;
+            return NextFileResult(NextLibraryFileStatus.Success, item);
         }
         finally
         {
@@ -89,7 +101,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
     }
 
-    private async Task<LibraryFile> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
+    /// <summary>
+    /// Constructs a next library file result
+    /// <param name="status">the status of the call</param>
+    /// <param name="file">the library file to process</param>
+    /// </summary>
+    private NextLibraryFileResult NextFileResult(NextLibraryFileStatus? status = null, LibraryFile file = null)
+    {
+        NextLibraryFileResult result = new();
+        if (status != null)
+            result.Status = status.Value;
+        result.File = file;
+        return result;
+    }
+    
+    private async Task<NextLibraryFileResult> GetNextMemoryCache(ProcessingNode node, Guid workerUid)
     {
         var data = (await GetAll(FileStatus.Unprocessed)).ToArray();
         await _mutex.WaitAsync();
@@ -136,9 +162,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.WorkerUid = workerUid;
                 item.ProcessingStarted = DateTime.Now;
                 data[i] = await DbHelper.Update(item);
-                return data[i];
+                return NextFileResult (NextLibraryFileStatus.Success, data[i]);
             }
-            return null;
+            return NextFileResult (NextLibraryFileStatus.NoFile, null);
         }
         finally
         {
@@ -204,10 +230,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 Name = x.Name
             };
 
+            if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.Disabled)
+            {
+                item.Date = x.DateCreated;
+            }
+
             if (status == FileStatus.Processing)
             {
                 item.Node = x.Node?.Name;
                 item.ProcessingTime = x.ProcessingTime;
+                item.Date = x.ProcessingStarted;
+            }
+
+            if (status == FileStatus.ProcessingFailed)
+            {
+                item.Date = x.ProcessingEnded;
             }
 
             if (status == FileStatus.Duplicate)
@@ -219,7 +256,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 item.OriginalSize = x.OriginalSize;
                 item.OutputPath = x.OutputPath;
                 item.ProcessingTime = x.ProcessingTime;
-
+                item.Date = x.ProcessingEnded;
             }
             return item;
         });

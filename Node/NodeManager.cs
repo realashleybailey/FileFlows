@@ -52,6 +52,8 @@ public class NodeManager
         if (updater.RunCheck())
             return;
 
+        Version nodeVersion = Version.Parse(Globals.Version);
+
         var flowWorker = new FlowWorker(AppSettings.Instance.HostName)
         {
             IsEnabledCheck = () =>
@@ -78,6 +80,14 @@ public class NodeManager
                     AppSettings.Instance.TempPath = settings.TempPath;
                     AppSettings.Instance.Save();
 
+                    var serverVersion = new SystemService().GetVersion().Result;
+                    if (serverVersion != nodeVersion)
+                    {
+                        Logger.Instance?.ILog($"Node version '{nodeVersion}' does not match server version '{serverVersion}'");
+                        NodeUpdater.CheckForUpdate();
+                        return false;
+                    }
+
                     return AppSettings.Instance.Enabled;
                 }
                 catch (Exception ex)
@@ -93,7 +103,7 @@ public class NodeManager
             }
         };
         
-        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner());
+        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner(), new TempFileCleaner(AppSettings.Instance.HostName));
     }
 
     

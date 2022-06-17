@@ -1,15 +1,16 @@
-﻿using FileFlows.Server.Controllers;
-using FileFlows.Server.Helpers;
-using FileFlows.ServerShared.Workers;
+﻿using FileFlows.ServerShared.Workers;
+#if(!DEBUG)
+using System.Runtime.InteropServices;
+using FileFlows.Server.Controllers;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
-using System.Runtime.InteropServices;
+#endif
 
 namespace FileFlows.Server.Workers;
 
 public class TelemetryReporter: Worker
 {
-    public TelemetryReporter() : base(ScheduleType.Hourly, 1)
+    public TelemetryReporter() : base(ScheduleType.Daily, 5)
     {
         Trigger();
     }

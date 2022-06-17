@@ -39,14 +39,6 @@
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="ffFlow" Width="6rem" MobileWidth="4rem">
-                    <Header>
-                        @Globals.lblEnabled
-                    </Header>
-                    <Cell Context="item">
-                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
-                    </Cell>
-                </FlowTableColumn>
             </Columns>
         </FlowTable>
 

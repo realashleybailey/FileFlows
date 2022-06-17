@@ -23,8 +23,9 @@ public abstract class UpdaterWorker : Worker
     /// Constructs an instance of a Update Worker
     /// </summary>
     /// <param name="upgradeScriptPrefix">The script to execute in the upgrade zip file</param>
-    /// <param name="minutes">how many minute between checks</param>
-    public UpdaterWorker(string upgradeScriptPrefix, int minutes) : base(ScheduleType.Minute, minutes)
+    /// <param name="schedule">the type of schedule this worker runs at</param>
+    /// <param name="interval">the interval of this worker</param>
+    public UpdaterWorker(string upgradeScriptPrefix, ScheduleType schedule, int interval) : base(schedule, interval)
     {
         CurrentVersion = Version.Parse(Globals.Version);
         this.UpgradeScriptPrefix = upgradeScriptPrefix;

@@ -11,7 +11,7 @@ public class LogFileCleaner:Worker
     /// <summary>
     /// Constructs a log file cleaner
     /// </summary>
-    public LogFileCleaner() : base(ScheduleType.Hourly, 1)
+    public LogFileCleaner() : base(ScheduleType.Daily, 5)
     {
         Trigger();
     }

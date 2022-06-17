@@ -1,3 +1,4 @@
+using System.Security.Cryptography.Xml;
 using FileFlows.Server.Helpers;
 
 namespace FileFlows.Server.Controllers;
@@ -183,9 +184,9 @@ public class WorkerController : Controller
     public IEnumerable<FlowExecutorInfo> GetAll()
     {
         // we don't want to return the logs here, too big
-        return Executors.Values.Select(x => new FlowExecutorInfo
+        return Executors.Values.Where(x => x != null).Select(x => new FlowExecutorInfo
         {
-            // have to create a new object, otherwise if we chagne the log we change the log on the shared object
+            // have to create a new object, otherwise if we change the log we change the log on the shared object
             LibraryFile = x.LibraryFile,
             CurrentPart = x.CurrentPart,
             CurrentPartName = x.CurrentPartName,

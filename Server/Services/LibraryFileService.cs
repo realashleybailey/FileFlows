@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Server.Services;
+﻿using FileFlows.ServerShared.Models;
+
+namespace FileFlows.Server.Services;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Services;
@@ -35,7 +37,7 @@ public class LibraryFileService : ILibraryFileService
     /// <param name="nodeUid">The UID of the node</param>
     /// <param name="workerUid">The UID of the worker on the node</param>
     /// <returns>If found, the next library file to process, otherwise null</returns>
-    public Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid) 
+    public Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, Guid workerUid) 
         => new LibraryFileController().GetNext(new NextLibraryFileArgs
             {
                  NodeName   = nodeName,

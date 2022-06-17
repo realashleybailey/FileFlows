@@ -33,6 +33,7 @@ namespace FileFlows.Client.Pages
         private ffElement[] Filtered { get; set; }
         private List<ffPart> Parts { get; set; } = new List<ffPart>();
 
+        private string lblObsoleteMessage;
 
         private int _Zoom = 100;
         private int Zoom
@@ -99,6 +100,7 @@ namespace FileFlows.Client.Pages
             lblClose = Translater.Instant("Labels.Close");
             lblSaving = Translater.Instant("Labels.Saving");
             lblFilter = Translater.Instant("Labels.FilterPlaceholder");
+            lblObsoleteMessage = Translater.Instant("Labels.ObsoleteConfirm.Message");
 
 
             NavigationCheck = async () =>
@@ -256,7 +258,7 @@ namespace FileFlows.Client.Pages
         }
 
         [JSInvokable]
-        public object AddElement(string uid)
+        public async Task<object> AddElement(string uid)
         {
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);
             string name;
@@ -271,6 +273,18 @@ namespace FileFlows.Client.Pages
                 name = Translater.Instant($"Flow.Parts.{type}.Label", supressWarnings: true);
                 if (name == "Label")
                     name = FlowHelper.FormatLabel(type);
+            }
+
+            if (element.Obsolete)
+            {
+                string msg = element.ObsoleteMessage?.EmptyAsNull() ?? lblObsoleteMessage;
+                string confirmMessage = Translater.Instant("Labels.ObsoleteConfirm.Question");
+                string title = Translater.Instant("Labels.ObsoleteConfirm.Title");
+
+                msg += "\n\n" + confirmMessage;
+                var confirmed = await Confirm.Show(title, msg);
+                if (confirmed == false)
+                    return null;
             }
 
             element.Name = name;

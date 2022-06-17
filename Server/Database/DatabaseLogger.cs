@@ -41,6 +41,7 @@ public class DatabaseLogger:ILogWriter
             JsonSerializer.Serialize(x)));
         if (message.StartsWith("\"") && message.EndsWith("\""))
             message = message[1..^1];
+        message = message.Replace("\\u0027", "'");
         await DbHelper.Log(clientUid, type, message);
     }
 }

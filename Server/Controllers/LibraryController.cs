@@ -1,3 +1,5 @@
+using FileFlows.Server.Workers;
+
 namespace FileFlows.Server.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -44,7 +46,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="library">The library to save</param>
         /// <returns>the saved library instance</returns>
         [HttpPost]
-        public Task<Library> Save([FromBody] Library library)
+        public async Task<Library> Save([FromBody] Library library)
         {
             if (library?.Flow == null)
                 throw new Exception("ErrorMessages.NoFlowSpecified");
@@ -53,7 +55,11 @@ namespace FileFlows.Server.Controllers
             if (Regex.IsMatch(library.Schedule, "^[01]{672}$") == false)
                 library.Schedule = new string('1', 672);
 
-            return base.Update(library, checkDuplicateName: true);
+            bool newLib = library.Uid == Guid.Empty; 
+            var result = await base.Update(library, checkDuplicateName: true);
+            if (newLib && result != null)
+                await Rescan(new() { Uids = new[] { result.Uid } });
+            return result;
         }
 
         /// <summary>
@@ -99,8 +105,13 @@ namespace FileFlows.Server.Controllers
                     continue;
                 item.LastScanned = DateTime.MinValue;
                 await Update(item);
-
             }
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(1);
+                LibraryWorker.ScanNow();
+            });
         }
 
         internal async Task UpdateFlowName(Guid uid, string name)

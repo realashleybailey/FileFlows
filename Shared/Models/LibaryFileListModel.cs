@@ -61,4 +61,10 @@ public class LibaryFileListModel: IUniqueObject
     /// Gets or sets the processing time taken of the file
     /// </summary>
     public TimeSpan? ProcessingTime { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a date to show in the list
+    /// Could be processed at, could be detected at, or starting processing at
+    /// </summary>
+    public DateTime? Date { get; set; }
 }

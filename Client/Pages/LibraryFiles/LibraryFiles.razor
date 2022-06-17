@@ -104,6 +104,29 @@
                     <Cell Context="item">@item.Name
 @item.Duplicate</Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="LibaryFileListModel" Width="10rem" MobileWidth="0" Hidden="@((SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled) == false)">
+                    <Header>
+                        @if (SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled)
+                        {
+                            <span>Found</span>
+                        }
+                        else if (SelectedStatus == FileStatus.Processing)
+                        {
+                            <span>Started</span>
+                        }
+                        else if (SelectedStatus == FileStatus.Processed)
+                        {
+                            <span>Finished</span>
+                        }
+                        else if (SelectedStatus == FileStatus.ProcessingFailed)
+                        {
+                            <span>Failed</span>
+                        }
+                    </Header>
+                    <Cell Context="item">
+                        <span>@DateString(item.Date)</span>
+                    </Cell>
+                </FlowTableColumn>
                 <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
                     <Header>
                         Flow
@@ -133,10 +156,9 @@
                         {
                             <span>@item.Node</span>
                         }
-                            
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="(SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Duplicate)" MobileWidth="5rem">
+                <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing) == false)" MobileWidth="5rem">
                     <Header>
                         Time
                     </Header>

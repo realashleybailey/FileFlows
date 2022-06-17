@@ -41,9 +41,22 @@
                             <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
                             foreach (var ele in grp.OrderBy(x => x.Type == FlowElementType.Script ? x.Name : string.Empty).ThenBy(x => x.Type).ThenBy(x => x.DisplayName.Substring(x.DisplayName.IndexOf(":") + 1)))
                             {
-                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type" ondragstart="ffFlow.Mouse.dragElementStart(event)">
+                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "")" ondragstart="ffFlow.Mouse.dragElementStart(event)">
                                     <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
                                     @((ele.Type == FlowElementType.Script) ? ele.Name : ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1))
+                                    
+                                   @{
+                                       string ribbonTT = "";
+                                       if (ele.Obsolete)
+                                       {
+                                           ribbonTT = ele.ObsoleteMessage?.EmptyAsNull() ?? lblObsoleteMessage;
+                                       }
+                                   } 
+                                    
+                                    <div class="ribbon" title="@ribbonTT">
+                                      <div class="ribbon-content">
+                                      </div>
+                                    </div>
                                 </li>
                             }
                         }

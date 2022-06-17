@@ -1,4 +1,6 @@
-﻿namespace FileFlows.ServerShared.Services;
+﻿using FileFlows.ServerShared.Models;
+
+namespace FileFlows.ServerShared.Services;
 
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
@@ -15,7 +17,7 @@ public interface ILibraryFileService
     /// <param name="nodeUid">The UID of the node</param>
     /// <param name="workerUid">The UID of the worker on the node</param>
     /// <returns>If found, the next library file to process, otherwise null</returns>
-    Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid);
+    Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, Guid workerUid);
 
     /// <summary>
     /// Gets a library file by its UID
@@ -142,12 +144,12 @@ public class LibraryFileService : Service, ILibraryFileService
     /// <param name="nodeUid">The UID of the node</param>
     /// <param name="workerUid">The UID of the worker on the node</param>
     /// <returns>If found, the next library file to process, otherwise null</returns>
-    public async Task<LibraryFile> GetNext(string nodeName, Guid nodeUid, Guid workerUid)
+    public async Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, Guid workerUid)
     {
         // can throw exception if nothing to process
         try
         {
-            var result = await HttpHelper.Post<LibraryFile>($"{ServiceBaseUrl}/api/library-file/next-file", new NextLibraryFileArgs
+            var result = await HttpHelper.Post<NextLibraryFileResult>($"{ServiceBaseUrl}/api/library-file/next-file", new NextLibraryFileArgs
             {
                 NodeName = nodeName,
                 NodeUid = nodeUid,
@@ -158,7 +160,7 @@ public class LibraryFileService : Service, ILibraryFileService
                 return null; 
             return result.Data;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return null;
         }

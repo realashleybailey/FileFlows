@@ -90,7 +90,11 @@ class LicenseHelper
         var email = AppSettings.Instance.LicenseEmail;
         var key = AppSettings.Instance.LicenseKey;
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(key))
+        {
+            AppSettings.Instance.LicenseCode = string.Empty;
+            AppSettings.Instance.Save();
             return;
+        }
         try
         {
             string json = JsonSerializer.Serialize(new LicenseValidationModel
@@ -121,12 +125,14 @@ class LicenseHelper
             AppSettings.Instance.LicenseCode = licenseCode;
             AppSettings.Instance.Save();
         }
+#if(DEBUG)
         catch (Exception ex)
         {
-            #if(DEBUG)
             Logger.Instance.ELog("Failed validating license: " + ex.Message + "\n" + ex.Message);
-            #endif
         }
+#else
+        catch (Exception) { }
+#endif
     }
     
     class LicenseValidationModel

@@ -169,6 +169,22 @@ canvas {
     .label {
         flex-grow: 1;
     }
+    
+    &.obsolete {
+        .ribbon
+        {
+            display:unset;
+        }
+        .ribbon-content::before { 
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            content: "\f00d";
+        }
+    }
 }
 
 ::deep .flow-part {
@@ -179,6 +195,30 @@ canvas {
         box-shadow: 0 3px 10px rgba(var(--accent-rgb), 0.1);
     }
 }
+
+
+.ribbon {
+    position: absolute;
+    right: 8px;
+    top: -3px;
+
+    filter: drop-shadow(2px 3px 2px rgba(black, 0.5));
+    display:none;
+
+    > .ribbon-content {
+        color: white;
+        font-size: .75rem;
+        text-align: center;
+        font-weight: 400;
+        background: #a90101 linear-gradient(45deg, rgba(black, 0) 0%, rgba(white, 0.25) 100%);
+        padding: 8px 2px 4px;
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 4px), 0 100%);
+        width: 20px;
+        min-height: 20px;
+        transition: clip-path 1s, padding 1s, background 1s;
+    }
+}
+
 
 .group {
     padding: .25rem 0;

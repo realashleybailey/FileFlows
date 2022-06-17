@@ -8,7 +8,7 @@ namespace FileFlows.Server.Database.Managers;
 /// UID Converter that converts GUIDs to string when saving to the database
 /// this is used by the sqlite db to avoid writing GUIDs as blobs
 /// </summary>
-public class UidConverter:DefaultMapper
+public class GuidConverter:DefaultMapper
 {
     /// <summary>
     /// Get the convert for converting an object to the object actually stored in the database

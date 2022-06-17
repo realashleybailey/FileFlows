@@ -95,9 +95,35 @@ public class MySqlDbManager: DbManager
 
         db.Execute($"CREATE INDEX idx_DbObject_Type ON {nameof(DbObject)}(Type)");
         db.Execute($"CREATE INDEX idx_DbObject_Name ON {nameof(DbObject)}(Name)");
+        
+        AddVirtualColumns();
         return true;
     }
 
+
+    /// <summary>
+    /// Adds virtual columns to database to improve performance
+    /// </summary>
+    public void AddVirtualColumns()
+    {
+        string sql = @"ALTER TABLE DbObject
+ADD COLUMN js_Status int GENERATED ALWAYS AS (json_extract(Data,'$.Status')) VIRTUAL,
+ADD COLUMN js_Order int GENERATED ALWAYS AS (json_extract(Data,'$.Order')) VIRTUAL,
+ADD COLUMN js_OriginalSize bigint GENERATED ALWAYS AS (convert(json_extract(Data,'$.OriginalSize'), signed)) VIRTUAL,
+ADD COLUMN js_ProcessingStarted datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 23), datetime)) VIRTUAL,
+ADD COLUMN js_ProcessingEnded datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 23), datetime)) VIRTUAL,
+ADD COLUMN js_LibraryUid varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Library.Uid'))) VIRTUAL,
+
+ADD COLUMN js_Enabled boolean GENERATED ALWAYS AS (convert(json_extract(Data,'$.Enabled'), signed)) VIRTUAL,
+ADD COLUMN js_Priority int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.Priority')), signed)) VIRTUAL,
+ADD COLUMN js_ProcessingOrder int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.ProcessingOrder')), signed)) VIRTUAL,
+ADD COLUMN js_Schedule varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL
+;";
+        
+        using var db = GetDb();
+        db.Execute(sql);
+    }
+    
     /// <summary>
     /// Gets the library file status  
     /// </summary>

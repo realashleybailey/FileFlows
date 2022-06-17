@@ -71,7 +71,7 @@ public class SqliteDbManager : DbManager
         try
         {
             var db = new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
-            db.Mappers.Add(new UidConverter());
+            db.Mappers.Add(new GuidConverter());
             return db;
         }
         catch (Exception ex)

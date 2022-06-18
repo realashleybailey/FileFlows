@@ -17,11 +17,15 @@ This is the location where the node will create temporary files.  These files ar
 ## Mapping
 When you create a library, the path to that library is relative to the server.  If this path is not accessible on the node via the same path, you must map that location to somewhere accessible on the node.
 
-For example, you may have a local path of /media/tv on you server, but your node maybe be a Windows machine and accesses that location via a network share of \\\\myserver\\tv.  
+For example, a library file of "/media/tv/myshow/season 1/myshow.mkv" would need to be mapped to a location the external processing node could access the file from.
 
-So you would need to configure a mapping of
+If your external processing node was a Windows machine and accesses that location via a network share of \\\\myserver\\tv.  
+
+You would need to configure a mapping of
 - Server: /media/tv
 - Node: \\\\myserver\\tv
+
+Then that external processing node could access the library file from \\\\myserver\\tv\\myshow\\season 1\\myshow.mkv.
 
 ---
 

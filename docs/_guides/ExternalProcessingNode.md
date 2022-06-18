@@ -7,24 +7,32 @@ layout: default
 
 An external processing node, allows you to share or off loading the processing of files onto multiple systems, or a more powerful system.
 
-### Temporary Directory
+---
+
+## Temporary Directory
 This is the location where the node will create temporary files.  These files are only accessed by the node and the server does not need to access this directory.
+
+---
 
 ## Mapping
 When you create a library, the path to that library is relative to the server.  If this path is not accessible on the node via the same path, you must map that location to somewhere accessible on the node.
 
-For example, you may have a local path of /media/tv on you server, but your node maybe be a Windows machine and accesses that location via a network share of \\myserver\tv.  
+For example, you may have a local path of /media/tv on you server, but your node maybe be a Windows machine and accesses that location via a network share of \\\\myserver\\tv.  
 
 So you would need to configure a mapping of
 - Server: /media/tv
-- Node: \\myserver\tv
+- Node: \\\\myserver\\tv
+
+---
 
 ### Copy to, Move To 
 Additional to libraries, you may have a [Copy File](/plugins/basic-nodes/copy-file) or [Move File](/plugins/basic-nodes/move-file) and their locations must also be mapped.
 
-E.g. if you use a [Copy File](/plugins/basic-nodes/copy-file) to copy the file to /media/tv-processed and that location is accessible \\myserver\tv-processed, you must make a mapping
+E.g. if you use a [Copy File](/plugins/basic-nodes/copy-file) to copy the file to /media/tv-processed and that location is accessible \\\\myserver\\tv-processed, you must make a mapping
 - Server: /media/tv-processed
-- Node: \\myserver\tv-processed
+- Node: \\\\myserver\\tv-processed
+
+---
 
 ### Tools 
 Tools also need to be mapped if they are accessible via different locations.

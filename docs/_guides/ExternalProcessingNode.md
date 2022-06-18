@@ -16,15 +16,15 @@ When you create a library, the path to that library is relative to the server.  
 For example, you may have a local path of /media/tv on you server, but your node maybe be a Windows machine and accesses that location via a network share of \\myserver\tv.  
 
 So you would need to configure a mapping of
-Server: /media/tv
-Node: \\myserver\tv
+- Server: /media/tv
+- Node: \\myserver\tv
 
 ### Copy to, Move To 
 Additional to libraries, you may have a [Copy File](/plugins/basic-nodes/copy-file) or [Move File](/plugins/basic-nodes/move-file) and their locations must also be mapped.
 
 E.g. if you use a [Copy File](/plugins/basic-nodes/copy-file) to copy the file to /media/tv-processed and that location is accessible \\myserver\tv-processed, you must make a mapping
-Server: /media/tv-processed
-Node: \\myserver\tv-processed
+- Server: /media/tv-processed
+- Node: \\myserver\tv-processed
 
 ### Tools 
 Tools also need to be mapped if they are accessible via different locations.
@@ -35,7 +35,7 @@ But if you are using Docker as the Server and Ubuntu as the node, you must map t
 
 For example, to map FFMPEG, if FFMPEG was installed to /home/myuser/ffmpeg/ffmpeg, your mapping would be:
 
-Server: /usr/local/bin/ffmpeg
-Node: /home/myuser/ffmpeg/ffmpeg
+- Server: /usr/local/bin/ffmpeg
+- Node: /home/myuser/ffmpeg/ffmpeg
 
 

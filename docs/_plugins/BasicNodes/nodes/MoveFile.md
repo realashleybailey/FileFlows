@@ -1,5 +1,6 @@
 ---
 name: Move File
+title: Move File
 permalink: /plugins/basic-nodes/move-file
 layout: default
 plugin: Basic Nodes

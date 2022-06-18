@@ -1,5 +1,6 @@
 ---
 name: Copy File
+title: Copy File
 permalink: /plugins/basic-nodes/copy-file
 layout: default
 plugin: Basic Nodes

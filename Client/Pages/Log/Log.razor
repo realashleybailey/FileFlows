@@ -1,12 +1,13 @@
 @namespace FileFlows.Client.Pages
 @page "/log"
 @using FileFlows.Plugin
+@using FileFlows.Client.Helpers
 
 <PageView FullWidth=true>
     <Head>
         @if (UsingDatabase)
         {   
-            <a class="btn" @onclick=@ToggleSearch>@lblSearch</a>
+            <a class="btn" @onclick=@SearchPane.ToggleSearch>@lblSearch</a>
         }
         else
         {
@@ -30,77 +31,67 @@
 
 </PageView>
 
-<form class="search-pane @(SearchVisible ? "visible" : "hidden")" @onsubmit=@Search>
-    <div class="search-head">
-        <span class="title">@lblSearch</span>
-        <span class="close" @onclick=@ToggleSearch></span>
-    </div>
-    <div class="search-fields">
-        <div class="search-field input">
-            <div class="label">Date</div>
-            <div class="value">
-                <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRanges TimePicker="true" TimePicker24Hour="true" DateFormat="@($"d MMM HH:mm")">
-                      <PickerTemplate>
-                            <div id="@context.Id" @onclick="context.Toggle" class="daterangeinput">
-                                <i class="fas fa-calendar"></i>
-                                <span>
-                                    @if ((context.TStartDate == null && context.TEndDate == null) ||
-                                         (context.TStartDate == LiveStart && context.TEndDate == LiveEnd) )
-                                    {
-                                        <span>Live Data</span>
-                                    }
-                                    else
-                                    {
-                                        <span>
-                                            @context.FormattedRange
-                                        </span>
-                                    }
-                                </span>
-                                <i class="fas fa-chevron-down float-right"></i>
-                            </div>
-                        </PickerTemplate>
-                </DateRangePicker>
-            </div>
-        </div>
-        <div class="search-field input">
-            <div class="label">Source</div>
-            <div class="value">
-                <select @bind="SearchModel.ClientUid">
-                    <option value="">Server</option>
-                    @foreach (var node in Nodes.OrderBy(x => x.Value))
-                    {
-                        <option value=@node.Key>@node.Value</option>
-                    }
-                </select>
-            </div>
-        </div>
-        <div class="search-field input">
-            <div class="label">Type</div>
-            <div class="value">
-                <select @bind="SearchModel.Type">
-                    <option>Any</option>
-                    <option value=@LogType.Error>Error</option>
-                    <option value=@LogType.Warning>Warning</option>
-                    <option value=@LogType.Info>Info</option>
-                    <option value=@LogType.Debug>Debug</option>
-                </select>
-            </div>
-        </div>
-        <div class="search-field input">
-            <div class="label">
-                <FlowSwitch @bind-Value=@SearchModel.TypeIncludeHigherSeverity />
-                Include Higher Severity
-            </div>
-        </div>
-        <div class="search-field input">
-            <div class="label">Text</div>
-            <div class="value">
-                <input type="text" @bind="SearchModel.Message">
-            </div>
+<SearchPane @ref=SearchPane Searched=@Search>
+    <div class="search-field input">
+        <div class="label">Date</div>
+        <div class="value">
+            <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRangeHelper.LiveDateRanges TimePicker="true" TimePicker24Hour="true" DateFormat="@($"d MMM HH:mm")">
+                  <PickerTemplate>
+                        <div id="@context.Id" @onclick="context.Toggle" class="daterangeinput">
+                            <i class="fas fa-calendar"></i>
+                            <span>
+                                @if ((context.TStartDate == null && context.TEndDate == null) ||
+                                     (context.TStartDate == DateRangeHelper.LiveStart && context.TEndDate == DateRangeHelper.LiveEnd) )
+                                {
+                                    <span>Live Data</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @context.FormattedRange
+                                    </span>
+                                }
+                            </span>
+                            <i class="fas fa-chevron-down float-right"></i>
+                        </div>
+                    </PickerTemplate>
+            </DateRangePicker>
         </div>
     </div>
-
-    <div class="search-submit">
-        <button class="btn">@lblSearch</button>
+    <div class="search-field input">
+        <div class="label">Source</div>
+        <div class="value">
+            <select @bind="SearchModel.ClientUid">
+                <option value="">Server</option>
+                @foreach (var node in Nodes.OrderBy(x => x.Value))
+                {
+                    <option value=@node.Key>@node.Value</option>
+                }
+            </select>
+        </div>
     </div>
-</form>
+    <div class="search-field input">
+        <div class="label">Type</div>
+        <div class="value">
+            <select @bind="SearchModel.Type">
+                <option>Any</option>
+                <option value=@LogType.Error>Error</option>
+                <option value=@LogType.Warning>Warning</option>
+                <option value=@LogType.Info>Info</option>
+                <option value=@LogType.Debug>Debug</option>
+            </select>
+        </div>
+    </div>
+    <div class="search-field input">
+        <div class="label">
+            <FlowSwitch @bind-Value=@SearchModel.TypeIncludeHigherSeverity />
+            Include Higher Severity
+        </div>
+    </div>
+    <div class="search-field input">
+        <div class="label">Text</div>
+        <div class="value">
+            <input type="text" @bind="SearchModel.Message">
+        </div>
+    </div>
+</SearchPane>

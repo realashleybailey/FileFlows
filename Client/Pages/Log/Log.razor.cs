@@ -4,6 +4,7 @@ using FileFlows.Plugin;
 using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components;
 using System.Timers;
+using FileFlows.Client.Helpers;
 
 namespace FileFlows.Client.Pages;
 
@@ -16,18 +17,14 @@ public partial class Log : ComponentBase
     private string lblDownload, lblSearch, lblSearching;
     private string DownloadUrl;
 
-    private DateTime LiveStart = DateTime.Today.AddDays(-7);
-    private DateTime LiveEnd = DateTime.Today.AddDays(7);
+
+    SearchPane SearchPane { get; set; }
 
 
     private SettingsUiModel Settings;
     private LogType LogLevel { get; set; } = LogType.Info;
 
-    private Dictionary<string, DateRange> DateRanges;
-
     private Dictionary<Guid, string> Nodes = new();
-
-    private bool SearchVisible;
 
     private readonly LogSearchModel SearchModel = new()
     {
@@ -43,8 +40,8 @@ public partial class Log : ComponentBase
 #if (!DEMO)
     protected override async Task OnInitializedAsync()
     {
-        SearchModel.FromDate = LiveStart;
-        SearchModel.ToDate = LiveEnd;
+        SearchModel.FromDate = DateRangeHelper.LiveStart;
+        SearchModel.ToDate = DateRangeHelper.LiveEnd;
         
         Settings = (await HttpHelper.Get<SettingsUiModel>("/api/settings/ui-settings")).Data ?? new();
 
@@ -53,44 +50,6 @@ public partial class Log : ComponentBase
             Nodes = nodeResult.Data.Where(x => x.Uid != new Guid("bf47da28-051e-452e-ad21-c6a3f477fea9")).ToDictionary(x => x.Uid,
                 x => x.Name);
 
-        DateRanges = new Dictionary<string, DateRange> {
-            { 
-                Translater.Instant("Labels.DateRanges.Live"), new DateRange
-                {
-                    Start = LiveStart,
-                    End =  LiveEnd
-                }
-            },
-            { 
-                Translater.Instant("Labels.DateRanges.Today"), new DateRange
-                {
-                    Start = DateTime.Today,
-                    End =  DateTime.Today.AddDays(1).AddTicks(-1)
-                }
-            },
-            { 
-                Translater.Instant("Labels.DateRanges.Yesterday"), new DateRange
-                {
-                    Start = DateTime.Today.AddDays(-1),
-                    End =  DateTime.Today.AddTicks(-1)
-                }
-            },
-            { 
-                Translater.Instant("Labels.DateRanges.Last24Hours"), new DateRange
-                {
-                    Start = DateTime.Now.AddDays(-1),
-                    End =  DateTime.Now.AddHours(1)
-                }
-            },
-            { 
-                Translater.Instant("Labels.DateRanges.Last3Days"), new DateRange
-                {
-                    Start = DateTime.Now.AddDays(-3),
-                    End =  DateTime.Now.AddHours(1)
-                }
-            },
-        };
-        
         this.lblSearch = Translater.Instant("Labels.Search");
         this.lblSearching = Translater.Instant("Labels.Searching");
         this.lblDownload = Translater.Instant("Labels.Download");
@@ -129,7 +88,7 @@ public partial class Log : ComponentBase
     {
         if (UsingDatabase)
         {
-            if (SearchModel.ToDate != LiveEnd || SearchModel.FromDate != LiveStart)
+            if (SearchModel.ToDate != DateRangeHelper.LiveEnd || SearchModel.FromDate != DateRangeHelper.LiveStart)
                 return;
         }
         
@@ -175,12 +134,6 @@ public partial class Log : ComponentBase
         await Refresh();
     }
 
-    void ToggleSearch()
-    {
-        SearchVisible = !SearchVisible;
-        this.StateHasChanged();
-    }
-    
     
     public void OnRangeSelect(DateRange range)
     {

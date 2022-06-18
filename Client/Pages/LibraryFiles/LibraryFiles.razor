@@ -1,225 +1,263 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
+@using Microsoft.AspNetCore.Components
+@using FileFlows.Client.Helpers
 @inherits ListPage<LibaryFileListModel>
 
 @page "/library-files"
 
 <PageView Flex="@true" Title="@Title">
 
-    <Head>
-    </Head>
+<Head>
+    <a class="btn" @onclick=@SearchPane.ToggleSearch>@lblSearch</a>
+</Head>
 
-    <Body>
+<Body>
 
-        <div class="status-picker">
-            @foreach (var status in Statuses)
+<div class="status-picker">
+    @foreach (var status in Statuses)
+    {
+        if((status.Status == FileStatus.Disabled || status.Status == FileStatus.OutOfSchedule || status.Status == FileStatus.ProcessingFailed || status.Status == FileStatus.Duplicate) && status.Count == 0)
+        {
+            if(SelectedStatus == status.Status)
+                SelectUnprocessed();
+            continue;
+        }
+        <div class="status @status.Status @(status.Status == SelectedStatus ? "active" : "")"
+             @onclick="() => SetSelected(status)">
+            @switch (status.Status)
             {
-                if((status.Status == FileStatus.Disabled || status.Status == FileStatus.OutOfSchedule || status.Status == FileStatus.ProcessingFailed || status.Status == FileStatus.Duplicate) && status.Count == 0)
-                {
-                    if(SelectedStatus == status.Status)
-                        SelectUnprocessed();
-                    continue;
-                }
-                <div class="status @status.Status @(status.Status == SelectedStatus ? "active" : "")"
-                @onclick="() => SetSelected(status)">
-                    @switch (status.Status)
-                    {
-                        case FileStatus.Unprocessed:
-                            <span class=" icon far fa-hourglass"></span>
-                            break;
-                        case FileStatus.Disabled:
-                            <span class=" icon fas fa-toggle-off"></span>
-                            break;
-                        case FileStatus.Processed:
-                            <span class="icon far fa-check-circle"></span>
-                            break;
-                        case FileStatus.Processing:
-                            <span class="icon fas fa-file-medical-alt"></span>
-                            break;
-                        case FileStatus.FlowNotFound:
-                            <span class="icon fas fa-exclamation"></span>
-                            break;
-                        case FileStatus.ProcessingFailed:
-                            <span class="icon far fa-times-circle"></span>
-                            break;
-                        case FileStatus.OutOfSchedule:
-                            <span class="icon far fa-calendar-times"></span>
-                            break;
-                        case FileStatus.Duplicate:
-                            <span class="icon far fa-copy"></span>
-                            break;
-                        case FileStatus.MappingIssue:
-                            <span class="icon fas fa-map-marked-alt"></span>
-                            break;
+                case FileStatus.Unprocessed:
+                    <span class=" icon far fa-hourglass"></span>
+                    break;
+                case FileStatus.Disabled:
+                    <span class=" icon fas fa-toggle-off"></span>
+                    break;
+                case FileStatus.Processed:
+                    <span class="icon far fa-check-circle"></span>
+                    break;
+                case FileStatus.Processing:
+                    <span class="icon fas fa-file-medical-alt"></span>
+                    break;
+                case FileStatus.FlowNotFound:
+                    <span class="icon fas fa-exclamation"></span>
+                    break;
+                case FileStatus.ProcessingFailed:
+                    <span class="icon far fa-times-circle"></span>
+                    break;
+                case FileStatus.OutOfSchedule:
+                    <span class="icon far fa-calendar-times"></span>
+                    break;
+                case FileStatus.Duplicate:
+                    <span class="icon far fa-copy"></span>
+                    break;
+                case FileStatus.MappingIssue:
+                    <span class="icon fas fa-map-marked-alt"></span>
+                    break;
 
-                    }
-
-                    <span class="count">@status.Count</span>
-                    <span class="name">@status.Name</span>
-                </div>
             }
-        </div>
 
-        <FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
-            DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
-            <ToolBar>                    
-                <FlowTableButton TItem="LibaryFileListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
-                @if(SelectedStatus == FileStatus.Duplicate)
-                {                    
-                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />           
-                }
-                @if (SelectedStatus == FileStatus.Processing)
+            <span class="count">@status.Count</span>
+            <span class="name">@status.Name</span>
+        </div>
+    }
+</div>
+
+<FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
+           DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
+    <ToolBar>                    
+        <FlowTableButton TItem="LibaryFileListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
+        @if(SelectedStatus == FileStatus.Duplicate)
+        {                    
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />           
+        }
+        @if (SelectedStatus == FileStatus.Processing)
+        {
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
+        }
+        else
+        {
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+        }
+                
+        @if (SelectedStatus == FileStatus.Unprocessed)
+        {
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
+        }
+        else if(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
+        {
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
+        }
+        <FlowTableHelpButton TItem="LibaryFileListModel" HelpUrl="library-files" />
+    </ToolBar>
+
+    <Columns>
+        <FlowTableColumn TItem="LibaryFileListModel" Hidden="(SelectedStatus == FileStatus.Duplicate)">
+            <Header>
+                @Globals.lblName
+            </Header>
+            <Cell Context="item">
+                <span>@item.RelativePath</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Hidden="(SelectedStatus != FileStatus.Duplicate)" Pre="true">
+            <Header>
+                @Globals.lblName
+            </Header>
+            <Cell Context="item">@item.Name
+                @item.Duplicate</Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="10rem" MobileWidth="0" Hidden="@((SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled) == false)">
+            <Header>
+                @if (SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled)
                 {
-                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
+                    <span>Found</span>
+                }
+                else if (SelectedStatus == FileStatus.Processing)
+                {
+                    <span>Started</span>
+                }
+                else if (SelectedStatus == FileStatus.Processed)
+                {
+                    <span>Finished</span>
+                }
+                else if (SelectedStatus == FileStatus.ProcessingFailed)
+                {
+                    <span>Failed</span>
+                }
+            </Header>
+            <Cell Context="item">
+                <span>@DateString(item.Date)</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
+            <Header>
+                Flow
+            </Header>
+            <Cell Context="item">
+                <span>@item.Flow</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing)">
+            <Header>
+                Library
+            </Header>
+            <Cell Context="item">
+                <span>@item.Library</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus != FileStatus.Processing)">
+            <Header>
+                Node
+            </Header>
+            <Cell Context="item">
+                @if(item.Node == "FileFlowsServer")
+                {
+                    <span>@lblFileFlowsServer</span>
                 }
                 else
                 {
-                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+                    <span>@item.Node</span>
                 }
-                
-                @if (SelectedStatus == FileStatus.Unprocessed)
-                {
-                    <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
-                }
-                else if(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
-                {
-                    <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />                    
-                }
-                <FlowTableHelpButton TItem="LibaryFileListModel" HelpUrl="library-files" />
-            </ToolBar>
-
-            <Columns>
-                <FlowTableColumn TItem="LibaryFileListModel" Hidden="(SelectedStatus == FileStatus.Duplicate)">
-                    <Header>
-                        @Globals.lblName
-                    </Header>
-                    <Cell Context="item">
-                        <span>@item.RelativePath</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Hidden="(SelectedStatus != FileStatus.Duplicate)" Pre="true">
-                    <Header>
-                        @Globals.lblName
-                    </Header>
-                    <Cell Context="item">@item.Name
-@item.Duplicate</Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="10rem" MobileWidth="0" Hidden="@((SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled) == false)">
-                    <Header>
-                        @if (SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled)
-                        {
-                            <span>Found</span>
-                        }
-                        else if (SelectedStatus == FileStatus.Processing)
-                        {
-                            <span>Started</span>
-                        }
-                        else if (SelectedStatus == FileStatus.Processed)
-                        {
-                            <span>Finished</span>
-                        }
-                        else if (SelectedStatus == FileStatus.ProcessingFailed)
-                        {
-                            <span>Failed</span>
-                        }
-                    </Header>
-                    <Cell Context="item">
-                        <span>@DateString(item.Date)</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
-                    <Header>
-                        Flow
-                    </Header>
-                    <Cell Context="item">
-                        <span>@item.Flow</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing)">
-                    <Header>
-                        Library
-                    </Header>
-                    <Cell Context="item">
-                        <span>@item.Library</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus != FileStatus.Processing)">
-                    <Header>
-                        Node
-                    </Header>
-                    <Cell Context="item">
-                        @if(item.Node == "FileFlowsServer")
-                        {
-                            <span>@lblFileFlowsServer</span>
-                        }
-                        else
-                        {
-                            <span>@item.Node</span>
-                        }
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing) == false)" MobileWidth="5rem">
-                    <Header>
-                        Time
-                    </Header>
-                    <Cell Context="item">
-                        <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
-                    <Header>
-                        Size
-                    </Header>
-                    <Cell Context="item">
-                        @{
-                            long fs = item.FinalSize ?? 0;
-                            long os = item.OriginalSize ?? 0;
-                            int width = (int)((((double)fs) / os) * 100);
-                            bool bigger = width > 100;
-                            if (width > 100)
-                                width = 100;
-                            string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
-                        }
-                        @if(fs > 0){
-                            <div class="flow-bar @(bigger ? "grew" : "")" title="@toolTip">
-                                <div class="bar-value" style="width:calc(@(width)% - 2px)"></div>
-                            </div>
-                        }
-                    </Cell>
-                </FlowTableColumn>
-            </Columns>
-        </FlowTable>
-    <div class="pager">
-        <div class="page-size">
-            <select class="page-size" @onchange=@PageSizeChange>
-                @foreach (int size in new[] { 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000, 5000 })
-                {
-                    <option selected=@(PageSize == size)>@size</option>
-                }
-            </select>
-        </div>
-        @if (TotalItems > PageSize)
-        {
-            <ul>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing) == false)" MobileWidth="5rem">
+            <Header>
+                Time
+            </Header>
+            <Cell Context="item">
+                <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
+            <Header>
+                Size
+            </Header>
+            <Cell Context="item">
                 @{
-                    int maxPages = App.Instance.IsMobile ? 7 : 15;
-                    int start = PageIndex - (maxPages / 2);
-                    if (start < 0)
-                        start = 0;
-                    int end = Math.Min(PageCount, start + maxPages);
-                    if (end == PageCount)
-                        start = end - maxPages;
-                    if (start < 0)
-                        start = 0;
+                    long fs = item.FinalSize ?? 0;
+                    long os = item.OriginalSize ?? 0;
+                    int width = (int)((((double)fs) / os) * 100);
+                    bool bigger = width > 100;
+                    if (width > 100)
+                        width = 100;
+                    string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
                 }
-                @for (int i = start; i < end; i++)
-                {
-                    int page = i;
-                    <li class="@(page == PageIndex ? "current-page" : "")" @onclick=@(() => PageChange(page))>@(page + 1)</li>
+                @if(fs > 0){
+                    <div class="flow-bar @(bigger ? "grew" : "")" title="@toolTip">
+                        <div class="bar-value" style="width:calc(@(width)% - 2px)"></div>
+                    </div>
                 }
-            </ul>
-        }
+            </Cell>
+        </FlowTableColumn>
+    </Columns>
+</FlowTable>
+<div class="pager">
+    <div class="page-size">
+        <select class="page-size" @onchange=@PageSizeChange>
+            @foreach (int size in new[] { 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000, 5000 })
+            {
+                <option selected=@(PageSize == size)>@size</option>
+            }
+        </select>
     </div>
-    </Body>
+    @if (TotalItems > PageSize)
+    {
+        <ul>
+            @{
+                int maxPages = App.Instance.IsMobile ? 7 : 15;
+                int start = PageIndex - (maxPages / 2);
+                if (start < 0)
+                    start = 0;
+                int end = Math.Min(PageCount, start + maxPages);
+                if (end == PageCount)
+                    start = end - maxPages;
+                if (start < 0)
+                    start = 0;
+            }
+            @for (int i = start; i < end; i++)
+            {
+                int page = i;
+                <li class="@(page == PageIndex ? "current-page" : "")" @onclick=@(() => PageChange(page))>@(page + 1)</li>
+            }
+        </ul>
+    }
+</div>
+</Body>
 
 </PageView>
+
+<SearchPane @ref=SearchPane Searched=@Search>
+    <div class="search-field input">
+        <div class="label">Date</div>
+        <div class="value">
+            <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRangeHelper.DateRanges TimePicker="true" TimePicker24Hour="true" DateFormat="@($"d MMM HH:mm")">
+                  <PickerTemplate>
+                        <div id="@context.Id" @onclick="context.Toggle" class="daterangeinput">
+                            <i class="fas fa-calendar"></i>
+                            <span>
+                                @if ((context.TStartDate == null && context.TEndDate == null) ||
+                                     (context.TStartDate == DateTime.MinValue && context.TEndDate == DateTime.MaxValue) )
+                                {
+                                    <span>Any Time</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @context.FormattedRange
+                                    </span>
+                                }
+                            </span>
+                            <i class="fas fa-chevron-down float-right"></i>
+                        </div>
+                    </PickerTemplate>
+            </DateRangePicker>
+        </div>
+    </div>
+    <div class="search-field input">
+        <div class="label">Path</div>
+        <div class="value">
+            <input type="text" @bind="SearchModel.Path">
+        </div>
+    </div>
+</SearchPane>

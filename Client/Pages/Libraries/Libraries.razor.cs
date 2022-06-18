@@ -167,7 +167,8 @@ public partial class Libraries : ListPage<Library>
             return; // nothing to delete
         var confirmResult = await Confirm.Show("Labels.Delete",
             Translater.Instant("Pages.Libraries.Messages.DeleteConfirm", new { count = uids.Length }),
-            "Pages.Libraries.Messages.DeleteLibraryFiles"
+            "Pages.Libraries.Messages.KeepLibraryFiles",
+            false
         );
         if (confirmResult.Confirmed == false)
             return; // rejected the confirm
@@ -177,7 +178,7 @@ public partial class Libraries : ListPage<Library>
 
         try
         {
-            var deleteResult = await HttpHelper.Delete($"{ApiUrl}?deleteLibraryFiles={confirmResult.SwitchState}", new ReferenceModel { Uids = uids });
+            var deleteResult = await HttpHelper.Delete($"{ApiUrl}?deleteLibraryFiles={(confirmResult.SwitchState == false)}", new ReferenceModel { Uids = uids });
             if (deleteResult.Success == false)
             {
                 if(Translater.NeedsTranslating(deleteResult.Body))

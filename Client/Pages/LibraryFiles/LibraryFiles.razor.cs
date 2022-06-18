@@ -1,3 +1,4 @@
+using BlazorDateRangePicker;
 using Humanizer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -29,7 +30,13 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
     private int Count;
+    private string lblSearch, lblSearching;
 
+    SearchPane SearchPane { get; set; }
+    private readonly LibraryFileSearchModel SearchModel = new()
+    {
+        Path = string.Empty
+    };
     private string Title;
     private string lblLibraryFiles, lblFileFlowsServer;
     private int TotalItems;
@@ -127,6 +134,8 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
         lblLibraryFiles = Translater.Instant("Pages.LibraryFiles.Title");
         lblFileFlowsServer = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
         Title = lblLibraryFiles + ": " + Translater.Instant("Enums.FileStatus." + FileStatus.Unprocessed);
+        this.lblSearch = Translater.Instant("Labels.Search");
+        this.lblSearching = Translater.Instant("Labels.Searching");
         this.PageSize = await LocalStorage.GetItemAsync<int>(nameof(PageSize));
         if (this.PageSize < 100 || this.PageSize > 5000)
             this.PageSize = 1000;
@@ -320,4 +329,19 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
             date.Value.Minute, date.Value.Second);
         return localDate.ToUniversalTime().Humanize();
     }
+    
+    
+    async Task Search()
+    {
+        Blocker.Show(lblSearching);
+        await Refresh();
+        Blocker.Hide();
+    }
+    
+    public void OnRangeSelect(DateRange range)
+    {
+        SearchModel.FromDate = range.Start.Date;
+        SearchModel.ToDate = range.End.Date;
+    }
+
 }

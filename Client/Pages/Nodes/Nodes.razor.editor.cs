@@ -24,9 +24,12 @@ namespace FileFlows.Client.Pages
             if (node.OperatingSystem == OperatingSystemType.Linux || node.OperatingSystem == OperatingSystemType.Unknown)
                 tabs.Add("Advanced", TabAdvanced(node));
 
+            string helpUrl = isServerProcessingNode
+                ? string.Empty
+                : "http://docs.fileflows.com/guides/external-processing-node";
 
             var result = await Editor.Open("Pages.ProcessingNode", "Pages.ProcessingNode.Title", null, node, tabs: tabs, large: true,
-              saveCallback: Save);
+              saveCallback: Save, helpUrl: helpUrl);
 #endif
             return false;
         }

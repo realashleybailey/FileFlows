@@ -70,6 +70,9 @@ public class MySqlDbManager: DbManager
 
     protected override void CreateStoredProcedures()
     {
+        Logger.Instance.ILog("Adding virtual columns");
+        AddVirtualColumns();
+        
         Logger.Instance.ILog("Creating Stored Procedures");
         using var db = new NPoco.Database(ConnectionString + ";Allow User Variables=True", null, MySqlConnector.MySqlConnectorFactory.Instance);
         
@@ -96,7 +99,6 @@ public class MySqlDbManager: DbManager
         db.Execute($"CREATE INDEX idx_DbObject_Type ON {nameof(DbObject)}(Type)");
         db.Execute($"CREATE INDEX idx_DbObject_Name ON {nameof(DbObject)}(Name)");
         
-        AddVirtualColumns();
         return true;
     }
 
@@ -132,7 +134,12 @@ public class MySqlDbManager: DbManager
         }
 
         if (string.IsNullOrEmpty(sql))
+        {
+            Logger.Instance.ILog("Virtual columns already found in database");
             return;
+        }
+        
+        Logger.Instance.ILog("Adding virtual columns to database");
 
         sql = @"ALTER TABLE DbObject " + sql + ";";
         db.Execute(sql);

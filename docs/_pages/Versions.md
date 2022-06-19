@@ -6,6 +6,24 @@ layout: default
 order: 800
 ---
 
+## Version 0.8.2
+
+#### New
+- Added a "Search" for files.  This allows you to search all files and discover any "hidden" files that may have had their library deleted.
+- Added an option to remove files when removing a library.  This is selected by default
+- File viewer now has a link to partial log to view only the selected executed node.
+  - Logs had to change slightly so this will be imperfect for older processed files.
+- Added "Processing Node" to file viewer to show what processing node processed a file
+
+#### Fixed
+- Improved MySQL performance
+- [FFMPEG Builder: Add Audio Track](/plugins/video-nodes/ffmpeg-builder/add-audio-track) bitrate now goes up to 2048Kbps
+- Fixed issue with scheduling time for workers could be a negative number causing FileFlows to crash on startup
+
+
+---
+
+
 ## Version 0.8.1
 
 #### New

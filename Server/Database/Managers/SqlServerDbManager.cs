@@ -117,6 +117,18 @@ public class SqlServerDbManager: DbManager
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
     
+    
+    /// <summary>
+    /// Performance a search for library files
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>a list of matching library files</returns>
+    public override Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter)
+    {
+        var notImplemented = new LibraryFile[] { };
+        return Task.FromResult((IEnumerable<LibraryFile>)notImplemented);
+    }
+    
     /// <summary>
     /// Gets the shrinkage group data
     /// </summary>

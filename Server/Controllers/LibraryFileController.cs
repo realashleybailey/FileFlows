@@ -832,4 +832,23 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             await DbHelper.DeleteLibraryFilesFromLibraries(libraryUids);
         }
     }
+
+    /// <summary>
+    /// Performance a search for library files
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>a list of matching library files</returns>
+    [HttpPost("search")]
+    public async Task<IEnumerable<LibraryFile>> Search([FromBody] LibraryFileSearchModel filter)
+    {
+        if (DbHelper.UseMemoryCache == false)
+            return await DbHelper.SearchLibraryFiles(filter);
+
+        var results = await this.GetDataList();
+        results = results.Where(x =>
+            x.DateCreated >= filter.FromDate && x.DateCreated <= filter.ToDate && (string.IsNullOrEmpty(filter.Path) ||
+                x.Name.ToLowerInvariant().Contains(filter.Path.ToLowerInvariant()))).Take(500);
+        return results;
+
+    }
 }

@@ -198,6 +198,14 @@ public class DbHelper
     public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start = 0, int max = 0, Guid? nodeUid = null) => 
         Manager.GetLibraryFiles(status, start, max, TimeHelper.GetCurrentQuarter(), nodeUid);
 
+
+    /// <summary>
+    /// Performance a search for library files
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>a list of matching library files</returns>
+    public static Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter) => Manager.SearchLibraryFiles(filter);
+
     /// <summary>
     /// Gets the shrinkage group data
     /// </summary>

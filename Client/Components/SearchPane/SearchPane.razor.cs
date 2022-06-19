@@ -1,4 +1,6 @@
+using BlazorMonaco;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace FileFlows.Client.Components;
 
@@ -23,11 +25,22 @@ partial class SearchPane:ComponentBase
     /// </summary>
     [Parameter] public EventCallback Searched { get; set; }
 
+    /// <summary>
+    /// Gets or sets event that is fired when the user clicks close
+    /// </summary>
+    [Parameter] public EventCallback Closed { get; set; }
+
+    /// <summary>
+    /// Gets or sets the initial visible state
+    /// </summary>
+    [Parameter] public bool InitialVisibleState { get; set; }
+
     private string lblSearch;
 
     protected override void OnInitialized()
     {
         this.lblSearch = Translater.Instant("Labels.Search");
+        this.Visible = InitialVisibleState;
     }
     
     /// <summary>
@@ -36,8 +49,16 @@ partial class SearchPane:ComponentBase
     public void ToggleSearch()
     {
         Visible = !Visible;
+        if (Visible == false)
+            Closed.InvokeAsync();
         this.StateHasChanged();
     }
 
     Task Search() => Searched.InvokeAsync();
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if(e.Key == "Escape" && this.Visible)
+            ToggleSearch();
+    }
 }

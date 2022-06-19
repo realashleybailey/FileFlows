@@ -167,4 +167,16 @@ public class SqliteDbManager : DbManager
         string dest = filename + ".backup";
         File.Move(filename, dest, true);
     }
+    
+    
+    /// <summary>
+    /// Performance a search for library files
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>a list of matching library files</returns>
+    public override Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter)
+    {
+        var notImplemented = new LibraryFile[] { };
+        return Task.FromResult((IEnumerable<LibraryFile>)notImplemented);
+    }
 }

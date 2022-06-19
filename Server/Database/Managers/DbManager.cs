@@ -679,6 +679,12 @@ public abstract class DbManager
     /// <returns>an enumerable of library files</returns>
     public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid);
 
+    /// <summary>
+    /// Performance a search for library files
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>a list of matching library files</returns>
+    public abstract Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter);
 
     /// <summary>
     /// Gets the shrinkage group data

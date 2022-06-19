@@ -9,7 +9,7 @@
 <PageView Flex="@true" Title="@Title">
 
 <Head>
-    <a class="btn" @onclick=@SearchPane.ToggleSearch>@lblSearch</a>
+    <a class="btn" @onclick=@Search>@lblSearch</a>
 </Head>
 
 <Body>
@@ -226,38 +226,3 @@
 </Body>
 
 </PageView>
-
-<SearchPane @ref=SearchPane Searched=@Search>
-    <div class="search-field input">
-        <div class="label">Date</div>
-        <div class="value">
-            <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRangeHelper.DateRanges TimePicker="true" TimePicker24Hour="true" DateFormat="@($"d MMM HH:mm")">
-                  <PickerTemplate>
-                        <div id="@context.Id" @onclick="context.Toggle" class="daterangeinput">
-                            <i class="fas fa-calendar"></i>
-                            <span>
-                                @if ((context.TStartDate == null && context.TEndDate == null) ||
-                                     (context.TStartDate == DateTime.MinValue && context.TEndDate == DateTime.MaxValue) )
-                                {
-                                    <span>Any Time</span>
-                                }
-                                else
-                                {
-                                    <span>
-                                        @context.FormattedRange
-                                    </span>
-                                }
-                            </span>
-                            <i class="fas fa-chevron-down float-right"></i>
-                        </div>
-                    </PickerTemplate>
-            </DateRangePicker>
-        </div>
-    </div>
-    <div class="search-field input">
-        <div class="label">Path</div>
-        <div class="value">
-            <input type="text" @bind="SearchModel.Path">
-        </div>
-    </div>
-</SearchPane>

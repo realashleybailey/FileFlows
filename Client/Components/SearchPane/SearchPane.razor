@@ -1,6 +1,6 @@
 @namespace FileFlows.Client.Components
 
-<form class="search-pane @(Visible ? "visible" : "hidden")" @onsubmit=@Search>
+<form class="search-pane @(Visible ? "visible" : "hidden")" @onsubmit=@Search @onkeydown=@OnKeyDown>
     <div class="search-head">
         <span class="title">@lblSearch</span>
         <span class="close" @onclick=@ToggleSearch></span>

@@ -169,6 +169,28 @@ public class MySqlDbManager: DbManager
     }
 
     /// <summary>
+    /// Performance a search for library files
+    /// </summary>
+    /// <param name="filter">the search filter</param>
+    /// <returns>a list of matching library files</returns>
+    public async override Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter)
+    {
+        using var db = GetDb();
+        string sql = $"select * from {nameof(DbObject)} ";
+        sql += " where Type = 'FileFlows.Shared.Models.LibraryFile'";
+        sql += " and (DateCreated between @0 and @1) ";
+        if (string.IsNullOrWhiteSpace(filter.Path) == false)
+            sql += " and Name like @2 ";
+        sql += " limit 500;";
+        var from = filter.FromDate;
+        var to = filter.ToDate < new DateTime(2000, 1, 1) ? DateTime.MaxValue : filter.ToDate;
+        
+        var dbObjects = await db.FetchAsync<DbObject>(sql, from, to,
+            string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%");
+        return ConvertFromDbObject<LibraryFile>(dbObjects);
+        
+    }
+    /// <summary>
     /// Deletes all the library files from the specified libraries
     /// </summary>
     /// <param name="libraryUids">the UIDs of the libraries</param>

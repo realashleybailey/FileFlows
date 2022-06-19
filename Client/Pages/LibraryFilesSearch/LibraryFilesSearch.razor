@@ -1,0 +1,91 @@
+@namespace FileFlows.Client.Pages
+
+
+@using FileFlows.Shared.Models
+@using Microsoft.AspNetCore.Components
+@using FileFlows.Client.Helpers
+@inherits ListPage<LibraryFile>
+
+@page "/library-files/search"
+
+<PageView Flex="@true" Title="@Title">
+
+<Head>
+</Head>
+
+<Body>
+
+<FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple"
+           DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
+    <ToolBar>                    
+        <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
+        <FlowTableButton TItem="LibraryFile" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+        <FlowTableHelpButton TItem="LibraryFile" HelpUrl="library-files" />
+    </ToolBar>
+
+    <Columns>
+        <FlowTableColumn TItem="LibraryFile">
+            <Header>
+                @Globals.lblName
+            </Header>
+            <Cell Context="item">
+                <span>@item.Name</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibraryFile" Width="10rem">
+            <Header>
+                Status
+            </Header>
+            <Cell Context="item">
+                <span>@item.Status</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0">
+            <Header>
+                Library
+            </Header>
+            <Cell Context="item">
+                <span>@item.Library</span>
+            </Cell>
+        </FlowTableColumn>
+    </Columns>
+</FlowTable>
+
+</Body>
+
+</PageView>
+
+<SearchPane @ref=SearchPane Searched=@Search Closed=@Closed InitialVisibleState="true">
+    <div class="search-field input">
+        <div class="label">Date</div>
+        <div class="value">
+            <DateRangePicker OnRangeSelect=@OnRangeSelect Ranges=@DateRangeHelper.DateRanges TimePicker="true" TimePicker24Hour="true" DateFormat="@($"d MMM HH:mm")">
+                  <PickerTemplate>
+                        <div id="@context.Id" @onclick="context.Toggle" class="daterangeinput">
+                            <i class="fas fa-calendar"></i>
+                            <span>
+                                @if ((context.TStartDate == null && context.TEndDate == null) ||
+                                     (context.TStartDate < new DateTime(2000,1,1) && context.TEndDate > new DateTime(2100,1,1) ))
+                                {
+                                    <span>Any Time</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @context.FormattedRange
+                                    </span>
+                                }
+                            </span>
+                            <i class="fas fa-chevron-down float-right"></i>
+                        </div>
+                    </PickerTemplate>
+            </DateRangePicker>
+        </div>
+    </div>
+    <div class="search-field input">
+        <div class="label">Path</div>
+        <div class="value">
+            <input id="lfs-path" type="text" @bind="SearchModel.Path">
+        </div>
+    </div>
+</SearchPane>

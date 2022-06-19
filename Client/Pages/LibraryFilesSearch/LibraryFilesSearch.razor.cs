@@ -22,7 +22,9 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
     {
         Path = string.Empty,
         FromDate = DateTime.MinValue,
-        ToDate = DateTime.MaxValue
+        ToDate = DateTime.MaxValue,
+        Limit = 1000,
+        LibraryName = string.Empty
     };
     
     protected async override Task OnInitializedAsync()

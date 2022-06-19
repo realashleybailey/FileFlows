@@ -22,4 +22,14 @@ public class LibraryFileSearchModel
     /// Gets or sets the to date to search
     /// </summary>
     public DateTime ToDate { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the name of the library
+    /// </summary>
+    public string LibraryName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of files to limit it too
+    /// </summary>
+    public int Limit { get; set; }
 }

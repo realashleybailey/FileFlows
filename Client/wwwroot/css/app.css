@@ -638,7 +638,7 @@ hr {
   display: inline-block;
   width: calc(50% - 0.9rem);
 }
-.search-pane input[type=text], .search-pane select {
+.search-pane input[type=text], .search-pane input[type=number], .search-pane select {
   width: 100%;
 }
 .search-pane select {

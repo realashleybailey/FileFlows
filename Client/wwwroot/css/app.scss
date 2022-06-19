@@ -285,7 +285,7 @@ input[type=file]{
             width:calc(50% - 0.9rem);
         }
     }
-    input[type=text], select {
+    input[type=text], input[type=number], select {
         width:100%;        
     }
     select {

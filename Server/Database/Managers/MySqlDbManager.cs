@@ -175,18 +175,23 @@ public class MySqlDbManager: DbManager
     /// <returns>a list of matching library files</returns>
     public async override Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter)
     {
+        if (filter.Limit <= 0 || filter.Limit > 10_000)
+            filter.Limit = 1000;
         using var db = GetDb();
         string sql = $"select * from {nameof(DbObject)} ";
         sql += " where Type = 'FileFlows.Shared.Models.LibraryFile'";
         sql += " and (DateCreated between @0 and @1) ";
         if (string.IsNullOrWhiteSpace(filter.Path) == false)
             sql += " and Name like @2 ";
-        sql += " limit 500;";
+        if (string.IsNullOrWhiteSpace(filter.LibraryName) == false)
+            sql += " and JSON_EXTRACT(Data, '$.Library.Name') like = @3 ";
+        sql += $" limit {filter.Limit};" ;
         var from = filter.FromDate;
         var to = filter.ToDate < new DateTime(2000, 1, 1) ? DateTime.MaxValue : filter.ToDate;
         
         var dbObjects = await db.FetchAsync<DbObject>(sql, from, to,
-            string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%");
+            string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%",
+            string.IsNullOrEmpty(filter.LibraryName) ? string.Empty : "%" + filter.LibraryName + "%");
         return ConvertFromDbObject<LibraryFile>(dbObjects);
         
     }

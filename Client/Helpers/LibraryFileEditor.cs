@@ -98,7 +98,7 @@ namespace FileFlows.Client.Helpers
             }
         }
 
-        private static List<ElementField> GetInfoTab(LibraryFile item)
+        private static List<ElementField> GetInfoTab(LibraryFileModel item)
         {
             List<ElementField> fields = new List<ElementField>();
 
@@ -196,16 +196,18 @@ namespace FileFlows.Client.Helpers
 
             if(item.ExecutedNodes?.Any() == true)
             {
-
-                fields.Add(new ElementField
+                var flowParts = new ElementField
                 {
                     InputType = FormInputType.ExecutedNodes,
                     Name = nameof(item.ExecutedNodes),
                     Parameters = new Dictionary<string, object>
                     {
-                        { nameof(InputExecutedNodes.HideLabel), true }
+                        { nameof(InputExecutedNodes.HideLabel), true },
                     }
-                });
+                };
+                if(item.Status != FileStatus.Processing)
+                    flowParts.Parameters.Add(nameof(InputExecutedNodes.Log), item.Log);
+                fields.Add(flowParts);
             }
 
             return fields;

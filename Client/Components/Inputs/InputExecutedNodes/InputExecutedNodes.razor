@@ -7,25 +7,59 @@
     {
         <table class="table">
             <thead>
-                <tr>
-                    <th class="name">Name</th>
-                    <th class="ndoe">Node</th>
-                    <th class="time">Time</th>
-                    <th class="output">Output</th>
-                </tr>
+            <tr>
+                <th class="name">Name</th>
+                <th class="ndoe">Node</th>
+                <th class="time">Time</th>
+                <th class="output">Output</th>
+                @if (string.IsNullOrEmpty(Log) == false)
+                {
+                    <th class="view-log"></th>
+                }
+            </tr>
             </thead>
             <tbody>
-                @foreach(var item in Value)
-                {
-                    <tr class="@(item.Output == -1 ? "output-error" : item.Output == 0 ? "output-exit" : "")">
-                        <td class="name">@item.NodeName</td>
-                        <td class="node">@FlowElement.FormatName(item.NodeUid)</td>
-                        <td class="time">@item.ProcessingTime</td>
-                        <td class="output">@item.Output</td>
-                    </tr>
-                }
+            @foreach(var item in Value)
+            {
+                <tr class="@(item.Output == -1 ? "output-error" : item.Output == 0 ? "output-exit" : "")">
+                    <td class="name">@FormatNodeName(item)</td>
+                    <td class="node">@FormatNodeUid(item.NodeUid)</td>
+                    <td class="time">@item.ProcessingTime</td>
+                    <td class="output">@item.Output</td>
+                    @if (string.IsNullOrEmpty(Log) == false)
+                    {
+                        <td class="view-log">
+                            <i class="fas fa-file-alt" @onclick="() => OpenLog(item)" title="@lblViewLog"></i>
+                        </td>
+                    }
+                </tr>
+            }
             </tbody>
         </table>
     }
 
 </InputWrapper>
+
+@if (PartialLogNode != null)
+{
+    <div class="editor-wrapper log-partial-viewer ">
+        <div class="background-overlay"></div>
+        <div class="editor">
+
+            <ViContainer Title="@FormatNodeName(PartialLogNode)" FullWidth=@true AlwaysShowTitle=@true>
+
+                <Head>
+                    <button @onclick=@ClosePartialLog>@lblClose</button>
+                </Head>
+
+                <Body>
+                    <CascadingValue IsFixed="true" Value="this">
+                        <div class="fields">
+                            <InputLogView Value=@PartialLog />
+                        </div>
+                    </CascadingValue>
+                </Body>
+            </ViContainer>
+        </div>
+    </div>
+}

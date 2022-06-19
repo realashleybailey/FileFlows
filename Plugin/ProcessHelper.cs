@@ -208,11 +208,11 @@ public class ProcessHelper
 
             if (args.Silent == false)
             {
-                Logger?.ILog(new string('=', 70));
+                Logger?.ILog(new string('-', 70));
                 Logger?.ILog($"Executing: {args.Command} {args.Arguments}");
                 if (string.IsNullOrEmpty(args.WorkingDirectory) == false)
                     Logger?.ILog($"Working Directory: {args.WorkingDirectory}");
-                Logger?.ILog(new string('=', 70));
+                Logger?.ILog(new string('-', 70));
             }
 
             outputBuilder = new StringBuilder();

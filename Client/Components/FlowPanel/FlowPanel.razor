@@ -176,7 +176,8 @@
         case FormInputType.ExecutedNodes:
             {
                 var oValue = GetValue<List<ExecutedNode>>(field.Name);
-                <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel />
+                var log = GetParameter<string>(field, nameof(InputExecutedNodes.Log));
+                <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel Log=@log />
             }
             break;
         case FormInputType.Table:

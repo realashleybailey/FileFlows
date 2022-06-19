@@ -58,6 +58,8 @@
     "CopyToClipboard": "Copy to clipboard",
     "CopiedToClipboard": "Copied ''{text}'' to clipboard.",
     "Test":"Test",
+    "LogPartialNotAvailable":"Unable to find partial log for node.",
+    "ViewLog":"View Log",
     "ObsoleteConfirm": {
       "Title": "Obsolete Node",
       "Message": "It is recommended you switch to a different node.",

@@ -134,7 +134,7 @@ public class MySqlDbManager: DbManager
             string colName = column[0];
             if (existingColumns.Contains(colName))
                 continue;
-            sql += colName[1] + "\n";
+            sql += column[1] + ",\n";
         }
 
         if (string.IsNullOrEmpty(sql))
@@ -142,10 +142,12 @@ public class MySqlDbManager: DbManager
             Logger.Instance.ILog("Virtual columns already found in database");
             return;
         }
+
+        sql = sql[..^2]; // remove last ,\n
         
         Logger.Instance.ILog("Adding virtual columns to database");
 
-        sql = @"ALTER TABLE DbObject " + sql + ";";
+        sql = "ALTER TABLE DbObject \n" + sql + ";";
         db.Execute(sql);
     }
     

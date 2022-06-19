@@ -46,13 +46,16 @@ public class MySqlDbManager: DbManager
             null,
             MySqlConnector.MySqlConnectorFactory.Instance);
     }
+    
+    private string GetDatabaseName(string connectionString)
+        => Regex.Match(ConnectionString, @"(?<=(Database=))[a-zA-Z0-9_\-]+").Value;
 
     protected override DbCreateResult CreateDatabase(bool recreate)
     {
         string connString = Regex.Replace(ConnectionString, "(^|;)Database=[^;]+", "");
         if (connString.StartsWith(";"))
             connString = connString[1..];
-        string dbName = Regex.Match(ConnectionString, @"(?<=(Database=))[a-zA-Z0-9_\-]+").Value;
+        string dbName = GetDatabaseName(ConnectionString);
         
         using var db = new NPoco.Database(connString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         bool exists = string.IsNullOrEmpty(db.ExecuteScalar<string>("select schema_name from information_schema.schemata where schema_name = @0", dbName)) == false;
@@ -109,7 +112,8 @@ public class MySqlDbManager: DbManager
     public void AddVirtualColumns()
     {
         using var db = GetDb();
-        var existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}';");
+        string dbName = GetDatabaseName(ConnectionString);
+        var existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
         
         var columns = new []{
             new []{"js_Status", "ADD COLUMN js_Status int GENERATED ALWAYS AS (json_extract(Data,'$.Status')) VIRTUAL"},

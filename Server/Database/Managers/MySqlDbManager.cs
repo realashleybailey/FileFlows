@@ -184,7 +184,7 @@ public class MySqlDbManager: DbManager
         if (string.IsNullOrWhiteSpace(filter.Path) == false)
             sql += " and Name like @2 ";
         if (string.IsNullOrWhiteSpace(filter.LibraryName) == false)
-            sql += " and JSON_EXTRACT(Data, '$.Library.Name') like = @3 ";
+            sql += " and JSON_EXTRACT(Data, '$.Library.Name') like @3 ";
         sql += $" limit {filter.Limit};" ;
         var from = filter.FromDate;
         var to = filter.ToDate < new DateTime(2000, 1, 1) ? DateTime.MaxValue : filter.ToDate;

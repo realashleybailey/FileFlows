@@ -281,7 +281,8 @@
         "Flow": "Flow",
         "ProcessingTime": "Processing Time",
         "OutputPath": "Output Path",
-        "ExecutedNodes": "Executed Nodes"
+        "ExecutedNodes": "Executed Nodes",
+        "Node": "Processing Node"
       }
     },
     "LibraryFiles": {

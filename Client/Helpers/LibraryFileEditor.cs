@@ -149,6 +149,18 @@ namespace FileFlows.Client.Helpers
                 });
             }
 
+            if (item.Status != FileStatus.Disabled && item.Status != FileStatus.Unprocessed &&
+                item.Status != FileStatus.OutOfSchedule)
+            {
+                if(item.Node?.Name == "FileFlowsServer")
+                    item.Node.Name = "Internal Processing Node";
+                fields.Add(new ElementField
+                {
+                    InputType = FormInputType.TextLabel,
+                    Name = nameof(item.Node)
+                });
+            }
+            
             if (string.IsNullOrEmpty(item.Flow?.Name) == false)
             {
                 fields.Add(new ElementField

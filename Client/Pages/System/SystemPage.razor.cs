@@ -16,21 +16,85 @@ public partial class SystemPage:ComponentBase, IDisposable
 
     private SystemInfoData? Data;
 
-    private ApexChart<SystemValue<float>> ChartCpuUsage;
+    private ApexChart<SystemValue<float>> ChartCpuUsage, ChartCpuUsageBottom;
     
-    ApexChartOptions<SystemValue<float>> ChartOptions;
+    ApexChartOptions<SystemValue<float>> cpuChartOptions;
+    ApexChartOptions<SystemValue<float>> cpuChartOptionsBottom;
 
     protected override void OnInitialized()
     {
         timerTask = TimerAsync();
-        ChartOptions = new ()
+        const string mainChartId = "mainChart";
+        cpuChartOptions = new ()
         {
-            Theme = new Theme
+            Title = new()
+            {
+                Text = null
+            },
+            Xaxis = new()
+            {
+              Labels  = new ()
+              {
+                  Show = false
+              }
+            },
+            Yaxis = new()
+            {
+                new ()
+                {
+                    Labels = new ()
+                    {
+                        Show = false
+                    }
+                } 
+            },
+            Stroke = new ()
+            {
+              Curve = Curve.Smooth
+            },
+            Theme = new()
             {
                 Mode = Mode.Dark,
                 Palette = PaletteType.Palette2
             }
         };
+        cpuChartOptions.Chart.Id = mainChartId;
+        cpuChartOptions.Chart.Toolbar = new Toolbar { AutoSelected = AutoSelected.Pan, Show = false };
+
+        cpuChartOptionsBottom = new()
+        {
+            Title = new()
+            {
+                Text = null
+            },
+            Xaxis = new()
+            {
+                Labels  = new ()
+                {
+                    Show = false
+                }
+            },
+            Yaxis = new()
+            {
+                new ()
+                {
+                    Labels = new ()
+                    {
+                        Show = false
+                    }
+                } 
+            },
+            Theme = new()
+            {
+                Mode = Mode.Dark,
+                Palette = PaletteType.Palette2
+            }
+        };
+        //var selectionStart = data.Min(e => e.Date).AddDays(30);
+        
+        cpuChartOptionsBottom.Chart.Toolbar = new Toolbar { Show = false };
+        cpuChartOptionsBottom.Xaxis = new XAxis { TickPlacement = TickPlacement.On };
+        cpuChartOptionsBottom.Chart.Brush = new ApexCharts.Brush { Enabled = true, Target = mainChartId };
     }
 
     private async Task TimerAsync()
@@ -63,7 +127,24 @@ public partial class SystemPage:ComponentBase, IDisposable
             var sysInfoResult = await HttpHelper.Get<SystemInfoData>("/api/system/history-data?since=" + Data.SystemDateTime);
             if (sysInfoResult.Success == false)
                 return;
+            this.Data = sysInfoResult.Data;
             await ChartCpuUsage.AppendDataAsync(sysInfoResult.Data.CpuUsage);
+            await ChartCpuUsageBottom.AppendDataAsync(sysInfoResult.Data.CpuUsage);
+        }
+
+        if (this.Data != null)
+        {
+            var min = this.Data.CpuUsage.Min(e => e.Time);
+            var max = this.Data.CpuUsage.Max(e => e.Time);
+            cpuChartOptionsBottom.Chart.Selection = new Selection
+            {
+                Enabled = true,
+                Xaxis = new SelectionXaxis
+                {
+                    Min = min.ToUnixTimeMilliseconds(),
+                    Max = max.ToUnixTimeMilliseconds()
+                }
+            };
         }
     }
 

@@ -9,17 +9,35 @@
 
     <Body>
     
-    @if (Data?.CpuUsage?.Any() == true)
-    {
-        <ApexChart @ref="ChartCpuUsage" TItem="SystemValue<float>" Title="CPU Usage" Options="ChartOptions">
-            <ApexPointSeries TItem="SystemValue<float>"
-                             Items="Data.CpuUsage"
-                             SeriesType="@SeriesType.Area"
-                             Name="CPU Usage"
-                             XValue="@(e => e.Time)"
-                             YValue="@(x => (decimal)x.Value)"/>
-        </ApexChart>
-    }
+    <div class="cpu-usage">
+        @if (Data?.CpuUsage?.Any() == true)
+        {
+            <ApexChart @ref="ChartCpuUsage" TItem="SystemValue<float>" Title="CPU Usage" Options="cpuChartOptions" Height="150" XAxisType="XAxisType.Datetime">
+                <ApexPointSeries TItem="SystemValue<float>"
+                                 Items="Data.CpuUsage"
+                                 SeriesType="@SeriesType.Area"
+                                 Name="CPU Usage"
+                                 XValue="@(e => e.Time)"
+                                 YValue="@(x => (decimal)x.Value)"/>
+            </ApexChart>
+            
+
+            <ApexChart @ref=ChartCpuUsageBottom TItem="SystemValue<float>"
+                       Title="Quantity"
+                       Options=cpuChartOptionsBottom
+                       Height="100"
+                       XAxisType="XAxisType.Datetime">
+
+                <ApexPointSeries TItem="SystemValue<float>"
+                                 Items="Data.CpuUsage"
+                                 Name="Quantity"
+                                 SeriesType="SeriesType.Bar"
+                                 XValue="@(x => x.Time)"
+                                 YValue="@(x => (decimal)x.Value)"
+                                 Stroke="@(new SeriesStroke { Width = 2, Color="#E51C15"})" />
+            </ApexChart>
+        }
+    </div>
     
     </Body>
 </PageView>

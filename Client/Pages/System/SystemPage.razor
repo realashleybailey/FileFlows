@@ -1,0 +1,25 @@
+@namespace FileFlows.Client.Pages
+
+@page "/system"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+    
+    @if (Data?.CpuUsage?.Any() == true)
+    {
+        <ApexChart @ref="ChartCpuUsage" TItem="SystemValue<float>" Title="CPU Usage" Options="ChartOptions">
+            <ApexPointSeries TItem="SystemValue<float>"
+                             Items="Data.CpuUsage"
+                             SeriesType="@SeriesType.Area"
+                             Name="CPU Usage"
+                             XValue="@(e => e.Time)"
+                             YValue="@(x => (decimal)x.Value)"/>
+        </ApexChart>
+    }
+    
+    </Body>
+</PageView>

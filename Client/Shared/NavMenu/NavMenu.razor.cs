@@ -57,9 +57,12 @@ namespace FileFlows.Client.Shared
                     new NavMenuItem("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
                     new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                     new NavMenuItem("Pages.Tools.Title", "fas fa-tools", "tools"),
-                    new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings")
+                    new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings"),
+                    new NavMenuItem("Pages.System.Title", "fas fa-microchip", "system")
                 }
             });
+            
+            
 
 
             MenuItems.Add(new NavMenuGroup

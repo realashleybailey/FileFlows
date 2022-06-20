@@ -2,6 +2,7 @@ using System.Configuration;
 using System.Diagnostics;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Workers;
+using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using FileHelper = FileFlows.ServerShared.Helpers.FileHelper;
@@ -107,6 +108,34 @@ public class SystemController:Controller
         info.IsPaused = settings.IsPaused;
         info.PausedUntil = settings.PausedUntil;
         return info;
+    }
+
+    /// <summary>
+    /// Gets history data of system information
+    /// </summary>
+    /// <param name="since">data since a date</param>
+    /// <returns>the history data</returns>
+    [HttpGet("history-data")]
+    public SystemInfoData GetSystemInfoData([FromQuery] DateTime? since = null)
+    {
+        if (since == null)
+        {
+            return new SystemInfoData()
+            {
+                SystemDateTime = DateTime.Now,
+                CpuUsage = SystemMonitor.Instance.CpuUsage,
+                MemoryUsage = SystemMonitor.Instance.MemoryUsage,
+                TempStorageUsage = SystemMonitor.Instance.TempStorageUsage,
+            };
+        }
+        
+        return new SystemInfoData()
+        {
+            SystemDateTime = DateTime.Now,
+            CpuUsage = SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since),
+            MemoryUsage = SystemMonitor.Instance.MemoryUsage.Where(x => x.Time > since),
+            TempStorageUsage = SystemMonitor.Instance.TempStorageUsage.Where(x => x.Time > since),
+        };
     }
 
     private async Task<float> GetCpuPercentage()

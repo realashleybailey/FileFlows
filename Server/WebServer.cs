@@ -162,7 +162,8 @@ public class WebServer
             new TelemetryReporter(),
             new ServerUpdater(),
             new TempFileCleaner(string.Empty),
-            new FlowRunnerMonitor()
+            new FlowRunnerMonitor(),
+            new SystemMonitor()
         );
 
         app.MapHub<Hubs.FlowHub>("/flow");

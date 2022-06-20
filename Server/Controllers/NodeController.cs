@@ -110,6 +110,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 // internal but doesnt exist
                 node.Address = Globals.InternalNodeName;
                 node.Name = Globals.InternalNodeName;
+                node.AllLibraries = ProcessingLibraries.All;
                 node.Mappings = null; // no mappings for internal
             }
         }
@@ -353,6 +354,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 Enabled = true,
                 FlowRunners = 1,
                 Version = Globals.Version,
+                AllLibraries = ProcessingLibraries.All,
 #if (DEBUG)
                 TempPath = windows ? @"d:\videos\temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
 #else

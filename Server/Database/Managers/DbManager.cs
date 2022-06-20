@@ -192,6 +192,7 @@ public abstract class DbManager
             Uid = Globals.InternalNodeUid,
             Name = Globals.InternalNodeName,
             Address = Globals.InternalNodeName,
+            AllLibraries = ProcessingLibraries.All,
             Schedule = new string('1', 672),
             Enabled = true,
             FlowRunners = 1,

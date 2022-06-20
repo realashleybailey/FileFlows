@@ -10,12 +10,12 @@ class ffFlowHistory {
     }
     
     redo() {
-        if(this.redoActions.length === 0){1
+        if(this.redoActions.length === 0)
             return; // nothing to redo
-        }
-        let action = this.redoActions.splice(0, 1)[0];
+        let action = this.redoActions.splice(this.redoActions.length - 1, 1)[0];
+        console.log('redo', action.constructor.name);
         this.history.push(action);
-        action.redo();
+        action.perform();
     }
     
     undo(){
@@ -23,6 +23,7 @@ class ffFlowHistory {
             return;
         }
         let action = this.history.pop();
+        console.log('undo', action.constructor.name);
         this.redoActions.push(action);
         action.undo();
     }    
@@ -90,7 +91,7 @@ class FlowActionDelete {
     perform() {
         var div = document.getElementById(this.uid);
         if (div) {
-            ffFlowPart.flowPartElements = ffFlowPart.flowPartElements.filter(x => x != div);
+            ffFlowPart.flowPartElements = ffFlowPart.flowPartElements.filter(x => x !== div);
             div.remove();
         }
 
@@ -103,7 +104,6 @@ class FlowActionDelete {
             }
         }
         
-
         ffFlow.setInfo();
         ffFlow.redrawLines();
     }
@@ -155,5 +155,41 @@ class FlowActionConnection {
         else
             ffFlow.FlowLines.ioOutputConnections.delete(this.outputNodeUid);
         ffFlow.redrawLines();        
+    }
+}
+
+
+class FlowActionAddNode {
+
+    part;
+    
+    constructor(part) {
+        this.part = part;
+    }
+
+    perform() {
+        ffFlowPart.addFlowPart(this.part);
+        ffFlow.parts.push(this.part);
+    }
+
+    undo()
+    {
+        var div = document.getElementById(this.part.uid);
+        if (div) {
+            ffFlowPart.flowPartElements = ffFlowPart.flowPartElements.filter(x => x !== div);
+            div.remove();
+        }
+
+        ffFlow.FlowLines.ioOutputConnections.delete(this.part.uid);
+
+        for (let i = 0; i < ffFlow.parts.length; i++) {
+            if (ffFlow.parts[i].uid === this.part.uid) {
+                ffFlow.parts.splice(i, 1);
+                break;
+            }
+        }
+
+        ffFlow.setInfo();
+        ffFlow.redrawLines();
     }
 }

@@ -178,8 +178,7 @@ window.ffFlow = {
             if (part.model?.outputs)
                 part.Outputs = part.model?.outputs;
 
-            ffFlowPart.addFlowPart(part);
-            ffFlow.parts.push(part);
+            ffFlow.History.perform(new FlowActionAddNode(part));
 
             if (element.noEditorOnAdd === true)
                 return;
@@ -454,9 +453,7 @@ window.ffFlow = {
             p.yPos += 80;
             if(p.Name)
                 p.Name = "Copy of " + p.Name;
-            ffFlowPart.addFlowPart(p);           
+            ffFlow.History.perform(new FlowActionAddNode(p));
         }
     }
-    
-    
 }

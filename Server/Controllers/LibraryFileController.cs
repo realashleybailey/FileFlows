@@ -825,7 +825,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// Deletes all the library files from the specified libraries
     /// </summary>
     /// <param name="libraryUids">the UIDs of the libraries</param>
-    public async Task DeleteFromLibraries(Guid[] libraryUids)
+    internal async Task DeleteFromLibraries(Guid[] libraryUids)
     {
         if (DbHelper.UseMemoryCache)
         {

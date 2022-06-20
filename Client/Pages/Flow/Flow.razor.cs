@@ -125,6 +125,15 @@ namespace FileFlows.Client.Pages
                     await eleFilter.FocusAsync();
                 });
             });
+            
+            HotKeyService.RegisterHotkey("FlowUndo", "Z", ctrl: true, shift:false, callback: () =>
+            {
+                _ = jsRuntime.InvokeVoidAsync("ffFlow.History.undo");
+            });
+            HotKeyService.RegisterHotkey("FlowUndo", "Z", ctrl: true, shift: true, callback: () =>
+            {
+                _ = jsRuntime.InvokeVoidAsync("ffFlow.History.redo");
+            });
             _ = Init();
         }
 

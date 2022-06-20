@@ -11,6 +11,7 @@ window.ffFlow = {
     lblDelete: 'Delete',
     lblNode: 'Node',
     Zoom:100,
+    History: new ffFlowHistory(),
 
     reset: function () {
         ffFlow.active = false;

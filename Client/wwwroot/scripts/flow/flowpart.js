@@ -54,34 +54,8 @@ window.ffFlowPart = {
 
         div.classList.add('size-' + Math.max(part.inputs, part.outputs));
 
-        div.addEventListener("click", function (event) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-            ffFlowPart.unselectAll();
-            div.classList.add('selected');
-            ffFlow.SelectedParts = [part];
-            ffFlow.selectNode(part);
-        });
-        div.addEventListener("dblclick", function (event) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-            ffFlow.setInfo(part.Name, 'Node');
-            ffFlowPart.editFlowPart(part.uid);
-        });
         div.setAttribute('tabIndex', -1);
-        div.addEventListener("keydown", function (event) {
-            if (event.code === 'Delete' || event.code === 'Backspace') {
-                ffFlowPart.deleteFlowPart(part.uid);
-                event.stopImmediatePropagation();
-                event.preventDefault();
-            }
-            else if (event.code === 'Enter') {
-                ffFlowPart.editFlowPart(part.uid);
-                event.stopImmediatePropagation();
-                event.preventDefault();
-            }            
-        });
-
+        ffFlowPart.attachEventListeners({part: part, div: div});
 
         if (part.inputs > 0) {
             let divInputs = document.createElement('div');
@@ -132,6 +106,59 @@ window.ffFlowPart = {
         ffFlowPart.setPartName(part);
         ffFlow.initOutputHints(part);
     },
+    
+    attachEventListeners: function(args){
+        let part = args.part;
+        let div = args.div;
+        let allEvents = args.allEvents;
+        if(!div)
+            div = document.getElementById(part.uid);
+
+        div.addEventListener("click", function (event) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            ffFlowPart.unselectAll();
+            div.classList.add('selected');
+            ffFlow.SelectedParts = [part];
+            ffFlow.selectNode(part);
+        });
+        div.addEventListener("dblclick", function (event) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            ffFlow.setInfo(part.Name, 'Node');
+            ffFlowPart.editFlowPart(part.uid);
+        });
+        div.addEventListener("keydown", function (event) {
+            if (event.code === 'Delete' || event.code === 'Backspace') {
+                ffFlowPart.deleteFlowPart(part.uid);
+                event.stopImmediatePropagation();
+                event.preventDefault();
+            }
+            else if (event.code === 'Enter') {
+                ffFlowPart.editFlowPart(part.uid);
+                event.stopImmediatePropagation();
+                event.preventDefault();
+            }
+        });
+        
+        if(allEvents){
+            for(let output of div.querySelectorAll('.output div')){
+                ffFlowPart.attachOutputNodeEvents(output);
+            }
+        }
+    },
+    
+    attachOutputNodeEvents: function(divOutput) {
+        divOutput.addEventListener("click", function (event) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+        });
+        divOutput.addEventListener("mousedown", function (event) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            ffFlow.FlowLines.ioDown(event, false);
+        });  
+    },
 
     setPartName: function (part) {
         try {
@@ -154,21 +181,8 @@ window.ffFlowPart = {
 
     deleteFlowPart: function (uid) 
     {
-        var div = document.getElementById(uid);
-        if (div)
-            div.remove();
-
-        ffFlow.FlowLines.ioOutputConnections.delete(uid);
-
-        for (let i = 0; i < ffFlow.parts.length; i++) {
-            if (ffFlow.parts[i].uid === uid) {
-                ffFlow.parts.splice(i, 1);
-                break;
-            }
-        }
-
-        ffFlow.setInfo();
-        ffFlow.redrawLines();
+        console.log("deleting flow part");
+        ffFlow.History.perform(new FlowActionDelete(uid));
     },
 
     editFlowPart: function (uid, deleteOnCancel) {
@@ -257,15 +271,7 @@ window.ffFlowPart = {
                 divOutput.setAttribute('x-output', i);
                 divOutput.classList.add('output');
                 divOutput.classList.add('output-' + i);
-                divOutput.addEventListener("click", function (event) {
-                    event.stopImmediatePropagation();
-                    event.preventDefault();
-                });
-                divOutput.addEventListener("mousedown", function (event) {
-                    event.stopImmediatePropagation();
-                    event.preventDefault();
-                    ffFlow.FlowLines.ioDown(event, false);
-                });
+                ffFlowPart.attachOutputNodeEvents(divOutput);
                 divOutputs.appendChild(divOutput);
             }
         } else if (divOutputs) {

@@ -85,15 +85,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         await _mutex.WaitAsync();
         try
         {
-            var item = (await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, start:0, max:1, nodeUid: node.Uid)).FirstOrDefault();
+            var item = (await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, start: 0, max: 1, nodeUid: node.Uid))
+                .FirstOrDefault();
             if (item == null)
-                return NextFileResult( NextLibraryFileStatus.NoFile, null);
+                return NextFileResult(NextLibraryFileStatus.NoFile, null);
             item.Status = FileStatus.Processing;
             item.Node = new ObjectReference { Uid = node.Uid, Name = node.Name };
             item.WorkerUid = workerUid;
             item.ProcessingStarted = DateTime.Now;
             await DbHelper.Update(item);
             return NextFileResult(NextLibraryFileStatus.Success, item);
+        }
+        catch(Exception ex)
+        {
+            Logger.Instance.ELog("Error Getting Next File From DB: " + ex.Message);
+            throw;
         }
         finally
         {

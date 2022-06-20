@@ -25,7 +25,6 @@ namespace FileFlows.Client.Services
                 "let tag = document.activeElement && document.activeElement.tagName ? document.activeElement.tagName.toLowerCase() : '';" +
                 "if(tag === 'input' || tag === 'textarea' || tag === 'select') return;" +
                 "let args = { Key: event.key, Shift: event.shiftKey, Ctrl: event.ctrlKey, Alt: event.altKey};" +
-                "console.log('hotkey:' , args);" +
                 "setTimeout(() => { DotNet.invokeMethodAsync('Client', 'HotkeysKeyDown', args)}, 1);" + // timeout here so we dont take the key
                 "})");
         }
@@ -56,7 +55,7 @@ namespace FileFlows.Client.Services
                 return;
             foreach(var rhk in RegisteredHotKeys)
             {
-                if (rhk.Key != hotkey.Key)
+                if (rhk.Key.ToLower() != hotkey.Key.ToLower())
                     continue;
                 if (rhk.Ctrl != hotkey.Ctrl)
                     continue;

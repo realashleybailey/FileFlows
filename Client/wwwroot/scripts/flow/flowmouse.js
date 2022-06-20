@@ -62,14 +62,18 @@ class ffFlowMouse {
             this.initialY = this.currentY;
             for(let part of document.querySelectorAll('.flow-part.selected')) {
                 part.style.transform = '';
-                let xPos = parseInt(part.style.left, 10) + ffFlow.translateCoord(this.currentX);
-                let yPos = parseInt(part.style.top, 10) + ffFlow.translateCoord(this.currentY);
-                part.style.left = xPos + 'px';
-                part.style.top = yPos + 'px';
+                let originalXPos = parseInt(part.style.left, 10);
+                let originalYPos = parseInt(part.style.top, 10);
+                let transCurX = ffFlow.translateCoord(this.currentX);
+                let transCurY = ffFlow.translateCoord(this.currentY);
+                let partLeft = parseInt(part.style.left, 10);
+                let partTop = parseInt(part.style.top, 10);
+                let xPos = partLeft + transCurX;
+                let yPos = partTop + transCurY;
+                if(xPos != originalXPos || yPos != originalYPos)
+                    ffFlow.History.perform(new FlowActionMove(part, xPos, yPos, originalXPos, originalYPos));
             }
-
-
-            ffFlow.redrawLines();
+            //ffFlow.redrawLines();
         }
         else if(this.canvasSelecting){
             let endX = e.x;

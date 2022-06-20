@@ -121,11 +121,11 @@ public class MySqlDbManager: DbManager
             new []{"js_OriginalSize", "ADD COLUMN js_OriginalSize bigint GENERATED ALWAYS AS (convert(json_extract(Data,'$.OriginalSize'), signed)) VIRTUAL"},
             new []{"js_ProcessingStarted", "ADD COLUMN js_ProcessingStarted datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 23), datetime)) VIRTUAL"},
             new []{"js_ProcessingEnded", "ADD COLUMN js_ProcessingEnded datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 23), datetime)) VIRTUAL"},
-            new []{"js_LibraryUid", "ADD COLUMN js_LibraryUid varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Library.Uid'))) VIRTUAL"},
+            new []{"js_LibraryUid", "ADD COLUMN js_LibraryUid varchar(36) COLLATE utf8_unicode_ci GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Library.Uid'))) VIRTUAL"},
             new []{"js_Enabled", "ADD COLUMN js_Enabled boolean GENERATED ALWAYS AS (convert(json_extract(Data,'$.Enabled'), signed)) VIRTUAL"},
             new []{"js_Priority", "ADD COLUMN js_Priority int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.Priority')), signed)) VIRTUAL"},
             new []{"js_ProcessingOrder", "ADD COLUMN js_ProcessingOrder int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.ProcessingOrder')), signed)) VIRTUAL"},
-            new []{"js_Schedule", "ADD COLUMN js_Schedule varchar(36) GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL"}
+            new []{"js_Schedule", "ADD COLUMN js_Schedule varchar(36) COLLATE utf8_unicode_ci GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL"}
         };
 
         string sql = "";
@@ -177,8 +177,17 @@ public class MySqlDbManager: DbManager
     {
         using var db = GetDb();
         db.OneTimeCommandTimeout = 120;
-        var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)", (int)status, quarter, start, max, nodeUid);
-        return ConvertFromDbObject<LibraryFile>(dbObjects);
+        try
+        {
+            var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)", (int)status,
+                quarter, start, max, nodeUid);
+            return ConvertFromDbObject<LibraryFile>(dbObjects);
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Error getting files from mysql: " + ex.Message);
+            throw;
+        }
     }
 
     /// <summary>

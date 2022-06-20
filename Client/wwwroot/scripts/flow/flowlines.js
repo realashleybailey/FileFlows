@@ -96,7 +96,7 @@ class ffFlowLines {
 
                 if (ffFlow.SingleOutputConnection) {
                     connections = [{ index: index, part: part }];
-                    this.ioOutputConnections.set(outputId, connections);
+                    ffFlow.History.perform(new FlowActionConnection(outputId, connections));
                 }
                 else
                     connections.push({ index: index, part: part });
@@ -287,22 +287,13 @@ class ffFlowLines {
         if (!this.ioSelectedConnection)
             return;
 
+        console.log('delete connection!');
         ffFlow.selectConnection();
 
         let selected = this.ioSelectedConnection;
         let outputNodeUid = selected.output.getAttribute('id');
-
-        if (ffFlow.SingleOutputConnection) {
-            this.ioOutputConnections.delete(outputNodeUid);
-        } else {
-            let connections = this.ioOutputConnections.get(outputNodeUid);
-            let index = connections.indexOf(selected.connection);
-            if (index >= 0) {
-                connections.splice(index, 1);
-            }
-        }
-
-        this.redrawLines();
+        
+        ffFlow.History.perform(new FlowActionConnection(outputNodeUid));
     }
 
 

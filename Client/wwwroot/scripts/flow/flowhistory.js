@@ -7,12 +7,10 @@ class ffFlowHistory {
         this.redoActions = [];
         this.history.push(action);
         action.perform();        
-        console.log('history', this);
     }
     
     redo() {
-        if(this.redoActions.length === 0){
-            console.log('nothing to redo');
+        if(this.redoActions.length === 0){1
             return; // nothing to redo
         }
         let action = this.redoActions.splice(0, 1)[0];
@@ -21,9 +19,7 @@ class ffFlowHistory {
     }
     
     undo(){
-        console.log('undo', this);
         if(this.history.length < 1) {
-            console.log('nothing to undo');
             return;
         }
         let action = this.history.pop();
@@ -64,7 +60,6 @@ class FlowActionMove {
         element.style.transform = '';
         element.style.left = x + 'px';
         element.style.top = y + 'px'
-        console.log('moving to', x, y);
 
         ffFlow.redrawLines();
     }
@@ -113,9 +108,7 @@ class FlowActionDelete {
         ffFlow.redrawLines();
     }
 
-    undo(){
-        console.log('undo delete!!!!', this.parent);
-        
+    undo(){        
         if(this.ffFlowPart)
             ffFlow.parts.push(this.ffFlowPart);
         

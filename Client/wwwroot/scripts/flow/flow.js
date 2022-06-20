@@ -75,6 +75,11 @@ window.ffFlow = {
         container.addEventListener("drop", (e) => { ffFlow.drop(e, true) }, false);
 
 
+        document.removeEventListener('copy', ffFlow.CopyEventListener);
+        document.addEventListener('copy', ffFlow.CopyEventListener);
+        document.removeEventListener('paste', ffFlow.PasteEventListener);
+        document.addEventListener('paste', ffFlow.PasteEventListener);
+
 
         let canvas = document.querySelector('canvas');
 
@@ -222,11 +227,11 @@ window.ffFlow = {
                 }
 
                 part.outputConnections.push(
-                    {
-                        input: input,
-                        output: output,
-                        inputNode: toPart
-                    });
+                {
+                    input: input,
+                    output: output,
+                    inputNode: toPart
+                });
             }
         }
         // remove any no longer existing connections
@@ -410,5 +415,48 @@ window.ffFlow = {
             event.stopImmediatePropagation();
             event.preventDefault();
         }
+    },
+    
+    CopyEventListener(e){
+        let eleFlowParts = document.getElementById('flow-parts');
+        if(!eleFlowParts)
+            return; // not on flow page, dont consume copy
+        
+        console.log('got copy command');
+        if (ffFlow.SelectedParts.length) {
+            let json = JSON.stringify(ffFlow.SelectedParts);
+            console.log('json', json);
+            e.clipboardData.setData('text/plain', json);
+        }
+        e.preventDefault();
+    },
+
+    async PasteEventListener(e) {
+        let eleFlowParts = document.getElementById('flow-parts');
+        if(!eleFlowParts)
+            return; // not on flow page, dont consume paste
+        let json = (e.clipboardData || window.clipboardData).getData('text');
+        if(!json)
+            return;
+        e.preventDefault();
+        let parts = [];
+        try {
+            parts = JSON.parse(json);
+        }catch(err) { return; }
+        console.log('parts', parts);
+        for(let p of parts){
+            if(!p.uid)
+                return; // not a valid item pasted in
+            p.uid = await ffFlow.csharp.invokeMethodAsync("NewGuid");
+            // for now we dont copy connections
+            p.outputConnections = null;
+            p.xPos += 120;
+            p.yPos += 80;
+            if(p.Name)
+                p.Name = "Copy of " + p.Name;
+            ffFlowPart.addFlowPart(p);           
+        }
     }
+    
+    
 }

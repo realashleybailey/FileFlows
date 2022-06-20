@@ -267,6 +267,9 @@ namespace FileFlows.Client.Pages
         }
 
         [JSInvokable]
+        public async Task<string> NewGuid() => Guid.NewGuid().ToString();
+
+        [JSInvokable]
         public async Task<object> AddElement(string uid)
         {
             var element = this.Available.FirstOrDefault(x => x.Uid == uid);

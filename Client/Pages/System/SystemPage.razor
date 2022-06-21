@@ -1,4 +1,5 @@
 @namespace FileFlows.Client.Pages
+@using FileFlows.Client.Components.Dashboard
 
 @page "/system"
 
@@ -9,35 +10,13 @@
 
     <Body>
     
-    <div class="cpu-usage">
-        @if (Data?.CpuUsage?.Any() == true)
-        {
-            <ApexChart @ref="ChartCpuUsage" TItem="SystemValue<float>" Title="CPU Usage" Options="cpuChartOptions" Height="150" XAxisType="XAxisType.Datetime">
-                <ApexPointSeries TItem="SystemValue<float>"
-                                 Items="Data.CpuUsage"
-                                 SeriesType="@SeriesType.Area"
-                                 Name="CPU Usage"
-                                 XValue="@(e => e.Time)"
-                                 YValue="@(x => (decimal)x.Value)"/>
-            </ApexChart>
-            
+    <div class="dashboard">
+        
+        <SystemValueLineChart TItem="float" @ref="chartCpuUsage" Title=@lblCpuUsage  Icon="fas fa-microchip" />
+        <SystemValueLineChart TItem="float" @ref="chartMemoryUsage" Title=@lblMemoryUsage SizeData=@true Icon="fas fa-memory"  />
+        <SystemValueLineChart TItem="long" @ref="chartTempStorage" Title=@lblTempStorage SizeData=@true Icon="fas fa-hdd"  />
 
-            <ApexChart @ref=ChartCpuUsageBottom TItem="SystemValue<float>"
-                       Title="Quantity"
-                       Options=cpuChartOptionsBottom
-                       Height="100"
-                       XAxisType="XAxisType.Datetime">
-
-                <ApexPointSeries TItem="SystemValue<float>"
-                                 Items="Data.CpuUsage"
-                                 Name="Quantity"
-                                 SeriesType="SeriesType.Bar"
-                                 XValue="@(x => x.Time)"
-                                 YValue="@(x => (decimal)x.Value)"
-                                 Stroke="@(new SeriesStroke { Width = 2, Color="#E51C15"})" />
-            </ApexChart>
-        }
     </div>
-    
+
     </Body>
 </PageView>

@@ -9,7 +9,7 @@ namespace FileFlows.Node.Workers;
 /// </summary>
 public class NodeUpdater:UpdaterWorker
 {
-    private static NodeUpdater Instance;
+    private static NodeUpdater? Instance;
     
     /// <summary>
     /// Constructs an instance of the node updater worker

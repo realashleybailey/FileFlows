@@ -1,7 +1,9 @@
 using System.Configuration;
 using System.Diagnostics;
+using FileFlows.Node.Workers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Workers;
+using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -185,5 +187,15 @@ public class SystemController:Controller
         // docker is easy, just stop it and it should auto restart
         WorkerManager.StopWorkers();
         Environment.Exit(99);
+    }
+
+    /// <summary>
+    /// Records the node system statistics to the server
+    /// </summary>
+    /// <param name="args">the node system statistics</param>
+    [HttpPost("node-system-statistics")]
+    public void RecordNodeSystemStatistics(NodeSystemStatistics args)
+    {
+        SystemMonitor.Instance.Record(args);
     }
 }

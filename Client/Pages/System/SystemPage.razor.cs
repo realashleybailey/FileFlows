@@ -1,6 +1,8 @@
+using System.Net.Sockets;
 using System.Threading;
 using System.Timers;
 using ApexCharts;
+using FileFlows.Client.Components.Dashboard;
 using Microsoft.AspNetCore.Components;
 
 namespace FileFlows.Client.Pages;
@@ -11,97 +13,30 @@ namespace FileFlows.Client.Pages;
 public partial class SystemPage:ComponentBase, IDisposable
 {
     private Task? timerTask;
-    private readonly PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
-    private readonly CancellationToken cancellationToken = new();
+    private readonly PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+    private readonly CancellationTokenSource cancellationToken = new();
 
     private SystemInfoData? Data;
 
-    private ApexChart<SystemValue<float>> ChartCpuUsage, ChartCpuUsageBottom;
-    
-    ApexChartOptions<SystemValue<float>> cpuChartOptions;
-    ApexChartOptions<SystemValue<float>> cpuChartOptionsBottom;
+    private SystemValueLineChart<float> chartCpuUsage, chartMemoryUsage;
+    private SystemValueLineChart<long> chartTempStorage;
 
-    protected override void OnInitialized()
+    private string lblCpuUsage, lblMemoryUsage, lblTempStorage;
+
+    protected override async Task OnInitializedAsync()
     {
+        this.lblCpuUsage = Translater.Instant("Pages.System.Labels.CpuUsage");
+        this.lblMemoryUsage = Translater.Instant("Pages.System.Labels.MemoryUsage");
+        this.lblTempStorage = Translater.Instant("Pages.System.Labels.TempStorage");
+        await Refresh();
         timerTask = TimerAsync();
-        const string mainChartId = "mainChart";
-        cpuChartOptions = new ()
-        {
-            Title = new()
-            {
-                Text = null
-            },
-            Xaxis = new()
-            {
-              Labels  = new ()
-              {
-                  Show = false
-              }
-            },
-            Yaxis = new()
-            {
-                new ()
-                {
-                    Labels = new ()
-                    {
-                        Show = false
-                    }
-                } 
-            },
-            Stroke = new ()
-            {
-              Curve = Curve.Smooth
-            },
-            Theme = new()
-            {
-                Mode = Mode.Dark,
-                Palette = PaletteType.Palette2
-            }
-        };
-        cpuChartOptions.Chart.Id = mainChartId;
-        cpuChartOptions.Chart.Toolbar = new Toolbar { AutoSelected = AutoSelected.Pan, Show = false };
-
-        cpuChartOptionsBottom = new()
-        {
-            Title = new()
-            {
-                Text = null
-            },
-            Xaxis = new()
-            {
-                Labels  = new ()
-                {
-                    Show = false
-                }
-            },
-            Yaxis = new()
-            {
-                new ()
-                {
-                    Labels = new ()
-                    {
-                        Show = false
-                    }
-                } 
-            },
-            Theme = new()
-            {
-                Mode = Mode.Dark,
-                Palette = PaletteType.Palette2
-            }
-        };
-        //var selectionStart = data.Min(e => e.Date).AddDays(30);
-        
-        cpuChartOptionsBottom.Chart.Toolbar = new Toolbar { Show = false };
-        cpuChartOptionsBottom.Xaxis = new XAxis { TickPlacement = TickPlacement.On };
-        cpuChartOptionsBottom.Chart.Brush = new ApexCharts.Brush { Enabled = true, Target = mainChartId };
     }
 
     private async Task TimerAsync()
     {
         try
         {
-            while (await timer.WaitForNextTickAsync(cancellationToken))
+            while (await timer.WaitForNextTickAsync(cancellationToken.Token))
             {
                 await Refresh();
             }
@@ -113,44 +48,31 @@ public partial class SystemPage:ComponentBase, IDisposable
 
     private async Task Refresh()
     {
-        bool initial = this.Data == null;
-        if (initial)
-        {
-            var sysInfoResult = await HttpHelper.Get<SystemInfoData>("/api/system/history-data");
-            if (sysInfoResult.Success == false)
-                return;
-            this.Data = sysInfoResult.Data;
-            this.StateHasChanged();
-        }
-        else
-        {
-            var sysInfoResult = await HttpHelper.Get<SystemInfoData>("/api/system/history-data?since=" + Data.SystemDateTime);
-            if (sysInfoResult.Success == false)
-                return;
-            this.Data = sysInfoResult.Data;
-            await ChartCpuUsage.AppendDataAsync(sysInfoResult.Data.CpuUsage);
-            await ChartCpuUsageBottom.AppendDataAsync(sysInfoResult.Data.CpuUsage);
-        }
+        var sysInfoResult = await HttpHelper.Get<SystemInfoData>("/api/system/history-data" + (Data == null ? "" : "?since=" + Data.SystemDateTime));
+        if (sysInfoResult.Success == false)
+            return;
+        this.Data = sysInfoResult.Data;
+        if(chartCpuUsage != null)
+            await chartCpuUsage.AppendData(sysInfoResult.Data.CpuUsage);
+        if (chartMemoryUsage != null)
+            await chartMemoryUsage.AppendData(sysInfoResult.Data.MemoryUsage);
+        if (chartTempStorage != null)
+            await chartTempStorage.AppendData(sysInfoResult.Data.TempStorageUsage);
 
-        if (this.Data != null)
-        {
-            var min = this.Data.CpuUsage.Min(e => e.Time);
-            var max = this.Data.CpuUsage.Max(e => e.Time);
-            cpuChartOptionsBottom.Chart.Selection = new Selection
-            {
-                Enabled = true,
-                Xaxis = new SelectionXaxis
-                {
-                    Min = min.ToUnixTimeMilliseconds(),
-                    Max = max.ToUnixTimeMilliseconds()
-                }
-            };
-        }
     }
 
     public void Dispose()
     {
-        timerTask?.Dispose();
-        timer?.Dispose();
+        if (timerTask is null)
+            return;
+        
+        cancellationToken.Cancel();
+        Task.Run(async () =>
+        {
+            await timerTask;
+            cancellationToken.Dispose();
+            timerTask?.Dispose();
+            timer?.Dispose();
+        });
     }
 }

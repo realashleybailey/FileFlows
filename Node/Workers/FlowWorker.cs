@@ -31,7 +31,7 @@ public class FlowWorker : Worker
     /// <summary>
     /// The instance of the flow worker 
     /// </summary>
-    private static FlowWorker Instance;
+    private static FlowWorker? Instance;
 
     private readonly Mutex mutex = new Mutex();
     private readonly List<Guid> ExecutingRunners = new ();

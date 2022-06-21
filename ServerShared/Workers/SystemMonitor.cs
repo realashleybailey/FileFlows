@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Models;
 
@@ -12,6 +13,7 @@ public class SystemMonitor:Worker
     public readonly Queue<SystemValue<float>> CpuUsage = new (10_000);
     public readonly Queue<SystemValue<float>> MemoryUsage = new (10_000);
     public readonly Queue<SystemValue<long>> TempStorageUsage = new(10_000);
+    private readonly Dictionary<Guid, NodeSystemStatistics> NodeTemporaryStorage = new();
 
     /// <summary>
     /// Gets the instance of the system monitor
@@ -71,19 +73,45 @@ public class SystemMonitor:Worker
     {
         var node = await new NodeService().GetServerNode();
         var tempPath = node?.TempPath;
-        if (string.IsNullOrEmpty(tempPath))
-            return 0;
-        
-        try
+        long size = 0;
+        if (string.IsNullOrEmpty(tempPath) == false)
         {
-            var dir = new DirectoryInfo(tempPath);
-            if (dir.Exists == false)
-                return 0;
-            return dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+            try
+            {
+                var dir = new DirectoryInfo(tempPath);
+                if (dir.Exists)
+                    size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+            }
+            catch (Exception)
+            {
+            }
         }
-        catch (Exception)
+
+        lock (NodeTemporaryStorage)
         {
-            return 0;
+            foreach (var nts in NodeTemporaryStorage.Values)
+            {
+                if (nts.RecordedAt > DateTime.Now.AddMinutes(-5))
+                    size += nts.TemporaryDirectorySize;
+            }
+        }
+
+        return size;
+    }
+
+    /// <summary>
+    /// Records the node system statistics to the server
+    /// </summary>
+    /// <param name="args">the node system statistics</param>
+    public void Record(NodeSystemStatistics args)
+    {
+        args.RecordedAt = DateTime.Now;
+        lock (NodeTemporaryStorage)
+        {
+            if (NodeTemporaryStorage.ContainsKey(args.Uid))
+                NodeTemporaryStorage[args.Uid] = args;
+            else
+                NodeTemporaryStorage.Add(args.Uid, args);
         }
     }
 }

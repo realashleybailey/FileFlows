@@ -60,13 +60,13 @@ public class NodeManager
             {
                 if (this.Registered == false)
                 {
-                    Logger.Instance.ILog($"Node not registered, Flow Worker skip running.");
+                    Logger.Instance?.ILog($"Node not registered, Flow Worker skip running.");
                     return false;
                 }
 
                 if (AppSettings.IsConfigured() == false)
                 {
-                    Logger.Instance.ILog($"Node not configured, Flow Worker skip running.");
+                    Logger.Instance?.ILog($"Node not configured, Flow Worker skip running.");
                     return false;
                 }
 
@@ -103,7 +103,7 @@ public class NodeManager
             }
         };
         
-        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner(), new TempFileCleaner(AppSettings.Instance.HostName));
+        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner(), new TempFileCleaner(AppSettings.Instance.HostName), new SystemStatisticsWorker());
     }
 
     

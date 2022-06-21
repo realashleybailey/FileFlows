@@ -3,7 +3,17 @@
 @if(Data != null && Data.Count > 0)
 {
     <div class="portlet library-files @(Completed ? "finished" : "upcoming")">
-        <div class="title"><span>@lblRecentlyFinished</span></div>
+        <div class="title">
+            @if (Completed)
+            {
+                <i class="fas fa-hourglass-end"></i>
+            }
+            else
+            {
+                <i class="fas fa-hourglass-start"></i>
+            }
+            <span>@lblRecentlyFinished</span>
+        </div>
         <div class="table-wrapper">
             <table class="table">
                 <thead>

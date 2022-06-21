@@ -18,7 +18,7 @@ public class Program
     internal static NodeManager? Manager { get; private set; }
 
     private static bool Exiting = false;
-    private static Mutex appMutex = null;
+    private static Mutex appMutex;
     const string appName = "FileFlowsNode";
     public static void Main(string[] args)
     {

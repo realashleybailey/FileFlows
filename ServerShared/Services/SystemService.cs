@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using FileFlows.ServerShared.Models;
 
 namespace FileFlows.ServerShared.Services;
     
@@ -21,17 +22,26 @@ public interface ISystemService
     /// </summary>
     /// <returns>the version the node can update to</returns>
     Task<Version> GetNodeUpdateVersion();
+    
     /// <summary>
     /// Gets the node updater binary
     /// </summary>
     /// <returns>the node updater binary</returns>
     Task<byte[]> GetNodeUpdater();
+    
     /// <summary>
     /// Gets an node update available
     /// </summary>
     /// <param name="version">the current version of the node</param>
     /// <returns>if there is a node update available, returns the update</returns>
     Task<byte[]> GetNodeUpdateIfAvailable(string version);
+
+    /// <summary>
+    /// Records the node system statistics to the server
+    /// </summary>
+    /// <param name="args">the node system statistics</param>
+    /// <returns>the task to await</returns>
+    Task RecordNodeSystemStatistics(NodeSystemStatistics args);
 }
 
 /// <summary>
@@ -137,6 +147,24 @@ public class SystemService : Service, ISystemService
         {
             Logger.Instance?.WLog("Failed to get update: " + ex.Message);
             return new byte[] { };
+        }
+    }
+
+
+    /// <summary>
+    /// Records the node system statistics to the server
+    /// </summary>
+    /// <param name="args">the node system statistics</param>
+    /// <returns>the task to await</returns>
+    public async Task RecordNodeSystemStatistics(NodeSystemStatistics args)
+    {
+        try
+        {
+            await HttpHelper.Post($"{ServiceBaseUrl}/api/system/node-system-statistics", args);
+        }
+        catch (Exception)
+        {
+            return;
         }
     }
 }

@@ -351,3 +351,35 @@ input[type=file]{
         color: var(--color) !important;
     }
 }
+
+@media screen and (min-width: 850px) {
+    .dashboard {
+        > div {
+            margin: unset;
+        }
+
+        display: grid;
+        grid-template-columns:repeat(auto-fill, minmax(30rem, 1fr));
+        grid-gap: 1rem;
+        grid-auto-rows: 1fr;
+    }
+
+}
+.portlet {
+    box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
+    background: rgba(var(--base), 0.2);
+
+    .title {
+        height: 2.5rem;
+        color: var(--color);
+        padding: 0.25rem 0.5rem;
+        i {
+            color:var(--accent);
+            margin-right: 0.5rem;
+        }
+    }
+    .content {
+        padding:0;
+        margin:0;
+    }
+}

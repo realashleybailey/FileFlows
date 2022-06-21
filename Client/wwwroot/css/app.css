@@ -701,4 +701,33 @@ hr {
   color: var(--color) !important;
 }
 
+@media screen and (min-width: 850px) {
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+    grid-gap: 1rem;
+    grid-auto-rows: 1fr;
+  }
+  .dashboard > div {
+    margin: unset;
+  }
+}
+.portlet {
+  box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
+  background: rgba(var(--base), 0.2);
+}
+.portlet .title {
+  height: 2.5rem;
+  color: var(--color);
+  padding: 0.25rem 0.5rem;
+}
+.portlet .title i {
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+.portlet .content {
+  padding: 0;
+  margin: 0;
+}
+
 /*# sourceMappingURL=app.css.map */

@@ -1,0 +1,11 @@
+.content ::deep
+{
+   > div + div {
+     position:relative;
+    top:-2rem;
+  }
+}
+
+.portlet{
+  height:240px;
+}

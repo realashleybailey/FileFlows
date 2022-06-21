@@ -68,7 +68,7 @@ public class MySqlDbManager: DbManager
         }
 
         Logger.Instance.ILog("Creating Database");
-        return db.Execute("create database " + dbName) > 0 ? DbCreateResult.Created : DbCreateResult.Failed;
+        return db.Execute("create database " + dbName + " character set utf8 collate 'utf8_unicode_ci';") > 0 ? DbCreateResult.Created : DbCreateResult.Failed;
     }
 
     protected override void CreateStoredProcedures()

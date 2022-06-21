@@ -10,3 +10,9 @@
 .processing-node.status-ok {
   color: var(--success);
 }
+
+.btn-download-node {
+  width: 10rem;
+}
+
+/*# sourceMappingURL=Nodes.razor.css.map */

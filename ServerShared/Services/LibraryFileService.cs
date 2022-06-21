@@ -160,7 +160,7 @@ public class LibraryFileService : Service, ILibraryFileService
                 return null; 
             return result.Data;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

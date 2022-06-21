@@ -35,27 +35,7 @@
   flex-direction: column;
 }
 
-::deep .portlet {
-  box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
-  background: rgba(var(--base), 0.2);
-}
-::deep .portlet .title {
-  height: 2.5rem;
-  color: var(--accent);
-  padding: 0.25rem 0.5rem;
-}
-
 @media screen and (min-width: 850px) {
-  .dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
-    grid-gap: 1rem;
-    grid-auto-rows: 1fr;
-  }
-  .dashboard > div {
-    margin: unset;
-  }
-
   .waiting-icon {
     font-size: 8rem;
   }

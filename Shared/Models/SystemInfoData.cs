@@ -22,6 +22,11 @@ public class SystemInfoData
     /// Gets or sets the CPU Usage
     /// </summary>
     public IEnumerable<SystemValue<long>> TempStorageUsage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the processing times for libraries
+    /// </summary>
+    public IEnumerable<BoxPlotData> LibraryProcessingTimes { get; set; }
 }
 
 
@@ -29,4 +34,14 @@ public class SystemValue<T>
 {
     public DateTime Time { get; set; } = DateTime.Now;
     public T Value { get; set; }
+}
+
+public class BoxPlotData
+{
+    public string Name { get; set; }
+    public int Minimum { get; set; }
+    public int LowQuartile { get; set; }
+    public int Median { get; set; }
+    public int HighQuartile { get; set; }
+    public int Maximum { get; set; }
 }

@@ -14,6 +14,11 @@ public class SystemMonitor:Worker
     public readonly Queue<SystemValue<float>> MemoryUsage = new (10_000);
     public readonly Queue<SystemValue<long>> TempStorageUsage = new(10_000);
     private readonly Dictionary<Guid, NodeSystemStatistics> NodeTemporaryStorage = new();
+    /// <summary>
+    /// Gets or sets the processing times for libraries
+    /// </summary>
+    public IEnumerable<BoxPlotData> LibraryProcessingTimes { get; set; }
+    
 
     /// <summary>
     /// Gets the instance of the system monitor
@@ -23,6 +28,14 @@ public class SystemMonitor:Worker
     public SystemMonitor() : base(ScheduleType.Second, 2)
     {
         Instance = this;
+        LibraryProcessingTimes = new BoxPlotData[]
+        {
+            new() { Name = "Library 1", Minimum = 10, LowQuartile = 20, Median = 28, HighQuartile = 40, Maximum = 70 },
+            new() { Name = "Library 2", Minimum = 15, LowQuartile = 32, Median = 45, HighQuartile = 63, Maximum = 96 },
+            new() { Name = "Library 3", Minimum = 5, LowQuartile = 14, Median = 32, HighQuartile = 45, Maximum = 60 },
+            new() { Name = "Library 4", Minimum = 22, LowQuartile = 40, Median = 70, HighQuartile = 90, Maximum = 120 },
+            new() { Name = "Library 5", Minimum = 17, LowQuartile = 28, Median = 54, HighQuartile = 76, Maximum = 104 },
+        };
     }
 
     protected override void Execute()

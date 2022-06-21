@@ -16,6 +16,9 @@
         <SystemValueLineChart TItem="float" @ref="chartMemoryUsage" Title=@lblMemoryUsage SizeData=@true Icon="fas fa-memory"  />
         <SystemValueLineChart TItem="long" @ref="chartTempStorage" Title=@lblTempStorage SizeData=@true Icon="fas fa-hdd"  />
 
+        @if(Data != null){
+            <BoxPlot Data="@Data.LibraryProcessingTimes" Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" />
+        }
     </div>
 
     </Body>

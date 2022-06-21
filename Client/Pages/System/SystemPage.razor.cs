@@ -21,13 +21,14 @@ public partial class SystemPage:ComponentBase, IDisposable
     private SystemValueLineChart<float> chartCpuUsage, chartMemoryUsage;
     private SystemValueLineChart<long> chartTempStorage;
 
-    private string lblCpuUsage, lblMemoryUsage, lblTempStorage;
+    private string lblCpuUsage, lblMemoryUsage, lblTempStorage, lblLibraryProcessingTimes;
 
     protected override async Task OnInitializedAsync()
     {
         this.lblCpuUsage = Translater.Instant("Pages.System.Labels.CpuUsage");
         this.lblMemoryUsage = Translater.Instant("Pages.System.Labels.MemoryUsage");
         this.lblTempStorage = Translater.Instant("Pages.System.Labels.TempStorage");
+        this.lblLibraryProcessingTimes = Translater.Instant("Pages.System.Labels.LibraryProcessingTimes");
         await Refresh();
         timerTask = TimerAsync();
     }

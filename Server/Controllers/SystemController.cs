@@ -122,16 +122,17 @@ public class SystemController:Controller
     {
         if (since == null)
         {
-            return new SystemInfoData()
+            return new ()
             {
                 SystemDateTime = DateTime.Now,
                 CpuUsage = SystemMonitor.Instance.CpuUsage,
                 MemoryUsage = SystemMonitor.Instance.MemoryUsage,
                 TempStorageUsage = SystemMonitor.Instance.TempStorageUsage,
+                LibraryProcessingTimes = SystemMonitor.Instance.LibraryProcessingTimes
             };
         }
         
-        return new SystemInfoData()
+        return new ()
         {
             SystemDateTime = DateTime.Now,
             CpuUsage = SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since),

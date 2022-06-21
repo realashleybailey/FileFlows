@@ -478,7 +478,8 @@
       "Labels":{
         "CpuUsage":"CPU Usage",
         "MemoryUsage":"Memory Usage",
-        "TempStorage":"Temporary Storage"
+        "TempStorage":"Temporary Storage",
+        "LibraryProcessingTimes":"Library Processing Times"
       }
     },
     "Tools": {

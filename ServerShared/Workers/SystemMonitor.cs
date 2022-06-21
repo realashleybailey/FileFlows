@@ -10,9 +10,9 @@ namespace FileFlows.ServerShared.Workers;
 /// </summary>
 public class SystemMonitor:Worker
 {
-    public readonly Queue<SystemValue<float>> CpuUsage = new (10_000);
-    public readonly Queue<SystemValue<float>> MemoryUsage = new (10_000);
-    public readonly Queue<SystemValue<long>> TempStorageUsage = new(10_000);
+    public readonly Queue<SystemValue<float>> CpuUsage = new (1_000);
+    public readonly Queue<SystemValue<float>> MemoryUsage = new (1_000);
+    public readonly Queue<SystemValue<long>> TempStorageUsage = new(1_000);
     private readonly Dictionary<Guid, NodeSystemStatistics> NodeTemporaryStorage = new();
     /// <summary>
     /// Gets or sets the processing times for libraries

@@ -125,9 +125,9 @@ public class SystemController:Controller
             return new ()
             {
                 SystemDateTime = DateTime.Now,
-                CpuUsage = SystemMonitor.Instance.CpuUsage,
-                MemoryUsage = SystemMonitor.Instance.MemoryUsage,
-                TempStorageUsage = SystemMonitor.Instance.TempStorageUsage,
+                CpuUsage = GroupData(SystemMonitor.Instance.CpuUsage),
+                MemoryUsage = GroupData(SystemMonitor.Instance.MemoryUsage),
+                TempStorageUsage = GroupData(SystemMonitor.Instance.TempStorageUsage),
                 LibraryProcessingTimes = SystemMonitor.Instance.LibraryProcessingTimes
             };
         }
@@ -139,6 +139,17 @@ public class SystemController:Controller
             MemoryUsage = SystemMonitor.Instance.MemoryUsage.Where(x => x.Time > since),
             TempStorageUsage = SystemMonitor.Instance.TempStorageUsage.Where(x => x.Time > since),
         };
+
+        IEnumerable<SystemValue<T>> GroupData<T>(IEnumerable<SystemValue<T>> data) 
+        {
+            return data.GroupBy(x =>
+                    new DateTime(x.Time.Year, x.Time.Month, x.Time.Day, x.Time.Hour, x.Time.Minute >= 30 ? 30 : 0, 0))
+                .Select(x => new SystemValue<T>
+                {
+                    Time = x.Key,
+                    Value = (T) Convert.ChangeType(x.Average(y => Convert.ToDecimal(y.Value)), typeof(T))
+                });
+        } 
     }
 
     private async Task<float> GetCpuPercentage()

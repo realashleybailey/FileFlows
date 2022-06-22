@@ -1,0 +1,5 @@
+.content ::deep {
+ > div + div {
+   margin-top:0.25rem;
+ } 
+}

@@ -155,6 +155,12 @@ public partial class SystemValueLineChart<TItem>:ComponentBase
                 OffsetX = 0,
                 OffsetY = 0,
                 Background = "transparent",
+                Events = new Dictionary<string, object>()
+                {
+                    {
+                        "selection", "console.log('event')"
+                    }
+                },
                 Toolbar = new()
                 {
                     
@@ -251,6 +257,19 @@ public partial class SystemValueLineChart<TItem>:ComponentBase
         //         };
         //     }
         // }
+    }
+    private void DataPointsSelected(SelectedData<SystemValue<TItem>> selectedData)
+    {
+        if (!selectedData.IsSelected)
+        {
+            Console.WriteLine("Nothing seelcted");
+            //this.selectedData = null;
+            return;
+        }
+
+        //this.selectedData = selectedData;
+        //detailsChart?.RenderAsync();
+        Console.WriteLine("selected data: " + System.Text.Json.JsonSerializer.Serialize(selectedData));
     }
     
     

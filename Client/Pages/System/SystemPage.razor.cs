@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using System.Timers;
@@ -18,19 +19,26 @@ public partial class SystemPage:ComponentBase, IDisposable
 
     private SystemInfoData? Data;
 
-    private SystemValueLineChart<float> chartCpuUsage, chartMemoryUsage;
+    private SystemValueLineChartApex<float> chartCpuUsage;
+    private SystemValueLineChart<float> chartMemoryUsage;
     private SystemValueLineChart<long> chartTempStorage;
 
     private string lblCpuUsage, lblMemoryUsage, lblTempStorage, lblLibraryProcessingTimes;
 
+    private string CpuUrl;
+
     protected override async Task OnInitializedAsync()
     {
+        this.CpuUrl = "/api/system/history-data/cpu";
+#if (DEBUG)
+        this.CpuUrl = "http://localhost:6868" + this.CpuUrl;
+#endif
         this.lblCpuUsage = Translater.Instant("Pages.System.Labels.CpuUsage");
         this.lblMemoryUsage = Translater.Instant("Pages.System.Labels.MemoryUsage");
         this.lblTempStorage = Translater.Instant("Pages.System.Labels.TempStorage");
         this.lblLibraryProcessingTimes = Translater.Instant("Pages.System.Labels.LibraryProcessingTimes");
-        await Refresh();
-        timerTask = TimerAsync();
+        //await Refresh();
+        //timerTask = TimerAsync();
     }
 
     private async Task TimerAsync()

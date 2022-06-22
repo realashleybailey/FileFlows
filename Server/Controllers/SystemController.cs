@@ -117,6 +117,19 @@ public class SystemController:Controller
     /// </summary>
     /// <param name="since">data since a date</param>
     /// <returns>the history data</returns>
+    [HttpGet("history-data/cpu")]
+    public IEnumerable<SystemValue<float>> GetCpuData([FromQuery] DateTime? since = null)
+    {
+        if (since == null)
+            return SystemMonitor.Instance.CpuUsage;
+        return SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since);
+    }
+
+    /// <summary>
+    /// Gets history data of system information
+    /// </summary>
+    /// <param name="since">data since a date</param>
+    /// <returns>the history data</returns>
     [HttpGet("history-data")]
     public SystemInfoData GetSystemInfoData([FromQuery] DateTime? since = null)
     {

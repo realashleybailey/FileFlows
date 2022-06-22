@@ -12,11 +12,12 @@
     
     <div class="dashboard">
         
-        <SystemValueLineChart TItem="float" @ref="chartCpuUsage" Title=@lblCpuUsage  Icon="fas fa-microchip" />
-        <SystemValueLineChart TItem="float" @ref="chartMemoryUsage" Title=@lblMemoryUsage SizeData=@true Icon="fas fa-memory"  />
-        <SystemValueLineChart TItem="long" @ref="chartTempStorage" Title=@lblTempStorage SizeData=@true Icon="fas fa-hdd"  />
+        <SystemValueLineChartApex TItem="float" @ref=chartCpuUsage Title=@lblCpuUsage  Icon="fas fa-microchip" Url=@CpuUrl />
+        
 
-        @if(Data != null){
+        @if(Data != null && false){
+            <SystemValueLineChart TItem="float" @ref="chartMemoryUsage" Title=@lblMemoryUsage SizeData=@true Icon="fas fa-memory"  />
+            <SystemValueLineChart TItem="long" @ref="chartTempStorage" Title=@lblTempStorage SizeData=@true Icon="fas fa-hdd"  />
             <BoxPlot Data="@Data.LibraryProcessingTimes" Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" />
         }
     </div>

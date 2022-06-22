@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using FileFlows.Shared.Json;
+
 namespace FileFlows.Shared.Models;
 
 /// <summary>
@@ -32,7 +35,11 @@ public class SystemInfoData
 
 public class SystemValue<T>
 {
+    [JsonPropertyName("x")]
+    [JsonConverter(typeof(DateTimeStringConverter))]
     public DateTime Time { get; set; } = DateTime.Now;
+    
+    [JsonPropertyName("y")]
     public T Value { get; set; }
 }
 

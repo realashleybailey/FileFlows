@@ -207,7 +207,7 @@ public class HttpHelper
             }
 
             string body = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode && body.Contains("An unhandled error has occurred.") == false)
+            if (response.IsSuccessStatusCode && (body.Contains("INFO") == false && body.Contains("An unhandled error has occurred.")) == false)
             {
                 var options = new JsonSerializerOptions
                 {

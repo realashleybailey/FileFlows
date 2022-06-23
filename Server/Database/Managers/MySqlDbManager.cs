@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
+using FileFlows.Server.Controllers;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
 using NPoco;
@@ -30,6 +31,13 @@ public class MySqlDbManager: DbManager
             Message         TEXT               COLLATE utf8_unicode_ci      NOT NULL
         );
 
+        CREATE TABLE {nameof(DbStatistic)}(
+            LogDate         datetime           default           now(),
+            Name            varchar(100)       COLLATE utf8_unicode_ci      NOT NULL,
+            Type            int                NOT NULL,            
+            StringValue     TEXT               COLLATE utf8_unicode_ci      NOT NULL,            
+            NumberValue     double             NOT NULL
+        );
 ";
     /// <summary>
     /// Creates an instance of a MySqlDbManager
@@ -367,7 +375,61 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         return ConvertFromDbObject<Flow>(dbObject);
     }
 
+    /// <summary>
+    /// Records a statistic
+    /// </summary>
+    /// <param name="statistic">the statistic to record</param>
+    public override async Task RecordStatistc(Statistic statistic)
+    {
+        if (statistic?.Value == null)
+            return;
+        
+        using var db = GetDb();
+        if (double.TryParse(statistic.Value.ToString(), out double number))
+        {
+            await db.InsertAsync(new DbStatistic()
+            {
+                Type = StatisticType.Number,
+                Name = statistic.Name,
+                LogDate = DateTime.Now,
+                NumberValue = number,
+                StringValue = string.Empty
+            });
+        }
+        else
+        {
+            // treat as string
+            await db.InsertAsync(new DbStatistic()
+            {
+                Type = StatisticType.String,
+                Name = statistic.Name,
+                LogDate = DateTime.Now,
+                NumberValue = 0,
+                StringValue = statistic.Value.ToString()
+            });
+        }
+    }
 
+    /// <summary>
+    /// Gets statistics by name
+    /// </summary>
+    /// <returns>the matching statistics</returns>
+    public override async Task<IEnumerable<Statistic>> GetStatisticsByName(string name)
+    {
+        using var db = GetDb();
+        var stats = await db.FetchAsync<DbStatistic>("where Name = @0", name);
+        var results = new List<Statistic>();
+        foreach (var stat in stats)
+        {
+            if(stat.Type == StatisticType.Number)
+                results.Add(new () { Name = stat.Name, Value = stat.NumberValue});
+            if(stat.Type == StatisticType.String)
+                results.Add(new () { Name = stat.Name, Value = stat.StringValue});
+        }
+
+        return results;
+    }
+    
     /// <summary>
     /// Tests the connection to a database
     /// </summary>

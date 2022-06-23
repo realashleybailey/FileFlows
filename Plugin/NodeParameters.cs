@@ -61,6 +61,11 @@ public class NodeParameters
     /// Gets or sets the function responsible for getting the actual tool path
     /// </summary>
     public Func<string, string>? GetToolPathActual { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the action that records statistics
+    /// </summary>
+    public Action<string, object>? StatisticRecorder { get; set; }
 
     /// <summary>
     /// Gets or sets the function responsible for getting plugin settings JSON configuration
@@ -764,6 +769,13 @@ public class NodeParameters
             return this.Variables[name];
         return null;
     }
+
+    /// <summary>
+    /// Records a statistic with the server
+    /// </summary>
+    /// <param name="name">the name of the statistic</param>
+    /// <param name="value">the value of the statistic</param>
+    public void RecordStatistic(string name, object value) => StatisticRecorder?.Invoke(name, value);
 }
 
 

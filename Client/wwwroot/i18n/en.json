@@ -480,7 +480,8 @@
         "MemoryUsage":"Memory Usage",
         "TempStorage":"Temporary Storage",
         "LibraryProcessingTimes":"Library Processing Times [Seconds Per Megabyte]",
-        "ProcessingHeatMap":"Processing Heat Map"
+        "ProcessingHeatMap":"Processing Heat Map",
+        "Codec":"Codec"
       }
     },
     "Tools": {

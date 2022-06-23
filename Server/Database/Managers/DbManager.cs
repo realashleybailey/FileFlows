@@ -2,6 +2,7 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 using FileFlows.Plugin;
+using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
@@ -761,7 +762,18 @@ public abstract class DbManager
     /// <param name="libraryUids">the UIDs of the libraries</param>
     /// <returns>the task to await</returns>
     public virtual Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids) => Task.CompletedTask;
-    
+
+    /// <summary>
+    /// Records a statistic
+    /// </summary>
+    /// <param name="statistic">the statistic to record</param>
+    public virtual Task RecordStatistc(Statistic statistic) => Task.CompletedTask;
+
+    /// <summary>
+    /// Gets statistics by name
+    /// </summary>
+    /// <returns>the matching statistics</returns>
+    public virtual Task<IEnumerable<Statistic>> GetStatisticsByName(string name) => Task.FromResult((IEnumerable<Statistic>)new Statistic[] { });
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

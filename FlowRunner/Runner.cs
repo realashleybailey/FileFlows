@@ -300,6 +300,11 @@ public class Runner
             var pluginService = PluginService.Load();
             return pluginService.GetSettingsJson(pluginSettingsType).Result;
         };
+        nodeParameters.StatisticRecorder = (string name, object value) =>
+        {
+            var statService = StatisticService.Load();
+            statService.Record(name, value);
+        };
 
         var pluginLoader = PluginService.Load();
         var status = ExecuteFlow(Flow, pluginLoader, runFlows);

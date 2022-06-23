@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
+using FileFlows.Server.Controllers;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
 
@@ -271,6 +272,20 @@ public class DbHelper
     /// <returns>the task to await</returns>
     public static Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids) =>
         Manager.DeleteLibraryFilesFromLibraries(libraryUids);
+    
+    
+    /// <summary>
+    /// Records a statistic
+    /// </summary>
+    /// <param name="statistic">the statistic to record</param>
+    public static Task RecordStatistc(Statistic statistic) => Manager.RecordStatistc(statistic);
+    
+
+    /// <summary>
+    /// Gets statistics by name
+    /// </summary>
+    /// <returns>the matching statistics</returns>
+    public static Task<IEnumerable<Statistic>> GetStatisticsByName(string name) => Manager.GetStatisticsByName(name);
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

@@ -27,6 +27,4 @@ When checked, the replacements will be done against the working filename, otherw
 
 ## Outputs
 1. Replacement done
-2: No replacement done
-
-## Fields
+2. No replacement done

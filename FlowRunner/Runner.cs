@@ -401,6 +401,8 @@ public class Runner
                     TimeSpan executionTime = DateTime.Now.Subtract(nodeStartTime);
                     if(failure == false)
                         RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime, part);
+                    nodeParameters.Logger?.ILog("Node execution time: " + executionTime);
+                    nodeParameters.Logger?.ILog(new string('=', 70));
                 }
 
                 if (gotoFlow != null)

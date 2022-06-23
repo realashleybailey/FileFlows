@@ -46,6 +46,8 @@ export class TreeMapChart{
             //statistic data, convert it
             let newData = {};
             for(let d of data){
+                if(d.Value === 'mpeg2video')
+                    d.Value = 'mpeg2'; // too long
                 if(newData[d.Value])
                     newData[d.Value] = newData[d.Value] + 1;
                 else

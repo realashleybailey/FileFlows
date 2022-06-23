@@ -194,6 +194,11 @@ public class SystemController:Controller
         if (DbHelper.UseMemoryCache)
             return "Not supported by this installation";
         var data = await DbHelper.GetHourProcessingTotals();
+        // arrange the data so its shows monday -> sunday visually
+        data.Reverse();
+        var sunday = data[0];
+        data.RemoveAt(0);
+        data.Add(sunday);
         return data.Select((x, index) => new
         {
             name = ((DayOfWeek)index).ToString()[..3],

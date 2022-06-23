@@ -8,24 +8,27 @@
 <PageView ClassName="fix-width">
 
     <Head>
-        @if (SystemInfo?.CpuUsage > 0 && SystemInfo?.MemoryUsage > 0)
+        @if (App.Instance.IsMobile == false)
         {
-            <span>CPU Usage: @SystemInfo.CpuUsage.ToString("0.00") %</span>
-            <span>Memory Usage: @(FileSizeFormatter.Format(SystemInfo.MemoryUsage))</span>
-        }
-        @if (string.IsNullOrEmpty(lblPauseLabel) == false)
-        {
-            <button @onclick=@TogglePaused class="btn btn-pause">
-                @if (SystemInfo.IsPaused)
-                {
-                    <i class="fas fa-play"></i>
-                }
-                else
-                {
-                    <i class="fas fa-pause"></i>
-                }
-                @lblPauseLabel
-            </button>
+            @if (SystemInfo?.CpuUsage > 0 && SystemInfo?.MemoryUsage > 0)
+            {
+                <span>CPU Usage: @SystemInfo.CpuUsage.ToString("0.00") %</span>
+                <span>Memory Usage: @(FileSizeFormatter.Format(SystemInfo.MemoryUsage))</span>
+            }
+            @if (string.IsNullOrEmpty(lblPauseLabel) == false)
+            {
+                <button @onclick=@TogglePaused class="btn btn-pause">
+                    @if (SystemInfo.IsPaused)
+                    {
+                        <i class="fas fa-play"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-pause"></i>
+                    }
+                    @lblPauseLabel
+                </button>
+            }
         }
     </Head>
 

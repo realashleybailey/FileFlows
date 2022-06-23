@@ -26,5 +26,10 @@ namespace FileFlows.Client.Components
         [Parameter]
         public bool Flex { get; set; }
 
+        /// <summary>
+        /// Gets or sets additional class names to add to the ViContainer
+        /// </summary>
+        [Parameter] public string ClassName { get; set; }
+
     }
 }

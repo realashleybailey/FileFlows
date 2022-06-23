@@ -730,4 +730,14 @@ hr {
   margin: 0;
 }
 
+.vi-container.fix-width {
+  max-width: unset !important;
+}
+.vi-container.fix-width .top-row {
+  max-width: 1400px;
+}
+.vi-container.fix-width > .content > div {
+  max-width: 1400px;
+}
+
 /*# sourceMappingURL=app.css.map */

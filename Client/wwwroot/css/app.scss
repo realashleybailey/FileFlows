@@ -383,3 +383,16 @@ input[type=file]{
         margin:0;
     }
 }
+
+.vi-container.fix-width {
+    max-width: unset !important;
+    .top-row {
+        max-width:1400px;
+    }
+    > .content {
+        > div {
+            max-width:1400px;
+        }
+    }
+    
+} 

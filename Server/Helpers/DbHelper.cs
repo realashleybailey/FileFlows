@@ -278,7 +278,7 @@ public class DbHelper
     /// Records a statistic
     /// </summary>
     /// <param name="statistic">the statistic to record</param>
-    public static Task RecordStatistc(Statistic statistic) => Manager.RecordStatistc(statistic);
+    public static Task RecordStatistic(Statistic statistic) => Manager.RecordStatistic(statistic);
     
 
     /// <summary>

@@ -379,7 +379,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// Records a statistic
     /// </summary>
     /// <param name="statistic">the statistic to record</param>
-    public override async Task RecordStatistc(Statistic statistic)
+    public override async Task RecordStatistic(Statistic statistic)
     {
         if (statistic?.Value == null)
             return;
@@ -387,6 +387,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         using var db = GetDb();
         if (double.TryParse(statistic.Value.ToString(), out double number))
         {
+            Logger.Instance.ILog("Recording double statistic: " + statistic.Name);
             await db.InsertAsync(new DbStatistic()
             {
                 Type = StatisticType.Number,
@@ -398,6 +399,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         }
         else
         {
+            Logger.Instance.ILog("Recording string statistic: " + statistic.Name + " = " + statistic.Value);
             // treat as string
             await db.InsertAsync(new DbStatistic()
             {

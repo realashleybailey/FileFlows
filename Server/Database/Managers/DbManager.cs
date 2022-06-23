@@ -767,7 +767,7 @@ public abstract class DbManager
     /// Records a statistic
     /// </summary>
     /// <param name="statistic">the statistic to record</param>
-    public virtual Task RecordStatistc(Statistic statistic) => Task.CompletedTask;
+    public virtual Task RecordStatistic(Statistic statistic) => Task.CompletedTask;
 
     /// <summary>
     /// Gets statistics by name

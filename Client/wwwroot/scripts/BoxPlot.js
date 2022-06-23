@@ -51,6 +51,14 @@ export class BoxPlotChart{
                     show: false
                 }
             },
+            plotOptions: {
+                boxPlot: {
+                    colors: {
+                        upper: '#ff0090',
+                        lower: '#84004bd9'
+                    }
+                }
+            },
             theme: {
                 mode: 'dark'
             },stroke: {

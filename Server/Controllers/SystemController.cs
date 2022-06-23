@@ -185,6 +185,27 @@ public class SystemController:Controller
     }
 
     /// <summary>
+    /// Gets heat map data for the processing times of the system
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("history-data/processing-heatmap")]
+    public async Task<object> GetProcessingHeatMap()
+    {
+        if (DbHelper.UseMemoryCache)
+            return "Not supported by this installation";
+        var data = await DbHelper.GetHourProcessingTotals();
+        return data.Select((x, index) => new
+        {
+            name = ((DayOfWeek)index).ToString()[..3],
+            data = x.Select(y => new
+            {
+                x = y.Key == 0 ? "12am" : y.Key == 12 ? "12pm" : y.Key > 12 ? (y.Key - 12) + "pm" : y.Key + "am",
+                y = y.Value
+            })
+        });
+    }
+
+    /// <summary>
     /// Gets history data of system information
     /// </summary>
     /// <param name="since">data since a date</param>

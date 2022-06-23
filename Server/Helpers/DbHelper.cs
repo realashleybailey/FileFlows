@@ -211,7 +211,12 @@ public class DbHelper
     /// </summary>
     /// <returns>the processing time for each library file</returns>
     public static Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes() => Manager.GetLibraryProcessingTimes();
-    
+
+    /// <summary>
+    /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
+    /// </summary>
+    /// <returns>heatmap data</returns>
+    public static Task<List<Dictionary<int, int>>> GetHourProcessingTotals() => Manager.GetHourProcessingTotals();
     /// <summary>
     /// Gets the shrinkage group data
     /// </summary>

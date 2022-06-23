@@ -693,6 +693,14 @@ public abstract class DbManager
     /// <returns>the processing time for each library file</returns>
     public abstract Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes();
 
+
+    /// <summary>
+    /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
+    /// </summary>
+    /// <returns>heatmap data</returns>
+    public virtual async Task<List<Dictionary<int, int>>> GetHourProcessingTotals() =>
+        throw new NotImplementedException();
+
     /// <summary>
     /// Gets the shrinkage group data
     /// </summary>

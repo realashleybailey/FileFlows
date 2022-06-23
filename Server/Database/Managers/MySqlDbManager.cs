@@ -246,8 +246,41 @@ public class MySqlDbManager: DbManager
         JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
         js_OriginalSize as OriginalSize,
         timestampdiff(second, js_ProcessingStarted, js_ProcessingEnded) AS Seconds
-        from FileFlowsDocker.DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
+        from DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
         AND js_Status = 1 AND js_ProcessingEnded > js_ProcessingStarted;"); 
+    }
+
+    /// <summary>
+    /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
+    /// </summary>
+    /// <returns>heatmap data</returns>
+    public override async Task<List<Dictionary<int, int>>> GetHourProcessingTotals()
+    {
+        using var db = GetDb();
+        string sql = @"SELECT 
+DAYOFWEEK(js_ProcessingStarted) AS day, 
+HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
+ from DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
+AND js_Status = 1 AND js_ProcessingStarted IS not NULL
+GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
+
+        var data = (await db.FetchAsync<(int day, int hour, int count)>(sql));
+
+        var days = new List<Dictionary<int, int>>();
+        for (int i = 0; i < 7; i++)
+        {
+            Dictionary<int, int> hours = new Dictionary<int, int>();
+            var results = new Dictionary<int, int>();
+            for (int j = 0; j < 24; j++)
+            {
+                int count = data.Where(x => x.day == i && x.hour == j).Select(x => x.count).FirstOrDefault();
+                results.Add(j, count);
+            }
+
+            days.Add(results);
+        }
+
+        return days;
     }
 
     /// <summary>

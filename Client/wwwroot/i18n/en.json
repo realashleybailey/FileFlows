@@ -479,7 +479,8 @@
         "CpuUsage":"CPU Usage",
         "MemoryUsage":"Memory Usage",
         "TempStorage":"Temporary Storage",
-        "LibraryProcessingTimes":"Library Processing Times [Seconds Per Megabyte]"
+        "LibraryProcessingTimes":"Library Processing Times [Seconds Per Megabyte]",
+        "ProcessingHeatMap":"Processing Heat Map"
       }
     },
     "Tools": {

@@ -11,27 +11,23 @@ namespace FileFlows.Client.Pages;
 /// <summary>
 /// Page that displays system information
 /// </summary>
-public partial class SystemPage:ComponentBase, IDisposable
+public partial class SystemPage:ComponentBase
 {
-    private Task? timerTask;
-    private readonly PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
-    private readonly CancellationTokenSource cancellationToken = new();
-
-    private SystemInfoData? Data;
-
-    private SystemValueLineChartApex<float> chartCpuUsage;
-    private SystemValueLineChart<float> chartMemoryUsage;
-    private SystemValueLineChart<long> chartTempStorage;
-
     private string lblCpuUsage, lblMemoryUsage, lblTempStorage, lblLibraryProcessingTimes;
 
-    private string CpuUrl;
+    private string CpuUrl, MemoryUrl, TempStorageUrl, LibraryProcessingTimeUrl;
 
     protected override async Task OnInitializedAsync()
     {
         this.CpuUrl = "/api/system/history-data/cpu";
+        this.MemoryUrl = "/api/system/history-data/memory";
+        this.TempStorageUrl = "/api/system/history-data/temp-storage";
+        this.LibraryProcessingTimeUrl  = "/api/system/history-data/library-processing-time";
 #if (DEBUG)
         this.CpuUrl = "http://localhost:6868" + this.CpuUrl;
+        this.MemoryUrl = "http://localhost:6868" + this.MemoryUrl;
+        this.TempStorageUrl = "http://localhost:6868" + this.TempStorageUrl;
+        this.LibraryProcessingTimeUrl = "http://localhost:6868" + this.LibraryProcessingTimeUrl;
 #endif
         this.lblCpuUsage = Translater.Instant("Pages.System.Labels.CpuUsage");
         this.lblMemoryUsage = Translater.Instant("Pages.System.Labels.MemoryUsage");
@@ -39,49 +35,5 @@ public partial class SystemPage:ComponentBase, IDisposable
         this.lblLibraryProcessingTimes = Translater.Instant("Pages.System.Labels.LibraryProcessingTimes");
         //await Refresh();
         //timerTask = TimerAsync();
-    }
-
-    private async Task TimerAsync()
-    {
-        try
-        {
-            while (await timer.WaitForNextTickAsync(cancellationToken.Token))
-            {
-                await Refresh();
-            }
-        }
-        catch (Exception)
-        {
-        }
-    }
-
-    private async Task Refresh()
-    {
-        var sysInfoResult = await HttpHelper.Get<SystemInfoData>("/api/system/history-data" + (Data == null ? "" : "?since=" + Data.SystemDateTime));
-        if (sysInfoResult.Success == false)
-            return;
-        this.Data = sysInfoResult.Data;
-        if(chartCpuUsage != null)
-            await chartCpuUsage.AppendData(sysInfoResult.Data.CpuUsage);
-        if (chartMemoryUsage != null)
-            await chartMemoryUsage.AppendData(sysInfoResult.Data.MemoryUsage);
-        if (chartTempStorage != null)
-            await chartTempStorage.AppendData(sysInfoResult.Data.TempStorageUsage);
-
-    }
-
-    public void Dispose()
-    {
-        if (timerTask is null)
-            return;
-        
-        cancellationToken.Cancel();
-        Task.Run(async () =>
-        {
-            await timerTask;
-            cancellationToken.Dispose();
-            timerTask?.Dispose();
-            timer?.Dispose();
-        });
     }
 }

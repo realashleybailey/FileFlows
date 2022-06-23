@@ -4,15 +4,6 @@ export function newSystemValueLineChart(uid, args){
     window.FlowCharts[uid] = new SystemValueLineChart(uid, args);
 }
 
-export function updateData(uid, data){
-    let chart = window.FlowCharts[uid];
-    console.log('new data', data);
-    if(!chart){
-        console.log('chart not found!');
-        return;
-    }
-    chart.updateData(data);
-}
 
 export function dispose(uid) {
     let chart = window.FlowCharts[uid];
@@ -33,7 +24,12 @@ export class SystemValueLineChart{
     lastFetch;
     timer;
     disposed;
-    seriesName = 'CPU Usage';
+    seriesName;
+    
+    selectedRange = {
+        start: null,
+        end: null
+    };
     
     constructor(uid, args) {
         console.log('uid', uid);
@@ -43,6 +39,7 @@ export class SystemValueLineChart{
         this.topUid = uid + '-top';
         this.sizeData = !!args?.sizeData;
         this.url = args.url;
+        this.seriesName = args.title;
         
         this.getData();
     }
@@ -53,7 +50,11 @@ export class SystemValueLineChart{
         
         let data;
         if(this.lastFetch) {
-            let response = await fetch(`${this.url}?since=${this.lastFetch}`);
+            let time = new Date(this.lastFetch.getTime() + 1000);
+            let fullDate = time.getFullYear() + '-' + ((time.getMonth() + 1).toString()).padStart(2, '0') + '-' + (time.getDate().toString()).padStart(2, '0')
+            let fullTime = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0') + ':' + time.getSeconds().toString().padStart(2, '0')
+                            + '.' + time.getMilliseconds().toString().padEnd(3, '0');
+            let response = await fetch(`${this.url}?since=${fullDate}T${fullTime}Z`);
             data = await response.json();
         }else {
             let response = await fetch(this.url);
@@ -69,23 +70,28 @@ export class SystemValueLineChart{
             this.data = this.data.concat(data);
         else {
             this.data = data;
-            this.createTop();
         }
         this.lastFetch = this.data[this.data.length -1].x;
 
         let buckets = this.adjustData(this.data, 100);
-        if(buckets.length !== this.data.length)
+        let showBottom = buckets.length !== this.data.length; 
+        if(showBottom)
         {            
-            this.buckets = buckets;
-            if(this.chartBottom) {
-                this.chartBottom.updateSeries([{
-                    name: this.seriesName,
-                    data: this.buckets
-                }]);
-            }else {
-                this.createBottom();
-            }
+            if(this.chartBottom)
+                this.updateBottom(buckets);
+            else
+                this.buckets = buckets;
+        }else {
+            this.selectedRange.start = data[0].x;
+            this.selectedRange.end = data[data.length - 1].x;
         }
+        
+        if(!this.chartTop)
+            this.createTop();
+        if(!this.chartBottom && showBottom)
+            this.createBottom();
+        
+        
         if(this.timer)
             clearTimeout(this.timer);
         if(!this.disposed)
@@ -147,6 +153,37 @@ export class SystemValueLineChart{
         return buckets;
     }
     
+    updateBottom(buckets)
+    {
+        let oldEnd = this.buckets[this.buckets.length - 1].x;
+        let newEnd = buckets[buckets.length - 1].x;
+        
+        let diff = newEnd.getTime() - oldEnd.getTime();
+        this.buckets = buckets;
+                
+        this.chartBottom.updateSeries([{
+            name: this.seriesName,
+            data: this.buckets
+        }]);
+
+        this.selectedRange.start = new Date(this.selectedRange.start.getTime() + diff);
+        this.selectedRange.end  = new Date(this.selectedRange.end.getTime() + diff);
+
+        this.chartBottom.updateOptions(
+            {
+                chart: {
+                    selection: {
+
+                        xaxis: {
+                            min: this.selectedRange.start.getTime(),
+                            max: this.selectedRange.end.getTime()
+                        }
+                    }
+                }
+            }
+        );
+    }
+    
     createTop(){
         let data = this.adjustData(this.data, 500);
         var options = {
@@ -172,7 +209,7 @@ export class SystemValueLineChart{
             },
             series: [
                 {
-                    name: "CPU Usage",
+                    name: this.seriesName,
                     data: data
                 }
             ],
@@ -214,9 +251,9 @@ export class SystemValueLineChart{
                 strokeWidth: 3  
             },
             tooltip: {
-                x: {
-                    format: 'h:mm:ss ttt, d MMM yyyy', 
-                    show:false                    
+                x: { 
+                    show:true,
+                    formatter: (value, opts) => new Date(value).toLocaleTimeString()
                 },
                 y: {
                     formatter: this.sizeData ?
@@ -251,10 +288,9 @@ export class SystemValueLineChart{
     
     updateTopSelection(minDate, maxDate, dontWait)
     {
+        this.selectedRange.start = minDate;
+        this.selectedRange.end = maxDate;
         let doIt = () => {
-            console.log('updateTopSelection.minDate', minDate);
-            console.log('updateTopSelection.maxDate', maxDate);
-
             let min = minDate.getTime();
             let max = maxDate.getTime();
             let rangeData = this.data.filter(x => {
@@ -267,7 +303,6 @@ export class SystemValueLineChart{
                 name: this.seriesName,
                 data: data
             }]);
-            console.log('series updated', data);
         };
         
         if(dontWait)
@@ -279,7 +314,6 @@ export class SystemValueLineChart{
 
 
     createBottom(){
-        console.log('create bottom data', this.buckets);
         let d = [] ;
         let yMax = 0;
 
@@ -292,7 +326,8 @@ export class SystemValueLineChart{
             if(b.y > yMax)
                 yMax = b.y;
         }
-        console.log('brush', brushStart, brushEnd);
+        this.selectedRange.start = brushStart;
+        this.selectedRange.end = brushEnd;
         
         var options = {
             chart: {
@@ -351,7 +386,7 @@ export class SystemValueLineChart{
             },
             series: [
                 {
-                    name: 'CPU Usage',
+                    name: this.seriesName,
                     data: d
                 }
             ],

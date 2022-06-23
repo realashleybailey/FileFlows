@@ -234,6 +234,22 @@ public class MySqlDbManager: DbManager
 
     }
 
+
+    /// <summary>
+    /// Gets the processing time for each library file 
+    /// </summary>
+    /// <returns>the processing time for each library file</returns>
+    public override async Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
+    {
+        using var db = GetDb();
+        return await db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
+        JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
+        js_OriginalSize as OriginalSize,
+        timestampdiff(second, js_ProcessingStarted, js_ProcessingEnded) AS Seconds
+        from FileFlowsDocker.DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
+        AND js_Status = 1 AND js_ProcessingEnded > js_ProcessingStarted;"); 
+    }
+
     /// <summary>
     /// Gets the shrinkage group data
     /// </summary>

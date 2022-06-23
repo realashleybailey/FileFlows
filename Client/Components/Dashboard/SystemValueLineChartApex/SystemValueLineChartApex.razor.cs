@@ -32,8 +32,6 @@ public partial class SystemValueLineChartApex<TItem>:ComponentBase, IDisposable
     /// </summary>
     [Parameter] public string Icon { get; set; }
 
-    [Parameter] public List<SystemValue<TItem>> Data { get; set; } = new();
-
     /// <summary>
     /// Gets or sets if this data is size data, eg KB, MB, GB etc
     /// </summary>
@@ -61,18 +59,12 @@ public partial class SystemValueLineChartApex<TItem>:ComponentBase, IDisposable
             jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/SystemValueLineChart.js");
             await jsCharts.InvokeVoidAsync("newSystemValueLineChart", Uid, new
             {
-                this.Data,
                 this.Url,
-                this.SizeData
+                this.SizeData,
+                this.Title
             }); 
         }
     }
-
-    public async Task AppendData(IEnumerable<SystemValue<TItem>> data)
-    {
-        jsCharts.InvokeVoidAsync("updateData", Uid, data);
-    }
-
 
     public void Dispose()
     {

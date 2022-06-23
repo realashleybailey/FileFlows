@@ -1,5 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using FileFlows.Node.Workers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Workers;
@@ -113,16 +115,91 @@ public class SystemController:Controller
     }
 
     /// <summary>
-    /// Gets history data of system information
+    /// Gets history CPU data of system information
     /// </summary>
     /// <param name="since">data since a date</param>
-    /// <returns>the history data</returns>
+    /// <returns>the history CPU data</returns>
     [HttpGet("history-data/cpu")]
     public IEnumerable<SystemValue<float>> GetCpuData([FromQuery] DateTime? since = null)
     {
         if (since == null)
             return SystemMonitor.Instance.CpuUsage;
         return SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since);
+    }
+    
+    /// <summary>
+    /// Gets history memory data of system information
+    /// </summary>
+    /// <param name="since">data since a date</param>
+    /// <returns>the history memory data</returns>
+    [HttpGet("history-data/memory")]
+    public IEnumerable<SystemValue<float>> GetMemoryData([FromQuery] DateTime? since = null)
+    {
+        if (since == null)
+            return SystemMonitor.Instance.MemoryUsage;
+        return SystemMonitor.Instance.MemoryUsage.Where(x => x.Time > since);
+    }
+    
+    /// <summary>
+    /// Gets history temporary storage data of system information
+    /// </summary>
+    /// <param name="since">data since a date</param>
+    /// <returns>the history temporary storage data</returns>
+    [HttpGet("history-data/temp-storage")]
+    public IEnumerable<SystemValue<long>> GetTempStorageData([FromQuery] DateTime? since = null)
+    {
+        if (since == null)
+            return SystemMonitor.Instance.TempStorageUsage;
+        return SystemMonitor.Instance.TempStorageUsage.Where(x => x.Time > since);
+    }
+
+    /// <summary>
+    /// Gets history library processing time data
+    /// </summary>
+    /// <returns>history library processing time data</returns>
+    [HttpGet("history-data/library-processing-time")]
+    public async Task<object> GetLibraryProcessingTime()
+    {
+        if (DbHelper.UseMemoryCache)
+            return new object[] { }; // not supported
+        var data = await DbHelper.GetLibraryProcessingTimes();
+        var dict = data.GroupBy(x => x.Library, x => x);
+        
+        return dict.Select(x => new
+        {
+            x = x.Key?.EmptyAsNull() ?? "Unknown",
+            y = GetStats(x)
+        });
+
+        int[] GetStats(IEnumerable<LibraryFileProcessingTime> list)
+        {
+            var sorted = list.OrderBy(x => x.Seconds).ToList();
+            int count = 0;
+            double sum = 0.0;
+            double sumsq = 0.0;
+            double max = double.MinValue;
+            double min = double.MaxValue;
+
+            foreach (var item in sorted)
+            {
+
+                var sample = (item.OriginalSize / (double)item.Seconds) / 1_000_000;
+                if (sample == 0)
+                    continue;
+                count++;
+                sum += sample;
+                sumsq += sample * sample;
+                if (sample > max) max = sample;
+                if (sample < min) min = sample;
+            }
+
+            var medianValue = sorted[sorted.Count / 2];
+            double median = (medianValue.OriginalSize / (double)medianValue.Seconds) / 1_000_000;
+
+            double mean = sum / count;
+            double stdev = Math.Sqrt((sumsq / count) - (mean * mean));
+            return new[] { (int)min, (int)(median - stdev), (int)median, (int)(median + stdev), (int)max };
+        }
     }
 
     /// <summary>

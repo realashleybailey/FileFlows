@@ -688,6 +688,12 @@ public abstract class DbManager
     public abstract Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter);
 
     /// <summary>
+    /// Gets the processing time for each library file 
+    /// </summary>
+    /// <returns>the processing time for each library file</returns>
+    public abstract Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes();
+
+    /// <summary>
     /// Gets the shrinkage group data
     /// </summary>
     /// <returns>the shrinkage group data</returns>

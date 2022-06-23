@@ -130,6 +130,15 @@ public class SqlServerDbManager: DbManager
     }
     
     /// <summary>
+    /// Gets the processing time for each library file 
+    /// </summary>
+    /// <returns>the processing time for each library file</returns>
+    public override Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
+    {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
     /// Gets the shrinkage group data
     /// </summary>
     /// <returns>the shrinkage group data</returns>

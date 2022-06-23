@@ -144,6 +144,16 @@ public class SqliteDbManager : DbManager
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Gets the processing time for each library file 
+    /// </summary>
+    /// <returns>the processing time for each library file</returns>
+    public override Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
+    {
+        throw new NotImplementedException();
+    }
+
+
     public override Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
     {
         throw new NotImplementedException();

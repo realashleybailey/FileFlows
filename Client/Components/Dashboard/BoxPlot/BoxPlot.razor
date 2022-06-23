@@ -10,12 +10,6 @@
         <span>@Title</span>
     </div>
     <div class="content">
-        
-        <ApexChart TItem="BoxPlotData">
-            <ApexBoxPlotSeries TItem="BoxPlotData"
-                        Items="Data"
-                        XValue="@(e => e.Name)"
-                        YValue="@(e => /*new [] {e.Minimum, e.LowQuartile, e.Median, e.HighQuartile, e.Maximum}*/ e.Median)" />
-        </ApexChart>
+        <div id="@Uid"></div>
     </div>
 </div>

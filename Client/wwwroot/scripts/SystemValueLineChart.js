@@ -33,6 +33,7 @@ export class SystemValueLineChart{
     lastFetch;
     timer;
     disposed;
+    seriesName = 'CPU Usage';
     
     constructor(uid, args) {
         console.log('uid', uid);
@@ -50,54 +51,39 @@ export class SystemValueLineChart{
         if(this.disposed)
             return; 
         
+        let data;
         if(this.lastFetch) {
             let response = await fetch(`${this.url}?since=${this.lastFetch}`);
-            let data = await response.json();
-            this.data = this.data.concat(data);
+            data = await response.json();
         }else {
             let response = await fetch(this.url);
-            this.data = await response.json();
+            data = await response.json();
+        }   
+        
+        for(let d of data){
+            if(typeof(d.x) === 'string')
+                d.x = new Date(Date.parse(d.x));
+        }
+        
+        if(this.lastFetch)
+            this.data = this.data.concat(data);
+        else {
+            this.data = data;
             this.createTop();
-        }        
+        }
         this.lastFetch = this.data[this.data.length -1].x;
 
-        let min = Date.parse(this.data[0].x);
-        let max = Date.parse(this.data[this.data.length - 1].x);
-        let timeDiff = (max - min) / 60000;
-        let minutes = 0;
-        if(timeDiff < 5)
-            minutes = 0;
-        else if(timeDiff < 100)
-            minutes = 1;
-        else 
-            minutes = Math.floor(timeDiff / 100);
-                
-        if(minutes > 0)
+        let buckets = this.adjustData(this.data, 100);
+        if(buckets.length !== this.data.length)
         {            
-            const ms = 1000 * 60 * minutes;
-            
-            // update the summary graph
-            let buckets = [];
-            let bucketDict = {};
-            for(let d of this.data) {
-                let dt = new Date(Date.parse(d.x));
-                let thirtyMins = new Date(Math.floor(dt.getTime() / ms) * ms);
-                if(bucketDict[thirtyMins] == null) {
-                    bucketDict[thirtyMins] = {x: thirtyMins, y: d.y, t: d.y, c: 1};
-                    buckets.push(bucketDict[thirtyMins]);
-                }
-                else {
-                    let b = bucketDict[thirtyMins];
-                    b.t += d.y;
-                    ++b.c; 
-                    b.y = b.t / b.c;
-                }
-            }            
-            if(!this.buckets){
-                this.buckets = buckets;
+            this.buckets = buckets;
+            if(this.chartBottom) {
+                this.chartBottom.updateSeries([{
+                    name: this.seriesName,
+                    data: this.buckets
+                }]);
+            }else {
                 this.createBottom();
-            }else{
-                this.buckets = buckets;                
             }
         }
         if(this.timer)
@@ -123,7 +109,46 @@ export class SystemValueLineChart{
         }]);
     }
     
+    adjustData(data, desiredItems){
+        let min = data[0].x;
+        let max = data[data.length - 1].x;
+
+        let timeDiff = (max - min) / 60000;
+        let minutes = 0;
+        if(timeDiff < 5)
+            minutes = 0;
+        else if(timeDiff < desiredItems)
+            minutes = 1;
+        else
+            minutes = Math.floor(timeDiff / desiredItems);
+
+        if(minutes === 0)
+            return data;
+        
+        const ms = 1000 * 60 * minutes;
+
+        // update the summary graph
+        let buckets = [];
+        let bucketDict = {};
+        for(let d of data) {
+            let dt = new Date(Date.parse(d.x));
+            let thirtyMins = new Date(Math.floor(dt.getTime() / ms) * ms);
+            if(bucketDict[thirtyMins] == null) {
+                bucketDict[thirtyMins] = {x: thirtyMins, y: d.y, t: d.y, c: 1};
+                buckets.push(bucketDict[thirtyMins]);
+            }
+            else {
+                let b = bucketDict[thirtyMins];
+                b.t += d.y;
+                ++b.c;
+                b.y = b.t / b.c;
+            }
+        }
+        return buckets;
+    }
+    
     createTop(){
+        let data = this.adjustData(this.data, 500);
         var options = {
             chart: {
                 id: this.topUid,
@@ -148,7 +173,7 @@ export class SystemValueLineChart{
             series: [
                 {
                     name: "CPU Usage",
-                    data: this.data
+                    data: data
                 }
             ],
             grid: {
@@ -222,16 +247,53 @@ export class SystemValueLineChart{
         this.chartTop.render();
     }
 
+    updateTopTimeout;
+    
+    updateTopSelection(minDate, maxDate, dontWait)
+    {
+        let doIt = () => {
+            console.log('updateTopSelection.minDate', minDate);
+            console.log('updateTopSelection.maxDate', maxDate);
+
+            let min = minDate.getTime();
+            let max = maxDate.getTime();
+            let rangeData = this.data.filter(x => {
+                let xTime = x.x.getTime();
+                return xTime >= min && xTime <= max;
+            });
+            let data = this.adjustData(rangeData, 500);
+
+            this.chartTop.updateSeries([{
+                name: this.seriesName,
+                data: data
+            }]);
+            console.log('series updated', data);
+        };
+        
+        if(dontWait)
+            doIt();
+        if(this.updateTopTimeout)
+            clearTimeout(this.updateTopTimeout);
+        this.updateTopTimeout = setTimeout(() => doIt(), 250);
+    }
+
 
     createBottom(){
         console.log('create bottom data', this.buckets);
         let d = [] ;
         let yMax = 0;
+
+        let brushEnd = this.buckets[this.buckets.length - 1].x;
+        let brushStart = new Date(brushEnd.getTime() - 5 * 60000); // -5 minutes
+        if(this.buckets[0].x > brushStart)
+            brushStart = this.buckets[0].x;
         for(let b of this.buckets) {
             d.push({x: b.x, y: (b.y.toFixed(1) + ' %')});
             if(b.y > yMax)
                 yMax = b.y;
         }
+        console.log('brush', brushStart, brushEnd);
+        
         var options = {
             chart: {
                 height: 30,
@@ -256,6 +318,15 @@ export class SystemValueLineChart{
                     fill: {
                         color: "#fff",
                         opacity: 0.4
+                    },
+                    xaxis: {
+                        min: brushStart.getTime(),
+                        max: brushEnd.getTime()
+                    }
+                },
+                events: {
+                    selection: (context, xy) => {
+                        this.updateTopSelection(new Date(xy.xaxis.min), new Date(xy.xaxis.max));
                     }
                 }
             },

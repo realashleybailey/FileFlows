@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
+using Avalonia.Animation;
 using Microsoft.Extensions.FileProviders;
 
 namespace FileFlows.Server.Workers;
@@ -74,7 +75,7 @@ public class WatchedLibrary:IDisposable
         }
         finally
         {
-            if (Disposed == false && QueuedFiles?.Any() == true)
+            if (Disposed == false && QueuedHasItems())
             {
                 QueueTimer.Start();
             }
@@ -86,7 +87,7 @@ public class WatchedLibrary:IDisposable
         while (Disposed == false)
         {
             ProcessQueuedItem();
-            if(QueuedFiles?.Any() != true)
+            if(QueuedHasItems() != true)
             {
                 LogQueueMessage($"{Library.Name} nothing queued");
                 Thread.Sleep(1000);
@@ -99,8 +100,11 @@ public class WatchedLibrary:IDisposable
         try
         {
             string? fullpath;
-            if (QueuedFiles.TryDequeue(out fullpath) == false)
-                return;
+            lock (QueuedFiles)
+            {
+                if (QueuedFiles.TryDequeue(out fullpath) == false)
+                    return;
+            }
 
             LogQueueMessage($"{Library.Name} Dequeued: {fullpath}");
 
@@ -480,7 +484,7 @@ public class WatchedLibrary:IDisposable
             return;
         }
 
-        if (QueuedFiles.Contains(fullPath) == false)
+        if (QueueContains(fullPath) == false)
         {
             LogQueueMessage($"{Library.Name} queueing file: {fullPath}");
             QueueItem(fullPath);
@@ -566,7 +570,7 @@ public class WatchedLibrary:IDisposable
                 var dirs = new DirectoryInfo(Library.Path).GetDirectories();
                 foreach (var dir in dirs)
                 {
-                    if (QueuedFiles.Contains(dir.FullName) == false)
+                    if (QueueContains(dir.FullName) == false)
                     {
                         QueueItem(dir.FullName);
                         ++count;
@@ -598,7 +602,7 @@ public class WatchedLibrary:IDisposable
                     }
 
 
-                    if (QueuedFiles.Contains(file.FullName) == false)
+                    if (QueueContains(file.FullName) == false)
                     {
                         LogQueueMessage($"{Library.Name} queueing file for scan: {file.FullName}", settings);
                         QueueItem(file.FullName);
@@ -607,7 +611,7 @@ public class WatchedLibrary:IDisposable
                 }
             }
 
-            LogQueueMessage($"Files queued for '{Library.Name}': {count} / {QueuedFiles.Count}");
+            LogQueueMessage($"Files queued for '{Library.Name}': {count} / {QueueCount()}");
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
         }
         catch(Exception ex)
@@ -683,10 +687,55 @@ public class WatchedLibrary:IDisposable
         catch (Exception) { }
         return files;
     }
+    
 
+    /// <summary>
+    /// Safely gets the number of queued items
+    /// </summary>
+    /// <returns>the number of queued items</returns>
+    private int QueueCount()
+    {
+        lock (QueuedFiles)
+        {
+            return QueuedFiles.Count();
+        }
+    }
+
+    /// <summary>
+    /// Safely checks if the queue has items
+    /// </summary>
+    /// <returns>if the queue has items</returns>
+    private bool QueuedHasItems()
+    {
+        lock (QueuedFiles)
+        {
+            return QueuedFiles.Any();
+        }   
+    }
+
+    /// <summary>
+    /// Safely adds an item to the queue
+    /// </summary>
+    /// <param name="fullPath">the item to add</param>
     private void QueueItem(string fullPath)
     {
-        QueuedFiles.Enqueue(fullPath);
+        lock (QueuedFiles)
+        {
+            QueuedFiles.Enqueue(fullPath);
+        }
         QueueTimer.Start();
+    }
+
+    /// <summary>
+    /// Safely checks if the queue contains an item
+    /// </summary>
+    /// <param name="item">the item to check</param>
+    /// <returns>true if the queue contains it</returns>
+    private bool QueueContains(string item)
+    {
+        lock (QueuedFiles)
+        {
+            return QueuedFiles.Contains(item);
+        }
     }
 }

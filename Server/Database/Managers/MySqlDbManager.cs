@@ -379,7 +379,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// Records a statistic
     /// </summary>
     /// <param name="statistic">the statistic to record</param>
-    public override async Task RecordStatistc(Statistic statistic)
+    public override async Task RecordStatistic(Statistic statistic)
     {
         if (statistic?.Value == null)
             return;

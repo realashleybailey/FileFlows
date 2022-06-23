@@ -69,11 +69,14 @@ public class StatisticsController : Controller
     /// Records a statistic
     /// </summary>
     /// <param name="statistic">the statistic to record</param>
+    [HttpPost("record")]
     public async Task Record([FromBody] Statistic statistic)
     {
+        if (statistic == null)
+            return;
         if (DbHelper.UseMemoryCache)
             return; // only save this to an external database
-        await DbHelper.RecordStatistc(statistic);
+        await DbHelper.RecordStatistic(statistic);
     }
 
     /// <summary>

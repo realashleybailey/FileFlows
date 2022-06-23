@@ -45,7 +45,7 @@ public class StatisticService : Service, IStatisticService
     {
         try
         {
-            await HttpHelper.Post($"{ServiceBaseUrl}/api/statistic/record", new
+            await HttpHelper.Post($"{ServiceBaseUrl}/api/statistics/record", new
             {
                 Name = name,
                 Value = value

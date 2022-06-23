@@ -163,43 +163,25 @@ public class SystemController:Controller
         if (DbHelper.UseMemoryCache)
             return new object[] { }; // not supported
         var data = await DbHelper.GetLibraryProcessingTimes();
-        var dict = data.GroupBy(x => x.Library, x => x);
+        var dict = data.Select(x => new
+        {
+            x.Library,
+            Value = (x.OriginalSize / 1_000_000d) / x.Seconds
+        }).OrderBy(x => x.Value).GroupBy(x => x.Library, x=> x);
         
-        return dict.Select(x => new
+        return dict.Where(x => x.Count() > 10).Select(x =>
         {
-            x = x.Key?.EmptyAsNull() ?? "Unknown",
-            y = GetStats(x)
-        });
-
-        int[] GetStats(IEnumerable<LibraryFileProcessingTime> list)
-        {
-            var sorted = list.OrderBy(x => x.Seconds).ToList();
-            int count = 0;
-            double sum = 0.0;
-            double sumsq = 0.0;
-            double max = double.MinValue;
-            double min = double.MaxValue;
-
-            foreach (var item in sorted)
+            var list = x.ToList();
+            int length = list.Count;
+            var median = list[length / 2];
+            var lq = list[length / 4];
+            var hq = list[length / 4 * 3];
+            return new
             {
-
-                var sample = (item.OriginalSize / (double)item.Seconds) / 1_000_000;
-                if (sample == 0)
-                    continue;
-                count++;
-                sum += sample;
-                sumsq += sample * sample;
-                if (sample > max) max = sample;
-                if (sample < min) min = sample;
-            }
-
-            var medianValue = sorted[sorted.Count / 2];
-            double median = (medianValue.OriginalSize / (double)medianValue.Seconds) / 1_000_000;
-
-            double mean = sum / count;
-            double stdev = Math.Sqrt((sumsq / count) - (mean * mean));
-            return new[] { (int)min, (int)(median - stdev), (int)median, (int)(median + stdev), (int)max };
-        }
+                x = x.Key?.EmptyAsNull() ?? "Unknown", 
+                y = new [] { (int)list[0].Value, (int)lq.Value, (int)median.Value,(int) hq.Value,(int) list[length -1].Value }
+            };
+        });
     }
 
     /// <summary>

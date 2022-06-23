@@ -21,7 +21,6 @@ export class BoxPlotChart{
     chart;
         
     constructor(uid, args) {
-        console.log('uid', uid);
         this.uid = uid;
         
         this.url = args.url;
@@ -62,22 +61,14 @@ export class BoxPlotChart{
             },
             series: [{
                 data:data
-            }],
-            yaxis: {
-                title: {
-                    text: 'Time Per Megabyte'
-                }
-            }
+            }]
         };
-        console.log(options);
-
         this.chart = new ApexCharts(document.getElementById(this.uid), options);
         this.chart.render();
     }
     
     dispose() {
         this.disposed = true;      
-        console.log('disposed!!!');
     }
     
     

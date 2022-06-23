@@ -32,7 +32,6 @@ export class SystemValueLineChart{
     };
     
     constructor(uid, args) {
-        console.log('uid', uid);
         this.uid = uid;
         
         this.bottomUid = uid + '-bottom';

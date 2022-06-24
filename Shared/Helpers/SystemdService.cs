@@ -16,6 +16,7 @@ public class SystemdService
     /// <param name="isNode">if installing node or server</param>
     public static void Install(string baseDirectory, bool isNode)
     {
+        CreateEntryPoint(baseDirectory, isNode);
         SaveServiceFile(baseDirectory, isNode);
         RunService(isNode);
         Console.WriteLine("Run the following to check the status of the service: ");
@@ -33,6 +34,18 @@ public class SystemdService
         Process.Start("systemctl", $"enable {name}.service");
         Process.Start("systemctl", "daemon-reload");
         Process.Start("systemctl", $"start {name}.service");
+    }
+
+    /// <summary>
+    /// Create an entry point file that will be used by systemd to start FileFlows
+    /// </summary>
+    /// <param name="baseDirectory">the base directory for the FileFiles install, DirectoryHelper.BaseDirectory</param>
+    /// <param name="isNode">if installing node or server</param>
+    private static void CreateEntryPoint(string baseDirectory, bool isNode)
+    {
+        string shScript = @"
+
+".TrimStart()
     }
 
     /// <summary>

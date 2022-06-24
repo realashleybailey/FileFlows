@@ -1,6 +1,7 @@
 ---
 title: Systemd Service
 name: Systemd Service
+permalink: /guides/systemd
 layout: default
 ---
 

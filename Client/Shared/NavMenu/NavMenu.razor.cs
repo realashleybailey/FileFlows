@@ -42,8 +42,6 @@ namespace FileFlows.Client.Shared
             else if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Libraries) !=
                 ConfigurationStatus.Libraries)
                 nmiLibraries.ConfigStatusStepLabel = "Step 2";
-            else
-                nmiLibraries.ConfigStatusStepLabel = "Step 2";
 
             MenuItems.Add(new NavMenuGroup
             {

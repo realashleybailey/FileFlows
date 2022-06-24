@@ -68,6 +68,40 @@ sudo systemctl status fileflows-node.service
 
 ---
 
+### Uninstall
+To uninstall the Server run
+```bash
+cd Server
+sudo dotnet FileFlows.Server.dll --systemd --uninstall
+```
+Or to uninstall manually 
+
+```bash
+sudo systemctl stop fileflows
+sudo systemctl disable fileflows
+sudo rm /etc/systemd/system/fileflows.service
+sudo systemctl daemon-reload
+sudo systemctl reset-failed
+```
+
+To uninstall the Node run
+```bash
+cd Node
+sudo dotnet FileFlows.Node.dll --systemd --uninstall
+```
+
+
+Or to uninstall manually 
+```bash
+sudo systemctl stop fileflows-node
+sudo systemctl disable fileflows-node
+sudo rm /etc/systemd/system/fileflows-node.service
+sudo systemctl daemon-reload
+sudo systemctl reset-failed
+```
+
+---
+
 ### FAQ
 Question:
 I am getting the following error when trying to install the service "sudo: dotnet: command not found"

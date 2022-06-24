@@ -48,6 +48,12 @@ class CommandLineOptions
     public bool InstallService { get; set; }
     
     /// <summary>
+    /// Gets or sets if should uninstall the sysetmd service
+    /// </summary>
+    [CommandLineArg("Uninstall the systemd service", "", command: "uninstall")]
+    public bool Uninstall { get; set; }
+    
+    /// <summary>
     /// Gets or sets if running inside a docker container
     /// </summary>
     [CommandLineArg("The location of dotnet, used to install the systemd service", "/usr/john/.dotnet", command: "dotnet")]

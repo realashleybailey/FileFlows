@@ -25,6 +25,22 @@ public class SystemdService
     }
 
     /// <summary>
+    /// Uninstall the service
+    /// </summary>
+    /// <param name="isNode">if uninstalling node or server</param>
+    public static void Uninstall(bool isNode)
+    {
+        string name = isNode ? "fileflows-node" : "fileflows";
+        
+        Process.Start("systemctl", "stop " + name);
+        Process.Start("systemctl", "disable " + name);
+        if(File.Exists($"/etc/systemd/system/{name}.service"))
+            File.Delete($"/etc/systemd/system/{name}.service");
+        Process.Start("systemctl", "daemon-reload");
+        Process.Start("systemctl", "reset-failed");
+    }
+
+    /// <summary>
     /// Runs the service
     /// </summary>
     /// <param name="isNode">if installing node or server</param>

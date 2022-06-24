@@ -37,7 +37,10 @@ public class Program
         var options = CommandLineOptions.Parse(args);
         if (Globals.IsLinux && options.InstallService)
         {
-            SystemdService.Install(DirectoryHelper.BaseDirectory, true);
+            if(options.Uninstall)
+                SystemdService.Uninstall(true);
+            else
+                SystemdService.Install(DirectoryHelper.BaseDirectory, true);
             return;
         }
         Globals.IsDocker = options.Docker;

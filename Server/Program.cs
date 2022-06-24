@@ -34,7 +34,10 @@ public class Program
             
             if (Globals.IsLinux && args?.Any(x => x == "--systemd") == true)
             {
-                SystemdService.Install(DirectoryHelper.BaseDirectory, isNode: false);
+                if(args?.Any(x => x == "--uninstall") == true)
+                    SystemdService.Uninstall(false);
+                else
+                    SystemdService.Install(DirectoryHelper.BaseDirectory, isNode: false);
                 return;
             }
             

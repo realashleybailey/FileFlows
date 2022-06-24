@@ -62,7 +62,11 @@ public class SystemdService
         int spaceIndex = whereIsDotnet.IndexOf(" ");
         if (spaceIndex > 0)
             whereIsDotnet = whereIsDotnet.Substring(0, spaceIndex);
-        return whereIsDotnet?.EmptyAsNull() ?? "dotnet";
+        if (string.IsNullOrWhiteSpace(whereIsDotnet))
+            return "dotnet";
+        if (Directory.Exists(whereIsDotnet)) // check if it is a directory
+            return whereIsDotnet + "/dotnet";
+        return whereIsDotnet;
     }
 
     private static string ExecuteToString(string cmd, string args)
@@ -102,7 +106,8 @@ public class SystemdService
         string appName = isNode ? "FileFlows Node" : "FileFlows";
         string appPath = isNode ? "Node" : "Server";
         string dll = isNode ? "FileFlows.Node.dll" : "FileFlows.Server.dll";
-        string shScript = $@"
+        string shScript = $@"#!/usr/bin/env bash
+
  if test -f ""{fullUS}""; then
     echo ""Upgrade found""
     chmod +x {fullUS}
@@ -114,8 +119,8 @@ fi
 printf ""Launching {appName}\n""
 cd {appPath}
 exec {dotnet} {dll} --no-gui --systemd-service
-".TrimStart();
-        string entryPoint = Path.Combine(baseDirectory, "fileflows" + (isNode ? "node" : "") + "-systemd-entrypoint.sh");
+";
+        string entryPoint = Path.Combine(baseDirectory, "fileflows" + (isNode ? "-node" : "") + "-systemd-entrypoint.sh");
         System.IO.File.WriteAllText(entryPoint, shScript);
         FileHelper.MakeExecutable(entryPoint);
         return entryPoint;

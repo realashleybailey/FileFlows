@@ -69,6 +69,12 @@ public class SystemdService
         return whereIsDotnet;
     }
 
+    /// <summary>
+    /// Executes a command and returns the standard output
+    /// </summary>
+    /// <param name="cmd">the command to execute</param>
+    /// <param name="args">the parameters for the command</param>
+    /// <returns>the command output</returns>
     private static string ExecuteToString(string cmd, string args)
     {
         try

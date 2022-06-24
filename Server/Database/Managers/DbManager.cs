@@ -774,6 +774,19 @@ public abstract class DbManager
     /// </summary>
     /// <returns>the matching statistics</returns>
     public virtual Task<IEnumerable<Statistic>> GetStatisticsByName(string name) => Task.FromResult((IEnumerable<Statistic>)new Statistic[] { });
+    
+    /// <summary>
+    /// Executes SQL against the database
+    /// </summary>
+    /// <param name="sql">the SQL to execute</param>
+    /// <param name="args">arguments for where clause</param>
+    /// <returns>the rows effected</returns>
+    public virtual async Task<int> Execute(string sql, object[] args)
+    {
+        using var db = GetDb();
+        return await db.ExecuteAsync(sql, args);
+    }
+    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

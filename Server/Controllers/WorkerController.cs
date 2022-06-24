@@ -106,7 +106,6 @@ public class WorkerController : Controller
                 libfile.Status = info.LibraryFile.Status;
                 await libfileController.Update(libfile);
             }
-            _ = new StatisticsController().RecordStatistics(info.LibraryFile);
         }
     }
 

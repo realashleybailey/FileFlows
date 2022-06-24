@@ -36,6 +36,11 @@ export class PieChartChart{
         let response = await fetch(this.url);
         let data = await response.json();
         data = this.fixData(data);
+
+        if(!data?.series?.length){
+            document.getElementById(this.uid).closest('.portlet').style.display = 'none';
+            return;
+        }
         this.createChart(data);
     }
     
@@ -71,16 +76,12 @@ export class PieChartChart{
             data.labels.push(v.label);
             data.series.push(v.value);
         }
-        console.log('pie chart data', data);
         return data;
     }
     
     
     createChart(data)
-    {
-        if(!data?.series?.length)
-            return;
-        
+    {        
         let options = {
             chart: {
                 height: 300,

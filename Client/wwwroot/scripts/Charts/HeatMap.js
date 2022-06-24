@@ -35,6 +35,10 @@ export class HeatMapChart{
         
         let response = await fetch(this.url);
         let data = await response.json();
+        if(!data?.length) {
+            document.getElementById(this.uid).closest('.portlet').style.display = 'none';
+            return;
+        }
         this.createChart(data);
     }
     

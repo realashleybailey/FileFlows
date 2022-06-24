@@ -13,8 +13,6 @@ public class Upgrader
         // so on a clean install these do not run
         if (currentVersion > new Version(0, 4, 0))
         {
-            if (currentVersion < new Version(0, 5, 0))
-                new UpgradeStats().Run();
             if (currentVersion < new Version(0, 5, 3))
                 new Upgrade0_5_3().Run();
             if (currentVersion < new Version(0, 6, 0))
@@ -27,6 +25,8 @@ public class Upgrader
                 new Upgrade0_8_0().Run(settings);
             if (currentVersion < new Version(0, 8, 1))
                 new Upgrade0_8_1().Run(settings);
+            if (currentVersion < new Version(0, 8, 3))
+                new Upgrade0_8_3().Run(settings);
         }
         
         // always check on default scripts

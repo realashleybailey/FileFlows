@@ -36,6 +36,11 @@ export class TreeMapChart{
         let response = await fetch(this.url);
         let data = await response.json();
         data = this.fixData(data);
+        
+        if(!data?.length) {
+            document.getElementById(this.uid).closest('.portlet').style.display = 'none';
+            return;
+        }
         this.createChart(data);
     }
 
@@ -61,10 +66,7 @@ export class TreeMapChart{
     }
     
     createChart(data)
-    {
-        if(!data?.length)
-            return;
-        
+    {        
         let options = {
             chart: {
                 height: 300,

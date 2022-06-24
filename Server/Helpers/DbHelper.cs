@@ -166,6 +166,14 @@ public class DbHelper
     public static Task Delete<T>(string andWhere = "", params object[] args) => Manager.Delete<T>(andWhere, args);
 
     /// <summary>
+    /// Executes SQL against the database
+    /// </summary>
+    /// <param name="sql">the SQL to execute</param>
+    /// <param name="args">arguments for where clause</param>
+    /// <returns>the rows effected</returns>
+    internal static Task<int> Execute(string sql = "", params object[] args) => Manager.Execute(sql, args);
+    
+    /// <summary>
     /// Finds an existing library file in the database
     /// </summary>
     /// <param name="fullPath">the full path of the library file</param>
@@ -286,6 +294,7 @@ public class DbHelper
     /// </summary>
     /// <returns>the matching statistics</returns>
     public static Task<IEnumerable<Statistic>> GetStatisticsByName(string name) => Manager.GetStatisticsByName(name);
+    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

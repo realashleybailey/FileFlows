@@ -43,7 +43,7 @@ public partial class TreeMap:ComponentBase, IDisposable
     {
         if (firstRender)
         {
-            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/TreeMap.js");
+            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Charts/TreeMap.js");
             await jsCharts.InvokeVoidAsync("newTreeMap", Uid, new
             {
                 this.Url,

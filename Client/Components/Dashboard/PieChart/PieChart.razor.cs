@@ -3,23 +3,21 @@ using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Components.Dashboard;
 
-/// <summary>
-/// Heat Map chart
-/// </summary>
-public partial class HeatMap : ComponentBase, IDisposable
+public partial class PieChart:ComponentBase, IDisposable
 {
     [Inject] public IJSRuntime jsRuntime { get; set; }
-
+    
     private string _Title = string.Empty;
-
     /// <summary>
     /// Gets or sets the title 
     /// </summary>
-    [Parameter]
-    public string Title
+    [Parameter] public string Title
     {
         get => _Title;
-        set { _Title = Translater.TranslateIfNeeded(value); }
+        set
+        {
+            _Title = Translater.TranslateIfNeeded(value);
+        }
     }
 
     /// <summary>
@@ -31,9 +29,8 @@ public partial class HeatMap : ComponentBase, IDisposable
     /// <summary>
     /// Gets or sets the URL to retrieve the data
     /// </summary>
-    [Parameter]
-    public string Url { get; set; }
-
+    [Parameter] public string Url { get; set; }
+        
     private string Uid;
     public IJSObjectReference jsCharts;
 
@@ -46,12 +43,12 @@ public partial class HeatMap : ComponentBase, IDisposable
     {
         if (firstRender)
         {
-            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Charts/HeatMap.js");
-            await jsCharts.InvokeVoidAsync("newHeatMap", Uid, new
+            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Charts/PieChart.js");
+            await jsCharts.InvokeVoidAsync("newPieChart", Uid, new
             {
                 this.Url,
                 this.Title
-            });
+            }); 
         }
     }
 

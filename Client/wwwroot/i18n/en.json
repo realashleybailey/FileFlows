@@ -481,7 +481,9 @@
         "TempStorage":"Temporary Storage",
         "LibraryProcessingTimes":"Library Processing Times [Seconds Per Megabyte]",
         "ProcessingHeatMap":"Processing Heat Map",
-        "Codec":"Codec"
+        "Codec":"Codec",
+        "VideoContainer": "Video Container",
+        "VideoResolution": "Video Resolution"
       }
     },
     "Tools": {

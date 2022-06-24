@@ -56,7 +56,7 @@ public partial class SystemValueLineChartApex<TItem>:ComponentBase, IDisposable
     {
         if (firstRender)
         {
-            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/SystemValueLineChart.js");
+            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Charts/SystemValueLineChart.js");
             await jsCharts.InvokeVoidAsync("newSystemValueLineChart", Uid, new
             {
                 this.Url,

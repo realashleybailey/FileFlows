@@ -1,7 +1,7 @@
-export function newBoxPlot(uid, args){
+export function newTreeMap(uid, args){
     if(!window.FlowCharts)
         window.FlowCharts = {};
-    window.FlowCharts[uid] = new BoxPlotChart(uid, args);
+    window.FlowCharts[uid] = new TreeMapChart(uid, args);
 }
 
 export function dispose(uid) {
@@ -11,7 +11,7 @@ export function dispose(uid) {
 }
 
 
-export class BoxPlotChart{
+export class TreeMapChart{
     uid;
     data;
     url;
@@ -35,14 +35,40 @@ export class BoxPlotChart{
         
         let response = await fetch(this.url);
         let data = await response.json();
+        data = this.fixData(data);
         this.createChart(data);
     }
+
+    fixData(data) {
+        if (!data?.length || (data[0].Name && data[0].Value) === false)
+            return data;
+
+        //statistic data, convert it
+        let newData = {};
+        for (let d of data) {
+            if (d.Value === 'mpeg2video')
+                d.Value = 'mpeg2'; // too long
+            if (newData[d.Value])
+                newData[d.Value] = newData[d.Value] + 1;
+            else
+                newData[d.Value] = 1;
+        }
+        data = [];
+        Object.keys(newData).forEach(x => {
+            data.push({x: x, y: newData[x]});
+        });
+        return data;
+    }
     
-    createChart(data){
+    createChart(data)
+    {
+        if(!data?.length)
+            return;
+        
         let options = {
             chart: {
                 height: 300,
-                type: 'boxPlot',
+                type: 'treemap',
                 background: 'transparent',
                 zoom: {
                     enabled: false
@@ -51,14 +77,7 @@ export class BoxPlotChart{
                     show: false
                 }
             },
-            plotOptions: {
-                boxPlot: {
-                    colors: {
-                        upper: '#ff0090',
-                        lower: '#84004bd9'
-                    }
-                }
-            },
+            colors: ['#33b2df'],
             theme: {
                 mode: 'dark'
             },stroke: {

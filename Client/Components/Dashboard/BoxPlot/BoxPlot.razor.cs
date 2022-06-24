@@ -43,7 +43,7 @@ public partial class BoxPlot:ComponentBase, IDisposable
     {
         if (firstRender)
         {
-            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/BoxPlot.js");
+            jsCharts = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Charts/BoxPlot.js");
             await jsCharts.InvokeVoidAsync("newBoxPlot", Uid, new
             {
                 this.Url,

@@ -107,17 +107,14 @@ public abstract class UpdaterWorker : Worker
     {
         try
         {
-            // if inside docker we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
-            if (Globals.IsDocker == false)
+            // if inside docker or systemd we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
+            if (Globals.IsDocker == false && Globals.IsSystemd)
             {
                 Logger.Instance?.ILog($"{UpdaterName}About to execute upgrade script: " + updateScript);
                 var fi = new FileInfo(updateScript);
 
                 var psi = new ProcessStartInfo(updateScript);
-                if(Globals.IsSystemd)
-                    psi.ArgumentList.Add("systemd");
-                else
-                    psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
+                psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
                 psi.WorkingDirectory = fi.DirectoryName;
                 psi.UseShellExecute = true;
                 psi.CreateNoWindow = true;

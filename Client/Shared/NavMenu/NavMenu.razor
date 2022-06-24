@@ -47,7 +47,7 @@
                                                                                            @onclick="() => Click(item)">
                         <span class="@item.Icon" aria-hidden="true"></span> @item.Title
                     </a>
-                    @if (string.IsNullOrEmpty(item.ConfigStatusStepLabel) == false)
+                    @if (Active != item && string.IsNullOrEmpty(item.ConfigStatusStepLabel) == false)
                     {
                         <div class="not-configured-pointer">@item.ConfigStatusStepLabel</div>
                     }

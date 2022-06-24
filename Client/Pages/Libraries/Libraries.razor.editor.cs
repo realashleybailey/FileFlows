@@ -148,7 +148,7 @@ public partial class Libraries : ListPage<Library>
             }
         });
         
-        if(UsingExternalDatabase)
+        if(App.Instance.FileFlowsSystem.ExternalDatabase)
         {
             fields.Add(new ElementField
             {

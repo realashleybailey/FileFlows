@@ -38,6 +38,10 @@
             </li>
             @foreach (var item in group.Items)
             {
+                if (item == null)
+                {
+                    continue;
+                }
                 <li class="nav-item @(item.Url.Replace("/", ""))">
                     <a class="nav-link @(Active == item  ? "active": "")" href="@item.Url" @onclick:preventDefault @onclick:stopPropagation
                     @onclick="() => Click(item)">

@@ -5,7 +5,7 @@
 
 <PageView FullWidth=true>
     <Head>
-        @if (UsingDatabase)
+        @if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {   
             <a class="btn" @onclick=@SearchPane.ToggleSearch>@lblSearch</a>
         }

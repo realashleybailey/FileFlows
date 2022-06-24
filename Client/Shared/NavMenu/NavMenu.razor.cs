@@ -28,8 +28,8 @@ namespace FileFlows.Client.Shared
                 Icon = "fas fa-info-circle",
                 Items = new List<NavMenuItem>
                 {
-                    new NavMenuItem("Pages.Dashboard.Title", "fas fa-chart-pie", ""),
-                    new NavMenuItem("Pages.LibraryFiles.Title", "fas fa-copy", "library-files")
+                    new ("Pages.Dashboard.Title", "fas fa-chart-pie", ""),
+                    new ("Pages.LibraryFiles.Title", "fas fa-copy", "library-files")
                 }
             });
 
@@ -39,10 +39,10 @@ namespace FileFlows.Client.Shared
                 Icon = "fas fa-code-branch",
                 Items = new List<NavMenuItem>
                 {
-                    new NavMenuItem("Pages.Flows.Title", "fas fa-sitemap", "flows"),
-                    new NavMenuItem("Pages.Libraries.Title", "fas fa-folder", "libraries"),
+                    new ("Pages.Flows.Title", "fas fa-sitemap", "flows"),
+                    new ("Pages.Libraries.Title", "fas fa-folder", "libraries"),
 #if (!DEMO)
-                    new NavMenuItem("Pages.Nodes.Title", "fas fa-desktop", "nodes")
+                    new ("Pages.Nodes.Title", "fas fa-desktop", "nodes")
 #endif
                 }
             });
@@ -54,16 +54,12 @@ namespace FileFlows.Client.Shared
                 Icon = "fas fa-hdd",
                 Items = new List<NavMenuItem>
                 {
-                    new NavMenuItem("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
-                    new NavMenuItem("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
-                    new NavMenuItem("Pages.Tools.Title", "fas fa-tools", "tools"),
-                    new NavMenuItem("Pages.Settings.Title", "fas fa-cogs", "settings"),
-                    new NavMenuItem("Pages.System.Title", "fas fa-microchip", "system")
+                    new ("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
+                    new ("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
+                    new ("Pages.Tools.Title", "fas fa-tools", "tools"),
+                    new ("Pages.Settings.Title", "fas fa-cogs", "settings"),
                 }
             });
-            
-            
-
 
             MenuItems.Add(new NavMenuGroup
             {
@@ -72,7 +68,7 @@ namespace FileFlows.Client.Shared
                 Items = new List<NavMenuItem>
                 {
                     new NavMenuItem("Pages.Log.Title", "fas fa-file-alt", "log"),
-                    new NavMenuItem("Pages.Statistics.Title", "fas fa-chart-line", "statistics")
+                    App.Instance.FileFlowsSystem.Licensed ? new NavMenuItem("Pages.System.Title", "fas fa-microchip", "system") : null
                 }
             });
 

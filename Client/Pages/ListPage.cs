@@ -26,13 +26,6 @@ namespace FileFlows.Client.Pages
         protected bool Loaded { get; set; }
         protected bool HasData { get; set; }
 
-        /// <summary>
-        /// Gets if the system is using an external database
-        /// </summary>
-        protected bool UsingExternalDatabase { get; private set; }
-
-
-
         public List<T> _Data = new List<T>();
         public List<T> Data
         {
@@ -80,7 +73,6 @@ namespace FileFlows.Client.Pages
         public virtual async Task Load(Guid? selectedUid = null)
         {
             Blocker.Show();
-            this.UsingExternalDatabase = (await HttpHelper.Get<bool>("/api/settings/using-external-database")).Data;
             await this.WaitForRender();
             try
             {

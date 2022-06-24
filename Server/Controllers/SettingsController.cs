@@ -18,22 +18,31 @@ public class SettingsController : Controller
     private static SemaphoreSlim semaphore = new SemaphoreSlim(1);
 
     /// <summary>
-    /// Whether or not the system is configured
+    /// Gets the system status of FileFlows
     /// </summary>
-    /// <returns>return 2 if everything is configured, 1 if partially configured, 0 if not configured</returns>
-    [HttpGet("is-configured")]
-    public async Task<int> IsConfigured()
+    /// <returns>the system status of FileFlows</returns>
+    [HttpGet("fileflows-status")]
+    public FileFlowsStatus GetFileFlowsStatus()
     {
-        // this updates the TZ with the TZ from the client if not set
-        var settings = await Get();
+        FileFlowsStatus status = new();
+        
+        var license = LicenseHelper.GetLicense();
+        if (license?.Status == LicenseStatus.Valid)
+        {
+            status.Licensed = true;
+            string dbConnStr = AppSettings.Instance.DatabaseConnection;
+            status.ExternalDatabase = (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite")) == false;
+        }
 
         var libs = new LibraryController().GetData().Result?.Any() == true;
         var flows = new FlowController().GetData().Result?.Any() == true;
-        if (libs && flows)
-            return 2;
+        
         if (flows)
-            return 1;
-        return 0;
+            status.ConfigurationStatus |= ConfigurationStatus.Flows;
+        if (libs)
+            status.ConfigurationStatus |= ConfigurationStatus.Libraries;
+        
+        return status;
     }
 
     /// <summary>
@@ -76,8 +85,6 @@ public class SettingsController : Controller
         var uiModel = JsonSerializer.Deserialize<SettingsUiModel>(json);
         SetLicenseFields(uiModel, license);
         
-
-
         string dbConnStr = AppSettings.Instance.DatabaseMigrateConnection?.EmptyAsNull() ?? AppSettings.Instance.DatabaseConnection;
         if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
             uiModel.DbType = DatabaseType.Sqlite;
@@ -253,19 +260,6 @@ public class SettingsController : Controller
             return ServerUpdater.Instance.RunCheck();
         });
         await Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Gets if the the system is using an external database
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("using-external-database")]
-    public bool UsingExternalDatabase()
-    {
-        string dbConnStr = AppSettings.Instance.DatabaseConnection;
-        if (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite"))
-            return false;
-        return true;
     }
 }
 

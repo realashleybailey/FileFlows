@@ -120,6 +120,8 @@ public partial class Settings : ComponentBase
                 await HttpHelper.Post("/api/node", this.InternalProcessingNode);
             }
 
+            await App.Instance.LoadAppInfo();
+
             await this.Refresh();
         }
         finally

@@ -25,6 +25,9 @@ namespace FileFlows.Client
 
         public static FileFlows.Shared.Models.Settings Settings;
 
+        public FileFlowsStatus FileFlowsSystem { get; private set; }
+        
+
         public async Task LoadLanguage()
         {
             string langFile = await LoadLanguageFile("i18n/en.json?version=" + Globals.Version);
@@ -34,6 +37,12 @@ namespace FileFlows.Client
             string pluginLang = await LoadLanguageFile("/api/plugin/language/en.json?ts=" + System.DateTime.Now.ToFileTime());
 #endif
             Translater.Init(langFile, pluginLang);
+        }
+
+        public async Task LoadAppInfo()
+        {
+            FileFlowsSystem = (await HttpHelper.Get<FileFlowsStatus>("/api/settings/fileflows-status")).Data;
+            this.StateHasChanged();
         }
 
         private async Task<string> LoadLanguageFile(string url)
@@ -58,12 +67,10 @@ namespace FileFlows.Client
 #else
             Settings = (await HttpHelper.Get<FileFlows.Shared.Models.Settings>("/api/settings")).Data ?? new FileFlows.Shared.Models.Settings();
 #endif
-            await Task.Run(async () =>
-            {
-                await LoadLanguage();
-                LanguageLoaded = true;
-                this.StateHasChanged();
-            });
+            await LoadAppInfo();
+            await LoadLanguage();
+            LanguageLoaded = true;
+            this.StateHasChanged();
         }
 
         record Dimensions(int width, int height);

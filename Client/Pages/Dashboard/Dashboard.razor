@@ -35,7 +35,7 @@
     <Body>
 
     <CascadingValue Value="this" IsFixed="true">
-        @if (ConfiguredStatus < 2)
+        @if ((int)ConfiguredStatus < 3)
         {
             <h1>Not Yet Configured</h1>
             <p>You have not yet configured any Flows or Libraries.</p><br/>
@@ -46,7 +46,7 @@
             <p>You can have as many Flows as you like, ranging from many tasks.</p>
             <p>For example, you can configure a Flow to convert video files from one format into another. Or a Flow to move pictures into folders based on the date they were taken.</p>
 
-            @if (ConfiguredStatus == 0)
+            @if ((ConfiguredStatus & ConfigurationStatus.Flows) != ConfigurationStatus.Flows)
             {
                 <div class="not-configured-pointer step-flows">Step 1</div>
             }
@@ -56,7 +56,7 @@
             <p>FileFlows needs one or more Libraries to monitor for files.</p>
             <p>These can be directories or drives.</p>
             <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
-            @if (ConfiguredStatus == 1)
+            @if ((ConfiguredStatus & ConfigurationStatus.Libraries) != ConfigurationStatus.Libraries)
             {
                 <div class="not-configured-pointer step-library">Step 2</div>
             }

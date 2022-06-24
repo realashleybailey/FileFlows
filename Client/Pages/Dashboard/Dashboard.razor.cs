@@ -23,7 +23,7 @@ namespace FileFlows.Client.Pages
         public readonly List<LibraryFile> Upcoming = new List<LibraryFile>();
         private bool _needsRendering = false;
 
-        private int ConfiguredStatus = 2;
+        private ConfigurationStatus ConfiguredStatus = ConfigurationStatus.Flows | ConfigurationStatus.Libraries;
         [Inject] public IJSRuntime jSRuntime { get; set; }
         [CascadingParameter] public Blocker Blocker { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
@@ -44,9 +44,9 @@ namespace FileFlows.Client.Pages
             AutoRefreshTimer.AutoReset = true;
             AutoRefreshTimer.Start();
 #if (DEMO)
-            ConfiguredStatus = 2;
+            ConfiguredStatus = ConfigurationStatus.Flows | ConfigurationStatus.Libraries;
 #else
-            ConfiguredStatus = (await HttpHelper.Get<int>("/api/settings/is-configured")).Data;
+            ConfiguredStatus = App.Instance.FileFlowsSystem.ConfigurationStatus;
 #endif
             lblLog = Translater.Instant("Labels.Log");
             lblCancel = Translater.Instant("Labels.Cancel");

@@ -20,8 +20,6 @@ public partial class Log : ComponentBase
 
     SearchPane SearchPane { get; set; }
 
-
-    private SettingsUiModel Settings;
     private LogType LogLevel { get; set; } = LogType.Info;
 
     private Dictionary<Guid, string> Nodes = new();
@@ -34,17 +32,12 @@ public partial class Log : ComponentBase
         TypeIncludeHigherSeverity = true
     };
 
-    private bool UsingDatabase =>
-        Settings?.DbType == DatabaseType.MySql || Settings?.DbType == DatabaseType.SqlServer; 
-
 #if (!DEMO)
     protected override async Task OnInitializedAsync()
     {
         SearchModel.FromDate = DateRangeHelper.LiveStart;
         SearchModel.ToDate = DateRangeHelper.LiveEnd;
         
-        Settings = (await HttpHelper.Get<SettingsUiModel>("/api/settings/ui-settings")).Data ?? new();
-
         var nodeResult = await HttpHelper.Get<List<ProcessingNode>>("/api/node");
         if (nodeResult.Success && nodeResult.Data != null)
             Nodes = nodeResult.Data.Where(x => x.Uid != new Guid("bf47da28-051e-452e-ad21-c6a3f477fea9")).ToDictionary(x => x.Uid,
@@ -86,7 +79,7 @@ public partial class Log : ComponentBase
     }
     void AutoRefreshTimerElapsed(object sender, ElapsedEventArgs e)
     {
-        if (UsingDatabase)
+        if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
             if (SearchModel.ToDate != DateRangeHelper.LiveEnd || SearchModel.FromDate != DateRangeHelper.LiveStart)
                 return;
@@ -104,7 +97,7 @@ public partial class Log : ComponentBase
 
     async Task Refresh()
     {
-        if (UsingDatabase)
+        if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
             var response = await HttpHelper.Post<string>("/api/log/search", SearchModel);
             if (response.Success)

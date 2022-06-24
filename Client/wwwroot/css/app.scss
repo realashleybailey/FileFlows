@@ -382,6 +382,7 @@ input[type=file]{
         padding:0;
         margin:0;
         height:calc(100% - 2rem);
+        padding-left: 0.75rem;
     }
     
 }
@@ -399,7 +400,12 @@ input[type=file]{
     
 }
 
-
+.draghandle {
+    cursor:grab;
+}
+.grid-stack-item {
+    overflow:hidden;
+}
 
 /** step pointer start */
 
@@ -452,4 +458,5 @@ input[type=file]{
         top:3px;
     }
 }
+
 /** step pointer end */

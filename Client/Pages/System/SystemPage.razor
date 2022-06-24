@@ -12,21 +12,22 @@
     
     <div class="grid-stack">
         
-        <SystemValueLineChartApex TItem="float" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
-        <SystemValueLineChartApex TItem="float" Title=@lblMemoryUsage SizeData=@true Icon="fas fa-memory" Url=@MemoryUrl />
+        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
+        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
+        
         @if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
-            <HeatMap Title=@lblProcessingHeatMap Icon="fas fa-calendar-alt" Url=@ProcessingHeatMapUrl/>
-            <PieChart Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl/>
-            <TreeMap Title=@lblCodec Icon="fas fa-photo-video" Url=@CodecUrl/>
-            <PieChart Title=@lblVideoContainer Icon="fas fa-film" Url=@VideoContainerUrl/>
+            <ApexChart Height="2" ChartType="ApexChartType.TreeMap" Title=@lblCodec Icon="fas fa-photo-video" Url=@CodecUrl />
+            <ApexChart Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl />
+            <ApexChart Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoContainer Icon="fas fa-film" Url=@VideoContainerUrl />
+            <ApexChart Height="2" ChartType="ApexChartType.HeatMap" Title=@lblProcessingHeatMap Icon="fas fa-calendar-alt" Url=@ProcessingHeatMapUrl />
         }
         
-        <SystemValueLineChartApex TItem="long"  Title=@lblTempStorage SizeData=@true Icon="fas fa-hdd"  Url=@TempStorageUrl  />
-        <SystemValueLineChartApex TItem="long"  Title=@lblLogStorage SizeData=@true Icon="fas fa-hdd"  Url=@LogStorageUrl  />
+        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblTempStorage Icon="fas fa-hdd" Url=@TempStorageUrl />
+        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblLogStorage Icon="fas fa-hdd" Url=@LogStorageUrl />
         
         @if (App.Instance.FileFlowsSystem.ExternalDatabase){
-            <BoxPlot Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
+            <ApexChart Height="2" ChartType="ApexChartType.BoxPlot" Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
         }
     </div>
 

@@ -49,8 +49,8 @@ public partial class SystemPage:ComponentBase
         this.lblVideoResolution = Translater.Instant("Pages.System.Labels.VideoResolution");
     }
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     await jsRuntime.InvokeVoidAsync("eval", "(new Muuri('.dashboard'))");
-    // }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await jsRuntime.InvokeVoidAsync("ff.dashboard", "SystemPage");
+    }
 }

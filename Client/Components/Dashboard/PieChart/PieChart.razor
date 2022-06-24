@@ -1,14 +1,16 @@
 @namespace FileFlows.Client.Components.Dashboard
 
-<div class="portlet line-data">
-    <div class="title">
-        @if (string.IsNullOrEmpty(Icon) == false)
-        {
-            <i class="@Icon"></i>
-        }
-        <span>@Title</span>
-    </div>
-    <div class="content">
-        <div id="@Uid"></div>
+<div class="grid-stack-item portlet line-data">
+    <div class="inner">
+        <div class="title">
+            @if (string.IsNullOrEmpty(Icon) == false)
+            {
+                <i class="@Icon"></i>
+            }
+            <span>@Title</span>
+        </div>
+        <div class="content">
+            <div id="@Uid"></div>
+        </div>
     </div>
 </div>

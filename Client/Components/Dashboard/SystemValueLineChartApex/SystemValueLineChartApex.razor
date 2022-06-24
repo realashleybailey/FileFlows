@@ -1,16 +1,18 @@
 @namespace FileFlows.Client.Components.Dashboard
 @typeparam TItem
 
-<div class="portlet line-data">
-    <div class="title">
-        @if (string.IsNullOrEmpty(Icon) == false)
-        {
-            <i class="@Icon"></i>
-        }
-        <span>@Title</span>
-    </div>
-    <div class="content">
-        <div id="@TopUid"></div>
-        <div id="@BottomUid"></div>
+<div class="grid-stack-item portlet line-data">
+    <div class="inner">
+        <div class="title">
+            @if (string.IsNullOrEmpty(Icon) == false)
+            {
+                <i class="@Icon"></i>
+            }
+            <span>@Title</span>
+        </div>
+        <div class="content">
+            <div id="@TopUid"></div>
+            <div id="@BottomUid"></div>
+        </div>
     </div>
 </div>

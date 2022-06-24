@@ -381,7 +381,9 @@ input[type=file]{
     .content {
         padding:0;
         margin:0;
+        height:calc(100% - 2rem);
     }
+    
 }
 
 .vi-container.fix-width {

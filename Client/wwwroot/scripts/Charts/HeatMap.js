@@ -46,7 +46,6 @@ export class HeatMapChart{
         let options = {
             series: data,
             chart: {
-                height: 300,
                 type: 'heatmap',
                 background: 'transparent',
                 zoom: {

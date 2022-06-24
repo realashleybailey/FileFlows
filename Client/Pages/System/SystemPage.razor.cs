@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Pages;
 
@@ -12,6 +13,8 @@ public partial class SystemPage:ComponentBase
 
     private string CpuUrl, MemoryUrl, TempStorageUrl, LogStorageUrl, LibraryProcessingTimeUrl, ProcessingHeatMapUrl, VideoContainerUrl,
         CodecUrl, VideoResolutionUrl;
+
+    [Inject] private IJSRuntime jsRuntime { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,4 +48,9 @@ public partial class SystemPage:ComponentBase
         this.lblVideoContainer = Translater.Instant("Pages.System.Labels.VideoContainer");
         this.lblVideoResolution = Translater.Instant("Pages.System.Labels.VideoResolution");
     }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     await jsRuntime.InvokeVoidAsync("eval", "(new Muuri('.dashboard'))");
+    // }
 }

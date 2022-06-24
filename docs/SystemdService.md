@@ -4,98 +4,98 @@ name: Systemd Service
 layout: default
 ---
 
-This is how you can configure FileFlows to run as a systemd service in linux.
+If you wish to install either FileFlows Server or FileFlows node as as systemd service.  Follow this guide.
 
-Service file
+First you need to have "dotnet" available to sudo and in the path variable.  This is needed as you have to use sudo to install the service, and the systemd file will use "dotnet" to launch FileFlows.
+
+### FileFlows Server
+To install FileFlows server as a systemd service run the following:
+
 ```
-[Unit]
-Description=FileFlows
-
-[Service]
-# if /usr/bin/dotnet doesn't work, use 'which dotnet' to find correct dotnet executable path
-ExecStart=/usr/bin/dotnet /home/USER_HERE/FileFlows/FileFlows.Server.dll --no-gui
-SyslogIdentifier=FileFlows
-WorkingDirectory=/home/USER_HERE/FileFlows
-User=root
-Restart=always
-RestartSec=5
-Environment=DOTNET_ROOT=/usr/lib64/dotnet
-
-[Install]
-WantedBy=multi-user.target
-```
-Save the systemd file under
-/etc/systemd/system/fileflows.service
-
-Then run
-```
-sudo systemctl daemon-reload
-sudo systemctl start fileflows.service
+cd Server
+sudo dotnet FileFlows.Server.dll --systemd
 ```
 
-To check the status
+### FileFlows Node
+To install FileFlows Node, it is recommended that you first run the Node manually to create the configuration file which include the URL of the server
+
+```
+cd Node
+dotnet FileFlows.Node.dll --no-gui
+```
+
+This will create a JSON configuration file /Data/node.config
+
+```json
+{
+  "ServerUrl": "",
+  "TempPath": "/home/user/FileFlows/Temp",
+  "HostName": "machine-name",
+  "Runners": 0,
+  "Enabled": false
+}
+```
+Update the "ServerURL" with the URL to your FileFlows Server, for example
+
+```json 
+{
+  "ServerUrl": "http://192.168.1.100:5000/",
+  "TempPath": "/home/user/FileFlows/Temp",
+  "HostName": "machine-name",
+  "Runners": 0,
+  "Enabled": false
+}
+```
+Save the file.
+
+Then install the systemd service with the following command
+```
+sudo dotnet FileFlows.Node.dll --systemd
+```
+
+### Check The Status
+To check the status of the FileFlows Server run
 ```
 sudo systemctl status fileflows.service
 ```
 
-To run it on startup, enable the service using
+And to check the status of the FileFlows Node run
+
 ```
-sudo systemctl enable fileflows.service
-sudo systemctl daemon-reload
+sudo systemctl status fileflows-node.service
 ```
 
+---
 
-## Script to Download FileFlows and Configure systemd
-NOTE: To update the USER field
+### FAQ
+Question:
+I am getting the following error when trying to install the service "sudo: dotnet: command not found"
+
+Answer:
+This means sudo cannot access dotnet, you can use whereis to find dotnet then include the full path
+
+For example,
 ```
-#! /bin/bash
-
-#INPUT USER BEFORE EXECUTING!
-USER="USER_GOES_HERE"
-DIR_HOME="/home/$USER/"
-cd $DIR_HOME
-DIR_FF="/home/$USER/FileFlows"
-if [ -d "$DIR_FF" ]; then
-  #$DIR exists
-  echo "FileFlows folder found, deleting everything except Data for update..."
-  cd $DIR_FF
-  find -maxdepth 1 ! -name Data ! -name . -exec rm -rv {} \;
-  cd $DIR_HOME
-else
-  echo "FileFlows folder not found, creating..."
-  mkdir FileFlows
-fi
-wget -O FileFlows.zip     https://fileflows.com/downloads/server-zip
-unzip FileFlows.zip -d FileFlows
-rm FileFlows.zip
-echo "Checking systemd service file"
-FILE=/etc/systemd/system/fileflows.service
-if test -f "$FILE"; then
-  echo "$FILE exists, restarting service..."
-  systemctl restart fileflows.service
-else
-  echo "FILE doesn't exist, creating..."
-  cat > $FILE <<EOF
-[Unit]
-Description=FileFlows
-
-[Service]
-# if /usr/bin/dotnet doesnt work, use which dotnet to find correct dotnet executable path
-ExecStart=/usr/bin/dotnet /home/$USER/FileFlows/FileFlows.Server.dll --no-gui
-SyslogIdentifier=FileFlows
-WorkingDirectory=/home/$USER/FileFlows
-User=root
-Restart=always
-RestartSec=5
-Environment=DOTNET_ROOT=/usr/lib64/dotnet
-
-[Install]
-WantedBy=multi-user.target
-EOF
-echo "Enabling and starting service..."
-systemctl daemon-reload
-systemctl enable fileflows.service
-systemctl start fileflows.service
-fi
-echo "All done!"
+> whereis dotnet
+> dotnet: /home/user/.dotnet/dotnet
+> sudo /home/user/.dotnet/dotnet FileFlows.Server.dll --systemd
 ```
+
+--- 
+
+Question: 
+I am getting an error saying dotnet cannot be found
+
+Answer: 
+If dotnet is not available in the PATH variable, you can modify the /etc/systemd/system/fileflows.service or /etc/systemd/system/fileflows-node.service and replace "dotnet" with the full path to dotnet.
+You can find dotnet by running
+```
+whereis dotnet
+```
+For example,
+```
+> whereis dotnet
+> dotnet: /home/user/.dotnet/dotnet
+> sudo nano /etc/systemd/system/fileflows.service
+```
+And replace "dotnet" with /home/user/.dotnet/dotnet

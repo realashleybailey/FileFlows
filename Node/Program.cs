@@ -43,6 +43,8 @@ public class Program
         Globals.IsDocker = options.Docker;
         Globals.IsSystemd = options.IsSystemd;
         
+        Console.WriteLine("BaseDirectory: " + DirectoryHelper.BaseDirectory);
+        
         DirectoryHelper.Init(options.Docker, true);
         
         appMutex = new Mutex(true, appName, out bool createdNew);
@@ -83,7 +85,9 @@ public class Program
                 AppSettings.ForcedTempPath = options.Temp;
             if (string.IsNullOrEmpty(options.Name) == false)
                 AppSettings.ForcedHostName = options.Name;
-
+            
+            if(File.Exists(DirectoryHelper.NodeConfigFile) == false)
+                AppSettings.Instance.Save();
 
             new ConsoleLogger();
             new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlows-Node");

@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using FileFlows.Node.Ui;
 using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Workers;
@@ -137,8 +138,10 @@ public class NodeManager
             AppSettings.Instance.Runners = AppSettings.EnvironmentalRunnerCount.Value;
 
         if (AppSettings.EnvironmentalEnabled != null)
-            AppSettings.Instance.Enabled = AppSettings.EnvironmentalEnabled.Value; 
-                
+            AppSettings.Instance.Enabled = AppSettings.EnvironmentalEnabled.Value;
+
+        if (string.IsNullOrEmpty(AppSettings.Instance.TempPath))
+            AppSettings.Instance.TempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
 
         var settings = AppSettings.Instance;
         var nodeService = new NodeService();

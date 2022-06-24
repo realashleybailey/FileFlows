@@ -350,6 +350,13 @@ namespace FileFlows.Client.Pages
                 var result = await HttpHelper.Put<ff>(API_URL, Model);
                 if (result.Success)
                 {
+                    if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Flows) !=
+                        ConfigurationStatus.Flows)
+                    {
+                        // refresh the app configuration status
+                        await App.Instance.LoadAppInfo();
+                    }
+
                     Model = result.Data;
                     IsDirty = false;
                 }

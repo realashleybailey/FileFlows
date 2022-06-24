@@ -99,6 +99,12 @@ public partial class Libraries : ListPage<Library>
                 Toast.ShowError( Translater.TranslateIfNeeded(saveResult.Body?.EmptyAsNull() ?? "ErrorMessages.SaveFailed"));
                 return false;
             }
+            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Libraries) !=
+                ConfigurationStatus.Libraries)
+            {
+                // refresh the app configuration status
+                await App.Instance.LoadAppInfo();
+            }
 
             int index = this.Data.FindIndex(x => x.Uid == saveResult.Data.Uid);
             if (index < 0)

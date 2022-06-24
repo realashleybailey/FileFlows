@@ -152,6 +152,12 @@ public partial class Flows : ListPage<ffFlow>
         var newFlowTemplate = await GetNewFlowTemplate(newModelTask.Result);
         if (newFlowTemplate != null && newFlowTemplate.Uid != Guid.Empty)
         {
+            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Flows) !=
+                ConfigurationStatus.Flows)
+            {
+                // refresh the app configuration status
+                await App.Instance.LoadAppInfo();
+            }
             // was saved, refresh list
             await this.Refresh();
         }

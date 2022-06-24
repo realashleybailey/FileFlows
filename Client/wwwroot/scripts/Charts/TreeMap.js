@@ -82,8 +82,9 @@ export class TreeMapChart{
             colors: ['#33b2df'],
             theme: {
                 mode: 'dark'
-            },stroke: {
-                colors: ['#ffffff']
+            },
+            stroke:{
+                colors:['#33b2df']
             },
             grid: {
                 borderColor: '#90A4AE33'

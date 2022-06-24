@@ -243,6 +243,7 @@ export class SystemValueLineChart{
             },
             yaxis: {
                 show: false,
+                min:0
             },
             markers: {
                 colors: ["#00BAEC"],
@@ -346,6 +347,9 @@ export class SystemValueLineChart{
                 brush: {
                     target: this.topUid,
                     enabled: true
+                },
+                yaxis: {
+                    min:0
                 },
                 selection: {
                     enabled: true,

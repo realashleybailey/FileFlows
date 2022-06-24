@@ -1,6 +1,7 @@
 using Avalonia.Controls.Chrome;
 using Avalonia.Threading;
 using FileFlows.Node.Utils;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 
 namespace FileFlows.Node.Ui;

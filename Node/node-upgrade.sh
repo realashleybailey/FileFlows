@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-if [ "$1" != "docker" ]; then 
+if [ "$1" = "systemd" ]; then
+  systemctl stop fileflows-node.service
+elif [ "$1" != "docker" ]; then 
   kill %1
 fi
 
@@ -15,7 +17,9 @@ mv NodeUpdate/run-node.sh run-node.sh
 
 rm -rf NodeUpdate
 
-if [ "$1" != "docker" ]; then 
+if [ "$1" = "systemd" ]; then
+  systemctl start fileflows-node.service  
+elif [ "$1" != "docker" ]; then 
   chmod +x run-node.sh
   ./run-node.sh
 fi

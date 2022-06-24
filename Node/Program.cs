@@ -7,6 +7,7 @@ using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
+using FileFlows.Shared.Helpers;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace FileFlows.Node;
@@ -36,11 +37,11 @@ public class Program
         var options = CommandLineOptions.Parse(args);
         if (Globals.IsLinux && options.InstallService)
         {
-            Utils.SystemdService.Install(options.DotNet);
+            SystemdService.Install(DirectoryHelper.BaseDirectory, true);
             return;
         }
         Globals.IsDocker = options.Docker;
-        ServerShared.Globals.IsDocker = options.Docker;
+        Globals.IsSystemd = options.IsSystemd;
         
         DirectoryHelper.Init(options.Docker, true);
         
@@ -89,6 +90,10 @@ public class Program
             new ServerLogger();
             
             Logger.Instance?.ILog("FileFlows Node version: " + Globals.Version);
+            if (Globals.IsDocker)
+                Logger.Instance?.ILog("Running in a docker container");
+            else if (Globals.IsSystemd)
+                Logger.Instance?.ILog("Running as a systemd service");
 
             AppSettings.Init();
 
@@ -196,11 +201,12 @@ public class Program
     /// <summary>
     /// Quits the node application
     /// </summary>
-    internal static void Quit()
+    /// <param name="exitCode">the exit code</param>
+    internal static void Quit(int exitCode = 0)
     {
         Exiting = true;
         MainWindow.Instance?.ForceQuit();
-        Environment.Exit(0);
+        Environment.Exit(exitCode);
     }
     
 }

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-if [ "$1" != "docker" ]; then 
+if [ "$1" = "systemd" ]; then
+  systemctl stop fileflows.service
+elif [ "$1" != "docker" ]; then 
   kill %1
 fi
 
@@ -17,7 +19,9 @@ mv Update/run-server.sh run-server.sh
 
 rm -rf Update
 
-if [ "$1" != "docker" ]; then 
+if [ "$1" = "systemd" ]; then
+  systemctl start fileflows.service  
+elif [ "$1" != "docker" ]; then 
   chmod +x run-server.sh
   ./run-server.sh
 fi

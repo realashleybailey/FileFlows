@@ -10,7 +10,7 @@ public class Globals
     /// <summary>
     /// Gets the version of FileFlows
     /// </summary>
-    internal static string Version = "0.8.1.1427";
+    public static string Version = "0.8.1.1427";
 
     /// <summary>
     /// Gets if this is running on Windows
@@ -31,4 +31,9 @@ public class Globals
     /// Gets or sets if this node is running inside a docker container
     /// </summary>
     public static bool IsDocker { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this node is running as a systemd service
+    /// </summary>
+    public static bool IsSystemd { get; set; }
 }

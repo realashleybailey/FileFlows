@@ -1,4 +1,5 @@
 using System.Reflection;
+using FileFlows.ServerShared;
 
 namespace FileFlows.Node;
 
@@ -34,9 +35,14 @@ class CommandLineOptions
     [CommandLineArg("If running inside a docker container", "true", "docker", true)]
     public bool Docker { get; set; }
     
+    /// <summary>
+    /// Gets or sets if running inside as a systemd service
+    /// </summary>
+    [CommandLineArg("If running inside as a systemd service", "true", "systemd-service", true)]
+    public bool IsSystemd { get; set; }
     
     /// <summary>
-    /// Gets or sets if running inside a docker container
+    /// Gets or sets if should install sysetmd service
     /// </summary>
     [CommandLineArg("Installs FileFlows Node as a systemd service", "", command: "systemd")]
     public bool InstallService { get; set; }

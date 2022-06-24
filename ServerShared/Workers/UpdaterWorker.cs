@@ -114,7 +114,10 @@ public abstract class UpdaterWorker : Worker
                 var fi = new FileInfo(updateScript);
 
                 var psi = new ProcessStartInfo(updateScript);
-                psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
+                if(Globals.IsSystemd)
+                    psi.ArgumentList.Add("systemd");
+                else
+                    psi.ArgumentList.Add(Process.GetCurrentProcess().Id.ToString());
                 psi.WorkingDirectory = fi.DirectoryName;
                 psi.UseShellExecute = true;
                 psi.CreateNoWindow = true;

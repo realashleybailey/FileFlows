@@ -42,7 +42,7 @@ public class NodeUpdater:UpdaterWorker
     protected override void QuitApplication()
     {
         Logger.Instance?.ILog($"{UpdaterName}: Quiting Application");
-        Program.Quit();
+        Program.Quit(99);
     }
 
     /// <summary>

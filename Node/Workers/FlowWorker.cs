@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Models;
 using Microsoft.Extensions.Logging;
 

@@ -4,6 +4,7 @@ using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
+using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server;
@@ -30,7 +31,15 @@ public class Program
                 return;
             }
             
+            
+            if (Globals.IsLinux && args?.Any(x => x == "--systemd") == true)
+            {
+                SystemdService.Install(DirectoryHelper.BaseDirectory, isNode: false);
+                return;
+            }
+            
             ServerShared.Globals.IsDocker = args?.Any(x => x == "--docker") == true;
+            ServerShared.Globals.IsSystemd = args?.Any(x => x == "--systemd-service") == true;
             var noGui = args?.Any((x => x.ToLower() == "--no-gui")) == true || Docker;
             DirectoryHelper.Init(Docker, false);
             

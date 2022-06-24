@@ -56,7 +56,8 @@ public class ServerUpdater : UpdaterWorker
     {
         Logger.Instance.ILog($"{nameof(ServerUpdater)} - Exiting Application to run update");
         WorkerManager.StopWorkers();
-        Environment.Exit(99);
+        // systemd needs an OK status not to auto restart, we dont want to auto restart that when upgrading
+        Environment.Exit(Globals.IsSystemd ? 0 : 99);  
     }
     
     protected override bool GetAutoUpdatesEnabled()

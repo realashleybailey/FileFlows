@@ -13,6 +13,13 @@ public class Globals
     public static string Version = "0.8.1.1427";
 
     /// <summary>
+    /// The minimum supported node version
+    /// </summary>
+    public static readonly Version MinimumNodeVersion = new Version(Version);
+    
+    public static bool IsDevelopment { get; set; }
+
+    /// <summary>
     /// Gets if this is running on Windows
     /// </summary>
     public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -36,4 +43,24 @@ public class Globals
     /// Gets or sets if this node is running as a systemd service
     /// </summary>
     public static bool IsSystemd { get; set; }
+    
+    
+
+    /// <summary>
+    /// The name of the internal processing node
+    /// </summary>
+    public const string InternalNodeName = "FileFlowsServer";
+    
+    /// <summary>
+    /// The UID of the internal processing node
+    /// </summary>
+    public static readonly Guid InternalNodeUid = new Guid("bf47da28-051e-452e-ad21-c6a3f477fea9");
+
+
+    public const string FlowFailName = "Fail Flow";
+    private const string FailFlowUidStr = "fabbe59c-9d4d-4b6d-b1ef-4ed6585ac7cc";
+    public static readonly Guid FailFlowUid = new Guid(FailFlowUidStr);
+    public const string FailFlowDescription = "A system flow that will execute when another flow reports a failure, -1 from a node.";
+
+    public const string FlowFailureInputUid = "FileFlows.BasicNodes.FlowFailure";
 }

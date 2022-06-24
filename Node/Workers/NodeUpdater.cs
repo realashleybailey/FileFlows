@@ -1,3 +1,4 @@
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
@@ -42,7 +43,8 @@ public class NodeUpdater:UpdaterWorker
     protected override void QuitApplication()
     {
         Logger.Instance?.ILog($"{UpdaterName}: Quiting Application");
-        Program.Quit(99);
+        // systemd needs an OK status not to auto restart, we dont want to auto restart that when upgrading
+        Program.Quit(Globals.IsSystemd ? 0 : 99);
     }
 
     /// <summary>

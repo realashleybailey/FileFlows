@@ -479,6 +479,7 @@
         "CpuUsage":"CPU Usage",
         "MemoryUsage":"Memory Usage",
         "TempStorage":"Temporary Storage",
+        "LogStorage": "Log Storage",
         "LibraryProcessingTimes":"Library Processing Times [Seconds Per Megabyte]",
         "ProcessingHeatMap":"Processing Heat Map",
         "Codec":"Codec",

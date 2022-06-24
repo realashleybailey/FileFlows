@@ -154,6 +154,19 @@ public class SystemController:Controller
     }
 
     /// <summary>
+    /// Gets history logging storage data of system information
+    /// </summary>
+    /// <param name="since">data since a date</param>
+    /// <returns>the history logging storage data</returns>
+    [HttpGet("history-data/log-storage")]
+    public IEnumerable<SystemValue<long>> GetLoggingStorageData([FromQuery] DateTime? since = null)
+    {
+        if (since == null)
+            return SystemMonitor.Instance.LogStorageUsage;
+        return SystemMonitor.Instance.LogStorageUsage.Where(x => x.Time > since);
+    }
+    
+    /// <summary>
     /// Gets history library processing time data
     /// </summary>
     /// <returns>history library processing time data</returns>
@@ -194,12 +207,7 @@ public class SystemController:Controller
         if (DbHelper.UseMemoryCache)
             return "Not supported by this installation";
         var data = await DbHelper.GetHourProcessingTotals();
-        // arrange the data so its shows monday -> sunday visually
-        data.Reverse();
-        var sunday = data[0];
-        data.RemoveAt(0);
-        data.Add(sunday);
-        return data.Select((x, index) => new
+        var results = data.Select((x, index) => new
         {
             name = ((DayOfWeek)index).ToString()[..3],
             data = x.Select(y => new
@@ -207,47 +215,17 @@ public class SystemController:Controller
                 x = y.Key == 0 ? "12am" : y.Key == 12 ? "12pm" : y.Key > 12 ? (y.Key - 12) + "pm" : y.Key + "am",
                 y = y.Value
             })
-        });
-    }
-
-    /// <summary>
-    /// Gets history data of system information
-    /// </summary>
-    /// <param name="since">data since a date</param>
-    /// <returns>the history data</returns>
-    [HttpGet("history-data")]
-    public SystemInfoData GetSystemInfoData([FromQuery] DateTime? since = null)
-    {
-        if (since == null)
-        {
-            return new ()
-            {
-                SystemDateTime = DateTime.Now,
-                CpuUsage = GroupData(SystemMonitor.Instance.CpuUsage),
-                MemoryUsage = GroupData(SystemMonitor.Instance.MemoryUsage),
-                TempStorageUsage = GroupData(SystemMonitor.Instance.TempStorageUsage),
-                LibraryProcessingTimes = SystemMonitor.Instance.LibraryProcessingTimes
-            };
-        }
-        
-        return new ()
-        {
-            SystemDateTime = DateTime.Now,
-            CpuUsage = SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since),
-            MemoryUsage = SystemMonitor.Instance.MemoryUsage.Where(x => x.Time > since),
-            TempStorageUsage = SystemMonitor.Instance.TempStorageUsage.Where(x => x.Time > since),
-        };
-
-        IEnumerable<SystemValue<T>> GroupData<T>(IEnumerable<SystemValue<T>> data) 
-        {
-            return data.GroupBy(x =>
-                    new DateTime(x.Time.Year, x.Time.Month, x.Time.Day, x.Time.Hour, x.Time.Minute >= 30 ? 30 : 0, 0))
-                .Select(x => new SystemValue<T>
-                {
-                    Time = x.Key,
-                    Value = (T) Convert.ChangeType(x.Average(y => Convert.ToDecimal(y.Value)), typeof(T))
-                });
-        } 
+        }).OrderBy(x =>
+            // arrange the data so its shows monday -> sunday visually
+            x.name == "Mon" ? 7 :
+            x.name == "Tue" ? 6 :
+            x.name == "Wed" ? 5 :
+            x.name == "Thu" ? 4 :
+            x.name == "Fri" ? 3 :
+            x.name == "Sat" ? 2 :
+            1
+        );
+        return results;
     }
 
     private async Task<float> GetCpuPercentage()

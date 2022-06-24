@@ -12,19 +12,22 @@
     
     <div class="dashboard">
         
-        @if (App.Instance.FileFlowsSystem.ExternalDatabase)
-        {
-            <BoxPlot Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
-            <HeatMap Title=@lblProcessingHeatMap Icon="fas fa-calendar-alt" Url=@ProcessingHeatMapUrl />
-            <TreeMap Title=@lblCodec Icon="fas fa-photo-video" Url=@CodecUrl />
-
-            <PieChart Title=@lblVideoContainer Icon="fas fa-film" Url=@VideoContainerUrl />
-            <PieChart Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl />
-        }
-        
         <SystemValueLineChartApex TItem="float" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
         <SystemValueLineChartApex TItem="float" Title=@lblMemoryUsage SizeData=@true Icon="fas fa-memory" Url=@MemoryUrl />
+        @if (App.Instance.FileFlowsSystem.ExternalDatabase)
+        {
+            <HeatMap Title=@lblProcessingHeatMap Icon="fas fa-calendar-alt" Url=@ProcessingHeatMapUrl/>
+            <PieChart Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl/>
+            <TreeMap Title=@lblCodec Icon="fas fa-photo-video" Url=@CodecUrl/>
+            <PieChart Title=@lblVideoContainer Icon="fas fa-film" Url=@VideoContainerUrl/>
+        }
+        
         <SystemValueLineChartApex TItem="long"  Title=@lblTempStorage SizeData=@true Icon="fas fa-hdd"  Url=@TempStorageUrl  />
+        <SystemValueLineChartApex TItem="long"  Title=@lblLogStorage SizeData=@true Icon="fas fa-hdd"  Url=@LogStorageUrl  />
+        
+        @if (App.Instance.FileFlowsSystem.ExternalDatabase){
+            <BoxPlot Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
+        }
     </div>
 
     </Body>

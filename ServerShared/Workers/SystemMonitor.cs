@@ -13,11 +13,8 @@ public class SystemMonitor:Worker
     public readonly Queue<SystemValue<float>> CpuUsage = new (1_000);
     public readonly Queue<SystemValue<float>> MemoryUsage = new (1_000);
     public readonly Queue<SystemValue<long>> TempStorageUsage = new(1_000);
-    private readonly Dictionary<Guid, NodeSystemStatistics> NodeTemporaryStorage = new();
-    /// <summary>
-    /// Gets or sets the processing times for libraries
-    /// </summary>
-    public IEnumerable<BoxPlotData> LibraryProcessingTimes { get; set; }
+    public readonly Queue<SystemValue<long>> LogStorageUsage = new(1_000);
+    private readonly Dictionary<Guid, NodeSystemStatistics> NodeStatistics = new();
     
 
     /// <summary>
@@ -28,20 +25,13 @@ public class SystemMonitor:Worker
     public SystemMonitor() : base(ScheduleType.Second, 2)
     {
         Instance = this;
-        LibraryProcessingTimes = new BoxPlotData[]
-        {
-            new() { Name = "Library 1", Minimum = 10, LowQuartile = 20, Median = 28, HighQuartile = 40, Maximum = 70 },
-            new() { Name = "Library 2", Minimum = 15, LowQuartile = 32, Median = 45, HighQuartile = 63, Maximum = 96 },
-            new() { Name = "Library 3", Minimum = 5, LowQuartile = 14, Median = 32, HighQuartile = 45, Maximum = 60 },
-            new() { Name = "Library 4", Minimum = 22, LowQuartile = 40, Median = 70, HighQuartile = 90, Maximum = 120 },
-            new() { Name = "Library 5", Minimum = 17, LowQuartile = 28, Median = 54, HighQuartile = 76, Maximum = 104 },
-        };
     }
 
     protected override void Execute()
     {
         var taskCpu = GetCpu();
         var taskTempStorage = GetTempStorageSize();
+        var taskLogStorage = GetLogStorageSize();
 
         MemoryUsage.Enqueue(new()
         {
@@ -57,6 +47,10 @@ public class SystemMonitor:Worker
         TempStorageUsage.Enqueue(new ()
         {
             Value = taskTempStorage.Result
+        });
+        LogStorageUsage.Enqueue(new ()
+        {
+            Value = taskLogStorage.Result
         });
     }
 
@@ -86,12 +80,30 @@ public class SystemMonitor:Worker
     {
         var node = await new NodeService().GetServerNode();
         var tempPath = node?.TempPath;
+        return GetDirectorySize(tempPath);
+    }
+
+    private async Task<long> GetLogStorageSize()
+    {
+        await Task.Delay(1);
+        string logPath = DirectoryHelper.LoggingDirectory;
+        string libFileLogPath = DirectoryHelper.LibraryFilesLoggingDirectory;
+        if(libFileLogPath == null || logPath.Contains(libFileLogPath))
+            return GetDirectorySize(logPath, logginDir: true);
+        long logPathLength = GetDirectorySize(logPath);
+        long libFileLogPathLength = GetDirectorySize(libFileLogPath);
+        return logPathLength + libFileLogPathLength;
+    }
+    
+    
+    private long GetDirectorySize(string path, bool logginDir = false)
+    {
         long size = 0;
-        if (string.IsNullOrEmpty(tempPath) == false)
+        if (string.IsNullOrEmpty(path) == false)
         {
             try
             {
-                var dir = new DirectoryInfo(tempPath);
+                var dir = new DirectoryInfo(path);
                 if (dir.Exists)
                     size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
             }
@@ -100,12 +112,14 @@ public class SystemMonitor:Worker
             }
         }
 
-        lock (NodeTemporaryStorage)
+        lock (NodeStatistics)
         {
-            foreach (var nts in NodeTemporaryStorage.Values)
+            foreach (var nts in NodeStatistics.Values)
             {
                 if (nts.RecordedAt > DateTime.Now.AddMinutes(-5))
-                    size += nts.TemporaryDirectorySize;
+                {
+                    size += logginDir ? nts.LogDirectorySize : nts.TemporaryDirectorySize;
+                }
             }
         }
 
@@ -119,12 +133,12 @@ public class SystemMonitor:Worker
     public void Record(NodeSystemStatistics args)
     {
         args.RecordedAt = DateTime.Now;
-        lock (NodeTemporaryStorage)
+        lock (NodeStatistics)
         {
-            if (NodeTemporaryStorage.ContainsKey(args.Uid))
-                NodeTemporaryStorage[args.Uid] = args;
+            if (NodeStatistics.ContainsKey(args.Uid))
+                NodeStatistics[args.Uid] = args;
             else
-                NodeTemporaryStorage.Add(args.Uid, args);
+                NodeStatistics.Add(args.Uid, args);
         }
     }
 }

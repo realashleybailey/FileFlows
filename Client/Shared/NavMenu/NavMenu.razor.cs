@@ -33,14 +33,26 @@ namespace FileFlows.Client.Shared
                 }
             });
 
+            NavMenuItem nmiFlows = new("Pages.Flows.Title", "fas fa-sitemap", "flows");
+            NavMenuItem nmiLibraries = new("Pages.Libraries.Title", "fas fa-folder", "libraries");
+
+            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Flows) !=
+                ConfigurationStatus.Flows)
+                nmiFlows.ConfigStatusStepLabel = "Step 1";
+            else if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Libraries) !=
+                ConfigurationStatus.Libraries)
+                nmiLibraries.ConfigStatusStepLabel = "Step 2";
+            else
+                nmiLibraries.ConfigStatusStepLabel = "Step 2";
+
             MenuItems.Add(new NavMenuGroup
             {
                 Name = "Configuration",
                 Icon = "fas fa-code-branch",
                 Items = new List<NavMenuItem>
                 {
-                    new ("Pages.Flows.Title", "fas fa-sitemap", "flows"),
-                    new ("Pages.Libraries.Title", "fas fa-folder", "libraries"),
+                    nmiFlows,
+                    nmiLibraries,
 #if (!DEMO)
                     new ("Pages.Nodes.Title", "fas fa-desktop", "nodes")
 #endif
@@ -113,6 +125,11 @@ namespace FileFlows.Client.Shared
         public string Title { get; set; }
         public string Icon { get; set; }
         public string Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets a hint to show when configuration of this step is not done
+        /// </summary>
+        public string ConfigStatusStepLabel { get; set; }
 
         public NavMenuItem(string title = "", string icon = "", string url = "")
         {

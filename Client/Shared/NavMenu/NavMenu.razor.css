@@ -60,6 +60,9 @@
   display: none;
 }
 
+.nav-item {
+  position: relative;
+}
 .nav-item ::deep a {
   padding-left: 2rem;
   height: 2.5rem;

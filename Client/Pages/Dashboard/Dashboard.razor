@@ -46,20 +46,12 @@
             <p>You can have as many Flows as you like, ranging from many tasks.</p>
             <p>For example, you can configure a Flow to convert video files from one format into another. Or a Flow to move pictures into folders based on the date they were taken.</p>
 
-            @if ((ConfiguredStatus & ConfigurationStatus.Flows) != ConfigurationStatus.Flows)
-            {
-                <div class="not-configured-pointer step-flows">Step 1</div>
-            }
             <br/>
 
             <h2>Step 2. Creating a Library</h2>
             <p>FileFlows needs one or more Libraries to monitor for files.</p>
             <p>These can be directories or drives.</p>
             <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
-            @if ((ConfiguredStatus & ConfigurationStatus.Libraries) != ConfigurationStatus.Libraries)
-            {
-                <div class="not-configured-pointer step-library">Step 2</div>
-            }
         }
         else
         {

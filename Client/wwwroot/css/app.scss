@@ -395,4 +395,59 @@ input[type=file]{
         }
     }
     
-} 
+}
+
+
+
+/** step pointer start */
+
+@media screen and (max-width:850px){
+    .not-configured-pointer {
+        display:none;
+    }
+}
+
+@media screen and (min-width:850px) {
+    .not-configured-pointer {
+        position: absolute;
+        right: -9px;
+        top:5px;
+        width: 75px;
+        background: var(--accent);
+        height: 25px;
+        line-height: 25px;
+        margin-bottom: 30px;
+        text-align: center;
+        color: var(--color);
+        animation: bounce 1.75s infinite;
+        box-shadow: 0 3px 10px rgba(var(--accent-rgb), 0.2);
+
+        &:before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 14px solid transparent;
+            border-right: 10px solid var(--accent);
+        }
+    }
+    @keyframes bounce {
+        0% {
+            transform: translateX(0);
+        }
+
+        50% {
+            transform: translateX(-10px);
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+}
+@media screen and (max-height:856px) {
+    .not-configured-pointer {
+        top:3px;
+    }
+}
+/** step pointer end */

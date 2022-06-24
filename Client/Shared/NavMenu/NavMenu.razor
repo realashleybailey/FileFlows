@@ -44,9 +44,13 @@
                 }
                 <li class="nav-item @(item.Url.Replace("/", ""))">
                     <a class="nav-link @(Active == item  ? "active": "")" href="@item.Url" @onclick:preventDefault @onclick:stopPropagation
-                    @onclick="() => Click(item)">
+                                                                                           @onclick="() => Click(item)">
                         <span class="@item.Icon" aria-hidden="true"></span> @item.Title
                     </a>
+                    @if (string.IsNullOrEmpty(item.ConfigStatusStepLabel) == false)
+                    {
+                        <div class="not-configured-pointer">@item.ConfigStatusStepLabel</div>
+                    }
                 </li>
             }
         }

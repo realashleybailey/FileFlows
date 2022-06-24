@@ -62,6 +62,7 @@
 }
 
 .nav-item {
+    position: relative;
     ::deep a {
         padding-left:2rem;
         height: 2.5rem;

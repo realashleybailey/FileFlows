@@ -40,7 +40,7 @@ These let you alter the the variable value
 | file.Create.Month | Creation Month of original file | int | 3 |
 | file.Create.Day | Creation Day of original file | int | 28 |
 | file.Modified | Modified DateTime of original file | DateTime | Javascript new Date() |
-| file.Modified.Year | Modified Year of original file | int | 2020 |1
+| file.Modified.Year | Modified Year of original file | int | 2020 |
 | file.Modified.Month | Modified Month of original file | int | 3 |
 | file.Modified.Day | Modified Day of original file | int | 28 |
 | file.Modified | Modified DateTime of original file | DateTime | Javascript new Date() |

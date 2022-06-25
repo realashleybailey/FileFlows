@@ -88,8 +88,15 @@ namespace FileFlows.Client.Shared
 
 #endif
 
-            string currentRoute = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
-            Active = MenuItems.SelectMany(x => x.Items).Where(x => x.Url == currentRoute).FirstOrDefault() ?? MenuItems[0].Items.First();
+            try
+            {
+                string currentRoute = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
+                Active = MenuItems.SelectMany(x => x.Items).Where(x => x.Url == currentRoute).FirstOrDefault() ??
+                         MenuItems[0].Items.First();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void FileFlowsSystemUpdated(FileFlowsStatus system)

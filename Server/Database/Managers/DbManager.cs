@@ -95,8 +95,17 @@ public abstract class DbManager
     /// <returns>an instance of the IDatabase</returns>
     protected async Task<IDatabase> GetDb()
     {
-        var connection = await DbConnectionPool.Get();
-        return connection;
+        int count = 0;
+        while(++count < 100)
+        {
+            var connection = await DbConnectionPool.Get();
+            if (connection.Connection == null || (connection.Connection.State != ConnectionState.Closed &&
+                connection.Connection.State != ConnectionState.Broken))
+                return connection;
+            DbConnectionPool.DisposeOf(connection);
+        }
+        // should never happen, but to prevent an infinite loop
+        throw new Exception("Failed to get a connection");
     }
 
     /// <summary>

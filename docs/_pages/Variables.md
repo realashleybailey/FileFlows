@@ -19,7 +19,7 @@ For example, {file.Name}
 
 Typing { will open up a variable selector of available variables.
 
-![Text Variables](2022-06-26-11-12-27.png)
+![Text Variables](/images/2022-06-26-11-12-27.png)
 
 ## Using in a Function or Script
 To use a variable inside a function or script, call the Variables object
@@ -28,7 +28,7 @@ For example,
 ```javascript
 Variables.file.Name
 ```
-![Function Variables](2022-06-26-11-11-10.png)
+![Function Variables](/images/2022-06-26-11-11-10.png)
 
 ## Options
 These let you alter the the variable value

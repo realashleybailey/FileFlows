@@ -3,7 +3,7 @@ title: Versions
 name: Versions
 permalink: /versions
 layout: default
-order: 800
+order: 900
 ---
 
 ## Version 0.8.2

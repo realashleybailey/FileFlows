@@ -12,7 +12,7 @@
 }
 
 .btn-download-node {
-  width: 10rem;
+  width: 9rem !important;
 }
 
 /*# sourceMappingURL=Nodes.razor.css.map */

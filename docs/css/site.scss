@@ -212,10 +212,9 @@ th {
     padding:0.5rem;
 }
 td {    
-    background-color: #242424;
     padding:0.25rem;
 }
 
-tr:hover {
+tr:hover td {
     background:rgba(var(--accent-rgb), 0.4);
 }

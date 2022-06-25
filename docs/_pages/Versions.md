@@ -24,6 +24,7 @@ order: 900
 
 #### Fixed
 - API Page failed to load due to swagger error
+- Removed "No File" dashboard portlet 
 - Fixed issue with loading from localhost
 - Bug where "FFMPEG Builder: Subtitle Track Merge" would use the inverse of the selected files, so if you entered "sub" it would use any file but a "sub"
 - Renamed "Pattern Replacer" to "Filename Pattern Replacer"

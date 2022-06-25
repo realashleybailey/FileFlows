@@ -12,6 +12,23 @@ The available variables are based on the flow nodes before the current node.
 
 E.g. if you use a [Video File](/plugins/video-nodes/video-file) node this will insert {vi.Video.Codec} etc
 
+## Using in Text Fields
+To use a variable inside a text field, they must be wrapped in {}.
+
+For example, {file.Name}
+
+Typing { will open up a variable selector of available variables.
+
+![Text Variables](2022-06-26-11-12-27.png)
+
+## Using in a Function or Script
+To use a variable inside a function or script, call the Variables object
+
+For example,
+```javascript
+Variables.file.Name
+```
+![Function Variables](2022-06-26-11-11-10.png)
 
 ## Options
 These let you alter the the variable value

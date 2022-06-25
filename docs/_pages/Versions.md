@@ -11,9 +11,9 @@ order: 900
 #### New
 - Flow Editor: Copy and Paste nodes
 - Flow Editor: Undo/Redo history
-- System Page added (Premium Feature)
+- [System Page](/system) added (Premium Feature)
   - This gives you an overview of the system including Codecs processed, CPU/Memory/Storage/Database statistics, Processing times etc
-- Removed "Statistics" page as the "System" page now replaces this
+- Removed "Statistics" page as the [System Page](/system) page now replaces this
 - FFMPEG Builder: Video Codec no longer does a hardware test if a specific hardware encoder is specified.  
   - E.g. if you use qsv_h264 It will use that codec, it may fail, but it will use that
   - If you just use "h264" or "hevc" or "h265" it will continue to do the hardware test

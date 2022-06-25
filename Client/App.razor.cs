@@ -26,6 +26,10 @@ namespace FileFlows.Client
         public static FileFlows.Shared.Models.Settings Settings;
 
         public FileFlowsStatus FileFlowsSystem { get; private set; }
+
+        public delegate void FileFlowsSystemUpdated(FileFlowsStatus system);
+
+        public event FileFlowsSystemUpdated OnFileFlowsSystemUpdated;
         
 
         public async Task LoadLanguage()
@@ -43,6 +47,7 @@ namespace FileFlows.Client
         {
             FileFlowsSystem = (await HttpHelper.Get<FileFlowsStatus>("/api/settings/fileflows-status")).Data;
             this.StateHasChanged();
+            this.OnFileFlowsSystemUpdated?.Invoke(FileFlowsSystem);
         }
 
         private async Task<string> LoadLanguageFile(string url)

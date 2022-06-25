@@ -47,9 +47,12 @@
                                                                                            @onclick="() => Click(item)">
                         <span class="@item.Icon" aria-hidden="true"></span> @item.Title
                     </a>
-                    @if (Active != item && string.IsNullOrEmpty(item.ConfigStatusStepLabel) == false)
-                    {
-                        <div class="not-configured-pointer">@item.ConfigStatusStepLabel</div>
+                    @{
+                        string stepLabel = GetStepLabel(item);
+                        if (stepLabel != null)
+                        {
+                            <div class="not-configured-pointer">@stepLabel</div>
+                        }
                     }
                 </li>
             }

@@ -17,10 +17,21 @@ namespace FileFlows.Client.Shared
         private string lblVersion, lblHelp;
 
         private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+        private NavMenuItem nmiFlows, nmiLibraries;
+
         protected override void OnInitialized()
         {
             lblVersion = Translater.Instant("Labels.VersionNumber", new { version = Globals.Version });
             lblHelp = Translater.Instant("Labels.Help");
+
+            App.Instance.OnFileFlowsSystemUpdated += FileFlowsSystemUpdated;
+            
+            this.LoadMenu();
+        }
+        
+        void LoadMenu()
+        {
+            this.MenuItems.Clear();
 
             MenuItems.Add(new NavMenuGroup
             {
@@ -33,15 +44,8 @@ namespace FileFlows.Client.Shared
                 }
             });
 
-            NavMenuItem nmiFlows = new("Pages.Flows.Title", "fas fa-sitemap", "flows");
-            NavMenuItem nmiLibraries = new("Pages.Libraries.Title", "fas fa-folder", "libraries");
-
-            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Flows) !=
-                ConfigurationStatus.Flows)
-                nmiFlows.ConfigStatusStepLabel = "Step 1";
-            else if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Libraries) !=
-                ConfigurationStatus.Libraries)
-                nmiLibraries.ConfigStatusStepLabel = "Step 2";
+            nmiFlows = new("Pages.Flows.Title", "fas fa-sitemap", "flows");
+            nmiLibraries = new("Pages.Libraries.Title", "fas fa-folder", "libraries");
 
             MenuItems.Add(new NavMenuGroup
             {
@@ -88,6 +92,32 @@ namespace FileFlows.Client.Shared
             Active = MenuItems.SelectMany(x => x.Items).Where(x => x.Url == currentRoute).FirstOrDefault() ?? MenuItems[0].Items.First();
         }
 
+        private void FileFlowsSystemUpdated(FileFlowsStatus system)
+        {
+            this.LoadMenu();
+            this.StateHasChanged();
+        }
+
+        private string? GetStepLabel(NavMenuItem nmi)
+        {
+            if (nmi == Active)
+                return null;
+            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Flows) !=
+                ConfigurationStatus.Flows)
+            {
+                return nmi == nmiFlows ? "Step 1" : null;
+            }
+
+            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Libraries) !=
+                ConfigurationStatus.Libraries)
+            {
+                return nmi == nmiLibraries ? "Step 2" : null; 
+            }
+
+            return null;
+        }
+        
+
         private void ToggleNavMenu()
         {
             collapseNavMenu = !collapseNavMenu;
@@ -123,11 +153,6 @@ namespace FileFlows.Client.Shared
         public string Title { get; set; }
         public string Icon { get; set; }
         public string Url { get; set; }
-
-        /// <summary>
-        /// Gets or sets a hint to show when configuration of this step is not done
-        /// </summary>
-        public string ConfigStatusStepLabel { get; set; }
 
         public NavMenuItem(string title = "", string icon = "", string url = "")
         {

@@ -361,6 +361,7 @@ export class TimeSeriesChart extends FFChart
     url;
     lastFetch;
     timer;
+    maxValue;
 
     selectedRange = {
         start: null,
@@ -408,10 +409,16 @@ export class TimeSeriesChart extends FFChart
             data = await response.json();
         }
 
+        let max = 0;
         for(let d of data){
             if(typeof(d.x) === 'string')
                 d.x = new Date(Date.parse(d.x));
+            if(d.y === 0)
+                d.y = 0.001; // just show it appears
+            if(d.y > max)
+                max = d.y;
         }
+        this.maxValue = max;
 
         if(this.lastFetch)
             this.data = this.data.concat(data);
@@ -581,7 +588,8 @@ export class TimeSeriesChart extends FFChart
             },
             yaxis: {
                 show: false,
-                min:0
+                min:0,
+                max: this.maxValue === 0.001 ? 1 : this.maxValue
             },
             markers: {
                 colors: ["#00BAEC"],
@@ -613,12 +621,14 @@ export class TimeSeriesChart extends FFChart
                                 return '';
                             }
                             if(this.countData)
-                                return value;
+                                return value = 0.001 ? 0 : value;
                             return value.toFixed(1) + ' %';
                         }
                 }
             }
         };
+        
+        console.log('top options', JSON.parse(JSON.stringify(options)));
 
         this.chartTop = new ApexCharts(document.getElementById(this.topUid), options);
         this.chartTop.render();
@@ -666,6 +676,8 @@ export class TimeSeriesChart extends FFChart
             if(b.y > yMax)
                 yMax = b.y;
         }
+        if(yMax === 0.001)
+            yMax = 1;
         this.selectedRange.start = brushStart;
         this.selectedRange.end = brushEnd;
 

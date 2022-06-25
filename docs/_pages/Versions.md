@@ -6,6 +6,40 @@ layout: default
 order: 900
 ---
 
+## Version 0.8.3
+
+#### New
+- Flow Editor: Copy and Paste nodes
+- Flow Editor: Undo/Redo history
+- System Page added (Premium Feature)
+  - This gives you an overview of the system including Codecs processed, CPU/Memory/Storage/Database statistics, Processing times etc
+- Removed "Statistics" page as the "System" page now replaces this
+- FFMPEG Builder: Video Codec no longer does a hardware test if a specific hardware encoder is specified.  
+  - E.g. if you use qsv_h264 It will use that codec, it may fail, but it will use that
+  - If you just use "h264" or "hevc" or "h265" it will continue to do the hardware test
+- Server can now install/uninstall a systemd service using --systemd and --systemd --uninstall
+- Node can now install a systemd service using --systemd --uninstall
+- Server and Node now create an entrypoint bash script with using systemd and the auto upgrade process takes place inside that script.
+  - This fixes the issue with systemd restarting FileFlows while the upgrade is happening and works similar to how the Docker upgrade works
+
+#### Fixed
+- API Page failed to load due to swagger error
+- Fixed issue with loading from localhost
+- Bug where "FFMPEG Builder: Subtitle Track Merge" would use the inverse of the selected files, so if you entered "sub" it would use any file but a "sub"
+- Renamed "Pattern Replacer" to "Filename Pattern Replacer"
+- Music Nodes: Fixed issue where MusicInfo was not updated after file was processed
+- Updated QSV and VAAPI hardware decoding parameters
+- Plex Nodes not able t find path
+- Processing Nodes now default to "Process: All"
+- Step 1/2 hints for new installs now show on all screens
+- Fixed "Pause Processing" button on mobile view
+- Misc Cosmetic improvements
+
+
+
+
+---
+
 ## Version 0.8.2
 
 #### New

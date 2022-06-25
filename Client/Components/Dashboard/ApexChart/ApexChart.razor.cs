@@ -48,7 +48,12 @@ public partial class ApexChart:ComponentBase, IDisposable
     /// Gets or sets the URL to retrieve the data
     /// </summary>
     [Parameter] public string Url { get; set; }
-        
+    
+    /// <summary>
+    /// Any additional options to pass to the chart
+    /// </summary>
+    [Parameter] public object Options { get; set; }
+    
     /// <summary>
     /// UID of the chart, this is used to load/save the charts position
     /// </summary>
@@ -102,7 +107,7 @@ public enum ApexChartType
     /// </summary>
     TreeMap,
     /// <summary>
-    /// Time series
+    /// Time series percentage
     /// </summary>
     TimeSeries
 }

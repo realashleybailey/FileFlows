@@ -79,8 +79,7 @@ public class DbHelper
     /// <param name="uid">the Uid of the item</param>
     /// <param name="name">the name of the item</param>
     /// <returns>true if name is in use</returns>
-    public static Task<bool> NameInUse<T>(Guid uid, string name) =>
-        Task.FromResult(Manager.NameInUse<T>(uid, name));
+    public static Task<bool> NameInUse<T>(Guid uid, string name) => Manager.NameInUse<T>(uid, name);
 
     /// <summary>
     /// Select a single instance of a type

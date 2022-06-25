@@ -12,23 +12,21 @@
     
     <div class="grid-stack">
         
-        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
-        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
-        
+        <ApexChart Width="4" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
+        <ApexChart Width="4" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
+        <ApexChart Width="4" ChartType="ApexChartType.TimeSeries" Options="2" Title=@lblOpenDbConnections Icon="fas fa-memory" Url=@OpenDbConnectionsUrl />
+            
         @if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
-            <ApexChart Height="2" ChartType="ApexChartType.TreeMap" Title=@lblCodec Icon="fas fa-photo-video" Url=@CodecUrl />
-            <ApexChart Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl />
-            <ApexChart Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoContainer Icon="fas fa-film" Url=@VideoContainerUrl />
-            <ApexChart Height="2" ChartType="ApexChartType.HeatMap" Title=@lblProcessingHeatMap Icon="fas fa-calendar-alt" Url=@ProcessingHeatMapUrl />
+            <ApexChart Width="6" Height="2" ChartType="ApexChartType.TreeMap" Title=@lblCodec Icon="fas fa-photo-video" Url=@CodecUrl />
+            <ApexChart Width="6" Height="2" ChartType="ApexChartType.HeatMap" Title=@lblProcessingHeatMap Icon="fas fa-calendar-alt" Url=@ProcessingHeatMapUrl />
+            <ApexChart Width="4" Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoContainer Icon="fas fa-film" Url=@VideoContainerUrl />
+            <ApexChart Width="4" Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl />
+            <ApexChart Width="4" Height="2" ChartType="ApexChartType.BoxPlot" Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
         }
         
-        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblTempStorage Icon="fas fa-hdd" Url=@TempStorageUrl />
-        <ApexChart Width="2" ChartType="ApexChartType.TimeSeries" Title=@lblLogStorage Icon="fas fa-hdd" Url=@LogStorageUrl />
-        
-        @if (App.Instance.FileFlowsSystem.ExternalDatabase){
-            <ApexChart Height="2" ChartType="ApexChartType.BoxPlot" Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
-        }
+        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblTempStorage Icon="fas fa-hdd" Url=@TempStorageUrl />
+        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblLogStorage Icon="fas fa-hdd" Url=@LogStorageUrl />
     </div>
 
     </Body>

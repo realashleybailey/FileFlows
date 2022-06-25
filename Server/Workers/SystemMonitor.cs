@@ -1,19 +1,23 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using FileFlows.Server.Database.Managers;
 using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
+using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 
-namespace FileFlows.ServerShared.Workers;
+namespace FileFlows.Server.Workers;
 
 /// <summary>
 /// Worker that monitors system information
 /// </summary>
 public class SystemMonitor:Worker
 {
-    public readonly Queue<SystemValue<float>> CpuUsage = new (1_000);
-    public readonly Queue<SystemValue<float>> MemoryUsage = new (1_000);
-    public readonly Queue<SystemValue<long>> TempStorageUsage = new(1_000);
-    public readonly Queue<SystemValue<long>> LogStorageUsage = new(1_000);
+    public readonly FixedSizedQueue<SystemValue<float>> CpuUsage = new (1_000);
+    public readonly FixedSizedQueue<SystemValue<float>> MemoryUsage = new (1_000);
+    public readonly FixedSizedQueue<SystemValue<long>> TempStorageUsage = new(1_000);
+    public readonly FixedSizedQueue<SystemValue<long>> LogStorageUsage = new(1_000);
+    public readonly FixedSizedQueue<SystemValue<long>> OpenDbConnections = new(1_000);
     private readonly Dictionary<Guid, NodeSystemStatistics> NodeStatistics = new();
     
 
@@ -22,7 +26,7 @@ public class SystemMonitor:Worker
     /// </summary>
     public static SystemMonitor Instance { get; private set; }
     
-    public SystemMonitor() : base(ScheduleType.Second, 2)
+    public SystemMonitor() : base(ScheduleType.Second, 10)
     {
         Instance = this;
     }
@@ -52,28 +56,41 @@ public class SystemMonitor:Worker
         {
             Value = taskLogStorage.Result
         });
+        OpenDbConnections.Enqueue((new ()
+        {
+            Value = DbManager.GetOpenDbConnections()
+        }));
     }
 
     private async Task<float> GetCpu()
     {
         await Task.Delay(1);
-        var startTime = DateTime.UtcNow;
-        var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-        var stopWatch = new Stopwatch();
-        stopWatch.Start();
+        List<float> records = new List<float>();
+        int max = 7;
+        for (int i = 0; i <= max; i++)
+        {
+            var startTime = DateTime.UtcNow;
+            var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
 
-        await Task.Delay(100);
+            await Task.Delay(100);
 
-        stopWatch.Stop();
-        var endTime = DateTime.UtcNow;
-        var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+            stopWatch.Stop();
+            var endTime = DateTime.UtcNow;
+            var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
 
-        var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-        var totalMsPassed = (endTime - startTime).TotalMilliseconds;
-        var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+            var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+            var totalMsPassed = (endTime - startTime).TotalMilliseconds;
+            var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
 
-        var cpuUsagePercentage = (float)(cpuUsageTotal * 100);
-        return cpuUsagePercentage;
+            records.Add((float)(cpuUsageTotal * 100));
+            if (i == max)
+                break;
+            await Task.Delay(1000);
+        }
+
+        return records.Max();
     }
 
     private async Task<long> GetTempStorageSize()
@@ -139,6 +156,47 @@ public class SystemMonitor:Worker
                 NodeStatistics[args.Uid] = args;
             else
                 NodeStatistics.Add(args.Uid, args);
+        }
+    }
+}
+
+
+/// <summary>
+/// A queue of fixed size
+/// </summary>
+/// <typeparam name="T">the type to queue</typeparam>
+public class FixedSizedQueue<T> : ConcurrentQueue<T>
+{
+    private readonly object syncObject = new object();
+
+    /// <summary>
+    /// Gets or sets the max queue size
+    /// </summary>
+    public int Size { get; private set; }
+
+    /// <summary>
+    /// Constructs an instance of a fixed size queue
+    /// </summary>
+    /// <param name="size">the size of the queue</param>
+    public FixedSizedQueue(int size)
+    {
+        Size = size;
+    }
+
+    /// <summary>
+    /// Adds a item to the queue
+    /// </summary>
+    /// <param name="obj">the item to add</param>
+    public new void Enqueue(T obj)
+    {
+        base.Enqueue(obj);
+        lock (syncObject)
+        {
+            while (base.Count > Size)
+            {
+                T outObj;
+                base.TryDequeue(out outObj);
+            }
         }
     }
 }

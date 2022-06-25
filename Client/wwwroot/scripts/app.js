@@ -105,7 +105,6 @@ window.ff = {
         }
 
         var grid = GridStack.init({
-            column: 3,
             cellHeight:170,
             handle: '.draghandle'
         });
@@ -122,7 +121,6 @@ window.ff = {
                     id:id, x: x, y:y, w:w, h:h
                 });                
             }
-            console.log('dashboard data', JSON.parse(JSON.stringify(data)));
             localStorage.setItem('dashboard-' + uid, JSON.stringify(data));
         }
         

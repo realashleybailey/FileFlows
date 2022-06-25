@@ -484,7 +484,8 @@
         "ProcessingHeatMap":"Processing Heat Map",
         "Codec":"Codec",
         "VideoContainer": "Video Container",
-        "VideoResolution": "Video Resolution"
+        "VideoResolution": "Video Resolution",
+        "OpenDbConnections":"Open Database Connections"
       }
     },
     "Tools": {

@@ -9,10 +9,10 @@ namespace FileFlows.Client.Pages;
 public partial class SystemPage:ComponentBase
 {
     private string lblCpuUsage, lblMemoryUsage, lblTempStorage, lblLogStorage, lblLibraryProcessingTimes, lblProcessingHeatMap, lblCodec,
-        lblVideoContainer, lblVideoResolution;
+        lblVideoContainer, lblVideoResolution, lblOpenDbConnections;
 
     private string CpuUrl, MemoryUrl, TempStorageUrl, LogStorageUrl, LibraryProcessingTimeUrl, ProcessingHeatMapUrl, VideoContainerUrl,
-        CodecUrl, VideoResolutionUrl;
+        CodecUrl, VideoResolutionUrl, OpenDbConnectionsUrl;
 
     [Inject] private IJSRuntime jsRuntime { get; set; }
 
@@ -27,6 +27,7 @@ public partial class SystemPage:ComponentBase
         this.CodecUrl = "/api/statistics/by-name/CODEC";
         this.VideoContainerUrl = "/api/statistics/by-name/VIDEO_CONTAINER";
         this.VideoResolutionUrl = "/api/statistics/by-name/VIDEO_RESOLUTION";
+        this.OpenDbConnectionsUrl = "/api/system/history-data/open-db-connections";
 #if (DEBUG)
         this.CpuUrl = "http://localhost:6868" + this.CpuUrl;
         this.MemoryUrl = "http://localhost:6868" + this.MemoryUrl;
@@ -37,6 +38,7 @@ public partial class SystemPage:ComponentBase
         this.CodecUrl = "http://localhost:6868" + this.CodecUrl;
         this.VideoContainerUrl = "http://localhost:6868" + this.VideoContainerUrl;
         this.VideoResolutionUrl = "http://localhost:6868" + this.VideoResolutionUrl;
+        this.OpenDbConnectionsUrl = "http://localhost:6868" + this.OpenDbConnectionsUrl;
 #endif
         this.lblCpuUsage = Translater.Instant("Pages.System.Labels.CpuUsage");
         this.lblMemoryUsage = Translater.Instant("Pages.System.Labels.MemoryUsage");
@@ -47,6 +49,7 @@ public partial class SystemPage:ComponentBase
         this.lblCodec = Translater.Instant("Pages.System.Labels.Codec");
         this.lblVideoContainer = Translater.Instant("Pages.System.Labels.VideoContainer");
         this.lblVideoResolution = Translater.Instant("Pages.System.Labels.VideoResolution");
+        this.lblOpenDbConnections = Translater.Instant("Pages.System.Labels.OpenDbConnections");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

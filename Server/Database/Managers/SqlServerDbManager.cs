@@ -21,7 +21,7 @@ public class SqlServerDbManager: DbManager
 
     protected override string JsonExtractMethod => "json_value";
 
-    protected override IDatabase GetDb()
+    protected override NPoco.Database GetDbInstance()
     {
         return new NPoco.Database(ConnectionString,
             null,
@@ -94,7 +94,7 @@ public class SqlServerDbManager: DbManager
     public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         int quarter = TimeHelper.GetCurrentQuarter();
-        using var db = GetDb();
+        using var db = await GetDb();
         return await db.FetchAsync<LibraryStatus>(
             "exec GetLibraryFiles @@Status=0, @@IntervalIndex=@0, @@MaxItems=0, @@Start=0, @@NodeUid=null, @@Overview=1",
             quarter);
@@ -111,7 +111,7 @@ public class SqlServerDbManager: DbManager
     /// <returns>an enumerable of library files</returns>
     public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         var dbObjects = await db.FetchAsync<DbObject>("exec GetLibraryFiles @@Status=@1, @@IntervalIndex=@1, @@MaxItems=@2, @@Start=@3, @@NodeUid=@4, @@Overview=0", 
             (int)status, quarter, max, start, nodeUid);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
@@ -154,7 +154,7 @@ public class SqlServerDbManager: DbManager
     /// <returns>the failure flow</returns>
     public override async Task<Flow> GetFailureFlow(Guid libraryUid)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         var dbObject = await db.SingleAsync<DbObject>(
             "select * from DbObject where Type = @0 " +
             "and json_value(Data,'$.Type') = @1 " +

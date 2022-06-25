@@ -11,6 +11,7 @@ export function newChart(type, uid, args){
         window.FlowCharts[uid] = new TreeMapChart(uid, args);
     else if(type == 'TimeSeries')
         window.FlowCharts[uid] = new TimeSeriesChart(uid, args);
+    
 }
 
 export function dispose(uid) {
@@ -354,6 +355,7 @@ export class TimeSeriesChart extends FFChart
     topUid;
     chartBottom;
     sizeData;
+    countData;
     data;
     buckets;
     url;
@@ -365,14 +367,17 @@ export class TimeSeriesChart extends FFChart
         end: null
     };
 
-    constructor(uid, args) {
+    constructor(uid, args, bytes) {
         super(uid, args, true);
+        
+        let options = this.ele.getAttribute('x-options');        
 
         this.bottomUid = uid + '-bottom';
         this.topUid = uid + '-top';
-        this.sizeData = !!args?.sizeData;
+        this.sizeData = options === '1' === true;
+        this.countData  = options === '2' === true;
         this.url = args.url;
-
+        
         this.getData();
     }
     
@@ -413,48 +418,35 @@ export class TimeSeriesChart extends FFChart
         else {
             this.data = data;
         }
-        this.lastFetch = this.data[this.data.length -1].x;
-
-        let buckets = this.adjustData(this.data, 100);
-        let showBottom = buckets.length !== this.data.length;
-        if(showBottom)
+        
+        
+        if(this.data.length > 0) 
         {
-            if(this.chartBottom)
-                this.updateBottom(buckets);
-            else
-                this.buckets = buckets;
-        }else {
-            this.selectedRange.start = data[0].x;
-            this.selectedRange.end = data[data.length - 1].x;
+            this.lastFetch = this.data[this.data.length - 1].x;
+
+            let buckets = this.adjustData(this.data, 100);
+            let showBottom = buckets.length !== this.data.length;
+            if (showBottom) {
+                if (this.chartBottom)
+                    this.updateBottom(buckets);
+                else
+                    this.buckets = buckets;
+            } else {
+                this.selectedRange.start = data[0].x;
+                this.selectedRange.end = data[data.length - 1].x;
+            }
+
+            if (!this.chartTop)
+                this.createTop();
+            if (!this.chartBottom && showBottom)
+                this.createBottom();
+
         }
-
-        if(!this.chartTop)
-            this.createTop();
-        if(!this.chartBottom && showBottom)
-            this.createBottom();
-
 
         if(this.timer)
             clearTimeout(this.timer);
         if(!this.disposed)
-            this.timer = setTimeout(() => this.getData(), 5000);
-    }
-
-    updateData(data){
-        let animate = false;
-        let actualData = [];
-        for(let d of data){
-            if(typeof(d.time) === 'string')
-                d.time = new Date(Date.parse(d.time))
-            actualData.push({ x: d.time, y: d.value});
-        }
-        console.log('updating chart data', actualData);
-        // this.chartTop.updateSeries([{
-        //     data: actualData
-        // }], animate);
-        this.chartTop.appendData([{
-            data: actualData
-        }]);
+            this.timer = setTimeout(() => this.getData(), 10000);
     }
 
     adjustData(data, desiredItems){
@@ -540,7 +532,10 @@ export class TimeSeriesChart extends FFChart
                 },
                 sparkline: {
                     enabled: true
-                }
+                },
+                animations: {
+                    enabled: false
+                },
             },
             theme: {
                 mode: 'dark',
@@ -617,6 +612,8 @@ export class TimeSeriesChart extends FFChart
                             if (value === undefined) {
                                 return '';
                             }
+                            if(this.countData)
+                                return value;
                             return value.toFixed(1) + ' %';
                         }
                 }

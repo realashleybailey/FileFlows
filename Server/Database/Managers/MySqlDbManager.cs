@@ -48,7 +48,8 @@ public class MySqlDbManager: DbManager
         ConnectionString = connectionString;
     }
     
-    protected override NPoco.Database GetDb()
+
+    protected override NPoco.Database GetDbInstance()
     {
         return new NPoco.Database(ConnectionString,
             null,
@@ -109,7 +110,6 @@ public class MySqlDbManager: DbManager
 
         db.Execute($"CREATE INDEX idx_DbObject_Type ON {nameof(DbObject)}(Type)");
         db.Execute($"CREATE INDEX idx_DbObject_Name ON {nameof(DbObject)}(Name)");
-        
         return true;
     }
 
@@ -117,9 +117,9 @@ public class MySqlDbManager: DbManager
     /// <summary>
     /// Adds virtual columns to database to improve performance
     /// </summary>
-    public void AddVirtualColumns()
+    public async Task AddVirtualColumns()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         string dbName = GetDatabaseName(ConnectionString);
         var existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
         
@@ -166,7 +166,7 @@ public class MySqlDbManager: DbManager
     public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         int quarter = TimeHelper.GetCurrentQuarter();
-        using var db = GetDb();
+        using var db = await GetDb();
         string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
         var results = (await db.FetchAsync<LibraryStatus>(sql)).ToList();
         return results;
@@ -183,7 +183,7 @@ public class MySqlDbManager: DbManager
     /// <returns>an enumerable of library files</returns>
     public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         db.OneTimeCommandTimeout = 120;
         try
         {
@@ -207,7 +207,7 @@ public class MySqlDbManager: DbManager
     {
         if (filter.Limit <= 0 || filter.Limit > 10_000)
             filter.Limit = 1000;
-        using var db = GetDb();
+        using var db = await GetDb();
         string sql = $"select * from {nameof(DbObject)} ";
         sql += " where Type = 'FileFlows.Shared.Models.LibraryFile'";
         sql += " and (DateCreated between @0 and @1) ";
@@ -237,7 +237,7 @@ public class MySqlDbManager: DbManager
             sql += $"delete from {nameof(DbObject)} where js_LibraryUid = '{uid}';\n";
         if (sql == "")
             return;
-        using var db = GetDb();
+        using var db = await GetDb();
         await db.ExecuteAsync(sql);
 
     }
@@ -249,7 +249,7 @@ public class MySqlDbManager: DbManager
     /// <returns>the processing time for each library file</returns>
     public override async Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         return await db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
         JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
         js_OriginalSize as OriginalSize,
@@ -264,7 +264,7 @@ public class MySqlDbManager: DbManager
     /// <returns>heatmap data</returns>
     public override async Task<List<Dictionary<int, int>>> GetHourProcessingTotals()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         string sql = @"SELECT 
 DAYOFWEEK(js_ProcessingStarted) AS day, 
 HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
@@ -297,7 +297,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the shrinkage group data</returns>
     public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         return await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
     }
 
@@ -309,7 +309,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <param name="message">the message to log</param>
     public override async Task Log(Guid clientUid, LogType type, string message)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         await db.ExecuteAsync(
             $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
             $" values (@0, @1, @2)", clientUid, type, message);
@@ -323,7 +323,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     {
         try
         {
-            using var db = GetDb();
+            using var db = await GetDb();
             await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
         }
         catch (Exception)
@@ -338,7 +338,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the messages found in the log</returns>
     public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         string clientUid = filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString();
         string from = filter.FromDate.ToString("yyyy-MM-dd HH:mm:ss");
         string to = filter.ToDate.ToString("yyyy-MM-dd HH:mm:ss");
@@ -365,7 +365,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the failure flow</returns>
     public override async Task<Flow> GetFailureFlow(Guid libraryUid)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         var dbObject = await db.SingleAsync<DbObject>(
             "select * from DbObject where Type = @0 " +
             "and JSON_EXTRACT(Data,'$.Type') = @1 " +
@@ -384,7 +384,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         if (statistic?.Value == null)
             return;
         
-        using var db = GetDb();
+        using var db = await GetDb();
         if (double.TryParse(statistic.Value.ToString(), out double number))
         {
             await db.InsertAsync(new DbStatistic()
@@ -416,7 +416,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the matching statistics</returns>
     public override async Task<IEnumerable<Statistic>> GetStatisticsByName(string name)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         var stats = await db.FetchAsync<DbStatistic>("where Name = @0", name);
         var results = new List<Statistic>();
         foreach (var stat in stats)

@@ -18,6 +18,7 @@ public abstract class DbManager
 {
     
     protected string ConnectionString { get; init; }
+    private static ObjectPool<PooledConnection> DbConnectionPool;
 
     protected enum DbCreateResult
     {
@@ -78,12 +79,37 @@ public abstract class DbManager
     /// </summary>
     /// <returns>the default database connection string using the Sqlite database file</returns>
     public static string GetDefaultConnectionString() => SqliteDbManager.GetConnetionString(SqliteDbFile);
+
+    public DbManager()
+    {
+        if (DbConnectionPool == null)
+            DbConnectionPool = new ObjectPool<PooledConnection>(10, () =>
+            {
+                return new PooledConnection(GetDbInstance(), DbConnectionPool);
+            });
+    }
+
+    /// <summary>
+    /// Get an instance of the IDatabase
+    /// </summary>
+    /// <returns>an instance of the IDatabase</returns>
+    protected async Task<IDatabase> GetDb()
+    {
+        var connection = await DbConnectionPool.Get();
+        return connection;
+    }
+
+    /// <summary>
+    /// Gets the number of open database connections
+    /// </summary>
+    /// <returns>the number of open database connections</returns>
+    public static int GetOpenDbConnections() => DbConnectionPool.Count;
     
     /// <summary>
     /// Get an instance of the IDatabase
     /// </summary>
     /// <returns>an instance of the IDatabase</returns>
-    protected abstract IDatabase GetDb();
+    protected abstract NPoco.Database GetDbInstance();
 
 
     #region Setup Code
@@ -159,7 +185,7 @@ public abstract class DbManager
     /// <returns>true if successfully inserted</returns>
     private async Task<bool> CreateInitialData()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
         await AddOrUpdateObject(db, new Tool
         {
@@ -224,7 +250,7 @@ public abstract class DbManager
     /// <returns>a list of objects</returns>
     public virtual async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         DateTime start = DateTime.Now;
         var dbObjects = await db.FetchAsync<DbObject>("where Type=@0", typeof(T).FullName);
         return ConvertFromDbObject<T>(dbObjects);
@@ -271,7 +297,7 @@ public abstract class DbManager
     /// <returns>a list of objects</returns>
     public virtual async Task<IEnumerable<T>> Select<T>(string where, params object[] arguments) where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         var dbObjects = await db.FetchAsync<DbObject>($"where Type=@0 and {where} order by Name", typeof(T).FullName, arguments);
         return dbObjects.Select(x => Convert<T>(x));
     }
@@ -285,7 +311,7 @@ public abstract class DbManager
     /// <returns>a list of names</returns>
     public virtual async Task<IEnumerable<string>> GetNames<T>(string andWhere = "", params object[] args)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         
         if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
             andWhere = " and " + andWhere;
@@ -303,7 +329,7 @@ public abstract class DbManager
     /// <returns>a list of names</returns>
     public virtual async Task<Dictionary<Guid, string>> GetIndexedNames<T>(string andWhere = "", params object[] args)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         
         if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
             andWhere = " and " + andWhere;
@@ -318,9 +344,9 @@ public abstract class DbManager
     /// <param name="uid">the Uid of the item</param>
     /// <param name="name">the name of the item</param>
     /// <returns>true if name is in use</returns>
-    public virtual bool NameInUse<T>(Guid uid, string name)
+    public virtual async Task<bool> NameInUse<T>(Guid uid, string name)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         string sql = $"Name from {nameof(DbObject)} where Type=@0 and uid <> @1 and Name = @2";
         if (UseTop)
             sql = "select top 1 " + sql;
@@ -338,7 +364,7 @@ public abstract class DbManager
     /// <returns>a single instance</returns>
     public virtual async Task<T> Single<T>() where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0", typeof(T).FullName);
         if (string.IsNullOrEmpty(dbObject?.Data))
             return new T();
@@ -353,7 +379,7 @@ public abstract class DbManager
     /// <returns>a single instance</returns>
     public virtual async Task<T> Single<T>(Guid uid) where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         
         var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid);
         if (string.IsNullOrEmpty(dbObject?.Data))
@@ -369,7 +395,7 @@ public abstract class DbManager
     /// <returns>a single instance</returns>
     public virtual async Task<T> SingleByName<T>(string name) where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         
         var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and lower(Name)=lower(@1)", typeof(T).FullName, name);
         if (string.IsNullOrEmpty(dbObject?.Data))
@@ -437,7 +463,7 @@ public abstract class DbManager
     /// <param name="uid">the UID of the object to update</param>
     internal virtual  async Task UpdateLastModified(Guid uid)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         await db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
     }
 
@@ -480,7 +506,7 @@ public abstract class DbManager
             }
             if (sql.Length > 0)
             {
-                var db = GetDb();
+                using var db = await GetDb();
                 await db.ExecuteAsync(sql.ToString());
             }
         }
@@ -495,7 +521,7 @@ public abstract class DbManager
     /// <returns>an single instance</returns>
     public virtual async Task<T> Single<T>(string andWhere, params object[] args) where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         args = new object[] { typeof(T).FullName }.Union(args).ToArray();
         var dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and " + andWhere, args);
         if (string.IsNullOrEmpty(dbObject?.Data))
@@ -532,7 +558,7 @@ public abstract class DbManager
     {
         if (obj == null)
             return new T();
-        using var db = GetDb();
+        using var db = await GetDb();
         return await AddOrUpdateObject(db, obj);
     }
     
@@ -548,7 +574,7 @@ public abstract class DbManager
 
         var typeName = typeof(T).FullName;
         string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
-        using var db = GetDb();
+        using var db = await GetDb();
         await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type=@0 and Uid in ({strUids})", typeName);
     }
     
@@ -560,7 +586,7 @@ public abstract class DbManager
     /// <typeparam name="T">the type to delete</typeparam>
     public virtual async Task Delete<T>(string andWhere = "", params object[] args)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         
         if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
             andWhere = " and " + andWhere;
@@ -579,7 +605,7 @@ public abstract class DbManager
             return; // nothing to delete
 
         string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
-        using var db = GetDb();
+        using var db = await GetDb();
         await db.ExecuteAsync($"delete from {nameof(DbObject)} where Uid in ({strUids})");
     }
 
@@ -591,7 +617,7 @@ public abstract class DbManager
     /// <returns>the result of the known library file</returns>
     public virtual  async Task<LibraryFile> FindKnownLibraryFile(string fullPath)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
 
         // first see if this file exists by its name
         var dbObject = await db.FirstOrDefaultAsync<DbObject>(
@@ -612,7 +638,7 @@ public abstract class DbManager
         if (string.IsNullOrEmpty(fingerprint))
             return new LibraryFile();
 
-        using var db = GetDb();
+        using var db = await GetDb();
 
         var dbObject = await db.FirstOrDefaultAsync<DbObject>(
                 $"where Type=@0 and {JsonExtractMethod}(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName, fingerprint ?? string.Empty);
@@ -738,7 +764,7 @@ public abstract class DbManager
     /// <returns>the object if found</returns>
     public virtual async Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
     {
-        using var db = GetDb();
+        using var db = await GetDb();
 
         // first see if this file exists by its name
         var dbObject = await db.FirstOrDefaultAsync<DbObject>(
@@ -783,7 +809,7 @@ public abstract class DbManager
     /// <returns>the rows effected</returns>
     public virtual async Task<int> Execute(string sql, object[] args)
     {
-        using var db = GetDb();
+        using var db = await GetDb();
         return await db.ExecuteAsync(sql, args);
     }
     
@@ -796,7 +822,7 @@ public abstract class DbManager
     {
         try
         {
-            using var db = GetDb();
+            using var db = await GetDb();
             await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type = @0", typeof(LibraryFile).FullName);
             return true;
         }

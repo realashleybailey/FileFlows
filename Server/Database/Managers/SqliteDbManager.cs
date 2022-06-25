@@ -59,7 +59,7 @@ public class SqliteDbManager : DbManager
     /// Get an instance of the IDatabase
     /// </summary>
     /// <returns>an instance of the IDatabase</returns>
-    protected override IDatabase GetDb() => GetDb(this.ConnectionString);
+    protected override NPoco.Database GetDbInstance() => GetDb(this.ConnectionString);
 
     /// <summary>
     /// Gets a database instance
@@ -70,7 +70,7 @@ public class SqliteDbManager : DbManager
     {
         try
         {
-            var db = new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
+            using var db = new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
             db.Mappers.Add(new GuidConverter());
             return db;
         }

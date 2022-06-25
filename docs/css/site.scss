@@ -203,6 +203,10 @@ hr {
     color: var(--border-color);
 }
 
+table {
+    width:100%;
+}
+
 tbody, td, tfoot, th, thead, tr {
     border: solid 1px var(--border-color);
     text-align: left !important;

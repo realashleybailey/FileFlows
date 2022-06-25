@@ -4,6 +4,7 @@ name: Variables
 permalink: /variables
 layout: default
 order: 600
+toc: false
 ---
 
 Variables let you inject a string into a field.  

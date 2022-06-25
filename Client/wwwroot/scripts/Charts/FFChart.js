@@ -624,7 +624,7 @@ export class TimeSeriesChart extends FFChart
                                 return '';
                             }
                             if(this.countData)
-                                return value = 0.001 ? 0 : value;
+                                return value === 0.001 ? '0' : value.toString();
                             return value.toFixed(1) + ' %';
                         }
                 }

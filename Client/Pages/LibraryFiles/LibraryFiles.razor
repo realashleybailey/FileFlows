@@ -105,7 +105,7 @@
                 @Globals.lblName
             </Header>
             <Cell Context="item">@item.Name
-                @item.Duplicate</Cell>
+@item.Duplicate</Cell>
         </FlowTableColumn>
         <FlowTableColumn TItem="LibaryFileListModel" Width="10rem" MobileWidth="0" Hidden="@((SelectedStatus == FileStatus.Unprocessed || SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.OutOfSchedule || SelectedStatus == FileStatus.Disabled) == false)">
             <Header>

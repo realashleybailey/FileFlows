@@ -12,7 +12,6 @@ The available variables are based on the flow nodes before the current node.
 
 E.g. if you use a [Video File](/plugins/video-nodes/video-file) node this will insert {vi.Video.Codec} etc
 
----
 
 ## Options
 These let you alter the the variable value
@@ -22,7 +21,6 @@ These let you alter the the variable value
 | ! | Uppercase | {ext!} | MKV |
 | :0 | Left pad with 0 | {file.CreateDate.Day:00} | 05 |
 
----
 
 ## Always Available
 

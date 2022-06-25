@@ -16,6 +16,7 @@ public class Upgrade0_8_3
     {
         Logger.Instance.ILog("Upgrade running, running 0.8.3 upgrade script");
         DeleteStatistics();
+        AddStatisticsTable(settings);
     }
 
     /// <summary>
@@ -27,5 +28,31 @@ public class Upgrade0_8_3
         int rows = DbHelper.Execute($"delete from {nameof(DbObject)} where Type = 'FileFlows.Shared.Models.Statistics'").Result;
         if(rows > 0)
             Logger.Instance.ILog("Deleted old statistics from database");
+    }
+
+    /// <summary>
+    /// Adds the DbStatistic table
+    /// </summary>
+    /// <param name="settings">the settings</param>
+    private void AddStatisticsTable(Settings settings)
+    {
+        if (DbHelper.UseMemoryCache)
+            return; // not using external database
+
+        var manager = DbHelper.GetDbManager();
+        try
+        {
+            manager.Execute(@"
+CREATE TABLE DbStatistic(
+    LogDate         datetime           default           now(),
+    Name            varchar(100)       COLLATE utf8_unicode_ci      NOT NULL,
+    Type            int                NOT NULL,            
+    StringValue     TEXT               COLLATE utf8_unicode_ci      NOT NULL,            
+    NumberValue     double             NOT NULL
+);", null);
+        }
+        catch (Exception)
+        {
+        }
     }
 }

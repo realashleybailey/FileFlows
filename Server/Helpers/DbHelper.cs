@@ -1,3 +1,4 @@
+using System.Data.Entity.Infrastructure.Design;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
@@ -28,6 +29,8 @@ public class DbHelper
         Manager = DbManager.GetManager(connstring);
         return Manager.CreateDb();
     }
+
+    internal static DbManager GetDbManager() => Manager;
 
     /// <summary>
     /// Gets if the database manager should use a memory cache

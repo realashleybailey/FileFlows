@@ -1,6 +1,7 @@
 export function newChart(type, uid, args){
     if(!window.FlowCharts)
         window.FlowCharts = {};
+    args.type = type;
     if(type == 'BoxPlot')
         window.FlowCharts[uid] = new BoxPlotChart(uid, args);
     else if(type == 'HeatMap')
@@ -27,6 +28,7 @@ class FFChart {
     url;
     seriesName;
     chart;
+    chartBottomPad = 18;
 
 
     constructor(uid, args, dontGetData) {
@@ -37,6 +39,7 @@ class FFChart {
         this.seriesName = args.title;
 
         this.ele = document.getElementById(uid);
+        this.ele.classList.add('chart-' + args.type);
         this.ele.addEventListener('dashboardElementResized', (event) => this.dashboardElementResized(event));
     
         if(dontGetData !== true)
@@ -44,12 +47,11 @@ class FFChart {
     }
     getHeight() {
         let chartDiv = this.ele.querySelector('.content');
-        return chartDiv.clientHeight - 32;
+        return chartDiv.clientHeight - this.chartBottomPad;
     }
 
     dashboardElementResized(event) {
-        let chartDiv = event.target.querySelector('.content');
-        let height = chartDiv.clientHeight - 32;
+        let height = this.getHeight();
 
         this.chart.updateOptions({
             chart: {
@@ -190,6 +192,7 @@ export class HeatMapChart extends FFChart
 {
     constructor(uid, args) {
         super(uid, args);
+        this.chartBottomPad = 0;
     }
 
     getChartOptions(data){

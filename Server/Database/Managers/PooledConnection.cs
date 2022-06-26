@@ -13,6 +13,10 @@ public class PooledConnection: IDatabase, IDisposable
 {
     private NPoco.Database Db;
     private ObjectPool<PooledConnection> pool;
+    /// <summary>
+    /// Gets when the pooled connection was created
+    /// </summary>
+    public readonly DateTime CreationDate = new DateTime();
     
     public PooledConnection(NPoco.Database db, ObjectPool<PooledConnection> pool)
     {

@@ -38,6 +38,13 @@ public class WatchedLibrary:IDisposable
     {
         this.Library = library;
         this.UseScanner = library.Scan;
+
+        if (Directory.Exists(library.Path) == false)
+        {
+            Logger.Instance.WLog("Library does not exist, falling back to scanner: " + library.Path);
+            this.UseScanner = true;
+        }
+
         if(UseScanner == false)
             SetupWatcher();
 
@@ -471,6 +478,8 @@ public class WatchedLibrary:IDisposable
         }
         catch (Exception ex)
         {
+            if (ex.Message?.StartsWith("Could not find a part of the path") == true)
+                return; // can happen if file is being moved quickly
             Logger.Instance?.ELog("WatchedLibrary.Watched Exception: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
     }
@@ -494,8 +503,11 @@ public class WatchedLibrary:IDisposable
     internal void UpdateLibrary(Library library)
     {
         this.Library = library;
-
-        if (UseScanner && library.Scan == false)
+        if (Directory.Exists(library.Path) == false)
+        {
+            UseScanner = true;
+        }
+        else if (UseScanner && library.Scan == false)
         {
             Logger.Instance.ILog($"WatchedLibrary: Library '{library.Name}' switched to watched mode, starting watcher");
             UseScanner = false;

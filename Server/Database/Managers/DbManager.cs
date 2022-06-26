@@ -99,11 +99,23 @@ public abstract class DbManager
         while(++count < 100)
         {
             var connection = await DbConnectionPool.Get();
-            if (connection.Connection == null || (connection.Connection.State != ConnectionState.Closed &&
-                connection.Connection.State != ConnectionState.Broken))
-                return connection;
-            DbConnectionPool.DisposeOf(connection);
+            if (connection != null && (connection.Connection == null ||
+                                       (connection.Connection.State != ConnectionState.Closed &&
+                                        connection.Connection.State != ConnectionState.Broken)))
+            {
+                if(connection.CreationDate > DateTime.Now.AddMinutes(-5))
+                    return connection;
+                FileLogger.Instance?.Log(LogType.Info, "Disposing of old DB connection");
+                DbConnectionPool.DisposeOf(connection);
+            }
+            else
+            {
+                FileLogger.Instance?.Log(LogType.Info, "Got connection of state: " + connection?.Connection?.State);
+                DbConnectionPool.DisposeOf(connection);
+            }
         }
+
+        FileLogger.Instance?.Log(LogType.Error, "Failed to get DB Connection from the connection pool");
         // should never happen, but to prevent an infinite loop
         throw new Exception("Failed to get a connection");
     }

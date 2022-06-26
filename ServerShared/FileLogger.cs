@@ -16,6 +16,11 @@ public class FileLogger : ILogWriter
     private SemaphoreSlim mutex = new SemaphoreSlim(1);
 
     /// <summary>
+    /// Gets an instance of the FileLogger
+    /// </summary>
+    public static FileLogger Instance { get; private set; }
+
+    /// <summary>
     /// Creates a file logger
     /// </summary>
     /// <param name="loggingPath">The path where to save the log file to</param>
@@ -25,6 +30,7 @@ public class FileLogger : ILogWriter
         this.LoggingPath = loggingPath;
         this.LogPrefix = logPrefix;
         Shared.Logger.Instance.RegisterWriter(this);
+        Instance = this;
     }
     
     /// <summary>

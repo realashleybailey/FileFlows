@@ -204,7 +204,7 @@ public class SystemController:Controller
             var hq = list[length / 4 * 3];
             return new
             {
-                x = x.Key?.Replace("Movie Downloads", "Movies")?.Replace("TV Downloads", "TV Shows")?.EmptyAsNull() ?? "Unknown", 
+                x = x.Key?.EmptyAsNull() ?? "Unknown", 
                 y = new [] { (int)list[0].Value, (int)lq.Value, (int)median.Value,(int) hq.Value,(int) list[length -1].Value }
             };
         });

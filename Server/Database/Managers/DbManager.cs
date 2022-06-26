@@ -130,7 +130,7 @@ public abstract class DbManager
     /// Gets the number of open database connections
     /// </summary>
     /// <returns>the number of open database connections</returns>
-    public static int GetOpenDbConnections() => DbConnectionPool.Count;
+    public static int GetOpenDbConnections() => DbConnectionPool?.Count ?? 0;
     
     /// <summary>
     /// Get an instance of the IDatabase

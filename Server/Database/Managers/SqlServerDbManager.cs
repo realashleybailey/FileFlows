@@ -81,6 +81,7 @@ public class SqlServerDbManager: DbManager
         using var db = new NPoco.Database(ConnectionString, null, SqlClientFactory.Instance);
         db.Execute(createDbSql);
 
+        
         db.Execute("CREATE INDEX idx_DbObject_Type_Name ON DbObject(Type, Name);");
         db.Execute("ALTER DATABASE CURRENT SET MEMORY_OPTIMIZED_ELEVATE_TO_SNAPSHOT=ON");
         return true;

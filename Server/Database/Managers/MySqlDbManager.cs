@@ -51,7 +51,7 @@ public class MySqlDbManager: DbManager
 
     protected override NPoco.Database GetDbInstance()
     {
-        return new NPoco.Database(ConnectionString,
+        return new NPoco.Database(ConnectionString + ";maximumpoolsize=50;",
             null,
             MySqlConnector.MySqlConnectorFactory.Instance);
     }
@@ -108,8 +108,10 @@ public class MySqlDbManager: DbManager
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         db.Execute(CreateMySqlDbScript);
 
-        db.Execute($"CREATE INDEX idx_DbObject_Type ON {nameof(DbObject)}(Type)");
-        db.Execute($"CREATE INDEX idx_DbObject_Name ON {nameof(DbObject)}(Name)");
+        db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Type ON {nameof(DbObject)}(Type)");
+        db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");
+        db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);");
+        db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);");
         return true;
     }
 
@@ -396,11 +398,13 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
                      $" order by {nameof(DbLogMessage.LogDate)} desc " +
                      " limit 1000";
         List<DbLogMessage> results;
+        DateTime dt = DateTime.Now;
         using (var db = await GetDb())
         {
             results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
                 string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
         }
+        Logger.Instance.ILog("Time taken to search log: " + DateTime.Now.Subtract(dt) + "\n" + sql);
 
         // need to reverse them as they're ordered newest at top
         results.Reverse();

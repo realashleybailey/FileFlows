@@ -27,6 +27,8 @@ public class Upgrader
                 new Upgrade0_8_1().Run(settings);
             if (currentVersion < new Version(0, 8, 3))
                 new Upgrade0_8_3().Run(settings);
+            if (currentVersion < new Version(0, 8, 4))
+                new Upgrade0_8_4().Run(settings);
         }
         
         // always check on default scripts

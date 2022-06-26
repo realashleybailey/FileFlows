@@ -98,7 +98,7 @@ public abstract class DbManager
     /// <returns>an instance of the IDatabase</returns>
     protected async Task<IDatabase> GetDb()
     {
-        if (UseDbPool == false)
+        if (UseDbPool == false || true)
             return GetDbInstance();
         
         int count = 0;

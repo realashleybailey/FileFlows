@@ -14,6 +14,7 @@ public class DbLogPruner:Worker
     /// </summary>
     public DbLogPruner() : base(ScheduleType.Daily, 5)
     {
+        Execute();
     }
 
     /// <summary>

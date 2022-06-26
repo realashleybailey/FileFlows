@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using FileFlows.Plugin;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -34,8 +35,10 @@ public class ObjectPool<T>
     /// <returns>an item instance</returns>
     public async Task<T> Get()
     {
+        string guid = Guid.NewGuid().ToString();
         while (ObjectsTaken >= Max)
         {
+            FileLogger.Instance?.Log(LogType.Info, "At maximum connections, waiting for free connection [" + guid + "]");
             await Task.Delay(25);
         }
 

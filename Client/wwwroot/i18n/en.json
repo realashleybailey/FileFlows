@@ -266,7 +266,9 @@
         "ReprocessRecreatedFiles":"Reprocess Recreated Files",
         "ReprocessRecreatedFiles-Help":"When enabled if a file is re-detected with a different creation time than that is recorded, the file will be automatically set to reprocess.\nThis is helpful on a library of downloaded files, where you may download the same file multiple times and wish to process it each time.",
         "ProcessingOrder":"Processing Order",
-        "ProcessingOrder-Help": "The order in which files will be processed by this library."
+        "ProcessingOrder-Help": "The order in which files will be processed by this library.",
+        "SkipFileAccessTests":"Skip File Access Tests",
+        "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue."
       }
     },
     "LibraryFile": {
@@ -458,7 +460,9 @@
           "User":"User",
           "User-Help":"The user used to connect to the database",
           "Password": "Password",
-          "Password-Help":"The password of the user to connect to the database"
+          "Password-Help":"The password of the user to connect to the database",
+          "UseConnectionPool":"Use Connection Pool",
+          "UseConnectionPool-Help":"When enabled, FileFlows will be limited to 10 database connections and will reuse the connections."
         },
         "License": {
           "Key": "License Key",

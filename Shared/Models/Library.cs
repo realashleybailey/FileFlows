@@ -43,6 +43,11 @@ public class Library : FileFlowObject
     public ObjectReference Flow { get; set; }
 
     /// <summary>
+    /// Gets or sets if the file access tests should be skipped for this library
+    /// </summary>
+    public bool SkipFileAccessTests { get; set; }
+
+    /// <summary>
     /// Gets or sets if this library should be routinely scanned,
     /// or if false, will listen for file system events.
     /// If off the library will still be fully scanned every other hour

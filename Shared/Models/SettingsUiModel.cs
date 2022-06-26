@@ -57,5 +57,10 @@ public class SettingsUiModel:Settings
     /// Gets or sets the password used to connect to the database
     /// </summary>
     public string DbPassword { get; set; }
+
+    /// <summary>
+    /// Gets or sets if the database should use a connection pool
+    /// </summary>
+    public bool DatabaseUseConnectionPool{ get; set; }
     
 }

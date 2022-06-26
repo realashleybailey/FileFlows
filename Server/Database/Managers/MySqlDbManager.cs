@@ -119,10 +119,13 @@ public class MySqlDbManager: DbManager
     /// </summary>
     public async Task AddVirtualColumns()
     {
-        using var db = await GetDb();
         string dbName = GetDatabaseName(ConnectionString);
-        var existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
-        
+        List<string> existingColumns;
+        using (var db = await GetDb())
+        {
+            existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
+        }
+
         var columns = new []{
             new []{"js_Status", "ADD COLUMN js_Status int GENERATED ALWAYS AS (json_extract(Data,'$.Status')) VIRTUAL"},
             new []{"js_Order", "ADD COLUMN js_Order int GENERATED ALWAYS AS (json_extract(Data,'$.Order')) VIRTUAL"},
@@ -156,7 +159,10 @@ public class MySqlDbManager: DbManager
         Logger.Instance.ILog("Adding virtual columns to database");
 
         sql = "ALTER TABLE DbObject \n" + sql + ";";
-        db.Execute(sql);
+        using (var db = await GetDb())
+        {
+            db.Execute(sql);
+        }
     }
     
     /// <summary>

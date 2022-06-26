@@ -68,6 +68,7 @@
                         <InputText @bind-Value=@Model.DbName Label="Pages.Settings.Fields.Database.Name" Validators=@RequiredValidator />
                         <InputText @bind-Value=@Model.DbUser Label="Pages.Settings.Fields.Database.User" Validators=@RequiredValidator />
                         <InputPassword @bind-Value=@Model.DbPassword Label="Pages.Settings.Fields.Database.Password" Validators=@RequiredValidator />
+                        <InputSwitch @bind-Value="@Model.DatabaseUseConnectionPool" Label="Pages.Settings.Fields.Database.UseConnectionPool" />
                     }
                     <div class="btn-test">
                         @if (Model.DbType != DatabaseType.Sqlite)

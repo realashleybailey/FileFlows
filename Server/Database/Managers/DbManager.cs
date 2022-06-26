@@ -79,17 +79,17 @@ public abstract class DbManager
     /// </summary>
     /// <returns>the default database connection string using the Sqlite database file</returns>
     public static string GetDefaultConnectionString() => SqliteDbManager.GetConnetionString(SqliteDbFile);
-    
-    private const bool UseDbPool = false;
+
+    /// <summary>
+    /// Gets if using a database connection pool
+    /// </summary>
+    public bool UseDbPool => AppSettings.Instance.DatabaseUseConnectionPool; 
 
     public DbManager()
     {
-        if (UseDbPool)
-        {
-            if (DbConnectionPool == null)
-                DbConnectionPool = new ObjectPool<PooledConnection>(10,
-                    () => { return new PooledConnection(GetDbInstance(), DbConnectionPool); });
-        }
+        if (DbConnectionPool == null)
+            DbConnectionPool = new ObjectPool<PooledConnection>(10,
+                () => { return new PooledConnection(GetDbInstance(), DbConnectionPool); });
     }
 
     /// <summary>

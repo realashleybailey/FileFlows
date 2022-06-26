@@ -222,6 +222,16 @@ public partial class Libraries : ListPage<Library>
         fields.Add(new ElementField
         {
             InputType = FormInputType.Switch,
+            Name = nameof(library.SkipFileAccessTests),
+            Conditions = new List<Condition>
+            {
+                new (efFolders, library.Folders, value: false)
+            }
+            
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Switch,
             Name = nameof(library.ReprocessRecreatedFiles)
         });
         fields.Add(new ElementField
@@ -230,7 +240,7 @@ public partial class Libraries : ListPage<Library>
             Name = nameof(library.UseFingerprinting),
             Conditions = new List<Condition>
             {
-                new Condition(efFolders, library.Folders, value: false)
+                new (efFolders, library.Folders, value: false)
             }
         });
         fields.Add(new ElementField

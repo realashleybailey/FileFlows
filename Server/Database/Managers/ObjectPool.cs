@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using FileFlows.Plugin;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -9,10 +8,10 @@ namespace FileFlows.Server.Database.Managers;
 /// of instances to be created
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class ObjectPool<T>
+public class ObjectPool<T> 
 {
     private readonly ConcurrentBag<T> Objects;
-    private readonly ConcurrentQueue<TakenObject<T>> Taken;
+    private readonly List<TakenObject<T>> Taken;
     private readonly Func<T> ObjectGenerator;
     private int ObjectsTaken;
     private readonly int Max;
@@ -22,6 +21,7 @@ public class ObjectPool<T>
     {
         public T Value { get; set; }
         public DateTime TakenAt { get; set; }
+        public string StackTrace { get; set; }
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class ObjectPool<T>
         this.Max = max;
         this.ObjectGenerator = objectGenerator ?? throw new ArgumentNullException(nameof(objectGenerator));
         this.Objects = new ConcurrentBag<T>();
-        this.Taken = new ConcurrentQueue<TakenObject<T>>();
+        this.Taken = new List<TakenObject<T>>();
     }
 
     /// <summary>
@@ -47,10 +47,11 @@ public class ObjectPool<T>
     {
         await WaitTurn();
         var obj = Objects.TryTake(out T item) ? item : ObjectGenerator();
-        Taken.Enqueue(new()
+        Taken.Add(new()
         {
             TakenAt = DateTime.Now,
-            Value = obj
+            Value = obj,
+            StackTrace = Environment.StackTrace
         });
         return obj;
     }
@@ -79,9 +80,13 @@ public class ObjectPool<T>
 
             lock (Taken)
             {
-                if (Taken.TryPeek(out TakenObject<T> taken) && taken.TakenAt < DateTime.Now.AddMinutes(-2))
+                if (Taken.Any() && Taken.First().TakenAt < DateTime.Now.AddMinutes(-2))
                 {
+                    var taken = Taken[0];
+                    Taken.RemoveAt(0);
                     // taken a while ago, lets reclaim it
+                    if (string.IsNullOrEmpty(taken.StackTrace) == false)
+                        Logger.Instance.WLog(LogType.Warning, "Reclaiming connection from: " + taken.StackTrace);
                     DisposeOf(taken.Value);
                 }
             }
@@ -93,7 +98,16 @@ public class ObjectPool<T>
 
         throw new Exception("Failed to wait for queued item: " + guid);
     }
-    
+
+    private void RemoveTaken(T item)
+    {
+        lock (Taken)
+        {
+            var taken = Taken.FirstOrDefault(x => EqualityComparer<T>.Default.Equals(x.Value, item));
+            if (taken != null)
+                Taken.Remove(taken);
+        }
+    }
 
     /// <summary>
     /// Disposes of an item so it cannot be reused
@@ -105,11 +119,13 @@ public class ObjectPool<T>
         {
             --ObjectsTaken;
         }
+        
+        RemoveTaken(item);
+    
         if(item is IDisposablePooledObject disposablePooledObject)
             disposablePooledObject.DisposePooledObject();
         else if(item is IDisposable disposable)
-            disposable.Dispose();
-    }
+            disposable.Dispose(); }
 
 
     /// <summary>
@@ -123,6 +139,8 @@ public class ObjectPool<T>
             if (--ObjectsTaken < 0)
                 ObjectsTaken = 0;
         }
+
+        RemoveTaken(item);
 
         Objects.Add(item);
     }

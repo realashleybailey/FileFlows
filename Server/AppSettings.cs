@@ -13,6 +13,11 @@ internal class AppSettings
     public string DatabaseConnection { get; set; }
 
     /// <summary>
+    /// Gets or sets if the database should use a connection pool
+    /// </summary>
+    public bool DatabaseUseConnectionPool{ get; set; }
+
+    /// <summary>
     /// Gets or sets the encryption key to use
     /// </summary>
     public string EncryptionKey { get; set; }

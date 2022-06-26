@@ -6,8 +6,6 @@ using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
-using Avalonia.Animation;
-using Microsoft.Extensions.FileProviders;
 
 namespace FileFlows.Server.Workers;
 
@@ -186,7 +184,7 @@ public class WatchedLibrary:IDisposable
 
             Logger.Instance.DLog($"New unknown {type}: {fullpath}");
 
-            if (Library.Folders == false &&
+            if (Library.SkipFileAccessTests == false && Library.Folders == false &&
                 CanAccess((FileInfo)fsInfo, Library.FileSizeDetectionInterval).Result == false)
             {
                 Logger.Instance.DLog($"Cannot access file: " + fullpath);

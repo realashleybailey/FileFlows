@@ -92,6 +92,7 @@ public class SettingsController : Controller
             new MySqlDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
         else
             new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
+        uiModel.DatabaseUseConnectionPool = AppSettings.Instance.DatabaseUseConnectionPool;
         
         return uiModel;
     }
@@ -172,6 +173,8 @@ public class SettingsController : Controller
             // need to migrate the database
             AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
         }
+
+        AppSettings.Instance.DatabaseUseConnectionPool = model.DatabaseUseConnectionPool; 
         // save AppSettings with updated license and db migration if set
         AppSettings.Instance.Save();
     }

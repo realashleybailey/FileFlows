@@ -17,6 +17,7 @@ public partial class Log : ComponentBase
     private string lblDownload, lblSearch, lblSearching;
     private string DownloadUrl;
 
+    private bool Searching = false;
 
     SearchPane SearchPane { get; set; }
 
@@ -79,6 +80,9 @@ public partial class Log : ComponentBase
     }
     void AutoRefreshTimerElapsed(object sender, ElapsedEventArgs e)
     {
+        if (Searching)
+            return;
+        
         if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
             if (SearchModel.ToDate != DateRangeHelper.LiveEnd || SearchModel.FromDate != DateRangeHelper.LiveStart)
@@ -90,9 +94,17 @@ public partial class Log : ComponentBase
 
     async Task Search()
     {
-        Blocker.Show(lblSearching);
-        await Refresh();
-        Blocker.Hide();
+        this.Searching = true;
+        try
+        {
+            Blocker.Show(lblSearching);
+            await Refresh();
+            Blocker.Hide();
+        }
+        finally
+        {
+            this.Searching = false;
+        }
     }
 
     async Task Refresh()

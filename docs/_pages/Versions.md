@@ -21,6 +21,7 @@ order: 900
 - Node can now install a systemd service using --systemd --uninstall
 - Server and Node now create an entry point bash script with using systemd and the auto-upgrade process takes place inside that script.
   - This fixes the issue with systemd restarting FileFlows while the upgrade is happening and works similar to how the Docker upgrade works
+- Whenever the Server or Node is started a new log file will be created with a unique name. 
 
 #### Fixed
 - API Page failed to load due to swagger error
@@ -34,6 +35,7 @@ order: 900
 - Processing Nodes now default to "Process: All"
 - Step 1/2 hints for new installs now show on all screens
 - Fixed the "Pause Processing" button on the mobile view
+- Log files were created with no .log extension, causing the log cleaner to never delete the old log files
 - Misc Cosmetic improvements
 
 

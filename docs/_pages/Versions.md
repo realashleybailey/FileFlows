@@ -19,7 +19,7 @@ order: 900
   - If you just use "h264" or "hevc" or "h265" it will continue to do the hardware test
 - Server can now install/uninstall a systemd service using --systemd and --systemd --uninstall
 - Node can now install a systemd service using --systemd --uninstall
-- Server and Node now create an entrypoint bash script with using systemd and the auto upgrade process takes place inside that script.
+- Server and Node now create an entry point bash script with using systemd and the auto-upgrade process takes place inside that script.
   - This fixes the issue with systemd restarting FileFlows while the upgrade is happening and works similar to how the Docker upgrade works
 - Database now uses a connection pool, with a maximum of 10 connections to be used.
 
@@ -29,12 +29,12 @@ order: 900
 - Fixed issue with loading from localhost
 - Bug where "FFMPEG Builder: Subtitle Track Merge" would use the inverse of the selected files, so if you entered "sub" it would use any file but a "sub"
 - Renamed "Pattern Replacer" to "Filename Pattern Replacer"
-- Music Nodes: Fixed issue where MusicInfo was not updated after file was processed
+- Music Nodes: Fixed issue where MusicInfo was not updated after the file was processed
 - Updated QSV and VAAPI hardware decoding parameters
-- Plex Nodes not able t find path
+- Plex Nodes are not able t find the path
 - Processing Nodes now default to "Process: All"
 - Step 1/2 hints for new installs now show on all screens
-- Fixed "Pause Processing" button on mobile view
+- Fixed the "Pause Processing" button on the mobile view
 - Misc Cosmetic improvements
 
 

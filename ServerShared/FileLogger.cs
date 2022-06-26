@@ -10,6 +10,10 @@ public class FileLogger : ILogWriter
 {
     private string LogPrefix;
     private string LoggingPath;
+    /// <summary>
+    /// If a new file should be created
+    /// </summary>
+    private bool NewFile = false;
 
     private DateOnly LogDate = DateOnly.MinValue;
 
@@ -29,6 +33,7 @@ public class FileLogger : ILogWriter
     {
         this.LoggingPath = loggingPath;
         this.LogPrefix = logPrefix;
+        this.NewFile = true;
         Shared.Logger.Instance.RegisterWriter(this);
         Instance = this;
     }
@@ -149,10 +154,13 @@ public class FileLogger : ILogWriter
         string file = Path.Combine(LoggingPath, LogPrefix + "-" + DateTime.Now.ToString("MMMdd"));
         for (int i = 1; i < 100; i++)
         {
-            FileInfo fi = new(file + "-" + i.ToString("D2"));
+            FileInfo fi = new(file + "-" + i.ToString("D2") + ".log");
             if (fi.Exists == false)
+            {
+                NewFile = false;
                 return fi.FullName;
-            if (fi.Length < 10_000_000)
+            }
+            if (NewFile == false && fi.Length < 10_000_000)
                 return fi.FullName;
         }
 

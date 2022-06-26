@@ -21,7 +21,7 @@ order: 900
 - Node can now install a systemd service using --systemd --uninstall
 - Server and Node now create an entrypoint bash script with using systemd and the auto upgrade process takes place inside that script.
   - This fixes the issue with systemd restarting FileFlows while the upgrade is happening and works similar to how the Docker upgrade works
-- Database now use a Pooled connection, with a maximum of 10 connections being used.
+- Database now uses a connection pool, with a maximum of 10 connections to be used.
 
 #### Fixed
 - API Page failed to load due to swagger error

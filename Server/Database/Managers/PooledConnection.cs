@@ -9,7 +9,7 @@ namespace FileFlows.Server.Database.Managers;
 /// <summary>
 /// A pooled database connection
 /// </summary>
-public class PooledConnection: IDatabase, IDisposable
+public class PooledConnection: IDatabase, IDisposable, IDisposablePooledObject
 {
     private NPoco.Database Db;
     private ObjectPool<PooledConnection> pool;
@@ -22,6 +22,13 @@ public class PooledConnection: IDatabase, IDisposable
     {
         this.Db = db;
         this.pool = pool;
+    }
+    
+    public void DisposePooledObject()
+    {
+        if(Db != null)
+            Db.Dispose();
+        Db = null;
     }
     
     public void Dispose()

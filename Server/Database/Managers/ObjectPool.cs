@@ -57,7 +57,9 @@ public class ObjectPool<T>
         {
             --ObjectsTaken;
         }
-        if(item is IDisposable disposable)
+        if(item is IDisposablePooledObject disposablePooledObject)
+            disposablePooledObject.DisposePooledObject();
+        else if(item is IDisposable disposable)
             disposable.Dispose();
     }
 
@@ -82,3 +84,14 @@ public class ObjectPool<T>
     /// </summary>
     public int Count => ObjectsTaken;
 }
+
+/// <summary>
+/// Interface thats is called when disposing of the object from the ObjectPooler
+/// </summary>
+public interface IDisposablePooledObject
+{
+    /// <summary>
+    /// Called to permanently dispose of an object
+    /// </summary>
+    void DisposePooledObject();
+} 

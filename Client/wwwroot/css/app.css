@@ -731,7 +731,6 @@ hr {
   height: calc(100% - 2rem);
   padding-left: 0.25rem;
   width: calc(100% - 0.25rem);
-  overflow: hidden;
 }
 .portlet.chart-TreeMap .content {
   padding-left: 0.75rem;

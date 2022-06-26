@@ -16,7 +16,7 @@ public class PooledConnection: IDatabase, IDisposable
     /// <summary>
     /// Gets when the pooled connection was created
     /// </summary>
-    public readonly DateTime CreationDate = new DateTime();
+    public readonly DateTime CreationDate = DateTime.Now;
     
     public PooledConnection(NPoco.Database db, ObjectPool<PooledConnection> pool)
     {

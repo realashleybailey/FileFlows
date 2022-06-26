@@ -120,16 +120,13 @@ class FFChart {
             }
         };
         let instanceOptions = this.getChartOptions(data);
-        // let options = {
-        //     ...defaultOptions,
-        //     ...instanceOptions
-        // }
         let options = this.mergeDeep(defaultOptions, instanceOptions);
-        
-        console.log(this.seriesName, JSON.parse(JSON.stringify(options)));
-        
-        this.chart = new ApexCharts(document.getElementById(this.chartUid), options);
-        this.chart.render();
+               
+        let ele = document.getElementById(this.chartUid);
+        if(ele) {
+            this.chart = new ApexCharts(ele, options);
+            this.chart.render();
+        }
     }
     isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item));
@@ -770,8 +767,11 @@ export class TimeSeriesChart extends FFChart
             }
         };
 
-        this.chartBottom = new ApexCharts(document.getElementById(this.bottomUid), options);
-        this.chartBottom.render();
+        let ele = document.getElementById(this.bottomUid);
+        if(ele) {
+            this.chartBottom = new ApexCharts(ele, options);
+            this.chartBottom.render();
+        }
     }
 
 

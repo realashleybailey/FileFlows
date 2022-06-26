@@ -63,7 +63,8 @@ public class ObjectPool<T>
                 }
             }
 
-            FileLogger.Instance?.Log(LogType.Info, "At maximum connections, waiting for free connection [" + guid + "]");
+            if(count % 10 == 0)
+                FileLogger.Instance?.Log(LogType.Info, "At maximum connections, waiting for free connection [" + guid + "]");
             await Task.Delay(10);
         } while (++count < 100);
 

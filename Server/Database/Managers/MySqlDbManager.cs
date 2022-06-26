@@ -166,9 +166,13 @@ public class MySqlDbManager: DbManager
     public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         int quarter = TimeHelper.GetCurrentQuarter();
-        using var db = await GetDb();
-        string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
-        var results = (await db.FetchAsync<LibraryStatus>(sql)).ToList();
+        List<LibraryStatus> results;
+        using (var db = await GetDb())
+        {
+            string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
+            results = (await db.FetchAsync<LibraryStatus>(sql)).ToList();
+        }
+
         return results;
     }
 
@@ -181,14 +185,28 @@ public class MySqlDbManager: DbManager
     /// <param name="quarter">the current quarter</param>
     /// <param name="nodeUid">optional UID of node to limit results for</param>
     /// <returns>an enumerable of library files</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
+    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max,
+        int quarter, Guid? nodeUid)
     {
-        using var db = await GetDb();
-        db.OneTimeCommandTimeout = 120;
+        List<DbObject> dbObjects;
+        using (var db = await GetDb())
+        {
+            db.OneTimeCommandTimeout = 120;
+            try
+            {
+                dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)",
+                    (int)status,
+                    quarter, start, max, nodeUid);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Error getting files from mysql: " + ex.Message);
+                throw;
+            }
+        }
+
         try
         {
-            var dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)", (int)status,
-                quarter, start, max, nodeUid);
             return ConvertFromDbObject<LibraryFile>(dbObjects);
         }
         catch (Exception ex)
@@ -207,7 +225,6 @@ public class MySqlDbManager: DbManager
     {
         if (filter.Limit <= 0 || filter.Limit > 10_000)
             filter.Limit = 1000;
-        using var db = await GetDb();
         string sql = $"select * from {nameof(DbObject)} ";
         sql += " where Type = 'FileFlows.Shared.Models.LibraryFile'";
         sql += " and (DateCreated between @0 and @1) ";
@@ -218,10 +235,15 @@ public class MySqlDbManager: DbManager
         sql += $" limit {filter.Limit};" ;
         var from = filter.FromDate;
         var to = filter.ToDate < new DateTime(2000, 1, 1) ? DateTime.MaxValue : filter.ToDate;
-        
-        var dbObjects = await db.FetchAsync<DbObject>(sql, from, to,
-            string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%",
-            string.IsNullOrEmpty(filter.LibraryName) ? string.Empty : "%" + filter.LibraryName + "%");
+
+        List<DbObject> dbObjects;
+        using (var db = await GetDb())
+        {
+            dbObjects = await db.FetchAsync<DbObject>(sql, from, to,
+                string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%",
+                string.IsNullOrEmpty(filter.LibraryName) ? string.Empty : "%" + filter.LibraryName + "%");
+        }
+
         return ConvertFromDbObject<LibraryFile>(dbObjects);
         
     }
@@ -237,9 +259,10 @@ public class MySqlDbManager: DbManager
             sql += $"delete from {nameof(DbObject)} where js_LibraryUid = '{uid}';\n";
         if (sql == "")
             return;
-        using var db = await GetDb();
-        await db.ExecuteAsync(sql);
-
+        using (var db = await GetDb())
+        {
+            await db.ExecuteAsync(sql);
+        }
     }
 
 
@@ -249,13 +272,18 @@ public class MySqlDbManager: DbManager
     /// <returns>the processing time for each library file</returns>
     public override async Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
     {
-        using var db = await GetDb();
-        return await db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
+        List<LibraryFileProcessingTime> result;
+        using (var db = await GetDb())
+        {
+            result = await db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
         JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
         js_OriginalSize as OriginalSize,
         timestampdiff(second, js_ProcessingStarted, js_ProcessingEnded) AS Seconds
         from DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
-        AND js_Status = 1 AND js_ProcessingEnded > js_ProcessingStarted;"); 
+        AND js_Status = 1 AND js_ProcessingEnded > js_ProcessingStarted;");
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -264,7 +292,7 @@ public class MySqlDbManager: DbManager
     /// <returns>heatmap data</returns>
     public override async Task<List<Dictionary<int, int>>> GetHourProcessingTotals()
     {
-        using var db = await GetDb();
+        List<(int day, int hour, int count)> data;
         string sql = @"SELECT 
 DAYOFWEEK(js_ProcessingStarted) AS day, 
 HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
@@ -272,7 +300,10 @@ HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
 AND js_Status = 1 AND js_ProcessingStarted IS not NULL
 GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
 
-        var data = (await db.FetchAsync<(int day, int hour, int count)>(sql));
+        using (var db = await GetDb())
+        {
+            data = (await db.FetchAsync<(int day, int hour, int count)>(sql));
+        }
 
         var days = new List<Dictionary<int, int>>();
         for (int i = 0; i < 7; i++)
@@ -297,8 +328,12 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the shrinkage group data</returns>
     public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
     {
-        using var db = await GetDb();
-        return await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
+        List<ShrinkageData> results;
+        using (var db = await GetDb())
+        {
+            results = await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
+        }
+        return results;
     }
 
     /// <summary>
@@ -309,10 +344,12 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <param name="message">the message to log</param>
     public override async Task Log(Guid clientUid, LogType type, string message)
     {
-        using var db = await GetDb();
-        await db.ExecuteAsync(
-            $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
-            $" values (@0, @1, @2)", clientUid, type, message);
+        using (var db = await GetDb())
+        {
+            await db.ExecuteAsync(
+                $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
+                $" values (@0, @1, @2)", clientUid, type, message);
+        }
     }
 
     /// <summary>
@@ -323,8 +360,10 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     {
         try
         {
-            using var db = await GetDb();
-            await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
+            using (var db = await GetDb())
+            {
+                await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
+            }
         }
         catch (Exception)
         {
@@ -338,7 +377,6 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the messages found in the log</returns>
     public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
     {
-        using var db = await GetDb();
         string clientUid = filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString();
         string from = filter.FromDate.ToString("yyyy-MM-dd HH:mm:ss");
         string to = filter.ToDate.ToString("yyyy-MM-dd HH:mm:ss");
@@ -351,8 +389,13 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
                      (filter.Message?.EmptyAsNull() != null ? $" and {nameof(DbLogMessage.Message)} like @2 " : "") +
                      $" order by {nameof(DbLogMessage.LogDate)} desc " +
                      " limit 1000";
-        var results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
-            string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
+        List<DbLogMessage> results;
+        using (var db = await GetDb())
+        {
+            results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
+                string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
+        }
+
         // need to reverse them as they're ordered newest at top
         results.Reverse();
         return results;
@@ -365,13 +408,17 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the failure flow</returns>
     public override async Task<Flow> GetFailureFlow(Guid libraryUid)
     {
-        using var db = await GetDb();
-        var dbObject = await db.SingleAsync<DbObject>(
-            "select * from DbObject where Type = @0 " +
-            "and JSON_EXTRACT(Data,'$.Type') = @1 " +
-            "and JSON_EXTRACT(Data,'$.Enabled') = 1 ",
-            typeof(Flow).FullName, (int)
-            FlowType.Failure);
+        DbObject dbObject;
+        using (var db = await GetDb())
+        {
+            dbObject = await db.SingleAsync<DbObject>(
+                "select * from DbObject where Type = @0 " +
+                "and JSON_EXTRACT(Data,'$.Type') = @1 " +
+                "and JSON_EXTRACT(Data,'$.Enabled') = 1 ",
+                typeof(Flow).FullName, (int)
+                FlowType.Failure);
+        }
+
         return ConvertFromDbObject<Flow>(dbObject);
     }
 
@@ -383,30 +430,33 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     {
         if (statistic?.Value == null)
             return;
-        
-        using var db = await GetDb();
+        DbStatistic stat;
         if (double.TryParse(statistic.Value.ToString(), out double number))
         {
-            await db.InsertAsync(new DbStatistic()
+            stat = new DbStatistic()
             {
                 Type = StatisticType.Number,
                 Name = statistic.Name,
                 LogDate = DateTime.Now,
                 NumberValue = number,
                 StringValue = string.Empty
-            });
+            };
         }
         else
         {
             // treat as string
-            await db.InsertAsync(new DbStatistic()
+            stat = new DbStatistic()
             {
                 Type = StatisticType.String,
                 Name = statistic.Name,
                 LogDate = DateTime.Now,
                 NumberValue = 0,
                 StringValue = statistic.Value.ToString()
-            });
+            };
+        }
+        using (var db = await GetDb())
+        {
+            await db.InsertAsync(stat);
         }
     }
 
@@ -416,8 +466,12 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the matching statistics</returns>
     public override async Task<IEnumerable<Statistic>> GetStatisticsByName(string name)
     {
-        using var db = await GetDb();
-        var stats = await db.FetchAsync<DbStatistic>("where Name = @0", name);
+        List<DbStatistic> stats;
+        using (var db = await GetDb())
+        {
+            stats = await db.FetchAsync<DbStatistic>("where Name = @0", name);
+        }
+
         var results = new List<Statistic>();
         foreach (var stat in stats)
         {

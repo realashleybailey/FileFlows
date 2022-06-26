@@ -12,10 +12,17 @@ namespace FileFlows.Server.Database.Managers;
 public class ObjectPool<T>
 {
     private readonly ConcurrentBag<T> Objects;
+    private readonly ConcurrentQueue<TakenObject<T>> Taken;
     private readonly Func<T> ObjectGenerator;
     private int ObjectsTaken;
     private readonly int Max;
     private readonly ConcurrentQueue<string> Queue = new ();
+
+    private class TakenObject<T>
+    {
+        public T Value { get; set; }
+        public DateTime TakenAt { get; set; }
+    }
 
     /// <summary>
     /// Creates an object pool
@@ -28,6 +35,7 @@ public class ObjectPool<T>
         this.Max = max;
         this.ObjectGenerator = objectGenerator ?? throw new ArgumentNullException(nameof(objectGenerator));
         this.Objects = new ConcurrentBag<T>();
+        this.Taken = new ConcurrentQueue<TakenObject<T>>();
     }
 
     /// <summary>
@@ -38,7 +46,13 @@ public class ObjectPool<T>
     public async Task<T> Get()
     {
         await WaitTurn();
-        return Objects.TryTake(out T item) ? item : ObjectGenerator();
+        var obj = Objects.TryTake(out T item) ? item : ObjectGenerator();
+        Taken.Enqueue(new()
+        {
+            TakenAt = DateTime.Now,
+            Value = obj
+        });
+        return obj;
     }
 
     private async Task WaitTurn()
@@ -60,6 +74,15 @@ public class ObjectPool<T>
 
                     Queue.TryDequeue(out string dequeued);
                     return;
+                }
+            }
+
+            lock (Taken)
+            {
+                if (Taken.TryPeek(out TakenObject<T> taken) && taken.TakenAt < DateTime.Now.AddMinutes(-2))
+                {
+                    // taken a while ago, lets reclaim it
+                    DisposeOf(taken.Value);
                 }
             }
 

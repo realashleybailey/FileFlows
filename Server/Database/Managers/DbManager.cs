@@ -79,14 +79,17 @@ public abstract class DbManager
     /// </summary>
     /// <returns>the default database connection string using the Sqlite database file</returns>
     public static string GetDefaultConnectionString() => SqliteDbManager.GetConnetionString(SqliteDbFile);
+    
+    private const bool UseDbPool = false;
 
     public DbManager()
     {
-        if (DbConnectionPool == null)
-            DbConnectionPool = new ObjectPool<PooledConnection>(10, () =>
-            {
-                return new PooledConnection(GetDbInstance(), DbConnectionPool);
-            });
+        if (UseDbPool)
+        {
+            if (DbConnectionPool == null)
+                DbConnectionPool = new ObjectPool<PooledConnection>(10,
+                    () => { return new PooledConnection(GetDbInstance(), DbConnectionPool); });
+        }
     }
 
     /// <summary>
@@ -95,6 +98,9 @@ public abstract class DbManager
     /// <returns>an instance of the IDatabase</returns>
     protected async Task<IDatabase> GetDb()
     {
+        if (UseDbPool == false)
+            return GetDbInstance();
+        
         int count = 0;
         while(++count < 100)
         {

@@ -1,5 +1,6 @@
 using System.Data.SQLite;
 using FileFlows.Server.Database.Managers;
+using NPoco;
 
 namespace FileFlows.Server.Database;
 
@@ -31,35 +32,9 @@ public class DbMigrater
             destDbManager.CreateDb(recreate: true, insertInitialData: false).Wait();
             using var dest = GetDatabase(destinationConnection);
 
-            var dbObjects = source.Fetch<DbObject>($"select * from {nameof(DbObject)}")?.ToArray();
-            if (dbObjects?.Any() != true)
-            {
-                Logger.Instance?.ILog("Database Migration finished with nothing to migrate");
-                return true;
-            }
-
-            foreach (var obj in dbObjects)
-            {
-                Logger.Instance?.DLog($"Migrating [{obj.Uid}][{obj.Type}]: {obj.Name ?? string.Empty}");
-
-                try
-                {
-                    dest.Execute(
-                        $"insert into {nameof(DbObject)} (Uid, Name, Type, DateCreated, DateModified, Data) values (@0, @1, @2, @3, @4, @5)",
-                        obj.Uid.ToString(),
-                        obj.Name,
-                        obj.Type,
-                        obj.DateCreated,
-                        obj.DateModified,
-                        obj.Data ?? string.Empty);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Instance.ELog("Failed migrating: " +  ex.Message);
-                    Logger.Instance.ELog("Migration Object: " + JsonSerializer.Serialize(obj));
-                    throw;
-                }
-            }
+            MigrateDbObjects(source, dest);
+            MigrateDbStatistics(source, dest);
+            MigrateDbLogs(source, dest);
 
             Logger.Instance?.ILog("Database Migration complete");
             return true;
@@ -71,6 +46,90 @@ public class DbMigrater
         }
     }
 
+    private static void MigrateDbObjects(NPoco.Database source, NPoco.Database dest)
+    {
+        var dbObjects = source.Fetch<DbObject>($"select * from {nameof(DbObject)}")?.ToArray();
+        if (dbObjects?.Any() != true)
+            return;
+
+        foreach (var obj in dbObjects)
+        {
+            Logger.Instance?.DLog($"Migrating [{obj.Uid}][{obj.Type}]: {obj.Name ?? string.Empty}");
+
+            try
+            {
+                dest.Execute(
+                    $"insert into {nameof(DbObject)} (Uid, Name, Type, DateCreated, DateModified, Data) values (@0, @1, @2, @3, @4, @5)",
+                    obj.Uid.ToString(),
+                    obj.Name,
+                    obj.Type,
+                    obj.DateCreated,
+                    obj.DateModified,
+                    obj.Data ?? string.Empty);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed migrating: " +  ex.Message);
+                Logger.Instance.ELog("Migration Object: " + JsonSerializer.Serialize(obj));
+                throw;
+            }
+        }
+    }
+
+    private static void MigrateDbStatistics(NPoco.Database source, NPoco.Database dest)
+    {
+        if (source.DatabaseType == DatabaseType.SQLite || dest.DatabaseType == DatabaseType.SQLite)
+            return;
+        
+        var dbStatistics = source.Fetch<DbStatistic>($"select * from {nameof(DbStatistic)}")?.ToArray();
+        if (dbStatistics?.Any() != true)
+            return;
+
+        foreach (var obj in dbStatistics)
+        {
+            try
+            {
+                dest.Execute(
+                    $"insert into {nameof(DbStatistic)} (LogDate, Name, Type, StringValue, NumberValue) values (@0, @1, @2, @3, @4)",
+                    obj.LogDate,
+                    obj.Name,
+                    (int)obj.Type,
+                    obj.StringValue ?? string.Empty,
+                    obj.NumberValue);
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
+    
+    
+    private static void MigrateDbLogs(NPoco.Database source, NPoco.Database dest)
+    {
+        if (source.DatabaseType == DatabaseType.SQLite || dest.DatabaseType == DatabaseType.SQLite)
+            return;
+        
+        var dbLogMessages = source.Fetch<DbLogMessage>($"select * from {nameof(DbLogMessage)}")?.ToArray();
+        if (dbLogMessages?.Any() != true)
+            return;
+
+        foreach (var obj in dbLogMessages)
+        {
+            try
+            {
+                dest.Execute(
+                    $"insert into {nameof(DbLogMessage)} (ClientUid, LogDate, Type, Message) values (@0, @1, @2, @3)",
+                    obj.ClientUid,
+                    obj.LogDate,
+                    (int)obj.Type,
+                    obj.Message ?? string.Empty);
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
+    
     /// <summary>
     /// Gets a Database from its connection string
     /// </summary>

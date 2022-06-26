@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using FileFlows.Plugin;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -14,6 +15,7 @@ public class ObjectPool<T>
     private readonly Func<T> ObjectGenerator;
     private int ObjectsTaken;
     private readonly int Max;
+    private readonly ConcurrentQueue<string> Queue = new ();
 
     /// <summary>
     /// Creates an object pool
@@ -35,20 +37,39 @@ public class ObjectPool<T>
     /// <returns>an item instance</returns>
     public async Task<T> Get()
     {
-        string guid = Guid.NewGuid().ToString();
-        while (ObjectsTaken >= Max)
-        {
-            FileLogger.Instance?.Log(LogType.Info, "At maximum connections, waiting for free connection [" + guid + "]");
-            await Task.Delay(25);
-        }
-
-        lock (this)
-        {
-            ++ObjectsTaken;
-        }
-
+        await WaitTurn();
         return Objects.TryTake(out T item) ? item : ObjectGenerator();
     }
+
+    private async Task WaitTurn()
+    {
+        string guid = Guid.NewGuid().ToString();
+        Queue.Enqueue(guid);
+        int count = 0;
+        do
+        {
+            if (ObjectsTaken < Max)
+            {
+                if (Queue.TryPeek(out string top) && top == guid)
+                {
+                    // we're first in the queue
+                    lock (this)
+                    {
+                        ++ObjectsTaken;
+                    }
+
+                    Queue.TryDequeue(out string dequeued);
+                    return;
+                }
+            }
+
+            FileLogger.Instance?.Log(LogType.Info, "At maximum connections, waiting for free connection [" + guid + "]");
+            await Task.Delay(10);
+        } while (++count < 100);
+
+        throw new Exception("Failed to wait for queued item: " + guid);
+    }
+    
 
     /// <summary>
     /// Disposes of an item so it cannot be reused

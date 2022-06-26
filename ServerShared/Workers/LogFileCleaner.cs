@@ -26,9 +26,12 @@ public class LogFileCleaner:Worker
             return; // not yet ready
         var dir = DirectoryHelper.LoggingDirectory;
         int count = 0;
-        foreach (var file in new DirectoryInfo(dir).GetFiles("FileFlows*.log")
+        foreach (var file in new DirectoryInfo(dir).GetFiles("FileFlows*")
                      .OrderByDescending(x => x.LastWriteTime))
         {
+            if (string.IsNullOrEmpty(file.Extension) == false && file.Extension != ".log")
+                continue;
+            
             if (++count > settings.LogFileRetention)
             {
                 try

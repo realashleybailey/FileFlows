@@ -24,11 +24,11 @@ public partial class Settings : ComponentBase
     private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblLogging, 
         lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblRestart, lblLicense, lblUpdates, 
         lblCheckNow;
-    
-    
+
+    private string OriginalDatabase, OriginalServer;
 
     private SettingsUiModel Model { get; set; } = new ();
-
+    
     private ProcessingNode InternalProcessingNode { get; set; }
 
     readonly List<Validator> RequiredValidator = new ();
@@ -91,6 +91,8 @@ public partial class Settings : ComponentBase
                            new string[] { };
             // humanize the flags
             this.Model.LicenseFlags = string.Join(", ", flags.OrderBy(x => x).Select(FlowHelper.FormatLabel));
+            this.OriginalServer = this.Model?.DbServer;
+            this.OriginalDatabase = this.Model?.DbName;
         }
 
         var nodesResponse = await HttpHelper.Get<ProcessingNode[]>("/api/node");

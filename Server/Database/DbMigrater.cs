@@ -1,6 +1,7 @@
 using System.Data.SQLite;
 using FileFlows.Server.Database.Managers;
-using NPoco;
+using FileFlows.Shared.Models;
+using DatabaseType = NPoco.DatabaseType;
 
 namespace FileFlows.Server.Database;
 
@@ -42,6 +43,28 @@ public class DbMigrater
         catch (Exception ex)
         {
             Logger.Instance.ELog("Failed to migrate data: " + ex.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks if the external database already exists and is a FileFlows DB
+    /// </summary>
+    /// <param name="connectionString">the connection string</param>
+    /// <returns>if the database exists or not</returns>
+    public static bool ExternalDatabaseExists(string connectionString)
+    {
+        if (string.IsNullOrWhiteSpace(connectionString) || connectionString.ToLower().IndexOf(".sqlite") > 0)
+            return false; // never treat SQL lite as existing
+
+        try
+        {
+            var db = DbManager.GetManager(connectionString);
+            var settings = db.Single<Settings>().Result;
+            return string.IsNullOrEmpty(settings?.Version) == false;
+        }
+        catch (Exception)
+        {
             return false;
         }
     }

@@ -92,7 +92,7 @@ public class SettingsController : Controller
             new MySqlDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
         else
             new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
-        uiModel.DatabaseUseConnectionPool = AppSettings.Instance.DatabaseUseConnectionPool;
+        uiModel.RecreateDatabase = AppSettings.Instance.RecreateDatabase;
         
         return uiModel;
     }
@@ -174,7 +174,7 @@ public class SettingsController : Controller
             AppSettings.Instance.DatabaseMigrateConnection = newConnectionString?.EmptyAsNull() ?? DbManager.GetDefaultConnectionString();
         }
 
-        AppSettings.Instance.DatabaseUseConnectionPool = model.DatabaseUseConnectionPool; 
+        AppSettings.Instance.RecreateDatabase = model.RecreateDatabase; 
         // save AppSettings with updated license and db migration if set
         AppSettings.Instance.Save();
     }

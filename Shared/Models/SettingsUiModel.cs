@@ -59,8 +59,8 @@ public class SettingsUiModel:Settings
     public string DbPassword { get; set; }
 
     /// <summary>
-    /// Gets or sets if the database should use a connection pool
+    /// Gets or sets if the database should be recreated if it already exists
     /// </summary>
-    public bool DatabaseUseConnectionPool{ get; set; }
+    public bool RecreateDatabase { get; set; }
     
 }

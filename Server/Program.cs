@@ -183,6 +183,15 @@ public class Program
                 AppSettings.Instance.DatabaseMigrateConnection = null;
                 AppSettings.Instance.Save();
             }
+            else if (AppSettings.Instance.RecreateDatabase == false &&
+                     DbMigrater.ExternalDatabaseExists(AppSettings.Instance.DatabaseMigrateConnection))
+            {
+                Console.WriteLine("Switching to existing database");
+                AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
+                AppSettings.Instance.DatabaseMigrateConnection = null;
+                AppSettings.Instance.RecreateDatabase = false;
+                AppSettings.Instance.Save();
+            }
             else
             {
                 Console.WriteLine("Database migration starting");
@@ -193,6 +202,7 @@ public class Program
                 else
                     Console.WriteLine("Database migration failed, reverting to previous database settings");
                 AppSettings.Instance.DatabaseMigrateConnection = null;
+                AppSettings.Instance.RecreateDatabase = false;
                 AppSettings.Instance.Save();
             }
         }

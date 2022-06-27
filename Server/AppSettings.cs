@@ -13,9 +13,9 @@ internal class AppSettings
     public string DatabaseConnection { get; set; }
 
     /// <summary>
-    /// Gets or sets if the database should use a connection pool
+    /// Gets or sets if the database should recreate if it already exists
     /// </summary>
-    public bool DatabaseUseConnectionPool{ get; set; }
+    public bool RecreateDatabase{ get; set; }
 
     /// <summary>
     /// Gets or sets the encryption key to use

@@ -80,11 +80,6 @@ public abstract class DbManager
     /// <returns>the default database connection string using the Sqlite database file</returns>
     public static string GetDefaultConnectionString() => SqliteDbManager.GetConnetionString(SqliteDbFile);
 
-    /// <summary>
-    /// Gets if using a database connection pool
-    /// </summary>
-    public bool UseDbPool => AppSettings.Instance.DatabaseUseConnectionPool; 
-
     public DbManager()
     {
         if (DbConnectionPool == null)
@@ -98,8 +93,7 @@ public abstract class DbManager
     /// <returns>an instance of the IDatabase</returns>
     protected async Task<IDatabase> GetDb()
     {
-        if (UseDbPool == false || true)
-            return GetDbInstance();
+        return GetDbInstance();
         
         int count = 0;
         while(++count < 100)

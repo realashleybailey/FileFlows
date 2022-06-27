@@ -152,18 +152,25 @@ public class FileLogger : ILogWriter
     public string GetLogFilename()
     {
         string file = Path.Combine(LoggingPath, LogPrefix + "-" + DateTime.Now.ToString("MMMdd"));
-        for (int i = 1; i < 100; i++)
+        string latestAcceptableFile = string.Empty;
+        for (int i = 99; i >= 0; i--)
         {
             FileInfo fi = new(file + "-" + i.ToString("D2") + ".log");
             if (fi.Exists == false)
             {
-                NewFile = false;
-                return fi.FullName;
+                latestAcceptableFile = fi.FullName;
             }
-            if (NewFile == false && fi.Length < 10_000_000)
-                return fi.FullName;
+            else if (NewFile == false && fi.Length < 10_000_000)
+            {
+                latestAcceptableFile = fi.FullName;
+                break;
+            }
+            else
+            {
+                break;
+            }
         }
-
-        return string.Empty;
+        NewFile = false;
+        return latestAcceptableFile;
     }
 }

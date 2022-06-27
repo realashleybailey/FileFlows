@@ -55,23 +55,7 @@ public class Program
 
             InitializeLoggers();
 
-            Logger.Instance.ILog(new string('=', 50));
-            Thread.Sleep(1); // so log message can be written
-            Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
-            Thread.Sleep(1); // so log message can be written
-            if(Docker)
-                Logger.Instance.ILog("Running inside docker container");
-            Thread.Sleep(1); // so log message can be written
-            Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
-            Thread.Sleep(1); // so log message can be written
-            foreach (DictionaryEntry var in Environment.GetEnvironmentVariables())
-            {
-                Logger.Instance.DLog($"ENV.{var.Key} = {var.Value}");
-                Thread.Sleep(1); // so log message can be written
-            }
-            Thread.Sleep(1); // so log message can be written
-            Logger.Instance.ILog(new string('=', 50));
-            Thread.Sleep(1); // so log message can be written
+            WriteLogHeader(args);
 
             CleanDefaultTempDirectory();
 
@@ -145,6 +129,27 @@ public class Program
         }
     }
 
+    private static void WriteLogHeader(string[] args)
+    {
+        Logger.Instance.ILog(new string('=', 50));
+        Thread.Sleep(1); // so log message can be written
+        Logger.Instance.ILog("Starting FileFlows " + Globals.Version);
+        Thread.Sleep(1); // so log message can be written
+        if(Docker)
+            Logger.Instance.ILog("Running inside docker container");
+        Thread.Sleep(1); // so log message can be written
+        Logger.Instance.DLog("Arguments: " + (args?.Any() == true ? string.Join(" ", args) : "No arguments"));
+        Thread.Sleep(1); // so log message can be written
+        foreach (DictionaryEntry var in Environment.GetEnvironmentVariables())
+        {
+            Logger.Instance.DLog($"ENV.{var.Key} = {var.Value}");
+            Thread.Sleep(1); // so log message can be written
+        }
+        Thread.Sleep(1); // so log message can be written
+        Logger.Instance.ILog(new string('=', 50));
+        Thread.Sleep(1); // so log message can be written
+    }
+
     private static void CheckLicense()
     {
         LicenseHelper.Update().Wait();
@@ -186,7 +191,7 @@ public class Program
             else if (AppSettings.Instance.RecreateDatabase == false &&
                      DbMigrater.ExternalDatabaseExists(AppSettings.Instance.DatabaseMigrateConnection))
             {
-                Console.WriteLine("Switching to existing database");
+                Logger.Instance.ILog("Switching to existing database");
                 AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
                 AppSettings.Instance.DatabaseMigrateConnection = null;
                 AppSettings.Instance.RecreateDatabase = false;
@@ -194,13 +199,13 @@ public class Program
             }
             else
             {
-                Console.WriteLine("Database migration starting");
+                Logger.Instance.ILog("Database migration starting");
                 bool migrated = DbMigrater.Migrate(AppSettings.Instance.DatabaseConnection,
                     AppSettings.Instance.DatabaseMigrateConnection);
                 if (migrated)
                     AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
                 else
-                    Console.WriteLine("Database migration failed, reverting to previous database settings");
+                    Logger.Instance.ELog("Database migration failed, reverting to previous database settings");
                 AppSettings.Instance.DatabaseMigrateConnection = null;
                 AppSettings.Instance.RecreateDatabase = false;
                 AppSettings.Instance.Save();

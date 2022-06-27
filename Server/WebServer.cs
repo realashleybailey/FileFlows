@@ -25,16 +25,6 @@ public class WebServer
 
     public static void Start(string[] args)
     {
-        if (Helpers.DbHelper.Initialize().Result == false)
-        {
-            Logger.Instance.ELog("Failed initializing database");
-            return;
-        }
-        else
-        {
-            Logger.Instance.ILog("Database initialized");
-        }
-        
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

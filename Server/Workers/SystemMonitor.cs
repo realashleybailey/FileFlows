@@ -13,11 +13,11 @@ namespace FileFlows.Server.Workers;
 /// </summary>
 public class SystemMonitor:Worker
 {
-    public readonly FixedSizedQueue<SystemValue<float>> CpuUsage = new (1_000);
-    public readonly FixedSizedQueue<SystemValue<float>> MemoryUsage = new (1_000);
-    public readonly FixedSizedQueue<SystemValue<long>> TempStorageUsage = new(1_000);
-    public readonly FixedSizedQueue<SystemValue<long>> LogStorageUsage = new(1_000);
-    public readonly FixedSizedQueue<SystemValue<long>> OpenDbConnections = new(1_000);
+    public readonly FixedSizedQueue<SystemValue<float>> CpuUsage = new (250);
+    public readonly FixedSizedQueue<SystemValue<float>> MemoryUsage = new (250);
+    public readonly FixedSizedQueue<SystemValue<long>> TempStorageUsage = new(250);
+    public readonly FixedSizedQueue<SystemValue<long>> LogStorageUsage = new(250);
+    public readonly FixedSizedQueue<SystemValue<long>> OpenDbConnections = new(250);
     private readonly Dictionary<Guid, NodeSystemStatistics> NodeStatistics = new();
     
 

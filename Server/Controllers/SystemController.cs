@@ -122,9 +122,10 @@ public class SystemController:Controller
     [HttpGet("history-data/cpu")]
     public IEnumerable<SystemValue<float>> GetCpuData([FromQuery] DateTime? since = null)
     {
-        if (since == null)
-            return SystemMonitor.Instance.CpuUsage;
-        return SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since);
+        if (since != null)
+            return SystemMonitor.Instance.CpuUsage.Where(x => x.Time > since);
+        var data = SystemMonitor.Instance.CpuUsage;
+        return EaseData(data);
     }
     
     /// <summary>
@@ -135,9 +136,10 @@ public class SystemController:Controller
     [HttpGet("history-data/memory")]
     public IEnumerable<SystemValue<float>> GetMemoryData([FromQuery] DateTime? since = null)
     {
-        if (since == null)
-            return SystemMonitor.Instance.MemoryUsage;
-        return SystemMonitor.Instance.MemoryUsage.Where(x => x.Time > since);
+        if (since != null)
+            return SystemMonitor.Instance.MemoryUsage.Where(x => x.Time > since);
+        var data = SystemMonitor.Instance.MemoryUsage;
+        return EaseData(data);
     }
     
     /// <summary>
@@ -148,9 +150,10 @@ public class SystemController:Controller
     [HttpGet("history-data/temp-storage")]
     public IEnumerable<SystemValue<long>> GetTempStorageData([FromQuery] DateTime? since = null)
     {
-        if (since == null)
-            return SystemMonitor.Instance.TempStorageUsage;
-        return SystemMonitor.Instance.TempStorageUsage.Where(x => x.Time > since);
+        if (since != null)
+            return SystemMonitor.Instance.TempStorageUsage.Where(x => x.Time > since);
+        var data = SystemMonitor.Instance.TempStorageUsage;
+        return EaseData(data);
     }
 
     /// <summary>
@@ -161,11 +164,33 @@ public class SystemController:Controller
     [HttpGet("history-data/log-storage")]
     public IEnumerable<SystemValue<long>> GetLoggingStorageData([FromQuery] DateTime? since = null)
     {
-        if (since == null)
-            return SystemMonitor.Instance.LogStorageUsage;
-        return SystemMonitor.Instance.LogStorageUsage.Where(x => x.Time > since);
+        if (since != null)
+            return SystemMonitor.Instance.LogStorageUsage.Where(x => x.Time > since);
+        var data = SystemMonitor.Instance.LogStorageUsage;
+        return EaseData(data);
     }
-    
+
+    private IEnumerable<SystemValue<T>> EaseData<T>(IEnumerable<SystemValue<T>> data)
+    {
+        List<SystemValue<T>> eased = new();
+        var dtCutoff = DateTime.Now.AddMinutes(-5);
+        var recent = data.Where(x => x.Time > dtCutoff);
+        var older = data.Where(x => x.Time <= dtCutoff)
+            .GroupBy(x => new DateTime(x.Time.Year, x.Time.Month, x.Time.Day, x.Time.Hour, x.Time.Minute, 0))
+            .ToDictionary(x => x.Key, x => x.ToList());
+        foreach (var old in older)
+        {
+            double max = old.Value.Max(x => Convert.ToDouble(x.Value));
+            eased.Add(new ()
+            {
+                Time = old.Key,
+                Value = (T)Convert.ChangeType(max, typeof(T))
+            });
+        }
+        eased.AddRange(recent);
+        return eased;
+    }
+
     /// <summary>
     /// Gets history number of open database connections
     /// </summary>

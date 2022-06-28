@@ -82,8 +82,6 @@ BEGIN
             set sOrder = ' order by DateCreated desc ';
         end if;
         
-        select @queryString;
-
         SET @queryString = CONCAT(
                 'select DbObject.Uid, DbObject.Name, DbObject.Type, DbObject.DateCreated, DbObject.DateModified, DbObject.Data ',
                 ' from DbObject left outer join tempLibraries on js_LibraryUid = tempLibraries.Uid ',

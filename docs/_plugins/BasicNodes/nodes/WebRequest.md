@@ -11,8 +11,6 @@ toc: true
 
 Copies a file to the destination folder
 
-## Fields
-
 ### URL
 The URL of the request.
 
@@ -37,4 +35,5 @@ The body of the request being sent.  Variables can be used in this field.
 | :---: | :---: | :---: | :---: |
 | web.StatusCode | The status code from the response | number | 200 |
 | web.Body | The body of the response | string | this is a sample body |
+
 Note: In the [Flow Editor](/pages/flow-editor) this examples values will be used, so if you are expecting JSON back, the code will be evaluated with "this is a sample body" when saving.

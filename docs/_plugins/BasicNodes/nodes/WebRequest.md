@@ -31,6 +31,7 @@ The body of the request being sent.  Variables can be used in this field.
 2. Request returned a non-successful status code
 
 ## Variables
+
 | Variable | Description | Type | Example |
 | :---: | :---: | :---: | :---: |
 | web.StatusCode | The status code from the response | number | 200 |

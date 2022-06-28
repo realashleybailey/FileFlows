@@ -66,13 +66,13 @@ BEGIN
         if FileStatus = 0 or FileStatus = -1 then
             set sOrder = ' order by tempLibraries.Priority asc, 
 		  case
-			   when js_Status > 0 then 0
+			    when js_Status > 0 then 0
 				when js_Order <> -1 then js_Order
 				when tempLibraries.ProcessingOrder = 1 then FLOOR(RAND()*(10000)+1000) # random
 				when tempLibraries.ProcessingOrder = 2 then 1000 + (js_OriginalSize / 1000000) #smallest first
 				when tempLibraries.ProcessingOrder = 3 then 10000000 - (js_OriginalSize / 10000)  #largest first
 				when tempLibraries.ProcessingOrder = 4 then now() - DateCreated #newest first
-				else 10000 +  timestampdiff(SECOND, ''2022-01-01'', NOW())
+				else UNIX_TIMESTAMP(DateCreated)
 				end';
         elseif FileStatus = 2 then
             set sOrder = ' order by js_ProcessingStarted asc ';
@@ -81,6 +81,8 @@ BEGIN
         else
             set sOrder = ' order by DateCreated desc ';
         end if;
+        
+        select @queryString;
 
         SET @queryString = CONCAT(
                 'select DbObject.Uid, DbObject.Name, DbObject.Type, DbObject.DateCreated, DbObject.DateModified, DbObject.Data ',

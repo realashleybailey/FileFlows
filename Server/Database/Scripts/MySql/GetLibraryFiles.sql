@@ -69,7 +69,7 @@ BEGIN
 				when tempLibraries.ProcessingOrder = 2 then 1000 + (js_OriginalSize / 1000000) #smallest first
 				when tempLibraries.ProcessingOrder = 3 then 10000000 - (js_OriginalSize / 10000)  #largest first
 				when tempLibraries.ProcessingOrder = 4 then now() - DateCreated #newest first
-				else 10000
+				else 10000 +  timestampdiff(SECOND, ''2022-01-01'', NOW())
 				end';
         elseif FileStatus = 2 then
             set sOrder = ' order by js_ProcessingStarted asc ';

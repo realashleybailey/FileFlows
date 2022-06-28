@@ -12,8 +12,10 @@
     
     <div class="grid-stack">
         
-        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
-        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
+        <ApexChart Width="3" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
+        <ApexChart Width="3" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
+        <ApexChart Width="3" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblTempStorage Icon="fas fa-hdd" Url=@TempStorageUrl />
+        <ApexChart Width="3" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblLogStorage Icon="fas fa-hdd" Url=@LogStorageUrl />
             
         @if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
@@ -23,9 +25,6 @@
             <ApexChart Width="4" Height="2" ChartType="ApexChartType.PieChart" Title=@lblVideoResolution Icon="fas fa-tv" Url=@VideoResolutionUrl />
             <ApexChart Width="4" Height="2" ChartType="ApexChartType.BoxPlot" Title=@lblLibraryProcessingTimes Icon="fas fa-stopwatch" Url=@LibraryProcessingTimeUrl />
         }
-        
-        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblTempStorage Icon="fas fa-hdd" Url=@TempStorageUrl />
-        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblLogStorage Icon="fas fa-hdd" Url=@LogStorageUrl />
     </div>
 
     </Body>

@@ -16,9 +16,6 @@ Shows you the current and historic CPU usage.   This data is bucketed and the ma
 ### Memory Usage
 Shows you the current and historic memory usage.   This data is bucketed and the maximum value recorded in a 10 second bucket is shown.
 
-### Open Database Connections
-Shows you the current and historic open database connections.   This data is bucketed and the maximum value recorded in a 10 second bucket is shown.
-
 ### Codec
 Shows you how many of each codecs have been processed.  This combines both Video and Audio codecs.
 

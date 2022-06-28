@@ -10,7 +10,7 @@ order: 900
 
 #### New
 - MySQL is now using a connection pool, a maximum of 50 connections
-  - Removed "Open Database Connections" portlet from System page as this information is no longer available
+  - Removed the "Open Database Connections" portlet from the System page as this information is no longer available
 - Setting to "Recreate Database", if unchecked and the database already exists, no data will be migrated and FileFlows will simply switch to this database.
 - Node: [FFMPEG Builder:Audio Converter](/plugins/video-nodes/ffmpeg-builder/audio-converter)
 - Library Option: Skip File Access Tests

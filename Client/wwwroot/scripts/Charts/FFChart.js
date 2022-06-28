@@ -628,8 +628,6 @@ export class TimeSeriesChart extends FFChart
             }
         };
         
-        console.log('top options', JSON.parse(JSON.stringify(options)));
-
         this.chartTop = new ApexCharts(document.getElementById(this.topUid), options);
         this.chartTop.render();
     }

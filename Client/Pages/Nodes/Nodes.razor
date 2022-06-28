@@ -63,6 +63,16 @@
                         }
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="ProcessingNode" Width="12rem" MobileWidth="0">
+                    <Header>
+                    </Header>
+                    <Cell Context="item">
+                        @if (Globals.Version != item.Version)
+                        {
+                            <span style="font-style: italic;color: var(--warning);" title="The Server and Nodes must be on the same version">Upgrade Required</span>
+                        }
+                    </Cell>
+                </FlowTableColumn>
                 <FlowTableColumn TItem="ProcessingNode" Width="8rem" MobileWidth="0">
                     <Header>
                         @lblRunners

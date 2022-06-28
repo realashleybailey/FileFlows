@@ -519,12 +519,7 @@ public class NodeParameters
             Logger?.ILog($"Mapped path from '{originalDestination}' to '{destination}'");
         
         FileInfo file = new FileInfo(destination);
-        if (string.IsNullOrEmpty(file.Extension) == false)
-        {
-            // just ensures extensions are lowercased
-            destination = new FileInfo(file.FullName.Substring(0, file.FullName.LastIndexOf(file.Extension)) + file.Extension.ToLower()).FullName;
-        }
-
+        
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         if (isWindows)
         {

@@ -420,6 +420,13 @@ window.ffFlow = {
         let eleFlowParts = document.getElementById('flow-parts');
         if(!eleFlowParts)
             return; // not on flow page, dont consume copy
+
+        let active = document.activeElement;
+        if(active) {
+            let flowParts = active.closest('.flow-parts');
+            if (!flowParts)
+                return; // flowparts/canvas does not have focus, do not listen to this event
+        }
         
         console.log('got copy command');
         if (ffFlow.SelectedParts.length) {
@@ -434,6 +441,14 @@ window.ffFlow = {
         let eleFlowParts = document.getElementById('flow-parts');
         if(!eleFlowParts)
             return; // not on flow page, dont consume paste
+
+        let active = document.activeElement;
+        if(active) {
+            let flowParts = active.closest('.flow-parts');
+            if (!flowParts)
+                return; // flowparts/canvas does not have focus, do not listen to this event
+        }
+        
         let json = (e.clipboardData || window.clipboardData).getData('text');
         if(!json)
             return;

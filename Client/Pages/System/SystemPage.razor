@@ -12,9 +12,8 @@
     
     <div class="grid-stack">
         
-        <ApexChart Width="4" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
-        <ApexChart Width="4" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
-        <ApexChart Width="4" ChartType="ApexChartType.TimeSeries" Options="2" Title=@lblOpenDbConnections Icon="fas fa-memory" Url=@OpenDbConnectionsUrl />
+        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Title=@lblCpuUsage Icon="fas fa-microchip" Url=@CpuUrl />
+        <ApexChart Width="6" ChartType="ApexChartType.TimeSeries" Options="1" Title=@lblMemoryUsage Icon="fas fa-memory" Url=@MemoryUrl />
             
         @if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {

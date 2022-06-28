@@ -17,7 +17,6 @@ public class SystemMonitor:Worker
     public readonly FixedSizedQueue<SystemValue<float>> MemoryUsage = new (250);
     public readonly FixedSizedQueue<SystemValue<long>> TempStorageUsage = new(250);
     public readonly FixedSizedQueue<SystemValue<long>> LogStorageUsage = new(250);
-    public readonly FixedSizedQueue<SystemValue<long>> OpenDbConnections = new(250);
     private readonly Dictionary<Guid, NodeSystemStatistics> NodeStatistics = new();
     
 
@@ -56,10 +55,6 @@ public class SystemMonitor:Worker
         {
             Value = taskLogStorage.Result
         });
-        OpenDbConnections.Enqueue((new ()
-        {
-            Value = DbManager.GetOpenDbConnections()
-        }));
     }
 
     private async Task<float> GetCpu()

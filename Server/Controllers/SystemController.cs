@@ -190,19 +190,6 @@ public class SystemController:Controller
         eased.AddRange(recent);
         return eased;
     }
-
-    /// <summary>
-    /// Gets history number of open database connections
-    /// </summary>
-    /// <param name="since">data since a date</param>
-    /// <returns>the history number of open database connections</returns>
-    [HttpGet("history-data/open-db-connections")]
-    public IEnumerable<SystemValue<long>> GetDatabaseConnections([FromQuery] DateTime? since = null)
-    {
-        if (since == null)
-            return SystemMonitor.Instance.OpenDbConnections;
-        return SystemMonitor.Instance.OpenDbConnections.Where(x => x.Time > since);
-    }
     
     /// <summary>
     /// Gets history library processing time data

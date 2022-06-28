@@ -6,6 +6,29 @@ layout: default
 order: 900
 ---
 
+## Version 0.8.4
+
+#### New
+- MySQL is now using a connection pool, a maximum of 50 connections
+  - Removed "Open Database Connections" portlet from System page as this information is no longer available
+- Setting to "Recreate Database", if unchecked and the database already exists, no data will be migrated and FileFlows will simply switch to this database.
+- Node: [FFMPEG Builder:Audio Converter](/plugins/video-nodes/ffmpeg-builder/audio-converter)
+- Library Option: Skip File Access Tests
+  - When enabled, the library will not test if the server can read/write to a file before adding it into the system.
+- New indicator on the [Nodes](/nodes) page if the node and server version mismatches
+- New File Status "Missing Library"
+  - Shown if a file was added into the database and then the Library was deleted
+  - This allows you to delete these files for reprocessing if a new library with the same path is created
+
+#### Fixed
+- MySQL was ordering unprocessed incorrectly
+- Zooming in the Flow Editor would break the multi-select
+- Copy/Paste in Flow Editor would capture all copy/paste events and not just when in focus
+- Log DB Pruner was not pruning database logs
+
+
+---
+
 ## Version 0.8.3
 
 #### New
@@ -37,8 +60,6 @@ order: 900
 - Fixed the "Pause Processing" button on the mobile view
 - Log files were created with no .log extension, causing the log cleaner to never delete the old log files
 - Misc Cosmetic improvements
-
-
 
 
 ---

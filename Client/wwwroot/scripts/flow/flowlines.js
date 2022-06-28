@@ -144,11 +144,19 @@ class ffFlowLines {
             return;
         let canvas = this.getCanvas();
         let canvasBounds = canvas.getBoundingClientRect();
+
+
         
         let x1 = window.ffFlow.Mouse.initialX;
         let y1 = window.ffFlow.Mouse.initialY;
         let x2 = window.ffFlow.Mouse.currentX;
         let y2 = window.ffFlow.Mouse.currentY;
+        
+        x1 = ffFlow.translateCoord(x1, true);
+        x2 = ffFlow.translateCoord(x2, true);
+        y1 = ffFlow.translateCoord(y1, true);
+        y2 = ffFlow.translateCoord(y2, true);
+        
         x1 -= canvasBounds.left;
         y1 -= canvasBounds.top;
         this.ioContext.strokeStyle = this.accentColor;

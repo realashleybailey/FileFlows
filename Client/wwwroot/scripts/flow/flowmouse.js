@@ -79,10 +79,10 @@ class ffFlowMouse {
             let endX = e.x;
             let endY = e.y;
             let selectedBounds = {
-                x: Math.min(this.initialX, this.initialX + this.currentX),
-                y: Math.min(this.initialY, this.initialY + this.currentY),
-                width: Math.abs(this.currentX),
-                height: Math.abs(this.currentY)
+                x: ffFlow.translateCoord(Math.min(this.initialX, this.initialX + this.currentX)),
+                y: ffFlow.translateCoord(Math.min(this.initialY, this.initialY + this.currentY)),
+                width: ffFlow.translateCoord(Math.abs(this.currentX)),
+                height: ffFlow.translateCoord(Math.abs(this.currentY))
             };            
             // set this in a timeout, this fixes an issue with the mouse click event clearing our selection
             setTimeout(()=>{

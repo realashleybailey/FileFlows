@@ -39,11 +39,12 @@ BEGIN
         select Status, count(Uid) as Count
         from (
                  select case
+                            when tempLibraries.Uid is null then 7
                             when js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0 then 0
                             when js_Status = 0 and tempLibraries.Enabled = false then -1
                             when js_Status = 0 then -2
                             else js_Status end as Status, DbObject.Uid
-                 from DbObject inner join tempLibraries on js_LibraryUid = tempLibraries.Uid
+                 from DbObject left outer join tempLibraries on js_LibraryUid = tempLibraries.Uid
                  where Type = 'FileFlows.Shared.Models.LibraryFile'
              ) as tbl
         group by Status;
@@ -56,6 +57,8 @@ BEGIN
             set sWhere = ' and js_Status  = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0';
         elseif FileStatus = -2 then -- disabled
             set sWhere = ' and js_Status  = 0 and tempLibraries.Enabled = false';
+        elseif FileStatus = 7 then -- missing libraries
+            set sWhere= ' and tempLibraries.Uid is null ';
         else
             set sWhere = CONCAT(' and js_Status = ', FileStatus);
         end if;
@@ -81,7 +84,7 @@ BEGIN
 
         SET @queryString = CONCAT(
                 'select DbObject.Uid, DbObject.Name, DbObject.Type, DbObject.DateCreated, DbObject.DateModified, DbObject.Data ',
-                ' from DbObject inner join tempLibraries on js_LibraryUid = tempLibraries.Uid ',
+                ' from DbObject left outer join tempLibraries on js_LibraryUid = tempLibraries.Uid ',
                 ' where Type = ''FileFlows.Shared.Models.LibraryFile'' ',
                 sWhere, ' ', sOrder, ' limit ', StartItem, ', ', MaxItems, '; '
             );

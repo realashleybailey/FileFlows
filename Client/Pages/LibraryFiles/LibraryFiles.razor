@@ -54,6 +54,9 @@
                 case FileStatus.MappingIssue:
                     <span class="icon fas fa-map-marked-alt"></span>
                     break;
+                case FileStatus.MissingLibrary:
+                    <span class="icon fas fa-trash"></span>
+                    break;
 
             }
 
@@ -62,6 +65,13 @@
         </div>
     }
 </div>
+
+@if (SelectedStatus == FileStatus.MissingLibrary)
+{
+    <div class="info box">The libraries these files belong to have been deleted. A new library may have been created with the same path, but the ID of the library has changed.
+To process these files, delete them and scan the library again.
+    </div>
+}
 
 <FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
            DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
@@ -130,7 +140,7 @@
                 <span>@DateString(item.Date)</span>
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate)">
+        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="@((int)SelectedStatus < 1 || SelectedStatus == FileStatus.Duplicate || SelectedStatus == FileStatus.MissingLibrary)">
             <Header>
                 Flow
             </Header>
@@ -138,7 +148,7 @@
                 <span>@item.Flow</span>
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing)">
+        <FlowTableColumn TItem="LibaryFileListModel" Width="12rem" MobileWidth="0" Hidden="(SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.MissingLibrary)">
             <Header>
                 Library
             </Header>
@@ -167,6 +177,14 @@
             </Header>
             <Cell Context="item">
                 <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
+            </Cell>
+        </FlowTableColumn>
+        <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="SelectedStatus != FileStatus.MissingLibrary" MobileWidth="10rem">
+            <Header>
+                Status
+            </Header>
+            <Cell Context="item">
+                <span>@Translater.Instant("Enums.FileStatus." + item.Status)</span>
             </Cell>
         </FlowTableColumn>
         <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">

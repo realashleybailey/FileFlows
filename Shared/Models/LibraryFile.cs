@@ -160,7 +160,11 @@ public enum FileStatus
     /// <summary>
     /// The file could not be processed due to a mapping issue
     /// </summary>
-    MappingIssue = 6
+    MappingIssue = 6,
+    /// <summary>
+    /// The library this file was created under no longer exists
+    /// </summary>
+    MissingLibrary = 7
 }
 
 /// <summary>

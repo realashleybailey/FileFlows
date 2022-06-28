@@ -1,16 +1,11 @@
-using System.Runtime.InteropServices;
-using FileFlows.Server.Database.Managers;
-using FileFlows.ServerShared.Models;
-using FileFlows.Shared;
-
-namespace FileFlows.Server.Controllers;
-
 using Microsoft.AspNetCore.Mvc;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using FileFlows.Plugin;
-using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Formatters;
+using FileFlows.ServerShared.Models;
+
+namespace FileFlows.Server.Controllers;
 
 /// <summary>
 /// Library files controller
@@ -256,6 +251,9 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             if (status == FileStatus.Duplicate)
                 item.Duplicate = x.Duplicate?.Name;
 
+            if (status == FileStatus.MissingLibrary)
+                item.Status = x.Status;
+
             if (status == FileStatus.Processed)
             {
                 item.FinalSize = x.FinalSize;
@@ -299,7 +297,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
         libraryFiles = all;
         
-        if (status != null)
+        if (status != null && status != FileStatus.MissingLibrary)
         {
             FileStatus searchStatus =
                 (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled)
@@ -457,7 +455,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 return x.Status;
             // unprocessed just show the enabled libraries
             if (libraries.ContainsKey(x.Library.Uid) == false)
-                return (FileStatus) (-99);
+                return FileStatus.MissingLibrary;
 
             var lib = libraries[x.Library.Uid];
             if (lib.Enabled == false)
@@ -467,7 +465,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             return FileStatus.Unprocessed;
         });
 
-        return statuses.Where(x => (int)x != -99).GroupBy(x => x)
+        return statuses.GroupBy(x => x)
             .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
 
     }

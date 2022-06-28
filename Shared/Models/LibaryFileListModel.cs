@@ -67,4 +67,9 @@ public class LibaryFileListModel: IUniqueObject
     /// Could be processed at, could be detected at, or starting processing at
     /// </summary>
     public DateTime? Date { get; set; }
+
+    /// <summary>
+    /// Gets or sets the status of the file
+    /// </summary>
+    public FileStatus? Status { get; set; }
 }

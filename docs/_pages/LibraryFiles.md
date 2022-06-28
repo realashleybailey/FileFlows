@@ -20,6 +20,10 @@ This page contains a list of files found by the library scanner.
   * Happens if the flow has been deleted and the Library has not updated Flow set. 
   * To fix this, edit the Library and configure a Flow for it.
   * Then select the items to process and click Reprocess
+* Missing Library
+  * The libraries these files belong to have been deleted. A new library may have been created with the same path, but the ID of the library has changed.
+  * To process these files, delete them and scan the library again.
+  * These files may have been left un-deleted to retain the processing statistics for these files.
 
 
 

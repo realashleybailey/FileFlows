@@ -142,6 +142,7 @@ public class WebServer
         LibraryWorker.ResetProcessing();
         WorkerManager.StartWorkers(
             new LicenseValidatorWorker(),
+            new SystemMonitor(),
             new LibraryWorker(),
             new LogFileCleaner(),
             new DbLogPruner(),
@@ -152,8 +153,7 @@ public class WebServer
             new TelemetryReporter(),
             new ServerUpdater(),
             new TempFileCleaner(string.Empty),
-            new FlowRunnerMonitor(),
-            new SystemMonitor()
+            new FlowRunnerMonitor()
         );
 
         app.MapHub<Hubs.FlowHub>("/flow");

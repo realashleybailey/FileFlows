@@ -8,6 +8,20 @@
 <PageView ClassName="fix-width">
 
     <Head>
+        @if (App.Instance.FileFlowsSystem.Licensed)
+        {
+            <span>Dashboard</span>
+            <select @bind="ActiveDashboardUid">
+                @if (Dashboards?.Any() == true)
+                {
+                    @foreach (var dashboard in Dashboards.OrderBy(x => x.Name))
+                    {
+                        <option value=@dashboard.Uid>@dashboard.Name</option>
+                    }
+                }
+            </select>
+            <button @onclick=@AddDashboard class="btn" style="width:2rem">+</button>
+        }
         @if (App.Instance.IsMobile == false)
         {
             @if (SystemInfo?.CpuUsage > 0 && SystemInfo?.MemoryUsage > 0)

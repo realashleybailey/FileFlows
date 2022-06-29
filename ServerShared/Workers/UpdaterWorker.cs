@@ -156,6 +156,7 @@ public abstract class UpdaterWorker : Worker
                 return string.Empty;
             }
 
+            
             Logger.Instance?.DLog($"{UpdaterName}: Downloaded update: " + update);
 
             var updateDir = new FileInfo(update).DirectoryName;

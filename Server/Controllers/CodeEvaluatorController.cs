@@ -68,6 +68,7 @@ namespace FileFlows.Server.Controllers
             })
             .SetValue("Logger", log)
             .SetValue("Variables", model.Variables)
+            .SetValue("Sleep", (int milliseconds) => { })
             .SetValue("Flow", new Plugin.NodeParameters(string.Empty, null, false, String.Empty));
 
 

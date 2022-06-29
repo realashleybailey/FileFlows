@@ -41,6 +41,11 @@ window.ffCode = {
    Extension: string
 };`;
         monaco.languages.typescript.javascriptDefaults.addExtraLib(funFileInfo, 'ff.funFileInfo');
+        
+        monaco.editor.createModel(
+            "const Sleep = function(milliseconds)",
+            "javascript"
+        );
 
         if (variables) {
             var actualVaraibles = {};

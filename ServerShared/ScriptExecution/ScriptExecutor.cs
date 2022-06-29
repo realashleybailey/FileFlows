@@ -78,6 +78,7 @@ public class ScriptExecutor:IScriptExecutor
             })
             .SetValue("Logger", args.Logger)
             .SetValue("Variables", args.Variables)
+            .SetValue("Sleep", (int milliseconds) => Thread.Sleep(milliseconds))
             .SetValue("Flow", args)
             .SetValue("Execute", (object eArgs) => {
                 args.Logger.ILog("eArgsType:", eArgs.GetType().FullName);

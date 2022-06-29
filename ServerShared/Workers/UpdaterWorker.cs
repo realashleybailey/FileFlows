@@ -108,7 +108,7 @@ public abstract class UpdaterWorker : Worker
         try
         {
             // if inside docker or systemd we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
-            if (Globals.IsDocker == false && Globals.IsSystemd)
+            if (Globals.IsDocker == false && Globals.IsSystemd == false)
             {
                 Logger.Instance?.ILog($"{UpdaterName}About to execute upgrade script: " + updateScript);
                 var fi = new FileInfo(updateScript);

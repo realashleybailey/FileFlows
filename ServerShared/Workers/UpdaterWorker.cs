@@ -121,6 +121,7 @@ public abstract class UpdaterWorker : Worker
                 Process.Start(psi);
             }
             
+            
 
             QuitApplication();
         }

@@ -45,7 +45,7 @@ These let you alter the the variable value
 | Variable | Description | Type | Example |
 | :---: | :---: | :---: | :---: |
 | ext | Extension of working file | string | .mkv |
-| file.Name | Short filename of working file | string | b0d11434-8fce-4d3c-ad55-774e05061bdf.mkv |
+| file.Name | Short filename of working file without extension | string | b0d11434-8fce-4d3c-ad55-774e05061bdf |
 | file.FullName | Full filename of working file | string | /temp/FFRunner/b0d11434-8fce-4d3c-ad55-774e05061bdf.mkv |
 | file.Extension | Extension of working file | string | .mkv |
 | file.Size | Size of working file in bytes | long | 100000000 |
@@ -64,7 +64,7 @@ These let you alter the the variable value
 | file.Modified.Month | Modified Month of original file | int | 3 |
 | file.Modified.Day | Modified Day of original file | int | 28 |
 | file.Orig.Extension | Extension of original file | string | .mkv |
-| file.Orig.FileName | Short filename of original file | string | TestFile.mkv |
+| file.Orig.FileName | Short filename of original file without extension | string | TestFile |
 | file.Orig.FullName | Full filename of original file | string | C:\Files\TestFile.mkv |
 | file.Orig.Size | Size of original file in bytes | long | 100000000 |
 | folder.Orig.FileName | Short folder name of original file | string | Files |

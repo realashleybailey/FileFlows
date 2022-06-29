@@ -25,6 +25,8 @@ Optional headers to send with the request.
 
 ### Body
 The body of the request being sent.  Variables can be used in this field.
+This is a plain text field and variables can be used using the {}.
+For example {file.Name}
 
 ## Outputs
 1. Successfully sent
@@ -39,3 +41,19 @@ The body of the request being sent.  Variables can be used in this field.
 
 
 Note: In the [Flow Editor](/flow-editor) this examples values will be used, so if you are expecting JSON back, the code will be evaluated with "this is a sample body" when saving.
+
+
+### JSON Body Example
+To send a JSON body
+1. Set the content type to "JSON"
+2. Choose the HTTP method, for example "POST"
+3. Set the body
+```json
+{
+    "SomeInt": 123,
+    "SomeString": "this is a string",
+    "StringVariable": "{file.Name}",
+    "IntVariable": {file.Size}
+}
+```
+

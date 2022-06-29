@@ -122,6 +122,7 @@ public abstract class UpdaterWorker : Worker
             }
             
             
+            
 
             QuitApplication();
         }

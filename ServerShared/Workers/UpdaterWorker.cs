@@ -120,6 +120,7 @@ public abstract class UpdaterWorker : Worker
                 psi.CreateNoWindow = true;
                 Process.Start(psi);
             }
+            
 
             QuitApplication();
         }

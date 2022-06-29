@@ -1,17 +1,121 @@
+export function initDashboard(portlets){
+    console.log('init dashboard!', portlets);
+    if(!portlets)
+        return;
+    
+    let dashboard = document.querySelector('.dashboard.grid-stack');
+    dashboard.textContent = '';
+    
+    for(let p of portlets)
+    {
+        let div = document.createElement("div");
+        div.setAttribute('id', p.uid);
+        div.className = 'grid-stack-item portlet';
+        div.setAttribute('gs-w', p.width);
+        div.setAttribute('gs-h', p.height);
+        div.setAttribute('gs-x', p.x);
+        div.setAttribute('gs-y', p.y);
+        
+        let title = document.createElement('div');
+        div.appendChild(title);
+        title.className = 'title draghandle';
+        let icon = document.createElement('i');
+        title.appendChild(icon);
+        icon.className = p.icon;
+        let spanTitle = document.createElement('span');
+        title.appendChild(spanTitle);
+        spanTitle.innerText = p.name;
+        
+        let content = document.createElement('div');
+        content.className = 'content';
+        div.appendChild(content);
+        if(p.type === 105){
+            let top = document.createElement('div');
+            top.setAttribute('id', p.uid + '-top');
+            content.appendChild(top);
+
+            let bottom = document.createElement('div');
+            bottom.setAttribute('id', p.uid + '-bottom');
+            content.appendChild(bottom);
+        }
+        else
+        {
+            let chart = document.createElement('div');
+            chart.setAttribute('id', p.uid + '-chart');
+            content.appendChild(chart);            
+        }
+        dashboard.appendChild(div);
+        newChart(p.type, p.uid, { url: p.url, flags: p.flags});
+    }
+    intDashboardActual('default');
+}
+
+function intDashboardActual(uid) {
+    let dashboardData = localStorage.getItem('dashboard-' + uid);
+
+    if(dashboardData)
+    {
+        try {
+            dashboardData = JSON.parse(dashboardData);
+            for (let item of dashboardData) {
+                let ele = document.getElementById(item.id);
+                if (!ele) {
+                    console.log('element not found', item, item.id);
+                    continue;
+                }
+                ele.setAttribute('gs-x', item.x);
+                ele.setAttribute('gs-y', item.y);
+                ele.setAttribute('gs-w', item.w);
+                ele.setAttribute('gs-h', item.h);
+            }
+        }catch(err){
+            // can throw if the saved data is corrupt, silent fail to defaults
+        }
+    }
+
+    var grid = GridStack.init({
+        cellHeight:170,
+        handle: '.draghandle'
+    });
+
+    let saveGrid = () => {
+        let data = [];
+        for(let ele of document.querySelectorAll('.grid-stack-item')){
+            let id = ele.id;
+            let x = parseInt(ele.getAttribute('gs-x'), 10);
+            let y = parseInt(ele.getAttribute('gs-y'), 10);
+            let w = parseInt(ele.getAttribute('gs-w'), 10);
+            let h = parseInt(ele.getAttribute('gs-h'), 10);
+            data.push({
+                id:id, x: x, y:y, w:w, h:h
+            });
+        }
+        localStorage.setItem('dashboard-' + uid, JSON.stringify(data));
+    }
+
+    grid.on('resizestop', (e, el) => {
+        window.dashboardElementResized.args = e;
+        el.dispatchEvent(window.dashboardElementResized);
+        saveGrid();
+    });
+}
+
 export function newChart(type, uid, args){
     if(!window.FlowCharts)
         window.FlowCharts = {};
     args.type = type;
-    if(type == 'BoxPlot')
+    if(type == 'BoxPlot' || type === 101)
         window.FlowCharts[uid] = new BoxPlotChart(uid, args);
-    else if(type == 'HeatMap')
+    else if(type == 'HeatMap' || type === 102)
         window.FlowCharts[uid] = new HeatMapChart(uid, args);
-    else if(type == 'PieChart')
+    else if(type == 'PieChart' || type === 103)
         window.FlowCharts[uid] = new PieChartChart(uid, args);
-    else if(type == 'TreeMap')
+    else if(type == 'TreeMap' || type === 104)
         window.FlowCharts[uid] = new TreeMapChart(uid, args);
-    else if(type == 'TimeSeries')
+    else if(type == 'TimeSeries' || type === 105)
         window.FlowCharts[uid] = new TimeSeriesChart(uid, args);
+    else 
+        console.log('unknown type: ' + type);
     
 }
 
@@ -34,7 +138,7 @@ class FFChart {
     constructor(uid, args, dontGetData) {
         this.uid = uid;
         this.chartUid = uid + '-chart';
-
+        
         this.url = args.url;
         this.seriesName = args.title;
 
@@ -70,7 +174,7 @@ class FFChart {
         data = this.fixData(data);
 
         if(this.hasData(data) === false){
-            document.getElementById(this.uid).style.display = 'none';
+            //document.getElementById(this.uid).style.display = 'none';
             return;
         }
         this.createChart(data);
@@ -368,10 +472,10 @@ export class TimeSeriesChart extends FFChart
         end: null
     };
 
-    constructor(uid, args, bytes) {
+    constructor(uid, args) {
         super(uid, args, true);
         
-        let options = this.ele.getAttribute('x-options');        
+        let options = args.flags !== null ? args.flags : this.ele.getAttribute('x-options');        
 
         this.bottomUid = uid + '-bottom';
         this.topUid = uid + '-top';
@@ -628,8 +732,11 @@ export class TimeSeriesChart extends FFChart
             }
         };
         
-        this.chartTop = new ApexCharts(document.getElementById(this.topUid), options);
-        this.chartTop.render();
+        let eleTop = document.getElementById(this.topUid);
+        if(eleTop) {
+            this.chartTop = new ApexCharts(eleTop, options);
+            this.chartTop.render();
+        }
     }
 
     updateTopTimeout;

@@ -10,25 +10,29 @@
     <Head>
         @if (App.Instance.FileFlowsSystem.Licensed)
         {
-            <span>Dashboard</span>
-            <select @bind="ActiveDashboardUid">
-                @if (Dashboards?.Any() == true)
-                {
-                    @foreach (var dashboard in Dashboards.OrderBy(x => x.Name))
+            <div class="dashboard-selector">
+                <select @bind="ActiveDashboardUid">
+                    @if (Dashboards?.Any() == true)
                     {
-                        <option value=@dashboard.Uid>@dashboard.Name</option>
+                        @foreach (var dashboard in Dashboards.OrderBy(x => x.Label))
+                        {
+                            <option value=@dashboard.Value>@dashboard.Label</option>
+                        }
                     }
-                }
-            </select>
-            <button @onclick=@AddDashboard class="btn" style="width:2rem">+</button>
+                </select>
+                <button @onclick=@AddDashboard><i class="fas fa-plus"></i></button>
+            </div>
         }
-        @if (App.Instance.IsMobile == false)
+        else if (App.Instance.IsMobile == false)
         {
             @if (SystemInfo?.CpuUsage > 0 && SystemInfo?.MemoryUsage > 0)
             {
                 <span>CPU Usage: @SystemInfo.CpuUsage.ToString("0.00") %</span>
                 <span>Memory Usage: @(FileSizeFormatter.Format(SystemInfo.MemoryUsage))</span>
             }
+        }
+        @if (App.Instance.IsMobile == false)
+        {
             @if (string.IsNullOrEmpty(lblPauseLabel) == false)
             {
                 <button @onclick=@TogglePaused class="btn btn-pause">
@@ -66,6 +70,11 @@
             <p>FileFlows needs one or more Libraries to monitor for files.</p>
             <p>These can be directories or drives.</p>
             <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
+        }
+        else if (App.Instance.FileFlowsSystem.Licensed)
+        {
+            <div class="grid-stack dashboard">
+            </div>
         }
         else
         {

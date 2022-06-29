@@ -1,3 +1,5 @@
+using FileFlows.Shared.Portlets;
+
 namespace FileFlows.Shared.Models;
 
 /// <summary>
@@ -7,6 +9,16 @@ public class Dashboard: FileFlowObject
 {
     private List<Portlet> _Portlets = new List<Portlet>();
 
+    /// <summary>
+    /// The name of the default dashboard
+    /// </summary>
+    public const string DefaultDashboardName = "Default Dashboard";
+    
+    /// <summary>
+    /// The UID of the default dashboard
+    /// </summary>
+    public static readonly Guid DefaultDashboardUid = new Guid("bed286d9-68f0-48a8-8c6d-05ec6f81d67c");
+        
     /// <summary>
     /// Gets or sets the portlets on this dashboard
     /// </summary>
@@ -19,6 +31,79 @@ public class Dashboard: FileFlowObject
             if(value != null)
                 _Portlets.AddRange(value);
         }
+    }
+
+    /// <summary>
+    /// Gets a default dashboard
+    /// </summary>
+    /// <returns>the default dashboard</returns>
+    public static Dashboard GetDefaultDashboard()
+    {
+        var db = new Dashboard();
+        db.Name = DefaultDashboardName;
+        db.Uid = DefaultDashboardUid;
+        db.Portlets = new();
+        // top row
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 1, Width = 3,
+            Y = 0, X = 0,
+            PortletDefinitionUid = new CpuUsage().Uid
+        });
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 1, Width = 3,
+            Y = 0, X = 3,
+            PortletDefinitionUid = new MemoryUsage().Uid
+        });
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 1, Width = 3,
+            Y = 0, X = 6,
+            PortletDefinitionUid = new TempStorage().Uid
+        });
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 1, Width = 3,
+            Y = 0, X = 9,
+            PortletDefinitionUid = new LogStorage().Uid
+        });
+        
+        // second row
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 2, Width = 6,
+            Y = 1, X = 0,
+            PortletDefinitionUid = new Codecs().Uid
+        });
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 2, Width = 6,
+            Y = 1, X = 6,
+            PortletDefinitionUid = new ProcessingTimes().Uid
+        });
+        
+        // bottom row
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 2, Width = 4,
+            Y = 3, X = 0,
+            PortletDefinitionUid = new VideoContainers().Uid
+        });
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 2, Width = 4,
+            Y = 3, X = 4,
+            PortletDefinitionUid = new VideoResolution().Uid
+        });
+        db.Portlets.Add(new Portlet()
+        {
+            Height = 2, Width = 4,
+            Y = 3, X = 8,
+            PortletDefinitionUid = new LibraryProcessingTimes().Uid
+        });
+
+        return db;
     }
 }
 
@@ -48,71 +133,4 @@ public class Portlet
     /// The UID of the Portlet Definition
     /// </summary>
     public Guid PortletDefinitionUid { get; set; }
-}
-
-/// <summary>
-/// Portlet definition, these are the different types of portlets in the system
-/// </summary>
-public class PortletDefinition
-{
-    /// <summary>
-    /// Gets the UID 
-    /// </summary>
-    public Guid Uid { get; }
-    /// <summary>
-    /// Gets the URL
-    /// </summary>
-    public string Url { get; }
-    /// <summary>
-    /// Gets the Name
-    /// </summary>
-    public string Name { get; }
-    /// <summary>
-    /// Gets the type of portlet
-    /// </summary>
-    public PortletType Type { get; }
-    /// <summary>
-    /// Gets any flags 
-    /// </summary>
-    public int Flags { get; }
-}
-
-
-/// <summary>
-/// Available portlet types
-/// </summary>
-public enum PortletType
-{
-    /// <summary>
-    /// Processing files
-    /// </summary>
-    Processing = 1,
-    /// <summary>
-    /// Upcoming videos
-    /// </summary>
-    Upcoming = 2,
-    /// <summary>
-    /// Recently finished
-    /// </summary>
-    RecentlyFinished = 1,
-    /// <summary>
-    /// Box plot 
-    /// </summary>
-    BoxPlot = 101,
-    /// <summary>
-    /// Heat map
-    /// </summary>
-    HeatMap = 102,
-    /// <summary>
-    /// Pie chart
-    /// </summary>
-    PieChart = 103,
-    /// <summary>
-    /// Tree map
-    /// </summary>
-    TreeMap = 104,
-    /// <summary>
-    /// Time series percentage
-    /// </summary>
-    TimeSeries = 105
 }

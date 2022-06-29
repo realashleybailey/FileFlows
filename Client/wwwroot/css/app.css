@@ -803,5 +803,26 @@ hr {
   }
 }
 /** step pointer end */
+.dashboard-selector {
+  display: inline-block;
+  border: solid 1px var(--accent);
+  position: relative;
+  top: 2px;
+}
+.dashboard-selector select {
+  width: 16rem;
+  border: none;
+  background: transparent;
+  color: var(--color);
+  height: 2.05rem;
+  outline: none !important;
+  padding-left: 2rem;
+}
+.dashboard-selector button {
+  width: 2rem !important;
+  border: none !important;
+  position: absolute;
+  left: 0;
+}
 
 /*# sourceMappingURL=app.css.map */

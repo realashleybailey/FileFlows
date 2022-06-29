@@ -9,6 +9,7 @@ namespace FileFlows.Client.Pages;
 
 public partial class Dashboard : ComponentBase, IDisposable
 {
+    
     const string ApIUrl = "/api/worker";
     private bool Refreshing = false;
     public readonly List<FlowExecutorInfo> Workers = new List<FlowExecutorInfo>();
@@ -30,9 +31,10 @@ public partial class Dashboard : ComponentBase, IDisposable
     public delegate void Disposing();
     public event Disposing OnDisposing;
 
-    private List<FileFlows.Shared.Models.Dashboard> Dashboards;
-    private FileFlows.Shared.Models.Dashboard ActiveDashboard;
+    private List<ListOption> Dashboards;
     private Guid ActiveDashboardUid;
+    private readonly List<PortletUiModel> Portlets = new List<PortletUiModel>();
+    private IJSObjectReference jsCharts;
     
     protected override async Task OnInitializedAsync()
     {
@@ -58,6 +60,10 @@ public partial class Dashboard : ComponentBase, IDisposable
         lblProcessingTime = Translater.Instant("Pages.Dashboard.Fields.ProcessingTime");
         lblLibrary = Translater.Instant("Pages.Dashboard.Fields.Library");
         lblWorkingFile = Translater.Instant("Pages.Dashboard.Fields.WorkingFile");
+        
+        
+        jsCharts = await jSRuntime.InvokeAsync<IJSObjectReference>("import", $"./scripts/Charts/FFChart.js");
+        
         await GetJsFunctionObject();
         await LoadDashboards();
         await this.Refresh();
@@ -67,10 +73,25 @@ public partial class Dashboard : ComponentBase, IDisposable
     {
         if (App.Instance.FileFlowsSystem.Licensed == false)
             return;
-        var dbResponse = await HttpHelper.Get<List<FileFlows.Shared.Models.Dashboard>>("/api/dashboard");
-        if (dbResponse.Success == false)
+        var dbResponse = await HttpHelper.Get<List<ListOption>>("/api/dashboard/list");
+        if (dbResponse.Success == false || dbResponse.Data == null)
             return;
         this.Dashboards = dbResponse.Data;
+        foreach (var db in this.Dashboards)
+            db.Value = Guid.Parse(db.Value.ToString());
+        this.ActiveDashboardUid = (Guid)this.Dashboards[0].Value;
+        await LoadDashboard();
+    }
+
+    private async Task LoadDashboard()
+    {
+        var portletsResponse = await HttpHelper.Get<List<PortletUiModel>>("/api/dashboard/" + this.ActiveDashboardUid + "/portlets");
+        if (portletsResponse.Success == false)
+            return;
+        this.Portlets.Clear();
+        if(portletsResponse.Data?.Any() == true)
+            this.Portlets.AddRange(portletsResponse.Data);
+        await jsCharts.InvokeVoidAsync($"initDashboard",  this.Portlets); 
     }
 
     private System.Threading.Mutex mutexJsFunctions = new ();

@@ -305,6 +305,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                     : status.Value;
             libraryFiles = libraryFiles.Where(x => x.Status == searchStatus);
         }
+        else if (status == FileStatus.MissingLibrary)
+        {
+            libraryFiles = libraryFiles.Where(x => libraries.ContainsKey(x.Library.Uid) == false);
+        }
 
 
         if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule)

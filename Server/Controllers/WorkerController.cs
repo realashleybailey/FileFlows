@@ -183,7 +183,7 @@ public class WorkerController : Controller
     public IEnumerable<FlowExecutorInfo> GetAll()
     {
         // we don't want to return the logs here, too big
-        return Executors.Values.Where(x => x != null).Select(x => new FlowExecutorInfo
+        var results = Executors.Values.Where(x => x != null).Select(x => new FlowExecutorInfo
         {
             // have to create a new object, otherwise if we change the log we change the log on the shared object
             LibraryFile = x.LibraryFile,
@@ -199,6 +199,34 @@ public class WorkerController : Controller
             Uid = x.Uid,
             WorkingFile = x.WorkingFile
         });
+        #if(DEBUG)
+        if (results.Any() != true)
+        {
+            results = Enumerable.Range(1, 4).Select(x => new FlowExecutorInfo
+            {
+                LibraryFile = new LibraryFile()
+                {
+                    Name = "File " + x
+                },
+                CurrentPart = x,
+                CurrentPartName = "Part " + x,
+                CurrentPartPercent = x / 10f,
+                Library = new()
+                {
+                    Name = "Library " + x
+                },
+                NodeUid = new Guid("00000000-0000-0000-0000-00000000000" + x),
+                NodeName = "Node " + x,
+                RelativeFile = "/tv/file" + x + ".mkv",
+                StartedAt = DateTime.Now.AddMinutes(-x * 5),
+                TotalParts = 10,
+                Uid = new Guid("00000000-0000-0000-0000-00000000000" + x),
+                WorkingFile = "workingfile-" + x
+            });
+
+        }
+        #endif
+        return results;
     }
 
     /// <summary>

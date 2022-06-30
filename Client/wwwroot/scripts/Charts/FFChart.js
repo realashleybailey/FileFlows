@@ -1,5 +1,4 @@
 export function initDashboard(portlets){
-    console.log('init dashboard!', portlets);
     if(!portlets)
         return;
     
@@ -49,6 +48,7 @@ export function initDashboard(portlets){
     }
     intDashboardActual('default');
 }
+
 
 function intDashboardActual(uid) {
     let dashboardData = localStorage.getItem('dashboard-' + uid);
@@ -104,7 +104,11 @@ export function newChart(type, uid, args){
     if(!window.FlowCharts)
         window.FlowCharts = {};
     args.type = type;
-    if(type == 'BoxPlot' || type === 101)
+    if(type == 'Processing' || type === 1)
+        window.FlowCharts[uid] = new Processing(uid, args);
+    else if(type == 'LibraryFileTable' || type === 2)
+        window.FlowCharts[uid] = new LibraryFileTable(uid, args);
+    else if(type == 'BoxPlot' || type === 101)
         window.FlowCharts[uid] = new BoxPlotChart(uid, args);
     else if(type == 'HeatMap' || type === 102)
         window.FlowCharts[uid] = new HeatMapChart(uid, args);
@@ -123,6 +127,17 @@ export function dispose(uid) {
     let chart = window.FlowCharts[uid];
     if(chart)
         chart.dispose();
+}
+
+export function disposeAll(){
+    console.log('disposing all charts')
+    Object.keys(window.FlowCharts).forEach(uid => {
+        try {
+            window.FlowCharts[uid].dispose();            
+        }catch(err){
+            console.log('err', err);
+        }
+    });
 }
 
 class FFChart {
@@ -890,4 +905,334 @@ export class TimeSeriesChart extends FFChart
         }, true, false);
     }
 
+}
+
+
+export class LibraryFileTable extends FFChart
+{
+    lblIncrease = 'Increase';
+    lblDecrease = 'Decrease';
+    recentlyFinished;
+    timer;
+    existing;
+    
+    constructor(uid, args) {
+        super(uid, args);
+        this.recentlyFinished = args.flags === 1;
+    }
+    
+    formatShrinkage(original, final)
+    {
+        let diff = Math.abs(original - final);
+        return this.formatSize(diff) + (original < final ? " " + this.lblIncrease : " " + this.lblDecrease) +
+        "\n" + this.formatSize(final) + " / " + this.formatSize(original);
+    }
+    
+    formatSize(size) {
+        let sizes = ["B", "KB", "MB", "GB", "TB"];
+
+        let order = 0;
+        let num = size;
+        while (num >= 1000 && order < sizes.length - 1) {
+            order++;
+            num /= 1000;
+        }
+        return num.toFixed(2) + ' ' + sizes[order];
+    }
+
+    async getData() {
+        if(this.disposed)
+            return;
+        super.getData();
+        
+        this.timer = setTimeout(() => this.getData(), 5000);
+    }
+
+    createChart(data) {
+        let json = data ? JSON.stringify(data) : '';
+        if(json === this.existing)
+            return;
+        this.existing = json; // so we dont refresh if we don't have to
+        if(data?.length)
+            this.createTableData(data);
+        else
+            this.createNoData();
+    }
+
+    createNoData(data){
+        let chartDiv = document.getElementById(this.chartUid);
+        chartDiv.textContent = '';
+        
+        let div = document.createElement('div');
+        div.className = 'no-data';
+        
+        let span = document.createElement('span');
+        div.appendChild(span);
+        
+        let icon = document.createElement('i');
+        span.appendChild(icon);        
+        icon.className = 'fas fa-times';
+        
+        let spanText = document.createElement('span');
+        span.appendChild(spanText);
+        spanText.innerText = this.recentlyFinished ? 'No files recently finished' : 'No upcoming files';
+        
+        chartDiv.appendChild(div);
+        
+    }
+    
+    createTableData(data)
+    {
+        let table = document.createElement('table');
+        let thead = document.createElement('thead');
+        table.appendChild(thead);
+        let theadTr = document.createElement('tr');
+        thead.appendChild(theadTr);
+
+        let columns = this.recentlyFinished ? ['Name', 'Time', 'Size'] : ['Name']
+
+        for(let title of columns){
+            let th = document.createElement('th');
+            th.innerText = title;
+            if(title !== 'Name')
+                th.style.width = '6rem';
+            theadTr.appendChild(th);                
+        }
+        
+        let tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        for(let item of data)
+        {    
+            let tr = document.createElement('tr');
+            tbody.appendChild(tr);
+            
+            let tdRelativePath = document.createElement('td');
+            tdRelativePath.innerText = item.RelativePath
+            tr.appendChild(tdRelativePath);
+            
+            if(this.recentlyFinished === false)
+                continue;
+            // finished
+            let fs = item.FinalSize;
+            let os = item.OriginalSize;
+            let width = (fs / os) * 100;
+            let bigger = width > 100;
+            if (width > 100)
+                width = 100;
+            let toolTip = this.formatShrinkage(os, fs);
+
+            let tdTime = document.createElement('td');
+            tdTime.style.width = '6rem';
+            tr.appendChild(tdTime);
+            
+            let aTime = document.createElement('a');
+            tdTime.appendChild(aTime);
+            let time = item.ProcessingTime || '';
+            if(time.indexOf('.') > 0)
+                time = time.substring(0, time.indexOf('.'));
+            aTime.innerText = time;
+            aTime.addEventListener('click', (event) => {
+               event.preventDefault();
+               console.log('time clicked');
+            });
+
+            let tdSize = document.createElement('td');
+            tdSize.style.width = '6rem';
+            tr.appendChild(tdSize);                
+            if(fs > 0) 
+            {
+                let divSize = document.createElement('div');
+                tdSize.appendChild(divSize);
+                divSize.className = 'flow-bar ' + (bigger ? 'grew' : '');
+                divSize.setAttribute('title', toolTip);
+                
+                let divInner = document.createElement('div');
+                divSize.appendChild(divInner);
+                divInner.className = 'bar-value';
+                divInner.style.width = 'calc(' + width + '% - 2px)';
+            }
+        }
+        let chartDiv = document.getElementById(this.chartUid);
+        chartDiv.textContent = '';
+        chartDiv.appendChild(table);
+    }
+}
+
+
+
+export class Processing extends FFChart
+{
+    recentlyFinished;
+    timer;
+    existing;
+    runners = {};
+
+    constructor(uid, args) {
+        super(uid, args);
+        this.recentlyFinished = args.flags === 1;
+    }
+
+    async getData() {
+        if(this.disposed)
+            return;
+        super.getData();
+
+        this.timer = setTimeout(() => this.getData(), 5000);
+    }
+
+    createChart(data) {
+        let json = data ? JSON.stringify(data) : '';
+        if(json === this.existing)
+            return;
+        this.existing = json; // so we dont refresh if we don't have to
+        if(data?.length)
+            this.createRunners(data);
+        else
+            this.createNoData();
+    }
+
+    createNoData(data){
+        let chartDiv = document.getElementById(this.chartUid);
+        chartDiv.textContent = '';
+
+        let div = document.createElement('div');
+        div.className = 'no-data';
+
+        let span = document.createElement('span');
+        div.appendChild(span);
+
+        let icon = document.createElement('i');
+        span.appendChild(icon);
+        icon.className = 'fas fa-times';
+
+        let spanText = document.createElement('span');
+        span.appendChild(spanText);
+        spanText.innerText = 'No files currently processing';
+
+        chartDiv.appendChild(div);
+
+    }
+
+    createRunners(data) {
+        let running = [];
+        let chartDiv = document.getElementById(this.chartUid);
+        chartDiv.className = 'processing-runners runners-' + data.length;
+        for(let worker of data){
+            running.push(worker.Uid);
+            if(this.runners[worker.Uid]){
+                this.updateRunner(worker);
+            }
+            else
+            {
+                this.createRunner(chartDiv, worker);
+            }
+            this.createOrUpdateRadialBar(worker);
+        }
+        let keys = Object.keys(this.runners);
+        for(let i=keys.length; i >= 0; i--){
+            let key = keys[i];
+            if(!key)
+                continue;
+            if(running.indexOf(key) < 0){
+                console.log('removing runner: ' , key);
+                this.removeRunner(this.runners[key]);
+                delete this.runners[key];
+            }
+        }
+    }
+    
+    createRunner(chartDiv, runner)
+    {
+        console.log('creating runner', runner);
+        let div = document.createElement('div');
+        div.className = 'runner';
+        div.id = 'runner-' + runner.Uid;
+        
+        let divChart = document.createElement('div');
+        div.appendChild(divChart);
+        divChart.className = 'chart chart-' + this.uid;
+        
+        let divInfo = document.createElement('div');
+        div.appendChild(divInfo);
+        this.runners[runner.Uid] = {
+            Uid: runner.Uid
+        };
+        chartDiv.appendChild(div);
+    }
+    
+    updateRunner(runner){
+        
+    }
+    
+    removeRunner(runner){
+        
+    }
+    
+    createOrUpdateRadialBar(runner){
+        let overall = runner.TotalParts == 0 ? 100 : (runner.CurrentPart / runner.TotalParts) * 100;
+        let options = {
+            chart: {
+                id: 'chart-' + this.uid,
+                height: 280,
+                type: "radialBar",
+                foreColor: 'var(--color)',
+            },
+            plotOptions: {
+                radialBar: {
+                    hollow: {
+                        margin: 5,
+                        size: '48%',
+                        background: 'transparent',
+                    },
+                    track: {
+                        //show: false,
+                        background: '#333',
+                    },
+                    startAngle: -135,
+                    endAngle: 135,
+                    stroke: {
+                        lineCap: 'round'
+                    },
+                    dataLabels: {
+                        total: {
+                            show: true,
+                            label: 'Overall',
+                            formatter: function (val) {
+                                return +(parseFloat(overall).toFixed(2)) + ' %';
+                            }
+                        },
+                        value: {
+                            show: true,
+                            formatter: function (val) {
+                                return +(parseFloat(val).toFixed(2)) + ' %';
+                            }
+                        }
+
+                    }
+                }
+            },
+            //colors: ['var(--accent)', 'var(--accent-complementary)'],
+            series: [overall],
+            labels: ['Overall']
+        };
+        if (runner.CurrentPartPercent > 0) {
+            options.series.push(runner.CurrentPartPercent);
+            options.labels.push('Current');
+        }
+
+        let updated = false;
+
+        if (document.querySelector('.chart-' + this.uid + ' .apexcharts-canvas')) {
+            try {
+                ApexCharts.exec('chart-' + this.uid, 'updateOptions', options, false, false);
+                updated = true;
+            } catch (err) { }
+        }
+
+        if (updated === false) {
+            let eleChart = document.querySelector(".chart-" + this.uid);
+            if (eleChart)
+                new ApexCharts(eleChart, options).render();
+        }
+    }
 }

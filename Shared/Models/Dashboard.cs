@@ -43,64 +43,94 @@ public class Dashboard: FileFlowObject
         db.Name = DefaultDashboardName;
         db.Uid = DefaultDashboardUid;
         db.Portlets = new();
+        int rowIndex = 0;
+        
         // top row
-        db.Portlets.Add(new Portlet()
+        db.Portlets.Add(new ()
         {
             Height = 1, Width = 3,
-            Y = 0, X = 0,
-            PortletDefinitionUid = new CpuUsage().Uid
+            Y = rowIndex, X = 0,
+            PortletDefinitionUid = CpuUsage.PD_UID
         });
-        db.Portlets.Add(new Portlet()
+        db.Portlets.Add(new ()
         {
             Height = 1, Width = 3,
-            Y = 0, X = 3,
-            PortletDefinitionUid = new MemoryUsage().Uid
+            Y = rowIndex, X = 3,
+            PortletDefinitionUid = MemoryUsage.PD_UID
         });
-        db.Portlets.Add(new Portlet()
+        db.Portlets.Add(new ()
         {
             Height = 1, Width = 3,
-            Y = 0, X = 6,
-            PortletDefinitionUid = new TempStorage().Uid
+            Y = rowIndex, X = 6,
+            PortletDefinitionUid = TempStorage.PD_UID
         });
-        db.Portlets.Add(new Portlet()
+        db.Portlets.Add(new ()
         {
             Height = 1, Width = 3,
-            Y = 0, X = 9,
-            PortletDefinitionUid = new LogStorage().Uid
+            Y = rowIndex, X = 9,
+            PortletDefinitionUid = LogStorage.PD_UID
         });
+        ++rowIndex;
         
-        // second row
-        db.Portlets.Add(new Portlet()
+        // executing
+        db.Portlets.Add(new ()
+        {
+            Height = 2, Width = 12,
+            Y = rowIndex, X = 0,
+            PortletDefinitionUid = Processing.PD_UID
+        });
+        rowIndex += 2;
+        
+        // library files row
+        db.Portlets.Add(new ()
         {
             Height = 2, Width = 6,
-            Y = 1, X = 0,
-            PortletDefinitionUid = new Codecs().Uid
+            Y = rowIndex, X = 0,
+            PortletDefinitionUid = FilesUpcoming.PD_UID
         });
-        db.Portlets.Add(new Portlet()
+        db.Portlets.Add(new ()
         {
             Height = 2, Width = 6,
-            Y = 1, X = 6,
-            PortletDefinitionUid = new ProcessingTimes().Uid
+            Y = rowIndex, X = 6,
+            PortletDefinitionUid = FilesRecentlyFinished.PD_UID
         });
+        rowIndex += 2;
         
-        // bottom row
-        db.Portlets.Add(new Portlet()
+        
+        
+        // codecs and times row
+        db.Portlets.Add(new ()
         {
-            Height = 2, Width = 4,
-            Y = 3, X = 0,
-            PortletDefinitionUid = new VideoContainers().Uid
+            Height = 2, Width = 6,
+            Y = rowIndex, X = 0,
+            PortletDefinitionUid = Codecs.PD_UID
         });
-        db.Portlets.Add(new Portlet()
+        db.Portlets.Add(new ()
         {
-            Height = 2, Width = 4,
-            Y = 3, X = 4,
-            PortletDefinitionUid = new VideoResolution().Uid
+            Height = 2, Width = 6,
+            Y = rowIndex, X = 6,
+            PortletDefinitionUid = ProcessingTimes.PD_UID
         });
-        db.Portlets.Add(new Portlet()
+        rowIndex += 2;
+        
+        // containers, resolution, processing times row
+        db.Portlets.Add(new ()
         {
             Height = 2, Width = 4,
-            Y = 3, X = 8,
-            PortletDefinitionUid = new LibraryProcessingTimes().Uid
+            Y = rowIndex, X = 0,
+            PortletDefinitionUid = VideoContainers.PD_UID
+        });
+        db.Portlets.Add(new ()
+        {
+            Height = 2, Width = 4,
+            Y = rowIndex, X = 4,
+            PortletDefinitionUid = VideoResolution.PD_UID
+        });
+        db.Portlets.Add(new ()
+        {
+            Height = 2, Width = 4,
+            Y = rowIndex, X = 8,
+            PortletDefinitionUid = LibraryProcessingTimes.PD_UID
         });
 
         return db;

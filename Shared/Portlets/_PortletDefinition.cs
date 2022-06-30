@@ -14,6 +14,12 @@ public abstract class PortletDefinition
     /// <returns>the portlet definition</returns>
     public static PortletDefinition GetDefinition(Guid uid)
     {
+        if (uid == Processing.PD_UID)
+            return new Processing();
+        if (uid == FilesRecentlyFinished.PD_UID)
+            return new FilesRecentlyFinished();
+        if (uid == FilesUpcoming.PD_UID)
+            return new FilesUpcoming();
         if (uid == AudioCodecs.PD_UID)
             return new AudioCodecs();
         if (uid == Codecs.PD_UID)
@@ -76,13 +82,9 @@ public enum PortletType
     /// </summary>
     Processing = 1,
     /// <summary>
-    /// Upcoming videos
+    /// Table of library files
     /// </summary>
-    Upcoming = 2,
-    /// <summary>
-    /// Recently finished
-    /// </summary>
-    RecentlyFinished = 1,
+    LibraryFileTable = 2,
     /// <summary>
     /// Box plot 
     /// </summary>

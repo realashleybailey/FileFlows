@@ -10,7 +10,7 @@ namespace FileFlows.Client.Pages;
 public partial class Dashboard : ComponentBase, IDisposable
 {
     
-    const string ApIUrl = "/api/worker";
+    const string ApiUrl = "/api/worker";
     private bool Refreshing = false;
     public readonly List<FlowExecutorInfo> Workers = new List<FlowExecutorInfo>();
 
@@ -66,7 +66,8 @@ public partial class Dashboard : ComponentBase, IDisposable
         
         await GetJsFunctionObject();
         await LoadDashboards();
-        await this.Refresh();
+        if(UsingBasicDashboard)
+            await this.Refresh();
     }
 
     private async Task LoadDashboards()
@@ -113,9 +114,14 @@ public partial class Dashboard : ComponentBase, IDisposable
         }
     }
 
+    private bool UsingBasicDashboard => App.Instance.FileFlowsSystem.Licensed == false;
+
     public void Dispose()
     {
         OnDisposing?.Invoke();
+
+        _ = jsCharts?.InvokeVoidAsync("disposeAll");
+        
         if (jsFunctions != null)
         {
             try
@@ -141,7 +147,7 @@ public partial class Dashboard : ComponentBase, IDisposable
 
     async Task Refresh()
     {
-        if (Refreshing)
+        if (Refreshing || UsingBasicDashboard == false) 
             return;
         Refreshing = true;
         try
@@ -234,7 +240,7 @@ public partial class Dashboard : ComponentBase, IDisposable
             }
         };
 #else
-        return await HttpHelper.Get<List<FlowExecutorInfo>>(ApIUrl);
+        return await HttpHelper.Get<List<FlowExecutorInfo>>(ApiUrl);
 #endif
         
     }
@@ -260,7 +266,7 @@ public partial class Dashboard : ComponentBase, IDisposable
     {
         Blocker.Show();
         string log = string.Empty;
-        string url = $"{ApIUrl}/{worker.LibraryFile.Uid}/log?lineCount=200";
+        string url = $"{ApiUrl}/{worker.LibraryFile.Uid}/log?lineCount=200";
         try
         {
             var logResult = await GetLog(url);
@@ -326,7 +332,7 @@ libpostproc    55.  3.100 / 55.  3.100"
         Blocker.Show();
         try
         {
-            await HttpHelper.Delete($"{ApIUrl}/{worker.Uid}?libraryFileUid={worker.LibraryFile.Uid}");
+            await HttpHelper.Delete($"{ApiUrl}/{worker.Uid}?libraryFileUid={worker.LibraryFile.Uid}");
             await Task.Delay(1000);
             await Refresh();
         }

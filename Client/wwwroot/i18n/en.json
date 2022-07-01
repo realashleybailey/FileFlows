@@ -173,14 +173,16 @@
         "ShrinkageTitle": "Storage Saved",
         "FinalSize": "Final Size",
         "OriginalSize": "Original Size",
-        "Savings": "Savings"
+        "Savings": "Savings",
+        "AddPortlet":"Add Portlet"
       },
       "ErrorMessages": {
         "LogFailed": "Failed to retrieve log for worker"
       },
       "Messages": {
         "CancelMessage": "Are you sure you want to cancel the worker for {RelativeFile}?",
-        "Waiting": "Waiting for a file to process"
+        "Waiting": "Waiting for a file to process",
+        "DeleteDashboard":"Are you sure you want to delete the current dashboard?\n\nThis cannot be undone."
       },
       "Fields": {
         "Log": "Log",

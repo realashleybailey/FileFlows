@@ -11,7 +11,7 @@
 
     public partial class LibraryFilesSummary:ComponentBase
     {
-        [CascadingParameter] Pages.Dashboard Dashboard { get; set; }
+        [CascadingParameter] BasicDashboard Dashboard { get; set; }
         [CascadingParameter] Editor Editor { get; set; }
 
         [Parameter] public bool Completed { get; set; }

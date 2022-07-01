@@ -2,6 +2,7 @@
 @using FileFlows.Shared.Models
 @using FileFlows.Shared.Formatters
 @using System.ComponentModel.DataAnnotations
+@using FileFlows.Client.Components.Dashboard;
 
 @page "/"
 
@@ -21,32 +22,14 @@
                     }
                 </select>
                 <button @onclick=@AddDashboard><i class="fas fa-plus"></i></button>
+                <button disabled=@(DashboardDeletable == false) @onclick=@DeleteDashboard><i class="fas fa-trash"></i></button>
             </div>
-        }
-        else if (App.Instance.IsMobile == false)
-        {
-            @if (SystemInfo?.CpuUsage > 0 && SystemInfo?.MemoryUsage > 0)
-            {
-                <span>CPU Usage: @SystemInfo.CpuUsage.ToString("0.00") %</span>
-                <span>Memory Usage: @(FileSizeFormatter.Format(SystemInfo.MemoryUsage))</span>
-            }
+            
+            <button class="btn" @onclick=@AddPortletDialog>@lblAddPortlet</button>
         }
         @if (App.Instance.IsMobile == false)
         {
-            @if (string.IsNullOrEmpty(lblPauseLabel) == false)
-            {
-                <button @onclick=@TogglePaused class="btn btn-pause">
-                    @if (SystemInfo.IsPaused)
-                    {
-                        <i class="fas fa-play"></i>
-                    }
-                    else
-                    {
-                        <i class="fas fa-pause"></i>
-                    }
-                    @lblPauseLabel
-                </button>
-            }
+            <PauseResume />
         }
     </Head>
 
@@ -55,103 +38,15 @@
     <CascadingValue Value="this" IsFixed="true">
         @if ((int)ConfiguredStatus < 3)
         {
-            <h1>Not Yet Configured</h1>
-            <p>You have not yet configured any Flows or Libraries.</p><br/>
-
-            <h2>Step 1. Creating a Flow </h2>
-            <p>To use FileFlows a Flow must first be created.</p>
-            <p>A Flow can be thought of as a processing rule that is run against files.</p>
-            <p>You can have as many Flows as you like, ranging from many tasks.</p>
-            <p>For example, you can configure a Flow to convert video files from one format into another. Or a Flow to move pictures into folders based on the date they were taken.</p>
-
-            <br/>
-
-            <h2>Step 2. Creating a Library</h2>
-            <p>FileFlows needs one or more Libraries to monitor for files.</p>
-            <p>These can be directories or drives.</p>
-            <p>You can configure filters on a Library to only look for certain types of files, e.g. Movies or Pictures.</p>
+            <InitialConfigWelcome />
         }
-        else if (App.Instance.FileFlowsSystem.Licensed)
+        else if (App.Instance.FileFlowsSystem.Licensed && ActiveDashboardUid != Guid.Empty)
         {
-            <div class="grid-stack dashboard">
-            </div>
+            <CustomDashboard ActiveDashboardUid=@ActiveDashboardUid />
         }
         else
         {
-            <div class="dashboard-wrapper">
-                <div class="dashboard">
-    
-                    <div class="mobile-view">
-                        @if (string.IsNullOrEmpty(lblPauseLabel) == false)
-                        {
-                            <button @onclick=@TogglePaused class="btn btn-pause">
-                                @if (SystemInfo.IsPaused)
-                                {
-                                    <i class="fas fa-play"></i>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-pause"></i>
-                                }
-                                @lblPauseLabel
-                            </button>
-                        }
-                    </div>
-                    
-                    @if (Workers?.Any() == true)
-                    {
-                        for (int i = 0; i < Workers.Count; i++)
-                        {
-                            var worker = Workers[i];
-                            <div class="worker-wrapper portlet">
-                                <div class="chart-wrapper">
-                                    <div class="chart chart-@i"></div>
-                                </div>
-                                <div class="worker-info">
-                                    <span class="label-value current">
-                                        <span class="label">@lblNode</span>
-                                        <span class="value">@worker.NodeName</span>
-                                    </span>
-                                    <span class="label-value current">
-                                        <span class="label">@lblFile</span>
-                                        <span class="value">@worker.RelativeFile</span>
-                                    </span>
-                                    <span class="label-value working-file">
-                                        <span class="label">@lblWorkingFile</span>
-                                        <span class="value">@worker.WorkingFile</span>
-                                    </span>
-                                    <span class="label-value library">
-                                        <span class="label">@lblLibrary</span>
-                                        <span class="value">@worker.Library.Name</span>
-                                    </span>
-                                    <span class="label-value current-step">
-                                        <span class="label">@lblCurrentStep</span>
-                                        <span class="value">@Helpers.FlowHelper.FormatLabel(worker.CurrentPartName)</span>
-                                    </span>
-                                    <span class="label-value processing-time">
-                                        <span class="label">@lblProcessingTime</span>
-                                        <span class="value">@worker.ProcessingTime.ToString(@"hh\:mm\:ss")</span>
-                                    </span>
-                                    <div class="actions-wrapper">
-                                        <div class="actions">
-                                            <button @onclick="() => LogClicked(worker)">@lblLog</button>
-                                            <button @onclick="() => CancelClicked(worker)">@lblCancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
-
-                    <FileFlows.Client.Components.Dashboard.ShrinkageBar/>
-
-                    <FileFlows.Client.Components.Dashboard.LibraryFilesSummary/>
-                    <FileFlows.Client.Components.Dashboard.LibraryFilesSummary Completed=@true />
-
-
-                    <div class="spacer"></div>
-                </div>
-            </div>
+            <BasicDashboard />
         }
     </CascadingValue>
     </Body>

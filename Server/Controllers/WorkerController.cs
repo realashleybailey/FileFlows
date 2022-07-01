@@ -183,7 +183,8 @@ public class WorkerController : Controller
     public IEnumerable<FlowExecutorInfo> GetAll()
     {
         // we don't want to return the logs here, too big
-        var results = Executors.Values.Where(x => x != null).Select(x => new FlowExecutorInfo
+        var liveExecutors = Executors.Values.Where(x => x != null).ToList();
+        var results = liveExecutors.Select(x => new FlowExecutorInfo
         {
             // have to create a new object, otherwise if we change the log we change the log on the shared object
             LibraryFile = x.LibraryFile,
@@ -198,7 +199,7 @@ public class WorkerController : Controller
             TotalParts = x.TotalParts,
             Uid = x.Uid,
             WorkingFile = x.WorkingFile
-        });
+        }).ToList();
         #if(DEBUG)
         if (results.Any() != true)
         {
@@ -222,7 +223,7 @@ public class WorkerController : Controller
                 TotalParts = 10,
                 Uid = new Guid("00000000-0000-0000-0000-00000000000" + x),
                 WorkingFile = "workingfile-" + x
-            });
+            }).ToList();
 
         }
         #endif

@@ -1,4 +1,4 @@
-export function initDashboard(portlets){
+export function initDashboard(portlets, csharp){
     if(!portlets)
         return;
     
@@ -14,6 +14,8 @@ export function initDashboard(portlets){
         div.setAttribute('gs-h', p.height);
         div.setAttribute('gs-x', p.x);
         div.setAttribute('gs-y', p.y);
+        if(p.type === 1)
+            div.setAttribute('gs-no-resize', 1);
         
         let title = document.createElement('div');
         div.appendChild(title);
@@ -44,7 +46,7 @@ export function initDashboard(portlets){
             content.appendChild(chart);            
         }
         dashboard.appendChild(div);
-        newChart(p.type, p.uid, { url: p.url, flags: p.flags});
+        newChart(p.type, p.uid, { url: p.url, flags: p.flags, csharp: csharp});
     }
     intDashboardActual('default');
 }
@@ -77,7 +79,8 @@ function intDashboardActual(uid) {
         cellHeight:170,
         handle: '.draghandle'
     });
-
+    window.ffGrid = grid;
+    
     let saveGrid = () => {
         let data = [];
         for(let ele of document.querySelectorAll('.grid-stack-item')){
@@ -148,11 +151,13 @@ class FFChart {
     seriesName;
     chart;
     chartBottomPad = 18;
+    csharp;
 
 
     constructor(uid, args, dontGetData) {
         this.uid = uid;
         this.chartUid = uid + '-chart';
+        this.csharp = args.csharp;
         
         this.url = args.url;
         this.seriesName = args.title;
@@ -170,8 +175,10 @@ class FFChart {
     }
 
     dashboardElementResized(event) {
+        if(!this.chart)
+            return;
+        
         let height = this.getHeight();
-
         this.chart.updateOptions({
             chart: {
                 height: height
@@ -1066,13 +1073,20 @@ export class Processing extends FFChart
     timer;
     existing;
     runners = {};
+    eleInfo;
+    eleChart;
+    infoTemplate;
 
     constructor(uid, args) {
         super(uid, args);
         this.recentlyFinished = args.flags === 1;
+        this.infoTemplate = Handlebars.compile(this.infoTemplate);
     }
 
     async getData() {
+        if(this.timer)
+            clearTimeout(this.timer);
+        
         if(this.disposed)
             return;
         super.getData();
@@ -1089,6 +1103,13 @@ export class Processing extends FFChart
             this.createRunners(data);
         else
             this.createNoData();
+
+        this.setSize(data?.length);
+    }
+    
+    setSize(size) {
+        let rows = Math.floor((size - 1) / 3) + 1;
+        ffGrid.update(this.ele, { h: rows});
     }
 
     createNoData(data){
@@ -1110,7 +1131,6 @@ export class Processing extends FFChart
         spanText.innerText = 'No files currently processing';
 
         chartDiv.appendChild(div);
-
     }
 
     createRunners(data) {
@@ -1119,13 +1139,10 @@ export class Processing extends FFChart
         chartDiv.className = 'processing-runners runners-' + data.length;
         for(let worker of data){
             running.push(worker.Uid);
-            if(this.runners[worker.Uid]){
-                this.updateRunner(worker);
-            }
-            else
-            {
+            if(!this.runners[worker.Uid]){ 
                 this.createRunner(chartDiv, worker);
             }
+            this.updateRunner(worker);
             this.createOrUpdateRadialBar(worker);
         }
         let keys = Object.keys(this.runners);
@@ -1147,21 +1164,97 @@ export class Processing extends FFChart
         let div = document.createElement('div');
         div.className = 'runner';
         div.id = 'runner-' + runner.Uid;
+
+
+        let eleChart = document.createElement('div');
+        div.appendChild(eleChart);
+        eleChart.id = 'runner-' + runner.Uid + '-chart';
+        eleChart.className = 'chart chart-' + runner.Uid;
         
-        let divChart = document.createElement('div');
-        div.appendChild(divChart);
-        divChart.className = 'chart chart-' + this.uid;
-        
-        let divInfo = document.createElement('div');
-        div.appendChild(divInfo);
+        let eleInfo = document.createElement('div');
+        eleInfo.id = 'runner-' + runner.Uid + '-info';
+        div.appendChild(eleInfo);
+        eleInfo.className = 'info';
         this.runners[runner.Uid] = {
             Uid: runner.Uid
         };
         chartDiv.appendChild(div);
+        
+        let buttons = document.createElement('div');
+        div.appendChild(buttons);
+        buttons.className = 'buttons';
+        
+        let btnLog = document.createElement('button');
+        btnLog.className = 'btn btn-log';
+        btnLog.innerText = 'Log';
+        btnLog.addEventListener('click', () => {
+            console.log('view log', runner);
+            this.csharp.invokeMethodAsync("OpenLog", runner.Uid, runner.LibraryFile.Uid);
+        });
+        buttons.appendChild(btnLog);
+        
+        let btnCancel = document.createElement('button');
+        btnCancel.className = 'btn btn-cancel';
+        btnCancel.innerText = 'Cancel';
+        btnCancel.addEventListener('click', () => {
+            console.log('cancelling', runner);
+            this.csharp.invokeMethodAsync("CancelRunner", runner.Uid, runner.LibraryFile.Uid, runner.LibraryFile.Name).then(() =>{
+                this.getData();
+            });
+        });
+        buttons.appendChild(btnCancel);
+        
+        this.eleInfo = document.getElementById(`runner-${runner.Uid}-info`);
+        this.eleChart = document.getElementById(`runner-${runner.Uid}-chart`);
+        console.log('created chart and info', this.eleInfo);
     }
     
-    updateRunner(runner){
+    infoTemplate = `
+<div class="lv w-2 file">
+    <span class="l">File</span>
+    <span class="v">{{file}}</span>
+</div>
+<div class="lv node">
+    <span class="l">Node</span>
+    <span class="v">{{node}}</span>
+</div>
+<div class="lv library">
+    <span class="l">Library</span>
+    <span class="v">{{library}}</span>
+</div>
+<div class="lv step">
+    <span class="l">Step</span>
+    <span class="v">{{step}}</span>
+</div>
+<div class="lv time">
+    <span class="l">Time</span>
+    <span class="v">{{time}}</span>
+</div>
+`;
+    
+    updateRunner(runner)
+    {    
+        var args = {
+            file: runner.LibraryFile.Name,
+            node: runner.NodeName,
+            library: runner.Library.Name,
+            step: runner.CurrentPartName,
+            time: this.timeDiff( Date.parse(runner.StartedAt), Date.now())
+        };
+        let rendered = this.infoTemplate(args);
+        this.eleInfo.innerHTML = rendered;
+    }
+    
+    timeDiff(start, end)
+    {
+        let diff = (end - start) / 1000;
+        let hours = Math.floor(diff / 3600);
+        diff -= (hours * 3600);
+        let minutes = Math.floor(diff / 60);
+        diff -= (minutes * 60);
+        let seconds = Math.floor(diff);
         
+        return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
     }
     
     removeRunner(runner){
@@ -1169,11 +1262,12 @@ export class Processing extends FFChart
     }
     
     createOrUpdateRadialBar(runner){
+        let chartUid = `runner-${runner.Uid}-chart`;
         let overall = runner.TotalParts == 0 ? 100 : (runner.CurrentPart / runner.TotalParts) * 100;
         let options = {
             chart: {
-                id: 'chart-' + this.uid,
-                height: 280,
+                id: chartUid,
+                height: this.runners.length > 3 ? '200px' : '190px',
                 type: "radialBar",
                 foreColor: 'var(--color)',
             },
@@ -1185,7 +1279,6 @@ export class Processing extends FFChart
                         background: 'transparent',
                     },
                     track: {
-                        //show: false,
                         background: '#333',
                     },
                     startAngle: -135,
@@ -1197,12 +1290,14 @@ export class Processing extends FFChart
                         total: {
                             show: true,
                             label: 'Overall',
+                            fontSize: '0.8rem',
                             formatter: function (val) {
                                 return +(parseFloat(overall).toFixed(2)) + ' %';
                             }
                         },
                         value: {
                             show: true,
+                            fontSize: '0.7rem',
                             formatter: function (val) {
                                 return +(parseFloat(val).toFixed(2)) + ' %';
                             }
@@ -1222,17 +1317,17 @@ export class Processing extends FFChart
 
         let updated = false;
 
-        if (document.querySelector('.chart-' + this.uid + ' .apexcharts-canvas')) {
+        if (this.eleChart.querySelector('.apexcharts-canvas')) {
             try {
-                ApexCharts.exec('chart-' + this.uid, 'updateOptions', options, false, false);
+                ApexCharts.exec(chartUid, 'updateOptions', options, false, false);
                 updated = true;
             } catch (err) { }
         }
 
         if (updated === false) {
-            let eleChart = document.querySelector(".chart-" + this.uid);
-            if (eleChart)
-                new ApexCharts(eleChart, options).render();
+            
+            if (this.eleChart)
+                new ApexCharts(this.eleChart, options).render();
         }
     }
 }

@@ -179,7 +179,7 @@
         "LogFailed": "Failed to retrieve log for worker"
       },
       "Messages": {
-        "CancelMesssage": "Are you sure you want to cancel the worker for {RelativeFile}?",
+        "CancelMessage": "Are you sure you want to cancel the worker for {RelativeFile}?",
         "Waiting": "Waiting for a file to process"
       },
       "Fields": {

@@ -92,7 +92,8 @@ public partial class Dashboard : ComponentBase, IDisposable
         this.Portlets.Clear();
         if(portletsResponse.Data?.Any() == true)
             this.Portlets.AddRange(portletsResponse.Data);
-        await jsCharts.InvokeVoidAsync($"initDashboard",  this.Portlets); 
+        var dotNetObjRef = DotNetObjectReference.Create(this);
+        await jsCharts.InvokeVoidAsync($"initDashboard",  this.Portlets, dotNetObjRef); 
     }
 
     private System.Threading.Mutex mutexJsFunctions = new ();
@@ -325,7 +326,7 @@ libpostproc    55.  3.100 / 55.  3.100"
     private async Task CancelClicked(FlowExecutorInfo worker)
     {
         if (await Confirm.Show("Labels.Cancel",
-            Translater.Instant("Pages.Dashboard.Messages.CancelMesssage", worker)) == false)
+            Translater.Instant("Pages.Dashboard.Messages.CancelMessage", worker)) == false)
             return; // rejected the confirm
 
 #if (!DEMO)
@@ -342,6 +343,35 @@ libpostproc    55.  3.100 / 55.  3.100"
         }
 #endif
     }
+
+    /// <summary>
+    /// Cancels an runner
+    /// </summary>
+    /// <param name="runnerUid">The UID of the runner</param>
+    /// <param name="libraryFileUid">The UID of the library file</param>
+    /// <param name="name">the filename for the confirm prompt</param>
+    [JSInvokable]
+    public async Task CancelRunner(Guid runnerUid, Guid libraryFileUid, string name)
+    {
+
+        if (await Confirm.Show("Labels.Cancel",
+                Translater.Instant("Pages.Dashboard.Messages.CancelMessage", new {RelativeFile = name})) == false)
+            return;
+        
+        Blocker.Show();
+        try
+        {
+            await HttpHelper.Delete($"{ApiUrl}/{runnerUid}?libraryFileUid={libraryFileUid}");
+            await Task.Delay(1000);
+            //await Refresh();
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
+        
+    }
+    
 
     private async Task TogglePaused()
     {

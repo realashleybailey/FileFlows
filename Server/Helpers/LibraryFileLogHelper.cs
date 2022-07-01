@@ -1,3 +1,4 @@
+using System.Text;
 using FileFlows.Server.Controllers;
 using FileFlows.Shared.Helpers;
 
@@ -45,7 +46,17 @@ public class LibraryFileLogHelper
         var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid.ToString());
 
         if (File.Exists(logFile + ".log"))
-            return File.ReadAllText(logFile + ".log");
+        {
+            StringBuilder log = new StringBuilder();
+            using FileStream fs = new FileStream(logFile + ".log", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using StreamReader sr = new StreamReader(fs);
+            while (sr.Peek() >= 0)
+            {
+                log.AppendLine(sr.ReadLine());
+            }
+            return log.ToString();
+        }
+
         if (File.Exists(logFile + ".log.gz"))
             return Gzipper.DecompressFileToString(logFile + ".log.gz");
         
@@ -83,7 +94,17 @@ public class LibraryFileLogHelper
     public static async Task AppendToLog(Guid uid, string content)
     {
         var logFile = Path.Combine(DirectoryHelper.LibraryFilesLoggingDirectory, uid + ".log");
-        await File.AppendAllTextAsync(logFile, content + Environment.NewLine);
+        if (File.Exists(logFile) == false)
+        {
+            await File.WriteAllTextAsync(logFile, content);
+        }
+        else
+        {
+            using var fs = new FileStream(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            using StreamWriter sr = new StreamWriter(fs);
+            await sr.WriteLineAsync(content);
+            await sr.FlushAsync();
+        }
     }
 
     /// <summary>

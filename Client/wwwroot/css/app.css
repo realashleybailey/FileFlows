@@ -728,7 +728,7 @@ hr {
 .portlet .content {
   padding: 0;
   margin: 0;
-  height: calc(100% - 2rem);
+  height: calc(100% - 3rem);
   padding-left: 0.25rem;
   width: calc(100% - 0.25rem);
 }
@@ -748,6 +748,11 @@ hr {
 }
 .portlet .content td a {
   cursor: pointer;
+  color: var(--color) !important;
+}
+.portlet .content td a:hover {
+  text-decoration: underline !important;
+  color: var(--accent) !important;
 }
 .portlet .content tr th:first-child, .portlet .content tr td:first-child {
   padding-left: 0.5rem;
@@ -792,28 +797,19 @@ hr {
   grid-gap: 0.5rem;
   grid-auto-rows: 1fr;
   overflow: hidden;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 .portlet .processing-runners.runners-1 {
   grid-template-columns: 1fr;
 }
-.portlet .processing-runners.runners-2, .portlet .processing-runners.runners-4 {
-  grid-template-columns: repeat(2, 1fr);
+.portlet .processing-runners.runners-1 .runner, .portlet .processing-runners.runners-2 .runner, .portlet .processing-runners.runners-3 .runner {
+  height: 125px;
 }
 .portlet .processing-runners.runners-1 .buttons, .portlet .processing-runners.runners-2 .buttons, .portlet .processing-runners.runners-3 .buttons {
-  bottom: 2rem;
-}
-@media screen and (max-width: 1500px) {
-  .portlet .processing-runners:not(.runners-1):not(.runners-2):not(.runners-4) .info {
-    display: flex;
-    flex-direction: column;
-  }
-  .portlet .processing-runners:not(.runners-1):not(.runners-2):not(.runners-4) .lv.library {
-    display: none;
-  }
+  bottom: 0.25rem;
 }
 .portlet .runner {
-  height: 150px;
+  height: 142px;
   display: flex;
   flex-direction: row;
   border: solid 1px var(--border-color);
@@ -838,13 +834,12 @@ hr {
   grid-column: 1/3;
 }
 .portlet .runner .chart {
+  min-width: 170px;
+  width: 170px;
   max-width: 170px;
 }
-.portlet .runner .cancel {
-  position: absolute;
-  cursor: pointer;
-  right: 0.5rem;
-  top: 0.5rem;
+.portlet .runner .chart .apexcharts-datalabel-label {
+  fill: var(--color) !important;
 }
 .portlet .runner .lv {
   font-size: 0.9rem;
@@ -853,6 +848,7 @@ hr {
 }
 .portlet .runner .lv .l {
   width: 4rem;
+  min-width: 4rem;
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.6;
@@ -861,6 +857,10 @@ hr {
 }
 .portlet .runner .lv .l::after {
   content: ":";
+}
+.portlet .runner .lv .v {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .portlet .runner .lv + .lv {
   border-top: solid 1px var(--border-color);
@@ -885,7 +885,7 @@ hr {
   max-width: unset !important;
 }
 .vi-container.fix-width .top-row {
-  max-width: 1400px;
+  max-width: 1440px;
 }
 .vi-container.fix-width > .content > div {
   max-width: 1400px;

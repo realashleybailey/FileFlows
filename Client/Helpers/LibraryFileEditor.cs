@@ -56,7 +56,7 @@ namespace FileFlows.Client.Helpers
 
                 model = result.Data;
                 if (model.Status == FileStatus.Processing)
-                    logUrl += "?lines=300";
+                    logUrl += "?lines=5000";
 
                 var logResult = await GetLibraryFileLog(logUrl);
                 model.Log = (logResult.Success ? logResult.Data : string.Empty) ?? string.Empty;

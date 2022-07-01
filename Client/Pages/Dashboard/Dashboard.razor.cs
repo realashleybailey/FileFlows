@@ -263,11 +263,30 @@ public partial class Dashboard : ComponentBase, IDisposable
     }
 
 
-    private async Task LogClicked(FlowExecutorInfo worker)
+    private Task LogClicked(FlowExecutorInfo worker)
+        => OpenLog(worker.LibraryFile.Uid, worker.LibraryFile.Name);
+    
+    /// <summary>
+    /// Opens the full library file editor for a completed library file
+    /// </summary>
+    /// <param name="libraryFileUid">The UID of the library file</param>
+    [JSInvokable]
+    public async Task OpenFileViewer(Guid libraryFileUid)
+    {
+        await Helpers.LibraryFileEditor.Open(Blocker, Editor, libraryFileUid);
+    }
+    
+    /// <summary>
+    /// Opens a log for a executing library file
+    /// </summary>
+    /// <param name="libraryFileUid">The UID of the library file</param>
+    /// <param name="libraryFileName">the filename of the library file</param>
+    [JSInvokable]
+    public async Task OpenLog(Guid libraryFileUid, string libraryFileName)
     {
         Blocker.Show();
         string log = string.Empty;
-        string url = $"{ApiUrl}/{worker.LibraryFile.Uid}/log?lineCount=200";
+        string url = $"{ApiUrl}/{libraryFileUid}/log?lineCount=200";
         try
         {
             var logResult = await GetLog(url);
@@ -294,7 +313,7 @@ public partial class Dashboard : ComponentBase, IDisposable
             }
         });
 
-        await Editor.Open("Pages.Dashboard", worker.LibraryFile.Name, fields, new { Log = log }, large: true, readOnly: true);
+        await Editor.Open("Pages.Dashboard", libraryFileName, fields, new { Log = log }, large: true, readOnly: true);
     }
 
     private async Task<RequestResult<string>> GetLog(string url)
@@ -363,15 +382,12 @@ libpostproc    55.  3.100 / 55.  3.100"
         {
             await HttpHelper.Delete($"{ApiUrl}/{runnerUid}?libraryFileUid={libraryFileUid}");
             await Task.Delay(1000);
-            //await Refresh();
         }
         finally
         {
             Blocker.Hide();
         }
-        
     }
-    
 
     private async Task TogglePaused()
     {

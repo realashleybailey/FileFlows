@@ -203,15 +203,15 @@ public class WorkerController : Controller
         #if(DEBUG)
         if (results.Any() != true)
         {
-            results = Enumerable.Range(1, 4).Select(x => new FlowExecutorInfo
+            results = Enumerable.Range(1, 1).Select(x => new FlowExecutorInfo
             {
                 LibraryFile = new LibraryFile()
                 {
-                    Name = "File " + x
+                    Name = "File_x." + new string('w', 200)
                 },
                 CurrentPart = x,
                 CurrentPartName = "Part " + x,
-                CurrentPartPercent = x / 10f,
+                CurrentPartPercent = x * 10,
                 Library = new()
                 {
                     Name = "Library " + x
@@ -220,7 +220,7 @@ public class WorkerController : Controller
                 NodeName = "Node " + x,
                 RelativeFile = "/tv/file" + x + ".mkv",
                 StartedAt = DateTime.Now.AddMinutes(-x * 5),
-                TotalParts = 10,
+                TotalParts = 20,
                 Uid = new Guid("00000000-0000-0000-0000-00000000000" + x),
                 WorkingFile = "workingfile-" + x
             }).ToList();
@@ -250,7 +250,9 @@ public class WorkerController : Controller
         Guid executorId;
         lock (Executors)
         {
-            executorId = Executors.Where(x => x.Value.LibraryFile.Uid == uid).Select(x => x.Key).FirstOrDefault();
+            executorId = Executors.Where(x => x.Value?.LibraryFile?.Uid == uid).Select(x => x.Key).FirstOrDefault();
+            if (executorId == Guid.Empty)
+                executorId = Executors.Where(x => x.Value == null).Select(x => x.Key).FirstOrDefault();
         }
         if (executorId == Guid.Empty)
         {
@@ -285,7 +287,9 @@ public class WorkerController : Controller
             Executors?.TryGetValue(uid, out flowinfo);
             if(flowinfo == null)
             {
-                flowinfo = Executors.Values.Where(x => x.LibraryFile?.Uid == uid || x.Uid == uid || x.NodeUid == uid).FirstOrDefault();
+                flowinfo = Executors.Values.Where(x => x != null && (x.LibraryFile?.Uid == uid || x.Uid == uid || x.NodeUid == uid)).FirstOrDefault();
+                if(flowinfo == null)
+                    flowinfo = Executors.Values.Where(x => x == null).FirstOrDefault();
             }
             if(flowinfo == null)
             {

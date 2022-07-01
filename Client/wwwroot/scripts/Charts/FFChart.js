@@ -1003,6 +1003,7 @@ export class LibraryFileTable extends FFChart
             th.innerText = title;
             if(title !== 'Name')
                 th.style.width = '6rem';
+            th.className = title.toLowerCase();
             theadTr.appendChild(th);                
         }
         
@@ -1040,7 +1041,7 @@ export class LibraryFileTable extends FFChart
             aTime.innerText = time;
             aTime.addEventListener('click', (event) => {
                event.preventDefault();
-               console.log('time clicked');
+               this.csharp.invokeMethodAsync("OpenFileViewer", item.Uid);
             });
 
             let tdSize = document.createElement('td');
@@ -1080,7 +1081,7 @@ export class Processing extends FFChart
     constructor(uid, args) {
         super(uid, args);
         this.recentlyFinished = args.flags === 1;
-        this.infoTemplate = Handlebars.compile(this.infoTemplate);
+        this.infoTemplate = Handlebars.compile(this.infoTemplateHtml);
     }
 
     async getData() {
@@ -1108,7 +1109,7 @@ export class Processing extends FFChart
     }
     
     setSize(size) {
-        let rows = Math.floor((size - 1) / 3) + 1;
+        let rows = Math.floor((size - 1) / 2) + 1;
         ffGrid.update(this.ele, { h: rows});
     }
 
@@ -1151,8 +1152,9 @@ export class Processing extends FFChart
             if(!key)
                 continue;
             if(running.indexOf(key) < 0){
-                console.log('removing runner: ' , key);
-                this.removeRunner(this.runners[key]);
+                let eleRemove = document.getElementById('runner-' + key)
+                if(eleRemove)
+                    eleRemove.remove();
                 delete this.runners[key];
             }
         }
@@ -1186,10 +1188,10 @@ export class Processing extends FFChart
         
         let btnLog = document.createElement('button');
         btnLog.className = 'btn btn-log';
-        btnLog.innerText = 'Log';
+        btnLog.innerText = 'Info';
         btnLog.addEventListener('click', () => {
-            console.log('view log', runner);
-            this.csharp.invokeMethodAsync("OpenLog", runner.Uid, runner.LibraryFile.Uid);
+            //this.csharp.invokeMethodAsync("OpenLog", runner.LibraryFile.Uid, runner.LibraryFile.Name);
+            this.csharp.invokeMethodAsync("OpenFileViewer", runner.LibraryFile.Uid);
         });
         buttons.appendChild(btnLog);
         
@@ -1197,7 +1199,6 @@ export class Processing extends FFChart
         btnCancel.className = 'btn btn-cancel';
         btnCancel.innerText = 'Cancel';
         btnCancel.addEventListener('click', () => {
-            console.log('cancelling', runner);
             this.csharp.invokeMethodAsync("CancelRunner", runner.Uid, runner.LibraryFile.Uid, runner.LibraryFile.Name).then(() =>{
                 this.getData();
             });
@@ -1208,8 +1209,8 @@ export class Processing extends FFChart
         this.eleChart = document.getElementById(`runner-${runner.Uid}-chart`);
         console.log('created chart and info', this.eleInfo);
     }
-    
-    infoTemplate = `
+
+    infoTemplateHtml = `
 <div class="lv w-2 file">
     <span class="l">File</span>
     <span class="v">{{file}}</span>
@@ -1234,15 +1235,14 @@ export class Processing extends FFChart
     
     updateRunner(runner)
     {    
-        var args = {
+        let args = {
             file: runner.LibraryFile.Name,
             node: runner.NodeName,
             library: runner.Library.Name,
-            step: runner.CurrentPartName,
+            step: runner.CurrentPartName || 'Starting...',
             time: this.timeDiff( Date.parse(runner.StartedAt), Date.now())
         };
-        let rendered = this.infoTemplate(args);
-        this.eleInfo.innerHTML = rendered;
+        this.eleInfo.innerHTML = this.infoTemplate(args);
     }
     
     timeDiff(start, end)
@@ -1255,10 +1255,6 @@ export class Processing extends FFChart
         let seconds = Math.floor(diff);
         
         return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
-    }
-    
-    removeRunner(runner){
-        
     }
     
     createOrUpdateRadialBar(runner){
@@ -1289,24 +1285,27 @@ export class Processing extends FFChart
                     dataLabels: {
                         total: {
                             show: true,
-                            label: 'Overall',
+                            label: runner.CurrentPartPercent ? (runner.CurrentPartPercent.toFixed(1) + ' %') : 'Overall',
                             fontSize: '0.8rem',
                             formatter: function (val) {
-                                return +(parseFloat(overall).toFixed(2)) + ' %';
+                                return parseFloat(overall).toFixed(1) + ' %';
                             }
                         },
                         value: {
                             show: true,
                             fontSize: '0.7rem',
                             formatter: function (val) {
-                                return +(parseFloat(val).toFixed(2)) + ' %';
+                                return +(parseFloat(val).toFixed(1)) + ' %';
                             }
                         }
 
                     }
                 }
             },
-            //colors: ['var(--accent)', 'var(--accent-complementary)'],
+            colors: [
+                '#2b8fb3',
+                '#c30471', 
+            ],
             series: [overall],
             labels: ['Overall']
         };

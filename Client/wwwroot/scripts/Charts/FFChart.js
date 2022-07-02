@@ -1,30 +1,116 @@
-export function initDashboard(portlets, csharp){
+export function initDashboard(uid, portlets, csharp, isReadOnly){
     if(!portlets)
         return;
+    disposeAll();
+    destroyDashboard();
     
     let dashboard = document.querySelector('.dashboard.grid-stack');
-    dashboard.textContent = '';
-    
+    if(!dashboard)
+    {
+        dashboard = document.createElement('div');
+        dashboard.className = 'dashboard grid-stack';
+        let container = document.querySelector('.dashboard-wrapper');
+        container.appendChild(dashboard);        
+    }
+    else {
+        dashboard.classList.remove('readonly');
+        dashboard.textContent = '';
+    }
+    if (isReadOnly)
+        dashboard.classList.add('readonly');
+
     for(let p of portlets)
     {
         addPortlet(dashboard, p, csharp);
     }
-    intDashboardActual('default');
+    intDashboardActual(uid, csharp, isReadOnly);
 }
 
-export function addPortlets(portlets, csharp){
+export function destroyDashboard()
+{
+    if(!window.ffGrid)
+        return;
+    
+    try {
+        window.ffGrid.destroy();
+        delete window.ffGrid;
+    }catch(err){
+    }
+}
+
+export function addPortlets(uid, portlets, csharp){
+    if(!portlets)
+        return;
     let dashboard = document.querySelector('.dashboard.grid-stack');
     let grid = window.ffGrid;
     grid.batchUpdate();
     for(let p of portlets)
     {
-        console.log('adding portlet', p);
         let div = addPortlet(dashboard, p, csharp);
         grid.addWidget(div, { autoPosition: true});
         grid.update(div, { autoPosition: false});
     }
     grid.commit();
 }
+
+
+export function getGridData()
+{
+    let data = [];
+    for(let ele of document.querySelectorAll('.grid-stack-item')){
+        let uid = ele.id;
+        let x = parseInt(ele.getAttribute('gs-x'), 10);
+        let y = parseInt(ele.getAttribute('gs-y'), 10);
+        let w = parseInt(ele.getAttribute('gs-w'), 10);
+        let h = parseInt(ele.getAttribute('gs-h'), 10);
+        data.push({
+            Uid:uid, X: x, Y:y, Width:w, Height:h
+        });
+    }
+    return data;
+}
+
+
+export function dispose(uid) {
+    let chart = window.FlowCharts[uid];
+    if(chart)
+        chart.dispose();
+}
+
+export function disposeAll(){
+    if(!window.FlowCharts)
+        return;
+    console.log('disposing all charts')
+    Object.keys(window.FlowCharts).forEach(uid => {
+        try {
+            window.FlowCharts[uid].dispose();
+        }catch(err){
+            console.log('err', err);
+        }
+    });
+}
+
+function intDashboardActual(uid, csharp, isReadOnly) {
+    let grid = GridStack.init({
+        cellHeight:170,
+        handle: '.draghandle',
+        disableResize: isReadOnly,
+        disableDrag: isReadOnly
+    });
+    window.ffGrid = grid;
+
+    grid.on('resizestop', (e, el) => {
+        window.dashboardElementResized.args = e;
+        el.dispatchEvent(window.dashboardElementResized);
+        let data = getGridData();
+        csharp.invokeMethodAsync("SaveDashboard", uid, data);
+    });
+    grid.on('dragstop', () => {
+        let data = getGridData();
+        csharp.invokeMethodAsync("SaveDashboard", uid, data);        
+    });
+}
+
 
 function addPortlet(dashboard, p, csharp){
 
@@ -84,58 +170,6 @@ function addPortlet(dashboard, p, csharp){
     return div;
 }
 
-
-function intDashboardActual(uid) {
-    let dashboardData = localStorage.getItem('dashboard-' + uid);
-
-    if(dashboardData)
-    {
-        try {
-            dashboardData = JSON.parse(dashboardData);
-            for (let item of dashboardData) {
-                let ele = document.getElementById(item.id);
-                if (!ele) {
-                    console.log('element not found', item, item.id);
-                    continue;
-                }
-                ele.setAttribute('gs-x', item.x);
-                ele.setAttribute('gs-y', item.y);
-                ele.setAttribute('gs-w', item.w);
-                ele.setAttribute('gs-h', item.h);
-            }
-        }catch(err){
-            // can throw if the saved data is corrupt, silent fail to defaults
-        }
-    }
-
-    var grid = GridStack.init({
-        cellHeight:170,
-        handle: '.draghandle'
-    });
-    window.ffGrid = grid;
-    
-    let saveGrid = () => {
-        let data = [];
-        for(let ele of document.querySelectorAll('.grid-stack-item')){
-            let id = ele.id;
-            let x = parseInt(ele.getAttribute('gs-x'), 10);
-            let y = parseInt(ele.getAttribute('gs-y'), 10);
-            let w = parseInt(ele.getAttribute('gs-w'), 10);
-            let h = parseInt(ele.getAttribute('gs-h'), 10);
-            data.push({
-                id:id, x: x, y:y, w:w, h:h
-            });
-        }
-        localStorage.setItem('dashboard-' + uid, JSON.stringify(data));
-    }
-
-    grid.on('resizestop', (e, el) => {
-        window.dashboardElementResized.args = e;
-        el.dispatchEvent(window.dashboardElementResized);
-        saveGrid();
-    });
-}
-
 export function newChart(type, uid, args){
     if(!window.FlowCharts)
         window.FlowCharts = {};
@@ -157,23 +191,6 @@ export function newChart(type, uid, args){
     else 
         console.log('unknown type: ' + type);
     
-}
-
-export function dispose(uid) {
-    let chart = window.FlowCharts[uid];
-    if(chart)
-        chart.dispose();
-}
-
-export function disposeAll(){
-    console.log('disposing all charts')
-    Object.keys(window.FlowCharts).forEach(uid => {
-        try {
-            window.FlowCharts[uid].dispose();            
-        }catch(err){
-            console.log('err', err);
-        }
-    });
 }
 
 class FFChart {
@@ -1170,6 +1187,8 @@ export class Processing extends FFChart
     createRunners(data) {
         let running = [];
         let chartDiv = document.getElementById(this.chartUid);
+        if(!chartDiv)
+            return;
         chartDiv.className = 'processing-runners runners-' + data.length;
         for(let worker of data){
             running.push(worker.Uid);
@@ -1195,7 +1214,6 @@ export class Processing extends FFChart
     
     createRunner(chartDiv, runner)
     {
-        console.log('creating runner', runner);
         let div = document.createElement('div');
         div.className = 'runner';
         div.id = 'runner-' + runner.Uid;
@@ -1240,7 +1258,6 @@ export class Processing extends FFChart
         
         this.eleInfo = document.getElementById(`runner-${runner.Uid}-info`);
         this.eleChart = document.getElementById(`runner-${runner.Uid}-chart`);
-        console.log('created chart and info', this.eleInfo);
     }
 
     infoTemplateHtml = `

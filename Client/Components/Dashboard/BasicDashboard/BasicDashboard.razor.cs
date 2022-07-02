@@ -24,6 +24,8 @@ public partial class BasicDashboard
     [Inject] public IJSRuntime jSRuntime { get; set; }
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] Editor Editor { get; set; }
+    
+    [CascadingParameter] private Pages.Dashboard Dashboard { get; set; }
 
     public IJSObjectReference jsFunctions;
 
@@ -77,7 +79,7 @@ public partial class BasicDashboard
             return jsFunctions;
         mutexJsFunctions.WaitOne();
         if (jsFunctions != null)
-            return jsFunctions; // incase was fetched while mutex was locked
+            return jsFunctions; // in case was fetched while mutex was locked
         try
         {
             jsFunctions = await jSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/Dashboard.js");
@@ -89,7 +91,10 @@ public partial class BasicDashboard
         }
     }
 
-    private bool UsingBasicDashboard => App.Instance.FileFlowsSystem.Licensed == false;
+    /// <summary>
+    /// Gets if this is the active dasbhoard
+    /// </summary>
+    public bool IsActive => Dashboard.ActiveDashboardUid == Guid.Empty;
 
     public void Dispose()
     {
@@ -122,7 +127,7 @@ public partial class BasicDashboard
 
     async Task Refresh()
     {
-        if (Refreshing || UsingBasicDashboard == false) 
+        if (Refreshing || IsActive == false) 
             return;
         Refreshing = true;
         try

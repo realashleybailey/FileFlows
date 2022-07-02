@@ -202,83 +202,87 @@ public partial class CustomDashboard
         }
         var origModel = new AddPortletModel();
         var result = await Editor.Open("Pages.Portlet", "Pages.Portlet.Title", fields, null, lblSave: "Labels.Add", saveCallback:
-            (model) =>
+            async (model) =>
             {
                 Console.WriteLine("Save callback 1: " + JsonSerializer.Serialize(model));
                 var dict = model as IDictionary<string, object>;
-                if (dict != null)
+                var dotNetObjRef = DotNetObjectReference.Create(this);
+                if (dict == null)
+                    return true;
+            
+                Console.WriteLine("Save callback 2: " + dict.Count);
+                var newPortlets = new List<PortletUiModel>();
+                foreach (var key in dict.Keys)
                 {
-                    Console.WriteLine("Save callback 2: " + dict.Count);
-                    var newPortlets = new List<PortletUiModel>();
-                    foreach (var key in dict.Keys)
+                    Console.WriteLine("Save callback 2a");
+                    if (dict[key] as bool? != true)
+                        continue;
+                    Console.WriteLine("Save callback 2b");
+                    Console.WriteLine("Save callback 2c: " + key);
+                    
+                    switch (key)
                     {
-                        Console.WriteLine("Save callback 2a");
-                        if (dict[key] as bool? != true)
-                            continue;
-                        Console.WriteLine("Save callback 2b");
-                        Console.WriteLine("Save callback 2c: " + key);
-                        
-                        switch (key)
-                        {
-                            case nameof(CpuUsage):
-                                newPortlets.Add(CreateNetPortletModel(CpuUsage.PD_UID, 3, 1));
-                                break;
-                            case nameof(MemoryUsage):
-                                newPortlets.Add(CreateNetPortletModel(MemoryUsage.PD_UID, 3, 1));
-                                break;
-                            case nameof(LogStorage):
-                                newPortlets.Add(CreateNetPortletModel(LogStorage.PD_UID, 3, 1));
-                                break;
-                            case nameof(TempStorage):
-                                newPortlets.Add(CreateNetPortletModel(TempStorage.PD_UID, 3, 1));
-                                break;
-                            case nameof(Processing):
-                                newPortlets.Add(CreateNetPortletModel(Processing.PD_UID, 12, 1));
-                                break;
-                            case nameof(FilesUpcoming):
-                                newPortlets.Add(CreateNetPortletModel(FilesUpcoming.PD_UID, 6, 2));
-                                break;
-                            case nameof(FilesRecentlyFinished):
-                                newPortlets.Add(CreateNetPortletModel(FilesRecentlyFinished.PD_UID, 6, 2));
-                                break;
-                            case nameof(Codecs):
-                                newPortlets.Add(CreateNetPortletModel(Codecs.PD_UID, 6, 2));
-                                break;
-                            case nameof(VideoCodecs):
-                                newPortlets.Add(CreateNetPortletModel(VideoCodecs.PD_UID, 6, 2));
-                                break;
-                            case nameof(AudioCodecs):
-                                newPortlets.Add(CreateNetPortletModel(AudioCodecs.PD_UID, 6, 2));
-                                break;
-                            case nameof(ProcessingTimes):
-                                newPortlets.Add(CreateNetPortletModel(ProcessingTimes.PD_UID, 6, 2));
-                                break;
-                            case nameof(VideoContainers):
-                                newPortlets.Add(CreateNetPortletModel(VideoContainers.PD_UID, 4, 2));
-                                break;
-                            case nameof(VideoResolution):
-                                newPortlets.Add(CreateNetPortletModel(VideoResolution.PD_UID, 4, 2));
-                                break;
-                            case nameof(LibraryProcessingTimes):
-                                newPortlets.Add(CreateNetPortletModel(LibraryProcessingTimes.PD_UID, 4, 2));
-                                break;
-                        }
+                        case nameof(CpuUsage):
+                            newPortlets.Add(CreateNetPortletModel(CpuUsage.PD_UID, 3, 1));
+                            break;
+                        case nameof(MemoryUsage):
+                            newPortlets.Add(CreateNetPortletModel(MemoryUsage.PD_UID, 3, 1));
+                            break;
+                        case nameof(LogStorage):
+                            newPortlets.Add(CreateNetPortletModel(LogStorage.PD_UID, 3, 1));
+                            break;
+                        case nameof(TempStorage):
+                            newPortlets.Add(CreateNetPortletModel(TempStorage.PD_UID, 3, 1));
+                            break;
+                        case nameof(Processing):
+                            newPortlets.Add(CreateNetPortletModel(Processing.PD_UID, 12, 1));
+                            break;
+                        case nameof(FilesUpcoming):
+                            newPortlets.Add(CreateNetPortletModel(FilesUpcoming.PD_UID, 6, 2));
+                            break;
+                        case nameof(FilesRecentlyFinished):
+                            newPortlets.Add(CreateNetPortletModel(FilesRecentlyFinished.PD_UID, 6, 2));
+                            break;
+                        case nameof(Codecs):
+                            newPortlets.Add(CreateNetPortletModel(Codecs.PD_UID, 6, 2));
+                            break;
+                        case nameof(VideoCodecs):
+                            newPortlets.Add(CreateNetPortletModel(VideoCodecs.PD_UID, 6, 2));
+                            break;
+                        case nameof(AudioCodecs):
+                            newPortlets.Add(CreateNetPortletModel(AudioCodecs.PD_UID, 6, 2));
+                            break;
+                        case nameof(ProcessingTimes):
+                            newPortlets.Add(CreateNetPortletModel(ProcessingTimes.PD_UID, 6, 2));
+                            break;
+                        case nameof(VideoContainers):
+                            newPortlets.Add(CreateNetPortletModel(VideoContainers.PD_UID, 4, 2));
+                            break;
+                        case nameof(VideoResolution):
+                            newPortlets.Add(CreateNetPortletModel(VideoResolution.PD_UID, 4, 2));
+                            break;
+                        case nameof(LibraryProcessingTimes):
+                            newPortlets.Add(CreateNetPortletModel(LibraryProcessingTimes.PD_UID, 4, 2));
+                            break;
                     }
                     
                     Console.WriteLine("Save callback 3");
                     Logger.Instance.ILog("ADding portlets: ", newPortlets );
 
-                    if (newPortlets.Any())
-                    {
-                        Console.WriteLine("Save callback 4");
-                        this.Portlets.AddRange(newPortlets);
-                        var dotNetObjRef = DotNetObjectReference.Create(this);
-                        jsCharts.InvokeVoidAsync($"addPortlets",  newPortlets, dotNetObjRef); 
-                    }
                     Console.WriteLine("Save callback 5");
                 }
-                Console.WriteLine("Save callback 6");
-                return Task.FromResult(true);
+                if (newPortlets.Any())
+                {
+                    Console.WriteLine("Save callback 4");
+                    this.Portlets.AddRange(newPortlets);
+                    await jsCharts.InvokeVoidAsync($"addPortlets", ActiveDashboardUid, newPortlets, dotNetObjRef); 
+                    var gridPortlets = await jsCharts.InvokeAsync<PortletUiModel[]>($"getGridData", ActiveDashboardUid, dotNetObjRef);
+                    Console.WriteLine("gridportlts: ");
+                    Console.WriteLine(JsonSerializer.Serialize(gridPortlets));
+                    await SaveDashboard(ActiveDashboardUid, gridPortlets);
+                }
+                Console.WriteLine("Save finished");
+                return true;
             });
     }
 

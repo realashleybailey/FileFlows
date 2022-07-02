@@ -365,6 +365,14 @@ input[type=file]{
     }
 }
 
+.dashboard.readonly {
+    .fa-trash {
+        display:none !important;
+    }
+    .title:hover {
+        cursor:default !important;        
+    }
+}
 
 .portlet {
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
@@ -636,7 +644,7 @@ input[type=file]{
     border: solid 1px var(--accent);
     position:relative;
     top:2px;
-    margin-right:0.5rem;
+    margin-left:0.5rem;
     *
     {
         border-radius: 0;

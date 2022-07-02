@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using FileFlows.Shared.Portlets;
 
 namespace FileFlows.Shared.Models;
@@ -36,8 +37,9 @@ public class Dashboard: FileFlowObject
     /// <summary>
     /// Gets a default dashboard
     /// </summary>
+    /// <param name="usingExternalDatabase">If the the system is using an external database or not</param>
     /// <returns>the default dashboard</returns>
-    public static Dashboard GetDefaultDashboard()
+    public static Dashboard GetDefaultDashboard(bool usingExternalDatabase)
     {
         var db = new Dashboard();
         db.Name = DefaultDashboardName;
@@ -95,44 +97,45 @@ public class Dashboard: FileFlowObject
             PortletDefinitionUid = FilesRecentlyFinished.PD_UID
         });
         rowIndex += 2;
-        
-        
-        
-        // codecs and times row
-        db.Portlets.Add(new ()
-        {
-            Height = 2, Width = 6,
-            Y = rowIndex, X = 0,
-            PortletDefinitionUid = Codecs.PD_UID
-        });
-        db.Portlets.Add(new ()
-        {
-            Height = 2, Width = 6,
-            Y = rowIndex, X = 6,
-            PortletDefinitionUid = ProcessingTimes.PD_UID
-        });
-        rowIndex += 2;
-        
-        // containers, resolution, processing times row
-        db.Portlets.Add(new ()
-        {
-            Height = 2, Width = 4,
-            Y = rowIndex, X = 0,
-            PortletDefinitionUid = VideoContainers.PD_UID
-        });
-        db.Portlets.Add(new ()
-        {
-            Height = 2, Width = 4,
-            Y = rowIndex, X = 4,
-            PortletDefinitionUid = VideoResolution.PD_UID
-        });
-        db.Portlets.Add(new ()
-        {
-            Height = 2, Width = 4,
-            Y = rowIndex, X = 8,
-            PortletDefinitionUid = LibraryProcessingTimes.PD_UID
-        });
 
+
+        if (usingExternalDatabase)
+        {
+            // codecs and times row
+            db.Portlets.Add(new()
+            {
+                Height = 2, Width = 6,
+                Y = rowIndex, X = 0,
+                PortletDefinitionUid = Codecs.PD_UID
+            });
+            db.Portlets.Add(new()
+            {
+                Height = 2, Width = 6,
+                Y = rowIndex, X = 6,
+                PortletDefinitionUid = ProcessingTimes.PD_UID
+            });
+            rowIndex += 2;
+
+            // containers, resolution, processing times row
+            db.Portlets.Add(new()
+            {
+                Height = 2, Width = 4,
+                Y = rowIndex, X = 0,
+                PortletDefinitionUid = VideoContainers.PD_UID
+            });
+            db.Portlets.Add(new()
+            {
+                Height = 2, Width = 4,
+                Y = rowIndex, X = 4,
+                PortletDefinitionUid = VideoResolution.PD_UID
+            });
+            db.Portlets.Add(new()
+            {
+                Height = 2, Width = 4,
+                Y = rowIndex, X = 8,
+                PortletDefinitionUid = LibraryProcessingTimes.PD_UID
+            });
+        }
         return db;
     }
 }

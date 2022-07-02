@@ -178,7 +178,8 @@
         "AddPortlet":"Add Portlet"
       },
       "ErrorMessages": {
-        "LogFailed": "Failed to retrieve log for worker"
+        "LogFailed": "Failed to retrieve log for worker",
+        "FailedToCreate":"Failed to create dashboard"
       },
       "Messages": {
         "CancelMessage": "Are you sure you want to cancel the worker for {RelativeFile}?",

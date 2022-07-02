@@ -715,6 +715,13 @@ hr {
     margin: unset;
   }
 }
+.dashboard.readonly .fa-trash {
+  display: none !important;
+}
+.dashboard.readonly .title:hover {
+  cursor: default !important;
+}
+
 .portlet {
   box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
   background: rgba(var(--base), 0.2);
@@ -969,7 +976,7 @@ hr {
   border: solid 1px var(--accent);
   position: relative;
   top: 2px;
-  margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 .dashboard-selector * {
   border-radius: 0;

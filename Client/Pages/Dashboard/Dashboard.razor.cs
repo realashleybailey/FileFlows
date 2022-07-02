@@ -11,6 +11,7 @@ public partial class Dashboard : ComponentBase
 {
     private ConfigurationStatus ConfiguredStatus = ConfigurationStatus.Flows | ConfigurationStatus.Libraries;
     [Inject] public IJSRuntime jSRuntime { get; set; }
+    [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] Editor Editor { get; set; }
     public EventHandler AddPortletEvent { get; set; }
@@ -18,7 +19,24 @@ public partial class Dashboard : ComponentBase
     private string lblAddPortlet;
     
     private List<ListOption> Dashboards;
-    private Guid ActiveDashboardUid;
+
+    private Guid _ActiveDashboardUid;
+
+    /// <summary>
+    /// Gets the UID of the active dashboard
+    /// </summary>
+    public Guid ActiveDashboardUid
+    {
+        get => _ActiveDashboardUid;
+        private set
+        {
+            _ActiveDashboardUid = value;
+            _ = LocalStorage.SetItemAsync("ACTIVE_DASHBOARD", value);
+        }
+    }
+
+
+    private bool Unlicensed => App.Instance.FileFlowsSystem.Licensed == false;
     
     protected override async Task OnInitializedAsync()
     {
@@ -29,14 +47,12 @@ public partial class Dashboard : ComponentBase
 #endif
         lblAddPortlet = Translater.Instant("Pages.Dashboard.Labels.AddPortlet");
         
-        if(UsingBasicDashboard == false)
+        if(Unlicensed == false)
             await LoadDashboards();
     }
 
     private async Task LoadDashboards()
     {
-        if (App.Instance.FileFlowsSystem.Licensed == false)
-            return;
         var dbResponse = await HttpHelper.Get<List<ListOption>>("/api/dashboard/list");
         if (dbResponse.Success == false || dbResponse.Data == null)
             return;
@@ -48,6 +64,20 @@ public partial class Dashboard : ComponentBase
             Label = "Basic Dashboard",
             Value = Guid.Empty
         });
+        SortDashboards();
+        var lsActiveDashboard = await LocalStorage.GetItemAsync<Guid?>("ACTIVE_DASHBOARD");
+        if (lsActiveDashboard != null &&  this.Dashboards.Any(x => ((Guid)x.Value) == lsActiveDashboard))
+        {
+            this.ActiveDashboardUid = lsActiveDashboard.Value;
+        }
+        else
+        {
+            this.ActiveDashboardUid = (Guid)this.Dashboards[0].Value;
+        }
+    }
+
+    private void SortDashboards()
+    {
         this.Dashboards = this.Dashboards.OrderBy(x =>
         {
             if ((Guid)x.Value == FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
@@ -56,17 +86,35 @@ public partial class Dashboard : ComponentBase
                 return -1;
             return 0;
         }).ThenBy(x => x.Label).ToList();
-        this.ActiveDashboardUid = (Guid)this.Dashboards[0].Value;
     }
-
-
-    private bool UsingBasicDashboard => App.Instance.FileFlowsSystem.Licensed == false;
 
 
 
     private async Task AddDashboard()
     {
         string name = await Prompt.Show("New Dashboard", "Enter a name of the new dashboard");
+        this.Blocker.Show();
+        try
+        {
+            var newDashboardResult = await HttpHelper.Put<FileFlows.Shared.Models.Dashboard>("/api/dashboard", new { Name = name });
+            if (newDashboardResult.Success == false)
+            {
+                string error = newDashboardResult.Body?.EmptyAsNull() ?? "Pages.Dashboard.ErrorMessages.FailedToCreate";
+                Toast.ShowError(error);
+                return;
+            }
+            this.Dashboards.Add(new ()
+            {
+                Label = newDashboardResult.Data.Name,
+                Value = newDashboardResult.Data.Uid
+            });
+            SortDashboards();
+            this.ActiveDashboardUid = newDashboardResult.Data.Uid;
+        }
+        finally
+        {
+            this.Blocker.Hide();
+        }
     }
 
     private async Task DeleteDashboard()
@@ -74,6 +122,19 @@ public partial class Dashboard : ComponentBase
         if (DashboardDeletable == false)
             return;
         bool confirmed = await Confirm.Show("Labels.Delete", "Pages.Dashboard.Messages.DeleteDashboard");
+        if (confirmed == false)
+            return;
+        Blocker.Show();
+        try
+        {
+            await HttpHelper.Delete("/api/dashboard/" + ActiveDashboardUid);
+            this.Dashboards.RemoveAll(x => (Guid)x.Value == ActiveDashboardUid);
+            this.ActiveDashboardUid = (Guid)this.Dashboards[0].Value;
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
     }
 
     private bool DashboardDeletable => ActiveDashboardUid != Guid.Empty &&

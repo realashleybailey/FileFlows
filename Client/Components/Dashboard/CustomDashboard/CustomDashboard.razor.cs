@@ -17,6 +17,7 @@ public partial class CustomDashboard : IDisposable
     [CascadingParameter] private Pages.Dashboard Dashboard { get; set; }
     
     private Guid _ActiveDashboardUid;
+    private bool needsLoading = false;
 
     [Parameter]
     public Guid ActiveDashboardUid
@@ -26,10 +27,26 @@ public partial class CustomDashboard : IDisposable
         {
             if (_ActiveDashboardUid == value)
                 return;
-            _ActiveDashboardUid = value;
-            _ = this.LoadDashboard();
+            if (jsCharts == null)
+            {
+                needsLoading = true;
+                _ActiveDashboardUid = value;
+                return;
+            }
+            _ = Task.Run(async () =>
+            {
+                var dotNetObjRef = DotNetObjectReference.Create(this);
+                await jsCharts.InvokeVoidAsync($"destroyDashboard",  this.Portlets, dotNetObjRef); 
+                _ActiveDashboardUid = value;
+                await this.LoadDashboard();
+            });
         }
     }
+
+    /// <summary>
+    /// Gets if the active dashboard is the default dashboard
+    /// </summary>
+    private bool IsDefaultDashboard => ActiveDashboardUid == FileFlows.Shared.Models.Dashboard.DefaultDashboardUid;
 
     public IJSObjectReference jsFunctions;
 
@@ -40,6 +57,15 @@ public partial class CustomDashboard : IDisposable
     {
         jsCharts = await jSRuntime.InvokeAsync<IJSObjectReference>("import", $"./scripts/Charts/FFChart.js");
         Dashboard.AddPortletEvent = (sender, args) => this.AddPortletDialog();
+
+        if (needsLoading)
+        {
+            needsLoading = false;
+            
+            var dotNetObjRef = DotNetObjectReference.Create(this);
+            await jsCharts.InvokeVoidAsync($"destroyDashboard",  this.Portlets, dotNetObjRef);
+            await this.LoadDashboard();
+        }
     }
     
     private async Task LoadDashboard()
@@ -51,7 +77,7 @@ public partial class CustomDashboard : IDisposable
         if(portletsResponse.Data?.Any() == true)
             this.Portlets.AddRange(portletsResponse.Data);
         var dotNetObjRef = DotNetObjectReference.Create(this);
-        await jsCharts.InvokeVoidAsync($"initDashboard",  this.Portlets, dotNetObjRef); 
+        await jsCharts.InvokeVoidAsync($"initDashboard",  this.ActiveDashboardUid, this.Portlets, dotNetObjRef, IsDefaultDashboard); 
     }
     
     public void Dispose()
@@ -169,9 +195,35 @@ libpostproc    55.  3.100 / 55.  3.100"
     [JSInvokable]
     public async Task<bool> RemovePortlet(Guid portletUid)
     {
+        if (IsDefaultDashboard)
+            return false; // cannot change default dashboard
+        
         bool confirmed = await Confirm.Show("Labels.Remove", "Pages.Dashboard.Messages.DeletePortlet");
         if (confirmed)
             this.Portlets.RemoveAll(x => x.Uid == portletUid);
         return confirmed;
+    }
+    
+    /// <summary>
+    /// Saves a dashboard
+    /// </summary>
+    /// <param name="dashboardUid">The UID of the dashboard</param>
+    /// <param name="portlets">The portlets to be saved</param>
+    [JSInvokable]
+    public async Task SaveDashboard(Guid dashboardUid, PortletUiModel[] portlets)
+    {
+        if (dashboardUid == FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
+            return; // cannot change default dashboard
+
+        var pActual = portlets.Select(x => new Portlet()
+        {
+            Height = x.Height,
+            Width = x.Width,
+            X = x.X,
+            Y = x.Y,
+            PortletDefinitionUid = x.Uid
+        }).ToArray();
+        
+        await HttpHelper.Put($"/api/dashboard/{dashboardUid}", pActual);
     }
 }

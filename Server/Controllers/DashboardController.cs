@@ -1,4 +1,5 @@
 using FileFlows.Plugin;
+using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using FileFlows.Shared.Portlets;
 using Microsoft.AspNetCore.Mvc;
@@ -38,15 +39,12 @@ public class DashboardController:ControllerStore<Dashboard>
             Label = x.Name,
             Value = x.Uid
         }).ToList();
-        if (dashboards.Any() == false)
+        // add default
+        dashboards.Insert(0, new ()
         {
-            // add default
-            dashboards.Add(new ListOption()
-            {
-                Label = Dashboard.DefaultDashboardName,
-                Value = Dashboard.DefaultDashboardUid
-            });
-        }
+            Label = Dashboard.DefaultDashboardName,
+            Value = Dashboard.DefaultDashboardUid
+        });
         return dashboards;
     }
 
@@ -60,7 +58,7 @@ public class DashboardController:ControllerStore<Dashboard>
     {
         var db = await GetByUid(uid);
         if ((db == null || db.Uid == Guid.Empty) && uid == Dashboard.DefaultDashboardUid)
-            db = Dashboard.GetDefaultDashboard();
+            db = Dashboard.GetDefaultDashboard(DbHelper.UseMemoryCache == false);
         else if (db == null)
             throw new Exception("Dashboard not found");
         List<PortletUiModel> portlets = new List<PortletUiModel>();
@@ -126,5 +124,21 @@ public class DashboardController:ControllerStore<Dashboard>
             throw new Exception("ErrorMessages.NameInUse");
 
         return await Update(model);
+    }
+
+    /// <summary>
+    /// Saves a dashboard
+    /// </summary>
+    /// <param name="uid">The UID of the dashboard</param>
+    /// <param name="portlets">The portlets to save</param>
+    /// <returns>The saved dashboard</returns>
+    [HttpPut("{uid}")]
+    public async Task<Dashboard> Save([FromRoute] Guid uid, [FromBody] List<Portlet> portlets)
+    {
+        var dashboard = await GetByUid(uid);
+        if (dashboard == null)
+            throw new Exception("Dashboard not found");
+        dashboard.Portlets = portlets ?? new List<Portlet>();
+        return await Save(dashboard);
     }
 }

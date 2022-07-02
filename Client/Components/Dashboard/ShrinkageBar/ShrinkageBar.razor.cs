@@ -69,6 +69,8 @@
 
         private async Task Refresh()
         {
+            if (Dashboard.IsActive == false)
+                return;
 #if (DEMO)
             if (Data?.Any() != true)
             {

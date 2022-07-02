@@ -11,6 +11,11 @@
     <Head>
         @if (App.Instance.FileFlowsSystem.Licensed)
         {
+            if (ActiveDashboardUid != Guid.Empty && ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
+            {
+                <button class="btn" @onclick=@AddPortlet>@lblAddPortlet</button>
+            }
+            
             <div class="dashboard-selector">
                 <select @bind="ActiveDashboardUid">
                     @if (Dashboards?.Any() == true)
@@ -24,8 +29,6 @@
                 <button @onclick=@AddDashboard><i class="fas fa-plus"></i></button>
                 <button disabled=@(DashboardDeletable == false) @onclick=@DeleteDashboard><i class="fas fa-trash"></i></button>
             </div>
-            
-            <button class="btn" @onclick=@AddPortlet>@lblAddPortlet</button>
         }
         @if (App.Instance.IsMobile == false)
         {

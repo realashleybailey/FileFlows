@@ -160,4 +160,15 @@ libpostproc    55.  3.100 / 55.  3.100"
             Blocker.Hide();
         }
     }
+
+    /// <summary>
+    /// Removes a portlet from the dashboard
+    /// </summary>
+    /// <param name="portletUid">The UID of the portlet</param>
+    [JSInvokable]
+    public async Task<bool> RemovePortlet(Guid portletUid)
+    {
+        bool confirmed = await Confirm.Show("Labels.Remove", "Pages.Dashboard.Messages.DeletePortlet");
+        return confirmed;
+    }
 }

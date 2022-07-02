@@ -17,6 +17,7 @@
     "Resume": "Resume Processing",
     "Add": "Add",
     "Edit": "Edit",
+    "Remove":"Remove",
     "Duplicate":"Duplicate",
     "Update": "Update",
     "Refresh": "Refresh",
@@ -182,7 +183,8 @@
       "Messages": {
         "CancelMessage": "Are you sure you want to cancel the worker for {RelativeFile}?",
         "Waiting": "Waiting for a file to process",
-        "DeleteDashboard":"Are you sure you want to delete the current dashboard?\n\nThis cannot be undone."
+        "DeleteDashboard":"Are you sure you want to delete the current dashboard?\n\nThis cannot be undone.",
+        "DeletePortlet": "Are you sure you want to remove this portlet?"
       },
       "Fields": {
         "Log": "Log",
@@ -325,8 +327,21 @@
     },
     "Portlet":{
       "Title":"Portlet",
-      "Fields":{
-        
+      "Fields": {
+        "CpuUsage": "CPU Usage",
+        "MemoryUsage": "Memory Usage",
+        "TempStorage": "Temporary Storage",
+        "LogStorage": "Log Storage",
+        "FilesUpcoming":"Upcoming",
+        "FilesRecentlyFinished":"Recently Finished",
+        "LibraryProcessingTimes": "Library Processing Times [Seconds Per Megabyte]",
+        "ProcessingTimes": "Processing Times",
+        "Codecs": "Codecs",
+        "AudioCodecs": "Audio Codecs",
+        "VideoCodecs": "Video Codecs",
+        "VideoContainers": "Video Container",
+        "VideoResolution": "Video Resolution",
+        "OpenDbConnections": "Open Database Connections"
       }
     },
     "ProcessingNode": {

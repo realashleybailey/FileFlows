@@ -23,4 +23,6 @@ public partial class InputPortlet: Input<bool>
             else base.Value = value;
         }
     }
+
+    private void ToggleValue() => this.Value = !this.Value;
 }

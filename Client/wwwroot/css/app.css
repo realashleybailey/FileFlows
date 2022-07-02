@@ -721,9 +721,22 @@ hr {
   color: var(--color);
   padding: 0.25rem 0.5rem;
 }
-.portlet .title i {
+.portlet .title i:not(.fa-trash) {
   color: var(--accent);
   margin-right: 0.5rem;
+}
+.portlet .title .fa-trash {
+  display: none;
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  cursor: pointer;
+}
+.portlet .title .fa-trash:hover {
+  color: var(--accent);
+}
+.portlet .title:hover .fa-trash {
+  display: unset;
 }
 .portlet .content {
   padding: 0;
@@ -1001,6 +1014,22 @@ hr {
 }
 .dashboard-selector button + button {
   right: 2rem;
+}
+
+.PagesPortlet .fields {
+  display: grid !important;
+  grid-gap: 0.5rem;
+  grid-auto-rows: 1fr;
+  overflow: hidden;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: min-content;
+  height: unset !important;
+}
+.PagesPortlet .row {
+  flex-direction: column !important;
+}
+.PagesPortlet .empty {
+  display: none;
 }
 
 /*# sourceMappingURL=app.css.map */

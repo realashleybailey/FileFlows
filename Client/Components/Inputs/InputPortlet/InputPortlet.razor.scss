@@ -1,0 +1,77 @@
+.input-portlet {
+  cursor:pointer;
+  overflow:hidden;
+}
+.title {
+  display:flex;
+  flex-direction: row;
+  .flow-switch-wrapper {   
+  }
+  label {
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow:1;
+  }
+}
+
+.preview {
+  position:relative;;
+}
+
+.preview.BoxPlot {
+  transform: scale(1.5, 2.5);
+  left: 1.5rem;
+  top: 1.5rem;
+}
+.preview.HeatMap {
+  top: -1rem;
+  transform: scale(1.35);
+}
+.preview.PieChart {
+  transform: scale(1.65);
+  top: 2rem;
+  left: 2rem;
+}
+.preview.Processing {
+  top: -1rem;
+  transform: scale(1.2);
+  left: 5rem;
+}
+.preview.TreeMap {
+  transform: scale(1.25);
+  left: 3rem;
+  top: -1rem;
+}
+
+.preview.TimeSeries {
+  ::deep {
+    svg {
+      height: 6rem;
+    }
+    svg + svg {
+      height: 2.5rem;
+      transform: scale(1.55, 1);
+      left: 3rem;
+      position: relative;
+    }
+  }
+}
+
+.preview.LibraryFileTable {
+  ::deep {
+    table {
+      font-size:0.6rem;
+      width:100%;
+      .flow-bar {
+        height: 0.5rem;
+      }
+      tbody {
+        tr {
+          border-top: solid 1px var(--border-color);
+        }
+      }
+    }
+  }
+}

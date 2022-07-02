@@ -373,10 +373,23 @@ input[type=file]{
         height: 2.5rem;
         color: var(--color);
         padding: 0.25rem 0.5rem;
-        i {
+        i:not(.fa-trash) {
             color:var(--accent);
             margin-right: 0.5rem;
         }
+        .fa-trash {
+            display:none;
+            position: absolute;
+            right: 1rem;
+            top: 0.5rem;
+            cursor: pointer;
+            &:hover {
+                color:var(--accent);
+            }
+        }
+        &:hover .fa-trash {
+            display:unset;
+        }        
     }
     .content {
         padding:0;
@@ -672,5 +685,23 @@ input[type=file]{
         + button {
             right:2rem;
         }
+    }
+}
+
+.PagesPortlet {
+    .fields {
+        display: grid !important;
+        grid-gap: 0.5rem;
+        grid-auto-rows: 1fr;
+        overflow:hidden;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: min-content;
+        height:unset !important;;
+    }
+    .row {
+        flex-direction: column !important;
+    }
+    .empty {
+        display:none;
     }
 }

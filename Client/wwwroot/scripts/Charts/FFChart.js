@@ -27,6 +27,18 @@ export function initDashboard(portlets, csharp){
         title.appendChild(spanTitle);
         spanTitle.innerText = p.name;
         
+        let eleRemove = document.createElement('i');
+        title.appendChild(eleRemove);
+        eleRemove.className = 'fas fa-trash';
+        eleRemove.setAttribute('title', 'Remove');
+        eleRemove.addEventListener('click', (event) => {
+            event.preventDefault();
+            csharp.invokeMethodAsync("RemovePortlet", p.uid).then((success) => {
+                if(success)
+                    window.ffGrid.removeWidget(div);
+            });
+        });        
+        
         let content = document.createElement('div');
         content.className = 'content';
         div.appendChild(content);

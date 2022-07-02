@@ -78,8 +78,4 @@ public partial class Dashboard : ComponentBase
     private bool DashboardDeletable => ActiveDashboardUid != Guid.Empty &&
                                       ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid;
 
-    private async Task AddPortletDialog()
-    {
-        
-    }
 }

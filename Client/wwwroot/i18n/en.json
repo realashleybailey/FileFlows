@@ -323,6 +323,12 @@
         "Enabled": "Enabled"
       }
     },
+    "Portlet":{
+      "Title":"Portlet",
+      "Fields":{
+        
+      }
+    },
     "ProcessingNode": {
       "Title": "Node",
       "Fields": {

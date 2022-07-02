@@ -2,6 +2,7 @@
 @using FileFlows.Plugin
 @using FileFlows.Shared
 @using FileFlows.Client.Helpers
+@using FileFlows.Shared.Portlets
 @{
     bool isScript = Regex.IsMatch(TypeName, @"^Flow\.Parts\.([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})");
 }
@@ -178,6 +179,12 @@
                 var oValue = GetValue<List<ExecutedNode>>(field.Name);
                 var log = GetParameter<string>(field, nameof(InputExecutedNodes.Log));
                 <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel Log=@log />
+            }
+            break;
+        case FormInputType.Portlet:
+            {
+                var pType = GetParameter<PortletType>(field, nameof(InputPortlet.Type));
+                <InputPortlet Field=@field Label="@label"  HideLabel=@hideLabel Type=@pType />
             }
             break;
         case FormInputType.Table:

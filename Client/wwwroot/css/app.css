@@ -955,6 +955,13 @@ hr {
   top: 2px;
   margin-right: 0.5rem;
 }
+.dashboard-selector * {
+  border-radius: 0;
+  background-color: var(--base);
+  color: var(--color);
+  border-color: black !important;
+  outline: none !important;
+}
 .dashboard-selector::before {
   display: inline-block;
   font-style: normal;
@@ -988,6 +995,9 @@ hr {
   position: absolute;
   right: 0;
   height: 2rem !important;
+}
+.dashboard-selector button:disabled i {
+  color: rgba(var(--color-rgb), 0.35) !important;
 }
 .dashboard-selector button + button {
   right: 2rem;

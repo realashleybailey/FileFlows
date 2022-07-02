@@ -1,0 +1,17 @@
+@namespace FileFlows.Client.Components.Inputs
+@using FileFlows.Client.Components.Inputs.InputPortletPreviews
+@using FileFlows.Shared.Portlets
+@inherits Input<bool>
+
+<InputWrapper Input="@this">
+    <div class="flow-switch-wrapper">
+        <FlowSwitch @bind-Value="@Value" />        
+        
+        @switch (Type)
+        {
+            case PortletType.TimeSeries:
+                <PreviewTimeSeries />
+                break;
+        }
+        </div>
+</InputWrapper>

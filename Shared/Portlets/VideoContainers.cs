@@ -10,7 +10,7 @@ public class VideoContainers:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("eca4b7ed-97bd-4947-bd30-9307abba7900");
+    public static readonly Guid PD_UID = new ("eca4b7ed-97bd-4947-bd30-9307abba7900");
     
     /// <summary>
     /// Gets the UID 

@@ -112,6 +112,13 @@
     Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
+        case FormInputType.Portlet:
+            {
+                var value = GetValue<bool>(field.Name);
+                var pType = GetParameter<PortletType>(field, nameof(InputPortlet.Type));
+                <InputPortlet Field=@field Label="@label"  HideLabel=@hideLabel Type=@pType Value=@value ValueChanged="@(x => UpdateValue(field, x))" />
+            }
+            break;
         case FormInputType.StringArray:
             {
                 var value = GetValue<string[]>(field.Name, new string[] { });
@@ -179,12 +186,6 @@
                 var oValue = GetValue<List<ExecutedNode>>(field.Name);
                 var log = GetParameter<string>(field, nameof(InputExecutedNodes.Log));
                 <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel Log=@log />
-            }
-            break;
-        case FormInputType.Portlet:
-            {
-                var pType = GetParameter<PortletType>(field, nameof(InputPortlet.Type));
-                <InputPortlet Field=@field Label="@label"  HideLabel=@hideLabel Type=@pType />
             }
             break;
         case FormInputType.Table:

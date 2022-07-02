@@ -10,7 +10,7 @@ public class TempStorage:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("40f8b3d8-e267-45f1-855f-a4ad9b13fac1");
+    public static readonly Guid PD_UID = new ("40f8b3d8-e267-45f1-855f-a4ad9b13fac1");
     
     /// <summary>
     /// Gets the UID 

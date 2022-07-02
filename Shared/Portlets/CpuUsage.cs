@@ -10,8 +10,8 @@ public class CpuUsage:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("1abd867e-fe34-4832-bb59-1236c3960855");
-    
+    public static readonly Guid PD_UID = new ("1abd867e-fe34-4832-bb59-1236c3960855");
+
     /// <summary>
     /// Gets the UID 
     /// </summary>

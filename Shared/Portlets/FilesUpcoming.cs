@@ -10,7 +10,7 @@ public class FilesUpcoming:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("1a545039-e37f-43a7-a3db-2b0640d83905");
+    public static readonly Guid PD_UID = new ("1a545039-e37f-43a7-a3db-2b0640d83905");
     
     /// <summary>
     /// Gets the UID 

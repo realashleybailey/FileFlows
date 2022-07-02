@@ -10,7 +10,7 @@ public class MemoryUsage:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("8badf12b-0881-46da-a5f1-8cc7e0c64d5d");
+    public static readonly Guid PD_UID = new ("8badf12b-0881-46da-a5f1-8cc7e0c64d5d");
     
     /// <summary>
     /// Gets the UID 

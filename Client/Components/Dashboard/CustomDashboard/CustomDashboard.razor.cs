@@ -15,7 +15,7 @@ public partial class CustomDashboard : IDisposable
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] Editor Editor { get; set; }
     [CascadingParameter] private Pages.Dashboard Dashboard { get; set; }
-
+    
     private Guid _ActiveDashboardUid;
 
     [Parameter]
@@ -39,6 +39,7 @@ public partial class CustomDashboard : IDisposable
     protected override async Task OnInitializedAsync()
     {
         jsCharts = await jSRuntime.InvokeAsync<IJSObjectReference>("import", $"./scripts/Charts/FFChart.js");
+        Dashboard.AddPortletEvent = (sender, args) => this.AddPortletDialog();
     }
     
     private async Task LoadDashboard()
@@ -169,6 +170,8 @@ libpostproc    55.  3.100 / 55.  3.100"
     public async Task<bool> RemovePortlet(Guid portletUid)
     {
         bool confirmed = await Confirm.Show("Labels.Remove", "Pages.Dashboard.Messages.DeletePortlet");
+        if (confirmed)
+            this.Portlets.RemoveAll(x => x.Uid == portletUid);
         return confirmed;
     }
 }

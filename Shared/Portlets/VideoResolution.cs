@@ -10,7 +10,7 @@ public class VideoResolution:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("af4a5687-18f5-406b-aa96-abb45912f289");
+    public static readonly Guid PD_UID = new ("af4a5687-18f5-406b-aa96-abb45912f289");
     
     /// <summary>
     /// Gets the UID 

@@ -10,7 +10,7 @@ public class Codecs:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("d7f212b6-29eb-4912-b7b5-0efe1d377164");
+    public static readonly Guid PD_UID = new ("d7f212b6-29eb-4912-b7b5-0efe1d377164");
     
     /// <summary>
     /// Gets the UID 

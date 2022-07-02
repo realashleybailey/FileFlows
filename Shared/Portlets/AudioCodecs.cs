@@ -10,7 +10,7 @@ public class AudioCodecs:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new("51dd33b4-7dcd-4123-8d8b-ecead198ba36");
+    public static readonly Guid PD_UID = new("51dd33b4-7dcd-4123-8d8b-ecead198ba36");
     
     /// <summary>
     /// Gets the UID 

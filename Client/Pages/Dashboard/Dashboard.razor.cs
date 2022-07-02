@@ -13,6 +13,7 @@ public partial class Dashboard : ComponentBase
     [Inject] public IJSRuntime jSRuntime { get; set; }
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] Editor Editor { get; set; }
+    public EventHandler AddPortletEvent { get; set; }
 
     private string lblAddPortlet;
     
@@ -77,5 +78,7 @@ public partial class Dashboard : ComponentBase
 
     private bool DashboardDeletable => ActiveDashboardUid != Guid.Empty &&
                                       ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid;
+
+    private void AddPortlet() => AddPortletEvent?.Invoke(this, new EventArgs());
 
 }

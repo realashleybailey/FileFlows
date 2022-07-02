@@ -2,6 +2,7 @@ using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using FileFlows.Shared;
+using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Components.Dialogs;
 
@@ -10,6 +11,8 @@ namespace FileFlows.Client.Components.Dialogs;
 /// </summary>
 public partial class Confirm : ComponentBase
 {
+    [Inject] public IJSRuntime jsRuntime { get; set; }
+    
     private string lblYes, lblNo;
     private string Message, Title, SwitchMessage;
     TaskCompletionSource<bool> ShowTask;
@@ -17,9 +20,12 @@ public partial class Confirm : ComponentBase
     private bool ShowSwitch;
     private bool SwitchState;
 
+    private string btnYesUid; 
+
     private static Confirm Instance { get; set; }
 
     private bool Visible { get; set; }
+    private bool focused = false;
 
     protected override void OnInitialized()
     {
@@ -60,6 +66,8 @@ public partial class Confirm : ComponentBase
 
     private Task<bool> ShowInstance(string title, string message)
     {
+        this.btnYesUid = Guid.NewGuid().ToString();
+        this.focused = false;
         this.Title = Translater.TranslateIfNeeded(title?.EmptyAsNull() ?? "Labels.Confirm");
         this.Message = Translater.TranslateIfNeeded(message ?? "");
         this.ShowSwitch = false;
@@ -71,6 +79,8 @@ public partial class Confirm : ComponentBase
     }
     private Task<(bool, bool)> ShowInstance(string title, string message, string switchMessage, bool switchState)
     {
+        this.btnYesUid = Guid.NewGuid().ToString();
+        this.focused = false;
         this.Title = Translater.TranslateIfNeeded(title?.EmptyAsNull() ?? "Labels.Confirm");
         this.Message = Translater.TranslateIfNeeded(message ?? "");
         this.SwitchMessage = Translater.TranslateIfNeeded(switchMessage ?? "");
@@ -81,6 +91,15 @@ public partial class Confirm : ComponentBase
 
         Instance.ShowSwitchTask  = new TaskCompletionSource<(bool, bool)>();
         return Instance.ShowSwitchTask.Task;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Visible && focused == false)
+        {
+            focused = true;
+            await jsRuntime.InvokeVoidAsync("eval", $"document.getElementById('{this.btnYesUid}').focus()");
+        }
     }
 
     private async void Yes()

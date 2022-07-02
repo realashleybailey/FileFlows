@@ -10,7 +10,7 @@ public class LogStorage:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("e7324e06-59fa-4923-8068-effcb9acba91");
+    public static readonly Guid PD_UID = new ("e7324e06-59fa-4923-8068-effcb9acba91");
     
     /// <summary>
     /// Gets the UID 

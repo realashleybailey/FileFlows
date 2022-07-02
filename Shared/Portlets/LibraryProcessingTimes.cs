@@ -10,7 +10,7 @@ public class LibraryProcessingTimes:PortletDefinition
     /// <summary>
     /// The Portlet Definition UID
     /// </summary>
-    internal static readonly Guid PD_UID = new ("356b405b-5fc2-44e6-84dd-7c04c0894c9c");
+    public static readonly Guid PD_UID = new ("356b405b-5fc2-44e6-84dd-7c04c0894c9c");
     
     /// <summary>
     /// Gets the UID 

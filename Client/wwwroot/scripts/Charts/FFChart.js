@@ -7,60 +7,81 @@ export function initDashboard(portlets, csharp){
     
     for(let p of portlets)
     {
-        let div = document.createElement("div");
-        div.setAttribute('id', p.uid);
-        div.className = 'grid-stack-item portlet';
-        div.setAttribute('gs-w', p.width);
-        div.setAttribute('gs-h', p.height);
-        div.setAttribute('gs-x', p.x);
-        div.setAttribute('gs-y', p.y);
-        if(p.type === 1)
-            div.setAttribute('gs-no-resize', 1);
-        
-        let title = document.createElement('div');
-        div.appendChild(title);
-        title.className = 'title draghandle';
-        let icon = document.createElement('i');
-        title.appendChild(icon);
-        icon.className = p.icon;
-        let spanTitle = document.createElement('span');
-        title.appendChild(spanTitle);
-        spanTitle.innerText = p.name;
-        
-        let eleRemove = document.createElement('i');
-        title.appendChild(eleRemove);
-        eleRemove.className = 'fas fa-trash';
-        eleRemove.setAttribute('title', 'Remove');
-        eleRemove.addEventListener('click', (event) => {
-            event.preventDefault();
-            csharp.invokeMethodAsync("RemovePortlet", p.uid).then((success) => {
-                if(success)
-                    window.ffGrid.removeWidget(div);
-            });
-        });        
-        
-        let content = document.createElement('div');
-        content.className = 'content';
-        div.appendChild(content);
-        if(p.type === 105){
-            let top = document.createElement('div');
-            top.setAttribute('id', p.uid + '-top');
-            content.appendChild(top);
-
-            let bottom = document.createElement('div');
-            bottom.setAttribute('id', p.uid + '-bottom');
-            content.appendChild(bottom);
-        }
-        else
-        {
-            let chart = document.createElement('div');
-            chart.setAttribute('id', p.uid + '-chart');
-            content.appendChild(chart);            
-        }
-        dashboard.appendChild(div);
-        newChart(p.type, p.uid, { url: p.url, flags: p.flags, csharp: csharp});
+        addPortlet(dashboard, p, csharp);
     }
     intDashboardActual('default');
+}
+
+export function addPortlets(portlets, csharp){
+    let dashboard = document.querySelector('.dashboard.grid-stack');
+    let grid = window.ffGrid;
+    grid.batchUpdate();
+    for(let p of portlets)
+    {
+        console.log('adding portlet', p);
+        let div = addPortlet(dashboard, p, csharp);
+        grid.addWidget(div, { autoPosition: true});
+        grid.update(div, { autoPosition: false});
+    }
+    grid.commit();
+}
+
+function addPortlet(dashboard, p, csharp){
+
+    let div = document.createElement("div");
+    div.setAttribute('id', p.uid);
+    div.className = 'grid-stack-item portlet';
+    div.setAttribute('gs-w', p.width);
+    div.setAttribute('gs-h', p.height);
+    div.setAttribute('gs-x', p.x);
+    div.setAttribute('gs-y', p.y);
+        
+    if(p.type === 1)
+        div.setAttribute('gs-no-resize', 1);
+
+    let title = document.createElement('div');
+    div.appendChild(title);
+    title.className = 'title draghandle';
+    let icon = document.createElement('i');
+    title.appendChild(icon);
+    icon.className = p.icon;
+    let spanTitle = document.createElement('span');
+    title.appendChild(spanTitle);
+    spanTitle.innerText = p.name;
+
+    let eleRemove = document.createElement('i');
+    title.appendChild(eleRemove);
+    eleRemove.className = 'fas fa-trash';
+    eleRemove.setAttribute('title', 'Remove');
+    eleRemove.addEventListener('click', (event) => {
+        event.preventDefault();
+        csharp.invokeMethodAsync("RemovePortlet", p.uid).then((success) => {
+            if(success)
+                window.ffGrid.removeWidget(div);
+        });
+    });
+
+    let content = document.createElement('div');
+    content.className = 'content';
+    div.appendChild(content);
+    if(p.type === 105){
+        let top = document.createElement('div');
+        top.setAttribute('id', p.uid + '-top');
+        content.appendChild(top);
+
+        let bottom = document.createElement('div');
+        bottom.setAttribute('id', p.uid + '-bottom');
+        content.appendChild(bottom);
+    }
+    else
+    {
+        let chart = document.createElement('div');
+        chart.setAttribute('id', p.uid + '-chart');
+        content.appendChild(chart);
+    }
+    dashboard.appendChild(div);
+    newChart(p.type, p.uid, { url: p.url, flags: p.flags, csharp: csharp});
+    return div;
 }
 
 

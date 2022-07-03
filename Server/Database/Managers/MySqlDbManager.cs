@@ -406,7 +406,6 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
             results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
                 string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
         }
-        Logger.Instance.ILog("Time taken to search log: " + DateTime.Now.Subtract(dt) + "\n" + sql);
 
         // need to reverse them as they're ordered newest at top
         results.Reverse();

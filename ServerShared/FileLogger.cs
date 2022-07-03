@@ -34,8 +34,11 @@ public class FileLogger : ILogWriter
         this.LoggingPath = loggingPath;
         this.LogPrefix = logPrefix;
         this.NewFile = true;
-        Shared.Logger.Instance.RegisterWriter(this);
-        Instance = this;
+        if (logPrefix != "FileFlowsDB")
+        {
+            Shared.Logger.Instance.RegisterWriter(this);
+            Instance = this;
+        }
     }
     
     /// <summary>

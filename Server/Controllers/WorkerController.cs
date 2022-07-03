@@ -200,7 +200,7 @@ public class WorkerController : Controller
             Uid = x.Uid,
             WorkingFile = x.WorkingFile
         }).ToList();
-        #if(DEBUG)
+        #if(DEBUG && false)
         if (results.Any() != true)
         {
             results = Enumerable.Range(1, 1).Select(x => new FlowExecutorInfo

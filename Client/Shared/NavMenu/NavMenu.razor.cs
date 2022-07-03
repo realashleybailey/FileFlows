@@ -81,8 +81,7 @@ namespace FileFlows.Client.Shared
                 Icon = "fas fa-question-circle",
                 Items = new List<NavMenuItem>
                 {
-                    new NavMenuItem("Pages.Log.Title", "fas fa-file-alt", "log"),
-                    App.Instance.FileFlowsSystem.Licensed ? new NavMenuItem("Pages.System.Title", "fas fa-microchip", "system") : null
+                    new NavMenuItem("Pages.Log.Title", "fas fa-file-alt", "log")
                 }
             });
 

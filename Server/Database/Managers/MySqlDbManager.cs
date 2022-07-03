@@ -51,9 +51,7 @@ public class MySqlDbManager: DbManager
 
     protected override NPoco.Database GetDbInstance()
     {
-        return new NPoco.Database(ConnectionString + ";maximumpoolsize=50;",
-            null,
-            MySqlConnector.MySqlConnectorFactory.Instance);
+        return new FlowDatabase(ConnectionString + ";maximumpoolsize=50;");
     }
     
     private string GetDatabaseName(string connectionString)

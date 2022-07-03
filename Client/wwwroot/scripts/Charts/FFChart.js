@@ -170,7 +170,7 @@ function addPortlet(dashboard, p, csharp){
     return div;
 }
 
-export function newChart(type, uid, args){
+function newChart(type, uid, args){
     if(!window.FlowCharts)
         window.FlowCharts = {};
     args.type = type;

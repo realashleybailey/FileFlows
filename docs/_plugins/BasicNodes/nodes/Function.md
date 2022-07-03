@@ -42,6 +42,13 @@ The "Log" object lets you log messages to the flow log
    Logger.DLog('an debug log message');
 ```
 
+## Sleep
+Allows you to "Sleep" for a specified amount of milliseconds
+```js
+// Sleep for 10 seconds (10,000 milliseconds)
+Sleep(10_000);
+```
+
 ## Flow object
 The "Flow" object lets you perform actions on the flow, it exposes helper methods to the code.
 ```js
@@ -69,7 +76,7 @@ The "Flow" object lets you perform actions on the flow, it exposes helper method
    Flow.ResetWorkingFile(); 
 
    // Sets the current working file to the file passed in
-   // dont delete is a boolean that if true will not delete the current working file
+   // don't delete is a boolean that if true will not delete the current working file
    // note: if the current working file is the original file, it will NEVER be deleted
    Flow.SetWorkingFile(filename, dontDelete);
 

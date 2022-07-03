@@ -9,7 +9,11 @@ namespace FileFlows.Server.Middleware;
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    private FileLogger RequestLogger;
+    
+    /// <summary>
+    /// Gets the logger for the request logger
+    /// </summary>
+    public static FileLogger RequestLogger { get; private set; }
 
     /// <summary>
     /// Constructs a instance of the exception middleware
@@ -38,7 +42,7 @@ public class LoggingMiddleware
                 var settings = new SettingsController().Get().Result;
                 if (settings.LogEveryRequest)
                 {
-                    RequestLogger.Log(LogType.Info,
+                    RequestLogger.Log((LogType) 999,
                         $"REQUEST [{context.Request?.Method}] [{context.Response?.StatusCode}]: {context.Request?.Path.Value}");
                 }
             }

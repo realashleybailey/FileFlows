@@ -1,7 +1,6 @@
 using System.Data;
 using System.Data.Common;
 using FileFlows.Plugin;
-using Microsoft.Data.SqlClient;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -10,7 +9,10 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class FlowDatabase:NPoco.Database
 {
-    private static FileLogger Logger;
+    /// <summary>
+    /// Gets the logger for the database
+    /// </summary>
+    public static FileLogger Logger { get;private set; }
 
     static FlowDatabase()
     {
@@ -41,7 +43,7 @@ public class FlowDatabase:NPoco.Database
         }
 
         string sql = GetCommandText(cmd);
-        Logger.Log(LogType.Debug, $"Executing [{hashCode.ToString("00000000")}]: " + sql);
+        Logger.Log((LogType) 999, $"Executing [{hashCode.ToString("00000000")}]: " + sql);
         
     }
 
@@ -59,8 +61,7 @@ public class FlowDatabase:NPoco.Database
 
         var time = DateTime.Now.Subtract(started);
         string sql = GetCommandText(cmd);
-        Logger.Log(time.TotalSeconds > 10 ? LogType.Error : 
-            time.TotalSeconds > 2 ? LogType.Warning : LogType.Debug, $"Executed  [{hashCode.ToString("00000000")}] [{time}]: " + sql);
+        Logger.Log((LogType) 999, $"Executed  [{hashCode.ToString("00000000")}] [{time}]: " + sql);
     }
 
     private string GetCommandText(DbCommand cmd)
@@ -73,7 +74,7 @@ public class FlowDatabase:NPoco.Database
         foreach (DbParameter param in cmd.Parameters)
         {
             ++count;
-            if (param.DbType == DbType.String)
+            if (param.DbType == DbType.String || param.DbType == DbType.Guid)
                 sql = sql.Replace("@" + count, "\"" + param.Value.ToString().Replace("\"", "\"\"") + "\"");
             else
                 sql = sql.Replace("@" + count, param.Value.ToString());

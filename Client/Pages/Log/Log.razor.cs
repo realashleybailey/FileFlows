@@ -25,10 +25,12 @@ public partial class Log : ComponentBase
 
     private Dictionary<Guid, string> Nodes = new();
 
+    private List<ListOption> LoggingSources = new ();
+
     private readonly LogSearchModel SearchModel = new()
     {
         Message = string.Empty,
-        ClientUid = null,
+        Source = string.Empty,
         Type = LogType.Info,
         TypeIncludeHigherSeverity = true
     };
@@ -38,11 +40,8 @@ public partial class Log : ComponentBase
     {
         SearchModel.FromDate = DateRangeHelper.LiveStart;
         SearchModel.ToDate = DateRangeHelper.LiveEnd;
-        
-        var nodeResult = await HttpHelper.Get<List<ProcessingNode>>("/api/node");
-        if (nodeResult.Success && nodeResult.Data != null)
-            Nodes = nodeResult.Data.Where(x => x.Uid != new Guid("bf47da28-051e-452e-ad21-c6a3f477fea9")).ToDictionary(x => x.Uid,
-                x => x.Name);
+
+        LoggingSources = (await HttpHelper.Get<List<ListOption>>("/api/log/log-sources")).Data;
 
         this.lblSearch = Translater.Instant("Labels.Search");
         this.lblSearching = Translater.Instant("Labels.Searching");

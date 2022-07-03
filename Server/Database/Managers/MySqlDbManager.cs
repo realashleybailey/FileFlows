@@ -383,7 +383,11 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the messages found in the log</returns>
     public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
     {
-        string clientUid = filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString();
+        if (filter.Source == "DATABASE" || filter.Source == "HTTP")
+        {
+            // just read those file.. er no
+        }
+        string clientUid = filter.Source.EmptyAsNull() ?? Guid.Empty.ToString();
         string from = filter.FromDate.ToString("yyyy-MM-dd HH:mm:ss");
         string to = filter.ToDate.ToString("yyyy-MM-dd HH:mm:ss");
         string sql = $"select * from {nameof(DbLogMessage)} " +

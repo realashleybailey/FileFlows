@@ -1,6 +1,8 @@
 ﻿using FileFlows.Plugin;
 using FileFlows.Server.Database;
+using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
+using FileFlows.Server.Middleware;
 using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Models;
 using FileFlows.Shared.Helpers;
@@ -31,6 +33,28 @@ public class LogController : Controller
     }
 
     /// <summary>
+    /// Get the available log sources
+    /// </summary>
+    /// <returns>the available log sources</returns>
+    [HttpGet("log-sources")]
+    public async Task<List<ListOption>>  GetLogSources()
+    {
+        List<ListOption> sources = new();
+        sources.Add(new() { Value = "", Label = "Server" });
+        sources.Add(new() { Value = "DATABASE", Label = "Database" });
+
+        var settings = await new SettingsController().Get();
+        if(settings.LogEveryRequest)
+            sources.Add(new() { Value = "HTTP", Label = "HTTP Requests" });
+
+        var nodes = await new NodeController().GetAll();
+        foreach (var node in nodes)
+            sources.Add(new() { Value = node.Uid.ToString(), Label = node.Name });
+        
+        return sources;
+    }
+
+    /// <summary>
     /// Searches the log using the given filter
     /// </summary>
     /// <param name="filter">the search filter</param>
@@ -40,6 +64,12 @@ public class LogController : Controller
     {
         if (DbHelper.UseMemoryCache)
             return "Not using external database, cannot search";
+
+        if (filter.Source == "HTTP")
+            return LogToHtml.Convert(LoggingMiddleware.RequestLogger.GetTail(1000));
+        if (filter.Source == "DATABASE")
+            return LogToHtml.Convert(FlowDatabase.Logger.GetTail(1000));
+        
         var messages = await DbHelper.SearchLog(filter);
         string log = string.Join("\n", messages.Select(x =>
         {

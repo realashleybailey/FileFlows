@@ -14,9 +14,9 @@ public class LogSearchModel
     public string Message { get; set; }
 
     /// <summary>
-    /// Gets or sets the client UID to search for
+    /// Gets or sets the log source
     /// </summary>
-    public Guid? ClientUid { get; set; }
+    public string Source { get; set; }
 
     /// <summary>
     /// Gets or sets what log type to search for

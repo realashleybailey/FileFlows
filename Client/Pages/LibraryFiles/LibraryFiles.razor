@@ -228,15 +228,34 @@ To process these files, delete them and scan the library again.
                 if (start < 0)
                     start = 0;
                 int end = Math.Min(PageCount, start + maxPages);
+                if (end < PageCount - 1)
+                    --end; 
                 if (end == PageCount)
                     start = end - maxPages;
                 if (start < 0)
                     start = 0;
+                if (start > 0)
+                {
+                    if (PageIndex == start)
+                        --end;
+                    else
+                        ++start;
+                }
+            }
+            @if (start > 0)
+            {
+                <li @onclick=@(() => PageChange(0))>1</li>
+                <li class="spacer">...</li>
             }
             @for (int i = start; i < end; i++)
             {
                 int page = i;
                 <li class="@(page == PageIndex ? "current-page" : "")" @onclick=@(() => PageChange(page))>@(page + 1)</li>
+            }
+            @if (end < PageCount - 1)
+            {
+                <li class="spacer">...</li>
+                <li @onclick=@(() => PageChange(PageCount - 1))>@(PageCount)</li>
             }
         </ul>
     }

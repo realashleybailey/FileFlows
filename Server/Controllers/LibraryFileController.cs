@@ -187,12 +187,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         {
             var taskOverview = DbHelper.GetLibraryFileOverview();
             var taskFiles = DbHelper.GetLibraryFiles(status, start: pageSize * page, max: pageSize);
-            Task.WaitAll(taskOverview, taskFiles);
+            var taskLibraries = DbHelper.Select<Library>();
+            Task.WaitAll(taskOverview, taskFiles, taskLibraries);
 
             return new()
             {
                 Status = taskOverview.Result,
-                LibraryFiles = ConvertToListModel(taskFiles.Result, status)
+                LibraryFiles = ConvertToListModel(taskFiles.Result, status, taskLibraries.Result)
             };
         }
         
@@ -201,7 +202,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         
         var result = new LibraryFileDatalistModel();
         result.Status = GetStatusData(allData.all, allData.libraries);
-        result.LibraryFiles = ConvertToListModel(allData.results, status);
+        var libraries = await new LibraryController().GetAll();
+        result.LibraryFiles = ConvertToListModel(allData.results, status, libraries);
 
 
         if (pageSize > 0)
@@ -217,9 +219,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         return result;
     }
 
-    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status)
+    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status, IEnumerable<Library> libaries)
     {
         files = files.ToList();
+        var dictLibraries = libaries.ToDictionary(x => x.Uid, x => x);
         return files.Select(x =>
         {
             var item = new LibaryFileListModel
@@ -234,6 +237,12 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.Disabled)
             {
                 item.Date = x.DateCreated;
+            }
+            if (status == FileStatus.OnHold && x.Library != null && dictLibraries.ContainsKey(x.Library.Uid))
+            {
+                var lib = dictLibraries[x.Library.Uid];
+                var scheduledAt = x.DateCreated.AddMinutes(lib.HoldMinutes);
+                item.ProcessingTime = scheduledAt.Subtract(DateTime.Now);
             }
 
             if (status == FileStatus.Processing)
@@ -300,7 +309,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (status != null && status != FileStatus.MissingLibrary)
         {
             FileStatus searchStatus =
-                (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled)
+                (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled || status.Value == FileStatus.OnHold)
                     ? FileStatus.Unprocessed
                     : status.Value;
             libraryFiles = libraryFiles.Where(x => x.Status == searchStatus);
@@ -311,7 +320,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
 
 
-        if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule)
+        if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.OnHold)
         {
             var filteredResults = libraryFiles
                 .Where(x =>
@@ -324,6 +333,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                         return false;
                     if (TimeHelper.InSchedule(lib.Schedule) == false)
                         return status == FileStatus.OutOfSchedule;
+                    if (lib.HoldMinutes != 0 && x.DateCreated > DateTime.Now.AddMinutes(-lib.HoldMinutes))                    
+                        return status == FileStatus.OnHold;
                     return status == FileStatus.Unprocessed;
                 })
                 .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
@@ -466,6 +477,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 return FileStatus.Disabled;
             if (TimeHelper.InSchedule(lib.Schedule) == false)
                 return FileStatus.OutOfSchedule;
+            if (lib.HoldMinutes != 0 && x.DateCreated > DateTime.Now.AddMinutes(-lib.HoldMinutes))
+                return FileStatus.OnHold;
             return FileStatus.Unprocessed;
         });
 

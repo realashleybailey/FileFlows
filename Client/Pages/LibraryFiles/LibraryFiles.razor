@@ -57,6 +57,9 @@
                 case FileStatus.MissingLibrary:
                     <span class="icon fas fa-trash"></span>
                     break;
+                case FileStatus.OnHold:
+                    <span class="icon fas fa-hand-paper"></span>
+                    break;
 
             }
 
@@ -171,7 +174,7 @@ To process these files, delete them and scan the library again.
                 }
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing) == false)" MobileWidth="5rem">
+        <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.OnHold) == false)" MobileWidth="5rem">
             <Header>
                 Time
             </Header>

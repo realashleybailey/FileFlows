@@ -108,6 +108,7 @@
       "Sun": "Sun"
     },
     "FileStatus": {
+      "OnHold":"On Hold",
       "Disabled": "Disabled",
       "OutOfSchedule": "Out Of Schedule",
       "Processed": "Processed",
@@ -274,7 +275,10 @@
         "ProcessingOrder":"Processing Order",
         "ProcessingOrder-Help": "The order in which files will be processed by this library.",
         "SkipFileAccessTests":"Skip File Access Tests",
-        "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue."
+        "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue.",
+        "HoldMinutes":"Hold Minutes",
+        "HoldMinutes-Suffix":"minutes",
+        "HoldMinutes-Help":"Optionally hold any files found in this library for this amount of minutes before processing them.  Each file will be held for this amount of time."
       }
     },
     "LibraryFile": {

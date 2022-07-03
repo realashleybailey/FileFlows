@@ -126,6 +126,10 @@ public class LibraryFile : FileFlowObject
 public enum FileStatus
 {
     /// <summary>
+    /// The file is on hold by its libraries hold interval
+    /// </summary>
+    OnHold = -3,
+    /// <summary>
     /// The library is disabled and the file will not be processed
     /// </summary>
     Disabled = -2,

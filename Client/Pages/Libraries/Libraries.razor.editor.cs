@@ -168,6 +168,11 @@ public partial class Libraries : ListPage<Library>
         }
         fields.Add(new ElementField
         {
+            InputType = FormInputType.Int,
+            Name = nameof(library.HoldMinutes)
+        });
+        fields.Add(new ElementField
+        {
             InputType = FormInputType.Switch,
             Name = nameof(library.Enabled)
         });

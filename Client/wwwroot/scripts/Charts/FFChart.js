@@ -1141,7 +1141,7 @@ export class Processing extends FFChart
         if(this.disposed)
             return;
         super.getData();
-
+        
         this.timer = setTimeout(() => this.getData(), 5000);
     }
 
@@ -1150,10 +1150,20 @@ export class Processing extends FFChart
         if(json === this.existing)
             return;
         this.existing = json; // so we dont refresh if we don't have to
-        if(data?.length)
+        let title = 'FileFlows - Dashboard';
+        if(data?.length) {
             this.createRunners(data);
+            let first = data[0];
+            console.log('first', first);
+            if(first.CurrentPartPercent > 0)
+                title = 'FileFlows - ' + first.CurrentPartPercent.toFixed(1) + ' %';
+            else
+                title = 'FileFlows - ' + first.CurrentPartName;
+        }
         else
             this.createNoData();
+        
+        document.title = title;
 
         this.setSize(data?.length);
     }

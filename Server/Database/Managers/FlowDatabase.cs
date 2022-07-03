@@ -14,7 +14,7 @@ public class FlowDatabase:NPoco.Database
 
     static FlowDatabase()
     {
-        Logger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsDB");
+        Logger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsDB", register: false);
     }
     
     /// <summary>

@@ -29,12 +29,13 @@ public class FileLogger : ILogWriter
     /// </summary>
     /// <param name="loggingPath">The path where to save the log file to</param>
     /// <param name="logPrefix">The prefix to use for the log file name</param>
-    public FileLogger(string loggingPath, string logPrefix)
+    /// <param name="register">if this logger should be registered</param>
+    public FileLogger(string loggingPath, string logPrefix, bool register = true)
     {
         this.LoggingPath = loggingPath;
         this.LogPrefix = logPrefix;
         this.NewFile = true;
-        if (logPrefix != "FileFlowsDB")
+        if (register)
         {
             Shared.Logger.Instance.RegisterWriter(this);
             Instance = this;

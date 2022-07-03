@@ -91,10 +91,24 @@ public class LogController : Controller
     /// <summary>
     /// Downloads the full system log
     /// </summary>
+    /// <param name="source">the source to download from</param>
     /// <returns>a download result of the full system log</returns>
     [HttpGet("download")]
-    public IActionResult Download()
+    public IActionResult Download([FromQuery] string source)
     {
+        if (source == "DATABASE")
+        {
+            string filename = FlowDatabase.Logger.GetLogFilename();
+            byte[] content = System.IO.File.ReadAllBytes(filename);
+            return File(content, "application/octet-stream", new FileInfo(filename).Name);
+        }
+        if (source == "HTTP")
+        {
+            string filename = LoggingMiddleware.RequestLogger.GetLogFilename();
+            byte[] content = System.IO.File.ReadAllBytes(filename);
+            return File(content, "application/octet-stream", new FileInfo(filename).Name);
+        }
+        
         if (Logger.Instance.TryGetLogger(out FileLogger logger))
         {
             string filename = logger.GetLogFilename();

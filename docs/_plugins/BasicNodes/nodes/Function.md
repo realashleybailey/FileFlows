@@ -86,6 +86,9 @@ The "Flow" object lets you perform actions on the flow, it exposes helper method
    // the temporary path, property NOT a function
    Flow.TempPath
 
+   // the path of the library the file belongs to
+   Flow.LibraryPath
+
    // Get a toolpath from the toolname, the toolname is case insensitive
    Flow.GetToolPath(toolname);
 

@@ -972,6 +972,7 @@ export class LibraryFileTable extends FFChart
     recentlyFinished;
     timer;
     existing;
+    hasNoData;
     
     constructor(uid, args) {
         super(uid, args);
@@ -1151,7 +1152,13 @@ export class Processing extends FFChart
             return;
         this.existing = json; // so we dont refresh if we don't have to
         let title = 'FileFlows - Dashboard';
-        if(data?.length) {
+        if(data?.length)
+        {
+            if(this.hasNoData)
+            {
+                chartDiv.textContent = '';
+                this.hasNoData = false;
+            }
             this.createRunners(data);
             let first = data[0];
             console.log('first', first);
@@ -1174,6 +1181,7 @@ export class Processing extends FFChart
     }
 
     createNoData(data){
+        this.hasNoData = true;
         let chartDiv = document.getElementById(this.chartUid);
         chartDiv.textContent = '';
 

@@ -1,4 +1,4 @@
-namespace FileFlows.FlowRunner;
+namespace FileFlows.Server;
 
 using FileFlows.Plugin;
 using System.Dynamic;

@@ -25,7 +25,28 @@ https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/archive/1.10.0
 
 This is a long guide, go slowly and follow each step closely.
 
-### Step 3. FileFlows
+### Step 3. Turn off cgroups
+
+Edit the NVIDIA Container Runtime configuration file
+```
+sudo nano /etc/nvidia-container-runtime/config.toml
+```
+
+Uncomment or add the line
+```
+no-cgroups = false
+```
+Save the file
+
+Restart docker and test
+
+```
+sudo systemctl restart docker
+sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
+```
+
+
+### Step 4. FileFlows
 
 Next its time to get FileFlows working.  This requires the "nvidia" runtime for docker from step 2.
 

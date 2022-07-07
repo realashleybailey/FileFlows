@@ -1,4 +1,5 @@
-﻿using FileFlows.Client.Components.Inputs;
+﻿using System.ComponentModel;
+using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
 
 namespace FileFlows.Client.Pages;
@@ -14,9 +15,10 @@ public partial class Nodes : ListPage<ProcessingNode>
         node.Mappings ??= new();
         this.EditingItem = node;
 
+        var scripts = (await HttpHelper.Get<List<Script>>("/api/script")).Data ?? new List<Script>();
 
         var tabs = new Dictionary<string, List<ElementField>>();
-        tabs.Add("General", TabGeneral(node, isServerProcessingNode));
+        tabs.Add("General", TabGeneral(node, isServerProcessingNode, scripts));
         tabs.Add("Schedule", TabSchedule(node, isServerProcessingNode));
         if(isServerProcessingNode == false)
             tabs.Add("Mappings", TabMappings(node));
@@ -34,7 +36,7 @@ public partial class Nodes : ListPage<ProcessingNode>
         return false;
     }
 
-    private List<ElementField> TabGeneral(ProcessingNode node, bool isServerProcessingNode)
+    private List<ElementField> TabGeneral(ProcessingNode node, bool isServerProcessingNode, List<Script> scripts)
     {
         List<ElementField> fields = new List<ElementField>();
 
@@ -92,6 +94,26 @@ public partial class Nodes : ListPage<ProcessingNode>
                 new FileFlows.Shared.Validators.Required()
             }
         });
+
+        if (App.Instance.FileFlowsSystem.Licensed)
+        {
+            var scriptOptions = scripts.Select(x => new ListOption
+            {
+                Value = new ObjectReference { Name = x.Name, Uid = x.Uid, Type = x.GetType().FullName }, Label = x.Name
+            }).ToList();
+            scriptOptions.Insert(0, new ListOption() { Label = "Labels.None", Value = new ObjectReference()});
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Select,
+                Name = nameof(node.PreExecuteScript),
+                Parameters = new Dictionary<string, object>
+                {
+                    { "AllowClear", false},
+                    { "Options", scriptOptions }
+                }
+            });
+        }
+
         return fields;
     }
 

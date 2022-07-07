@@ -1,6 +1,10 @@
 ﻿using System.Threading;
+using FileFlows.FlowRunner;
+using FileFlows.Plugin;
+using FileFlows.Plugin.Models;
 using FileFlows.ServerShared;
 using FileFlows.ServerShared.Models;
+using FileFlows.ServerShared.ScriptExecution;
 using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Node.Workers;
@@ -112,6 +116,9 @@ public class FlowWorker : Worker
             return;
         }
 
+        var settingsService = SettingsService.Load();
+        var ffStatus = settingsService.GetFileFlowsStatus().Result;
+
         string nodeName = node?.Name == "FileFlowsServer" ? "Internal Processing Node" : (node?.Name ?? "Unknown");
 
         if (node?.Enabled != true)
@@ -155,6 +162,12 @@ public class FlowWorker : Worker
                 Logger.Instance?.ELog($"Temp Path does not exist on on node '{nodeName}', and failed to create it: {tempPath}");
                 return;
             }
+        }
+
+        if (ffStatus?.Licensed == true && node.PreExecuteScript != null && node.PreExecuteScript.Uid != Guid.Empty)
+        {
+            if (PreExecuteScriptTest(node) == false)
+                return;
         }
         
         var libFileService = LibraryFileService.Load();
@@ -274,6 +287,24 @@ public class FlowWorker : Worker
                 Trigger();
             }
         });
+    }
+
+    private bool PreExecuteScriptTest(ProcessingNode node)
+    {
+        var scriptService  = ScriptService.Load();
+        string code = scriptService.GetCode(node.PreExecuteScript.Uid).Result;
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            Logger.Instance.ELog("Failed to load pre-execute script code");
+            return false;
+        }
+        var scriptNode = new ScriptNode();
+        scriptNode.Code = code;
+        var output = scriptNode.Execute(new NodeParameters(Logger.Instance));
+        if (output == 1)
+            return true;
+        Logger.Instance.ELog("Output from pre-execute script not expected: " + output);
+        return false;
     }
 
 

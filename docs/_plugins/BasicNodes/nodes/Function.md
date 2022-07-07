@@ -161,7 +161,7 @@ Example showing using the Flow.Execute
     // execute the process and capture the result
     let process = Flow.Execute({
     	command: ffmpeg,
-      workingDirectory: '/media/my-working/directory'
+      workingDirectory: '/media/my-working/directory',
     	argumentList: [
     		'-i',
     		Variables.file.FullName,

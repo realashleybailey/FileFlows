@@ -36,6 +36,11 @@ public class ProcessingNode: FileFlowObject
     /// Gets or sets the FileFlows version of this node
     /// </summary>
     public string Version { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a script to execute before a runner can start
+    /// </summary>
+    public ObjectReference PreExecuteScript { get; set; }
 
     /// <summary>
     /// Gets or sets the number of flow runners this node can run simultaneously 

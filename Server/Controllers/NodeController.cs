@@ -101,6 +101,11 @@ public class NodeController : ControllerStore<ProcessingNode>
                 internalNode.Permissions = node.Permissions;
                 internalNode.AllLibraries = node.AllLibraries;
                 internalNode.MaxFileSizeMb = node.MaxFileSizeMb;
+                if (node.PreExecuteScript == null || node.PreExecuteScript.Uid == Guid.Empty)
+                    internalNode.PreExecuteScript = null;
+                else
+                    internalNode.PreExecuteScript = node.PreExecuteScript;
+                
                 internalNode.Libraries = node.Libraries;
                 await CheckLicensedNodes(internalNode.Uid, internalNode.Enabled);
                 return await Update(internalNode, checkDuplicateName: true);

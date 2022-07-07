@@ -13,6 +13,12 @@ public interface ISettingsService
     /// </summary>
     /// <returns>the system settings</returns>
     Task<Settings> Get();
+    
+    /// <summary>
+    /// Gets the file flows status
+    /// </summary>
+    /// <returns>the file flows status</returns>
+    Task<FileFlowsStatus> GetFileFlowsStatus();
 }
 
 /// <summary>
@@ -53,6 +59,22 @@ public class SettingsService : Service, ISettingsService
         catch (Exception ex)
         {
             Logger.Instance?.WLog("Failed to get settings: " + ex.Message);
+            return null;
+        }
+    }
+
+    public async Task<FileFlowsStatus> GetFileFlowsStatus()
+    {
+        try
+        {
+            var result = await HttpHelper.Get<FileFlowsStatus>($"{ServiceBaseUrl}/api/settings/fileflows-status");
+            if (result.Success == false)
+                throw new Exception("Failed to get FileFlows status: " + result.Body);
+            return result.Data;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance?.WLog("Failed to get FileFlows status: " + ex.Message);
             return null;
         }
     }

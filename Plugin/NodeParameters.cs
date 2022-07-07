@@ -147,6 +147,16 @@ public class NodeParameters
         this.Process = new ProcessHelper(logger, this.Fake);
     }
 
+    /// <summary>
+    /// Constructs a new basic node parameters with no file 
+    /// </summary>
+    /// <param name="logger">the logger used during execution</param>
+    public NodeParameters(ILogger logger)
+    {
+        this.Logger = logger;
+        this.Process = new ProcessHelper(logger, false);
+    }
+
 
     /// <summary>
     /// Gets the file size of a directory and all its files

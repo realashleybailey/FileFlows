@@ -34,3 +34,12 @@ The final part of the FFMPEG Builder is the "FFMPEG Builder: Executor" this is w
 If will not execute, output 2, if nothing has been detected as needing to be executed.   If will return an output of -1 if the execution fails and the flow will exit.
 
 
+### Variables
+
+| Variable | Description | Type | Example |
+| :---: | :---: | :---: | :---: |
+| NoNvidia | The disables NVIDIA hardware encoding/decoding | boolean | true |
+| NoQSV | The disables Intel Quicksync Video hardware encoding/decoding | boolean | true |
+| NoAMD | The disables AMD/AMF hardware encoding/decoding | boolean | true |
+| NoVAAPI | The disables VAAPI hardware encoding/decoding | boolean | true |
+

@@ -47,11 +47,10 @@ public class MySqlDbManager: DbManager
     {
         ConnectionString = connectionString;
     }
-    
 
     protected override NPoco.Database GetDbInstance()
     {
-        return new FlowDatabase(ConnectionString + ";maximumpoolsize=50;");
+        return new FlowDatabase(ConnectionString);
     }
     
     private string GetDatabaseName(string connectionString)
@@ -123,7 +122,7 @@ public class MySqlDbManager: DbManager
         List<string> existingColumns;
         using (var db = await GetDb())
         {
-            existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
+            existingColumns = db.Db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
         }
 
         var columns = new []{
@@ -161,7 +160,7 @@ public class MySqlDbManager: DbManager
         sql = "ALTER TABLE DbObject \n" + sql + ";";
         using (var db = await GetDb())
         {
-            db.Execute(sql);
+            db.Db.Execute(sql);
         }
     }
     
@@ -176,7 +175,7 @@ public class MySqlDbManager: DbManager
         using (var db = await GetDb())
         {
             string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
-            results = (await db.FetchAsync<LibraryStatus>(sql)).ToList();
+            results = (await db.Db.FetchAsync<LibraryStatus>(sql)).ToList();
         }
 
         return results;
@@ -197,10 +196,10 @@ public class MySqlDbManager: DbManager
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            db.OneTimeCommandTimeout = 120;
+            db.Db.OneTimeCommandTimeout = 120;
             try
             {
-                dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)",
+                dbObjects = await db.Db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)",
                     (int)status,
                     quarter, start, max, nodeUid);
             }
@@ -245,7 +244,7 @@ public class MySqlDbManager: DbManager
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            dbObjects = await db.FetchAsync<DbObject>(sql, from, to,
+            dbObjects = await db.Db.FetchAsync<DbObject>(sql, from, to,
                 string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%",
                 string.IsNullOrEmpty(filter.LibraryName) ? string.Empty : "%" + filter.LibraryName + "%");
         }
@@ -267,7 +266,7 @@ public class MySqlDbManager: DbManager
             return;
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync(sql);
+            await db.Db.ExecuteAsync(sql);
         }
     }
 
@@ -281,7 +280,7 @@ public class MySqlDbManager: DbManager
         List<LibraryFileProcessingTime> result;
         using (var db = await GetDb())
         {
-            result = await db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
+            result = await db.Db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
         JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
         js_OriginalSize as OriginalSize,
         timestampdiff(second, js_ProcessingStarted, js_ProcessingEnded) AS Seconds
@@ -308,7 +307,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
 
         using (var db = await GetDb())
         {
-            data = (await db.FetchAsync<(int day, int hour, int count)>(sql));
+            data = (await db.Db.FetchAsync<(int day, int hour, int count)>(sql));
         }
 
         var days = new List<Dictionary<int, int>>();
@@ -337,7 +336,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         List<ShrinkageData> results;
         using (var db = await GetDb())
         {
-            results = await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
+            results = await db.Db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
         }
         return results;
     }
@@ -352,7 +351,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     {
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync(
+            await db.Db.ExecuteAsync(
                 $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
                 $" values (@0, @1, @2)", clientUid, type, message);
         }
@@ -368,7 +367,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         {
             using (var db = await GetDb())
             {
-                await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
+                await db.Db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
             }
         }
         catch (Exception)
@@ -403,7 +402,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         DateTime dt = DateTime.Now;
         using (var db = await GetDb())
         {
-            results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
+            results = await db.Db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
                 string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
         }
 
@@ -422,7 +421,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.SingleAsync<DbObject>(
+            dbObject = await db.Db.SingleAsync<DbObject>(
                 "select * from DbObject where Type = @0 " +
                 "and JSON_EXTRACT(Data,'$.Type') = @1 " +
                 "and JSON_EXTRACT(Data,'$.Enabled') = 1 ",
@@ -467,7 +466,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         }
         using (var db = await GetDb())
         {
-            await db.InsertAsync(stat);
+            await db.Db.InsertAsync(stat);
         }
     }
 
@@ -480,7 +479,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         List<DbStatistic> stats;
         using (var db = await GetDb())
         {
-            stats = await db.FetchAsync<DbStatistic>("where Name = @0", name);
+            stats = await db.Db.FetchAsync<DbStatistic>("where Name = @0", name);
         }
 
         var results = new List<Statistic>();

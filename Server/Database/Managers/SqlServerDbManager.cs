@@ -95,8 +95,8 @@ public class SqlServerDbManager: DbManager
     public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
     {
         int quarter = TimeHelper.GetCurrentQuarter();
-        using var db = await GetDb();
-        return await db.FetchAsync<LibraryStatus>(
+        using var flowDb = await GetDb();
+        return await flowDb.Db.FetchAsync<LibraryStatus>(
             "exec GetLibraryFiles @@Status=0, @@IntervalIndex=@0, @@MaxItems=0, @@Start=0, @@NodeUid=null, @@Overview=1",
             quarter);
     }
@@ -112,8 +112,8 @@ public class SqlServerDbManager: DbManager
     /// <returns>an enumerable of library files</returns>
     public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid)
     {
-        using var db = await GetDb();
-        var dbObjects = await db.FetchAsync<DbObject>("exec GetLibraryFiles @@Status=@1, @@IntervalIndex=@1, @@MaxItems=@2, @@Start=@3, @@NodeUid=@4, @@Overview=0", 
+        using var flowDb = await GetDb();
+        var dbObjects = await flowDb.Db.FetchAsync<DbObject>("exec GetLibraryFiles @@Status=@1, @@IntervalIndex=@1, @@MaxItems=@2, @@Start=@3, @@NodeUid=@4, @@Overview=0", 
             (int)status, quarter, max, start, nodeUid);
         return ConvertFromDbObject<LibraryFile>(dbObjects);
     }
@@ -155,8 +155,8 @@ public class SqlServerDbManager: DbManager
     /// <returns>the failure flow</returns>
     public override async Task<Flow> GetFailureFlow(Guid libraryUid)
     {
-        using var db = await GetDb();
-        var dbObject = await db.SingleAsync<DbObject>(
+        using var flowDb = await GetDb();
+        var dbObject = await flowDb.Db.SingleAsync<DbObject>(
             "select * from DbObject where Type = @0 " +
             "and json_value(Data,'$.Type') = @1 " +
             "and json_value(Data,'$.Enabled') = 1 ",

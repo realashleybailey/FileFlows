@@ -91,33 +91,33 @@ public abstract class DbManager
     /// Get an instance of the IDatabase
     /// </summary>
     /// <returns>an instance of the IDatabase</returns>
-    protected async Task<IDatabase> GetDb()
+    protected async Task<FlowDbConnection> GetDb()
     {
-        return GetDbInstance();
-        
-        int count = 0;
-        while(++count < 100)
-        {
-            var connection = await DbConnectionPool.Get();
-            if (connection != null && (connection.Connection == null ||
-                                       (connection.Connection.State != ConnectionState.Closed &&
-                                        connection.Connection.State != ConnectionState.Broken)))
-            {
-                if(connection.CreationDate > DateTime.Now.AddMinutes(-5))
-                    return connection;
-                FileLogger.Instance?.Log(LogType.Info, "Disposing of old DB connection");
-                DbConnectionPool.DisposeOf(connection);
-            }
-            else
-            {
-                FileLogger.Instance?.Log(LogType.Info, "Got connection of state: " + connection?.Connection?.State);
-                DbConnectionPool.DisposeOf(connection);
-            }
-        }
+        return await FlowDbConnection.Get(GetDbInstance);
 
-        FileLogger.Instance?.Log(LogType.Error, "Failed to get DB Connection from the connection pool");
-        // should never happen, but to prevent an infinite loop
-        throw new Exception("Failed to get a connection");
+        // int count = 0;
+        // while(++count < 100)
+        // {
+        //     var connection = await DbConnectionPool.Get();
+        //     if (connection != null && (connection.Connection == null ||
+        //                                (connection.Connection.State != ConnectionState.Closed &&
+        //                                 connection.Connection.State != ConnectionState.Broken)))
+        //     {
+        //         if(connection.CreationDate > DateTime.Now.AddMinutes(-5))
+        //             return connection;
+        //         FileLogger.Instance?.Log(LogType.Info, "Disposing of old DB connection");
+        //         DbConnectionPool.DisposeOf(connection);
+        //     }
+        //     else
+        //     {
+        //         FileLogger.Instance?.Log(LogType.Info, "Got connection of state: " + connection?.Connection?.State);
+        //         DbConnectionPool.DisposeOf(connection);
+        //     }
+        // }
+        //
+        // FileLogger.Instance?.Log(LogType.Error, "Failed to get DB Connection from the connection pool");
+        // // should never happen, but to prevent an infinite loop
+        // throw new Exception("Failed to get a connection");
     }
 
     /// <summary>
@@ -206,7 +206,8 @@ public abstract class DbManager
     /// <returns>true if successfully inserted</returns>
     private async Task<bool> CreateInitialData()
     {
-        using var db = await GetDb();
+        using var flowDb = await GetDb();
+        var db = flowDb.Db;
         bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
         await AddOrUpdateObject(db, new Tool
         {
@@ -275,7 +276,7 @@ public abstract class DbManager
         using (var db = await GetDb())
         {
             DateTime start = DateTime.Now;
-            dbObjects = await db.FetchAsync<DbObject>("where Type=@0", typeof(T).FullName);
+            dbObjects = await db.Db.FetchAsync<DbObject>("where Type=@0", typeof(T).FullName);
         }
 
         return ConvertFromDbObject<T>(dbObjects);
@@ -325,7 +326,7 @@ public abstract class DbManager
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            dbObjects = await db.FetchAsync<DbObject>($"where Type=@0 and {where} order by Name",
+            dbObjects = await db.Db.FetchAsync<DbObject>($"where Type=@0 and {where} order by Name",
                 typeof(T).FullName, arguments);
         }
 
@@ -346,7 +347,7 @@ public abstract class DbManager
         args = new object[] { typeof(T).FullName }.Union(args ?? new object[] { }).ToArray();
         using (var db = await GetDb())
         {
-            return await db.FetchAsync<string>(
+            return await db.Db.FetchAsync<string>(
                 $"select Name from {nameof(DbObject)} where Type=@0 {andWhere} order by name", args);
         }
     }
@@ -367,7 +368,7 @@ public abstract class DbManager
         List<(Guid Uid, string Name)> results;
         using (var db = await GetDb())
         {
-            results = await db.FetchAsync<(Guid Uid, string Name)>(
+            results = await db.Db.FetchAsync<(Guid Uid, string Name)>(
                 $"select Uid, Name from {nameof(DbObject)} where Type=@0 {andWhere} order by name", args);
         }
 
@@ -391,7 +392,7 @@ public abstract class DbManager
         string result;
         using (var db = await GetDb())
         {
-            result = db.FirstOrDefault<string>(sql, typeof(T).FullName, uid, name);
+            result = db.Db.FirstOrDefault<string>(sql, typeof(T).FullName, uid, name);
         }
 
         return string.IsNullOrEmpty(result) == false;
@@ -407,7 +408,7 @@ public abstract class DbManager
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0", typeof(T).FullName);
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Type=@0", typeof(T).FullName);
         }
 
         if (string.IsNullOrEmpty(dbObject?.Data))
@@ -426,7 +427,7 @@ public abstract class DbManager
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid);
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid);
         }
         
         if (string.IsNullOrEmpty(dbObject?.Data))
@@ -445,7 +446,7 @@ public abstract class DbManager
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and lower(Name)=lower(@1)",
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Type=@0 and lower(Name)=lower(@1)",
                 typeof(T).FullName, name);
         }
 
@@ -516,7 +517,7 @@ public abstract class DbManager
     {
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
+            await db.Db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
         }
     }
 
@@ -561,7 +562,7 @@ public abstract class DbManager
             {
                 using (var db = await GetDb())
                 {
-                    await db.ExecuteAsync(sql.ToString());
+                    await db.Db.ExecuteAsync(sql.ToString());
                 }
             }
         }
@@ -581,7 +582,7 @@ public abstract class DbManager
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and " + andWhere, args);
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Type=@0 and " + andWhere, args);
         }
 
         if (string.IsNullOrEmpty(dbObject?.Data))
@@ -621,7 +622,7 @@ public abstract class DbManager
         T result;
         using (var db = await GetDb())
         {
-            result = await AddOrUpdateObject(db, obj);
+            result = await AddOrUpdateObject(db.Db, obj);
         }
         return result;
     }
@@ -640,7 +641,7 @@ public abstract class DbManager
         string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type=@0 and Uid in ({strUids})", typeName);
+            await db.Db.ExecuteAsync($"delete from {nameof(DbObject)} where Type=@0 and Uid in ({strUids})", typeName);
         }
     }
     
@@ -659,7 +660,7 @@ public abstract class DbManager
         string sql = $"delete from {nameof(DbObject)} where Type=@0 {andWhere}";
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync(sql, args);
+            await db.Db.ExecuteAsync(sql, args);
         }
     }
     
@@ -675,7 +676,7 @@ public abstract class DbManager
         string strUids = String.Join(",", uids.Select(x => "'" + x.ToString() + "'"));
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync($"delete from {nameof(DbObject)} where Uid in ({strUids})");
+            await db.Db.ExecuteAsync($"delete from {nameof(DbObject)} where Uid in ({strUids})");
         }
     }
 
@@ -691,7 +692,7 @@ public abstract class DbManager
         using (var db = await GetDb())
         {
             // first see if this file exists by its name
-            dbObject = await db.FirstOrDefaultAsync<DbObject>(
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>(
                 "where Type=@0 and name = @1", typeof(LibraryFile).FullName, fullPath);
         }
 
@@ -714,7 +715,7 @@ public abstract class DbManager
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.FirstOrDefaultAsync<DbObject>(
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>(
                 $"where Type=@0 and {JsonExtractMethod}(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName,
                 fingerprint ?? string.Empty);
         }
@@ -844,7 +845,7 @@ public abstract class DbManager
         using (var db = await GetDb())
         {
             // first see if this file exists by its name
-            dbObject = await db.FirstOrDefaultAsync<DbObject>(
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>(
                 "where Type=@0 and name = @1", typeof(T).FullName, name);
         }
 
@@ -891,7 +892,7 @@ public abstract class DbManager
         int result;
         using (var db = await GetDb())
         {
-            result = await db.ExecuteAsync(sql, args);
+            result = await db.Db.ExecuteAsync(sql, args);
         }
         return result;
     }
@@ -907,7 +908,7 @@ public abstract class DbManager
         {
             using (var db = await GetDb())
             {
-                await db.ExecuteAsync($"delete from {nameof(DbObject)} where Type = @0", typeof(LibraryFile).FullName);
+                await db.Db.ExecuteAsync($"delete from {nameof(DbObject)} where Type = @0", typeof(LibraryFile).FullName);
             }
 
             return true;

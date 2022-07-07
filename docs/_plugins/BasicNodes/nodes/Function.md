@@ -104,6 +104,37 @@ The "Flow" object lets you perform actions on the flow, it exposes helper method
    Flow.Execute({command:'somecommand.exe', arguments: '-a -b -c', argumentList: ['can', 'use', 'instead of arguments'], timeout: 0, workingDirectory: 'optional'});
 ```
 
+## Flow.Execute
+
+This method allows you to execute any command from within a script.
+
+It takes a ExecuteArgs parameter which has the following properties
+```cs
+/// <summary>
+/// The command to execute
+/// </summary>
+string command;
+/// <summary>
+/// The arguments of the command
+/// </summary>
+string arguments;
+/// <summary>
+/// The arguments of the command as a list and will be correctly escaped
+/// </summary>
+string[] argumentList;
+/// <summary>
+/// The timeout in seconds of the process
+/// </summary>
+int timeout;
+/// <summary>
+/// When silent, nothing will be logged
+/// </summary>
+bool silent;
+/// <summary>
+/// The working directory of the process
+/// </summary>
+string workingDirectory;
+```
 
 ## Samples
 
@@ -130,6 +161,7 @@ Example showing using the Flow.Execute
     // execute the process and capture the result
     let process = Flow.Execute({
     	command: ffmpeg,
+      workingDirectory: '/media/my-working/directory'
     	argumentList: [
     		'-i',
     		Variables.file.FullName,

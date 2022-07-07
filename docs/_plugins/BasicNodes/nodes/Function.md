@@ -19,6 +19,22 @@ It can let you make decision paths based on previous nodes, compute variables fo
 * Return 0 to complete the flow successfully.  This will immediately stop the flow and mark it as successful
 * Return -1 to indicate an error and stop the flow.  This will mark the flow as unsuccessful.
 
+## Members
+
+This is a list of available builtin members available to a function
+```
+// Flow object that is executing
+Flow: object
+// The name of the machine executing this 
+Hostname: string
+// Logger available to log messages
+Logger: object
+// Sleep the execution for passed in milliseconds
+Sleep: function(millisecond: number)
+// Variables that can be used in many textfields
+Variables: map
+```
+
 ## Variables
 It includes the "Variables" object which exposes variables from the flow.  And you can set future variables for the flow in here
 
@@ -33,8 +49,9 @@ It includes the "Variables" object which exposes variables from the flow.  And y
 ```
 
 
-## Logging
-The "Log" object lets you log messages to the flow log
+## Logger
+
+Lets you log messages to the flow log
 ```js
    Logger.ILog('an information log message');
    Logger.WLog('an warning log message');
@@ -43,13 +60,15 @@ The "Log" object lets you log messages to the flow log
 ```
 
 ## Sleep
+
 Allows you to "Sleep" for a specified amount of milliseconds
 ```js
 // Sleep for 10 seconds (10,000 milliseconds)
 Sleep(10_000);
 ```
 
-## Flow object
+## Flow
+
 The "Flow" object lets you perform actions on the flow, it exposes helper methods to the code.
 ```js
    // will create a directory if it does not already exist

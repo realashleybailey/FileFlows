@@ -80,6 +80,7 @@ public class ScriptExecutor:IScriptExecutor
             .SetValue("Variables", args.Variables)
             .SetValue("Sleep", (int milliseconds) => Thread.Sleep(milliseconds))
             .SetValue("Flow", args)
+            .SetValue("Hostname", Environment.MachineName)
             .SetValue("Execute", (object eArgs) => {
                 args.Logger.ILog("eArgsType:", eArgs.GetType().FullName);
                 args.Logger.ILog("eArgsType Json:", JsonSerializer.Serialize(eArgs));

@@ -19,6 +19,11 @@ public class ProcessingNode: FileFlowObject
     public string Address { get; set; }
 
     /// <summary>
+    /// Gets or sets when the node was last seen
+    /// </summary>
+    public DateTime LastSeen { get; set; }
+
+    /// <summary>
     /// Gets or sets if this node is enabled
     /// </summary>
     public bool Enabled { get; set; }

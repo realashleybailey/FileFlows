@@ -373,8 +373,8 @@ public class NodeController : ControllerStore<ProcessingNode>
     internal async Task UpdateLastSeen(Guid uid)
     {
         var node = await GetByUid(uid);
-        node.DateModified = DateTime.Now;
-        await DbHelper.UpdateLastModified(node.Uid);
+        node.LastSeen = DateTime.Now;
+        await DbHelper.Update(node);
     }
 }
 

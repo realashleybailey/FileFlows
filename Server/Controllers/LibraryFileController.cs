@@ -540,6 +540,20 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         return await base.Update(existing);
     }
 
+
+    /// <summary>
+    /// Downloads a  log of a library file
+    /// </summary>
+    /// <param name="uid">The UID of the library file</param>
+    /// <returns>The download action result</returns>
+    [HttpGet("{uid}/log/download")]
+    public IActionResult GetLog([FromRoute] Guid uid)
+    {     
+        string log = LibraryFileLogHelper.GetLog(uid);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(log);
+        return File(data, "application/octet-stream", uid + ".log");
+    }
+    
     /// <summary>
     /// Get the log of a library file
     /// </summary>

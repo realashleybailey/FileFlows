@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Video Resolution
+/// Widget for Video Resolution
 /// </summary>
-public class VideoResolution:PortletDefinition
+public class VideoResolution:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("af4a5687-18f5-406b-aa96-abb45912f289");
+    public static readonly Guid WD_UID = new ("af4a5687-18f5-406b-aa96-abb45912f289");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class VideoResolution:PortletDefinition
     public override string Icon => "fas fa-tv";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.PieChart;
+    public override WidgetType Type => WidgetType.PieChart;
 
     /// <summary>
     /// Gets any flags 

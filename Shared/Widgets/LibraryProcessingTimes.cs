@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Library Processing Times
+/// Widget for Library Processing Times
 /// </summary>
-public class LibraryProcessingTimes:PortletDefinition
+public class LibraryProcessingTimes:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("356b405b-5fc2-44e6-84dd-7c04c0894c9c");
+    public static readonly Guid WD_UID = new ("356b405b-5fc2-44e6-84dd-7c04c0894c9c");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class LibraryProcessingTimes:PortletDefinition
     public override string Name => "Library Processing Times";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.BoxPlot;
+    public override WidgetType Type => WidgetType.BoxPlot;
 
     /// <summary>
     /// Gets any flags 

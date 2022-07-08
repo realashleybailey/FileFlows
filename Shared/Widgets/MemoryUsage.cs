@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Memory Usage
+/// Widget for Memory Usage
 /// </summary>
-public class MemoryUsage:PortletDefinition
+public class MemoryUsage:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("8badf12b-0881-46da-a5f1-8cc7e0c64d5d");
+    public static readonly Guid WD_UID = new ("8badf12b-0881-46da-a5f1-8cc7e0c64d5d");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class MemoryUsage:PortletDefinition
     public override string Name => "Memory Usage";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.TimeSeries;
+    public override WidgetType Type => WidgetType.TimeSeries;
 
     /// <summary>
     /// Gets any flags 

@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Video Containres
+/// Widget for Video Containres
 /// </summary>
-public class VideoContainers:PortletDefinition
+public class VideoContainers:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("eca4b7ed-97bd-4947-bd30-9307abba7900");
+    public static readonly Guid WD_UID = new ("eca4b7ed-97bd-4947-bd30-9307abba7900");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class VideoContainers:PortletDefinition
     public override string Name => "Video Containers";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.PieChart;
+    public override WidgetType Type => WidgetType.PieChart;
 
     /// <summary>
     /// Gets any flags 

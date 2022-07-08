@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Log Storage
+/// Widget for Log Storage
 /// </summary>
-public class LogStorage:PortletDefinition
+public class LogStorage:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("e7324e06-59fa-4923-8068-effcb9acba91");
+    public static readonly Guid WD_UID = new ("e7324e06-59fa-4923-8068-effcb9acba91");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class LogStorage:PortletDefinition
     public override string Name => "Log Storage";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.TimeSeries;
+    public override WidgetType Type => WidgetType.TimeSeries;
 
     /// <summary>
     /// Gets any flags 

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
-using FileFlows.Shared.Portlets;
+using FileFlows.Shared.Widgets;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
@@ -9,306 +9,292 @@ namespace FileFlows.Client.Components.Dashboard;
 
 public partial class CustomDashboard 
 {
-    private bool DoesntHavePortlet(Guid uid)
+    private bool DoesntHaveWidget(Guid uid)
     {
-        return Portlets?.Any(x => x.Uid == uid) != true;
+        return Widgets?.Any(x => x.Uid == uid) != true;
     }
     
-    private async Task AddPortletDialog()
+    private async Task AddWidgetDialog()
     {
         List<ElementField> fields = new List<ElementField>();
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.CpuUsage.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.CpuUsage.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.CpuUsage),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.CpuUsage),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TimeSeries }
+                    { nameof(InputWidget.Type), WidgetType.TimeSeries }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.MemoryUsage.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.MemoryUsage.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.MemoryUsage),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.MemoryUsage),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TimeSeries }
+                    { nameof(InputWidget.Type), WidgetType.TimeSeries }
                 }
             });
         }
 
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.LogStorage.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.LogStorage.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.LogStorage),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.LogStorage),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TimeSeries }
+                    { nameof(InputWidget.Type), WidgetType.TimeSeries }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.TempStorage.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.TempStorage.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.TempStorage),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.TempStorage),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TimeSeries }
+                    { nameof(InputWidget.Type), WidgetType.TimeSeries }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.Processing.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.Processing.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.Processing),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.Processing),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.Processing }
+                    { nameof(InputWidget.Type), WidgetType.Processing }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.FilesUpcoming.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.FilesUpcoming.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.FilesUpcoming),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.FilesUpcoming),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.LibraryFileTable }
+                    { nameof(InputWidget.Type), WidgetType.LibraryFileTable }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.FilesRecentlyFinished.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.FilesRecentlyFinished.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.FilesRecentlyFinished),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.FilesRecentlyFinished),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.LibraryFileTable }
+                    { nameof(InputWidget.Type), WidgetType.LibraryFileTable }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.Codecs.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.Codecs.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.Codecs),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.Codecs),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TreeMap }
+                    { nameof(InputWidget.Type), WidgetType.TreeMap }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.AudioCodecs.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.AudioCodecs.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.AudioCodecs),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.AudioCodecs),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TreeMap }
+                    { nameof(InputWidget.Type), WidgetType.TreeMap }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.VideoCodecs.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.VideoCodecs.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.VideoCodecs),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.VideoCodecs),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.TreeMap }
+                    { nameof(InputWidget.Type), WidgetType.TreeMap }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.ProcessingTimes.PD_UID))
+        if (App.Instance.FileFlowsSystem.ExternalDatabase && DoesntHaveWidget(FileFlows.Shared.Widgets.ProcessingTimes.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.ProcessingTimes),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.ProcessingTimes),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.HeatMap }
+                    { nameof(InputWidget.Type), WidgetType.HeatMap }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.LibraryProcessingTimes.PD_UID))
+        if (App.Instance.FileFlowsSystem.ExternalDatabase && DoesntHaveWidget(FileFlows.Shared.Widgets.LibraryProcessingTimes.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.LibraryProcessingTimes),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.LibraryProcessingTimes),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.BoxPlot }
+                    { nameof(InputWidget.Type), WidgetType.BoxPlot }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.VideoContainers.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.VideoContainers.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.VideoContainers),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.VideoContainers),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.PieChart }
+                    { nameof(InputWidget.Type), WidgetType.PieChart }
                 }
             });
         }
 
-        if (DoesntHavePortlet(FileFlows.Shared.Portlets.VideoResolution.PD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.VideoResolution.WD_UID))
         {
             fields.Add(new ElementField
             {
-                InputType = FormInputType.Portlet,
-                Name = nameof(FileFlows.Shared.Portlets.VideoResolution),
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.VideoResolution),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputPortlet.Type), PortletType.PieChart }
+                    { nameof(InputWidget.Type), WidgetType.PieChart }
                 }
             });
         }
-        var origModel = new AddPortletModel();
-        var result = await Editor.Open("Pages.Portlet", "Pages.Portlet.Title", fields, null, lblSave: "Labels.Add", saveCallback:
+        var origModel = new AddWidgetModel();
+        var result = await Editor.Open("Pages.Widget", "Pages.Widget.Title", fields, null, lblSave: "Labels.Add", saveCallback:
             async (model) =>
             {
-                Console.WriteLine("Save callback 1: " + JsonSerializer.Serialize(model));
                 var dict = model as IDictionary<string, object>;
                 var dotNetObjRef = DotNetObjectReference.Create(this);
                 if (dict == null)
                     return true;
             
-                Console.WriteLine("Save callback 2: " + dict.Count);
-                var newPortlets = new List<PortletUiModel>();
+                var newWidgets = new List<WidgetUiModel>();
                 foreach (var key in dict.Keys)
                 {
-                    Console.WriteLine("Save callback 2a");
                     if (dict[key] as bool? != true)
                         continue;
-                    Console.WriteLine("Save callback 2b");
-                    Console.WriteLine("Save callback 2c: " + key);
                     
                     switch (key)
                     {
                         case nameof(CpuUsage):
-                            newPortlets.Add(CreateNetPortletModel(CpuUsage.PD_UID, 3, 1));
+                            newWidgets.Add(CreateNewWidgetModel(CpuUsage.WD_UID, 3, 1));
                             break;
                         case nameof(MemoryUsage):
-                            newPortlets.Add(CreateNetPortletModel(MemoryUsage.PD_UID, 3, 1));
+                            newWidgets.Add(CreateNewWidgetModel(MemoryUsage.WD_UID, 3, 1));
                             break;
                         case nameof(LogStorage):
-                            newPortlets.Add(CreateNetPortletModel(LogStorage.PD_UID, 3, 1));
+                            newWidgets.Add(CreateNewWidgetModel(LogStorage.WD_UID, 3, 1));
                             break;
                         case nameof(TempStorage):
-                            newPortlets.Add(CreateNetPortletModel(TempStorage.PD_UID, 3, 1));
+                            newWidgets.Add(CreateNewWidgetModel(TempStorage.WD_UID, 3, 1));
                             break;
                         case nameof(Processing):
-                            newPortlets.Add(CreateNetPortletModel(Processing.PD_UID, 12, 1));
+                            newWidgets.Add(CreateNewWidgetModel(Processing.WD_UID, 12, 1));
                             break;
                         case nameof(FilesUpcoming):
-                            newPortlets.Add(CreateNetPortletModel(FilesUpcoming.PD_UID, 6, 2));
+                            newWidgets.Add(CreateNewWidgetModel(FilesUpcoming.WD_UID, 6, 2));
                             break;
                         case nameof(FilesRecentlyFinished):
-                            newPortlets.Add(CreateNetPortletModel(FilesRecentlyFinished.PD_UID, 6, 2));
+                            newWidgets.Add(CreateNewWidgetModel(FilesRecentlyFinished.WD_UID, 6, 2));
                             break;
                         case nameof(Codecs):
-                            newPortlets.Add(CreateNetPortletModel(Codecs.PD_UID, 6, 2));
+                            newWidgets.Add(CreateNewWidgetModel(Codecs.WD_UID, 6, 2));
                             break;
                         case nameof(VideoCodecs):
-                            newPortlets.Add(CreateNetPortletModel(VideoCodecs.PD_UID, 6, 2));
+                            newWidgets.Add(CreateNewWidgetModel(VideoCodecs.WD_UID, 6, 2));
                             break;
                         case nameof(AudioCodecs):
-                            newPortlets.Add(CreateNetPortletModel(AudioCodecs.PD_UID, 6, 2));
+                            newWidgets.Add(CreateNewWidgetModel(AudioCodecs.WD_UID, 6, 2));
                             break;
                         case nameof(ProcessingTimes):
-                            newPortlets.Add(CreateNetPortletModel(ProcessingTimes.PD_UID, 6, 2));
+                            newWidgets.Add(CreateNewWidgetModel(ProcessingTimes.WD_UID, 6, 2));
                             break;
                         case nameof(VideoContainers):
-                            newPortlets.Add(CreateNetPortletModel(VideoContainers.PD_UID, 4, 2));
+                            newWidgets.Add(CreateNewWidgetModel(VideoContainers.WD_UID, 4, 2));
                             break;
                         case nameof(VideoResolution):
-                            newPortlets.Add(CreateNetPortletModel(VideoResolution.PD_UID, 4, 2));
+                            newWidgets.Add(CreateNewWidgetModel(VideoResolution.WD_UID, 4, 2));
                             break;
                         case nameof(LibraryProcessingTimes):
-                            newPortlets.Add(CreateNetPortletModel(LibraryProcessingTimes.PD_UID, 4, 2));
+                            newWidgets.Add(CreateNewWidgetModel(LibraryProcessingTimes.WD_UID, 4, 2));
                             break;
                     }
-                    
-                    Console.WriteLine("Save callback 3");
-                    Logger.Instance.ILog("ADding portlets: ", newPortlets );
-
-                    Console.WriteLine("Save callback 5");
                 }
-                if (newPortlets.Any())
+                if (newWidgets.Any())
                 {
-                    Console.WriteLine("Save callback 4");
-                    this.Portlets.AddRange(newPortlets);
-                    await jsCharts.InvokeVoidAsync($"addPortlets", ActiveDashboardUid, newPortlets, dotNetObjRef); 
-                    var gridPortlets = await jsCharts.InvokeAsync<PortletUiModel[]>($"getGridData", ActiveDashboardUid, dotNetObjRef);
-                    Console.WriteLine("gridportlts: ");
-                    Console.WriteLine(JsonSerializer.Serialize(gridPortlets));
-                    await SaveDashboard(ActiveDashboardUid, gridPortlets);
+                    this.Widgets.AddRange(newWidgets);
+                    await jsCharts.InvokeVoidAsync($"addWidgets", ActiveDashboardUid, newWidgets, dotNetObjRef); 
+                    var gridWidgets = await jsCharts.InvokeAsync<WidgetUiModel[]>($"getGridData", ActiveDashboardUid, dotNetObjRef);
+                    await SaveDashboard(ActiveDashboardUid, gridWidgets);
                 }
-                Console.WriteLine("Save finished");
                 return true;
             });
     }
 
-    private PortletUiModel CreateNetPortletModel(Guid portlDefinitionUid, int width, int height)
+    private WidgetUiModel CreateNewWidgetModel(Guid widgetDefinitionUid, int width, int height)
     {
-        var pd = PortletDefinition.GetDefinition(portlDefinitionUid);
-        var pui = new PortletUiModel()
+        var wd = WidgetDefinition.GetDefinition(widgetDefinitionUid);
+        var wui = new WidgetUiModel()
         {
             Height = height,
             Width = width,
-            Uid = portlDefinitionUid,
+            Uid = widgetDefinitionUid,
 
-            Flags = pd.Flags,
-            Name = pd.Name,
-            Type = pd.Type,
-            Url = pd.Url,
-            Icon = pd.Icon
+            Flags = wd.Flags,
+            Name = wd.Name,
+            Type = wd.Type,
+            Url = wd.Url,
+            Icon = wd.Icon
         };
 #if(DEBUG)
-        pui.Url = "http://localhost:6868" + pui.Url;
+        wui.Url = "http://localhost:6868" + wui.Url;
 #endif
-        return pui;
+        return wui;
     }
 }
 
-public class AddPortletModel
+public class AddWidgetModel
 {
     public bool CpuUsage { get; set; }
     public bool MemoryUsage { get; set; }

@@ -1,5 +1,6 @@
 using System.Data.SQLite;
 using System.Text.RegularExpressions;
+using FileFlows.Server.Controllers;
 using FileFlows.Shared.Models;
 using NPoco;
 
@@ -11,6 +12,26 @@ namespace FileFlows.Server.Database.Managers;
 public class SqliteDbManager : DbManager
 {
     private readonly string DbFilename;
+    
+    protected readonly string CreateDbObjectTableScript =
+        @$"CREATE TABLE {nameof(DbObject)}(
+            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
+            Name            VARCHAR(1024)      NOT NULL,
+            Type            VARCHAR(255)       NOT NULL,
+            DateCreated     datetime           default           current_timestamp,
+            DateModified    datetime           default           current_timestamp,
+            Data            TEXT               NOT NULL
+        );";
+
+    internal readonly string CreateDbStatisticTableScript = @$"
+        CREATE TABLE {nameof(DbStatistic)}(
+            LogDate         datetime,
+            Name            varchar(100)       NOT NULL,
+            Type            int                NOT NULL,            
+            StringValue     TEXT               NOT NULL,            
+            NumberValue     REAL               NOT NULL
+        );
+";
     
     /// <summary>
     /// Constructs a new Sqlite Database Manager
@@ -111,14 +132,24 @@ public class SqliteDbManager : DbManager
         con.Open();
         try
         {
-            using var cmdExists =
-                new SQLiteCommand($"SELECT name FROM sqlite_master WHERE type='table' AND name='{nameof(DbObject)}'",
-                    con);
-            if (cmdExists.ExecuteScalar() != null)
-                return true; // tables exist, all good
+            foreach (var tbl in new[]
+                     {
+                         (nameof(DbObject), CreateDbObjectTableScript),
+                         (nameof(DbStatistic), CreateDbStaticTableScript: CreateDbStatisticTableScript)
+                     })
+            {
+                using var cmdExists =
+                    new SQLiteCommand(
+                        $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tbl.Item1}'",
+                        con);
+                if (cmdExists.ExecuteScalar() != null)
+                    continue;
 
-            using var cmd = new SQLiteCommand(CreateDbScript, con);
-            cmd.ExecuteNonQuery();
+                using var cmd = new SQLiteCommand(tbl.Item2, con);
+                cmd.ExecuteNonQuery();
+            }
+
+            return true;
         }
         finally
         {
@@ -188,5 +219,29 @@ public class SqliteDbManager : DbManager
     {
         var notImplemented = new LibraryFile[] { };
         return Task.FromResult((IEnumerable<LibraryFile>)notImplemented);
+    }
+
+    /// <summary>
+    /// Gets statistics by name
+    /// </summary>
+    /// <returns>the matching statistics</returns>
+    public override async Task<IEnumerable<Statistic>> GetStatisticsByName(string name)
+    {
+        List<DbStatistic> stats;
+        using (var db = await GetDb())
+        {
+            stats = await db.Db.FetchAsync<DbStatistic>("where Name = @0", name);
+        }
+
+        var results = new List<Statistic>();
+        foreach (var stat in stats)
+        {
+            if(stat.Type == StatisticType.Number)
+                results.Add(new () { Name = stat.Name, Value = stat.NumberValue});
+            if(stat.Type == StatisticType.String)
+                results.Add(new () { Name = stat.Name, Value = stat.StringValue});
+        }
+
+        return results;
     }
 }

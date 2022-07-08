@@ -1,5 +1,6 @@
 using System.Collections;
 using Avalonia;
+using FileFlows.Plugin;
 using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
@@ -20,6 +21,15 @@ public class Program
 
     public static void Main(string[] args)
     {
+        #if(DEBUG)
+        if (Globals.IsWindows)
+        {
+            new ProcessHelper(null, false).ExecuteShellCommand(new () {
+                Command = "Taskkill",
+                Arguments = "/IM ffmpeg.exe /F"
+            });
+        }
+        #endif
         try
         {
             if (args.Any(x =>

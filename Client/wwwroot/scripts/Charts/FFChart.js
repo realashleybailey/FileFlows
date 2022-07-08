@@ -1,5 +1,5 @@
-export function initDashboard(uid, portlets, csharp, isReadOnly){
-    if(!portlets)
+export function initDashboard(uid, Widgets, csharp, isReadOnly){
+    if(!Widgets)
         return;
     disposeAll();
     destroyDashboard();
@@ -19,9 +19,9 @@ export function initDashboard(uid, portlets, csharp, isReadOnly){
     if (isReadOnly)
         dashboard.classList.add('readonly');
 
-    for(let p of portlets)
+    for(let p of Widgets)
     {
-        addPortlet(dashboard, p, csharp);
+        addWidget(dashboard, p, csharp);
     }
     intDashboardActual(uid, csharp, isReadOnly);
 }
@@ -38,15 +38,15 @@ export function destroyDashboard()
     }
 }
 
-export function addPortlets(uid, portlets, csharp){
-    if(!portlets)
+export function addWidgets(uid, Widgets, csharp){
+    if(!Widgets)
         return;
     let dashboard = document.querySelector('.dashboard.grid-stack');
     let grid = window.ffGrid;
     grid.batchUpdate();
-    for(let p of portlets)
+    for(let p of Widgets)
     {
-        let div = addPortlet(dashboard, p, csharp);
+        let div = addWidget(dashboard, p, csharp);
         grid.addWidget(div, { autoPosition: true});
         grid.update(div, { autoPosition: false});
     }
@@ -112,11 +112,11 @@ function intDashboardActual(uid, csharp, isReadOnly) {
 }
 
 
-function addPortlet(dashboard, p, csharp){
+function addWidget(dashboard, p, csharp){
 
     let div = document.createElement("div");
     div.setAttribute('id', p.uid);
-    div.className = 'grid-stack-item portlet';
+    div.className = 'grid-stack-item Widget';
     div.setAttribute('gs-w', p.width);
     div.setAttribute('gs-h', p.height);
     div.setAttribute('gs-x', p.x);
@@ -141,7 +141,7 @@ function addPortlet(dashboard, p, csharp){
     eleRemove.setAttribute('title', 'Remove');
     eleRemove.addEventListener('click', (event) => {
         event.preventDefault();
-        csharp.invokeMethodAsync("RemovePortlet", p.uid).then((success) => {
+        csharp.invokeMethodAsync("RemoveWidget", p.uid).then((success) => {
             if(success)
                 window.ffGrid.removeWidget(div);
         });
@@ -1156,7 +1156,9 @@ export class Processing extends FFChart
         {
             if(this.hasNoData)
             {
-                chartDiv.textContent = '';
+                let chartDiv = document.getElementById(this.chartUid);
+                if(chartDiv)
+                    chartDiv.textContent = '';
                 this.hasNoData = false;
             }
             this.createRunners(data);

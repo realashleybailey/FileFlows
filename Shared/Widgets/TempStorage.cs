@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Temporary File Storage
+/// Widget for Temporary File Storage
 /// </summary>
-public class TempStorage:PortletDefinition
+public class TempStorage:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("40f8b3d8-e267-45f1-855f-a4ad9b13fac1");
+    public static readonly Guid WD_UID = new ("40f8b3d8-e267-45f1-855f-a4ad9b13fac1");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class TempStorage:PortletDefinition
     public override string Name => "Temporary File Storage";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.TimeSeries;
+    public override WidgetType Type => WidgetType.TimeSeries;
 
     /// <summary>
     /// Gets any flags 

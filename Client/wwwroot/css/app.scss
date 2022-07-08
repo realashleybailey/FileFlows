@@ -374,7 +374,7 @@ input[type=file]{
     }
 }
 
-.portlet {
+.Widget {
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base), 0.2);
 
@@ -697,7 +697,7 @@ input[type=file]{
     }
 }
 
-.PagesPortlet {
+.PagesWidget {
     .fields {
         display: grid !important;
         grid-gap: 0.5rem;
@@ -712,5 +712,8 @@ input[type=file]{
     }
     .empty {
         display:none;
+    }
+    .input-Widget {
+        overflow:hidden;
     }
 }

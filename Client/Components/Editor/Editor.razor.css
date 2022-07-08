@@ -1,4 +1,4 @@
-﻿.editor {
+.editor {
   position: fixed;
   right: 0;
   top: 0;
@@ -60,3 +60,10 @@
 .empty {
   margin-top: 1rem;
 }
+
+.btn-download {
+  width: 8rem !important;
+  margin-right: 1rem;
+}
+
+/*# sourceMappingURL=Editor.razor.css.map */

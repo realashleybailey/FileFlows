@@ -29,7 +29,7 @@ public partial class BasicDashboard
 
     public IJSObjectReference jsFunctions;
 
-    private string lblOverall, lblCurrent, lblPauseLabel, lblAddPortlet;
+    private string lblOverall, lblCurrent, lblPauseLabel, lblAddWidget;
     private Timer AutoRefreshTimer;
 
     private SystemInfo SystemInfo = new SystemInfo();
@@ -38,7 +38,7 @@ public partial class BasicDashboard
 
     private List<ListOption> Dashboards;
     private Guid ActiveDashboardUid;
-    private readonly List<PortletUiModel> Portlets = new List<PortletUiModel>();
+    private readonly List<WidgetUiModel> Widgets = new List<WidgetUiModel>();
     private IJSObjectReference jsCharts;
     
     protected override async Task OnInitializedAsync()
@@ -55,7 +55,7 @@ public partial class BasicDashboard
 #endif
         lblOverall = Translater.Instant("Pages.Dashboard.Fields.Overall");
         lblCurrent = Translater.Instant("Pages.Dashboard.Fields.Current");
-        lblAddPortlet = Translater.Instant("Pages.Dashboard.Labels.AddPortlet");
+        lblAddWidget = Translater.Instant("Pages.Dashboard.Labels.AddWidget");
         
         lblLog = Translater.Instant("Labels.Log");
         lblCancel = Translater.Instant("Labels.Cancel");

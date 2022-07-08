@@ -36,7 +36,7 @@ public partial class CustomDashboard : IDisposable
             _ = Task.Run(async () =>
             {
                 var dotNetObjRef = DotNetObjectReference.Create(this);
-                await jsCharts.InvokeVoidAsync($"destroyDashboard",  this.Portlets, dotNetObjRef); 
+                await jsCharts.InvokeVoidAsync($"destroyDashboard",  this.Widgets, dotNetObjRef); 
                 _ActiveDashboardUid = value;
                 await this.LoadDashboard();
             });
@@ -50,34 +50,34 @@ public partial class CustomDashboard : IDisposable
 
     public IJSObjectReference jsFunctions;
 
-    private readonly List<PortletUiModel> Portlets = new List<PortletUiModel>();
+    private readonly List<WidgetUiModel> Widgets = new List<WidgetUiModel>();
     private IJSObjectReference jsCharts;
     
     protected override async Task OnInitializedAsync()
     {
         jsCharts = await jSRuntime.InvokeAsync<IJSObjectReference>("import", $"./scripts/Charts/FFChart.js");
-        Dashboard.AddPortletEvent = (sender, args) => this.AddPortletDialog();
+        Dashboard.AddWidgetEvent = (sender, args) => this.AddWidgetDialog();
 
         if (needsLoading)
         {
             needsLoading = false;
             
             var dotNetObjRef = DotNetObjectReference.Create(this);
-            await jsCharts.InvokeVoidAsync($"destroyDashboard",  this.Portlets, dotNetObjRef);
+            await jsCharts.InvokeVoidAsync($"destroyDashboard",  this.Widgets, dotNetObjRef);
             await this.LoadDashboard();
         }
     }
     
     private async Task LoadDashboard()
     {
-        var portletsResponse = await HttpHelper.Get<List<PortletUiModel>>("/api/dashboard/" + ActiveDashboardUid + "/portlets");
-        if (portletsResponse.Success == false)
+        var WidgetsResponse = await HttpHelper.Get<List<WidgetUiModel>>("/api/dashboard/" + ActiveDashboardUid + "/Widgets");
+        if (WidgetsResponse.Success == false)
             return;
-        this.Portlets.Clear();
-        if(portletsResponse.Data?.Any() == true)
-            this.Portlets.AddRange(portletsResponse.Data);
+        this.Widgets.Clear();
+        if(WidgetsResponse.Data?.Any() == true)
+            this.Widgets.AddRange(WidgetsResponse.Data);
         var dotNetObjRef = DotNetObjectReference.Create(this);
-        await jsCharts.InvokeVoidAsync($"initDashboard",  this.ActiveDashboardUid, this.Portlets, dotNetObjRef, IsDefaultDashboard); 
+        await jsCharts.InvokeVoidAsync($"initDashboard",  this.ActiveDashboardUid, this.Widgets, dotNetObjRef, IsDefaultDashboard); 
     }
     
     public void Dispose()
@@ -189,18 +189,18 @@ libpostproc    55.  3.100 / 55.  3.100"
     }
 
     /// <summary>
-    /// Removes a portlet from the dashboard
+    /// Removes a Widget from the dashboard
     /// </summary>
-    /// <param name="portletUid">The UID of the portlet</param>
+    /// <param name="WidgetUid">The UID of the Widget</param>
     [JSInvokable]
-    public async Task<bool> RemovePortlet(Guid portletUid)
+    public async Task<bool> RemoveWidget(Guid WidgetUid)
     {
         if (IsDefaultDashboard)
             return false; // cannot change default dashboard
         
-        bool confirmed = await Confirm.Show("Labels.Remove", "Pages.Dashboard.Messages.DeletePortlet");
+        bool confirmed = await Confirm.Show("Labels.Remove", "Pages.Dashboard.Messages.DeleteWidget");
         if (confirmed)
-            this.Portlets.RemoveAll(x => x.Uid == portletUid);
+            this.Widgets.RemoveAll(x => x.Uid == WidgetUid);
         return confirmed;
     }
     
@@ -208,20 +208,20 @@ libpostproc    55.  3.100 / 55.  3.100"
     /// Saves a dashboard
     /// </summary>
     /// <param name="dashboardUid">The UID of the dashboard</param>
-    /// <param name="portlets">The portlets to be saved</param>
+    /// <param name="Widgets">The Widgets to be saved</param>
     [JSInvokable]
-    public async Task SaveDashboard(Guid dashboardUid, PortletUiModel[] portlets)
+    public async Task SaveDashboard(Guid dashboardUid, WidgetUiModel[] Widgets)
     {
         if (dashboardUid == FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
             return; // cannot change default dashboard
 
-        var pActual = portlets.Select(x => new Portlet()
+        var pActual = Widgets.Select(x => new Widget()
         {
             Height = x.Height,
             Width = x.Width,
             X = x.X,
             Y = x.Y,
-            PortletDefinitionUid = x.Uid
+            WidgetDefinitionUid = x.Uid
         }).ToArray();
         
         await HttpHelper.Put($"/api/dashboard/{dashboardUid}", pActual);

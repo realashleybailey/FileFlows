@@ -1,11 +1,11 @@
-using FileFlows.Shared.Portlets;
+using FileFlows.Shared.Widgets;
 using Microsoft.AspNetCore.Components;
 
 namespace FileFlows.Client.Components.Inputs;
 
-public partial class InputPortlet: Input<bool>
+public partial class InputWidget: Input<bool>
 {
-    [Parameter] public PortletType Type { get; set; }
+    [Parameter] public WidgetType Type { get; set; }
 
     private void ToggleValue() => this.Value = !this.Value;
 }

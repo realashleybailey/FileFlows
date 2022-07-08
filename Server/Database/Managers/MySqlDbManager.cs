@@ -431,45 +431,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
 
         return ConvertFromDbObject<Flow>(dbObject);
     }
-
-    /// <summary>
-    /// Records a statistic
-    /// </summary>
-    /// <param name="statistic">the statistic to record</param>
-    public override async Task RecordStatistic(Statistic statistic)
-    {
-        if (statistic?.Value == null)
-            return;
-        DbStatistic stat;
-        if (double.TryParse(statistic.Value.ToString(), out double number))
-        {
-            stat = new DbStatistic()
-            {
-                Type = StatisticType.Number,
-                Name = statistic.Name,
-                LogDate = DateTime.Now,
-                NumberValue = number,
-                StringValue = string.Empty
-            };
-        }
-        else
-        {
-            // treat as string
-            stat = new DbStatistic()
-            {
-                Type = StatisticType.String,
-                Name = statistic.Name,
-                LogDate = DateTime.Now,
-                NumberValue = 0,
-                StringValue = statistic.Value.ToString()
-            };
-        }
-        using (var db = await GetDb())
-        {
-            await db.Db.InsertAsync(stat);
-        }
-    }
-
+    
     /// <summary>
     /// Gets statistics by name
     /// </summary>

@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for Codecs
+/// Widget for Codecs
 /// </summary>
-public class Codecs:PortletDefinition
+public class Codecs:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("d7f212b6-29eb-4912-b7b5-0efe1d377164");
+    public static readonly Guid WD_UID = new ("d7f212b6-29eb-4912-b7b5-0efe1d377164");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class Codecs:PortletDefinition
     public override string Name => "Codecs";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.TreeMap;
+    public override WidgetType Type => WidgetType.TreeMap;
 
     /// <summary>
     /// Gets any flags 

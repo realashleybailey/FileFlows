@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for upcoming files
+/// Widget for upcoming files
 /// </summary>
-public class FilesUpcoming:PortletDefinition
+public class FilesUpcoming:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("1a545039-e37f-43a7-a3db-2b0640d83905");
+    public static readonly Guid WD_UID = new ("1a545039-e37f-43a7-a3db-2b0640d83905");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class FilesUpcoming:PortletDefinition
     public override string Icon => "fas fa-hourglass-start";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.LibraryFileTable;
+    public override WidgetType Type => WidgetType.LibraryFileTable;
 
     /// <summary>
     /// Gets any flags 

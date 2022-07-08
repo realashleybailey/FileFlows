@@ -89,7 +89,13 @@ namespace FileFlows.Client.Helpers
                     }
                 });
 
-                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true, noTranslateTitle: true);
+                string downloadUrl = $"{ApIUrl}/{libraryItemUid}/log/download";
+                #if(DEBUG)
+                downloadUrl = "http://localhost:6868" + downloadUrl;
+                #endif
+
+                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true, noTranslateTitle: true,
+                    lblDownloadButton: "Labels.DownloadLog", downloadUrl: downloadUrl);
             }
             else
             {

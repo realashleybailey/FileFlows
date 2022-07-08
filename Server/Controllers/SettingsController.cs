@@ -90,8 +90,8 @@ public class SettingsController : Controller
             uiModel.DbType = DatabaseType.Sqlite;
         else if (dbConnStr.Contains(";Uid="))
             new MySqlDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
-        else
-            new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
+        // else
+        //     new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
         uiModel.RecreateDatabase = AppSettings.Instance.RecreateDatabase;
         
         return uiModel;
@@ -214,9 +214,9 @@ public class SettingsController : Controller
 
     private string GetConnectionString(SettingsUiModel settings, DatabaseType dbType)
     {
-        if (dbType == DatabaseType.SqlServer)
-            return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
-                settings.DbPassword);
+        // if (dbType == DatabaseType.SqlServer)
+        //     return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+        //         settings.DbPassword);
         if (dbType == DatabaseType.MySql)
             return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
                 settings.DbPassword);
@@ -235,9 +235,9 @@ public class SettingsController : Controller
         if (model == null)
             throw new ArgumentException(nameof(model));
 
-        if (model.Type == DatabaseType.SqlServer)
-            return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
-                ?.EmptyAsNull() ?? "OK";
+        // if (model.Type == DatabaseType.SqlServer)
+        //     return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+        //         ?.EmptyAsNull() ?? "OK";
         if (model.Type == DatabaseType.MySql)
             return new MySqlDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
                 ?.EmptyAsNull() ?? "OK";

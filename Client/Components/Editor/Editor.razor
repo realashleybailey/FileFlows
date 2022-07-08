@@ -12,6 +12,11 @@
             <ViContainer Title="@Title" Icon="@Icon" FullWidth=@true AlwaysShowTitle=@true>
 
                 <Head>
+                    @if (ShowDownload)
+                    {
+                        <a href="@DownloadUrl" class="btn btn-download" target="_blank"><span>@lblDownloadButton</span></a>
+                    }
+                    
                     @if (ReadOnly)
                     {
                         <button @onclick=@Cancel>@lblClose</button>

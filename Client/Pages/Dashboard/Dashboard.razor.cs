@@ -14,9 +14,9 @@ public partial class Dashboard : ComponentBase
     [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] Editor Editor { get; set; }
-    public EventHandler AddPortletEvent { get; set; }
+    public EventHandler AddWidgetEvent { get; set; }
 
-    private string lblAddPortlet;
+    private string lblAddWidget;
     
     private List<ListOption> Dashboards;
 
@@ -45,7 +45,7 @@ public partial class Dashboard : ComponentBase
 #else
         ConfiguredStatus = App.Instance.FileFlowsSystem.ConfigurationStatus;
 #endif
-        lblAddPortlet = Translater.Instant("Pages.Dashboard.Labels.AddPortlet");
+        lblAddWidget = Translater.Instant("Pages.Dashboard.Labels.AddWidget");
         
         if(Unlicensed == false)
             await LoadDashboards();
@@ -140,6 +140,6 @@ public partial class Dashboard : ComponentBase
     private bool DashboardDeletable => ActiveDashboardUid != Guid.Empty &&
                                       ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid;
 
-    private void AddPortlet() => AddPortletEvent?.Invoke(this, new EventArgs());
+    private void AddWidget() => AddWidgetEvent?.Invoke(this, new EventArgs());
 
 }

@@ -101,9 +101,6 @@ public class DbMigrater
 
     private static void MigrateDbStatistics(NPoco.Database source, NPoco.Database dest)
     {
-        if (source.DatabaseType == DatabaseType.SQLite || dest.DatabaseType == DatabaseType.SQLite)
-            return;
-        
         var dbStatistics = source.Fetch<DbStatistic>($"select * from {nameof(DbStatistic)}")?.ToArray();
         if (dbStatistics?.Any() != true)
             return;

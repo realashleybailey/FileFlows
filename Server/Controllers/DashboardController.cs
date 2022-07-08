@@ -1,7 +1,7 @@
 using FileFlows.Plugin;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
-using FileFlows.Shared.Portlets;
+using FileFlows.Shared.Widgets;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FileFlows.Server.Controllers;
@@ -53,27 +53,27 @@ public class DashboardController:ControllerStore<Dashboard>
     /// </summary>
     /// <param name="uid">The UID of the dashboard</param>
     /// <returns>The dashboard instance</returns>
-    [HttpGet("{uid}/portlets")]
-    public async Task<IEnumerable<PortletUiModel>> Get(Guid uid)
+    [HttpGet("{uid}/Widgets")]
+    public async Task<IEnumerable<WidgetUiModel>> Get(Guid uid)
     {
         var db = await GetByUid(uid);
         if ((db == null || db.Uid == Guid.Empty) && uid == Dashboard.DefaultDashboardUid)
             db = Dashboard.GetDefaultDashboard(DbHelper.UseMemoryCache == false);
         else if (db == null)
             throw new Exception("Dashboard not found");
-        List<PortletUiModel> portlets = new List<PortletUiModel>();
-        foreach (var p in db.Portlets)
+        List<WidgetUiModel> Widgets = new List<WidgetUiModel>();
+        foreach (var p in db.Widgets)
         {
             try
             {
-                var pd = PortletDefinition.GetDefinition(p.PortletDefinitionUid);
-                PortletUiModel pui = new()
+                var pd = WidgetDefinition.GetDefinition(p.WidgetDefinitionUid);
+                WidgetUiModel pui = new()
                 {
                     X = p.X,
                     Y = p.Y,
                     Height = p.Height,
                     Width = p.Width,
-                    Uid = p.PortletDefinitionUid,
+                    Uid = p.WidgetDefinitionUid,
 
                     Flags = pd.Flags,
                     Name = pd.Name,
@@ -84,16 +84,16 @@ public class DashboardController:ControllerStore<Dashboard>
                 #if(DEBUG)
                 pui.Url = "http://localhost:6868" + pui.Url;
                 #endif
-                portlets.Add(pui);
+                Widgets.Add(pui);
             }
             catch (Exception ex)
             {
-                // can throw if portlet definition is not found
-                Logger.Instance.WLog("Portlet definition not found: " + p.PortletDefinitionUid);
+                // can throw if Widget definition is not found
+                Logger.Instance.WLog("Widget definition not found: " + p.WidgetDefinitionUid);
             }
         }
 
-        return portlets;
+        return Widgets;
     }
 
     /// <summary>
@@ -130,15 +130,15 @@ public class DashboardController:ControllerStore<Dashboard>
     /// Saves a dashboard
     /// </summary>
     /// <param name="uid">The UID of the dashboard</param>
-    /// <param name="portlets">The portlets to save</param>
+    /// <param name="Widgets">The Widgets to save</param>
     /// <returns>The saved dashboard</returns>
     [HttpPut("{uid}")]
-    public async Task<Dashboard> Save([FromRoute] Guid uid, [FromBody] List<Portlet> portlets)
+    public async Task<Dashboard> Save([FromRoute] Guid uid, [FromBody] List<Widget> Widgets)
     {
         var dashboard = await GetByUid(uid);
         if (dashboard == null)
             throw new Exception("Dashboard not found");
-        dashboard.Portlets = portlets ?? new List<Portlet>();
+        dashboard.Widgets = Widgets ?? new List<Widget>();
         return await Save(dashboard);
     }
 }

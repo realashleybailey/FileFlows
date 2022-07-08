@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for processing files
+/// Widget for processing files
 /// </summary>
-public class Processing:PortletDefinition
+public class Processing:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("9a74f25b-85b0-4838-a994-479728a243df");
+    public static readonly Guid WD_UID = new ("9a74f25b-85b0-4838-a994-479728a243df");
     
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class Processing:PortletDefinition
     public override string Icon => "fas fa-running";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.Processing;
+    public override WidgetType Type => WidgetType.Processing;
 
     /// <summary>
     /// Gets any flags 

@@ -1,14 +1,14 @@
 using System.Runtime.CompilerServices;
-using FileFlows.Shared.Portlets;
+using FileFlows.Shared.Widgets;
 
 namespace FileFlows.Shared.Models;
 
 /// <summary>
-/// Dashboard that shows portlets
+/// Dashboard that shows Widgets
 /// </summary>
 public class Dashboard: FileFlowObject
 {
-    private List<Portlet> _Portlets = new List<Portlet>();
+    private List<Widget> _widgets = new List<Widget>();
 
     /// <summary>
     /// The name of the default dashboard
@@ -21,16 +21,16 @@ public class Dashboard: FileFlowObject
     public static readonly Guid DefaultDashboardUid = new Guid("bed286d9-68f0-48a8-8c6d-05ec6f81d67c");
         
     /// <summary>
-    /// Gets or sets the portlets on this dashboard
+    /// Gets or sets the widgets on this dashboard
     /// </summary>
-    public List<Portlet> Portlets
+    public List<Widget> Widgets
     {
-        get => _Portlets;
+        get => _widgets;
         set
         {
-            _Portlets.Clear();
+            _widgets.Clear();
             if(value != null)
-                _Portlets.AddRange(value);
+                _widgets.AddRange(value);
         }
     }
 
@@ -44,126 +44,147 @@ public class Dashboard: FileFlowObject
         var db = new Dashboard();
         db.Name = DefaultDashboardName;
         db.Uid = DefaultDashboardUid;
-        db.Portlets = new();
+        db.Widgets = new();
         int rowIndex = 0;
         
         // top row
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 1, Width = 3,
             Y = rowIndex, X = 0,
-            PortletDefinitionUid = CpuUsage.PD_UID
+            WidgetDefinitionUid = CpuUsage.WD_UID
         });
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 1, Width = 3,
             Y = rowIndex, X = 3,
-            PortletDefinitionUid = MemoryUsage.PD_UID
+            WidgetDefinitionUid = MemoryUsage.WD_UID
         });
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 1, Width = 3,
             Y = rowIndex, X = 6,
-            PortletDefinitionUid = TempStorage.PD_UID
+            WidgetDefinitionUid = TempStorage.WD_UID
         });
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 1, Width = 3,
             Y = rowIndex, X = 9,
-            PortletDefinitionUid = LogStorage.PD_UID
+            WidgetDefinitionUid = LogStorage.WD_UID
         });
         ++rowIndex;
         
         // executing
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 2, Width = 12,
             Y = rowIndex, X = 0,
-            PortletDefinitionUid = Processing.PD_UID
+            WidgetDefinitionUid = Processing.WD_UID
         });
         rowIndex += 2;
         
         // library files row
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 2, Width = 6,
             Y = rowIndex, X = 0,
-            PortletDefinitionUid = FilesUpcoming.PD_UID
+            WidgetDefinitionUid = FilesUpcoming.WD_UID
         });
-        db.Portlets.Add(new ()
+        db.Widgets.Add(new ()
         {
             Height = 2, Width = 6,
             Y = rowIndex, X = 6,
-            PortletDefinitionUid = FilesRecentlyFinished.PD_UID
+            WidgetDefinitionUid = FilesRecentlyFinished.WD_UID
         });
         rowIndex += 2;
 
 
+        // codecs and times row
         if (usingExternalDatabase)
         {
-            // codecs and times row
-            db.Portlets.Add(new()
+            db.Widgets.Add(new()
             {
                 Height = 2, Width = 6,
                 Y = rowIndex, X = 0,
-                PortletDefinitionUid = Codecs.PD_UID
+                WidgetDefinitionUid = Codecs.WD_UID
             });
-            db.Portlets.Add(new()
+            db.Widgets.Add(new()
             {
                 Height = 2, Width = 6,
                 Y = rowIndex, X = 6,
-                PortletDefinitionUid = ProcessingTimes.PD_UID
+                WidgetDefinitionUid = ProcessingTimes.WD_UID
             });
-            rowIndex += 2;
-
-            // containers, resolution, processing times row
-            db.Portlets.Add(new()
+        }
+        else
+        {
+            db.Widgets.Add(new()
             {
-                Height = 2, Width = 4,
+                Height = 2, Width = 6,
                 Y = rowIndex, X = 0,
-                PortletDefinitionUid = VideoContainers.PD_UID
+                WidgetDefinitionUid = VideoCodecs.WD_UID
             });
-            db.Portlets.Add(new()
+            db.Widgets.Add(new()
             {
-                Height = 2, Width = 4,
-                Y = rowIndex, X = 4,
-                PortletDefinitionUid = VideoResolution.PD_UID
+                Height = 2, Width = 6,
+                Y = rowIndex, X = 6,
+                WidgetDefinitionUid = AudioCodecs.WD_UID
             });
-            db.Portlets.Add(new()
+            
+        }
+
+        rowIndex += 2;
+
+        // containers, resolution, processing times row
+        db.Widgets.Add(new()
+        {
+            Height = 2, Width = usingExternalDatabase ? 4 : 6,
+            Y = rowIndex, X = 0,
+            WidgetDefinitionUid = VideoContainers.WD_UID
+        });
+        db.Widgets.Add(new()
+        {
+            Height = 2, Width = usingExternalDatabase ? 4 : 6,
+            Y = rowIndex, X = usingExternalDatabase ? 4 : 6,
+            WidgetDefinitionUid = VideoResolution.WD_UID
+        });
+        if (usingExternalDatabase)
+        {
+            db.Widgets.Add(new()
             {
                 Height = 2, Width = 4,
                 Y = rowIndex, X = 8,
-                PortletDefinitionUid = LibraryProcessingTimes.PD_UID
+                WidgetDefinitionUid = LibraryProcessingTimes.WD_UID
             });
         }
+
         return db;
     }
 }
 
 /// <summary>
-/// Portlet shown on a dashboard
+/// Widget shown on a dashboard
 /// </summary>
-public class Portlet
+public class Widget
 {
     /// <summary>
-    /// Gets or sets the width of the portlet
+    /// Gets or sets the width of the widget
     /// </summary>
     public int Width { get; set; }
     /// <summary>
-    /// Gets or sets the height of the portlet
+    /// Gets or sets the height of the widget
     /// </summary>
     public int Height { get; set; }
     /// <summary>
-    /// Gets or sets the X position of the portlet
+    /// Gets or sets the X position of the widget
     /// </summary>
     public int X { get; set; }
     /// <summary>
-    /// Gets or sets the Y position of the portlet
+    /// Gets or sets the Y position of the widget
     /// </summary>
     public int Y { get; set; }
 
     /// <summary>
-    /// The UID of the Portlet Definition
+    /// The UID of the Widget Definition
     /// </summary>
-    public Guid PortletDefinitionUid { get; set; }
+    public Guid WidgetDefinitionUid { get; set; }
 }

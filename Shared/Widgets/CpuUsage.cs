@@ -1,21 +1,21 @@
 using FileFlows.Shared.Models;
 
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Portlet for CPU Usage
+/// Widget for CPU Usage
 /// </summary>
-public class CpuUsage:PortletDefinition
+public class CpuUsage:WidgetDefinition
 {
     /// <summary>
-    /// The Portlet Definition UID
+    /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid PD_UID = new ("1abd867e-fe34-4832-bb59-1236c3960855");
+    public static readonly Guid WD_UID = new ("1abd867e-fe34-4832-bb59-1236c3960855");
 
     /// <summary>
     /// Gets the UID 
     /// </summary>
-    public override Guid Uid => PD_UID;
+    public override Guid Uid => WD_UID;
 
     /// <summary>
     /// Gets the URL
@@ -33,9 +33,9 @@ public class CpuUsage:PortletDefinition
     public override string Name => "CPU Usage";
 
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public override PortletType Type => PortletType.TimeSeries;
+    public override WidgetType Type => WidgetType.TimeSeries;
 
     /// <summary>
     /// Gets any flags 

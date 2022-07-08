@@ -40,7 +40,7 @@ namespace FileFlows.Plugin
         Password = 21,
         ExecutedNodes = 22,
         Table = 23,
-        Portlet = 24
+        Widget = 24
     }
 
 

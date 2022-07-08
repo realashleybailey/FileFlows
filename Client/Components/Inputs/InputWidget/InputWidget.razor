@@ -1,10 +1,10 @@
 @namespace FileFlows.Client.Components.Inputs
-@using FileFlows.Client.Components.Inputs.InputPortletPreviews
-@using FileFlows.Shared.Portlets
+@using FileFlows.Client.Components.Inputs.InputWidgetPreviews
+@using FileFlows.Shared.Widgets
 @using Humanizer
 @inherits Input<bool>
 
-<div class="input-portlet" @onclick=@ToggleValue @onclick:preventDefault @onclick:stopPropagation>
+<div class="input-Widget" @onclick=@ToggleValue @onclick:preventDefault @onclick:stopPropagation>
     <span class="title">
         <div class="flow-switch-wrapper">
             <FlowSwitch @bind-Value="@Value"/>
@@ -14,25 +14,25 @@
     <div class="preview @Type">
         @switch (Type)
         {
-            case PortletType.BoxPlot:
+            case WidgetType.BoxPlot:
                 <PreviewBoxPlot />
                 break;
-            case PortletType.HeatMap:
+            case WidgetType.HeatMap:
                 <PreviewHeatMap />
                 break;
-            case PortletType.LibraryFileTable:
+            case WidgetType.LibraryFileTable:
                 <PreviewLibraryFileTable />
                 break;
-            case PortletType.PieChart:
+            case WidgetType.PieChart:
                 <PreviewPieChart />
                 break;
-            case PortletType.Processing:
+            case WidgetType.Processing:
                 <PreviewProcessing />
                 break;
-            case PortletType.TimeSeries:
+            case WidgetType.TimeSeries:
                 <PreviewTimeSeries />
                 break;
-            case PortletType.TreeMap:
+            case WidgetType.TreeMap:
                 <PreviewTreeMap />
                 break;
         }

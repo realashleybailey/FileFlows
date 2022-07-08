@@ -121,7 +121,7 @@
     text-align: center;
   }
 
-  ::deep .portlet {
+  ::deep .widget {
     margin-bottom: 2rem;
   }
 }

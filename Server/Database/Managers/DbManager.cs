@@ -26,15 +26,6 @@ public abstract class DbManager
         Created = 1,
         AlreadyExisted = 2
     }
-    protected readonly string CreateDbScript =
-        @$"CREATE TABLE {nameof(DbObject)}(
-            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
-            Name            VARCHAR(1024)      NOT NULL,
-            Type            VARCHAR(255)       NOT NULL,
-            DateCreated     datetime           default           current_timestamp,
-            DateModified    datetime           default           current_timestamp,
-            Data            TEXT               NOT NULL
-        );";
 
     /// <summary>
     /// Gets if the database manager should use a memory cache
@@ -66,7 +57,8 @@ public abstract class DbManager
         if(connectionString.Contains(";Uid="))
             return new MySqlDbManager(connectionString);
         
-        return new SqlServerDbManager(connectionString);
+        //return new SqlServerDbManager(connectionString);
+        throw new Exception("Unknown database: " + connectionString);
     }
 
     /// <summary>
@@ -873,7 +865,41 @@ public abstract class DbManager
     /// Records a statistic
     /// </summary>
     /// <param name="statistic">the statistic to record</param>
-    public virtual Task RecordStatistic(Statistic statistic) => Task.CompletedTask;
+    public async virtual Task RecordStatistic(Statistic statistic)
+    {
+        if (statistic?.Value == null)
+            return;
+        DbStatistic stat;
+        if (double.TryParse(statistic.Value.ToString(), out double number))
+        {
+            stat = new DbStatistic()
+            {
+                Type = StatisticType.Number,
+                Name = statistic.Name,
+                LogDate = DateTime.Now,
+                NumberValue = number,
+                StringValue = string.Empty
+            };
+        }
+        else
+        {
+            // treat as string
+            stat = new DbStatistic()
+            {
+                Type = StatisticType.String,
+                Name = statistic.Name,
+                LogDate = DateTime.Now,
+                NumberValue = 0,
+                StringValue = statistic.Value.ToString()
+            };
+        }
+        using (var db = await GetDb())
+        {
+            await db.Db.InsertAsync(stat);
+        }
+    }
+
+
 
     /// <summary>
     /// Gets statistics by name

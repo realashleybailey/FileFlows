@@ -2,7 +2,7 @@
 @using FileFlows.Plugin
 @using FileFlows.Shared
 @using FileFlows.Client.Helpers
-@using FileFlows.Shared.Portlets
+@using FileFlows.Shared.Widgets
 @{
     bool isScript = Regex.IsMatch(TypeName, @"^Flow\.Parts\.([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})");
 }
@@ -112,11 +112,11 @@
     Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose />
             }
             break;
-        case FormInputType.Portlet:
+        case FormInputType.Widget:
             {
                 var value = GetValue<bool>(field.Name);
-                var pType = GetParameter<PortletType>(field, nameof(InputPortlet.Type));
-                <InputPortlet Field=@field Label="@label"  HideLabel=@hideLabel Type=@pType Value=@value ValueChanged="@(x => UpdateValue(field, x))" />
+                var pType = GetParameter<WidgetType>(field, nameof(InputWidget.Type));
+                <InputWidget Field=@field Label="@label"  HideLabel=@hideLabel Type=@pType Value=@value ValueChanged="@(x => UpdateValue(field, x))" />
             }
             break;
         case FormInputType.StringArray:

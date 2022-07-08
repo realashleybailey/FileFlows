@@ -1,48 +1,48 @@
-namespace FileFlows.Shared.Portlets;
+namespace FileFlows.Shared.Widgets;
 
 
 
 /// <summary>
-/// Portlet definition, these are the different types of portlets in the system
+/// Widget definition, these are the different types of Widgets in the system
 /// </summary>
-public abstract class PortletDefinition
+public abstract class WidgetDefinition
 {
     /// <summary>
-    /// Gets a portlet definition from its UID
+    /// Gets a Widget definition from its UID
     /// </summary>
-    /// <param name="uid">The UID of the portlet definition</param>
-    /// <returns>the portlet definition</returns>
-    public static PortletDefinition GetDefinition(Guid uid)
+    /// <param name="uid">The UID of the Widget definition</param>
+    /// <returns>the Widget definition</returns>
+    public static WidgetDefinition GetDefinition(Guid uid)
     {
-        if (uid == Processing.PD_UID)
+        if (uid == Processing.WD_UID)
             return new Processing();
-        if (uid == FilesRecentlyFinished.PD_UID)
+        if (uid == FilesRecentlyFinished.WD_UID)
             return new FilesRecentlyFinished();
-        if (uid == FilesUpcoming.PD_UID)
+        if (uid == FilesUpcoming.WD_UID)
             return new FilesUpcoming();
-        if (uid == AudioCodecs.PD_UID)
+        if (uid == AudioCodecs.WD_UID)
             return new AudioCodecs();
-        if (uid == Codecs.PD_UID)
+        if (uid == Codecs.WD_UID)
             return new Codecs();
-        if (uid == CpuUsage.PD_UID)
+        if (uid == CpuUsage.WD_UID)
             return new CpuUsage();
-        if (uid == LibraryProcessingTimes.PD_UID)
+        if (uid == LibraryProcessingTimes.WD_UID)
             return new LibraryProcessingTimes();
-        if (uid == LogStorage.PD_UID)
+        if (uid == LogStorage.WD_UID)
             return new LogStorage();
-        if (uid == MemoryUsage.PD_UID)
+        if (uid == MemoryUsage.WD_UID)
             return new MemoryUsage();
-        if (uid == ProcessingTimes.PD_UID)
+        if (uid == ProcessingTimes.WD_UID)
             return new ProcessingTimes();
-        if (uid == TempStorage.PD_UID)
+        if (uid == TempStorage.WD_UID)
             return new TempStorage();
-        if (uid == VideoCodecs.PD_UID)
+        if (uid == VideoCodecs.WD_UID)
             return new VideoCodecs();
-        if (uid == VideoContainers.PD_UID)
+        if (uid == VideoContainers.WD_UID)
             return new VideoContainers();
-        if (uid == VideoResolution.PD_UID)
+        if (uid == VideoResolution.WD_UID)
             return new VideoResolution();
-        throw new Exception("Unknown portlet: " + uid);
+        throw new Exception("Unknown widget: " + uid);
     }
     
     /// <summary>
@@ -62,9 +62,9 @@ public abstract class PortletDefinition
     /// </summary>
     public abstract string Name { get; }
     /// <summary>
-    /// Gets the type of portlet
+    /// Gets the type of Widget
     /// </summary>
-    public abstract PortletType Type { get; }
+    public abstract WidgetType Type { get; }
     /// <summary>
     /// Gets any flags 
     /// </summary>
@@ -73,9 +73,9 @@ public abstract class PortletDefinition
 
 
 /// <summary>
-/// Available portlet types
+/// Available Widget types
 /// </summary>
-public enum PortletType
+public enum WidgetType
 {
     /// <summary>
     /// Processing files

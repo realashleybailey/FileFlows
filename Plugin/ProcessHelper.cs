@@ -313,7 +313,7 @@ public class ProcessHelper
         {
             Args?.OnStandardOutput(e.Data);
             if(Args?.Silent != true)
-                Logger.ILog(e.Data);
+                Logger?.ILog(e.Data);
             outputBuilder.AppendLine(e.Data);
         }
     }
@@ -334,7 +334,7 @@ public class ProcessHelper
         {
             Args?.OnErrorOutput(e.Data);
             if (Args?.Silent != true)
-                Logger.ILog(e.Data);
+                Logger?.ILog(e.Data);
             outputBuilder.AppendLine(e.Data);
         }
     }

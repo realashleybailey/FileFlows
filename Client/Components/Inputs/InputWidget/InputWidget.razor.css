@@ -1,4 +1,4 @@
-.input-portlet {
+.input-widget {
   cursor: pointer;
   overflow: hidden;
 }
@@ -69,4 +69,4 @@
   border-top: solid 1px var(--border-color);
 }
 
-/*# sourceMappingURL=InputPortlet.razor.css.map */
+/*# sourceMappingURL=InputWidget.razor.css.map */

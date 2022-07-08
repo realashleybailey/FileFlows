@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components;
 using System.Timers;
 using FileFlows.Client.Helpers;
+using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Pages;
 
@@ -12,14 +13,19 @@ namespace FileFlows.Client.Pages;
 public partial class Log : ComponentBase
 {
     [CascadingParameter] Blocker Blocker { get; set; }
+    [Inject] protected IJSRuntime jsRuntime { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     private string LogText { get; set; }
     private string lblDownload, lblSearch, lblSearching;
     private string DownloadUrl;
+    private bool scrollToBottom = false;
 
     private bool Searching = false;
 
     SearchPane SearchPane { get; set; }
+
+    
+    private Timer AutoRefreshTimer;
 
     private LogType LogLevel { get; set; } = LogType.Info;
 
@@ -58,9 +64,16 @@ public partial class Log : ComponentBase
         AutoRefreshTimer.AutoReset = true;
         AutoRefreshTimer.Start();
         _ = Refresh();
-
     }
-    private Timer AutoRefreshTimer;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (scrollToBottom)
+        {
+            await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content"});
+            scrollToBottom = false;
+        }
+    }
 
     private void NavigationManager_LocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
@@ -108,12 +121,14 @@ public partial class Log : ComponentBase
 
     async Task Refresh()
     {
+        bool nearBottom = string.IsNullOrWhiteSpace(LogText) == false && await jsRuntime.InvokeAsync<bool>("ff.nearBottom", new object[]{ ".page .content"});
         if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
             var response = await HttpHelper.Post<string>("/api/log/search", SearchModel);
             if (response.Success)
             {
                 this.LogText = response.Data;
+                this.scrollToBottom = nearBottom;
                 this.StateHasChanged();
             }
         }
@@ -123,6 +138,7 @@ public partial class Log : ComponentBase
             if (response.Success)
             {
                 this.LogText = response.Data;
+                this.scrollToBottom = nearBottom;
                 this.StateHasChanged();
             }
         }

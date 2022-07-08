@@ -1163,7 +1163,6 @@ export class Processing extends FFChart
             }
             this.createRunners(data);
             let first = data[0];
-            console.log('first', first);
             if(first.CurrentPartPercent > 0)
                 title = 'FileFlows - ' + first.CurrentPartPercent.toFixed(1) + ' %';
             else
@@ -1216,7 +1215,9 @@ export class Processing extends FFChart
                 this.createRunner(chartDiv, worker);
             }
             this.updateRunner(worker);
-            this.createOrUpdateRadialBar(worker);
+            try {
+                this.createOrUpdateRadialBar(worker);
+            }catch(err){}
         }
         let keys = Object.keys(this.runners);
         for(let i=keys.length; i >= 0; i--){
@@ -1271,7 +1272,9 @@ export class Processing extends FFChart
         btnCancel.innerText = 'Cancel';
         btnCancel.addEventListener('click', () => {
             this.csharp.invokeMethodAsync("CancelRunner", runner.Uid, runner.LibraryFile.Uid, runner.LibraryFile.Name).then(() =>{
-                this.getData();
+                try {
+                    this.getData();
+                }catch(err){}
             });
         });
         buttons.appendChild(btnCancel);
@@ -1327,7 +1330,7 @@ export class Processing extends FFChart
         return hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0')
     }
     
-    createOrUpdateRadialBar(runner){
+    createOrUpdateRadialBar(runner){        
         let chartUid = `runner-${runner.Uid}-chart`;
         let overall = runner.TotalParts == 0 ? 100 : (runner.CurrentPart / runner.TotalParts) * 100;
         let options = {

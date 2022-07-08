@@ -129,5 +129,30 @@ window.ff = {
             el.dispatchEvent(window.dashboardElementResized);
             saveGrid();
         });
+    },
+    
+    nearBottom: function(element){
+        let ele = element;
+        if(typeof(element) === 'string')
+            ele = document.getElementById(element);
+        if(!ele)
+            ele = document.querySelector(element);
+        if(!ele)
+            return false;
+
+        const threshold = 100;
+        const position = ele.scrollTop + ele.offsetHeight;
+        const height = ele.scrollHeight;
+        return position > height - threshold;
+    },
+    scrollToBottom: function(element) {
+        let ele = element;
+        if(typeof(element) === 'string')
+            ele = document.getElementById(element);
+        if(!ele)
+            ele = document.querySelector(element);
+        if(!ele)
+            return false;
+        ele.scrollTo({ top: ele.scrollHeight, behavior: 'smooth' })
     }
 };

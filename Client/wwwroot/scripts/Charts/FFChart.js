@@ -547,12 +547,15 @@ export class TimeSeriesChart extends FFChart
     constructor(uid, args) {
         super(uid, args, true);
         
-        let options = args.flags !== null ? args.flags : this.ele.getAttribute('x-options');        
+        console.log('args', args);
+        let options = args.flags !== null ? args.flags : this.ele.getAttribute('x-options');
+        if(!options)
+            options = '0';
 
         this.bottomUid = uid + '-bottom';
         this.topUid = uid + '-top';
-        this.sizeData = options === '1' === true;
-        this.countData  = options === '2' === true;
+        this.sizeData = options.toString() === '1';
+        this.countData  = options.toString() === '2';
         this.url = args.url;
         
         this.getData();
@@ -778,6 +781,11 @@ export class TimeSeriesChart extends FFChart
                     formatter: (value, opts) => new Date(value).toLocaleTimeString()
                 },
                 y: {
+                    title: {
+                        formatter: function (seriesName) {
+                            return '';
+                        }
+                    },
                     formatter: this.sizeData ?
                         (value, opts) => {
                             if (value === undefined) {

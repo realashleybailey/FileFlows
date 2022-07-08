@@ -1,6 +1,6 @@
 ---
-name: Apprise
-title: Apprise
+name: Settings
+title: Settings
 permalink: /plugins/apprise/settings
 layout: default
 plugin: Apprise

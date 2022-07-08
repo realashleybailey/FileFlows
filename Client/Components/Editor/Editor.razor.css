@@ -8,6 +8,9 @@
   z-index: 6;
   left: 0;
 }
+.editor.maximised {
+  width: 100vw !important;
+}
 
 .background-overlay {
   z-index: 5 !important;

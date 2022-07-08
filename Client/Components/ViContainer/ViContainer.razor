@@ -3,6 +3,10 @@
 <div class="vi-container @(FullWidth ? "fullwidth" : "") @(Flex ? "flex" : "") @ClassName">
     <div class="top-row  @(AlwaysShowTitle ? "show-title" : "")">
         <span class="title">
+            @if (Maximise)
+            {
+                <i class="far fa-window-maximize" @onclick=@ToggleMaximise></i>
+            }
             @if (string.IsNullOrEmpty(Icon) == false)
             {
                 <span class="icon @Icon"></span>

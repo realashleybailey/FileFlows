@@ -27,6 +27,8 @@ namespace FileFlows.Client.Components
         public string Title { get; set; }
         public string HelpUrl { get; set; }
         public string Icon { get; set; }
+        
+        private bool Maximised { get; set; }
 
         /// <summary>
         /// Get the name of the type this editor is editing
@@ -83,6 +85,7 @@ namespace FileFlows.Client.Components
             lblCancel = Translater.Instant("Labels.Cancel");
             lblClose = Translater.Instant("Labels.Close");
             lblHelp = Translater.Instant("Labels.Help");
+            this.Maximised = false;
         }
 
         protected override void OnAfterRender(bool firstRender)
@@ -138,6 +141,7 @@ namespace FileFlows.Client.Components
             this.Model = expandoModel;
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
+            this.Maximised = false;
             if (noTranslateTitle)
                 this.Title = title;
             else
@@ -449,6 +453,11 @@ namespace FileFlows.Client.Components
             if (string.IsNullOrWhiteSpace(HelpUrl))
                 return;
             _ = jsRuntime.InvokeVoidAsync("open", HelpUrl.ToLower(), "_blank");
+        }
+
+        void OnMaximised(bool maximised)
+        {
+            this.Maximised = maximised;
         }
     }
 }

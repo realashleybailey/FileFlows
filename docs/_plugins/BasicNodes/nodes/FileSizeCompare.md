@@ -1,17 +1,12 @@
 ---
-name: File Size Compare
-title: File Size Compare
-permalink: /plugins/basic-nodes/file-size-compare
+name: Input File
+title: Input File
+permalink: /plugins/basic-nodes/input-file
 layout: default
 plugin: Basic Nodes
 toc: true
 ---
 
-{% include node.html input=1 outputs=3 icon="fas fa-sitemap" name="File Size Compare" type="Logic" %}
+{% include node.html input=0 outputs=1 icon="far fa-file" name="Input File" type="Input" %}
 
-Checks if the file size has changed sized from the original file.
-
-### Outputs
-1. Smaller than original
-2. Same size as original
-3. Larger than original
+An input node for a file.  This is required and is the starting point of a flow.  Any input node can be used, just one is required.

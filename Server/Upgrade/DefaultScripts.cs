@@ -257,6 +257,58 @@ function Script(Days, UseLastWriteTime)
 "
 	    };
     }
+    
+    private Script Script_NvidiaBelowEncoderLimit()
+    {
+	    return new Script
+	    {
+		    Uid = new Guid("6aec0136-e5cf-4abc-b66b-a3aebbbd9c06"),
+		    Name = "NVIDIA: Below Encoder Limit",
+		    Code =
+			    $@"
+/**
+ * Checks the count of NVIDIA encodes currently processing and see if it is below a limit
+ * @author John Andrews
+ * @version {Globals.Version}
+ * @param {{int}} EncoderLimit The maximum number of encoders available
+ * @output Below encoder limit
+ * @output Not below encoder limit
+ */
+function Script(EncoderLimit)
+{{
+    // nvidia-smi --query-gpu=encoder.stats.sessionCount --format=csv
+    let process = Flow.Execute({{
+	    command: 'nvidia-smi',
+    	argumentList: [
+    		'--query-gpu=encoder.stats.sessionCount',
+    		'--format=csv,noheader'
+    	]
+    }});
+    if(process.exitCode != 0)
+    {{
+	    Logger.ELog('Unable to execute nvidia-smi');
+		    return -1;
+	}}
+    
+    let encoders = parseInt(process.standardOutput, 10);
+    if(isNaN(encoders)){{
+	    Logger.ELog('Unable to parse number of encoders: ' + process.standardOutput);
+	    return 1;
+	}}
+
+    if(encoders >= EncoderLimit)
+    {{
+	    Logger.WLog('Is not below the limit, at: ' + encoders);
+	    return 2;
+	}}
+
+    Logger.ILog('Is below the limit, at: ' + encoders);
+    return 1;
+}}
+"
+	    };
+    }
+    
     private List<Script> GetDefaultScripts()
     {
 	    var templates = new List<Script>();
@@ -266,6 +318,7 @@ function Script(Days, UseLastWriteTime)
 	    templates.Add(Script_VideoBitrateGreaterThan());
 	    templates.Add(Script_7ZipCompressToZip());
 	    templates.Add(Script_FileOlderThan());
+	    templates.Add(Script_NvidiaBelowEncoderLimit());
 	    return templates;
     }
 }

@@ -87,7 +87,14 @@ public class Runner
                 while (finished == false)
                 {
                     if (finished == false)
-                        await communicator.Hello(Program.Uid);
+                    {
+                        bool success = await communicator.Hello(Program.Uid);
+                        if (success == false)
+                        {
+                            Communicator_OnCancel();
+                            return;
+                        }
+                    }
                     await Task.Delay(5_000);
                 }
             });

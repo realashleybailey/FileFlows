@@ -31,9 +31,10 @@ public class FlowHub : Hub
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
     /// <param name="libraryFileUid">the UID of the library file</param>
-    public Task Hello(Guid runnerUid, Guid libraryFileUid)
+    /// <returns>if the hello was successful or not</returns>
+    public Task<bool> Hello(Guid runnerUid, Guid libraryFileUid)
     {
-        new WorkerController(null).Hello(runnerUid, libraryFileUid);
-        return Task.CompletedTask;
+        var result = new WorkerController(null).Hello(runnerUid, libraryFileUid);
+        return Task.FromResult(result);
     }
 }

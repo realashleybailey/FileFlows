@@ -366,7 +366,7 @@ public class WorkerController : Controller
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
     /// <param name="libraryFileUid">the UID of the library file</param>
-    internal void Hello(Guid runnerUid, Guid libraryFileUid)
+    internal bool Hello(Guid runnerUid, Guid libraryFileUid)
     {
         lock (Executors)
         {
@@ -377,11 +377,12 @@ public class WorkerController : Controller
                     Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
                     foreach (var executor in Executors.Values)
                         Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
-                    return; // unknown executor
+                    return false; // unknown executor
                 }
             }
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;
+            return true;
         }
     }
 

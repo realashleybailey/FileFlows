@@ -1052,8 +1052,11 @@ export class LibraryFileTable extends FFChart
         for(let title of columns){
             let th = document.createElement('th');
             th.innerText = title;
-            if(title !== 'Name')
+            if(title !== 'Name') {
                 th.style.width = '6rem';
+                th.style.minWidth = '6rem';
+                th.style.maxWidth = '6rem';
+            }
             th.className = title.toLowerCase();
             theadTr.appendChild(th);                
         }
@@ -1066,7 +1069,8 @@ export class LibraryFileTable extends FFChart
             tbody.appendChild(tr);
             
             let tdRelativePath = document.createElement('td');
-            tdRelativePath.innerText = item.RelativePath
+            tdRelativePath.innerText = item.RelativePath;
+            tdRelativePath.style.wordBreak = 'break-word';
             tr.appendChild(tdRelativePath);
             
             if(this.recentlyFinished === false)
@@ -1082,6 +1086,8 @@ export class LibraryFileTable extends FFChart
 
             let tdTime = document.createElement('td');
             tdTime.style.width = '6rem';
+            tdTime.style.minWidth = '6rem';
+            tdTime.style.maxWidth = '6rem';
             tr.appendChild(tdTime);
             
             let aTime = document.createElement('a');
@@ -1097,6 +1103,8 @@ export class LibraryFileTable extends FFChart
 
             let tdSize = document.createElement('td');
             tdSize.style.width = '6rem';
+            tdSize.style.minWidth = '6rem';
+            tdSize.style.maxWidth = '6rem';
             tr.appendChild(tdSize);                
             if(fs > 0) 
             {

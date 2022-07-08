@@ -1,3 +1,5 @@
+using Microsoft.JSInterop;
+
 namespace FileFlows.Client.Shared
 {
     using System.Collections.Generic;
@@ -9,6 +11,7 @@ namespace FileFlows.Client.Shared
     {
         [Inject] private INavigationService NavigationService { get; set; }
         [Inject] private NavigationManager NavigationManager { get; set; }
+        [Inject] public IJSRuntime jSRuntime { get; set; }
         private List<NavMenuGroup> MenuItems = new List<NavMenuGroup>();
         private bool collapseNavMenu = true;
 
@@ -134,6 +137,7 @@ namespace FileFlows.Client.Shared
             bool ok = await NavigationService.NavigateTo(item.Url);
             if (ok)
             {
+                await jSRuntime.InvokeVoidAsync("eval", $"document.title = 'FileFlows'");
                 SetActive(item);
                 collapseNavMenu = true;
                 this.StateHasChanged();

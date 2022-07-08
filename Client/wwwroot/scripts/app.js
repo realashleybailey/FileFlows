@@ -154,5 +154,21 @@ window.ff = {
         if(!ele)
             return false;
         ele.scrollTo({ top: ele.scrollHeight, behavior: 'smooth' })
+    },
+    codeCaptureSave: function(csharp) {
+        window.CodeCaptureListener = (e) => {
+            if(e.ctrlKey ===  false || e.shiftKey || e.altKey || e.code != 'KeyS')
+                return;
+            e.preventDefault();
+            e.stopPropagation();
+            setTimeout(() => {                
+                csharp.invokeMethodAsync("SaveCode");
+            },1);
+            return true;
+        };
+        document.addEventListener("keydown", window.CodeCaptureListener);
+    },
+    codeUncaptureSave: function(){
+        document.removeEventListener("keydown", window.CodeCaptureListener);        
     }
 };

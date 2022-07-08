@@ -8,7 +8,7 @@ namespace FileFlows.Client.Components.Inputs
     using FileFlows.Plugin;
     using Microsoft.AspNetCore.Components.Web;
 
-    public partial class InputCode : Input<string>
+    public partial class InputCode : Input<string>, IDisposable
     {
 
         const string API_URL = "/api/code-eval";
@@ -48,7 +48,19 @@ namespace FileFlows.Client.Components.Inputs
             this.InitialValue = Value;
             this.Editor.OnCancel += Editor_OnCancel;
             this.Editor.OnClosed += Editor_Closed;
+            
+            var dotNetObjRef = DotNetObjectReference.Create(this);
+            jsRuntime.InvokeVoidAsync("ff.codeCaptureSave", new object[] { dotNetObjRef });
             base.OnInitialized();
+        }
+
+        /// <summary>
+        /// Saves the code
+        /// </summary>
+        [JSInvokable]
+        public async Task SaveCode()
+        {
+            this.OnSubmit.InvokeAsync();
         }
 
         private Task Editor_Closed()
@@ -107,6 +119,11 @@ namespace FileFlows.Client.Components.Inputs
             {
                 await OnClose.InvokeAsync();
             }
+        }
+
+        public void Dispose()
+        {
+            jsRuntime.InvokeVoidAsync("ff.codeUncaptureSave");
         }
     }
 }

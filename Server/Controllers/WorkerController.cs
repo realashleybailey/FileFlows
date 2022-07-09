@@ -1,3 +1,4 @@
+
 using System.Security.Cryptography.Xml;
 using FileFlows.Server.Helpers;
 
@@ -200,14 +201,14 @@ public class WorkerController : Controller
             Uid = x.Uid,
             WorkingFile = x.WorkingFile
         }).ToList();
-        #if(DEBUG && false)
+        #if(DEBUG)
         if (results.Any() != true)
         {
-            results = Enumerable.Range(1, 1).Select(x => new FlowExecutorInfo
+            results = Enumerable.Range(1, 2).Select(x => new FlowExecutorInfo
             {
                 LibraryFile = new LibraryFile()
                 {
-                    Name = "File_x." + new string('w', 200)
+                    Name = "/ssssssssssssssssssss/dddddddddddddddwwwwwwwww/wwwwwweeeeeeeeeeeeexxxxxxxxxx/xxxxxxxxdffffffffffffffff/ffffddddddddddxzfdgffdgFile_x." + new string('w', 200)
                 },
                 CurrentPart = x,
                 CurrentPartName = "Part " + x,
@@ -217,8 +218,8 @@ public class WorkerController : Controller
                     Name = "Library " + x
                 },
                 NodeUid = new Guid("00000000-0000-0000-0000-00000000000" + x),
-                NodeName = "Node " + x,
-                RelativeFile = "/tv/file" + x + ".mkv",
+                NodeName = "FFMPEG Builder: Audio Normalization",
+                RelativeFile = "/tv/dfgdfgfffffffffffffffffffffff/dfffffffffffffffffff/dfddddddddddddddd/file" + x + ".mkv",
                 StartedAt = DateTime.Now.AddMinutes(-x * 5),
                 TotalParts = 20,
                 Uid = new Guid("00000000-0000-0000-0000-00000000000" + x),

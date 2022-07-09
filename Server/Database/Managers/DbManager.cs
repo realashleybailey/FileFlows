@@ -85,8 +85,11 @@ public abstract class DbManager
     /// <returns>an instance of the IDatabase</returns>
     protected async Task<FlowDbConnection> GetDb()
     {
-        return await FlowDbConnection.Get(GetDbInstance);
+        if (UseMemoryCache)
+            return await FlowDbConnection.Get(GetDbInstance);
 
+        return await FlowDbConnection.Get(() => new FlowDatabase(this.ConnectionString));
+        
         // int count = 0;
         // while(++count < 100)
         // {

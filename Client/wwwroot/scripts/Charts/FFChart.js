@@ -1158,7 +1158,7 @@ export class Processing extends FFChart
             return;
         super.getData();
         
-        this.timer = setTimeout(() => this.getData(), 5000);
+        //this.timer = setTimeout(() => this.getData(), 5000);
     }
 
     createChart(data) {

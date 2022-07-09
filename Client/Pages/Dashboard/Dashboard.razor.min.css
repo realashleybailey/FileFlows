@@ -1,1 +1,1 @@
-.dashboard-wrapper{position:absolute;top:1rem;bottom:1rem;left:1rem;right:1rem;max-width:1400px}.mobile-view{display:none}@media screen and (max-width:850px){.mobile-view{display:block;text-align:center;margin:0 0 1rem}}
+.dashboard-wrapper{position:absolute;top:1rem;bottom:1rem;left:1rem;right:1rem;max-width:1400px}.mobile-view{display:none}@media screen and (max-width:850px){.mobile-view{display:block;text-align:center;margin:0 0 1rem}}.mobile-pause-resume{text-align:center;margin-bottom:1rem}.mobile-pause-resume ::deep button{width:min(14rem,90%)!important}

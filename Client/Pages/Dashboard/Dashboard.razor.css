@@ -18,5 +18,12 @@
     margin: 0 0 1rem;
   }
 }
+.mobile-pause-resume {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.mobile-pause-resume ::deep button {
+  width: min(14rem, 90%) !important;
+}
 
 /*# sourceMappingURL=Dashboard.razor.css.map */

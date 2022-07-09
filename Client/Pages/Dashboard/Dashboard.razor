@@ -9,7 +9,7 @@
 <PageView ClassName="fix-width">
 
     <Head>
-        @if (App.Instance.FileFlowsSystem.Licensed)
+        @if (App.Instance.FileFlowsSystem.Licensed && App.Instance.IsMobile == false)
         {
             if (ActiveDashboardUid != Guid.Empty && ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
             {
@@ -32,7 +32,7 @@
         }
         @if (App.Instance.IsMobile == false)
         {
-            <PauseResume />
+            <PauseResume />   
         }
     </Head>
 
@@ -43,12 +43,18 @@
         {
             <InitialConfigWelcome />
         }
-        else if (App.Instance.FileFlowsSystem.Licensed && ActiveDashboardUid != Guid.Empty)
+        else if (App.Instance.IsMobile == false && App.Instance.FileFlowsSystem.Licensed && ActiveDashboardUid != Guid.Empty)
         {
             <CustomDashboard ActiveDashboardUid=@ActiveDashboardUid />
         }
         else
         {
+            @if (App.Instance.IsMobile)
+            {
+                <div class="mobile-pause-resume">
+                    <PauseResume />   
+                </div>
+            }
             <BasicDashboard />
         }
     </CascadingValue>

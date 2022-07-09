@@ -22,7 +22,7 @@ public class SettingsController : Controller
     /// </summary>
     /// <returns>the system status of FileFlows</returns>
     [HttpGet("fileflows-status")]
-    public FileFlowsStatus GetFileFlowsStatus()
+    public async Task<FileFlowsStatus> GetFileFlowsStatus()
     {
         FileFlowsStatus status = new();
         
@@ -34,9 +34,19 @@ public class SettingsController : Controller
             status.ExternalDatabase = (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite")) == false;
         }
 
-        var libs = new LibraryController().GetData().Result?.Any() == true;
-        var flows = new FlowController().GetData().Result?.Any() == true;
-        
+        bool libs, flows;
+
+        if (DbHelper.UseMemoryCache)
+        {
+            libs = new LibraryController().GetData().Result?.Any() == true;
+            flows = new FlowController().GetData().Result?.Any() == true;
+        }
+        else
+        {
+            flows = await DbHelper.HasAny<Flow>();
+            libs = await DbHelper.HasAny<Library>();
+        }
+
         if (flows)
             status.ConfigurationStatus |= ConfigurationStatus.Flows;
         if (libs)

@@ -297,6 +297,17 @@ public class DbHelper
     /// <returns>the matching statistics</returns>
     public static Task<IEnumerable<Statistic>> GetStatisticsByName(string name) => Manager.GetStatisticsByName(name);
     
+    /// <summary>
+    /// Checks if the database has any of the type
+    /// </summary>
+    /// <typeparam name="T">The type</typeparam>
+    /// <returns>true if has any of the time</returns>
+    public static async Task<bool> HasAny<T>() where T : FileFlowObject
+    {
+        var manager = GetDbManager();
+        int count = await manager.ExecuteScalar<int>("select count(uid) from DbObject where Type = @0", typeof(T).FullName);
+        return count > 0;
+    }
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

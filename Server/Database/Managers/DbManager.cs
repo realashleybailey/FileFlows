@@ -256,6 +256,20 @@ public abstract class DbManager
     #endregion
     
     
+    /// <summary>
+    /// Executes a sql command and returns a single value
+    /// </summary>
+    /// <typeparam name="T">the type of object to select</typeparam>
+    /// <param name="sql">The sql to execute</param>
+    /// <param name="args">The arguments for the sql command</param>
+    /// <returns>the single value</returns>
+    public virtual async Task<T> ExecuteScalar<T>(string sql, params object[] args)
+    {
+        using (var db = await GetDb())
+        {
+            return db.Db.ExecuteScalar<T>(sql, args);
+        }
+    }
 
     /// <summary>
     /// Select a list of objects

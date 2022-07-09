@@ -7,7 +7,8 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class FlowDbConnection:IDisposable
 {
-    private static SemaphoreSlim semaphore = new SemaphoreSlim(50, 50);
+    private const int MAX_CONNECTIONS = 30;
+    private static SemaphoreSlim semaphore = new SemaphoreSlim(MAX_CONNECTIONS, MAX_CONNECTIONS);
 
     /// <summary>
     /// Gets the database instance
@@ -21,7 +22,7 @@ public class FlowDbConnection:IDisposable
     /// <summary>
     /// Gets the count of open database connections
     /// </summary>
-    public static int GetOpenConnections => semaphore.CurrentCount;
+    public static int GetOpenConnections => MAX_CONNECTIONS - semaphore.CurrentCount;
 
     /// <summary>
     /// Gets a database connection

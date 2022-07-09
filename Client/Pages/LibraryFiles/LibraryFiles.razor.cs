@@ -1,6 +1,9 @@
+using System.Text.Json;
 using BlazorDateRangePicker;
+using FileFlows.Client.Components.Common;
 using Humanizer;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Pages;
@@ -24,11 +27,13 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
 
     [Inject] private IJSRuntime jsRuntime { get; set; }
 
-    private FileFlows.Shared.Models.FileStatus SelectedStatus = FileFlows.Shared.Models.FileStatus.Unprocessed;
+    private FlowSkyBox<FileStatus> Skybox;
+
+    private FileFlows.Shared.Models.FileStatus SelectedStatus;
 
     private string lblMoveToTop = "";
 
-    private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
+    //private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
     private int Count;
     private string lblSearch;
@@ -38,6 +43,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     {
         Path = string.Empty
     };
+
     private string Title;
     private string lblLibraryFiles, lblFileFlowsServer;
     private int TotalItems;
@@ -60,24 +66,19 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     {
         if (this.SelectedStatus == FileStatus.Unprocessed)
             return;
-        var status = this.Statuses.Where(x => x.Status == FileStatus.Unprocessed).FirstOrDefault();
         SelectedStatus = FileStatus.Unprocessed;
-        Title = lblLibraryFiles + ": " + status?.Name;
+        Skybox.SetSelectedValue(SelectedStatus);
+        Title = lblLibraryFiles + ": " + SelectedStatus.Humanize();
         _ = this.Refresh();
     }
 
-    private void SetSelected(LibraryStatus status)
+    private void SetSelected(FlowSkyBoxItem<FileStatus> status)
     {
+        SelectedStatus = status.Value;
         this.PageIndex = 0;
-        SelectedStatus = status.Status;
         Title = lblLibraryFiles + ": " + status.Name;
         _ = this.Refresh();
     }
-
-    //protected virtual Task<RequestResult<List<LibraryFile>>> FetchData()
-    //{
-    //    return HttpHelper.Get<List<LibraryFile>>($"{FetchUrl}?skip=0&top=250");
-    //}
 
 
 #if (DEMO)
@@ -108,7 +109,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     }
 #endif
 
-    public override string FetchUrl => $"{ApiUrl}/list-all?status={SelectedStatus}&page={PageIndex}&pageSize={PageSize}";
+    public override string FetchUrl => $"{ApiUrl}/list-all?status={Skybox?.SelectedItem?.Value}&page={PageIndex}&pageSize={PageSize}";
 
     private string NameMinWidth = "20ch";
 
@@ -131,6 +132,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     protected async override Task OnInitializedAsync()
     {
         base.OnInitialized();
+        this.SelectedStatus = FileFlows.Shared.Models.FileStatus.Unprocessed;
         lblMoveToTop = Translater.Instant("Pages.LibraryFiles.Buttons.MoveToTop");
         lblLibraryFiles = Translater.Instant("Pages.LibraryFiles.Title");
         lblFileFlowsServer = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
@@ -181,11 +183,44 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
 
        foreach (var s in data)
            s.Name = Translater.Instant("Enums.FileStatus." + s.Status.ToString());
-       Statuses.Clear();
-       Statuses.AddRange(data.OrderBy(x => { int index = order.IndexOf(x.Status); return index >= 0 ? index : 100; }));
-              this.Count = Statuses.Where(x => x.Status == SelectedStatus).Select(x => x.Count).FirstOrDefault();
 
+       var sbItems = new List<FlowSkyBoxItem<FileStatus>>();
+       foreach (var status in data.OrderBy(x =>
+                {
+                    int index = order.IndexOf(x.Status);
+                    return index >= 0 ? index : 100;
+                }))
+       {
+           string icon = status.Status switch
+           {
+               FileStatus.Unprocessed => "far fa-hourglass",
+               FileStatus.Disabled => "fas fa-toggle-off",
+               FileStatus.Processed => "far fa-check-circle",
+               FileStatus.Processing => "fas fa-file-medical-alt",
+               FileStatus.FlowNotFound => "fas fa-exclamation",
+               FileStatus.ProcessingFailed => "far fa-times-circle",
+               FileStatus.OutOfSchedule => "far fa-calendar-times",
+               FileStatus.Duplicate => "far fa-copy",
+               FileStatus.MappingIssue => "fas fa-map-marked-alt",
+               FileStatus.MissingLibrary => "fas fa-trash",
+               FileStatus.OnHold => "fas fa-hand-paper",
+               _ => ""
+           };
+           if (status.Status != FileStatus.Unprocessed && status.Count == 0)
+               continue;
+           sbItems.Add(new ()
+           {
+               Count = status.Count,
+               Icon = icon,
+               Name = status.Name,
+               Value = status.Status
+           });
+        }
+
+        Skybox.SetItems(sbItems, SelectedStatus);
+        this.Count = sbItems.Where(x => x.Value == SelectedStatus).Select(x => x.Count).FirstOrDefault();
         CheckPager();
+        this.StateHasChanged();
     }
 
     public override async Task<bool> Edit(LibaryFileListModel item)
@@ -301,7 +336,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
     /// </summary>
     private void CheckPager()
     {
-        var status = this.Statuses.FirstOrDefault(x => x.Status == this.SelectedStatus);
+        var status = Skybox.SelectedItem;
         this.TotalItems = status?.Count ?? 0;
         this.StateHasChanged();
     }

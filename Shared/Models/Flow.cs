@@ -32,6 +32,11 @@ public class Flow : FileFlowObject
     /// Gets or sets the parts of this flow
     /// </summary>
     public List<FlowPart> Parts { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this is the default failure flow
+    /// </summary>
+    public bool Default { get; set; }
 }
 
 /// <summary>

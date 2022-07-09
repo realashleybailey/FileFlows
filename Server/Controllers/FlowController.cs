@@ -38,10 +38,14 @@ public class FlowController : ControllerStore<Flow>
     {
         if (DbHelper.UseMemoryCache)
         {
-            var flow = (await GetDataList())?.Where(x => x.Type == FlowType.Failure && x.Enabled)?.FirstOrDefault();
+            var flow = (await GetDataList())?.Where(x => x.Type == FlowType.Failure && x.Enabled && x.Default)?.FirstOrDefault();
             return flow;
         }
-        return await DbHelper.GetFailureFlow(libraryUid);
+        else
+        {
+            var flow = await DbHelper.GetFailureFlow(libraryUid);
+            return flow;
+        }
     }
 
     /// <summary>
@@ -87,6 +91,7 @@ public class FlowController : ControllerStore<Flow>
         // reparse with new UIDs
         flow = JsonSerializer.Deserialize<Flow>(json);
         flow.Uid = Guid.Empty;
+        flow.Default = false;
         flow.DateModified = DateTime.Now;
         flow.DateCreated = DateTime.Now;
         flow.Name = await GetNewUniqueName(flow.Name);
@@ -167,6 +172,37 @@ public class FlowController : ControllerStore<Flow>
         return flow;
     }
 
+    /// <summary>
+    /// Sets the default state of a flow
+    /// </summary>
+    /// <param name="uid">The flow UID</param>
+    /// <param name="isDefault">Whether or not the flow should be the default</param>
+    [HttpPut("set-default/{uid}")]
+    public async Task SetDefault([FromRoute] Guid uid, [FromQuery(Name = "default")] bool isDefault = true)
+    {
+        var flow = await GetByUid(uid);
+        if (flow == null)
+            throw new Exception("Flow not found.");
+        if(flow.Type != FlowType.Failure)
+            throw new Exception("Flow not a failure flow.");
+
+        if (isDefault)
+        {
+            // make sure no others are defaults
+            var others = (await GetAll()).Where(x => x.Type == FlowType.Failure && x.Default && x.Uid != uid).ToList();
+            foreach (var other in others)
+            {
+                other.Default = false;
+                await Update(other);
+            }
+        }
+
+        if (isDefault == flow.Default)
+            return;
+
+        flow.Default = isDefault;
+        await Update(flow);
+    }
     /// <summary>
     /// Delete flows from the system
     /// </summary>
@@ -394,6 +430,14 @@ public class FlowController : ControllerStore<Flow>
             throw new Exception("Flow.ErrorMessages.NoInput");
         else if (inputNodes > 1)
             throw new Exception("Flow.ErrorMessages.TooManyInputNodes");
+
+        if (model.Uid == Guid.Empty && model.Type == FlowType.Failure)
+        {
+            // if first failure flow make it default
+            var others = (await GetAll()).Where(x => x.Type == FlowType.Failure).Count();
+            if (others == 0)
+                model.Default = true;
+        }
 
         return await Update(model);
     }

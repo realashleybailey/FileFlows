@@ -547,7 +547,6 @@ export class TimeSeriesChart extends FFChart
     constructor(uid, args) {
         super(uid, args, true);
         
-        console.log('args', args);
         let options = args.flags !== null ? args.flags : this.ele.getAttribute('x-options');
         if(!options)
             options = '0';

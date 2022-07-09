@@ -64,6 +64,7 @@ namespace FileFlows.Client
         {
             Instance = this;
             ClientConsoleLogger.jsRuntime = jsRuntime;
+            new ClientConsoleLogger();
             HttpHelper.Client = Client;
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;

@@ -143,6 +143,11 @@ namespace FileFlows.Client.Components.Common
             }
         }
 
+        /// <summary>
+        /// Calls StateHasChanged on the component
+        /// </summary>
+        public void TriggerStateHasChanged() => this.StateHasChanged();
+
         private void CheckItem(ChangeEventArgs e, TItem item)
         {
             bool @checked = e.Value as bool? == true;

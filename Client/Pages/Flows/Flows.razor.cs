@@ -1,3 +1,5 @@
+using FileFlows.Client.Components.Common;
+
 namespace FileFlows.Client.Pages;
 
 using System.Collections.Generic;
@@ -26,12 +28,17 @@ public partial class Flows : ListPage<ffFlow>
 
     public override string ApiUrl => "/api/flow";
 
+    private FlowSkyBox<FlowType> Skybox;
+
+    private List<ffFlow> DataStandard = new();
+    private List<ffFlow> DataFailure = new();
+    private FlowType SelectedType = FlowType.Standard;
+
     #if(DEBUG)
     private bool DEBUG = true;
     #else
     private bool DEBUG = false;
     #endif
-
 
 
 #if (DEMO)
@@ -552,5 +559,66 @@ public partial class Flows : ListPage<ffFlow>
             Blocker.Hide();
         }
 #endif
+    }
+
+    protected override Task PostDelete()
+    {
+        UpdateTypeData();
+        return Task.CompletedTask;
+    }
+
+    public override Task PostLoad()
+    {
+        UpdateTypeData();
+        return Task.CompletedTask;
+    }
+    
+    private void UpdateTypeData()
+    {
+        this.DataFailure = this.Data.Where(x => x.Type == FlowType.Failure).ToList();
+        this.DataStandard = this.Data.Where(x => x.Type == FlowType.Standard).ToList();
+        this.Skybox.SetItems(new List<FlowSkyBoxItem<FlowType>>()
+        {
+            new ()
+            {
+                Name = "Standard Flows",
+                Icon = "fas fa-sitemap",
+                Count = this.DataStandard.Count,
+                Value = FlowType.Standard
+            },
+            new ()
+            {
+                Name = "Failure Flows",
+                Icon = "fas fa-exclamation-circle",
+                Count = this.DataFailure.Count,
+                Value = FlowType.Failure
+            }
+        }, this.SelectedType);
+    }
+
+    private void SetSelected(FlowSkyBoxItem<FlowType> item)
+    {
+        SelectedType = item.Value;
+        // need to tell table to update so the "Default" column is shown correctly
+        Table.TriggerStateHasChanged();
+        this.StateHasChanged();
+    }
+
+    private async Task SetDefault()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item == null)
+            return;
+        
+        Blocker.Show();
+        try
+        {
+            await HttpHelper.Put($"/api/flow/set-default/{item.Uid}?default={(!item.Default)}");
+            await this.Refresh();
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
     }
 }

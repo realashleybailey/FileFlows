@@ -194,14 +194,17 @@ input[type=file]{
 
 .box.info {
     padding:1rem 1rem 1rem 3rem ;
-    color:var(--yellow);
+    color:var(--color);
+    font-size:0.85rem;
     position:relative;
-    border:dotted 1px var(--yellow);
+    border:solid 1px var(--yellow);
     white-space:pre-line !important;
+    margin-bottom:1rem;
     &::before {
         font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f071";
         position:absolute;
         left:1rem;
+        color:var(--yellow);
     }
     a {
         color: var(--yellow) !important;

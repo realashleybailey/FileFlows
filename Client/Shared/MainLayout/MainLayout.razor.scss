@@ -73,11 +73,22 @@
             .nav-menu-container {
                 margin-top: 2rem;
             }
+            .navbar {
+                padding:0;
+            }
 
             .navbar-brand {
                 margin: 0 !important;
                 position: relative;
-                left: -2px;
+                left: 8px;
+                background-image: url('/favicon.svg');
+                width: 2.5rem;
+                height: 2.5rem;
+                background-size: cover;
+                background-repeat: no-repeat;
+                svg {
+                    display:none;
+                }
             }
 
             .nav-menu-group {

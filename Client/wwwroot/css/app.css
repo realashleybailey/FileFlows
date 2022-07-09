@@ -554,10 +554,12 @@ hr {
 
 .box.info {
   padding: 1rem 1rem 1rem 3rem;
-  color: var(--yellow);
+  color: var(--color);
+  font-size: 0.85rem;
   position: relative;
-  border: dotted 1px var(--yellow);
+  border: solid 1px var(--yellow);
   white-space: pre-line !important;
+  margin-bottom: 1rem;
 }
 .box.info::before {
   font-family: "Font Awesome 5 Free";
@@ -565,6 +567,7 @@ hr {
   content: "\f071";
   position: absolute;
   left: 1rem;
+  color: var(--yellow);
 }
 .box.info a {
   color: var(--yellow) !important;

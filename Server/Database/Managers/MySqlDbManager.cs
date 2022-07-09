@@ -421,12 +421,12 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.Db.SingleAsync<DbObject>(
-                "select * from DbObject where Type = @0 " +
-                "and JSON_EXTRACT(Data,'$.Type') = @1 " +
-                "and JSON_EXTRACT(Data,'$.Enabled') = 1 ",
-                typeof(Flow).FullName, (int)
-                FlowType.Failure);
+            string sql = $@"select * from DbObject where Type = '{typeof(Flow).FullName}' " +
+                         $@"and JSON_EXTRACT(Data,'$.Type') = {(int)FlowType.Failure} " +
+                         "and JSON_EXTRACT(Data,'$.Default') = 1 " +
+                         "and JSON_EXTRACT(Data,'$.Enabled') = 1 ";
+                
+            dbObject = await db.Db.SingleAsync<DbObject>(sql);
         }
 
         return ConvertFromDbObject<Flow>(dbObject);

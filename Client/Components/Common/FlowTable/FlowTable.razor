@@ -79,7 +79,7 @@
                     @{
                         bool selected = Selection != SelectionMode.None && SelectedItems?.Contains(item.Key) == true;
                     }
-                    <div class="flowtable-row @(selected ? "selected" : "")" @ondblclick="() => OnDoubleClick(item.Key)" @onclick="() => OnClick(item.Key)">
+                    <div class="flowtable-row @(selected ? "selected" : "")" @ondblclick="() => OnDoubleClick(item.Key)" @onclick="(e) => OnClick(e, item.Key)">
                         @if(Selection!= SelectionMode.None)
                         {
                             <span style="width:2rem;min-width:2rem;max-width:2rem">

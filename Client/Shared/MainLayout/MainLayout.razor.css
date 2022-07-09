@@ -1,4 +1,4 @@
-﻿.page {
+.page {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -11,6 +11,7 @@
 .sidebar {
   background-color: rgba(var(--base-rgb), 0.15);
   border: 1px solid var(--border-color);
+  z-index: 2;
 }
 
 @media (min-width: 850px) {
@@ -29,4 +30,87 @@
     position: relative;
     max-width: calc(100% - 250px);
   }
+
+  .collapsed .main {
+    max-width: calc(100% - 3.5rem);
+  }
 }
+.expand-collapse {
+  display: none;
+}
+
+@media screen and (min-width: 850px) {
+  .expand-collapse {
+    display: unset;
+    position: absolute;
+    top: 1rem;
+    cursor: pointer;
+    left: 248px;
+    border: solid 1px var(--border-color);
+    width: 1.25rem;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    border-left: solid 2px var(--base);
+    background: var(--base);
+    font-size: 0.8rem;
+    padding-left: 0.25rem;
+    color: rgba(var(--color-rgb), 0.3);
+  }
+  .expand-collapse:hover {
+    color: var(--color);
+  }
+
+  .collapsed .expand-collapse {
+    left: calc(3.5rem + 2px);
+  }
+
+  .sidebar.collapsed {
+    width: 3.75rem !important;
+  }
+  .sidebar.collapsed ::deep .nav-menu-container {
+    margin-top: 2rem;
+  }
+  .sidebar.collapsed ::deep .navbar-brand {
+    margin: 0 !important;
+    position: relative;
+    left: -2px;
+  }
+  .sidebar.collapsed ::deep .nav-menu-group {
+    display: none;
+  }
+  .sidebar.collapsed ::deep .nav-item {
+    padding-left: 0 !important;
+  }
+  .sidebar.collapsed ::deep .nav-item a {
+    padding-left: 0.75rem !important;
+  }
+  .sidebar.collapsed ::deep .text-label {
+    display: none;
+  }
+  .sidebar.collapsed ::deep li.nav-item {
+    transition: width 0.2s ease;
+    overflow: hidden;
+    position: relative;
+  }
+  .sidebar.collapsed ::deep li.nav-item .text-label {
+    position: absolute;
+    left: 4rem;
+  }
+  .sidebar.collapsed ::deep li.nav-item:not(:hover) {
+    width: 3.75rem;
+  }
+  .sidebar.collapsed ::deep li.nav-item:hover {
+    width: 10rem;
+  }
+  .sidebar.collapsed ::deep li.nav-item:hover .text-label {
+    display: unset;
+  }
+  .sidebar.collapsed ::deep li.nav-item:hover a {
+    background-color: var(--accent) !important;
+  }
+  .sidebar.collapsed ::deep .version-info {
+    display: none !important;
+  }
+}
+
+/*# sourceMappingURL=MainLayout.razor.css.map */

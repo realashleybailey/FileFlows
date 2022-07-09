@@ -508,7 +508,7 @@ namespace FileFlows.Client.Pages
                                     var flowsResult = await HttpHelper.Get<ff[]>($"/api/flow");
                                     if (flowsResult.Success)
                                     {
-                                        flowOptions = flowsResult.Data?.Where(x => x.Uid != Model?.Uid && x.Type != FlowType.Failure)?.OrderBy(x => x.Name)?.Select(x => new ListOption
+                                        flowOptions = flowsResult.Data?.Where(x => x.Uid != Model?.Uid)?.OrderBy(x => x.Name)?.Select(x => new ListOption
                                         {
                                             Label = x.Name,
                                             Value = new ObjectReference

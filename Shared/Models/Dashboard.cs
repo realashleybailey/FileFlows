@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using FileFlows.Shared.Widgets;
 
@@ -66,12 +67,25 @@ public class Dashboard: FileFlowObject
             Y = rowIndex, X = 6,
             WidgetDefinitionUid = TempStorage.WD_UID
         });
-        db.Widgets.Add(new ()
+        if (usingExternalDatabase)
         {
-            Height = 1, Width = 3,
-            Y = rowIndex, X = 9,
-            WidgetDefinitionUid = LogStorage.WD_UID
-        });
+            db.Widgets.Add(new()
+            {
+                Height = 1, Width = 3,
+                Y = rowIndex, X = 9,
+                WidgetDefinitionUid = OpenDatabaseConnections.WD_UID
+            });
+        }
+        else
+        {
+            db.Widgets.Add(new()
+            {
+                Height = 1, Width = 3,
+                Y = rowIndex, X = 9,
+                WidgetDefinitionUid = LogStorage.WD_UID
+            });
+        }
+
         ++rowIndex;
         
         // executing

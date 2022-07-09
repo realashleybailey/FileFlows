@@ -71,6 +71,19 @@ public partial class CustomDashboard
             });
         }
 
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.OpenDatabaseConnections.WD_UID))
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.OpenDatabaseConnections),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputWidget.Type), WidgetType.TimeSeries }
+                }
+            });
+        }
+
         if (DoesntHaveWidget(FileFlows.Shared.Widgets.Processing.WD_UID))
         {
             fields.Add(new ElementField

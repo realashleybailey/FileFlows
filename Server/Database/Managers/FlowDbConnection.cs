@@ -7,7 +7,7 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class FlowDbConnection:IDisposable
 {
-    private static SemaphoreSlim semaphore = new SemaphoreSlim(10, 10);
+    private static SemaphoreSlim semaphore = new SemaphoreSlim(50, 50);
 
     /// <summary>
     /// Gets the database instance
@@ -17,6 +17,11 @@ public class FlowDbConnection:IDisposable
     private FlowDbConnection()
     {
     }
+
+    /// <summary>
+    /// Gets the count of open database connections
+    /// </summary>
+    public static int GetOpenConnections => semaphore.CurrentCount;
 
     /// <summary>
     /// Gets a database connection

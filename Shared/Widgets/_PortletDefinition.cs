@@ -42,6 +42,8 @@ public abstract class WidgetDefinition
             return new VideoContainers();
         if (uid == VideoResolution.WD_UID)
             return new VideoResolution();
+        if (uid == OpenDatabaseConnections.WD_UID)
+            return new OpenDatabaseConnections();
         throw new Exception("Unknown widget: " + uid);
     }
     

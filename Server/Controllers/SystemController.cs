@@ -143,6 +143,20 @@ public class SystemController:Controller
     }
     
     /// <summary>
+    /// Gets history of open database connections
+    /// </summary>
+    /// <param name="since">data since a date</param>
+    /// <returns>the open database connections data</returns>
+    [HttpGet("history-data/database-connections")]
+    public IEnumerable<SystemValue<float>> GetOpenDatabaseConnectionsData([FromQuery] DateTime? since = null)
+    {
+        if (since != null)
+            return SystemMonitor.Instance.OpenDatabaseConnections.Where(x => x.Time > since);
+        var data = SystemMonitor.Instance.OpenDatabaseConnections;
+        return EaseData(data);
+    }
+    
+    /// <summary>
     /// Gets history temporary storage data of system information
     /// </summary>
     /// <param name="since">data since a date</param>

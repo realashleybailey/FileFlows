@@ -1,5 +1,6 @@
 using BlazorDateRangePicker;
 using FileFlows.Client.Components;
+using FileFlows.Client.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -18,6 +19,7 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
     private bool Searched = false;
     [Inject] private IJSRuntime jsRuntime { get; set; }
     SearchPane SearchPane { get; set; }
+    
     private readonly LibraryFileSearchModel SearchModel = new()
     {
         Path = string.Empty,
@@ -33,6 +35,7 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
         this.lblSearch = Translater.Instant("Labels.Search");
         this.Title = Translater.Instant("Pages.LibraryFiles.Title");
         this.lblSearching = Translater.Instant("Labels.Searching");
+        MainLayout.Instance.ShowSearch();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -54,8 +57,12 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
         Blocker.Hide();
     }
 
-    Task Closed() => NavigationService.NavigateTo("/library-files");
-    
+    async Task Closed()
+    {
+        MainLayout.Instance.HideSearch();
+        await NavigationService.NavigateTo("/library-files");
+    }
+
     public void OnRangeSelect(DateRange range)
     {
         SearchModel.FromDate = range.Start.Date;

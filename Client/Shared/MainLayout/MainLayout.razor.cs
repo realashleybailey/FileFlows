@@ -10,6 +10,15 @@ public partial class MainLayout : LayoutComponentBase
     public Editor Editor { get; set; }
     [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
 
+    public static MainLayout Instance { get; private set; }
+
+    private bool SearchVisible = false;
+
+    public MainLayout()
+    {
+        Instance = this;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         App.Instance.NavMenuCollapsed = await LocalStorage.GetItemAsync<bool>("NavMenuCollapsed");
@@ -19,5 +28,18 @@ public partial class MainLayout : LayoutComponentBase
     {
         App.Instance.NavMenuCollapsed = !App.Instance.NavMenuCollapsed;
         LocalStorage.SetItemAsync("NavMenuCollapsed", App.Instance.NavMenuCollapsed);
+    }
+
+    public void ShowSearch()
+    {
+        SearchVisible = true;
+        this.StateHasChanged();
+    }
+
+    public void HideSearch()
+    {
+        SearchVisible = false;
+        this.StateHasChanged();
+        
     }
 }

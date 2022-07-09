@@ -1,4 +1,5 @@
 using BlazorMonaco;
+using FileFlows.Client.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -50,7 +51,14 @@ partial class SearchPane:ComponentBase
     {
         Visible = !Visible;
         if (Visible == false)
+        {
+            MainLayout.Instance.HideSearch();
             Closed.InvokeAsync();
+        }
+        else
+        {
+            MainLayout.Instance.ShowSearch();
+        }
         this.StateHasChanged();
     }
 

@@ -2,20 +2,23 @@
 
 @namespace FileFlows.Client.Shared
 
-<div class="page @(App.Instance.NavMenuCollapsed ? "collapsed": "")">
-    <div class="sidebar @(App.Instance.NavMenuCollapsed ? "collapsed": "")">
+<div class="page @(App.Instance.NavMenuCollapsed && SearchVisible == false ? "collapsed": "")">
+    <div class="sidebar @(App.Instance.NavMenuCollapsed && SearchVisible == false ? "collapsed": "")">
         <NavMenu @ref="Menu" />
         
-        <span class="expand-collapse" @onclick=@ToggleExpand>
-            @if (App.Instance.NavMenuCollapsed)
-            {
-                <i class="fas fa-angle-right"></i>
-            }
-            else
-            {
-                <i class="fas fa-angle-left"></i>
-            }
-        </span>
+        @if (SearchVisible == false)
+        {
+            <span class="expand-collapse" @onclick=@ToggleExpand>
+                @if (App.Instance.NavMenuCollapsed)
+                {
+                    <i class="fas fa-angle-right"></i>
+                }
+                else
+                {
+                    <i class="fas fa-angle-left"></i>
+                }
+            </span>
+        }
     </div>
 
     <div class="main">

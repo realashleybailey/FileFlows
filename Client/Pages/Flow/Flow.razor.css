@@ -527,4 +527,11 @@ canvas {
   white-space: nowrap;
 }
 
+.flow-container.has-collapsed-menu #flow-zoomer {
+  left: 3.5rem;
+}
+.flow-container.has-collapsed-menu ::deep .info-box {
+  left: calc(3.5rem + 3px);
+}
+
 /*# sourceMappingURL=Flow.razor.css.map */

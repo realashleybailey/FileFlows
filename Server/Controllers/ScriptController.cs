@@ -33,7 +33,7 @@ public class ScriptController : Controller
             });
         }
 
-        return scripts;
+        return scripts.OrderBy(x => x.Name);
     }
 
 

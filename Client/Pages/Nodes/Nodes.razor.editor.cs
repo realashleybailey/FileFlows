@@ -101,7 +101,7 @@ public partial class Nodes : ListPage<Guid, ProcessingNode>
             {
                 Value = x.Name, Label = x.Name
             }).ToList();
-            scriptOptions.Insert(0, new ListOption() { Label = "Labels.None", Value = new ObjectReference()});
+            scriptOptions.Insert(0, new ListOption() { Label = "Labels.None", Value = string.Empty});
             fields.Add(new ElementField
             {
                 InputType = FormInputType.Select,

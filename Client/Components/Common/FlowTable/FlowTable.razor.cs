@@ -194,38 +194,70 @@ namespace FileFlows.Client.Components.Common
         private async Task OnClick(MouseEventArgs e, TItem item)
         {
             bool changed = false;
-            if (this.SelectedItems.Contains(item) == false)
+            bool wasSelected = this.SelectedItems.Contains(item);
+            if (e.CtrlKey == false && e.ShiftKey == false)
             {
-                this.SelectedItems.Add(item);
+                // just select/unselect this one
+                if(wasSelected && this.SelectedItems.Count == 1)
+                    this.SelectedItems.Clear();
+                else
+                {
+                    this.SelectedItems.Clear();
+                    this.SelectedItems.Add(item);
+                }
                 changed = true;
             }
-
-            if (this.LastSelected != null && e.ShiftKey)
+            else if (e.CtrlKey)
             {
-                // select everything in between
-                int last = this.Data.IndexOf(this.LastSelected);
-                int current = this.Data.IndexOf(item);
-                int start = last > current ? current : last;
-                int end = last > current ? last : current;
-
-                bool unselecting = e.CtrlKey;
-                for (int i = start; i <= end && i < Data.Count - 1; i++)
+                // multiselect changing one item
+                if (wasSelected)
                 {
-                    var tItem = this.Data[i];
-                    if (unselecting)
+                    this.SelectedItems.Remove(item);
+                }
+                else
+                {
+                    this.SelectedItems.Add(item);
+                }
+                changed = true;
+            }
+            else
+            {
+
+                if (wasSelected == false)
+                {
+                    this.SelectedItems.Add(item);
+                    changed = true;
+                }
+
+                if (this.LastSelected != null && e.ShiftKey)
+                {
+                    // select everything in between
+                    int last = this.Data.IndexOf(this.LastSelected);
+                    int current = this.Data.IndexOf(item);
+                    int start = last > current ? current : last;
+                    int end = last > current ? last : current;
+
+                    bool unselecting = e.CtrlKey;
+                    for (int i = start; i <= end && i < Data.Count - 1; i++)
                     {
-                        if (this.SelectedItems.Contains(tItem))
+                        var tItem = this.Data[i];
+                        if (unselecting)
                         {
-                            this.SelectedItems.Remove(tItem);
+                            if (this.SelectedItems.Contains(tItem))
+                            {
+                                this.SelectedItems.Remove(tItem);
+                                changed = true;
+                            }
+                        }
+                        else if (this.SelectedItems.Contains(tItem) == false)
+                        {
+                            this.SelectedItems.Add(tItem);
                             changed = true;
                         }
-                    }else if (this.SelectedItems.Contains(tItem) == false)
-                    {
-                        this.SelectedItems.Add(tItem);
-                        changed = true;
                     }
                 }
             }
+
             if(changed)
                 this.NotifySelectionChanged();
 

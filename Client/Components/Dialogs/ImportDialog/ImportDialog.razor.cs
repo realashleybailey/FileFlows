@@ -1,3 +1,5 @@
+using System.Threading;
+
 namespace FileFlows.Client.Components.Dialogs
 {
     using System.Threading.Tasks;
@@ -12,7 +14,7 @@ namespace FileFlows.Client.Components.Dialogs
     {
         private string lblImport, lblCancel, lblBrowse;
         private string Message, Title;
-        TaskCompletionSource<string> ShowTask;
+        TaskCompletionSource<(string filename, string content)> ShowTask;
 
         private string FileName { get; set; }
         private bool HasFile { get; set; }
@@ -22,7 +24,8 @@ namespace FileFlows.Client.Components.Dialogs
 
         private string Value { get; set; }
 
-        private readonly string[] Extensions = new[] { "json" };
+        private string[] Extensions = new[] { "json" };
+        private string AcceptedTypes;
 
         private string Uid = System.Guid.NewGuid().ToString();
 
@@ -40,37 +43,39 @@ namespace FileFlows.Client.Components.Dialogs
             Instance = this;
         }
 
-        public static Task<string> Show()
+        public static Task<(string filename, string content)> Show(params string[] extensions)
         {
             if (Instance == null)
-                return Task.FromResult<string>("");
+                return Task.FromResult<(string, string)>((string.Empty, string.Empty));
 
-            return Instance.ShowInstance();
+            return Instance.ShowInstance(extensions);
         }
 
-        private Task<string> ShowInstance()
+        private Task<(string filename, string content)> ShowInstance(string[] extensions = null)
         {
             this.Value = string.Empty;
             this.FileName = string.Empty;
             this.Visible = true;
             this.Focus = true;
+            this.Extensions = extensions?.Any() == true ? extensions : new[] { "json" };
+            this.AcceptedTypes = string.Join(", ", this.Extensions.Select(x => "." + x));
             this.StateHasChanged();
 
-            Instance.ShowTask = new TaskCompletionSource<string>();
+            Instance.ShowTask = new TaskCompletionSource<(string filename, string content)>();
             return Instance.ShowTask.Task;
         }
 
         private async void Accept()
         {
             this.Visible = false;
-            Instance.ShowTask.TrySetResult(Value);
+            Instance.ShowTask.TrySetResult((FileName, Value));
             await Task.CompletedTask;
         }
 
         private async void Cancel()
         {
             this.Visible = false;
-            Instance.ShowTask.TrySetResult("");
+            Instance.ShowTask.TrySetResult((string.Empty, string.Empty));
             await Task.CompletedTask;
         }
 

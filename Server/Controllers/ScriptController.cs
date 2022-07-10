@@ -151,10 +151,11 @@ public class ScriptController : Controller
     /// </summary>
     /// <param name="name">The name</param>
     /// <param name="code">The code</param>
-    [HttpPost("import/{name}")]
-    public Script Import([FromRoute] string name, [FromBody] string code)
+    [HttpPost("import")]
+    public Script Import([FromQuery(Name = "filename")] string name, [FromBody] string code)
     {
         // will throw if any errors
+        name = name.Replace(".js", "").Replace(".JS", "");
         name = GetNewUniqueName(name);
         return Save(new () { Name = name, Code = code});
     }

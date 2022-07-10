@@ -489,7 +489,8 @@ public partial class Flows : ListPage<Guid, ffFlow>
     private async Task Import()
     {
 #if (!DEMO)
-        var json = await ImportDialog.Show();
+        var idResult = await ImportDialog.Show();
+        string json = idResult.content;
         if (string.IsNullOrEmpty(json))
             return;
 

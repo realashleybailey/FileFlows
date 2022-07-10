@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -79,18 +80,19 @@ public partial class Scripts : ListPage<string, Script>
     private async Task Import()
     {
 #if (!DEMO)
-        var json = await ImportDialog.Show();
-        if (string.IsNullOrEmpty(json))
+        var idResult = await ImportDialog.Show("js");
+        string js = idResult.content;
+        if (string.IsNullOrEmpty(js))
             return;
 
         Blocker.Show();
         try
         {
-            var newItem = await HttpHelper.Post<Script>("/api/script/import", json);
+            var newItem = await HttpHelper.Post<Script>("/api/script/import?filename=" + UrlEncoder.Create().Encode(idResult.filename), js);
             if (newItem != null && newItem.Success)
             {
                 await this.Refresh();
-                Toast.ShowSuccess(Translater.Instant("Pages.Script.Messages.Imported",
+                Toast.ShowSuccess(Translater.Instant("Pages.Scripts.Messages.Imported",
                     new { name = newItem.Data.Name }));
             }
             else

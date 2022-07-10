@@ -21,7 +21,7 @@ using FileFlows.Plugin;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
-public partial class Flows : ListPage<ffFlow>
+public partial class Flows : ListPage<Guid, ffFlow>
 {
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] public IJSRuntime jsRuntime { get; set; }

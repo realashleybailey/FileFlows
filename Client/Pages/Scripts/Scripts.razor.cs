@@ -9,7 +9,7 @@ using FileFlows.Client.Components;
 /// <summary>
 /// Page for processing nodes
 /// </summary>
-public partial class Scripts : ListPage<Script>
+public partial class Scripts : ListPage<string, Script>
 {
     public override string ApiUrl => "/api/script";
 

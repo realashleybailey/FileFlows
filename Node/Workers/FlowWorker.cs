@@ -154,7 +154,7 @@ public class FlowWorker : Worker
             }
         }
 
-        if (ffStatus?.Licensed == true && node.PreExecuteScript != null && node.PreExecuteScript.Uid != Guid.Empty)
+        if (ffStatus?.Licensed == true && string.IsNullOrWhiteSpace(node.PreExecuteScript) == false)
         {
             if (PreExecuteScriptTest(node) == false)
                 return;
@@ -282,7 +282,7 @@ public class FlowWorker : Worker
     private bool PreExecuteScriptTest(ProcessingNode node)
     {
         var scriptService  = ScriptService.Load();
-        string code = scriptService.GetCode(node.PreExecuteScript.Uid).Result;
+        string code = scriptService.GetCode(node.PreExecuteScript).Result;
         if (string.IsNullOrWhiteSpace(code))
         {
             Logger.Instance.ELog("Failed to load pre-execute script code");

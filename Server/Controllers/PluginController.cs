@@ -145,7 +145,7 @@ public class PluginController : ControllerStore<PluginInfo>
     /// <param name="model">The list of plugins to update</param>
     /// <returns>if the updates were successful or not</returns>
     [HttpPost("update")]
-    public async Task<bool> Update([FromBody] ReferenceModel model)
+    public async Task<bool> Update([FromBody] ReferenceModel<Guid> model)
     {
         bool updated = false;
         var plugins = await GetPluginPackages();
@@ -197,7 +197,7 @@ public class PluginController : ControllerStore<PluginInfo>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete

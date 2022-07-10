@@ -40,7 +40,7 @@ public class ProcessingNode: FileFlowObject
     /// <summary>
     /// Gets or sets a script to execute before a runner can start
     /// </summary>
-    public ObjectReference PreExecuteScript { get; set; }
+    public string PreExecuteScript { get; set; }
 
     /// <summary>
     /// Gets or sets the number of flow runners this node can run simultaneously 

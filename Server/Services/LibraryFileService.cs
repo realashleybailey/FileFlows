@@ -18,7 +18,7 @@ public class LibraryFileService : ILibraryFileService
     /// </summary>
     /// <param name="uid">The UID of the library file</param>
     /// <returns>a completed task</returns>
-    public Task Delete(Guid uid) => new LibraryFileController().Delete(new ReferenceModel {  Uids = new [] { uid } });
+    public Task Delete(Guid uid) => new LibraryFileController().Delete(new ReferenceModel<Guid> {  Uids = new [] { uid } });
 
     
     /// <summary>

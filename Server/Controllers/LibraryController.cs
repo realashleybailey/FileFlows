@@ -89,7 +89,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="deleteLibraryFiles">[Optional] if libraries files should also be deleted for this library</param>
         /// <returns>an awaited task,</returns>
         [HttpDelete]
-        public async Task Delete([FromBody] ReferenceModel model, [FromQuery] bool deleteLibraryFiles = false)
+        public async Task Delete([FromBody] ReferenceModel<Guid> model, [FromQuery] bool deleteLibraryFiles = false)
         {
             if (model?.Uids?.Any() != true)
                 return;
@@ -106,7 +106,7 @@ namespace FileFlows.Server.Controllers
         /// <param name="model">A reference model containing UIDs to rescan</param>
         /// <returns>an awaited task</returns>
         [HttpPut("rescan")]
-        public async Task Rescan([FromBody] ReferenceModel model)
+        public async Task Rescan([FromBody] ReferenceModel<Guid> model)
         {
             foreach(var uid in model.Uids)
             {

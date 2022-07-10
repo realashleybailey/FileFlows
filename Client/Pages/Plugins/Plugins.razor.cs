@@ -12,7 +12,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Client.Components.Inputs;
     using System.Text.Json;
 
-    public partial class Plugins : ListPage<PluginInfoModel>
+    public partial class Plugins : ListPage<Guid, PluginInfoModel>
     {
         public override string ApiUrl => "/api/plugin";
 
@@ -20,7 +20,7 @@ namespace FileFlows.Client.Pages
 
         protected override void OnInitialized()
         {
-            _ = Load();
+            _ = Load(default);
         }
 
         protected override string DeleteMessage => "Pages.Plugins.Messages.DeletePlugins";
@@ -45,7 +45,7 @@ namespace FileFlows.Client.Pages
             Data.Clear();
             try
             {
-                var result = await HttpHelper.Post($"{ApiUrl}/update", new ReferenceModel { Uids = plugins });
+                var result = await HttpHelper.Post($"{ApiUrl}/update", new ReferenceModel<Guid> { Uids = plugins });
                 if (result.Success)
                     await PluginsUpdated();
             }
@@ -60,7 +60,7 @@ namespace FileFlows.Client.Pages
         async Task PluginsUpdated()
         {
             await App.Instance.LoadLanguage();
-            await this.Load();
+            await this.Load(default);
         }
 
         private PluginInfo EditingPlugin = null;

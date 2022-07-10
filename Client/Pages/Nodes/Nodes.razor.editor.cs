@@ -4,7 +4,7 @@ using FileFlows.Plugin;
 
 namespace FileFlows.Client.Pages;
 
-public partial class Nodes : ListPage<ProcessingNode>
+public partial class Nodes : ListPage<Guid, ProcessingNode>
 {
 
     public override async Task<bool> Edit(ProcessingNode node)
@@ -99,7 +99,7 @@ public partial class Nodes : ListPage<ProcessingNode>
         {
             var scriptOptions = scripts.Select(x => new ListOption
             {
-                Value = new ObjectReference { Name = x.Name, Uid = x.Uid, Type = x.GetType().FullName }, Label = x.Name
+                Value = x.Name, Label = x.Name
             }).ToList();
             scriptOptions.Insert(0, new ListOption() { Label = "Labels.None", Value = new ObjectReference()});
             fields.Add(new ElementField

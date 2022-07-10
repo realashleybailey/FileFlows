@@ -4,7 +4,7 @@ namespace FileFlows.Shared.Models;
 /// A file flow object
 /// This is the base object for all database objects
 /// </summary>
-public class FileFlowObject: IUniqueObject
+public class FileFlowObject: IUniqueObject<Guid>
 {
     /// <summary>
     /// Gets or sets the UID of the item
@@ -31,10 +31,10 @@ public class FileFlowObject: IUniqueObject
 /// Interface used for unique objects.
 /// This mean only one object of this type can exist in the database
 /// </summary>
-public interface IUniqueObject
+public interface IUniqueObject<T>
 {
     /// <summary>
     /// Gets or sets the UID of the item
     /// </summary>
-    Guid Uid { get; set; }
+    T Uid { get; set; }
 }

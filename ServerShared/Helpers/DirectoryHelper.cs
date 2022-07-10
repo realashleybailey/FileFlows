@@ -29,6 +29,7 @@ public class DirectoryHelper
         InitLoggingDirectory();
         InitDataDirectory();
         InitPluginsDirectory();
+        InitScriptsDirectory();
 
         FlowRunnerDirectory = Path.Combine(BaseDirectory, "FlowRunner");
     }
@@ -47,6 +48,18 @@ public class DirectoryHelper
             return;
         MoveDirectoryContent(oldDir, dir);
         #endif
+    }
+
+    private static void InitScriptsDirectory()
+    {
+#if(DEBUG && false)
+        return;
+#else
+        string dir = ScriptsDirectory;
+        if (Directory.Exists(dir) == false)
+            Directory.CreateDirectory(dir);
+#endif
+        
     }
 
     private static string _BaseDirectory;
@@ -183,6 +196,20 @@ public class DirectoryHelper
                 return Path.Combine(DataDirectory, "Plugins");
             return Path.Combine(BaseDirectory, "Plugins");
             #endif
+        }
+    }
+    /// <summary>
+    /// Gets the scripts directory
+    /// </summary>
+    public static string ScriptsDirectory
+    {
+        get
+        {
+            // docker we expose this in the data directory so we
+            // reduce how many things we have to map out
+            if (IsDocker) 
+                return Path.Combine(DataDirectory, "Scripts");
+            return Path.Combine(BaseDirectory, "Scripts");
         }
     }
     /// <summary>

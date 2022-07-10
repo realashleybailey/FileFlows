@@ -19,7 +19,7 @@ using System;
 using FileFlows.Client.Components.Dialogs;
 using FileFlows.Plugin;
 
-public partial class LibraryFiles : ListPage<LibaryFileListModel>
+public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 {
     public override string ApiUrl => "/api/library-file";
     [Inject] private INavigationService NavigationService { get; set; }
@@ -243,7 +243,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
         Blocker.Show();
         try
         {
-            await HttpHelper.Post(ApiUrl + "/move-to-top", new ReferenceModel { Uids = uids });                
+            await HttpHelper.Post(ApiUrl + "/move-to-top", new ReferenceModel<Guid> { Uids = uids });                
         }
         finally
         {
@@ -298,7 +298,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
         Blocker.Show();
         try
         {
-            await HttpHelper.Post(ApiUrl + "/reprocess", new ReferenceModel { Uids = uids });
+            await HttpHelper.Post(ApiUrl + "/reprocess", new ReferenceModel<Guid> { Uids = uids });
         }
         finally
         {

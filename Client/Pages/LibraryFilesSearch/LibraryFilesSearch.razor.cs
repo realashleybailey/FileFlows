@@ -9,7 +9,7 @@ namespace FileFlows.Client.Pages;
 /// <summary>
 /// A search page for library files
 /// </summary>
-public partial class LibraryFilesSearch : ListPage<LibraryFile>
+public partial class LibraryFilesSearch : ListPage<Guid, LibraryFile>
 {
     [Inject] private INavigationService NavigationService { get; set; }
     public override string ApiUrl => "/api/library-file";
@@ -69,7 +69,7 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
         SearchModel.ToDate = range.End.Date;
     }
 
-    public override Task Load(Guid? selectedUid = null)
+    public override Task Load(Guid selectedUid)
     {
         if (Searched == false)
             return Task.CompletedTask;

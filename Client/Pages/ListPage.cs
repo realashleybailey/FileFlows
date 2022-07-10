@@ -5,7 +5,7 @@ using FileFlows.Client.Components.Common;
 
 namespace FileFlows.Client.Pages;
 
-public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
+public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
 {
     protected FlowTable<T> Table { get; set; }
     [CascadingParameter] public Blocker Blocker { get; set; }
@@ -37,10 +37,10 @@ public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
         lblDeleting = Translater.Instant("Labels.Deleting");
         lblRefresh = Translater.Instant("Labels.Refresh");
 
-        _ = Load();
+        _ = Load(default);
     }
 
-    public virtual async Task Refresh() => await Load();
+    public virtual async Task Refresh() => await Load(default);
 
     public virtual string FetchUrl => ApiUrl;
 
@@ -63,7 +63,7 @@ public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
     }
 
 
-    public virtual async Task Load(Guid? selectedUid = null)
+    public virtual async Task Load(U selectedUid)
     {
         Blocker.Show();
         await this.WaitForRender();
@@ -76,9 +76,9 @@ public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
                 if (Table != null)
                 {
                     Table.Data = this.Data;
-                    if (selectedUid != null && selectedUid.Value != Guid.Empty)
+                    if (selectedUid != null && selectedUid.Equals(default(U)) == false)
                     {
-                        int index = result.Data.FindIndex(x => x.Uid == selectedUid);
+                        int index = result.Data.FindIndex(x => x.Uid.Equals(selectedUid));
                         if (index >= 0)
                         {
                             this.Table.SetSelectedIndex(index);
@@ -157,7 +157,7 @@ public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
 
     public virtual async Task Delete()
     {
-        var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
+        var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new U[] { };
         if (uids.Length == 0)
             return; // nothing to delete
         if (await Confirm.Show("Labels.Delete",
@@ -170,7 +170,7 @@ public abstract class ListPage<T> : ComponentBase where T : IUniqueObject
         try
         {
 #if (!DEMO)
-            var deleteResult = await HttpHelper.Delete($"{ApiUrl}", new ReferenceModel { Uids = uids });
+            var deleteResult = await HttpHelper.Delete($"{ApiUrl}", new ReferenceModel<U> { Uids = uids });
             if (deleteResult.Success == false)
             {
                 if(Translater.NeedsTranslating(deleteResult.Body))

@@ -447,7 +447,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         var libfiles = await GetDataList();
         var uids = libfiles.Where(x => x.Status == FileStatus.Processing && x.Node?.Uid == nodeUid).Select(x => x.Uid).ToArray();
         if (uids.Any())
-            await Reprocess(new ReferenceModel { Uids = uids });
+            await Reprocess(new ReferenceModel<Guid> { Uids = uids });
     }
 
     /// <summary>
@@ -599,7 +599,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="model">The reference model of items in order to move</param>
     /// <returns>an awaited task</returns>
     [HttpPost("move-to-top")]
-    public async Task MoveToTop([FromBody] ReferenceModel model)
+    public async Task MoveToTop([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -686,7 +686,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -699,7 +699,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="model">A reference model containing UIDs to reprocess</param>
     /// <returns>an awaited task</returns>
     [HttpPost("reprocess")]
-    public async Task Reprocess([FromBody] ReferenceModel model)
+    public async Task Reprocess([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete

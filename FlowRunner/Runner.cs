@@ -594,8 +594,8 @@ public class Runner
             // special type
             var nodeScript = new ScriptNode();
             nodeScript.Model = part.Model;
-            Guid guid = Guid.Parse(part.FlowElementUid[7..43]); // 7 to remove "Scripts." 43 since guids are 36 characters, + 7 == 43
-            var script  = ScriptService.Load().Get(guid).Result;
+            string scriptName = part.FlowElementUid[7..]; // 7 to remove "Scripts." 
+            var script  = ScriptService.Load().Get(scriptName).Result;
             if (string.IsNullOrEmpty(script?.Code))
                 throw new Exception("Script not found");
             nodeScript.Code = script.Code;

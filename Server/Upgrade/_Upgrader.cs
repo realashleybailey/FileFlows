@@ -33,9 +33,6 @@ public class Upgrader
                 new Upgrade0_8_5().Run(settings);
         }
         
-        // always check on default scripts
-        new DefaultScripts().Run(settings);
-        
         // save the settings
         if (settings.Version != Globals.Version)
         {

@@ -51,21 +51,12 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
 
     protected async Task<string> GetNewUniqueName(string name)
     {
-        string newName = name.Trim();
         List<string> names;
         if (DbHelper.UseMemoryCache)
             names = (await GetData()).Select(x => x.Value.Name.ToLower()).ToList();
         else
             names = (await DbHelper.GetNames<T>()).Select(x => x.ToLower()).ToList();
-        int count = 2;
-        while (names.Contains(newName.ToLower()))
-        {
-            newName = name + " (" + count + ")";
-            ++count;
-            if (count > 100)
-                throw new Exception("Could not find unique name, aborting.");
-        }
-        return newName;
+        return UniqueNameHelper.GetUnique(name, names);
     }
 
     /// <summary>
@@ -121,7 +112,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         return await DbHelper.Single<T>(uid);
     }
 
-    protected async Task DeleteAll(ReferenceModel model)
+    protected async Task DeleteAll(ReferenceModel<Guid> model)
     {
         if (model?.Uids?.Any() != true)
             return;

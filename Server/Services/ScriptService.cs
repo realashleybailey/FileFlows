@@ -12,12 +12,14 @@ public class ScriptService:IScriptService
     /// <summary>
     /// Get a script
     /// </summary>
-    /// <param name="uid">The UID identifying the script</param>
+    /// <param name="name">The name of the script</param>
     /// <returns>the script</returns>
-    public Task<Script> Get(Guid uid) => new ScriptController().Get(uid);
+    public Task<Script> Get(string name) => new ScriptController().Get(name);
 
     /// <summary>
     /// Gets or sets a function used to load new instances of the service
     /// </summary>
-    public Task<string> GetCode(Guid uid) => new ScriptController().GetCode(uid);
+    /// <param name="name">The name of the script</param>
+    /// <returns>the script code</returns>
+    public Task<string> GetCode(string name) => new ScriptController().GetCode(name);
 }

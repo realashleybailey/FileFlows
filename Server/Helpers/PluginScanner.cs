@@ -150,7 +150,7 @@ public class PluginScanner
             {
                 Logger.Instance.DLog("Delete old plugin: " + plugin.Name);
                 // its an old style plugin, perm delete it
-                controller.Delete(new ReferenceModel { Uids = new[] { plugin.Uid } }).Wait();
+                controller.Delete(new ReferenceModel<Guid> { Uids = new[] { plugin.Uid } }).Wait();
             }
             else
             {

@@ -3,7 +3,7 @@ using FileFlows.Client.Components.Dialogs;
 
 namespace FileFlows.Client.Pages;
 
-public partial class Libraries : ListPage<Library>
+public partial class Libraries : ListPage<Guid, Library>
 {
     public override string ApiUrl => "/api/library";
 
@@ -152,7 +152,7 @@ public partial class Libraries : ListPage<Library>
         try
         {
 #if (!DEMO)
-            var deleteResult = await HttpHelper.Put($"{ApiUrl}/rescan", new ReferenceModel { Uids = uids });
+            var deleteResult = await HttpHelper.Put($"{ApiUrl}/rescan", new ReferenceModel<Guid> { Uids = uids });
             if (deleteResult.Success == false)
                 return;
 #endif
@@ -184,7 +184,7 @@ public partial class Libraries : ListPage<Library>
 
         try
         {
-            var deleteResult = await HttpHelper.Delete($"{ApiUrl}?deleteLibraryFiles={(confirmResult.SwitchState == false)}", new ReferenceModel { Uids = uids });
+            var deleteResult = await HttpHelper.Delete($"{ApiUrl}?deleteLibraryFiles={(confirmResult.SwitchState == false)}", new ReferenceModel<Guid> { Uids = uids });
             if (deleteResult.Success == false)
             {
                 if(Translater.NeedsTranslating(deleteResult.Body))

@@ -12,7 +12,7 @@ using FileFlows.Plugin;
 using System;
 using FileFlows.Client.Components.Inputs;
 
-public partial class Libraries : ListPage<Library>
+public partial class Libraries : ListPage<Guid, Library>
 {
     ElementField efTemplate;
 

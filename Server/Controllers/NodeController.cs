@@ -101,7 +101,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 internalNode.Permissions = node.Permissions;
                 internalNode.AllLibraries = node.AllLibraries;
                 internalNode.MaxFileSizeMb = node.MaxFileSizeMb;
-                if (node.PreExecuteScript == null || node.PreExecuteScript.Uid == Guid.Empty)
+                if (string.IsNullOrWhiteSpace(node.PreExecuteScript))
                     internalNode.PreExecuteScript = null;
                 else
                     internalNode.PreExecuteScript = node.PreExecuteScript;
@@ -130,7 +130,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         var internalNode = (await this.GetAll()).Where(x => x.Address == Globals.InternalNodeName).FirstOrDefault()?.Uid ?? Guid.Empty;
         if (model.Uids.Contains(internalNode))

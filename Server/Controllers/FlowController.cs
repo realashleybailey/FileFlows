@@ -209,7 +209,7 @@ public class FlowController : ControllerStore<Flow>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -233,15 +233,15 @@ public class FlowController : ControllerStore<Flow>
 
             var elements = await GetElements();
 
-            var scripts = (await new ScriptController().GetAll()).ToDictionary(x => x.Uid.ToString(), x => x.Name);
+            var scripts = (await new ScriptController().GetAll()).Select(x => x.Name).ToList();
             foreach (var p in flow.Parts)
             {
                 if (p.Type == FlowElementType.Script && string.IsNullOrWhiteSpace(p.Name))
                 {
-                    string feUid = p.FlowElementUid[7..43];
+                    string feName = p.FlowElementUid[7..];
                     // set the name to the script name
-                    if (scripts.ContainsKey(feUid))
-                        p.Name = scripts[feUid];
+                    if (scripts.Contains(feName))
+                        p.Name = feName;
                     else
                         p.Name = "Missing Script";
                 }
@@ -344,7 +344,7 @@ public class FlowController : ControllerStore<Flow>
             var sm = new ScriptParser().Parse(script?.Name, script?.Code);
             FlowElement ele = new FlowElement();
             ele.Name = script.Name;
-            ele.Uid = $"Script:{script.Uid}:{script.Name}";
+            ele.Uid = $"Script:{script.Name}";
             ele.Icon = "fas fa-scroll";
             ele.Inputs = 1;
             ele.Description = sm.Description;

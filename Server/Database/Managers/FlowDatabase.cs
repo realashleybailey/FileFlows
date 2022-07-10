@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 
 namespace FileFlows.Server.Database.Managers;
@@ -43,7 +44,7 @@ public class FlowDatabase:NPoco.Database
         }
 
         string sql = GetCommandText(cmd);
-        Logger.Log((LogType) 999, $"Executing [{hashCode.ToString("00000000")}]: " + sql);
+        //Logger.Log((LogType) 999, $"Executing [{hashCode.ToString("00000000")}]: " + sql);
         
     }
 
@@ -61,7 +62,20 @@ public class FlowDatabase:NPoco.Database
 
         var time = DateTime.Now.Subtract(started);
         string sql = GetCommandText(cmd);
-        Logger.Log((LogType) 999, $"Executed  [{hashCode.ToString("00000000")}] [{time}]: " + sql);
+        if (sql.Contains("LogMessage"))
+            sql = "LOGMESSAGE";
+        else if(sql.StartsWith("UPDATE `DbObject` SET `Name` = \""))
+        {
+            string name = Regex.Match(sql, @"(?<=(UPDATE `DbObject` SET `Name` = ""))[^""]+").Value;
+            sql = $"Updated DbObject '{name}'";
+        }
+        LogType lg = LogType.Info;
+        if (time.TotalSeconds > 1)
+            lg = LogType.Error;
+        if (time.TotalMilliseconds > 100)
+            lg = LogType.Warning;
+        
+        Logger.Log(lg, $"Executed  [{hashCode.ToString("00000000")}] [{time}]: " + sql);
     }
 
     private string GetCommandText(DbCommand cmd)

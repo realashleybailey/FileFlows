@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,8 @@ namespace FileFlows.Server.Controllers;
 [Route("/api/script")]
 public class ScriptController : Controller
 {
+    private const string UnsafeCharacters = "<>:\"/\\|?*";
+    
     /// <summary>
     /// Gets all scripts in the system
     /// </summary>
@@ -24,6 +27,7 @@ public class ScriptController : Controller
             string name = file.Name.Replace(".js", "");
             scripts.Add(new()
             {
+                Uid = name,
                 Name = name,
                 Code = await System.IO.File.ReadAllTextAsync(file.FullName)
             });
@@ -49,6 +53,7 @@ public class ScriptController : Controller
         string code = await System.IO.File.ReadAllTextAsync(file);
         return new Script()
         {
+            Uid = name,
             Name = name,
             Code = code
         };
@@ -85,8 +90,17 @@ public class ScriptController : Controller
     [HttpPost]
     public Script Save([FromBody] Script script)
     {
+        if(ValidScriptName(script.Name) == false)
+            throw new Exception("Invalid script name\nCannot contain: " + UnsafeCharacters);
+        
         if (SaveScript(script.Name, script.Code) == false)
             throw new Exception("Failed to save script");
+        if (script.Uid != script.Name)
+        {
+            Delete(new ReferenceModel<string>() { Uids = new[] { script.Uid } });
+            script.Uid = script.Name;
+        }
+
         return script;
     }
 
@@ -158,7 +172,8 @@ public class ScriptController : Controller
         if (script == null)
             return null;
         
-        string newName  = GetNewUniqueName(name);
+        script.Name = GetNewUniqueName(name);
+        script.Uid = script.Name;
         return Save(script);
     }
 
@@ -170,8 +185,15 @@ public class ScriptController : Controller
     
     private bool ValidScriptName(string name)
     {
-        if (string.IsNullOrEmpty(name) || name.Contains("..") || name.Contains("\\") || name.Contains("/"))
+        if (string.IsNullOrEmpty(name))
             return false;
+        if (name.Contains(".."))
+            return false;
+        foreach (char c in UnsafeCharacters.Union(Enumerable.Range(0, 31).Select(x => (char)x)))
+        {
+            if (name.IndexOf(c) >= 0)
+                return false;
+        }
         return true;
     }
     

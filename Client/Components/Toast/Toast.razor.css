@@ -13,11 +13,14 @@
   color: var(--accent);
   background: var(--base);
   position: relative;
-  word-break: break-all;
   font-size: 0.9rem;
   filter: drop-shadow(4px 5px 1px rgba(51, 51, 51, 0.6666666667));
   color: var(--color);
   border-radius: 0.5rem;
+}
+.flow-toast .flow-toast-msg {
+  word-break: break-word;
+  white-space: pre-line;
 }
 .flow-toast::before {
   display: inline-block;

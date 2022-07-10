@@ -13,10 +13,13 @@
     color: var(--accent);
     background:var(--base);
     position:relative;
-    word-break:break-all;
     font-size:0.9rem;
     filter: drop-shadow(4px 5px 1px #333333aa);
     color: var(--color);
+    .flow-toast-msg{
+        word-break:break-word;
+        white-space: pre-line;        
+    }
 
     border-radius: 0.5rem;
     &::before {

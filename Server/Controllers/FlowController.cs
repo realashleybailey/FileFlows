@@ -379,7 +379,7 @@ public class FlowController : ControllerStore<Flow>
             ele.Model = model as ExpandoObject;
             return ele;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return null;
         }

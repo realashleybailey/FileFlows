@@ -14,6 +14,7 @@ public class UniqueNameHelper
     /// <exception cref="Exception">exception if no unique name could be made</exception>
     public static string GetUnique(string name, List<string> names)
     {
+        names = names?.Select(x => x.ToLower())?.ToList() ?? new();
         string newName = name.Trim();
         int count = 2;
         while (names.Contains(newName.ToLower()))

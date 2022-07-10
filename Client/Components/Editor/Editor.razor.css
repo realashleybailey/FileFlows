@@ -51,6 +51,9 @@
 .fields ::deep .row + .row, .fields ::deep .row + .input-text-variables, .fields ::deep .input-text-variables + .row {
   margin-top: 1rem;
 }
+.fields ::deep .row.error {
+  height: auto;
+}
 
 @media screen and (max-width: 578px) {
   ::deep .content {

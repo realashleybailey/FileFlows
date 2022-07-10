@@ -290,6 +290,24 @@ public abstract class DbManager
 
         return ConvertFromDbObject<T>(dbObjects);
     }
+    
+    /// <summary>
+    /// Select a list of objects
+    /// </summary>
+    /// <typeparam name="T">the type of objects to select</typeparam>
+    /// <param name="sql">the sql command</param>
+    /// <param name="args">the sql arguments</param>
+    /// <returns>a list of objects</returns>
+    internal async Task<IEnumerable<T>> Fetch<T>(string sql, params object[] args)
+    {
+        List<T> dbObjects;
+        using (var db = await GetDb())
+        {
+            DateTime start = DateTime.Now;
+            dbObjects = await db.Db.FetchAsync<T>(sql, args);
+        }
+        return dbObjects;
+    }
 
     /// <summary>
     /// Converts DbObjects into strong types

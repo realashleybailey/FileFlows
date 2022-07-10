@@ -56,6 +56,9 @@
         .row + .row, .row + .input-text-variables, .input-text-variables + .row {
             margin-top: 1rem;
         }
+        .row.error {
+            height:auto;
+        } 
     }
 }
 @media screen and (max-width:578px) {

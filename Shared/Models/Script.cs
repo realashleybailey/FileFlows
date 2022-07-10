@@ -16,11 +16,7 @@ public class Script:IUniqueObject<string>
     public string Code { get; set; }
 
     /// <summary>
-    /// Alias for Name
+    /// Gets or sets the UID of this script, which is the original name of it
     /// </summary>
-    public string Uid
-    {
-        get => Name;
-        set => Name = value;
-    }
+    public string Uid { get; set; }
 }

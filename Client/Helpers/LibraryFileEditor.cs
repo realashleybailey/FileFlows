@@ -122,14 +122,11 @@ namespace FileFlows.Client.Helpers
                     Name = nameof(item.OutputPath)
                 });
             }
-            if (string.IsNullOrEmpty(item.Flow?.Name) == false)
+            fields.Add(new ElementField
             {
-                fields.Add(new ElementField
-                {
-                    InputType = FormInputType.TextLabel,
-                    Name = nameof(item.CreationTime)
-                });
-            }
+                InputType = FormInputType.TextLabel,
+                Name = nameof(item.CreationTime)
+            });
 
             fields.Add(new ElementField
             {

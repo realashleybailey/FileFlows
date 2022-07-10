@@ -38,6 +38,8 @@ namespace FileFlows.Client.Components.Inputs
                     sValue = string.Format("{0:n0}", longValue);
                 else if (Value is int intValue)
                     sValue = string.Format("{0:n0}", intValue);
+                else if (Value is DateTime dt)
+                    sValue = dt.ToString("d MMMM yyyy, h:mm:ss tt");
                 else
                     sValue = Value.ToString();
             }

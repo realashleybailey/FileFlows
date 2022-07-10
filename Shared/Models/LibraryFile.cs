@@ -82,6 +82,11 @@ public class LibraryFile : FileFlowObject
     public FileStatus Status { get; set; }
     
     /// <summary>
+    /// Gets or sets if the file no longer exists after it was processed
+    /// </summary>
+    public bool NoLongerExistsAfterProcessing { get; set; }
+    
+    /// <summary>
     /// Gets or sets the order of the file when the file should be processed
     /// </summary>
     public int Order { get; set; }

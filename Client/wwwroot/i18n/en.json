@@ -292,6 +292,7 @@
         "FinalSize": "Final Size",
         "FinalSizeSuffix": "Bytes",
         "Fingerprint": "Fingerprint",
+        "CreationTime": "Creation Date",
         "Library": "Library",
         "Status": "Status",
         "Flow": "Flow",

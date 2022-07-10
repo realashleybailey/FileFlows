@@ -87,6 +87,9 @@
     z-index:6;
     left:35%;
     border-left: 1px solid var(--border-color);
+    &.maximised{
+        left:0;
+    }    
 }
 
 @media screen and (max-width: 720px) 

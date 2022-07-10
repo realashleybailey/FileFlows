@@ -206,7 +206,7 @@ public partial class LibraryFiles : ListPage<LibaryFileListModel>
                FileStatus.OnHold => "fas fa-hand-paper",
                _ => ""
            };
-           if (status.Status != FileStatus.Unprocessed && status.Count == 0)
+           if (status.Status != FileStatus.Unprocessed && status.Status != FileStatus.Processing && status.Status != FileStatus.Processed && status.Count == 0)
                continue;
            sbItems.Add(new ()
            {

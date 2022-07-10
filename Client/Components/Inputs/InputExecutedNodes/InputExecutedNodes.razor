@@ -44,9 +44,9 @@
 {
     <div class="editor-wrapper log-partial-viewer ">
         <div class="background-overlay"></div>
-        <div class="editor">
+        <div class="editor @(Maximised ? "maximised" : "") ">
 
-            <ViContainer Title="@FormatNodeName(PartialLogNode)" FullWidth=@true AlwaysShowTitle=@true>
+            <ViContainer Title="@FormatNodeName(PartialLogNode)" FullWidth=@true AlwaysShowTitle=@true Maximise=true OnMaximised=@OnMaximised>
 
                 <Head>
                     <button @onclick=@ClosePartialLog>@lblClose</button>

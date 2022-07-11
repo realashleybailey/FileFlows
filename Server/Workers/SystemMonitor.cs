@@ -174,7 +174,6 @@ public class SystemMonitor:Worker
     /// <param name="args">the node system statistics</param>
     public void Record(NodeSystemStatistics args)
     {
-        Logger.Instance.ILog("Recording node system stats: " + System.Text.Json.JsonSerializer.Serialize(args));
         args.RecordedAt = DateTime.Now;
         lock (NodeStatistics)
         {

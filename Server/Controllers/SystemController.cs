@@ -321,7 +321,7 @@ public class SystemController:Controller
     /// </summary>
     /// <param name="args">the node system statistics</param>
     [HttpPost("node-system-statistics")]
-    public void RecordNodeSystemStatistics(NodeSystemStatistics args)
+    public void RecordNodeSystemStatistics([FromBody] NodeSystemStatistics args)
     {
         SystemMonitor.Instance.Record(args);
     }

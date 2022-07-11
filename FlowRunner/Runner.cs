@@ -153,32 +153,23 @@ public class Runner
             Info.LibraryFile.FinalSize = nodeParameters.GetDirectorySize(nodeParameters.WorkingFile);
         else
         {
-            var fileInfo = new FileInfo(nodeParameters.WorkingFile);
-            if (fileInfo.Exists == false)
-            {
-                nodeParameters.Logger?.WLog("Final final does not exist: " + fileInfo.FullName);
-                Info.LibraryFile.FinalSize = 0;
-            }
-            else
-            {
-                Info.LibraryFile.FinalSize = fileInfo.Length;
+            Info.LibraryFile.FinalSize = nodeParameters.LastValidWorkingFileSize;
 
-                try
+            try
+            {
+                if (Info.Fingerprint)
                 {
-                    if (Info.Fingerprint)
-                    {
-                        Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
-                        nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
-                    }
-                    else
-                    {
-                        Info.LibraryFile.Fingerprint = string.Empty;
-                    }
+                    Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
+                    nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
                 }
-                catch (Exception ex)
+                else
                 {
-                    nodeParameters?.Logger?.ILog("Error with fingerprinting: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    Info.LibraryFile.Fingerprint = string.Empty;
                 }
+            }
+            catch (Exception ex)
+            {
+                nodeParameters?.Logger?.ILog("Error with fingerprinting: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
         nodeParameters?.Logger?.ILog("Original Size: " + Info.LibraryFile.OriginalSize);

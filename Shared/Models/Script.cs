@@ -16,6 +16,11 @@ public class Script:IUniqueObject<string>
     public string Code { get; set; }
 
     /// <summary>
+    /// Gets or sets if this script is a system script
+    /// </summary>
+    public bool System { get; set; }
+
+    /// <summary>
     /// Gets or sets the UID of this script, which is the original name of it
     /// </summary>
     public string Uid { get; set; }

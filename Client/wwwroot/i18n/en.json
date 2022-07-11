@@ -409,7 +409,8 @@
       "Title":"Scripts",
       "Messages": {
         "Imported": "Script ''{name}'' imported",
-        "Duplicated":"Scripts ''{name}'' duplicated"
+        "Duplicated":"Scripts ''{name}'' duplicated",
+        "DeleteSystem":"You cannot delete a system script"
       },
       "Fields":{
       }

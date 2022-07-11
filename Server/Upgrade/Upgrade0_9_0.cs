@@ -46,7 +46,7 @@ public class Upgrade0_9_0
             string safeName = dbo.Name.Replace(": ", " - ");
             foreach (char c in "<>:\"/\\|?*")
                 safeName = safeName.Replace(c.ToString(), string.Empty);
-            string name = new FileInfo(Path.Combine(DirectoryHelper.ScriptsDirectory, safeName + ".js")).FullName;
+            string name = new FileInfo(Path.Combine(DirectoryHelper.ScriptsDirectoryUser, safeName + ".js")).FullName;
             File.WriteAllText(name, code);
             Logger.Instance.ILog($"Exported script '{dbo.Name}' to: {name}");
         }

@@ -31,6 +31,17 @@
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="Script" Width="10rem">
+                    <Header>
+                        System
+                    </Header>
+                    <Cell Context="item">
+                        @if (item.System)
+                        {
+                            <i class="fas fa-check"></i>
+                        }
+                    </Cell>
+                </FlowTableColumn>
             </Columns>
         </FlowTable>
 

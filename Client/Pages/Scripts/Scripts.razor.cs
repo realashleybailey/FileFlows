@@ -139,4 +139,17 @@ public partial class Scripts : ListPage<string, Script>
         }
 #endif
     }
+
+    public override async Task Delete()
+    {
+        var system = Table.GetSelected()?.Any(x => x.System) == true;
+        if (system)
+        {
+            Toast.ShowError("Pages.Scripts.Messages.DeleteSystem");
+            return;
+        }
+
+        await base.Delete();
+    }
+
 }

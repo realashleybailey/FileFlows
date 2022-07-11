@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.ServerShared.Helpers;
 
@@ -55,9 +56,11 @@ public class DirectoryHelper
 #if(DEBUG && false)
         return;
 #else
-        string dir = ScriptsDirectory;
-        if (Directory.Exists(dir) == false)
-            Directory.CreateDirectory(dir);
+        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectorySystem, ScriptsDirectoryUser })
+        {
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
+        }
 #endif
         
     }
@@ -212,6 +215,17 @@ public class DirectoryHelper
             return Path.Combine(BaseDirectory, "Scripts");
         }
     }
+
+    /// <summary>
+    /// Gets the scripts directory for system scripts
+    /// </summary>
+    public static string ScriptsDirectorySystem => Path.Combine(ScriptsDirectory, "System");
+    
+    /// <summary>
+    /// Gets the scripts directory for user scripts
+    /// </summary>
+    public static string ScriptsDirectoryUser => Path.Combine(ScriptsDirectory, "User");
+    
     /// <summary>
     /// Gets the location of the encryption key file
     /// </summary>

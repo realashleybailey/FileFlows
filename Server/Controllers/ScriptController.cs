@@ -22,20 +22,32 @@ public class ScriptController : Controller
     public async Task<IEnumerable<Script>> GetAll()
     {
         List<Script> scripts = new();
-        foreach (var file in new DirectoryInfo(DirectoryHelper.ScriptsDirectory).GetFiles("*.js"))
+        scripts.AddRange(await GetSystemScripts());
+        scripts.AddRange(await GetUserScripts());
+        
+        return scripts.OrderBy(x => x.Name);
+    }
+
+    private Task<IEnumerable<Script>> GetSystemScripts() => GetAll(DirectoryHelper.ScriptsDirectorySystem, system: true);
+    private Task<IEnumerable<Script>> GetUserScripts() => GetAll(DirectoryHelper.ScriptsDirectoryUser);
+
+    async Task<IEnumerable<Script>> GetAll(string directory, bool system = false)
+    {
+        List<Script> scripts = new();
+        foreach (var file in new DirectoryInfo(directory).GetFiles("*.js"))
         {
             string name = file.Name.Replace(".js", "");
             scripts.Add(new()
             {
                 Uid = name,
                 Name = name,
+                System = system,
                 Code = await System.IO.File.ReadAllTextAsync(file.FullName)
             });
         }
 
         return scripts.OrderBy(x => x.Name);
     }
-
 
     /// <summary>
     /// Get a script
@@ -45,18 +57,29 @@ public class ScriptController : Controller
     [HttpGet("{uid}")]
     public async Task<Script> Get(string name)
     {
-        if (ValidScriptName(name) == false)
-            throw new Exception("Script not found");
-        var file = GetFullFilename(name);
-        if (System.IO.File.Exists(file) == false)
-            throw new Exception("Script not found");
-        string code = await System.IO.File.ReadAllTextAsync(file);
+        var result = FindScript(name);
+        string code = await System.IO.File.ReadAllTextAsync(result.File);
         return new Script()
         {
             Uid = name,
             Name = name,
+            System = result.System,
             Code = code
         };
+    }
+
+    private (bool System, string File) FindScript(string name)
+    {
+        if (ValidScriptName(name) == false)
+            throw new Exception("Script not found");
+        string file = GetFullFilename(name, system: true);
+        if (System.IO.File.Exists(file))
+            return (true, file); 
+        file = GetFullFilename(name, system: false);
+        if (System.IO.File.Exists(file))
+            return (false, file);
+        throw new Exception("Script not found");
+
     }
 
     /// <summary>
@@ -71,10 +94,8 @@ public class ScriptController : Controller
             return $"Logger.ELog('invalid name: {name.Replace("'", "''")}');\nreturn -1";
         try
         {
-            string file = Path.Combine(DirectoryHelper.ScriptsDirectory, name + ".js");
-            if (System.IO.File.Exists(file) == false)
-                return "Logger.ELog('script not found');\nreturn -1";
-            return await System.IO.File.ReadAllTextAsync(file);
+            var result = FindScript(name);
+            return await System.IO.File.ReadAllTextAsync(result.File);
         }
         catch (Exception ex)
         {
@@ -116,7 +137,7 @@ public class ScriptController : Controller
         {
             if (ValidScriptName(m) == false)
                 continue;
-            string file = GetFullFilename(m);
+            string file = GetFullFilename(m, system: false);
             if (System.IO.File.Exists(file) == false)
                 continue;
             try
@@ -157,7 +178,7 @@ public class ScriptController : Controller
         // will throw if any errors
         name = name.Replace(".js", "").Replace(".JS", "");
         name = GetNewUniqueName(name);
-        return Save(new () { Name = name, Code = code});
+        return Save(new () { Name = name, Code = code, System = false});
     }
 
     /// <summary>
@@ -174,6 +195,7 @@ public class ScriptController : Controller
             return null;
         
         script.Name = GetNewUniqueName(name);
+        script.System = false;
         script.Uid = script.Name;
         return Save(script);
     }
@@ -198,8 +220,8 @@ public class ScriptController : Controller
         return true;
     }
     
-    private string GetFullFilename(string name) => 
-        new DirectoryInfo(Path.Combine(DirectoryHelper.ScriptsDirectory, name + ".js")).FullName;
+    private string GetFullFilename(string name, bool system) => 
+        new DirectoryInfo(Path.Combine(system ? DirectoryHelper.ScriptsDirectorySystem : DirectoryHelper.ScriptsDirectoryUser, name + ".js")).FullName;
 
     private bool SaveScript(string name, string code)
     {
@@ -209,7 +231,7 @@ public class ScriptController : Controller
             
             if(ValidScriptName(name) == false)
                 throw new Exception("Invalid script name:" + name);
-            string file = GetFullFilename(name);
+            string file = GetFullFilename(name, false);
             System.IO.File.WriteAllText(file, code);
             return true;
         }

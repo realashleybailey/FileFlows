@@ -158,7 +158,7 @@ public class Program
                 using StreamReader reader = new StreamReader(stream);
                 string js = reader.ReadToEnd();
                 string path =
-                    new DirectoryInfo(Path.Combine(DirectoryHelper.ScriptsDirectory, resource[suffix.Length..]))
+                    new DirectoryInfo(Path.Combine(DirectoryHelper.ScriptsDirectorySystem, resource[suffix.Length..]))
                         .FullName;
                 File.WriteAllText(path, js);
                 Logger.Instance.ILog("Restored script: " + path);

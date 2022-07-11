@@ -238,6 +238,22 @@ class FFChart {
         }, true, false);
     }
 
+    formatFileSize(size) {
+        if (size === undefined) {
+            return '';
+        }
+        let neg = size < 0;
+        size = Math.abs(size);
+        let sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        let order = 0;
+        while (size >= 1000 && order < sizes.length - 1) {
+            order++;
+            size = size / 1000;
+        }
+        if(neg)
+            size *= -1;
+        return size.toFixed(2) + ' ' + sizes[order];
+    }
 
     async getData() {
         if(this.disposed)
@@ -401,7 +417,7 @@ export class BarChart extends FFChart
     }
 
     hasData(data) {
-        return !!data?.data?.length;
+        return !!data?.labels?.length;
     }
 
     getChartOptions(data)
@@ -409,6 +425,18 @@ export class BarChart extends FFChart
         return {
             chart: {
                 type: 'bar',
+                stacked: true,
+                stackType: '100%'
+            },
+            legend: {
+                show: false
+            },
+            tooltip: {
+                y: {
+                    formatter: (value) => {
+                        return this.formatFileSize(value);
+                    }
+                }
             },
             plotOptions: {
                 bar: {
@@ -419,9 +447,20 @@ export class BarChart extends FFChart
             dataLabels: {
                 enabled: false
             },
-            series: [{ data: data.data }],
+            colors: [
+                '#02647e',
+                'rgba(0,191,232,0.85)',
+                'rgba(0,42,52,0.85)'
+            ],
+            series: data.series,
             xaxis: {
-                categories: data.labels
+                categories: data.labels,
+                axisTicks : {
+                    show: false
+                },
+                labels : {
+                    show: false
+                }
             }
         };
     }
@@ -821,16 +860,7 @@ export class TimeSeriesChart extends FFChart
                     },
                     formatter: this.sizeData ?
                         (value, opts) => {
-                            if (value === undefined) {
-                                return '';
-                            }
-                            let sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-                            let order = 0;
-                            while (value >= 1000 && order < sizes.length - 1) {
-                                order++;
-                                value = value / 1000;
-                            }
-                            return value.toFixed(2) + ' ' + sizes[order];
+                            return this.formatFileSize(value);
                         }
                         :
                         (value, opts) => {

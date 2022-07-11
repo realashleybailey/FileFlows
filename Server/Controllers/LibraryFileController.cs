@@ -756,9 +756,36 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     public async Task<object> ShrinkageBarChar()
     {
         var groups = await ShrinkageGroups();
+        #if(DEBUG)
+        groups = new Dictionary<string, ShrinkageData>()
+        {
+            { "Movies", new() { FinalSize = 10_000_000_000, OriginalSize = 25_000_000_000 } },
+            { "TV", new() { FinalSize = 45_000_000_000, OriginalSize = 75_000_000_000 } },
+            { "Other", new() { FinalSize = 45_000_000_000, OriginalSize = 40_000_000_000 } },
+        };
+        #endif
         return new
         {
-            data = groups.Select(x => (x.Value.OriginalSize - x.Value.FinalSize)).ToArray(),
+            series = new object[]
+            {
+                //new { name = "Final Size", data = groups.Select(x => (x.Value.OriginalSize - x.Value.FinalSize)).ToArray() },
+                new { name = "Final Size", data = groups.Select(x => x.Value.FinalSize).ToArray() },
+                //new { name = "Original Size", data = groups.Select(x => x.Value.OriginalSize).ToArray() }
+                new { name = "Savings", data = groups.Select(x =>
+                {
+                    var change = x.Value.OriginalSize - x.Value.FinalSize;
+                    if (change > 0)
+                        return change;
+                    return 0;
+                }).ToArray() },
+                new { name = "Increase", data = groups.Select(x =>
+                {
+                    var change = x.Value.OriginalSize - x.Value.FinalSize;
+                    if (change > 0)
+                        return 0;
+                    return change * -1;
+                }).ToArray() }
+            },
             labels = groups.Select(x => x.Key.Replace("###TOTAL###", "Total")).ToArray(),
         };
     }

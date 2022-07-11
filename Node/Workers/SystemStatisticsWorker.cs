@@ -63,7 +63,7 @@ public class SystemStatisticsWorker:Worker
             {
                 var dir = new DirectoryInfo(path);
                 if (dir.Exists)
-                    size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+                    size += dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
             }
             catch (Exception)
             {

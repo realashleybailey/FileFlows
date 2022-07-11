@@ -109,6 +109,12 @@ function intDashboardActual(uid, csharp, isReadOnly) {
         let data = getGridData();
         csharp.invokeMethodAsync("SaveDashboard", uid, data);        
     });
+    grid.on('removed', () => {
+        setTimeout(() => {                
+            let data = getGridData();
+            csharp.invokeMethodAsync("SaveDashboard", uid, data);
+        }, 500);
+    });
 }
 
 

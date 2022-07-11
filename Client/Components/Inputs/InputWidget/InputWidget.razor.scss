@@ -75,3 +75,10 @@
     }
   }
 }
+.preview.Bar {
+  ::deep svg {
+    transform: scale(1.25, 1.5);
+    position: relative;
+    left: 1rem;
+  }
+}

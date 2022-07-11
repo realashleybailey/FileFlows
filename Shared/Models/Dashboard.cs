@@ -167,7 +167,7 @@ public class Dashboard: FileFlowObject
             {
                 Height = 2, Width = 4,
                 Y = rowIndex, X = 8,
-                WidgetDefinitionUid = LibraryProcessingTimes.WD_UID
+                WidgetDefinitionUid = StorageSaved.WD_UID
             });
         }
 

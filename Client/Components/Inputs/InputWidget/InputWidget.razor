@@ -14,6 +14,9 @@
     <div class="preview @Type">
         @switch (Type)
         {
+            case WidgetType.Bar:
+                <PreviewBarChart />
+                break;
             case WidgetType.BoxPlot:
                 <PreviewBoxPlot />
                 break;

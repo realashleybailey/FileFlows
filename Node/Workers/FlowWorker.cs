@@ -290,7 +290,9 @@ public class FlowWorker : Worker
         }
         var scriptNode = new ScriptNode();
         scriptNode.Code = code;
-        var output = scriptNode.Execute(new NodeParameters(Logger.Instance));
+        var args = new NodeParameters(Logger.Instance);
+        args.ScriptExecutor = new FileFlows.ServerShared.ScriptExecution.ScriptExecutor();
+        var output = scriptNode.Execute(args);
         if (output == 1)
             return true;
         Logger.Instance.ELog("Output from pre-execute script not expected: " + output);

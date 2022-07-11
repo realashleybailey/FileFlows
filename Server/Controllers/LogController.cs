@@ -49,8 +49,11 @@ public class LogController : Controller
 
         var nodes = await new NodeController().GetAll();
         foreach (var node in nodes)
-            sources.Add(new() { Value = node.Uid.ToString(), Label = node.Name });
-        
+        {
+            if(node.Uid != Globals.InternalNodeUid) // internal logs to system log
+                sources.Add(new() { Value = node.Uid.ToString(), Label = node.Name });
+        }
+
         return sources;
     }
 

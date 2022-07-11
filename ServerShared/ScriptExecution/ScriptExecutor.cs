@@ -32,11 +32,6 @@ public class ScriptExecutor:IScriptExecutor
         var args = execArgs.Args;
         try
         {
-            long fileSize = 0;
-            var fileInfo = new FileInfo(args.WorkingFile);
-            if (fileInfo.Exists)
-                fileSize = fileInfo.Length;
-
             // replace Variables. with dictionary notation
             string tcode = execArgs.Code;
             foreach (string k in args.Variables.Keys.OrderByDescending(x => x.Length))

@@ -29,8 +29,6 @@ public partial class Log : ComponentBase
 
     private LogType LogLevel { get; set; } = LogType.Info;
 
-    private Dictionary<Guid, string> Nodes = new();
-
     private List<ListOption> LoggingSources = new ();
 
     private readonly LogSearchModel SearchModel = new()

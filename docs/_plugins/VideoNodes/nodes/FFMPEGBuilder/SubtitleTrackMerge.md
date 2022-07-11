@@ -22,6 +22,13 @@ The subtitles to search for to add
 #### Use Source Directory
 If checked the original source directory will be searched, otherwise the working directory will be used.
 
+### Match Filename
+When checked only subtitles with the same filename as the input file or the working file will be merged.
+
+For example,
+Input: MyFile.mkv
+Match: MyFile.srt
+Not Match: OtherFile.srt
 
 ### Outputs
 1. Subtitles found and added

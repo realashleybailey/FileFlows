@@ -6,6 +6,7 @@ using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
+using JsonSerializer = Jint.Native.Json.JsonSerializer;
 
 namespace FileFlows.Server.Workers;
 
@@ -173,6 +174,7 @@ public class SystemMonitor:Worker
     /// <param name="args">the node system statistics</param>
     public void Record(NodeSystemStatistics args)
     {
+        Logger.Instance.ILog("Recording node system stats: " + System.Text.Json.JsonSerializer.Serialize(args));
         args.RecordedAt = DateTime.Now;
         lock (NodeStatistics)
         {

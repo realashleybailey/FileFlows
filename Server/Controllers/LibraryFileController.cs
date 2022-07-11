@@ -749,6 +749,21 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     }
 
     /// <summary>
+    /// Gets the shrinkage data for a bar chart
+    /// </summary>
+    /// <returns>the bar chart data</returns>
+    [HttpGet("shrinkage-bar-chart")]
+    public async Task<object> ShrinkageBarChar()
+    {
+        var groups = await ShrinkageGroups();
+        return new
+        {
+            data = groups.Select(x => (x.Value.OriginalSize - x.Value.FinalSize)).ToArray(),
+            labels = groups.Select(x => x.Key.Replace("###TOTAL###", "Total")).ToArray(),
+        };
+    }
+
+    /// <summary>
     /// Get library file shrinkage grouped by library
     /// </summary>
     /// <returns>the library file shrinkage data</returns>

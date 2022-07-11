@@ -44,6 +44,8 @@ public abstract class WidgetDefinition
             return new VideoResolution();
         if (uid == OpenDatabaseConnections.WD_UID)
             return new OpenDatabaseConnections();
+        if (uid == StorageSaved.WD_UID)
+            return new StorageSaved();
         throw new Exception("Unknown widget: " + uid);
     }
     
@@ -106,5 +108,9 @@ public enum WidgetType
     /// <summary>
     /// Time series percentage
     /// </summary>
-    TimeSeries = 105
+    TimeSeries = 105,
+    /// <summary>
+    /// Bar graph
+    /// </summary>
+    Bar = 106
 }

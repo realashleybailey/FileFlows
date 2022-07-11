@@ -188,6 +188,8 @@ function newChart(type, uid, args){
         window.FlowCharts[uid] = new TreeMapChart(uid, args);
     else if(type == 'TimeSeries' || type === 105)
         window.FlowCharts[uid] = new TimeSeriesChart(uid, args);
+    else if(type == 'Bar' || type === 106)
+        window.FlowCharts[uid] = new BarChart(uid, args);
     else 
         console.log('unknown type: ' + type);
     
@@ -392,6 +394,38 @@ export class HeatMapChart extends FFChart
     }
 }
 
+export class BarChart extends FFChart
+{
+    constructor(uid, args) {
+        super(uid, args);
+    }
+
+    hasData(data) {
+        return !!data?.data?.length;
+    }
+
+    getChartOptions(data)
+    {
+        return {
+            chart: {
+                type: 'bar',
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    horizontal: true,
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            series: [{ data: data.data }],
+            xaxis: {
+                categories: data.labels
+            }
+        };
+    }
+}
 
 export class PieChartChart extends FFChart
 {

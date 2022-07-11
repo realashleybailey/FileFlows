@@ -342,6 +342,7 @@
         "LogStorage": "Log Storage",
         "FilesUpcoming":"Upcoming",
         "FilesRecentlyFinished":"Recently Finished",
+        "StorageSaved": "Storage Saved",
         "LibraryProcessingTimes": "Library Processing Times [Seconds Per Megabyte]",
         "ProcessingTimes": "Processing Times",
         "Codecs": "Codecs",

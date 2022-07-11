@@ -122,6 +122,19 @@ public partial class CustomDashboard
                 }
             });
         }
+        
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.StorageSaved.WD_UID))
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.StorageSaved),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputWidget.Type), WidgetType.Bar }
+                }
+            });
+        }
 
         if (DoesntHaveWidget(FileFlows.Shared.Widgets.Codecs.WD_UID))
         {
@@ -250,6 +263,9 @@ public partial class CustomDashboard
                             break;
                         case nameof(FilesRecentlyFinished):
                             newWidgets.Add(CreateNewWidgetModel(FilesRecentlyFinished.WD_UID, 6, 2));
+                            break;
+                        case nameof(StorageSaved):
+                            newWidgets.Add(CreateNewWidgetModel(StorageSaved.WD_UID, 6, 2));
                             break;
                         case nameof(Codecs):
                             newWidgets.Add(CreateNewWidgetModel(Codecs.WD_UID, 6, 2));

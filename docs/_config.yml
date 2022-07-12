@@ -1,14 +1,6 @@
 title: FileFlows Documentation
 description: Documentation for FileFlows
-#remote_theme: chrisrhymes/bulma-clean-theme
-#remote_theme: rundocs/jekyll-rtd-theme
-remote_theme: pmarsceill/just-the-docs
-
-
-include:
- - _pages
- - _plugins
- - _guides
+remote_theme: rundocs/jekyll-rtd-theme
 
 collections:
   pages:

@@ -2,6 +2,7 @@ title: FileFlows Documentation
 description: Documentation for FileFlows
 remote_theme: just-the-docs/just-the-docs
 color_scheme: fileflows
+url: "https://docs.fileflows.com"
 
 collections:
   pages:

@@ -2,6 +2,7 @@
 title: Scripts
 name: Scripts
 permalink: /scripts
+parent: Pages
 layout: default
 order: 160
 ---

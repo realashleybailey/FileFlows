@@ -2,6 +2,7 @@
 title: Tools
 name: Tools
 permalink: /tools
+parent: Pages
 layout: default
 order: 180
 ---

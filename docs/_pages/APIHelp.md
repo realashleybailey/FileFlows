@@ -1,6 +1,7 @@
 ---
 title: API Help
 name: API Help
+parent: Pages
 permalink: /api-help
 layout: default
 order: 1000

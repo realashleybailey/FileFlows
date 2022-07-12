@@ -2,6 +2,7 @@
 title: System
 name: System
 permalink: /system
+parent: Pages
 layout: default
 order: 200
 ---

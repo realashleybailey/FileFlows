@@ -2,6 +2,7 @@
 title: Variables
 name: Variables
 permalink: /variables
+parent: Pages
 layout: default
 order: 600
 toc: false

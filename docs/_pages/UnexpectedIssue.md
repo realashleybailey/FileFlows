@@ -2,6 +2,7 @@
 title: Unexpected Issue
 name: Unexpected Issue
 permalink: /report-unexpected-issue
+parent: Pages
 layout: default
 order: 800
 ---

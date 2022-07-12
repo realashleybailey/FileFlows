@@ -2,6 +2,7 @@
 title: Flows
 name: Flows
 permalink: /flows
+parent: Pages
 layout: default
 order: 130
 ---

@@ -1,6 +1,7 @@
 ---
 title: Dashboard
 name: Dashboard
+parent: Pages
 permalink: /dashboard
 layout: default
 order: 100

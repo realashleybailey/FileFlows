@@ -2,6 +2,7 @@
 title: Libraries
 name: Libraries
 permalink: /libraries
+parent: Pages
 layout: default
 order: 140
 ---

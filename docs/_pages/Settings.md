@@ -2,6 +2,7 @@
 title: Settings
 name: Settings
 permalink: /settings
+parent: Pages
 layout: default
 order: 190
 ---

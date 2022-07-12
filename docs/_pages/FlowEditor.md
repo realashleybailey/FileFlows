@@ -2,6 +2,7 @@
 title: Flow Editor
 name: Flow Editor
 permalink: /flow-editor
+parent: Pages
 layout: default
 order: 133
 ---

@@ -1,6 +1,7 @@
 ---
 title: Creating A Library
 name: Creating A Library
+parent: Pages
 permalink: /creating-a-library
 layout: default
 order: 530

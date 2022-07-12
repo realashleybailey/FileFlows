@@ -1,6 +1,7 @@
 ---
 title: Versions
 name: Versions
+parent: Pages
 permalink: /versions
 layout: default
 order: 900

@@ -2,6 +2,7 @@
 title: Nodes
 name: Nodes
 permalink: /nodes
+parent: Pages
 layout: default
 order: 150
 ---

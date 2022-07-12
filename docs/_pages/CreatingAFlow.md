@@ -1,6 +1,7 @@
 ---
 title: Creating A Flow
 name: Creating A Flow
+parent: Pages
 permalink: /creating-a-flow
 layout: default
 order: 520

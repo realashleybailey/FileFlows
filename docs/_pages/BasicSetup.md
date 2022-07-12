@@ -1,6 +1,7 @@
 ---
 title: Basic Setup
 name: Basic Setup
+parent: Pages
 permalink: /basic-setup
 layout: default
 order: 510

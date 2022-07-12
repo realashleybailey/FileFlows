@@ -2,6 +2,7 @@
 title: Files
 name: Files
 permalink: /library-files
+parent: Pages
 layout: default
 order: 120
 ---

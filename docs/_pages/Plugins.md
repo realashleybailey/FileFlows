@@ -2,6 +2,7 @@
 title: Plugins
 name: Plugins
 permalink: /plugins
+parent: Pages
 layout: default
 order: 170
 ---

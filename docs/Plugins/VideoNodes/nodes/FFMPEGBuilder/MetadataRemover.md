@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Metadata Remover
+title: Metadata Remover
 permalink: /plugins/video-nodes/ffmpeg-builder/metadata-remover
 name: Metadata Remover
 layout: default

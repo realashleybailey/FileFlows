@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Track Remover
+title: Track Remover
 permalink: /plugins/video-nodes/ffmpeg-builder/track-remover
 name: Track Remover
 layout: default

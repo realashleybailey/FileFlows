@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Audio Converter
+title: Audio Converter
 permalink: /plugins/video-nodes/ffmpeg-builder/audio-converter
 name: Audio Converter
 layout: default

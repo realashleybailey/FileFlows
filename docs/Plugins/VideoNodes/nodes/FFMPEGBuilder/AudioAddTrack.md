@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Audio Add Track
+title: Audio Add Track
 permalink: /plugins/video-nodes/ffmpeg-builder/add-audio-track
 name: Audio Add Track
 layout: default

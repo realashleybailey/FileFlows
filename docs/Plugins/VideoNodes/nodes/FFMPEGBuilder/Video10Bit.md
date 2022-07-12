@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Video 10 Bit
+title: Video 10 Bit
 permalink: /plugins/video-nodes/ffmpeg-builder/video-10-bit
 name: Video 10 Bit
 layout: default

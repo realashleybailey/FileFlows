@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Video Tag
+title: Video Tag
 permalink: /plugins/video-nodes/ffmpeg-builder/video-tag
 name: Video Tag
 layout: default

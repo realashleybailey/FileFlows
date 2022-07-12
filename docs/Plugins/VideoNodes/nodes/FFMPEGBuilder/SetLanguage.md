@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Set Language
+title: Set Language
 permalink: /plugins/video-nodes/ffmpeg-builder/set-language
 name: Set Language
 layout: default

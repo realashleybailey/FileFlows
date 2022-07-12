@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Video Scaler
+title: Video Scaler
 permalink: /plugins/video-nodes/ffmpeg-builder/video-scaler
 name: Video Scaler
 layout: default

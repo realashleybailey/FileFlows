@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Custom Parameters
+title: Custom Parameters
 permalink: /plugins/video-nodes/ffmpeg-builder/custom-parameters
 name: Custom Parameters
 layout: default

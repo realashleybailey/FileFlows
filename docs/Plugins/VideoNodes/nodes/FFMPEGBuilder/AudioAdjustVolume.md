@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Audio Adjust Volume
+title: Audio Adjust Volume
 permalink: /plugins/video-nodes/ffmpeg-builder/audio-adjust-volume
 name: Audio Adjust Volume
 layout: default

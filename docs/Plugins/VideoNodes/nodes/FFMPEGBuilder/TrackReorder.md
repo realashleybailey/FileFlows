@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder > Track Reorder
+title: Track Reorder
 permalink: /plugins/video-nodes/ffmpeg-builder/track-reorder
 name: Track Reorder
 layout: default

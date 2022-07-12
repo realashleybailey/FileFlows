@@ -1,3 +1,5 @@
+using FileFlows.Server.Workers;
+
 namespace FileFlows.Server.Controllers;
 
 using FileFlows.Plugin.Models;
@@ -437,6 +439,14 @@ public class FlowController : ControllerStore<Flow>
             var others = (await GetAll()).Where(x => x.Type == FlowType.Failure).Count();
             if (others == 0)
                 model.Default = true;
+        }
+
+        if (model.Uid != Guid.Empty)
+        {
+            // existing, check for name change
+            var existing = await GetByUid(model.Uid);
+            if(existing != null && existing.Name != model.Name)
+                new ObjectReferenceUpdater().Run();
         }
 
         return await Update(model);

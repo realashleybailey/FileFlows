@@ -55,6 +55,14 @@ namespace FileFlows.Server.Controllers
             if (Regex.IsMatch(library.Schedule, "^[01]{672}$") == false)
                 library.Schedule = new string('1', 672);
 
+            if (library.Uid != Guid.Empty)
+            {
+                // existing, check for name change
+                var existing = await GetByUid(library.Uid);
+                if(existing != null && existing.Name != library.Name)
+                    new ObjectReferenceUpdater().Run();
+            }
+            
             bool newLib = library.Uid == Guid.Empty; 
             var result = await base.Update(library, checkDuplicateName: true);
             if (newLib && result != null)

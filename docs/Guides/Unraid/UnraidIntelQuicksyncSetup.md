@@ -5,7 +5,7 @@ permalink: /guides/unraid/intel-quicksync-setup
 layout: default
 sub: Unraid
 parent: Unraid
-grandParent: Guides
+grand_parent: Guides
 ---
 
 

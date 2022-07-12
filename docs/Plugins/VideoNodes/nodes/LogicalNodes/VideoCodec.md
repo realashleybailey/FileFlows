@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > Video Codec
+title: Video Codec
 permalink: /plugins/video-nodes/logical-nodes/video-codec
 name: Video Codec
 layout: default

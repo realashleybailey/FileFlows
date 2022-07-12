@@ -1,11 +1,13 @@
 ---
-title: Video Nodes > Video File
+title: Video File
 permalink: /plugins/video-nodes/video-file
 name: Video File
 layout: default
 plugin: Video Nodes
 parent: Video Nodes
 grand_parent: Plugins
+nav_order: 1
+
 ---
 
 {% include node.html outputs=1 icon="fas fa-video" name="Video File" type="Input" %}

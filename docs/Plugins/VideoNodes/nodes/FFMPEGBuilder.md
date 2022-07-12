@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > FFMPEG Builder
+title: FFMPEG Builder
 permalink: /plugins/video-nodes/ffmpeg-builder
 name: FFMPEG Builder
 layout: default
@@ -8,6 +8,7 @@ parent: Video Nodes
 grand_parent: Plugins
 subs: true
 has_children: true
+nav_order: 2
 ---
 
 

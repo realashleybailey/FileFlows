@@ -1,11 +1,12 @@
 ---
-title: Video Nodes > FFMPEG
+title: FFMPEG
 permalink: /plugins/video-nodes/ffmpeg
 name: FFMPEG
 layout: default
 plugin: Video Nodes
 parent: Video Nodes
 grand_parent: Plugins
+nav_order: 4
 ---
 
 {% include node.html input=1 outputs=1 icon="far fa-file-video" name="FFMPEG" type="Process" %}

@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > Detect Black Bars
+title: Detect Black Bars
 permalink: /plugins/video-nodes/logical-nodes/detect-black-bars
 name: Detect Black Bars
 layout: default

@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > Can Use Hardware Encoding
+title: Can Use Hardware Encoding
 permalink: /plugins/video-nodes/logical-nodes/can-use-hardware-encoding
 name: Can Use Hardware Encoding
 layout: default

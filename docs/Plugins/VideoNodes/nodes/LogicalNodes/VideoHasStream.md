@@ -1,5 +1,5 @@
 ---
-title: Video Nodes > Video Has Stream
+title: Video Has Stream
 permalink: /plugins/video-nodes/logical-nodes/video-has-stream
 name: Video Has Stream
 layout: default

@@ -13,5 +13,6 @@ collections:
     output: true
 
 include:
+  - _pages
   - _plugins
   - _guides

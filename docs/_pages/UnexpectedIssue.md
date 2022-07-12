@@ -1,7 +1,9 @@
 ---
-title: Reporting An Unexpected Issue
-name: Reporting An Unexpected Issue
+title: Unexpected Issue
+name: Unexpected Issue
+permalink: /report-unexpected-issue
 layout: default
+order: 800
 ---
 
 If you ever come across this error message at the bottom of the page

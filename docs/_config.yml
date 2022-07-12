@@ -1,6 +1,7 @@
 title: FileFlows Documentation
 description: Documentation for FileFlows
 remote_theme: just-the-docs/just-the-docs
+color_scheme: dark
 
 collections:
   pages:

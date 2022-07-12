@@ -3,10 +3,9 @@ description: Documentation for FileFlows
 remote_theme: rundocs/jekyll-rtd-theme
 
 include:
- - _pages
  - _plugins
  - _guides
- 
+
 collections:
   pages:
     output: true

@@ -8,6 +8,7 @@ order: 200
 
 This page gives you an overview of the system and processing statistics.
 
+{% include youtube.html code="GCtHTl3UEf0" %}
 
 ### CPU Usage
 Shows you the current and historic CPU usage.   This data is bucketed and the maximum value recorded in a 10 second bucket is shown.

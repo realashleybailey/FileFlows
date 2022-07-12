@@ -48,16 +48,18 @@ public class ObjectReferenceUpdater:Worker
                 bool changed = false;
                 if (dictLibraries.ContainsKey(lf.Library.Uid) && lf.Library.Name != dictLibraries[lf.Library.Uid])
                 {
+                    string oldName = lf.Library.Name;
                     lf.Library.Name = dictLibraries[lf.Library.Uid];
-                    Logger.Instance.ILog($"Updating Library name reference '{lf.Flow.Name}' in file: {lf.Name}");
+                    Logger.Instance.ILog($"Updating Library name reference '{oldName}' to'{lf.Library.Name}' in file: {lf.Name}");
                     changed = true;
                 }
 
                 if (lf.Flow != null && lf.Flow.Uid != Guid.Empty && dictFlows.ContainsKey(lf.Flow.Uid) &&
                     lf.Flow.Name != dictFlows[lf.Flow.Uid])
                 {
+                    string oldname = lf.Flow.Name;
                     lf.Flow.Name = dictFlows[lf.Flow.Uid];
-                    Logger.Instance.ILog($"Updating Flow name reference '{lf.Flow.Name}' in file: {lf.Name}");
+                    Logger.Instance.ILog($"Updating Flow name reference '{oldname}' to '{lf.Flow.Name}' in file: {lf.Name}");
                     changed = true;
                 }
 
@@ -69,8 +71,9 @@ public class ObjectReferenceUpdater:Worker
             {
                 if (dictFlows.ContainsKey(lib.Flow.Uid) && lib.Flow.Name != dictFlows[lib.Flow.Uid])
                 {
+                    string oldname = lib.Flow.Name;
                     lib.Flow.Name = dictFlows[lib.Flow.Uid];
-                    Logger.Instance.ILog($"Updating Flow name reference '{lib.Flow.Name}' in library: {lib.Name}");
+                    Logger.Instance.ILog($"Updating Flow name reference '{oldname}' to '{lib.Flow.Name}' in library: {lib.Name}");
                     libraryController.Update(lib).Wait();
                 }
             }

@@ -19,6 +19,7 @@
     "Edit": "Edit",
     "Remove":"Remove",
     "Duplicate":"Duplicate",
+    "UsedBy":"Used By",
     "Update": "Update",
     "Refresh": "Refresh",
     "Download": "Download",
@@ -411,7 +412,8 @@
       "Messages": {
         "Imported": "Script ''{name}'' imported",
         "Duplicated":"Scripts ''{name}'' duplicated",
-        "DeleteSystem":"You cannot delete a system script"
+        "DeleteSystem":"You cannot delete a system script",
+        "DeleteUsed":"You cannot delete a script that is in use"
       },
       "Fields":{
       }

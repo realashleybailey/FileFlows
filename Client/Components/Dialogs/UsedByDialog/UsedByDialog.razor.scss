@@ -1,0 +1,22 @@
+table {
+  border: solid 1px var(--border-color);
+  width: 100%;
+  border-collapse: collapse;
+  thead tr {
+    font-weight: 600;
+    background: rgba(var(--input-background-rgb), 0.3);
+    th {
+      padding: 0.25rem 0.5rem;
+    }
+  }
+  tbody {
+    td {
+      padding: 0.25rem 0.5rem;
+    }
+    tr + tr {
+      td {
+        border-top:solid 1px var(--input-background);
+      }
+    }
+  }  
+}

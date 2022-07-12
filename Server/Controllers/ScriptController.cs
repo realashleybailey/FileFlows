@@ -24,7 +24,33 @@ public class ScriptController : Controller
         List<Script> scripts = new();
         scripts.AddRange(await GetSystemScripts());
         scripts.AddRange(await GetUserScripts());
-        
+        var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
+        var flows = await new FlowController().GetAll();
+        string flowTypeName = typeof(Flow).FullName;
+        foreach (var flow in flows)
+        {
+            if (flow?.Parts?.Any() != true)
+                continue;
+            foreach (var p in flow.Parts)
+            {
+                if (p.FlowElementUid.StartsWith("Script:") == false)
+                    continue;
+                string scriptName = p.FlowElementUid[7..].ToLower();
+                if (dictScripts.ContainsKey(scriptName) == false)
+                    continue;
+                var script = dictScripts[scriptName];
+                script.UsedBy ??= new();
+                if (script.UsedBy.Any(x => x.Uid == flow.Uid))
+                    continue;
+                script.UsedBy.Add(new ()
+                {
+                    Name = flow.Name,
+                    Type = flowTypeName,
+                    Uid = flow.Uid
+                });
+            }
+        }
+
         return scripts.OrderBy(x => x.Name);
     }
 

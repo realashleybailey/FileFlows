@@ -11,6 +11,10 @@ namespace FileFlows.Client.Components.Dialogs
         [Parameter] public RenderFragment Body { get; set; }
         [Parameter] public string Title { get; set; }
 
+        /// <summary>
+        /// Gets or sets optional styling
+        /// </summary>
+        [Parameter] public string Styling { get; set; }
         [Parameter] public bool Visible { get; set; }
 
     }

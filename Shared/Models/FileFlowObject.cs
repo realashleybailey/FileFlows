@@ -1,3 +1,5 @@
+using FileFlows.Plugin;
+
 namespace FileFlows.Shared.Models;
 
 /// <summary>
@@ -37,4 +39,21 @@ public interface IUniqueObject<T>
     /// Gets or sets the UID of the item
     /// </summary>
     T Uid { get; set; }
+}
+
+/// <summary>
+/// Interface to show what is using this object
+/// </summary>
+public interface IInUse
+{
+    /// <summary>
+    /// Gets or sets what is using this object
+    /// </summary>
+    List<ObjectReference> UsedBy { get; set; }
+
+    /// <summary>
+    /// Gets if this object is in use
+    /// </summary>
+    bool InUse => UsedBy?.Count > 0;
+
 }

@@ -1,9 +1,11 @@
+using FileFlows.Plugin;
+
 namespace FileFlows.Shared.Models;
 
 /// <summary>
 /// A script is a special function node that lets you reuse them
 /// </summary>
-public class Script:IUniqueObject<string>
+public class Script:IUniqueObject<string>, IInUse
 {
     /// <summary>
     /// Gets or sets the name of the script
@@ -24,4 +26,9 @@ public class Script:IUniqueObject<string>
     /// Gets or sets the UID of this script, which is the original name of it
     /// </summary>
     public string Uid { get; set; }
+
+    /// <summary>
+    /// Gets or sets what is using this object
+    /// </summary>
+    public List<ObjectReference> UsedBy { get; set; }
 }

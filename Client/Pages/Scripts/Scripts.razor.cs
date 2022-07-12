@@ -148,8 +148,25 @@ public partial class Scripts : ListPage<string, Script>
             Toast.ShowError("Pages.Scripts.Messages.DeleteSystem");
             return;
         }
+        
+        
+        var used = Table.GetSelected()?.Any(x => x.UsedBy?.Any() == true) == true;
+        if (used)
+        {
+            Toast.ShowError("Pages.Scripts.Messages.DeleteUsed");
+            return;
+        }
+
 
         await base.Delete();
     }
 
+
+    private async Task UsedBy()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item?.UsedBy?.Any() != true)
+            return;
+        await UsedByDialog.Show(item.UsedBy);
+    }
 }

@@ -1,0 +1,1 @@
+table{border:solid 1px var(--border-color);width:100%;border-collapse:collapse}table thead tr{font-weight:600;background:rgba(var(--input-background-rgb),.3)}table tbody td,table thead tr th{padding:.25rem .5rem}table tbody tr+tr td{border-top:solid 1px var(--input-background)}

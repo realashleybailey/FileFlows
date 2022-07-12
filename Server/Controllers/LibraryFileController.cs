@@ -533,6 +533,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if(string.IsNullOrEmpty(file.OutputPath))
             existing.OutputPath = file.OutputPath;
         existing.Flow = file.Flow;
+        if(file.Library != null && file.Library.Uid == existing.Library.Uid)
+            existing.Library = file.Library; // name may have changed and is being updated
         existing.ProcessingEnded = file.ProcessingEnded;
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;

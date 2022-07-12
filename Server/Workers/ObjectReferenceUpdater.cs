@@ -22,6 +22,15 @@ public class ObjectReferenceUpdater:Worker
     }
 
     /// <summary>
+    /// Runs the updater asynchronously 
+    /// </summary>
+    internal async Task RunAsync()
+    {
+        await Task.Delay(1);
+        Run();
+    }
+    
+    /// <summary>
     /// Runs the updater
     /// </summary>
     internal void Run()
@@ -50,7 +59,7 @@ public class ObjectReferenceUpdater:Worker
                 {
                     string oldName = lf.Library.Name;
                     lf.Library.Name = dictLibraries[lf.Library.Uid];
-                    Logger.Instance.ILog($"Updating Library name reference '{oldName}' to'{lf.Library.Name}' in file: {lf.Name}");
+                    Logger.Instance.ILog($"Updating Library name reference '{oldName}' to '{lf.Library.Name}' in file: {lf.Name}");
                     changed = true;
                 }
 

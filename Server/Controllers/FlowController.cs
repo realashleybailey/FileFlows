@@ -441,15 +441,18 @@ public class FlowController : ControllerStore<Flow>
                 model.Default = true;
         }
 
+        bool nameChanged = false;
         if (model.Uid != Guid.Empty)
         {
             // existing, check for name change
             var existing = await GetByUid(model.Uid);
-            if(existing != null && existing.Name != model.Name)
-                new ObjectReferenceUpdater().Run();
+            nameChanged = existing != null && existing.Name != model.Name;
         }
 
-        return await Update(model);
+        var result = await Update(model);
+        if(nameChanged)
+            _ = new ObjectReferenceUpdater().RunAsync();
+        return result;
     }
 
     /// <summary>

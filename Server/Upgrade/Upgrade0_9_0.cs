@@ -1,5 +1,6 @@
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
+using FileFlows.Server.Workers;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Upgrade;
@@ -18,6 +19,9 @@ public class Upgrade0_9_0
         Logger.Instance.ILog("Upgrade running, running 0.9.0 upgrade script");
         AddStatisticsTable();
         ExportScripts();
+        
+        // update object references
+        new ObjectReferenceUpdater().Run();
     }
 
     /// <summary>

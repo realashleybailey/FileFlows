@@ -4,7 +4,7 @@ title: Settings
 permalink: /plugins/discord/settings
 layout: default
 plugin: Discord
-toc: true
+grand_parent: Plugins
 ---
 
 A plugin that allows you to send messages to a Discord server.

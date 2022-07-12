@@ -5,6 +5,7 @@ name: FFMPEG Builder
 layout: default
 plugin: Video Nodes
 parent: Video Nodes
+grand_parent: Plugins
 subs: true
 ---
 

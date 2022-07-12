@@ -4,7 +4,8 @@ title: File Size
 permalink: /plugins/basic-nodes/file-size
 layout: default
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-balance-scale-right" name="File Size" type="Logic" %}

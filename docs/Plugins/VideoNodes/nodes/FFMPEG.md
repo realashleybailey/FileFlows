@@ -5,6 +5,7 @@ name: FFMPEG
 layout: default
 plugin: Video Nodes
 parent: Video Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=1 icon="far fa-file-video" name="FFMPEG" type="Process" %}

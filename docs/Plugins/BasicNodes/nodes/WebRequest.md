@@ -4,7 +4,8 @@ title: Web Request
 permalink: /plugins/basic-nodes/web-request
 layout: default
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-globe" name="Web Request" type="Communication" %}

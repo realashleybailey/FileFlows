@@ -4,7 +4,8 @@ title: Replace Original
 permalink: /plugins/basic-nodes/replace-original
 layout: default
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-file" name="Replace Original" type="Process" %}

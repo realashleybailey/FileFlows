@@ -5,6 +5,7 @@ name: Video File
 layout: default
 plugin: Video Nodes
 parent: Video Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html outputs=1 icon="fas fa-video" name="Video File" type="Input" %}

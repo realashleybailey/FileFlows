@@ -4,7 +4,7 @@ title: Discord
 permalink: /plugins/discord/discord
 layout: default
 plugin: Discord
-toc: true
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=2 icon="fab fa-discord" name="Discord" type="Communication" %}

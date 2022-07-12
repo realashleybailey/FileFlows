@@ -5,6 +5,7 @@ name: Subtitle Track Remover
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+grand_parent: Plugins
 parent: Video Nodes
 ---
 

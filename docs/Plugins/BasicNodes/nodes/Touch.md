@@ -4,7 +4,8 @@ title: Touch
 permalink: /plugins/basic-nodes/touch
 layout: default
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-hand-point-right" name="Touch" type="Process" %}

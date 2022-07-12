@@ -5,4 +5,5 @@ layout: default
 plugin: Video Nodes
 nocontent: true
 subs: true
+has_children: true
 ---

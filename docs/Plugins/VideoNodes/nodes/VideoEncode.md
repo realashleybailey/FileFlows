@@ -5,6 +5,7 @@ name: Video Encode
 layout: default
 plugin: Video Nodes
 parent: Video Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=2 icon="far fa-file-video" name="Video Encode" type="Process" %}

@@ -4,7 +4,8 @@ title: Delete Source Directory
 permalink: /plugins/basic-nodes/delete-source-directory
 layout: default
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=2 icon="far fa-trash-alt" name="Delete Source Directory" type="Process" %}

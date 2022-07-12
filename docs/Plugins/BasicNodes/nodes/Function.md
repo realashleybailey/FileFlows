@@ -4,7 +4,8 @@ permalink: /plugins/basic-nodes/function
 layout: default
 description: Node that executes javascript functions
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-code" name="Function" type="Logic" %}

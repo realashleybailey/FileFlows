@@ -4,7 +4,8 @@ title: Copy File
 permalink: /plugins/basic-nodes/copy-file
 layout: default
 plugin: Basic Nodes
-parent: Plugins/Basic Nodes
+parent: Basic Nodes
+grand_parent: Plugins
 ---
 
 {% include node.html input=1 outputs=1 icon="far fa-copy" name="Copy File" type="Process" %}

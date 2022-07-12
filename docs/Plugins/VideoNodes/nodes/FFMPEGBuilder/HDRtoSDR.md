@@ -5,6 +5,7 @@ name: HDR to SDR
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+grand_parent: Plugins
 parent: Video Nodes
 ---
 

@@ -4,7 +4,7 @@ title: Goto Flow
 permalink: /plugins/basic-nodes/goto-flow
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=0 icon="fas fa-sitemap" name="Goto Flow" type="Logic" %}

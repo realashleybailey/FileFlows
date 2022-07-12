@@ -4,7 +4,7 @@ title: Executor
 permalink: /plugins/basic-nodes/executor
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-terminal" name="Executor" type="Process" %}

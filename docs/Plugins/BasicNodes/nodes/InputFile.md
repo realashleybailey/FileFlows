@@ -4,7 +4,7 @@ title: File Size Compare
 permalink: /plugins/basic-nodes/file-size-compare
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=3 icon="fas fa-sitemap" name="File Size Compare" type="Logic" %}

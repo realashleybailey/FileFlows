@@ -4,7 +4,7 @@ title: Move File
 permalink: /plugins/basic-nodes/move-file
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-file-export" name="Move File" type="Process" %}

@@ -3,7 +3,7 @@ name: Settings
 title: Settings
 permalink: /plugins/apprise/settings
 layout: default
-parent: Apprise
+parent: Plugins/Apprise
 plugin: Apprise
 ---
 

@@ -4,7 +4,7 @@ title: Pattern Match
 permalink: /plugins/basic-nodes/pattern-match
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-equals" name="Pattern Match" type="Logic" %}

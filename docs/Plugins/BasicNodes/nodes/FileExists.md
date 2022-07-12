@@ -4,7 +4,7 @@ title: File Exists
 permalink: /plugins/basic-nodes/file-exists
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-question-circle" name="File Exists" type="Logic" %}

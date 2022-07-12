@@ -4,7 +4,7 @@ title: Input Folder
 permalink: /plugins/basic-nodes/input-folder
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="far fa-folder" name="Input Folder" type="Input" %}

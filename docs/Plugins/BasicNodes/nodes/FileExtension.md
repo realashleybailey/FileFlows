@@ -4,7 +4,7 @@ title: File Extension
 permalink: /plugins/basic-nodes/file-extension
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-file-excel" name="File Extension" type="Logic" %}

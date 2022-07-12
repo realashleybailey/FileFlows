@@ -4,7 +4,7 @@ title: Delete
 permalink: /plugins/basic-nodes/delete
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="far fa-trash-alt" name="Delete" type="Process" %}

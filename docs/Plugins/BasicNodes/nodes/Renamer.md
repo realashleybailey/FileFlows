@@ -3,7 +3,7 @@ name: Renamer
 permalink: /plugins/basic-nodes/renamer
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-font" name="Renamer" type="Process" %}

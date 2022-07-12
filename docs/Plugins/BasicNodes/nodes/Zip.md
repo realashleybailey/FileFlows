@@ -4,7 +4,7 @@ title: Zip
 permalink: /plugins/basic-nodes/zip
 layout: default
 plugin: Basic Nodes
-toc: true
+parent: Plugins/Basic Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-file-archive" name="Zip" type="Process" %}

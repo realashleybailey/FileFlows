@@ -3,7 +3,7 @@ name: Apprise
 title: Apprise
 permalink: /plugins/apprise/apprise
 layout: default
-parent: Apprise
+parent: Plugins/Apprise
 plugin: Apprise
 ---
 

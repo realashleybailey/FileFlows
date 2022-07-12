@@ -1,0 +1,297 @@
+.flow-part {
+  width: 14rem;
+  min-width: 14rem;
+  float: right;
+  margin: 0 0 0rem 2rem;
+  position: relative;
+  top: -2rem;
+}
+
+.flow-part {
+  text-align: center;
+  border-radius: 0.75rem;
+  border: solid 3px transparent;
+  display: flex;
+  flex-direction: row;
+  outline: unset !important;
+  position: relative;
+  --flow-logic: var(--orange);
+  --flow-input: var(--indigo);
+  --flow-output: var(--green);
+  --flow-process: var(--cyan);
+  --flow-build-start: var(--teal);
+  --flow-build-end: var(--teal);
+  --flow-build-part: var(--blue);
+  --flow-communication: var(--yellow);
+  --flow-failure: var(--error);
+  --flow-script:#c14242;
+}
+.flow-part.Logic {
+  border-color: var(--flow-logic);
+}
+.flow-part.Input {
+  border-color: var(--flow-input);
+}
+.flow-part.Output {
+  border-color: var(--flow-output);
+}
+.flow-part.Process {
+  border-color: var(--flow-process);
+}
+.flow-part.BuildPart {
+  border-color: var(--flow-build-part);
+}
+.flow-part.BuildStart {
+  border-color: var(--flow-build-start);
+}
+.flow-part.BuildEnd {
+  border-color: var(--flow-build-end);
+}
+.flow-part.Communication {
+  border-color: var(--flow-communication);
+}
+.flow-part.Failure {
+  border-color: var(--flow-failure);
+}
+.flow-part.Script {
+  border-color: var(--flow-script);
+}
+.flow-part .icon-wrapper {
+  width: 2rem;
+  border-right: solid 3px;
+  margin: 0;
+  padding-left: 0.25rem;
+  display: flex;
+}
+.flow-part .icon-wrapper .icon {
+  margin: auto;
+}
+.flow-part .name {
+  flex-grow: 1;
+  margin: auto 0.5rem;
+  padding: 0.5rem 0;
+}
+.flow-part * {
+  user-select: none;
+}
+.flow-part.vertical {
+  min-height: 4rem;
+}
+.flow-part.vertical.size-1, .flow-part.vertical.size-2, .flow-part.vertical.size-3 {
+  width: 12rem;
+}
+.flow-part.vertical.size-4 {
+  width: calc(12rem + 4rem);
+}
+.flow-part.vertical.size-5 {
+  width: calc(12rem + 5rem);
+}
+.flow-part.vertical.size-6 {
+  width: calc(12rem + 6rem);
+}
+.flow-part.vertical.size-7 {
+  width: calc(12rem + 7rem);
+}
+.flow-part.vertical.size-8 {
+  width: calc(12rem + 8rem);
+}
+.flow-part.vertical.size-9 {
+  width: calc(12rem + 9rem);
+}
+.flow-part.vertical.size-10 {
+  width: calc(12rem + 10rem);
+}
+.flow-part.vertical.size-11 {
+  width: calc(12rem + 11rem);
+}
+.flow-part.vertical.size-12 {
+  width: calc(12rem + 12rem);
+}
+.flow-part.vertical.size-13 {
+  width: calc(12rem + 13rem);
+}
+.flow-part.vertical.size-14 {
+  width: calc(12rem + 14rem);
+}
+.flow-part.vertical.size-15 {
+  width: calc(12rem + 15rem);
+}
+.flow-part.vertical.size-16 {
+  width: calc(12rem + 16rem);
+}
+.flow-part.vertical.size-17 {
+  width: calc(12rem + 17rem);
+}
+.flow-part.vertical.size-18 {
+  width: calc(12rem + 18rem);
+}
+.flow-part.vertical.size-19 {
+  width: calc(12rem + 19rem);
+}
+.flow-part.vertical.size-20 {
+  width: calc(12rem + 20rem);
+}
+.flow-part:not(.vertical).size-1 {
+  height: 2.5rem;
+}
+.flow-part:not(.vertical).size-2 {
+  height: calc(2 * 2rem);
+}
+.flow-part:not(.vertical).size-3 {
+  height: calc(3 * 2rem);
+}
+.flow-part:not(.vertical).size-4 {
+  height: calc(4 * 2rem);
+}
+.flow-part:not(.vertical).size-5 {
+  height: calc(5 * 2rem);
+}
+.flow-part:not(.vertical).size-6 {
+  height: calc(6 * 2rem);
+}
+.flow-part:not(.vertical).size-7 {
+  height: calc(7 * 2rem);
+}
+.flow-part:not(.vertical).size-8 {
+  height: calc(8 * 2rem);
+}
+.flow-part:not(.vertical).size-9 {
+  height: calc(9 * 2rem);
+}
+.flow-part:not(.vertical).size-10 {
+  height: calc(10 * 2rem);
+}
+.flow-part:not(.vertical).size-11 {
+  height: calc(11 * 2rem);
+}
+.flow-part:not(.vertical).size-12 {
+  height: calc(12 * 2rem);
+}
+.flow-part:not(.vertical).size-13 {
+  height: calc(13 * 2rem);
+}
+.flow-part:not(.vertical).size-14 {
+  height: calc(14 * 2rem);
+}
+.flow-part:not(.vertical).size-15 {
+  height: calc(15 * 2rem);
+}
+.flow-part:not(.vertical).size-16 {
+  height: calc(16 * 2rem);
+}
+.flow-part:not(.vertical).size-17 {
+  height: calc(17 * 2rem);
+}
+.flow-part:not(.vertical).size-18 {
+  height: calc(18 * 2rem);
+}
+.flow-part:not(.vertical).size-19 {
+  height: calc(19 * 2rem);
+}
+.flow-part:not(.vertical).size-20 {
+  height: calc(20 * 2rem);
+}
+.flow-part.Logic:not(.selected) .icon-wrapper, .flow-part.Logic:not(.selected) .input > div, .flow-part.Logic:not(.selected) .output > div {
+  border-color: var(--flow-logic) !important;
+}
+.flow-part.Logic:not(.selected) .connected > div {
+  background-color: var(--flow-logic) !important;
+}
+.flow-part.Input:not(.selected) .icon-wrapper, .flow-part.Input:not(.selected) .input > div, .flow-part.Input:not(.selected) .output > div {
+  border-color: var(--flow-input) !important;
+}
+.flow-part.Input:not(.selected) .connected > div {
+  background-color: var(--flow-input) !important;
+}
+.flow-part.Output:not(.selected) .icon-wrapper, .flow-part.Output:not(.selected) .input > div, .flow-part.Output:not(.selected) .output > div {
+  border-color: var(--flow-output) !important;
+}
+.flow-part.Output:not(.selected) .connected > div {
+  background-color: var(--flow-output) !important;
+}
+.flow-part.Process:not(.selected) .icon-wrapper, .flow-part.Process:not(.selected) .input > div, .flow-part.Process:not(.selected) .output > div {
+  border-color: var(--flow-process) !important;
+}
+.flow-part.Process:not(.selected) .connected > div {
+  background-color: var(--flow-process) !important;
+}
+.flow-part.BuildStart:not(.selected) .icon-wrapper, .flow-part.BuildStart:not(.selected) .input > div, .flow-part.BuildStart:not(.selected) .output > div {
+  border-color: var(--flow-build-start) !important;
+}
+.flow-part.BuildStart:not(.selected) .connected > div {
+  background-color: var(--flow-build-start) !important;
+}
+.flow-part.BuildEnd:not(.selected) .icon-wrapper, .flow-part.BuildEnd:not(.selected) .input > div, .flow-part.BuildEnd:not(.selected) .output > div {
+  border-color: var(--flow-build-end) !important;
+}
+.flow-part.BuildEnd:not(.selected) .connected > div {
+  background-color: var(--flow-build-end) !important;
+}
+.flow-part.BuildPart:not(.selected) .icon-wrapper, .flow-part.BuildPart:not(.selected) .input > div, .flow-part.BuildPart:not(.selected) .output > div {
+  border-color: var(--flow-build-part) !important;
+}
+.flow-part.BuildPart:not(.selected) .connected > div {
+  background-color: var(--flow-build-part) !important;
+}
+.flow-part.Communication:not(.selected) .icon-wrapper, .flow-part.Communication:not(.selected) .input > div, .flow-part.Communication:not(.selected) .output > div {
+  border-color: var(--flow-communication) !important;
+}
+.flow-part.Communication:not(.selected) .connected > div {
+  background-color: var(--flow-communication) !important;
+}
+.flow-part.Failure:not(.selected) .icon-wrapper, .flow-part.Failure:not(.selected) .input > div, .flow-part.Failure:not(.selected) .output > div {
+  border-color: var(--flow-failure) !important;
+}
+.flow-part.Failure:not(.selected) .connected > div {
+  background-color: var(--flow-failure) !important;
+}
+.flow-part.Script:not(.selected) .icon-wrapper, .flow-part.Script:not(.selected) .input > div, .flow-part.Script:not(.selected) .output > div {
+  border-color: var(--flow-script) !important;
+}
+.flow-part.Script:not(.selected) .connected > div {
+  background-color: var(--flow-script) !important;
+}
+.flow-part.selected .icon-wrapper, .flow-part.selected .input > div, .flow-part.selected .output > div {
+  border-color: var(--accent) !important;
+}
+.flow-part.selected .connected > div {
+  background-color: var(--accent) !important;
+}
+.flow-part .inputs {
+  left: -0.65rem;
+}
+.flow-part .outputs {
+  right: -0.65rem;
+}
+.flow-part .inputs, .flow-part .outputs {
+  position: absolute;
+  width: 1rem;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+.flow-part .inputs .input, .flow-part .inputs .output, .flow-part .outputs .input, .flow-part .outputs .output {
+  margin: auto;
+}
+.flow-part .inputs .input > div, .flow-part .inputs .output > div, .flow-part .outputs .input > div, .flow-part .outputs .output > div {
+  width: 1rem;
+  height: 1rem;
+  margin: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: var(--base);
+  border: solid 2px;
+}
+.flow-part.vertical .inputs, .flow-part.vertical .outputs {
+  top: -1rem;
+  bottom: unset;
+  left: 30px;
+  right: 0;
+  flex-direction: row;
+  width: unset;
+  z-index: 2;
+}
+.flow-part.vertical .outputs {
+  top: unset;
+  bottom: -1rem;
+}

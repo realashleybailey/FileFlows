@@ -5,6 +5,7 @@ name: Video Tag
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-tag" name="FFMPEG Builder: Video Tag" type="BuildPart" %}

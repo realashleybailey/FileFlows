@@ -5,6 +5,7 @@ name: Add Input File
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-plus" name="FFMPEG Builder: Add Input File" type="BuildPart" %}

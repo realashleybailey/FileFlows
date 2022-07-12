@@ -4,6 +4,7 @@ permalink: /plugins/video-nodes/video-encode
 name: Video Encode
 layout: default
 plugin: Video Nodes
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="far fa-file-video" name="Video Encode" type="Process" %}

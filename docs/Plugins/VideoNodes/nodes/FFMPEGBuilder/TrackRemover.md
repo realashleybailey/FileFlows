@@ -5,6 +5,7 @@ name: Track Remover
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-eraser" name="FFMPEG Builder: Track Remover" type="BuildPart" %}

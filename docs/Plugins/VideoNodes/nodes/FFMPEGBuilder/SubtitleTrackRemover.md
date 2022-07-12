@@ -5,6 +5,7 @@ name: Subtitle Track Remover
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-comment" name="FFMPEG Builder: Subtitle Track Remover" type="BuildPart" %}

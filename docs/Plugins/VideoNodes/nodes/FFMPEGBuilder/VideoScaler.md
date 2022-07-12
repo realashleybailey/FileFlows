@@ -5,6 +5,7 @@ name: Video Scaler
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="far fa-file-video" name="FFMPEG Builder: Video Scaler" type="BuildPart" %}

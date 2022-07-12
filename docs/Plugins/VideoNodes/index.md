@@ -3,6 +3,7 @@ name: Video Nodes
 layout: default
 description: Index for Nodes for processing video files
 parent: Plugins
+has_children: true
 ---
 
 ### Video Nodes

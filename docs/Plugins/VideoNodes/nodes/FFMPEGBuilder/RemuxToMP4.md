@@ -5,6 +5,7 @@ name: Remux To MP4
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="far fa-file-video" name="FFMPEG Builder: Remux to MP4" type="BuildPart" %}

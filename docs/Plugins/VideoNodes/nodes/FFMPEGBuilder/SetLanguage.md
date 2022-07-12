@@ -5,6 +5,7 @@ name: Set Language
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-comment-dots" name="FFMPEG Builder: Set Language" type="BuildPart" %}

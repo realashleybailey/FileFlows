@@ -5,6 +5,7 @@ name: Audio Normalization
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-volume-up" name="FFMPEG Builder: Audio Normalization" type="BuildPart" %}

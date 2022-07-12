@@ -5,6 +5,7 @@ name: Subtitle Track Merge
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-comment-medical" name="FFMPEG Builder: Subtitle Track Merge" type="BuildPart" %}

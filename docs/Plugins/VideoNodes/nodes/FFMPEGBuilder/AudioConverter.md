@@ -5,6 +5,7 @@ name: Audio Converter
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-comments" name="FFMPEG Builder: Audio Converter" type="BuildPart" %}

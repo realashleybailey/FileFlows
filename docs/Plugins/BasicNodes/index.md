@@ -2,6 +2,7 @@
 name: Basic Nodes
 layout: default
 parent: Plugins
+has_children: true
 description: Index file for Basic nodes that provide the basic functionality to FileFlows
 ---
 

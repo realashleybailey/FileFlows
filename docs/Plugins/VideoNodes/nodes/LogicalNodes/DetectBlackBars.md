@@ -5,6 +5,7 @@ name: Detect Black Bars
 layout: default
 plugin: Video Nodes
 sub: Logical Nodes
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-film" name="Detect Black Bars" type="Logic" %}

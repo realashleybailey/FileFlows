@@ -5,6 +5,7 @@ name: Track Reorder
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-sort-alpha-down" name="FFMPEG Builder: Track Reorder" type="BuildPart" %}

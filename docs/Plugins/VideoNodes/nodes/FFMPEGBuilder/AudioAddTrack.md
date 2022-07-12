@@ -5,6 +5,7 @@ name: Audio Add Track
 layout: default
 plugin: Video Nodes
 sub: FFMPEG Builder
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=1 icon="fas fa-volume-off" name="FFMPEG Builder: Add Add Track" type="BuildPart" %}

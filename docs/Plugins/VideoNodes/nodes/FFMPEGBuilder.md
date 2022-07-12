@@ -4,6 +4,7 @@ permalink: /plugins/video-nodes/ffmpeg-builder
 name: FFMPEG Builder
 layout: default
 plugin: Video Nodes
+parent: Video Nodes
 subs: true
 ---
 

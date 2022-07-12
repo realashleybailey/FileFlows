@@ -5,6 +5,7 @@ name: Can Use Hardware Encoding
 layout: default
 plugin: Video Nodes
 sub: Logical Nodes
+parent: Video Nodes
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-eye" name="Can Use Hardware Encoding" type="Logic" %}

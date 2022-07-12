@@ -3,8 +3,8 @@ name: Apprise
 title: Apprise
 permalink: /plugins/apprise/apprise
 layout: default
+parent: Apprise
 plugin: Apprise
-toc: true
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-bell" name="Apprise" type="Communication" %}

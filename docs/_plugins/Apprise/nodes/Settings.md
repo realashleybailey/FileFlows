@@ -3,8 +3,8 @@ name: Settings
 title: Settings
 permalink: /plugins/apprise/settings
 layout: default
+parent: Apprise
 plugin: Apprise
-toc: true
 ---
 
 A plugin that allows you to send messages to a Apprise server.

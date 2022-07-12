@@ -118,11 +118,38 @@ public class ScriptController : Controller
             throw new Exception("Failed to save script");
         if (script.Uid != script.Name)
         {
-            Delete(new ReferenceModel<string>() { Uids = new[] { script.Uid } });
+            if (DeleteScript(script.Uid))
+            {
+                UpdateScriptReferences(script.Uid, script.Name);
+            }
             script.Uid = script.Name;
         }
 
         return script;
+    }
+
+    private async Task UpdateScriptReferences(string oldName, string newName)
+    {
+        var controller = new FlowController();
+        var flows = await controller.GetAll();
+        foreach (var flow in flows)
+        {
+            if (flow.Parts?.Any() != true)
+                continue;
+            bool changed = false;
+            foreach (var part in flow.Parts)
+            {
+                if (part.FlowElementUid == "Script:" + oldName)
+                {
+                    part.FlowElementUid = "Script:" + newName;
+                    changed = true;
+                }
+            }
+            if(changed)
+            {
+                await controller.Update(flow);
+            }
+        }
     }
 
     /// <summary>
@@ -133,6 +160,7 @@ public class ScriptController : Controller
     [HttpDelete]
     public void Delete([FromBody] ReferenceModel<string> model)
     {
+        
         foreach (string m in model.Uids)
         {
             if (ValidScriptName(m) == false)
@@ -151,6 +179,24 @@ public class ScriptController : Controller
         }
     }
 
+    private bool DeleteScript(string script)
+    {
+        if (ValidScriptName(script) == false)
+            return false;
+        string file = GetFullFilename(script, system: false);
+        if (System.IO.File.Exists(file) == false)
+            return false;
+        try
+        {
+            System.IO.File.Delete(file);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog($"Failed to delete script '{script}': {ex.Message}");
+            return false;
+        }
+    }
 
     /// <summary>
     /// Exports a script

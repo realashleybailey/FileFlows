@@ -25,7 +25,7 @@ This information is stored in the args.Parameters["VideoInfo"]
 | vi.Audio.Channels | Number of audio channels of first audio track | number | 5.1 |
 | vi.Audio.Language | Language of audio of first audio track | string | en |
 | vi.Audio.Codecs | List of all audio of audio tracks | string | eac3, ac3, aac, dts |
-| vi.Audio.Languages | List of all of audio track langauges | string | en, deu, mao |
+| vi.Audio.Languages | List of all of audio track languages | string | en, deu, mao |
 | vi.Resolution | Computed resolution of file (4K, 1080p, 720p, 480p, SD) | string | 4K |
 
 

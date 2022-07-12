@@ -43,8 +43,7 @@ public class SystemStatisticsWorker:Worker
 
     private async Task<long> GetTempStorageSize()
     {
-        var node = await new NodeService().GetServerNode();
-        var tempPath = node?.TempPath;
+        var tempPath = processingNode?.TempPath;
         return GetDirectorySize(tempPath);
     }
 
@@ -63,7 +62,7 @@ public class SystemStatisticsWorker:Worker
             {
                 var dir = new DirectoryInfo(path);
                 if (dir.Exists)
-                    size += dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+                    size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
             }
             catch (Exception)
             {

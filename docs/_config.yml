@@ -1,5 +1,6 @@
 title: FileFlows Documentation
 description: Documentation for FileFlows
+remote_theme: rundocs/jekyll-rtd-theme
 
 collections:
   pages:

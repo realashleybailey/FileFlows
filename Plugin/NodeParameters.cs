@@ -331,6 +331,7 @@ public class NodeParameters
         if (Fake) return;
 
         bool isDirectory = Directory.Exists(filename);
+        Logger?.ILog("Setting working file to: " + filename);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
         {
@@ -345,6 +346,12 @@ public class NodeParameters
             }
         }
 
+        if (isDirectory == false)
+        {
+            this.WorkingFileSize = new FileInfo(filename).Length;
+            Logger?.ILog("New working file size: " + this.WorkingFileSize);
+        }
+
         if (this.WorkingFile == filename)
         {
             Logger?.ILog("Working file same as new filename: " + filename);
@@ -353,8 +360,6 @@ public class NodeParameters
 
         if (isDirectory == false && this.WorkingFile != this.FileName)
         {
-            this.WorkingFileSize = new FileInfo(filename).Length;
-            Logger?.ILog("New working file size: " + this.WorkingFileSize);
             string fileToDelete = this.WorkingFile;
             if (dontDelete == false)
             {

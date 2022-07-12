@@ -7,6 +7,7 @@ plugin: Video Nodes
 parent: Video Nodes
 grand_parent: Plugins
 subs: true
+has_children: true
 ---
 
 

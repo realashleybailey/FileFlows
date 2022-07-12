@@ -1120,6 +1120,7 @@ export class LibraryFileTable extends FFChart
     {
         let table = document.createElement('table');
         let thead = document.createElement('thead');
+        thead.style.width = 'calc(100% - 10px)';
         table.appendChild(thead);
         let theadTr = document.createElement('tr');
         thead.appendChild(theadTr);

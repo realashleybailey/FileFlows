@@ -4,6 +4,7 @@ title: Settings
 permalink: /plugins/discord/settings
 layout: default
 plugin: Discord
+parent: Discord
 grand_parent: Plugins
 ---
 

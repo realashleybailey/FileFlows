@@ -3,6 +3,7 @@ title: External Processing Node
 name: External Processing Node
 permalink: /guides/external-processing-node
 layout: default
+parent: Guides
 ---
 
 An external processing node, allows you to share or off loading the processing of files onto multiple systems, or a more powerful system.

@@ -2,6 +2,7 @@
 title: Reporting An Unexpected Issue
 name: Reporting An Unexpected Issue
 layout: default
+nav_order: 50
 ---
 
 If you ever come across this error message at the bottom of the page

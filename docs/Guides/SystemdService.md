@@ -3,6 +3,7 @@ title: Systemd Service
 name: Systemd Service
 permalink: /guides/systemd
 layout: default
+parent: Guides
 ---
 
 If you wish to install either FileFlows Server or FileFlows node as as systemd service.  Follow this guide.

@@ -3,6 +3,7 @@ title: Docker NVIDIA Linux
 name: Docker NVIDIA Linux
 permalink: /guides/docker-linux-nvidia
 layout: default
+parent: Guides
 ---
 
 This is a generic guide to installing NVIDIA support on a docker instance running on a linux machine.

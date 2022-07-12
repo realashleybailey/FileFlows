@@ -1,7 +1,7 @@
 ---
-title: Pages
-name: Pages
+title: Guides
+name: Guides
 layout: default
-nav_order: 10
 has_children: true
+nav_order: 30
 ---

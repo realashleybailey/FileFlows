@@ -4,6 +4,8 @@ name: Unraid NVIDIA Setup
 permalink: /guides/unraid/nvidia-setup
 layout: default
 sub: Unraid
+parent: Unraid
+grandParent: Guides
 ---
 
 To pass your NVIDIA GPU to the docker container you must do the following

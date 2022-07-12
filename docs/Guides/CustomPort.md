@@ -3,6 +3,7 @@ title: Custom Port
 name: Custom Port
 permalink: /guides/custom-port
 layout: default
+parent: Guides
 ---
 
 To customize the port of the FileFlows Server if using the command parameter

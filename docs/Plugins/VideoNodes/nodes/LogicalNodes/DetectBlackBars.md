@@ -7,6 +7,7 @@ plugin: Video Nodes
 sub: Logical Nodes
 parent: Video Nodes
 grand_parent: Plugins
+nav_order: 21
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-film" name="Detect Black Bars" type="Logic" %}

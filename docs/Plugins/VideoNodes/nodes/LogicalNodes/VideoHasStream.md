@@ -7,6 +7,7 @@ plugin: Video Nodes
 sub: Logical Nodes
 parent: Video Nodes
 grand_parent: Plugins
+nav_order: 23
 ---
 
 {% include node.html input=1 outputs=2 icon="fas fa-video" name="Video Has Stream" type="Logic" %}

@@ -1,5 +1,6 @@
 title: FileFlows Documentation
 description: Documentation for FileFlows
+remote_theme: just-the-docs/just-the-docs
 
 collections:
   pages:

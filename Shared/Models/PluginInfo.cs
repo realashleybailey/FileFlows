@@ -1,3 +1,5 @@
+using FileFlows.Plugin;
+
 namespace FileFlows.Shared.Models;
 
 using System.Collections.Generic;
@@ -68,7 +70,7 @@ public class PluginInfo : FileFlowObject
 /// <summary>
 /// Gets or sets the model for plugin info
 /// </summary>
-public class PluginInfoModel : PluginInfo
+public class PluginInfoModel : PluginInfo, IInUse
 {
     /// <summary>
     /// Gets or sets the latest version of this plugin
@@ -89,4 +91,9 @@ public class PluginInfoModel : PluginInfo
             return current < latest;
         }
     }
+
+    /// <summary>
+    /// Gets or sets if the plugin is in use
+    /// </summary>
+    public List<ObjectReference> UsedBy { get; set; }
 }

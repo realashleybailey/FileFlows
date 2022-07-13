@@ -57,8 +57,11 @@
         }
         protected override void OnInitialized()
         {
-            this.Table.AddButton(this);
-            this.Table.SelectionChanged += Table_SelectionChanged;
+            if (this.Table != null)
+            {
+                this.Table.AddButton(this);
+                this.Table.SelectionChanged += Table_SelectionChanged;
+            }
 
             Table_SelectionChanged(null);
         }

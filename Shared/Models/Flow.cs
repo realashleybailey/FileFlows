@@ -1,3 +1,5 @@
+using FileFlows.Plugin;
+
 namespace FileFlows.Shared.Models;
 
 using System;
@@ -119,4 +121,35 @@ public class TemplateField
     /// Gets or sets the parameters for this field
     /// </summary>
     public object Parameters { get; set; }  
+}
+
+/// <summary>
+/// Model used in the flow list page
+/// </summary>
+public class FlowListModel: IInUse, IUniqueObject<Guid>
+{
+    /// <summary>
+    /// Gets or sets the UID
+    /// </summary>
+    public Guid Uid { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the name
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of flow
+    /// </summary>
+    public FlowType Type { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this is the default failure flow
+    /// </summary>
+    public bool Default { get; set; }
+    
+    /// <summary>
+    /// Gets or sets what is using this model
+    /// </summary>
+    public List<ObjectReference> UsedBy { get; set; }
 }

@@ -1,27 +1,18 @@
 using FileFlows.Client.Components.Common;
-
-namespace FileFlows.Client.Pages;
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components;
 using FileFlows.Client.Components.Dialogs;
-using FileFlows.Shared.Helpers;
-using FileFlows.Shared;
-using FileFlows.Shared.Models;
-using ffFlow = FileFlows.Shared.Models.Flow;
-using System;
 using FileFlows.Client.Components.Inputs;
-using System.Dynamic;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using ffFlow = FileFlows.Shared.Models.Flow;
 
-public partial class Flows : ListPage<Guid, ffFlow>
+namespace FileFlows.Client.Pages;
+
+public partial class Flows : ListPage<Guid, FlowListModel>
 {
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] public IJSRuntime jsRuntime { get; set; }
@@ -30,8 +21,8 @@ public partial class Flows : ListPage<Guid, ffFlow>
 
     private FlowSkyBox<FlowType> Skybox;
 
-    private List<ffFlow> DataStandard = new();
-    private List<ffFlow> DataFailure = new();
+    private List<FlowListModel> DataStandard = new();
+    private List<FlowListModel> DataFailure = new();
     private FlowType SelectedType = FlowType.Standard;
 
     #if(DEBUG)
@@ -40,17 +31,19 @@ public partial class Flows : ListPage<Guid, ffFlow>
     private bool DEBUG = false;
     #endif
 
+    public override string FetchUrl => ApiUrl + "/list-all";
+
 
 #if (DEMO)
-    protected override Task<RequestResult<List<ffFlow>>> FetchData()
+    protected override Task<RequestResult<List<FlowListModel>>> FetchData()
     {
-        var results = Enumerable.Range(1, 10).Select(x => new ffFlow
+        var results = Enumerable.Range(1, 10).Select(x => new FlowListModel
         {
             Uid = Guid.NewGuid(),
             Name = "Demo Flow " + x,
             Enabled = x < 5
         }).ToList();
-        return Task.FromResult(new RequestResult<List<ffFlow>> { Success = true, Data = results });
+        return Task.FromResult(new RequestResult<List<FlowListModel>> { Success = true, Data = results });
     }
 #endif
 
@@ -314,7 +307,7 @@ public partial class Flows : ListPage<Guid, ffFlow>
         });
     }
 
-    public override async Task<bool> Edit(ffFlow item)
+    public override async Task<bool> Edit(FlowListModel item)
     {
         if(item != null)
             NavigationManager.NavigateTo("flows/" + item.Uid);
@@ -621,5 +614,24 @@ public partial class Flows : ListPage<Guid, ffFlow>
         {
             Blocker.Hide();
         }
+    }
+
+    public override async Task Delete()
+    {
+        var used = Table.GetSelected()?.Any(x => x.UsedBy?.Any() == true) == true;
+        if (used)
+        {
+            Toast.ShowError("Pages.Flows.Messages.DeleteUsed");
+            return;
+        }
+        await base.Delete();
+    }
+
+    private async Task UsedBy()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item?.UsedBy?.Any() != true)
+            return;
+        await UsedByDialog.Show(item.UsedBy);
     }
 }

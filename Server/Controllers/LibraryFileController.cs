@@ -930,6 +930,5 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             x.DateCreated >= filter.FromDate && x.DateCreated <= filter.ToDate && (string.IsNullOrEmpty(filter.Path) ||
                 x.Name.ToLowerInvariant().Contains(filter.Path.ToLowerInvariant()))).Take(500);
         return results;
-
     }
 }

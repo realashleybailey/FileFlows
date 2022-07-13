@@ -30,6 +30,87 @@ public class FlowController : ControllerStore<Flow>
     [HttpGet]
     public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name.ToLower());
 
+    [HttpGet("list-all")]
+    public async Task<IEnumerable<FlowListModel>> ListAll()
+    {
+        var flows = await GetAll();
+        List<FlowListModel> list = new List<FlowListModel>();
+
+        var libraries = await new LibraryController().GetAll();
+        foreach(var item in flows)
+        {
+            list.Add(new FlowListModel
+            {
+                Default = item.Default,
+                Name = item.Name,
+                Type = item.Type,
+                Uid = item.Uid
+            });
+        }
+        var dictFlows  = list.ToDictionary(x => x.Uid, x => x);
+        
+        string flowTypeName = typeof(Flow).FullName;
+        foreach (var flow in flows)
+        {
+            if (flow?.Parts?.Any() != true)
+                continue;
+            foreach (var p in flow.Parts)
+            {
+                if (p.Model == null || p.FlowElementUid != "FileFlows.BasicNodes.Functions.GotoFlow")
+                    continue;
+                try
+                {
+                    var gotoModel = JsonSerializer.Deserialize<GotoFlowModel>(JsonSerializer.Serialize(p.Model), new JsonSerializerOptions()
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (gotoModel?.Flow == null || dictFlows.ContainsKey(gotoModel.Flow.Uid) == false)
+                        continue;
+                    var dictFlow = dictFlows[gotoModel.Flow.Uid];
+                    dictFlow.UsedBy ??= new();
+                    if (dictFlow.UsedBy.Any(x => x.Uid == flow.Uid))
+                        continue;
+                    dictFlow.UsedBy.Add(new()
+                    {
+                        Name = flow.Name,
+                        Type = flowTypeName,
+                        Uid = flow.Uid
+                    });
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        string libTypeName = typeof(Library).FullName;
+        foreach (var lib in libraries)
+        {
+            if (lib.Flow == null)
+                continue;
+            if (dictFlows.ContainsKey(lib.Flow.Uid) == false)
+                continue;
+            var dictFlow = dictFlows[lib.Flow.Uid];
+            if (dictFlow.UsedBy != null && dictFlow.UsedBy.Any(x => x.Uid == lib.Uid))
+                continue;
+            dictFlow.UsedBy ??= new();
+            dictFlow.UsedBy.Add(new()
+            {
+                Name = lib.Name,
+                Type = libTypeName,
+                Uid = lib.Uid
+            });
+        }
+        
+        return list;
+    }
+
+    private class GotoFlowModel
+    {
+        public ObjectReference Flow { get; set; }
+    }
+
     /// <summary>
     /// Gets the failure flow for a particular library
     /// </summary>

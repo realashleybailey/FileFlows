@@ -79,7 +79,6 @@ public class PluginController : ControllerStore<PluginInfo>
                     Type = flowTypeName,
                     Uid = flow.Uid
                 });
-                break;
             }
         }
         return pims.OrderBy(x => x.Name);

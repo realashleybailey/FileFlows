@@ -12,6 +12,7 @@ window.ff = {
         if (level === 0) parameters.length > 0 ? console.error(message, parameters) : console.error(message);
         else if (level === 1) parameters.length > 0 ? console.warn(message, parameters) : console.warn(message);
         else if (level === 2) parameters.length > 0 ? console.info(message, parameters) : console.info(message);
+        else if (level === 3) parameters.length > 0 ? console.log(message, parameters) : console.log(message);
         else parameters.length > 0 ? console.error(message, parameters) : console.log(message);
     },
     deviceDimensions: function () {

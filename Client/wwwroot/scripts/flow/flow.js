@@ -179,6 +179,7 @@ window.ffFlow = {
                 part.Outputs = part.model?.outputs;
 
             ffFlow.History.perform(new FlowActionAddNode(part));
+            
 
             if (element.noEditorOnAdd === true)
                 return;

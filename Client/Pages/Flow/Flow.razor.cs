@@ -413,7 +413,6 @@ namespace FileFlows.Client.Pages
             try
             {
                 var parts = await jsRuntime.InvokeAsync<List<FlowPart>>("ffFlow.getModel");
-                Logger.Instance.DLog("Parts", parts);
                 var variablesResult = await GetVariables(API_URL + "/" + part.Uid + "/variables?isNew=" + isNew, parts);
                 if (variablesResult.Success)
                     variables = variablesResult.Data;
@@ -434,7 +433,7 @@ namespace FileFlows.Client.Pages
             if (part.Type == FlowElementType.Script)
             {
                 typeName = "Script";
-                typeDisplayName = part.FlowElementUid[44..]; // 44 to remove Script:[Guid]:
+                typeDisplayName = part.FlowElementUid[7..]; // 7 to remove Script:
             }
             else
             {

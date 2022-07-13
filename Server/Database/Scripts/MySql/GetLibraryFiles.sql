@@ -68,7 +68,7 @@ BEGIN
         end if;
 
         if FileStatus = 0 or FileStatus = -1 then
-            set sOrder = ' order by tempLibraries.Priority desc, 
+            set sOrder = ' order by case when js_Order <> -1 then js_Order else 1000000 end, tempLibraries.Priority desc, 
 		  case
 			    when js_Status > 0 then 0
 				when js_Order <> -1 then js_Order

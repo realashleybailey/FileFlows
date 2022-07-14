@@ -97,13 +97,22 @@ public class ScriptController : Controller
     private (bool System, string File) FindScript(string name)
     {
         if (ValidScriptName(name) == false)
+        {
+            Logger.Instance.ELog("Script not found, name invalid: " + name);
             throw new Exception("Script not found");
-        string file = GetFullFilename(name, system: true);
-        if (System.IO.File.Exists(file))
-            return (true, file); 
-        file = GetFullFilename(name, system: false);
-        if (System.IO.File.Exists(file))
-            return (false, file);
+        }
+
+        string sysFilename = GetFullFilename(name, system: true);
+        if (System.IO.File.Exists(sysFilename))
+        {
+            return (true, sysFilename);
+        }
+
+        string userFilename = GetFullFilename(name, system: false);
+        if (System.IO.File.Exists(userFilename))
+            return (false, userFilename);
+        Logger.Instance.ELog($"Script '{name}' not found: {sysFilename}");
+        Logger.Instance.ELog($"Script '{name}' not found: {userFilename}");
         throw new Exception("Script not found");
 
     }

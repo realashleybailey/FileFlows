@@ -601,10 +601,19 @@ input[type=file]{
 @media screen and (max-width:850px){
     .not-configured-pointer {
         display:none;
-    }
+    }    
 }
 
 @media screen and (min-width:850px) {
+    .page.collapsed
+    {
+        .not-configured-pointer {
+            right: -80px !important;
+        }
+        .nav-item:hover .not-configured-pointer{
+            display:none !important;
+        }
+    }
     .not-configured-pointer {
         position: absolute;
         right: -9px;

@@ -151,8 +151,6 @@ a.btn {
   place-items: center;
   color: var(--color) !important;
   text-align: center;
-}
-a.btn span {
   min-width: 6rem;
 }
 
@@ -243,6 +241,11 @@ a.btn span {
   }
 }
 @media screen and (min-width: 850px) {
+  .page.collapsed .pointer-add {
+    left: 6px !important;
+    z-index: 10;
+  }
+
   .pointer-add {
     position: fixed;
     top: 81px;
@@ -939,6 +942,13 @@ hr {
   }
 }
 @media screen and (min-width: 850px) {
+  .page.collapsed .not-configured-pointer {
+    right: -80px !important;
+  }
+  .page.collapsed .nav-item:hover .not-configured-pointer {
+    display: none !important;
+  }
+
   .not-configured-pointer {
     position: absolute;
     right: -9px;

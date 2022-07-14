@@ -84,7 +84,7 @@ FileFlows will search for the 'Default' Failure Flow to use if a flow fails, if 
 
 </PageView>
 
-@if(Loaded && Data.Count == 0)
+@if(SelectedType != FlowType.Failure && Loaded && Data.Count == 0)
 {
     // 155px here because of skybox
     <div class="pointer-add" style="top:155px">Add</div>

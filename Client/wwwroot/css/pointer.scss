@@ -6,6 +6,12 @@
 }
 
 @media screen and (min-width:850px) {
+    .page.collapsed {
+        .pointer-add {
+            left: 6px !important;
+            z-index: 10;
+        }    
+    }
     .pointer-add {
         position: fixed;
         top: 81px;

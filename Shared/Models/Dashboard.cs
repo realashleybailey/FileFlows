@@ -135,13 +135,13 @@ public class Dashboard: FileFlowObject
             {
                 Height = 2, Width = 6,
                 Y = rowIndex, X = 0,
-                WidgetDefinitionUid = VideoCodecs.WD_UID
+                WidgetDefinitionUid = Codecs.WD_UID
             });
             db.Widgets.Add(new()
             {
                 Height = 2, Width = 6,
                 Y = rowIndex, X = 6,
-                WidgetDefinitionUid = AudioCodecs.WD_UID
+                WidgetDefinitionUid = StorageSaved.WD_UID
             });
             
         }

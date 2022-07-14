@@ -71,7 +71,7 @@ public partial class CustomDashboard
             });
         }
 
-        if (DoesntHaveWidget(FileFlows.Shared.Widgets.OpenDatabaseConnections.WD_UID))
+        if (App.Instance.FileFlowsSystem.ExternalDatabase && DoesntHaveWidget(FileFlows.Shared.Widgets.OpenDatabaseConnections.WD_UID))
         {
             fields.Add(new ElementField
             {
@@ -254,6 +254,9 @@ public partial class CustomDashboard
                             break;
                         case nameof(TempStorage):
                             newWidgets.Add(CreateNewWidgetModel(TempStorage.WD_UID, 3, 1));
+                            break;
+                        case nameof(OpenDatabaseConnections):
+                            newWidgets.Add(CreateNewWidgetModel(OpenDatabaseConnections.WD_UID, 3, 1));
                             break;
                         case nameof(Processing):
                             newWidgets.Add(CreateNewWidgetModel(Processing.WD_UID, 12, 1));

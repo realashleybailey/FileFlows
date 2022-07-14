@@ -352,7 +352,7 @@
         "VideoCodecs": "Video Codecs",
         "VideoContainers": "Video Container",
         "VideoResolution": "Video Resolution",
-        "OpenDbConnections": "Open Database Connections"
+        "OpenDatabaseConnections": "Open Database Connections"        
       }
     },
     "ProcessingNode": {

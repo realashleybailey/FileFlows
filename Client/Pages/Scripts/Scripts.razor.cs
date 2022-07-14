@@ -73,7 +73,7 @@ public partial class Scripts : ListPage<string, Script>
 #if (DEBUG)
         url = "http://localhost:6868" + url;
 #endif
-        await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".json" });
+        await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".js" });
 #endif
     }
 

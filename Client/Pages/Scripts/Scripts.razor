@@ -1,6 +1,6 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
-@inherits ListPage<Script>
+@inherits ListPage<string, Script>
 
 @page "/scripts"
 
@@ -18,6 +18,7 @@
                     <FlowTableButton TItem="Script" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import"/>
                     <FlowTableButton TItem="Script" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export"/>
                     <FlowTableButton TItem="Script" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
+                    <FlowTableButton TItem="Script" Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy" />   
                 }
                 <FlowTableHelpButton TItem="Script" HelpUrl="scripts" />
             </ToolBar>
@@ -29,6 +30,28 @@
                     </Header>
                     <Cell Context="item">
                         <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Script" Width="10rem">
+                    <Header>
+                        System
+                    </Header>
+                    <Cell Context="item">
+                        @if (item.System)
+                        {
+                            <i class="fas fa-check"></i>
+                        }
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Script" Width="10rem">
+                    <Header>
+                        In Use
+                    </Header>
+                    <Cell Context="item">
+                        @if (item.UsedBy?.Any() == true)
+                        {
+                            <i class="fas fa-check"></i>
+                        }
                     </Cell>
                 </FlowTableColumn>
             </Columns>

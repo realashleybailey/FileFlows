@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 
@@ -11,16 +12,16 @@ public interface IScriptService
     /// <summary>
     /// Get a script
     /// </summary>
-    /// <param name="uid">The UID identifying the script</param>
+    /// <param name="name">The name of the script</param>
     /// <returns>the script</returns>
-    Task<Script> Get(Guid uid);
+    Task<Script> Get(string name);
     
     /// <summary>
-    /// Get the code for a script
+    /// Gets or sets a function used to load new instances of the service
     /// </summary>
-    /// <param name="uid">The UID identifying the script</param>
-    /// <returns>the code for the script</returns>
-    Task<string> GetCode(Guid uid);
+    /// <param name="name">The name of the script</param>
+    /// <returns>the script code</returns>
+    Task<string> GetCode(string name);
 }
 
 /// <summary>
@@ -48,13 +49,16 @@ public class ScriptService:Service, IScriptService
     /// <summary>
     /// Get a script
     /// </summary>
-    /// <param name="uid">The UID identifying the script</param>
+    /// <param name="name">The name of the script</param>
     /// <returns>the script</returns>
-    public async Task<Script> Get(Guid uid)
+    public async Task<Script> Get(string name)
     {
         try
         {
-            var result = await HttpHelper.Get<Script>($"{ServiceBaseUrl}/api/script/{uid}");
+            string encoded = UrlEncoder.Create().Encode(name);
+            string url = $"{ServiceBaseUrl}/api/script/{encoded}";
+            Logger.Instance.ILog("Request script from: " + url);
+            var result = await HttpHelper.Get<Script>(url);
             if (result.Success == false)
                 throw new Exception(result.Body);
             return result.Data;
@@ -67,15 +71,18 @@ public class ScriptService:Service, IScriptService
     }
 
     /// <summary>
-    /// Get the code for a script
+    /// Gets or sets a function used to load new instances of the service
     /// </summary>
-    /// <param name="uid">The UID identifying the script</param>
-    /// <returns>the code for the script</returns>
-    public async Task<string> GetCode(Guid uid)
+    /// <param name="name">The name of the script</param>
+    /// <returns>the script code</returns>
+    public async Task<string> GetCode(string name)
     {
         try
         {
-            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/script/{uid}/code");
+            string encoded = UrlEncoder.Create().Encode(name);
+            string url = $"{ServiceBaseUrl}/api/script/{encoded}/code";
+            Logger.Instance.ILog("Request script code from: " + url);
+            var result = await HttpHelper.Get<string>(url);
             if (result.Success == false)
                 throw new Exception(result.Body);
             return result.Data;

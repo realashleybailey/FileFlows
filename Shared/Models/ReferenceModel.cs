@@ -3,10 +3,10 @@ namespace FileFlows.Shared.Models;
 /// <summary>
 /// A list of UIDs used for deleting/enabled etc
 /// </summary>
-public class ReferenceModel
+public class ReferenceModel<T>
 {
     /// <summary>
     /// Gets or sets the UIDs 
     /// </summary>
-    public System.Guid[] Uids { get; set; }
+    public T[] Uids { get; set; }
 }

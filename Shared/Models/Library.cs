@@ -116,6 +116,11 @@ public class Library : FileFlowObject
     /// Gets or sets the order this library will process its files
     /// </summary>
     public ProcessingOrder ProcessingOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of minutes to hold processing for this file
+    /// </summary>
+    public int HoldMinutes { get; set; }
 }
 
 /// <summary>

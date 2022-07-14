@@ -30,7 +30,9 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            Logger.Instance.ELog("ExceptionMiddleware: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            Logger.Instance.ELog("ExceptionMiddleware: " + ex.Message +
+                                 $"REQUEST [{context.Request?.Method}] [{context.Response?.StatusCode}]: {context.Request?.Path.Value}" +
+                                 Environment.NewLine + ex.StackTrace);
             context.Response.ContentType = "text/plain";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             await context.Response.WriteAsync(ex.Message);

@@ -1,4 +1,4 @@
-﻿button:not(.flowtable-button):not(.navbar-toggler), a.btn, .btn-select {
+button:not(.flowtable-button):not(.navbar-toggler), a.btn, .btn-select {
   font-size: 0.8rem !important;
   text-transform: uppercase;
   border-radius: unset !important;
@@ -22,14 +22,15 @@ button:not(.flowtable-button):not(.navbar-toggler):disabled, a.btn:disabled, .bt
   border-color: var(--input-background);
   color: var(--input-background);
 }
+button:not(.flowtable-button):not(.navbar-toggler):focus, a.btn:focus, .btn-select:focus {
+  background: rgba(var(--accent-rgb), 0.2) !important;
+}
 
 a.btn {
   display: inline-flex;
   place-items: center;
   color: var(--color) !important;
   text-align: center;
-}
-a.btn span {
   min-width: 6rem;
 }
 
@@ -41,3 +42,5 @@ a.btn span {
   background: var(--base);
   color: var(--color);
 }
+
+/*# sourceMappingURL=buttons.css.map */

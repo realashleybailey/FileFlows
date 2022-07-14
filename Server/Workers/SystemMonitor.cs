@@ -1,10 +1,12 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using FileFlows.Server.Database.Managers;
+using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
+using JsonSerializer = Jint.Native.Json.JsonSerializer;
 
 namespace FileFlows.Server.Workers;
 
@@ -15,6 +17,7 @@ public class SystemMonitor:Worker
 {
     public readonly FixedSizedQueue<SystemValue<float>> CpuUsage = new (250);
     public readonly FixedSizedQueue<SystemValue<float>> MemoryUsage = new (250);
+    public readonly FixedSizedQueue<SystemValue<float>> OpenDatabaseConnections = new (250);
     public readonly FixedSizedQueue<SystemValue<long>> TempStorageUsage = new(250);
     public readonly FixedSizedQueue<SystemValue<long>> LogStorageUsage = new(250);
     private readonly Dictionary<Guid, NodeSystemStatistics> NodeStatistics = new();
@@ -35,13 +38,14 @@ public class SystemMonitor:Worker
         var taskCpu = GetCpu();
         var taskTempStorage = GetTempStorageSize();
         var taskLogStorage = GetLogStorageSize();
+        var taskOpenDatabaseConnections = GetOpenDatabaseConnections();
 
         MemoryUsage.Enqueue(new()
         {
             Value = GC.GetTotalMemory(true)
         });
-        
-        Task.WaitAll(taskCpu, taskTempStorage);
+
+        Task.WaitAll(taskCpu, taskTempStorage, taskOpenDatabaseConnections);
         CpuUsage.Enqueue(new ()
         {
             Value = taskCpu.Result
@@ -55,6 +59,13 @@ public class SystemMonitor:Worker
         {
             Value = taskLogStorage.Result
         });
+        if (DbHelper.UseMemoryCache == false)
+        {
+            OpenDatabaseConnections.Enqueue(new()
+            {
+                Value = taskOpenDatabaseConnections.Result
+            });
+        }
     }
 
     private async Task<float> GetCpu()
@@ -88,6 +99,25 @@ public class SystemMonitor:Worker
         return records.Max();
     }
 
+    private async Task<int> GetOpenDatabaseConnections()
+    {
+        if (DbHelper.UseMemoryCache)
+            return 0;
+        
+        await Task.Delay(1);
+        List<int> records = new List<int>();
+        int max = 70;
+        for (int i = 0; i <= max; i++)
+        {
+            int count = FlowDbConnection.GetOpenConnections;
+            records.Add(count);
+            if (i == max)
+                break;
+            await Task.Delay(100);
+        }
+
+        return records.Max();
+    }
     private async Task<long> GetTempStorageSize()
     {
         var node = await new NodeService().GetServerNode();

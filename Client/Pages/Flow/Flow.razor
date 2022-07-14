@@ -27,7 +27,7 @@
     </Head>
 
     <Body>
-        <div class="flow-container">
+        <div class="flow-container @(App.Instance.NavMenuCollapsed ? "has-collapsed-menu" : "")">
             <div class="flow-elements">
                 <div class="flow-elements-filter">
                     <input @ref="eleFilter" type="text" @bind-value="txtFilter" @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" @onkeydown="FilterKeyDown" />

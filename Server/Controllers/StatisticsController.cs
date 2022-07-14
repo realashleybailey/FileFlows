@@ -19,7 +19,7 @@ public class StatisticsController : Controller
     {
         if (statistic == null)
             return;
-        if (DbHelper.UseMemoryCache)
+        if (LicenseHelper.IsLicensed() == false)
             return; // only save this to an external database
         await DbHelper.RecordStatistic(statistic);
     }
@@ -31,8 +31,9 @@ public class StatisticsController : Controller
     [HttpGet("by-name/{name}")]
     public Task<IEnumerable<Statistic>> GetStatisticsByName([FromRoute] string name)
     {
-        if (DbHelper.UseMemoryCache)
+        if (LicenseHelper.IsLicensed() == false)
             throw new Exception("Not supported by this installation.");
+        
         return DbHelper.GetStatisticsByName(name);
     }
 }

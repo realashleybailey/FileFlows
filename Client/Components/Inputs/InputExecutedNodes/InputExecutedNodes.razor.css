@@ -70,6 +70,9 @@
   left: 35%;
   border-left: 1px solid var(--border-color);
 }
+.log-partial-viewer .editor.maximised {
+  left: 0;
+}
 
 @media screen and (max-width: 720px) {
   .log-partial-viewer .editor {

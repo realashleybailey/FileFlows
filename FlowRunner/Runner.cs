@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FileFlows.Server;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.FlowRunner;
 
@@ -86,7 +87,14 @@ public class Runner
                 while (finished == false)
                 {
                     if (finished == false)
-                        await communicator.Hello(Program.Uid);
+                    {
+                        bool success = await communicator.Hello(Program.Uid);
+                        if (success == false)
+                        {
+                            Communicator_OnCancel();
+                            return;
+                        }
+                    }
                     await Task.Delay(5_000);
                 }
             });
@@ -145,32 +153,23 @@ public class Runner
             Info.LibraryFile.FinalSize = nodeParameters.GetDirectorySize(nodeParameters.WorkingFile);
         else
         {
-            var fileInfo = new FileInfo(nodeParameters.WorkingFile);
-            if (fileInfo.Exists == false)
-            {
-                nodeParameters.Logger?.WLog("Final final does not exist: " + fileInfo.FullName);
-                Info.LibraryFile.FinalSize = 0;
-            }
-            else
-            {
-                Info.LibraryFile.FinalSize = fileInfo.Length;
+            Info.LibraryFile.FinalSize = nodeParameters.LastValidWorkingFileSize;
 
-                try
+            try
+            {
+                if (Info.Fingerprint)
                 {
-                    if (Info.Fingerprint)
-                    {
-                        Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
-                        nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
-                    }
-                    else
-                    {
-                        Info.LibraryFile.Fingerprint = string.Empty;
-                    }
+                    Info.LibraryFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(nodeParameters.WorkingFile) ?? string.Empty;
+                    nodeParameters?.Logger?.ILog("Final Fingerprint: " + Info.LibraryFile.Fingerprint);
                 }
-                catch (Exception ex)
+                else
                 {
-                    nodeParameters?.Logger?.ILog("Error with fingerprinting: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    Info.LibraryFile.Fingerprint = string.Empty;
                 }
+            }
+            catch (Exception ex)
+            {
+                nodeParameters?.Logger?.ILog("Error with fingerprinting: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
         nodeParameters?.Logger?.ILog("Original Size: " + Info.LibraryFile.OriginalSize);
@@ -586,8 +585,8 @@ public class Runner
             // special type
             var nodeScript = new ScriptNode();
             nodeScript.Model = part.Model;
-            Guid guid = Guid.Parse(part.FlowElementUid[7..43]); // 7 to remove "Scripts." 43 since guids are 36 characters, + 7 == 43
-            var script  = ScriptService.Load().Get(guid).Result;
+            string scriptName = part.FlowElementUid[7..]; // 7 to remove "Scripts." 
+            var script  = ScriptService.Load().Get(scriptName).Result;
             if (string.IsNullOrEmpty(script?.Code))
                 throw new Exception("Script not found");
             nodeScript.Code = script.Code;

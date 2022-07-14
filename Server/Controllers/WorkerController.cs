@@ -1,3 +1,4 @@
+
 using System.Security.Cryptography.Xml;
 using FileFlows.Server.Helpers;
 
@@ -100,6 +101,7 @@ public class WorkerController : Controller
                 if(info.LibraryFile.FinalSize > 0)
                     libfile.FinalSize = info.LibraryFile.FinalSize;
 
+                libfile.NoLongerExistsAfterProcessing = new FileInfo(libfile.Name).Exists == false;
                 libfile.OutputPath = info.LibraryFile.OutputPath;
                 libfile.Fingerprint = info.LibraryFile.Fingerprint;
                 libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
@@ -183,7 +185,8 @@ public class WorkerController : Controller
     public IEnumerable<FlowExecutorInfo> GetAll()
     {
         // we don't want to return the logs here, too big
-        return Executors.Values.Where(x => x != null).Select(x => new FlowExecutorInfo
+        var liveExecutors = Executors.Values.Where(x => x != null).ToList();
+        var results = liveExecutors.Select(x => new FlowExecutorInfo
         {
             // have to create a new object, otherwise if we change the log we change the log on the shared object
             LibraryFile = x.LibraryFile,
@@ -198,7 +201,35 @@ public class WorkerController : Controller
             TotalParts = x.TotalParts,
             Uid = x.Uid,
             WorkingFile = x.WorkingFile
-        });
+        }).ToList();
+        #if(DEBUG)
+        if (false && results.Any() != true)
+        {
+            results = Enumerable.Range(1, 2).Select(x => new FlowExecutorInfo
+            {
+                LibraryFile = new LibraryFile()
+                {
+                    Name = "/ssssssssssssssssssss/dddddddddddddddwwwwwwwww/wwwwwweeeeeeeeeeeeexxxxxxxxxx/xxxxxxxxdffffffffffffffff/ffffddddddddddxzfdgffdgFile_x." + new string('w', 200)
+                },
+                CurrentPart = x,
+                CurrentPartName = "Part " + x,
+                CurrentPartPercent = x * 10,
+                Library = new()
+                {
+                    Name = "Library " + x
+                },
+                NodeUid = new Guid("00000000-0000-0000-0000-00000000000" + x),
+                NodeName = "FFMPEG Builder: Audio Normalization",
+                RelativeFile = "/tv/dfgdfgfffffffffffffffffffffff/dfffffffffffffffffff/dfddddddddddddddd/file" + x + ".mkv",
+                StartedAt = DateTime.Now.AddMinutes(-x * 5),
+                TotalParts = 20,
+                Uid = new Guid("00000000-0000-0000-0000-00000000000" + x),
+                WorkingFile = "workingfile-" + x
+            }).ToList();
+
+        }
+        #endif
+        return results;
     }
 
     /// <summary>
@@ -221,7 +252,9 @@ public class WorkerController : Controller
         Guid executorId;
         lock (Executors)
         {
-            executorId = Executors.Where(x => x.Value.LibraryFile.Uid == uid).Select(x => x.Key).FirstOrDefault();
+            executorId = Executors.Where(x => x.Value?.LibraryFile?.Uid == uid).Select(x => x.Key).FirstOrDefault();
+            if (executorId == Guid.Empty)
+                executorId = Executors.Where(x => x.Value == null).Select(x => x.Key).FirstOrDefault();
         }
         if (executorId == Guid.Empty)
         {
@@ -256,7 +289,9 @@ public class WorkerController : Controller
             Executors?.TryGetValue(uid, out flowinfo);
             if(flowinfo == null)
             {
-                flowinfo = Executors.Values.Where(x => x.LibraryFile?.Uid == uid || x.Uid == uid || x.NodeUid == uid).FirstOrDefault();
+                flowinfo = Executors.Values.Where(x => x != null && (x.LibraryFile?.Uid == uid || x.Uid == uid || x.NodeUid == uid)).FirstOrDefault();
+                if(flowinfo == null)
+                    flowinfo = Executors.Values.Where(x => x == null).FirstOrDefault();
             }
             if(flowinfo == null)
             {
@@ -333,7 +368,7 @@ public class WorkerController : Controller
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
     /// <param name="libraryFileUid">the UID of the library file</param>
-    internal void Hello(Guid runnerUid, Guid libraryFileUid)
+    internal bool Hello(Guid runnerUid, Guid libraryFileUid)
     {
         lock (Executors)
         {
@@ -344,11 +379,12 @@ public class WorkerController : Controller
                     Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
                     foreach (var executor in Executors.Values)
                         Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
-                    return; // unknown executor
+                    return false; // unknown executor
                 }
             }
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;
+            return true;
         }
     }
 

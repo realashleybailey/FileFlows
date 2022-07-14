@@ -98,3 +98,12 @@
         }
     }
 }
+.fa-window-maximize {
+    margin-right:0.5rem;
+    cursor:pointer;
+    position: relative;
+    top: 0.25rem;
+    &:hover {
+        color:var(--accent);
+    }
+}

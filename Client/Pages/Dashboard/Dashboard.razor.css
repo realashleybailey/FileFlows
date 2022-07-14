@@ -7,14 +7,6 @@
   max-width: 1400px;
 }
 
-.btn-pause {
-  margin-left: 1rem;
-  width: 12rem !important;
-}
-.btn-pause i {
-  margin-right: 0.5rem;
-}
-
 .mobile-view {
   display: none;
 }
@@ -26,171 +18,12 @@
     margin: 0 0 1rem;
   }
 }
-.waiting-icon {
-  font-size: 2rem;
-}
-
-.worker-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
-@media screen and (min-width: 850px) {
-  .waiting-icon {
-    font-size: 8rem;
-  }
-
-  .worker-wrapper {
-    flex-direction: row;
-  }
-
-  .actions-wrapper {
-    margin-top: 0;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-  }
-  .actions-wrapper .actions {
-    text-align: right !important;
-  }
-
-  .chart-wrapper {
-    width: 17rem !important;
-    min-width: 17rem !important;
-  }
-
-  .label-value {
-    display: block;
-  }
-}
-.worker-wrapper {
-  box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
-  background: rgba(var(--base), 0.2);
-  max-width: 100%;
-}
-.worker-wrapper .chart-wrapper {
-  position: relative;
-  top: -1rem;
-  width: 100%;
-  min-width: 100%;
-}
-.worker-wrapper.waiting .chart-wrapper {
-  display: none;
-}
-.worker-wrapper.waiting .worker-info {
-  display: flex;
-  flex-direction: row;
-}
-.worker-wrapper.waiting .worker-info .waiting-icon {
-  margin-left: 2rem;
-  opacity: 0.5;
-}
-.worker-wrapper.waiting .worker-info .waiting-message {
-  flex-grow: 1;
-  margin: auto;
+.mobile-pause-resume {
   text-align: center;
+  margin-bottom: 1rem;
 }
-.worker-wrapper .worker-info {
-  padding: 1rem;
-  flex-direction: column;
-  display: flex;
-  flex-grow: 1;
-  overflow: auto;
-}
-.worker-wrapper .worker-info .label-value {
-  flex-direction: row;
-  display: flex;
-}
-.worker-wrapper .worker-info .label-value .label {
-  width: 10rem;
-  min-width: 10rem;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: rgba(var(--color-rgb), 0.5);
-}
-.worker-wrapper .worker-info .label-value .value {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.worker-wrapper .worker-info .actions-wrapper {
-  margin-top: 1rem;
-}
-.worker-wrapper .worker-info .actions-wrapper .actions {
-  text-align: center;
-}
-.worker-wrapper .worker-info .actions-wrapper .actions ::deep button {
-  min-width: 7rem;
-  padding: 0;
-}
-.worker-wrapper .worker-info .actions-wrapper .actions ::deep button + button {
-  margin-left: 0.5rem;
-}
-
-.spacer {
-  height: 2rem;
-}
-
-@media screen and (max-width: 576px) {
-  .worker-info .label-value {
-    flex-direction: column !important;
-  }
-
-  .working-file {
-    display: none !important;
-  }
-
-  .actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-  }
-  .actions button {
-    flex-grow: 1;
-    flex-basis: 0;
-    margin: auto;
-  }
-  .actions button + button {
-    margin-left: 1rem;
-  }
-
-  ::deep .apexcharts-canvas {
-    width: 100% !important;
-    text-align: center;
-  }
-
-  ::deep .portlet {
-    margin-bottom: 2rem;
-  }
-}
-h1, h2 {
-  color: var(--accent);
-  font-style: italic;
-}
-
-@media screen and (min-width: 1250px) {
-  .worker-wrapper .worker-info {
-    padding-left: 0 !important;
-  }
-
-  .label-value {
-    flex-direction: unset !important;
-    display: unset !important;
-  }
-  .label-value .label {
-    width: unset !important;
-    min-width: unset !important;
-    display: block !important;
-  }
-  .label-value .value {
-    display: block !important;
-  }
-
-  .working-file {
-    display: none !important;
-  }
+.mobile-pause-resume ::deep button {
+  width: min(14rem, 90%) !important;
 }
 
 /*# sourceMappingURL=Dashboard.razor.css.map */

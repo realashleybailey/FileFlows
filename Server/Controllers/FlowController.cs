@@ -1,3 +1,5 @@
+using FileFlows.Server.Workers;
+
 namespace FileFlows.Server.Controllers;
 
 using FileFlows.Plugin.Models;
@@ -28,6 +30,87 @@ public class FlowController : ControllerStore<Flow>
     [HttpGet]
     public async Task<IEnumerable<Flow>> GetAll() => (await GetDataList()).OrderBy(x => x.Name.ToLower());
 
+    [HttpGet("list-all")]
+    public async Task<IEnumerable<FlowListModel>> ListAll()
+    {
+        var flows = await GetAll();
+        List<FlowListModel> list = new List<FlowListModel>();
+
+        var libraries = await new LibraryController().GetAll();
+        foreach(var item in flows)
+        {
+            list.Add(new FlowListModel
+            {
+                Default = item.Default,
+                Name = item.Name,
+                Type = item.Type,
+                Uid = item.Uid
+            });
+        }
+        var dictFlows  = list.ToDictionary(x => x.Uid, x => x);
+        
+        string flowTypeName = typeof(Flow).FullName;
+        foreach (var flow in flows)
+        {
+            if (flow?.Parts?.Any() != true)
+                continue;
+            foreach (var p in flow.Parts)
+            {
+                if (p.Model == null || p.FlowElementUid != "FileFlows.BasicNodes.Functions.GotoFlow")
+                    continue;
+                try
+                {
+                    var gotoModel = JsonSerializer.Deserialize<GotoFlowModel>(JsonSerializer.Serialize(p.Model), new JsonSerializerOptions()
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (gotoModel?.Flow == null || dictFlows.ContainsKey(gotoModel.Flow.Uid) == false)
+                        continue;
+                    var dictFlow = dictFlows[gotoModel.Flow.Uid];
+                    dictFlow.UsedBy ??= new();
+                    if (dictFlow.UsedBy.Any(x => x.Uid == flow.Uid))
+                        continue;
+                    dictFlow.UsedBy.Add(new()
+                    {
+                        Name = flow.Name,
+                        Type = flowTypeName,
+                        Uid = flow.Uid
+                    });
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        string libTypeName = typeof(Library).FullName;
+        foreach (var lib in libraries)
+        {
+            if (lib.Flow == null)
+                continue;
+            if (dictFlows.ContainsKey(lib.Flow.Uid) == false)
+                continue;
+            var dictFlow = dictFlows[lib.Flow.Uid];
+            if (dictFlow.UsedBy != null && dictFlow.UsedBy.Any(x => x.Uid == lib.Uid))
+                continue;
+            dictFlow.UsedBy ??= new();
+            dictFlow.UsedBy.Add(new()
+            {
+                Name = lib.Name,
+                Type = libTypeName,
+                Uid = lib.Uid
+            });
+        }
+        
+        return list;
+    }
+
+    private class GotoFlowModel
+    {
+        public ObjectReference Flow { get; set; }
+    }
+
     /// <summary>
     /// Gets the failure flow for a particular library
     /// </summary>
@@ -38,10 +121,14 @@ public class FlowController : ControllerStore<Flow>
     {
         if (DbHelper.UseMemoryCache)
         {
-            var flow = (await GetDataList())?.Where(x => x.Type == FlowType.Failure && x.Enabled)?.FirstOrDefault();
+            var flow = (await GetDataList())?.Where(x => x.Type == FlowType.Failure && x.Enabled && x.Default)?.FirstOrDefault();
             return flow;
         }
-        return await DbHelper.GetFailureFlow(libraryUid);
+        else
+        {
+            var flow = await DbHelper.GetFailureFlow(libraryUid);
+            return flow;
+        }
     }
 
     /// <summary>
@@ -87,6 +174,7 @@ public class FlowController : ControllerStore<Flow>
         // reparse with new UIDs
         flow = JsonSerializer.Deserialize<Flow>(json);
         flow.Uid = Guid.Empty;
+        flow.Default = false;
         flow.DateModified = DateTime.Now;
         flow.DateCreated = DateTime.Now;
         flow.Name = await GetNewUniqueName(flow.Name);
@@ -168,12 +256,43 @@ public class FlowController : ControllerStore<Flow>
     }
 
     /// <summary>
+    /// Sets the default state of a flow
+    /// </summary>
+    /// <param name="uid">The flow UID</param>
+    /// <param name="isDefault">Whether or not the flow should be the default</param>
+    [HttpPut("set-default/{uid}")]
+    public async Task SetDefault([FromRoute] Guid uid, [FromQuery(Name = "default")] bool isDefault = true)
+    {
+        var flow = await GetByUid(uid);
+        if (flow == null)
+            throw new Exception("Flow not found.");
+        if(flow.Type != FlowType.Failure)
+            throw new Exception("Flow not a failure flow.");
+
+        if (isDefault)
+        {
+            // make sure no others are defaults
+            var others = (await GetAll()).Where(x => x.Type == FlowType.Failure && x.Default && x.Uid != uid).ToList();
+            foreach (var other in others)
+            {
+                other.Default = false;
+                await Update(other);
+            }
+        }
+
+        if (isDefault == flow.Default)
+            return;
+
+        flow.Default = isDefault;
+        await Update(flow);
+    }
+    /// <summary>
     /// Delete flows from the system
     /// </summary>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -197,15 +316,15 @@ public class FlowController : ControllerStore<Flow>
 
             var elements = await GetElements();
 
-            var scripts = (await new ScriptController().GetAll()).ToDictionary(x => x.Uid.ToString(), x => x.Name);
+            var scripts = (await new ScriptController().GetAll()).Select(x => x.Name).ToList();
             foreach (var p in flow.Parts)
             {
                 if (p.Type == FlowElementType.Script && string.IsNullOrWhiteSpace(p.Name))
                 {
-                    string feUid = p.FlowElementUid[7..43];
+                    string feName = p.FlowElementUid[7..];
                     // set the name to the script name
-                    if (scripts.ContainsKey(feUid))
-                        p.Name = scripts[feUid];
+                    if (scripts.Contains(feName))
+                        p.Name = feName;
                     else
                         p.Name = "Missing Script";
                 }
@@ -308,7 +427,7 @@ public class FlowController : ControllerStore<Flow>
             var sm = new ScriptParser().Parse(script?.Name, script?.Code);
             FlowElement ele = new FlowElement();
             ele.Name = script.Name;
-            ele.Uid = $"Script:{script.Uid}:{script.Name}";
+            ele.Uid = $"Script:{script.Name}";
             ele.Icon = "fas fa-scroll";
             ele.Inputs = 1;
             ele.Description = sm.Description;
@@ -343,7 +462,7 @@ public class FlowController : ControllerStore<Flow>
             ele.Model = model as ExpandoObject;
             return ele;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return null;
         }
@@ -395,7 +514,26 @@ public class FlowController : ControllerStore<Flow>
         else if (inputNodes > 1)
             throw new Exception("Flow.ErrorMessages.TooManyInputNodes");
 
-        return await Update(model);
+        if (model.Uid == Guid.Empty && model.Type == FlowType.Failure)
+        {
+            // if first failure flow make it default
+            var others = (await GetAll()).Where(x => x.Type == FlowType.Failure).Count();
+            if (others == 0)
+                model.Default = true;
+        }
+
+        bool nameChanged = false;
+        if (model.Uid != Guid.Empty)
+        {
+            // existing, check for name change
+            var existing = await GetByUid(model.Uid);
+            nameChanged = existing != null && existing.Name != model.Name;
+        }
+
+        var result = await Update(model);
+        if(nameChanged)
+            _ = new ObjectReferenceUpdater().RunAsync();
+        return result;
     }
 
     /// <summary>

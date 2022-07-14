@@ -43,8 +43,7 @@ public class SystemStatisticsWorker:Worker
 
     private async Task<long> GetTempStorageSize()
     {
-        var node = await new NodeService().GetServerNode();
-        var tempPath = node?.TempPath;
+        var tempPath = processingNode?.TempPath;
         return GetDirectorySize(tempPath);
     }
 

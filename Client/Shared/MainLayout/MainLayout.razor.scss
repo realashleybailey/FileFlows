@@ -11,6 +11,7 @@
 .sidebar {
     background-color: rgba(var(--base-rgb), 0.15);
     border:1px solid var(--border-color);
+    z-index:2;
     //background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
 }
 
@@ -30,5 +31,112 @@
     .main {
         position: relative;
         max-width: calc(100% - 250px);
+    }
+    .collapsed .main {
+        max-width: calc(100% - 3.5rem);
+    }
+}
+
+.expand-collapse {
+    display:none;
+}
+@media screen and (min-width:850px) 
+{
+    .expand-collapse {
+        display:unset;
+        position: absolute;
+        top: 1rem;
+        cursor: pointer;
+        left: 248px;
+        border: solid 1px var(--border-color);
+        width: 1.25rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        border-left: solid 2px var(--base);
+        background: var(--base);
+        font-size: 0.8rem;
+        padding-left: 0.25rem;
+        color: rgba(var(--color-rgb), 0.3);
+        &:hover {
+            color:var(--color);
+        }
+    }
+    .collapsed .expand-collapse {
+        left: calc(3.5rem + 2px);
+    }
+
+    .sidebar.collapsed {
+
+        width: 3.75rem !important;
+
+        ::deep {
+            .nav-menu-container {
+                margin-top: 2rem;
+            }
+            .navbar {
+                padding:0;
+            }
+
+            .navbar-brand {
+                margin: 0 !important;
+                position: relative;
+                left: 8px;
+                background-image: url('/favicon.svg');
+                width: 2.5rem;
+                height: 2.5rem;
+                background-size: cover;
+                background-repeat: no-repeat;
+                svg {
+                    display:none;
+                }
+            }
+
+            .nav-menu-group {
+                display: none;
+            }
+
+            .nav-item {
+                padding-left: 0 !important;
+
+                a {
+                    padding-left: 0.75rem !important;
+                }
+            }
+
+            .text-label {
+                display: none;
+            }
+
+            li.nav-item {
+                transition: width 0.2s ease;
+                overflow: hidden;
+                position: relative;
+
+                .text-label {
+                    position: absolute;
+                    left: 4rem;
+                }
+
+                &:not(:hover) {
+                    width: 3.75rem;
+                }
+
+                &:hover {
+                    width: 10rem;
+
+                    .text-label {
+                        display: unset;
+                    }
+
+                    a {
+                        background-color: var(--accent) !important;
+                    }
+                }
+            }
+
+            .version-info {
+                display: none !important;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 using BlazorDateRangePicker;
 using FileFlows.Client.Components;
+using FileFlows.Client.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -8,7 +9,7 @@ namespace FileFlows.Client.Pages;
 /// <summary>
 /// A search page for library files
 /// </summary>
-public partial class LibraryFilesSearch : ListPage<LibraryFile>
+public partial class LibraryFilesSearch : ListPage<Guid, LibraryFile>
 {
     [Inject] private INavigationService NavigationService { get; set; }
     public override string ApiUrl => "/api/library-file";
@@ -18,6 +19,7 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
     private bool Searched = false;
     [Inject] private IJSRuntime jsRuntime { get; set; }
     SearchPane SearchPane { get; set; }
+    
     private readonly LibraryFileSearchModel SearchModel = new()
     {
         Path = string.Empty,
@@ -33,6 +35,7 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
         this.lblSearch = Translater.Instant("Labels.Search");
         this.Title = Translater.Instant("Pages.LibraryFiles.Title");
         this.lblSearching = Translater.Instant("Labels.Searching");
+        MainLayout.Instance.ShowSearch();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -54,15 +57,19 @@ public partial class LibraryFilesSearch : ListPage<LibraryFile>
         Blocker.Hide();
     }
 
-    Task Closed() => NavigationService.NavigateTo("/library-files");
-    
+    async Task Closed()
+    {
+        MainLayout.Instance.HideSearch();
+        await NavigationService.NavigateTo("/library-files");
+    }
+
     public void OnRangeSelect(DateRange range)
     {
         SearchModel.FromDate = range.Start.Date;
         SearchModel.ToDate = range.End.Date;
     }
 
-    public override Task Load(Guid? selectedUid = null)
+    public override Task Load(Guid selectedUid)
     {
         if (Searched == false)
             return Task.CompletedTask;

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components;
 using System.Timers;
 using FileFlows.Client.Helpers;
+using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Pages;
 
@@ -12,23 +13,28 @@ namespace FileFlows.Client.Pages;
 public partial class Log : ComponentBase
 {
     [CascadingParameter] Blocker Blocker { get; set; }
+    [Inject] protected IJSRuntime jsRuntime { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     private string LogText { get; set; }
     private string lblDownload, lblSearch, lblSearching;
     private string DownloadUrl;
+    private bool scrollToBottom = false;
 
     private bool Searching = false;
 
     SearchPane SearchPane { get; set; }
 
+    
+    private Timer AutoRefreshTimer;
+
     private LogType LogLevel { get; set; } = LogType.Info;
 
-    private Dictionary<Guid, string> Nodes = new();
+    private List<ListOption> LoggingSources = new ();
 
     private readonly LogSearchModel SearchModel = new()
     {
         Message = string.Empty,
-        ClientUid = null,
+        Source = string.Empty,
         Type = LogType.Info,
         TypeIncludeHigherSeverity = true
     };
@@ -38,11 +44,8 @@ public partial class Log : ComponentBase
     {
         SearchModel.FromDate = DateRangeHelper.LiveStart;
         SearchModel.ToDate = DateRangeHelper.LiveEnd;
-        
-        var nodeResult = await HttpHelper.Get<List<ProcessingNode>>("/api/node");
-        if (nodeResult.Success && nodeResult.Data != null)
-            Nodes = nodeResult.Data.Where(x => x.Uid != new Guid("bf47da28-051e-452e-ad21-c6a3f477fea9")).ToDictionary(x => x.Uid,
-                x => x.Name);
+
+        LoggingSources = (await HttpHelper.Get<List<ListOption>>("/api/log/log-sources")).Data;
 
         this.lblSearch = Translater.Instant("Labels.Search");
         this.lblSearching = Translater.Instant("Labels.Searching");
@@ -59,9 +62,16 @@ public partial class Log : ComponentBase
         AutoRefreshTimer.AutoReset = true;
         AutoRefreshTimer.Start();
         _ = Refresh();
-
     }
-    private Timer AutoRefreshTimer;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (scrollToBottom)
+        {
+            await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content"});
+            scrollToBottom = false;
+        }
+    }
 
     private void NavigationManager_LocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
@@ -109,12 +119,14 @@ public partial class Log : ComponentBase
 
     async Task Refresh()
     {
+        bool nearBottom = string.IsNullOrWhiteSpace(LogText) == false && await jsRuntime.InvokeAsync<bool>("ff.nearBottom", new object[]{ ".page .content"});
         if (App.Instance.FileFlowsSystem.ExternalDatabase)
         {
             var response = await HttpHelper.Post<string>("/api/log/search", SearchModel);
             if (response.Success)
             {
                 this.LogText = response.Data;
+                this.scrollToBottom = nearBottom;
                 this.StateHasChanged();
             }
         }
@@ -124,6 +136,7 @@ public partial class Log : ComponentBase
             if (response.Success)
             {
                 this.LogText = response.Data;
+                this.scrollToBottom = nearBottom;
                 this.StateHasChanged();
             }
         }

@@ -17,10 +17,14 @@
     "Resume": "Resume Processing",
     "Add": "Add",
     "Edit": "Edit",
+    "Remove":"Remove",
     "Duplicate":"Duplicate",
+    "UsedBy":"Used By",
     "Update": "Update",
     "Refresh": "Refresh",
     "Download": "Download",
+    "Default":"Default",
+    "DownloadLog": "Download Log",
     "Enabled": "Enabled",
     "Export": "Export",
     "Import": "Import",
@@ -107,6 +111,7 @@
       "Sun": "Sun"
     },
     "FileStatus": {
+      "OnHold":"On Hold",
       "Disabled": "Disabled",
       "OutOfSchedule": "Out Of Schedule",
       "Processed": "Processed",
@@ -173,14 +178,18 @@
         "ShrinkageTitle": "Storage Saved",
         "FinalSize": "Final Size",
         "OriginalSize": "Original Size",
-        "Savings": "Savings"
+        "Savings": "Savings",
+        "AddWidget":"Add Widget"
       },
       "ErrorMessages": {
-        "LogFailed": "Failed to retrieve log for worker"
+        "LogFailed": "Failed to retrieve log for worker",
+        "FailedToCreate":"Failed to create dashboard"
       },
       "Messages": {
-        "CancelMesssage": "Are you sure you want to cancel the worker for {RelativeFile}?",
-        "Waiting": "Waiting for a file to process"
+        "CancelMessage": "Are you sure you want to cancel the worker for {RelativeFile}?",
+        "Waiting": "Waiting for a file to process",
+        "DeleteDashboard":"Are you sure you want to delete the current dashboard?\n\nThis cannot be undone.",
+        "DeleteWidget": "Are you sure you want to remove this Widget?"
       },
       "Fields": {
         "Log": "Log",
@@ -217,7 +226,8 @@
       },
       "Messages": {
         "FlowImported": "Flow ''{name}'' imported",
-        "Duplicated": "Flow ''{name}'' duplicated"
+        "Duplicated": "Flow ''{name}'' duplicated",
+        "DeleteUsed":"You cannot delete a flow that is in use"
       }
     },
     "Libraries": {
@@ -269,7 +279,10 @@
         "ProcessingOrder":"Processing Order",
         "ProcessingOrder-Help": "The order in which files will be processed by this library.",
         "SkipFileAccessTests":"Skip File Access Tests",
-        "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue."
+        "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue.",
+        "HoldMinutes":"Hold Minutes",
+        "HoldMinutes-Suffix":"minutes",
+        "HoldMinutes-Help":"Optionally hold any files found in this library for this amount of minutes before processing them.  Each file will be held for this amount of time."
       }
     },
     "LibraryFile": {
@@ -281,6 +294,7 @@
         "FinalSize": "Final Size",
         "FinalSizeSuffix": "Bytes",
         "Fingerprint": "Fingerprint",
+        "CreationTime": "Creation Date",
         "Library": "Library",
         "Status": "Status",
         "Flow": "Flow",
@@ -321,6 +335,26 @@
         "Enabled": "Enabled"
       }
     },
+    "Widget":{
+      "Title":"Widget",
+      "Fields": {
+        "CpuUsage": "CPU Usage",
+        "MemoryUsage": "Memory Usage",
+        "TempStorage": "Temporary Storage",
+        "LogStorage": "Log Storage",
+        "FilesUpcoming":"Upcoming",
+        "FilesRecentlyFinished":"Recently Finished",
+        "StorageSaved": "Storage Saved",
+        "LibraryProcessingTimes": "Library Processing Times [Seconds Per Megabyte]",
+        "ProcessingTimes": "Processing Times",
+        "Codecs": "Codecs",
+        "AudioCodecs": "Audio Codecs",
+        "VideoCodecs": "Video Codecs",
+        "VideoContainers": "Video Container",
+        "VideoResolution": "Video Resolution",
+        "OpenDbConnections": "Open Database Connections"
+      }
+    },
     "ProcessingNode": {
       "Title": "Node",
       "Fields": {
@@ -353,7 +387,9 @@
         "Libraries-Help": "Select which libraries this node can process",
         "MaxFileSizeMb": "Max File Size",
         "MaxFileSizeMb-Suffix": "MB",
-        "MaxFileSizeMb-Help": "The maximum file size this Processing Node can process.  If set to 0, there will be no limit."
+        "MaxFileSizeMb-Help": "The maximum file size this Processing Node can process.  If set to 0, there will be no limit.",
+        "PreExecuteScript":"Pre-Execute Script",
+        "PreExecuteScript-Help":"A script that will run before any file is processed.  The result of this script must be 1 for it to pass anything else and the node will not process a file."
       }
     },
     "Plugins": {
@@ -362,7 +398,8 @@
         "PluginBrowser": "Plugin Browser"
       },
       "Messages": {
-        "DeletePlugins": "Are you sure you want to delete the selected {count, plural, one {plugin} other {plugins}}?\n\nDoing so will cause any Flows that use these plugins to stop working and processing will fail."
+        "DeleteUsed":"You cannot delete a plugin that is in use",
+        "DeletePlugins": "Are you sure you want to delete the selected {count, plural, one {plugin} other {plugins}}?"
       },
       "Fields": {
         "Authors": "Authors",
@@ -376,7 +413,9 @@
       "Title":"Scripts",
       "Messages": {
         "Imported": "Script ''{name}'' imported",
-        "Duplicated":"Scripts ''{name}'' duplicated"
+        "Duplicated":"Scripts ''{name}'' duplicated",
+        "DeleteSystem":"You cannot delete a system script",
+        "DeleteUsed":"You cannot delete a script that is in use"
       },
       "Fields":{
       }

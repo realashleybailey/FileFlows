@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Reflection;
 using Avalonia;
+using FileFlows.Plugin;
 using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
@@ -20,6 +22,15 @@ public class Program
 
     public static void Main(string[] args)
     {
+        #if(DEBUG)
+        if (Globals.IsWindows)
+        {
+            new ProcessHelper(null, false).ExecuteShellCommand(new () {
+                Command = "Taskkill",
+                Arguments = "/IM ffmpeg.exe /F"
+            });
+        }
+        #endif
         try
         {
             if (args.Any(x =>
@@ -91,6 +102,8 @@ public class Program
             if (PrepareDatabase() == false)
                 return;
 
+            RestoreDefaultScripts();
+
             if (Docker || noGui)
             {
                 Console.WriteLine("Starting FileFlows Server...");
@@ -126,6 +139,33 @@ public class Program
             }
             catch (Exception) { }
             Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+        }
+    }
+
+    private static void RestoreDefaultScripts()
+    {
+        Logger.Instance.ILog("Restoring default scripts");
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceNames = assembly.GetManifestResourceNames();
+        const string suffix = "FileFlows.Server.DefaultScripts.";
+        foreach (string resource in resourceNames)
+        {
+            if (resource.StartsWith(suffix) == false)
+                continue;
+            try
+            {
+                using Stream? stream = assembly.GetManifestResourceStream(resource);
+                using StreamReader reader = new StreamReader(stream);
+                string js = reader.ReadToEnd();
+                string path =
+                    new DirectoryInfo(Path.Combine(DirectoryHelper.ScriptsDirectorySystem, resource[suffix.Length..]))
+                        .FullName;
+                File.WriteAllText(path, js);
+                Logger.Instance.ILog("Restored script: " + path);
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 

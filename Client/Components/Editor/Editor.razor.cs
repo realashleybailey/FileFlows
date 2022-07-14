@@ -27,6 +27,8 @@ namespace FileFlows.Client.Components
         public string Title { get; set; }
         public string HelpUrl { get; set; }
         public string Icon { get; set; }
+        
+        private bool Maximised { get; set; }
 
         /// <summary>
         /// Get the name of the type this editor is editing
@@ -34,7 +36,7 @@ namespace FileFlows.Client.Components
         public string TypeName { get; set; }
         private bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblCancel, lblClose, lblHelp;
+        private string lblSave, lblSaving, lblCancel, lblClose, lblHelp, lblDownloadButton;
 
         private List<ElementField> Fields { get; set; }
 
@@ -47,6 +49,7 @@ namespace FileFlows.Client.Components
         public delegate Task<bool> SaveDelegate(ExpandoObject model);
         private SaveDelegate SaveCallback;
 
+        private bool ShowDownload { get; set; }
         private bool ReadOnly { get; set; }
         public bool Large { get; set; }
 
@@ -58,9 +61,10 @@ namespace FileFlows.Client.Components
         private bool _needsRendering = false;
 
         public delegate Task<bool> CancelDeletgate();
-        public delegate Task ClosedDeletgate();
+        public delegate Task BasicActionDelegate();
+        public string DownloadUrl;
         public event CancelDeletgate OnCancel;
-        public event ClosedDeletgate OnClosed;
+        public event BasicActionDelegate OnClosed;
 
 
         private RenderFragment _AdditionalFields;
@@ -81,6 +85,7 @@ namespace FileFlows.Client.Components
             lblCancel = Translater.Instant("Labels.Cancel");
             lblClose = Translater.Instant("Labels.Close");
             lblHelp = Translater.Instant("Labels.Help");
+            this.Maximised = false;
         }
 
         protected override void OnAfterRender(bool firstRender)
@@ -129,13 +134,14 @@ namespace FileFlows.Client.Components
             return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
         }
 
-        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null, bool noTranslateTitle = false)
+        internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null, bool noTranslateTitle = false, string lblDownloadButton = "Labels.Download", string downloadUrl = null)
         {
             this.RegisteredInputs.Clear();
             var expandoModel = ConverToExando(model);
             this.Model = expandoModel;
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
+            this.Maximised = false;
             if (noTranslateTitle)
                 this.Title = title;
             else
@@ -144,6 +150,9 @@ namespace FileFlows.Client.Components
             this.Tabs = tabs;
             this.ReadOnly = readOnly;
             this.Large = large;
+            this.ShowDownload = string.IsNullOrWhiteSpace(downloadUrl) == false;
+            this.lblDownloadButton = Translater.TranslateIfNeeded(lblDownloadButton);
+            this.DownloadUrl = downloadUrl;
             this.Visible = true;
             this.HelpUrl = helpUrl ?? string.Empty;
             this.AdditionalFields = additionalFields;
@@ -444,6 +453,11 @@ namespace FileFlows.Client.Components
             if (string.IsNullOrWhiteSpace(HelpUrl))
                 return;
             _ = jsRuntime.InvokeVoidAsync("open", HelpUrl.ToLower(), "_blank");
+        }
+
+        void OnMaximised(bool maximised)
+        {
+            this.Maximised = maximised;
         }
     }
 }

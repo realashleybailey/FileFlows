@@ -47,13 +47,10 @@ public class MySqlDbManager: DbManager
     {
         ConnectionString = connectionString;
     }
-    
 
     protected override NPoco.Database GetDbInstance()
     {
-        return new NPoco.Database(ConnectionString + ";maximumpoolsize=50;",
-            null,
-            MySqlConnector.MySqlConnectorFactory.Instance);
+        return new FlowDatabase(ConnectionString);
     }
     
     private string GetDatabaseName(string connectionString)
@@ -125,7 +122,7 @@ public class MySqlDbManager: DbManager
         List<string> existingColumns;
         using (var db = await GetDb())
         {
-            existingColumns = db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
+            existingColumns = db.Db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
         }
 
         var columns = new []{
@@ -163,7 +160,7 @@ public class MySqlDbManager: DbManager
         sql = "ALTER TABLE DbObject \n" + sql + ";";
         using (var db = await GetDb())
         {
-            db.Execute(sql);
+            db.Db.Execute(sql);
         }
     }
     
@@ -178,7 +175,7 @@ public class MySqlDbManager: DbManager
         using (var db = await GetDb())
         {
             string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
-            results = (await db.FetchAsync<LibraryStatus>(sql)).ToList();
+            results = (await db.Db.FetchAsync<LibraryStatus>(sql)).ToList();
         }
 
         return results;
@@ -199,10 +196,10 @@ public class MySqlDbManager: DbManager
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            db.OneTimeCommandTimeout = 120;
+            db.Db.OneTimeCommandTimeout = 120;
             try
             {
-                dbObjects = await db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)",
+                dbObjects = await db.Db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)",
                     (int)status,
                     quarter, start, max, nodeUid);
             }
@@ -247,7 +244,7 @@ public class MySqlDbManager: DbManager
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            dbObjects = await db.FetchAsync<DbObject>(sql, from, to,
+            dbObjects = await db.Db.FetchAsync<DbObject>(sql, from, to,
                 string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%",
                 string.IsNullOrEmpty(filter.LibraryName) ? string.Empty : "%" + filter.LibraryName + "%");
         }
@@ -269,7 +266,7 @@ public class MySqlDbManager: DbManager
             return;
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync(sql);
+            await db.Db.ExecuteAsync(sql);
         }
     }
 
@@ -283,7 +280,7 @@ public class MySqlDbManager: DbManager
         List<LibraryFileProcessingTime> result;
         using (var db = await GetDb())
         {
-            result = await db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
+            result = await db.Db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
         JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
         js_OriginalSize as OriginalSize,
         timestampdiff(second, js_ProcessingStarted, js_ProcessingEnded) AS Seconds
@@ -310,7 +307,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
 
         using (var db = await GetDb())
         {
-            data = (await db.FetchAsync<(int day, int hour, int count)>(sql));
+            data = (await db.Db.FetchAsync<(int day, int hour, int count)>(sql));
         }
 
         var days = new List<Dictionary<int, int>>();
@@ -339,7 +336,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         List<ShrinkageData> results;
         using (var db = await GetDb())
         {
-            results = await db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
+            results = await db.Db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
         }
         return results;
     }
@@ -354,7 +351,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     {
         using (var db = await GetDb())
         {
-            await db.ExecuteAsync(
+            await db.Db.ExecuteAsync(
                 $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
                 $" values (@0, @1, @2)", clientUid, type, message);
         }
@@ -370,7 +367,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         {
             using (var db = await GetDb())
             {
-                await db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
+                await db.Db.ExecuteAsync($"call DeleteOldLogs({maxLogs});");
             }
         }
         catch (Exception)
@@ -385,7 +382,11 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <returns>the messages found in the log</returns>
     public override async Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter)
     {
-        string clientUid = filter.ClientUid?.ToString()?.EmptyAsNull() ?? Guid.Empty.ToString();
+        if (filter.Source == "DATABASE" || filter.Source == "HTTP")
+        {
+            // just read those file.. er no
+        }
+        string clientUid = filter.Source.EmptyAsNull() ?? Guid.Empty.ToString();
         string from = filter.FromDate.ToString("yyyy-MM-dd HH:mm:ss");
         string to = filter.ToDate.ToString("yyyy-MM-dd HH:mm:ss");
         string sql = $"select * from {nameof(DbLogMessage)} " +
@@ -401,10 +402,9 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         DateTime dt = DateTime.Now;
         using (var db = await GetDb())
         {
-            results = await db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
+            results = await db.Db.FetchAsync<DbLogMessage>(sql, filter.FromDate, filter.ToDate,
                 string.IsNullOrWhiteSpace(filter.Message) ? string.Empty : "%" + filter.Message.Trim() + "%");
         }
-        Logger.Instance.ILog("Time taken to search log: " + DateTime.Now.Subtract(dt) + "\n" + sql);
 
         // need to reverse them as they're ordered newest at top
         results.Reverse();
@@ -421,55 +421,17 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         DbObject dbObject;
         using (var db = await GetDb())
         {
-            dbObject = await db.SingleAsync<DbObject>(
-                "select * from DbObject where Type = @0 " +
-                "and JSON_EXTRACT(Data,'$.Type') = @1 " +
-                "and JSON_EXTRACT(Data,'$.Enabled') = 1 ",
-                typeof(Flow).FullName, (int)
-                FlowType.Failure);
+            string sql = $@"select * from DbObject where Type = '{typeof(Flow).FullName}' " +
+                         $@"and JSON_EXTRACT(Data,'$.Type') = {(int)FlowType.Failure} " +
+                         "and JSON_EXTRACT(Data,'$.Default') = 1 " +
+                         "and JSON_EXTRACT(Data,'$.Enabled') = 1 ";
+                
+            dbObject = await db.Db.SingleAsync<DbObject>(sql);
         }
 
         return ConvertFromDbObject<Flow>(dbObject);
     }
-
-    /// <summary>
-    /// Records a statistic
-    /// </summary>
-    /// <param name="statistic">the statistic to record</param>
-    public override async Task RecordStatistic(Statistic statistic)
-    {
-        if (statistic?.Value == null)
-            return;
-        DbStatistic stat;
-        if (double.TryParse(statistic.Value.ToString(), out double number))
-        {
-            stat = new DbStatistic()
-            {
-                Type = StatisticType.Number,
-                Name = statistic.Name,
-                LogDate = DateTime.Now,
-                NumberValue = number,
-                StringValue = string.Empty
-            };
-        }
-        else
-        {
-            // treat as string
-            stat = new DbStatistic()
-            {
-                Type = StatisticType.String,
-                Name = statistic.Name,
-                LogDate = DateTime.Now,
-                NumberValue = 0,
-                StringValue = statistic.Value.ToString()
-            };
-        }
-        using (var db = await GetDb())
-        {
-            await db.InsertAsync(stat);
-        }
-    }
-
+    
     /// <summary>
     /// Gets statistics by name
     /// </summary>
@@ -479,7 +441,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         List<DbStatistic> stats;
         using (var db = await GetDb())
         {
-            stats = await db.FetchAsync<DbStatistic>("where Name = @0", name);
+            stats = await db.Db.FetchAsync<DbStatistic>("where Name = @0", name);
         }
 
         var results = new List<Statistic>();

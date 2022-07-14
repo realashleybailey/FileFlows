@@ -1,30 +1,29 @@
-namespace FileFlows.Client.Pages;
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using FileFlows.Client.Components.Common;
 using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components;
 using FileFlows.Client.Components.Dialogs;
-using FileFlows.Shared.Helpers;
-using FileFlows.Shared;
-using FileFlows.Shared.Models;
-using ffFlow = FileFlows.Shared.Models.Flow;
-using System;
 using FileFlows.Client.Components.Inputs;
-using System.Dynamic;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using ffFlow = FileFlows.Shared.Models.Flow;
 
-public partial class Flows : ListPage<ffFlow>
+namespace FileFlows.Client.Pages;
+
+public partial class Flows : ListPage<Guid, FlowListModel>
 {
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] public IJSRuntime jsRuntime { get; set; }
 
     public override string ApiUrl => "/api/flow";
+
+    private FlowSkyBox<FlowType> Skybox;
+
+    private List<FlowListModel> DataStandard = new();
+    private List<FlowListModel> DataFailure = new();
+    private FlowType SelectedType = FlowType.Standard;
 
     #if(DEBUG)
     private bool DEBUG = true;
@@ -32,18 +31,19 @@ public partial class Flows : ListPage<ffFlow>
     private bool DEBUG = false;
     #endif
 
+    public override string FetchUrl => ApiUrl + "/list-all";
 
 
 #if (DEMO)
-    protected override Task<RequestResult<List<ffFlow>>> FetchData()
+    protected override Task<RequestResult<List<FlowListModel>>> FetchData()
     {
-        var results = Enumerable.Range(1, 10).Select(x => new ffFlow
+        var results = Enumerable.Range(1, 10).Select(x => new FlowListModel
         {
             Uid = Guid.NewGuid(),
             Name = "Demo Flow " + x,
             Enabled = x < 5
         }).ToList();
-        return Task.FromResult(new RequestResult<List<ffFlow>> { Success = true, Data = results });
+        return Task.FromResult(new RequestResult<List<FlowListModel>> { Success = true, Data = results });
     }
 #endif
 
@@ -307,7 +307,7 @@ public partial class Flows : ListPage<ffFlow>
         });
     }
 
-    public override async Task<bool> Edit(ffFlow item)
+    public override async Task<bool> Edit(FlowListModel item)
     {
         if(item != null)
             NavigationManager.NavigateTo("flows/" + item.Uid);
@@ -482,7 +482,8 @@ public partial class Flows : ListPage<ffFlow>
     private async Task Import()
     {
 #if (!DEMO)
-        var json = await ImportDialog.Show();
+        var idResult = await ImportDialog.Show();
+        string json = idResult.content;
         if (string.IsNullOrEmpty(json))
             return;
 
@@ -552,5 +553,85 @@ public partial class Flows : ListPage<ffFlow>
             Blocker.Hide();
         }
 #endif
+    }
+
+    protected override Task PostDelete()
+    {
+        UpdateTypeData();
+        return Task.CompletedTask;
+    }
+
+    public override Task PostLoad()
+    {
+        UpdateTypeData();
+        return Task.CompletedTask;
+    }
+    
+    private void UpdateTypeData()
+    {
+        this.DataFailure = this.Data.Where(x => x.Type == FlowType.Failure).ToList();
+        this.DataStandard = this.Data.Where(x => x.Type == FlowType.Standard).ToList();
+        this.Skybox.SetItems(new List<FlowSkyBoxItem<FlowType>>()
+        {
+            new ()
+            {
+                Name = "Standard Flows",
+                Icon = "fas fa-sitemap",
+                Count = this.DataStandard.Count,
+                Value = FlowType.Standard
+            },
+            new ()
+            {
+                Name = "Failure Flows",
+                Icon = "fas fa-exclamation-circle",
+                Count = this.DataFailure.Count,
+                Value = FlowType.Failure
+            }
+        }, this.SelectedType);
+    }
+
+    private void SetSelected(FlowSkyBoxItem<FlowType> item)
+    {
+        SelectedType = item.Value;
+        // need to tell table to update so the "Default" column is shown correctly
+        Table.TriggerStateHasChanged();
+        this.StateHasChanged();
+    }
+
+    private async Task SetDefault()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item == null)
+            return;
+        
+        Blocker.Show();
+        try
+        {
+            await HttpHelper.Put($"/api/flow/set-default/{item.Uid}?default={(!item.Default)}");
+            await this.Refresh();
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
+    }
+
+    public override async Task Delete()
+    {
+        var used = Table.GetSelected()?.Any(x => x.UsedBy?.Any() == true) == true;
+        if (used)
+        {
+            Toast.ShowError("Pages.Flows.Messages.DeleteUsed");
+            return;
+        }
+        await base.Delete();
+    }
+
+    private async Task UsedBy()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item?.UsedBy?.Any() != true)
+            return;
+        await UsedByDialog.Show(item.UsedBy);
     }
 }

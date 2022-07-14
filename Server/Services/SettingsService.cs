@@ -16,4 +16,11 @@ public class SettingsService : ISettingsService
     /// </summary>
     /// <returns>the system settings</returns>
     public Task<Settings> Get() => new SettingsController().Get();
+
+    /// <summary>
+    /// Gets the file flows status
+    /// </summary>
+    /// <returns>the file flows status</returns>
+    public Task<FileFlowsStatus> GetFileFlowsStatus() =>
+        new SettingsController().GetFileFlowsStatus();
 }

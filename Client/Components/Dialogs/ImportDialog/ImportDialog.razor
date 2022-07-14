@@ -11,7 +11,7 @@
                 @lblBrowse
             </label>
         </div>
-        <Microsoft.AspNetCore.Components.Forms.InputFile OnChange="LoadFile" id="@Uid" style="display:none" accept=".json" />
+        <Microsoft.AspNetCore.Components.Forms.InputFile OnChange="LoadFile" id="@Uid" style="display:none" accept="@AcceptedTypes" />
     </Body>
     <Footer>
         <button @onclick=@Accept disabled="@(HasFile ? null : "disabled")">@lblImport</button>

@@ -326,12 +326,18 @@ public class WatchedLibrary:IDisposable
         }
 
 
-        if (Library.ReprocessRecreatedFiles && fsInfo.CreationTime > existing.CreationTime)
+        bool creationTimeChanged = fsInfo.CreationTime > existing.CreationTime;
+        if (Library.ReprocessRecreatedFiles && (creationTimeChanged|| existing.NoLongerExistsAfterProcessing))
         {
-            Logger.Instance.DLog($"{Library.Name} file '{fullPath}' creation time has changed, reprocessing file");
+            if(creationTimeChanged)
+                Logger.Instance.DLog($"{Library.Name} file '{fullPath}' creation time has changed, reprocessing file");
+            else
+                Logger.Instance.DLog($"{Library.Name} file '{fullPath}' was removed after processing, file is found again");
+            
             existing.Fingerprint = Library.UseFingerprinting ? ServerShared.Helpers.FileHelper.CalculateFingerprint(fullPath) : string.Empty;
             existing.CreationTime = fsInfo.CreationTime;
             existing.LastWriteTime = fsInfo.LastWriteTime;
+            existing.NoLongerExistsAfterProcessing = false;
             existing.Status = FileStatus.Unprocessed;
             await DbHelper.Update(existing);
             return (true, existing.Fingerprint, null);

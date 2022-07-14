@@ -1,0 +1,20 @@
+table {
+  border: solid 1px var(--border-color);
+  width: 100%;
+  border-collapse: collapse;
+}
+table thead tr {
+  font-weight: 600;
+  background: rgba(var(--input-background-rgb), 0.3);
+}
+table thead tr th {
+  padding: 0.25rem 0.5rem;
+}
+table tbody td {
+  padding: 0.25rem 0.5rem;
+}
+table tbody tr + tr td {
+  border-top: solid 1px var(--input-background);
+}
+
+/*# sourceMappingURL=UsedByDialog.razor.css.map */

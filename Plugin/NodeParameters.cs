@@ -14,7 +14,7 @@ public class NodeParameters
     /// Note: This maybe a mapped filename if executed on a external processing node
     /// </summary>
     public string FileName { get; init; }
-    
+
     /// <summary>
     /// Gets or sets the file relative to the library path
     /// </summary>
@@ -27,12 +27,27 @@ public class NodeParameters
     /// </summary>
     public string WorkingFile { get; private set; }
 
+    private long _WorkingFileSize { get; set; }
+    /// <summary>
+    /// Gets the last actual record file size that is greater than zero
+    /// </summary>
+    public long LastValidWorkingFileSize { get; private set; }
+
     /// <summary>
     /// Gets or sets the file size of the current working file
     /// </summary>
-    public long WorkingFileSize { get; private set; }
+    public long WorkingFileSize
+    {
+        get => _WorkingFileSize;
+        private set
+        {
+            if (value > 1)
+                LastValidWorkingFileSize = value;
+            _WorkingFileSize = value;
+        }
+    }
 
-    /// <summary>
+/// <summary>
     /// Gets or sets the logger used by the flow during execution
     /// </summary>
     public ILogger? Logger { get; set; }
@@ -145,6 +160,16 @@ public class NodeParameters
         this.Logger = logger;
         InitFile(filename);
         this.Process = new ProcessHelper(logger, this.Fake);
+    }
+
+    /// <summary>
+    /// Constructs a new basic node parameters with no file 
+    /// </summary>
+    /// <param name="logger">the logger used during execution</param>
+    public NodeParameters(ILogger logger)
+    {
+        this.Logger = logger;
+        this.Process = new ProcessHelper(logger, false);
     }
 
 
@@ -306,6 +331,7 @@ public class NodeParameters
         if (Fake) return;
 
         bool isDirectory = Directory.Exists(filename);
+        Logger?.ILog("Setting working file to: " + filename);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
         {
@@ -320,6 +346,12 @@ public class NodeParameters
             }
         }
 
+        if (isDirectory == false)
+        {
+            this.WorkingFileSize = new FileInfo(filename).Length;
+            Logger?.ILog("New working file size: " + this.WorkingFileSize);
+        }
+
         if (this.WorkingFile == filename)
         {
             Logger?.ILog("Working file same as new filename: " + filename);
@@ -328,8 +360,6 @@ public class NodeParameters
 
         if (isDirectory == false && this.WorkingFile != this.FileName)
         {
-            this.WorkingFileSize = new FileInfo(filename).Length;
-            Logger?.ILog("New working file size: " + this.WorkingFileSize);
             string fileToDelete = this.WorkingFile;
             if (dontDelete == false)
             {

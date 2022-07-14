@@ -29,13 +29,17 @@ public class FileLogger : ILogWriter
     /// </summary>
     /// <param name="loggingPath">The path where to save the log file to</param>
     /// <param name="logPrefix">The prefix to use for the log file name</param>
-    public FileLogger(string loggingPath, string logPrefix)
+    /// <param name="register">if this logger should be registered</param>
+    public FileLogger(string loggingPath, string logPrefix, bool register = true)
     {
         this.LoggingPath = loggingPath;
         this.LogPrefix = logPrefix;
         this.NewFile = true;
-        Shared.Logger.Instance.RegisterWriter(this);
-        Instance = this;
+        if (register)
+        {
+            Shared.Logger.Instance.RegisterWriter(this);
+            Instance = this;
+        }
     }
     
     /// <summary>
@@ -51,21 +55,33 @@ public class FileLogger : ILogWriter
             string logFile = GetLogFilename();
             string prefix = type switch
             {
-                LogType.Info => "INFO",
-                LogType.Error => "ERRR",
-                LogType.Warning => "WARN",
-                LogType.Debug => "DBUG",
+                LogType.Info => " [INFO]",
+                LogType.Error => " [ERRR]",
+                LogType.Warning => " [WARN]",
+                LogType.Debug => " [DBUG]",
                 _ => ""
             };
 
-            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " [" + prefix + "] -> " + string.Join(
+            string message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + prefix + " -> " + string.Join(
                 ", ", args.Select(x =>
                     x == null ? "null" :
                     x.GetType().IsPrimitive ? x.ToString() :
                     x is string ? x.ToString() :
                     System.Text.Json.JsonSerializer.Serialize(x)));
             Console.WriteLine(message);
-            File.AppendAllText(logFile, message + Environment.NewLine);
+            
+            
+            if (File.Exists(logFile) == false)
+            {
+                await File.WriteAllTextAsync(logFile, message + Environment.NewLine);
+            }
+            else
+            {
+                using var fs = new FileStream(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                using StreamWriter sr = new StreamWriter(fs);
+                await sr.WriteLineAsync(message);
+                await sr.FlushAsync();
+            }
         }
         finally
         {

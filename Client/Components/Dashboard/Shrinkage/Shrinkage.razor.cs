@@ -10,7 +10,7 @@
 
     public partial class Shrinkage:ComponentBase
     {
-        [CascadingParameter] Pages.Dashboard Dashboard { get; set; }
+        [CascadingParameter] BasicDashboard Dashboard { get; set; }
         private string Uid = Guid.NewGuid().ToString();
 
 

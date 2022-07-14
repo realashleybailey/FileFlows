@@ -39,7 +39,8 @@ namespace FileFlows.Plugin
         TextLabel = 20,
         Password = 21,
         ExecutedNodes = 22,
-        Table = 23
+        Table = 23,
+        Widget = 24
     }
 
 

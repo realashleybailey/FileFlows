@@ -1,42 +1,80 @@
 @namespace FileFlows.Client.Pages
-@using ffFlow = FileFlows.Shared.Models.Flow;
-@inherits ListPage<ffFlow>
+@inherits ListPage<Guid, FlowListModel>
 
 @page "/flows"
 
-<PageView>
+<PageView Flex="@true" >
 
     <Head>
     </Head>
 
     <Body>
-        <FlowTable @ref="Table" Data="@Data" TItem="ffFlow" Selection="SelectionMode.Multiple"
+    
+        <FlowSkyBox TItem="FlowType" @ref=Skybox OnSelected=@SetSelected />
+    
+@if (SelectedType == FlowType.Failure)
+{
+    <div class="info box">This is a special flow type that will be executed if any flow fails.
+FileFlows will search for the 'Default' Failure Flow to use if a flow fails, if not found then processing will immediately stop.
+    </div>
+}
+    
+    
+    <FlowTable @ref="Table" Data="@(SelectedType == FlowType.Failure ? DataFailure : DataStandard)" TItem="FlowListModel" Selection="SelectionMode.Multiple"
             DoubleClick="@OnDoubleClick">
             <ToolBar>            
-                <FlowTableButton TItem="ffFlow" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
-                <FlowTableButton TItem="ffFlow" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-                <FlowTableButton TItem="ffFlow" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />      
+                <FlowTableButton TItem="FlowListModel" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="FlowListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="FlowListModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />     
+                @if (SelectedType == FlowType.Failure)
+                {
+                    <FlowTableButton TItem="FlowListModel" Clicked=SetDefault SelectedOne="true" Icon="fas fa-check" Label="Labels.Default" />
+                }
+                <FlowTableButton TItem="FlowListModel" Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy" />   
                 @if (App.Instance.IsMobile == false)
                 {
-                    <FlowTableButton TItem="ffFlow" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import" />
-                    <FlowTableButton TItem="ffFlow" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export" />
-                    <FlowTableButton TItem="ffFlow" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
+                    <FlowTableButton TItem="FlowListModel" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import" />
+                    <FlowTableButton TItem="FlowListModel" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export" />
+                    <FlowTableButton TItem="FlowListModel" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
                     if (DEBUG)
                     {
-                        <FlowTableButton TItem="ffFlow" Clicked=Template SelectedOne="true" Icon="fas fa-file-export" Label="Template"/>
+                        <FlowTableButton TItem="FlowListModel" Clicked=Template SelectedOne="true" Icon="fas fa-file-export" Label="Template"/>
                     }
                 }
-                <FlowTableHelpButton TItem="ffFlow" HelpUrl="flows" />
+                <FlowTableHelpButton TItem="FlowListModel" HelpUrl="flows" />
             </ToolBar>
 
             <Columns>
-
-                <FlowTableColumn TItem="ffFlow">
+                <FlowTableColumn TItem="FlowListModel">
                     <Header>
                         @Globals.lblName
                     </Header>
                     <Cell Context="item">
                         <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="FlowListModel" Hidden="@(SelectedType != FlowType.Failure)" Width="10rem">
+                    <Header>
+                        Default
+                    </Header>
+                    <Cell Context="item">
+                        <span>
+                            @if (item.Default)
+                            {
+                                <i class="fas fa-check"></i>
+                            }
+                        </span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="FlowListModel" Width="10rem">
+                    <Header>
+                        In Use
+                    </Header>
+                    <Cell Context="item">
+                        @if (item.UsedBy?.Any() == true)
+                        {
+                            <i class="fas fa-check"></i>
+                        }
                     </Cell>
                 </FlowTableColumn>
             </Columns>
@@ -48,5 +86,6 @@
 
 @if(Loaded && Data.Count == 0)
 {
-    <div class="pointer-add">Add</div>
+    // 155px here because of skybox
+    <div class="pointer-add" style="top:155px">Add</div>
 }

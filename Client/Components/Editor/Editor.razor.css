@@ -1,4 +1,4 @@
-﻿.editor {
+.editor {
   position: fixed;
   right: 0;
   top: 0;
@@ -7,6 +7,9 @@
   background: var(--base-darker);
   z-index: 6;
   left: 0;
+}
+.editor.maximised {
+  width: 100vw !important;
 }
 
 .background-overlay {
@@ -48,6 +51,9 @@
 .fields ::deep .row + .row, .fields ::deep .row + .input-text-variables, .fields ::deep .input-text-variables + .row {
   margin-top: 1rem;
 }
+.fields ::deep .row.error {
+  height: auto;
+}
 
 @media screen and (max-width: 578px) {
   ::deep .content {
@@ -60,3 +66,10 @@
 .empty {
   margin-top: 1rem;
 }
+
+.btn-download {
+  width: 8rem !important;
+  margin-right: 1rem;
+}
+
+/*# sourceMappingURL=Editor.razor.css.map */

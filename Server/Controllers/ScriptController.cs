@@ -1,40 +1,142 @@
+using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Helpers;
-
-namespace FileFlows.Server.Controllers;
-
 using Microsoft.AspNetCore.Mvc;
 using FileFlows.Shared.Models;
+
+namespace FileFlows.Server.Controllers;
 
 /// <summary>
 /// Script controller
 /// </summary>
 [Route("/api/script")]
-public class ScriptController : ControllerStore<Script>
+public class ScriptController : Controller
 {
+    private const string UnsafeCharacters = "<>:\"/\\|?*";
+    
     /// <summary>
     /// Gets all scripts in the system
     /// </summary>
     /// <returns>a list of all scripts</returns>
     [HttpGet]
-    public async Task<IEnumerable<Script>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
+    public async Task<IEnumerable<Script>> GetAll()
+    {
+        List<Script> scripts = new();
+        scripts.AddRange(await GetSystemScripts());
+        scripts.AddRange(await GetUserScripts());
+        var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
+        var flows = await new FlowController().GetAll();
+        string flowTypeName = typeof(Flow).FullName;
+        foreach (var flow in flows)
+        {
+            if (flow?.Parts?.Any() != true)
+                continue;
+            foreach (var p in flow.Parts)
+            {
+                if (p.FlowElementUid.StartsWith("Script:") == false)
+                    continue;
+                string scriptName = p.FlowElementUid[7..].ToLower();
+                if (dictScripts.ContainsKey(scriptName) == false)
+                    continue;
+                var script = dictScripts[scriptName];
+                script.UsedBy ??= new();
+                if (script.UsedBy.Any(x => x.Uid == flow.Uid))
+                    continue;
+                script.UsedBy.Add(new ()
+                {
+                    Name = flow.Name,
+                    Type = flowTypeName,
+                    Uid = flow.Uid
+                });
+            }
+        }
 
+        return scripts.OrderBy(x => x.Name);
+    }
+
+    private Task<IEnumerable<Script>> GetSystemScripts() => GetAll(DirectoryHelper.ScriptsDirectorySystem, system: true);
+    private Task<IEnumerable<Script>> GetUserScripts() => GetAll(DirectoryHelper.ScriptsDirectoryUser);
+
+    async Task<IEnumerable<Script>> GetAll(string directory, bool system = false)
+    {
+        List<Script> scripts = new();
+        foreach (var file in new DirectoryInfo(directory).GetFiles("*.js"))
+        {
+            string name = file.Name.Replace(".js", "");
+            scripts.Add(new()
+            {
+                Uid = name,
+                Name = name,
+                System = system,
+                Code = await System.IO.File.ReadAllTextAsync(file.FullName)
+            });
+        }
+
+        return scripts.OrderBy(x => x.Name);
+    }
 
     /// <summary>
     /// Get a script
     /// </summary>
-    /// <param name="uid">The UID of the script</param>
+    /// <param name="name">The name of the script</param>
     /// <returns>the script instance</returns>
-    [HttpGet("{uid}")]
-    public Task<Script> Get(Guid uid) => GetByUid(uid);
+    [HttpGet("{name}")]
+    public async Task<Script> Get([FromRoute] string name)
+    {
+        var result = FindScript(name);
+        string code = await System.IO.File.ReadAllTextAsync(result.File);
+        return new Script()
+        {
+            Uid = name,
+            Name = name,
+            System = result.System,
+            Code = code
+        };
+    }
+
+    private (bool System, string File) FindScript(string name)
+    {
+        if (ValidScriptName(name) == false)
+        {
+            Logger.Instance.ELog("Script not found, name invalid: " + name);
+            throw new Exception("Script not found");
+        }
+
+        string sysFilename = GetFullFilename(name, system: true);
+        if (System.IO.File.Exists(sysFilename))
+        {
+            return (true, sysFilename);
+        }
+
+        string userFilename = GetFullFilename(name, system: false);
+        if (System.IO.File.Exists(userFilename))
+            return (false, userFilename);
+        Logger.Instance.ELog($"Script '{name}' not found: {sysFilename}");
+        Logger.Instance.ELog($"Script '{name}' not found: {userFilename}");
+        throw new Exception("Script not found");
+
+    }
 
     /// <summary>
     /// Gets the code for a script
     /// </summary>
-    /// <param name="uid">The UID of the script</param>
+    /// <param name="name">The name of the script</param>
     /// <returns>the code for a script</returns>
-    [HttpGet("{uid}/code")]
-    public async Task<string> GetCode(Guid uid) => (await GetByUid(uid))?.Code ?? string.Empty;
+    [HttpGet("{name}/code")]
+    public async Task<string> GetCode(string name)
+    {
+        if (ValidScriptName(name) == false)
+            return $"Logger.ELog('invalid name: {name.Replace("'", "''")}');\nreturn -1";
+        try
+        {
+            var result = FindScript(name);
+            return await System.IO.File.ReadAllTextAsync(result.File);
+        }
+        catch (Exception ex)
+        {
+            return $"Logger.ELog('Failed reading script: {ex.Message}');\nreturn -1";
+        }
+    }
 
     /// <summary>
     /// Saves a script
@@ -42,9 +144,47 @@ public class ScriptController : ControllerStore<Script>
     /// <param name="script">The script to save</param>
     /// <returns>the saved script instance</returns>
     [HttpPost]
-    public Task<Script> Save([FromBody] Script script)
+    public Script Save([FromBody] Script script)
     {
-        return base.Update(script, checkDuplicateName: true);
+        if(ValidScriptName(script.Name) == false)
+            throw new Exception("Invalid script name\nCannot contain: " + UnsafeCharacters);
+        
+        if (SaveScript(script.Name, script.Code) == false)
+            throw new Exception("Failed to save script");
+        if (script.Uid != script.Name)
+        {
+            if (DeleteScript(script.Uid))
+            {
+                UpdateScriptReferences(script.Uid, script.Name);
+            }
+            script.Uid = script.Name;
+        }
+
+        return script;
+    }
+
+    private async Task UpdateScriptReferences(string oldName, string newName)
+    {
+        var controller = new FlowController();
+        var flows = await controller.GetAll();
+        foreach (var flow in flows)
+        {
+            if (flow.Parts?.Any() != true)
+                continue;
+            bool changed = false;
+            foreach (var part in flow.Parts)
+            {
+                if (part.FlowElementUid == "Script:" + oldName)
+                {
+                    part.FlowElementUid = "Script:" + newName;
+                    changed = true;
+                }
+            }
+            if(changed)
+            {
+                await controller.Update(flow);
+            }
+        }
     }
 
     /// <summary>
@@ -53,68 +193,133 @@ public class ScriptController : ControllerStore<Script>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public Task Delete([FromBody] ReferenceModel model) => DeleteAll(model);
-    
-    
-    
+    public void Delete([FromBody] ReferenceModel<string> model)
+    {
+        
+        foreach (string m in model.Uids)
+        {
+            if (ValidScriptName(m) == false)
+                continue;
+            string file = GetFullFilename(m, system: false);
+            if (System.IO.File.Exists(file) == false)
+                continue;
+            try
+            {
+                System.IO.File.Delete(file);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog($"Failed to delete script '{m}': {ex.Message}");
+            }
+        }
+    }
+
+    private bool DeleteScript(string script)
+    {
+        if (ValidScriptName(script) == false)
+            return false;
+        string file = GetFullFilename(script, system: false);
+        if (System.IO.File.Exists(file) == false)
+            return false;
+        try
+        {
+            System.IO.File.Delete(file);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog($"Failed to delete script '{script}': {ex.Message}");
+            return false;
+        }
+    }
+
     /// <summary>
     /// Exports a script
     /// </summary>
-    /// <param name="uid">The UID of the script</param>
+    /// <param name="name">The name of the script</param>
     /// <returns>A download response of the script</returns>
-    [HttpGet("export/{uid}")]
-    public async Task<IActionResult> Export([FromRoute] Guid uid)
+    [HttpGet("export/{name}")]
+    public async Task<IActionResult> Export([FromRoute] string name)
     {
-        var script = await GetByUid(uid);
+        var script = await GetCode(name);
         if (script == null)
             return NotFound();
-        string json = JsonSerializer.Serialize(script, new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
-        byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(json);
-        return File(data, "application/octet-stream", script.Name + ".json");
+        byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(script);
+        return File(data, "application/octet-stream", name + ".js");
     }
 
     /// <summary>
     /// Imports a script
     /// </summary>
-    /// <param name="json">The json data to import</param>
-    /// <returns>The newly import script</returns>
+    /// <param name="name">The name</param>
+    /// <param name="code">The code</param>
     [HttpPost("import")]
-    public async Task<Script> Import([FromBody] string json)
+    public Script Import([FromQuery(Name = "filename")] string name, [FromBody] string code)
     {
-        Script? script = JsonSerializer.Deserialize<Script>(json);
-        if (string.IsNullOrWhiteSpace(script?.Code))
-            throw new Exception("Invalid script");
-        
         // will throw if any errors
-        new ScriptParser().Parse(script.Name ?? string.Empty, script.Code);
-        
-        script.Uid = Guid.Empty;
-        script.DateModified = DateTime.Now;
-        script.DateCreated = DateTime.Now;
-        script.Name = await GetNewUniqueName(script.Name);
-        return await Update(script);
+        name = name.Replace(".js", "").Replace(".JS", "");
+        name = GetNewUniqueName(name);
+        return Save(new () { Name = name, Code = code, System = false});
     }
 
     /// <summary>
     /// Duplicates a script
     /// </summary>
-    /// <param name="uid">The UID of the script</param>
+    /// <param name="uid">The name of the script to duplicate</param>
     /// <returns>The duplicated script</returns>
-    [HttpGet("duplicate/{uid}")]
-    public async Task<Script> Duplicate([FromRoute] Guid uid)
+    [HttpGet("duplicate/{name}")]
+    public async Task<Script> Duplicate([FromRoute] string name)
     {
         // use DbHelper to avoid the cache, otherwise we would update the in memory object 
-        var script = await DbHelper.Single<Script>(uid);
+        var script = await Get(name);
         if (script == null)
             return null;
-        script.Uid = Guid.Empty;
-        script.DateModified = DateTime.Now;
-        script.DateCreated = DateTime.Now;
-        script.Name = await GetNewUniqueName(script.Name);
-        return await Update(script);
+        
+        script.Name = GetNewUniqueName(name);
+        script.System = false;
+        script.Uid = script.Name;
+        return Save(script);
     }
 
+    private string GetNewUniqueName(string name)
+    {
+        List<string> names = new DirectoryInfo(DirectoryHelper.ScriptsDirectory).GetFiles("*.js", SearchOption.AllDirectories).Select(x => x.Name.Replace(".js", "")).ToList();
+        return UniqueNameHelper.GetUnique(name, names);
+    }
+    
+    private bool ValidScriptName(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return false;
+        if (name.Contains(".."))
+            return false;
+        foreach (char c in UnsafeCharacters.Union(Enumerable.Range(0, 31).Select(x => (char)x)))
+        {
+            if (name.IndexOf(c) >= 0)
+                return false;
+        }
+        return true;
+    }
+    
+    private string GetFullFilename(string name, bool system) => 
+        new DirectoryInfo(Path.Combine(system ? DirectoryHelper.ScriptsDirectorySystem : DirectoryHelper.ScriptsDirectoryUser, name + ".js")).FullName;
+
+    private bool SaveScript(string name, string code)
+    {
+        try
+        {
+            new ScriptParser().Parse(name ?? string.Empty, code);
+            
+            if(ValidScriptName(name) == false)
+                throw new Exception("Invalid script name:" + name);
+            string file = GetFullFilename(name, false);
+            System.IO.File.WriteAllText(file, code);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog($"Failed saving script '{name}': {ex.Message}");
+            return false;
+        }
+    }
 }

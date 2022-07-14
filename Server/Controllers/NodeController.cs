@@ -101,6 +101,11 @@ public class NodeController : ControllerStore<ProcessingNode>
                 internalNode.Permissions = node.Permissions;
                 internalNode.AllLibraries = node.AllLibraries;
                 internalNode.MaxFileSizeMb = node.MaxFileSizeMb;
+                if (string.IsNullOrWhiteSpace(node.PreExecuteScript))
+                    internalNode.PreExecuteScript = null;
+                else
+                    internalNode.PreExecuteScript = node.PreExecuteScript;
+                
                 internalNode.Libraries = node.Libraries;
                 await CheckLicensedNodes(internalNode.Uid, internalNode.Enabled);
                 return await Update(internalNode, checkDuplicateName: true);
@@ -125,7 +130,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         var internalNode = (await this.GetAll()).Where(x => x.Address == Globals.InternalNodeName).FirstOrDefault()?.Uid ?? Guid.Empty;
         if (model.Uids.Contains(internalNode))
@@ -373,8 +378,8 @@ public class NodeController : ControllerStore<ProcessingNode>
     internal async Task UpdateLastSeen(Guid uid)
     {
         var node = await GetByUid(uid);
-        node.DateModified = DateTime.Now;
-        await DbHelper.UpdateLastModified(node.Uid);
+        node.LastSeen = DateTime.Now;
+        await DbHelper.Update(node);
     }
 }
 

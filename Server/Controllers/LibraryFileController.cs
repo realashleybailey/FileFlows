@@ -187,12 +187,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         {
             var taskOverview = DbHelper.GetLibraryFileOverview();
             var taskFiles = DbHelper.GetLibraryFiles(status, start: pageSize * page, max: pageSize);
-            Task.WaitAll(taskOverview, taskFiles);
+            var taskLibraries = DbHelper.Select<Library>();
+            Task.WaitAll(taskOverview, taskFiles, taskLibraries);
 
             return new()
             {
                 Status = taskOverview.Result,
-                LibraryFiles = ConvertToListModel(taskFiles.Result, status)
+                LibraryFiles = ConvertToListModel(taskFiles.Result, status, taskLibraries.Result)
             };
         }
         
@@ -201,7 +202,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         
         var result = new LibraryFileDatalistModel();
         result.Status = GetStatusData(allData.all, allData.libraries);
-        result.LibraryFiles = ConvertToListModel(allData.results, status);
+        var libraries = await new LibraryController().GetAll();
+        result.LibraryFiles = ConvertToListModel(allData.results, status, libraries);
 
 
         if (pageSize > 0)
@@ -217,9 +219,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         return result;
     }
 
-    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status)
+    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status, IEnumerable<Library> libaries)
     {
         files = files.ToList();
+        var dictLibraries = libaries.ToDictionary(x => x.Uid, x => x);
         return files.Select(x =>
         {
             var item = new LibaryFileListModel
@@ -234,6 +237,12 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.Disabled)
             {
                 item.Date = x.DateCreated;
+            }
+            if (status == FileStatus.OnHold && x.Library != null && dictLibraries.ContainsKey(x.Library.Uid))
+            {
+                var lib = dictLibraries[x.Library.Uid];
+                var scheduledAt = x.DateCreated.AddMinutes(lib.HoldMinutes);
+                item.ProcessingTime = scheduledAt.Subtract(DateTime.Now);
             }
 
             if (status == FileStatus.Processing)
@@ -300,7 +309,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (status != null && status != FileStatus.MissingLibrary)
         {
             FileStatus searchStatus =
-                (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled)
+                (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled || status.Value == FileStatus.OnHold)
                     ? FileStatus.Unprocessed
                     : status.Value;
             libraryFiles = libraryFiles.Where(x => x.Status == searchStatus);
@@ -311,7 +320,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
 
 
-        if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule)
+        if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.OnHold)
         {
             var filteredResults = libraryFiles
                 .Where(x =>
@@ -324,6 +333,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                         return false;
                     if (TimeHelper.InSchedule(lib.Schedule) == false)
                         return status == FileStatus.OutOfSchedule;
+                    if (lib.HoldMinutes != 0 && x.DateCreated > DateTime.Now.AddMinutes(-lib.HoldMinutes))                    
+                        return status == FileStatus.OnHold;
                     return status == FileStatus.Unprocessed;
                 })
                 .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
@@ -436,7 +447,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         var libfiles = await GetDataList();
         var uids = libfiles.Where(x => x.Status == FileStatus.Processing && x.Node?.Uid == nodeUid).Select(x => x.Uid).ToArray();
         if (uids.Any())
-            await Reprocess(new ReferenceModel { Uids = uids });
+            await Reprocess(new ReferenceModel<Guid> { Uids = uids });
     }
 
     /// <summary>
@@ -466,6 +477,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
                 return FileStatus.Disabled;
             if (TimeHelper.InSchedule(lib.Schedule) == false)
                 return FileStatus.OutOfSchedule;
+            if (lib.HoldMinutes != 0 && x.DateCreated > DateTime.Now.AddMinutes(-lib.HoldMinutes))
+                return FileStatus.OnHold;
             return FileStatus.Unprocessed;
         });
 
@@ -520,6 +533,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if(string.IsNullOrEmpty(file.OutputPath))
             existing.OutputPath = file.OutputPath;
         existing.Flow = file.Flow;
+        if(file.Library != null && file.Library.Uid == existing.Library.Uid)
+            existing.Library = file.Library; // name may have changed and is being updated
         existing.ProcessingEnded = file.ProcessingEnded;
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;
@@ -527,6 +542,20 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         return await base.Update(existing);
     }
 
+
+    /// <summary>
+    /// Downloads a  log of a library file
+    /// </summary>
+    /// <param name="uid">The UID of the library file</param>
+    /// <returns>The download action result</returns>
+    [HttpGet("{uid}/log/download")]
+    public IActionResult GetLog([FromRoute] Guid uid)
+    {     
+        string log = LibraryFileLogHelper.GetLog(uid);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(log);
+        return File(data, "application/octet-stream", uid + ".log");
+    }
+    
     /// <summary>
     /// Get the log of a library file
     /// </summary>
@@ -572,7 +601,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="model">The reference model of items in order to move</param>
     /// <returns>an awaited task</returns>
     [HttpPost("move-to-top")]
-    public async Task MoveToTop([FromBody] ReferenceModel model)
+    public async Task MoveToTop([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -659,7 +688,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -672,7 +701,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     /// <param name="model">A reference model containing UIDs to reprocess</param>
     /// <returns>an awaited task</returns>
     [HttpPost("reprocess")]
-    public async Task Reprocess([FromBody] ReferenceModel model)
+    public async Task Reprocess([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
@@ -722,6 +751,50 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     }
 
     /// <summary>
+    /// Gets the shrinkage data for a bar chart
+    /// </summary>
+    /// <returns>the bar chart data</returns>
+    [HttpGet("shrinkage-bar-chart")]
+    public async Task<object> ShrinkageBarChar()
+    {
+        var groups = await ShrinkageGroups();
+        #if(DEBUG)
+        groups = new Dictionary<string, ShrinkageData>()
+        {
+            { "Movies", new() { FinalSize = 10_000_000_000, OriginalSize = 25_000_000_000 } },
+            { "TV", new() { FinalSize = 45_000_000_000, OriginalSize = 75_000_000_000 } },
+            { "Other", new() { FinalSize = 45_000_000_000, OriginalSize = 40_000_000_000 } },
+            { "Other2", new() { FinalSize = 15_000_000_000, OriginalSize = 20_000_000_000 } },
+            { "Other3", new() { FinalSize = 27_000_000_000, OriginalSize = 30_000_000_000 } },
+        };
+        #endif
+        return new
+        {
+            series = new object[]
+            {
+                //new { name = "Final Size", data = groups.Select(x => (x.Value.OriginalSize - x.Value.FinalSize)).ToArray() },
+                new { name = "Final Size", data = groups.Select(x => x.Value.FinalSize).ToArray() },
+                //new { name = "Original Size", data = groups.Select(x => x.Value.OriginalSize).ToArray() }
+                new { name = "Savings", data = groups.Select(x =>
+                {
+                    var change = x.Value.OriginalSize - x.Value.FinalSize;
+                    if (change > 0)
+                        return change;
+                    return 0;
+                }).ToArray() },
+                new { name = "Increase", data = groups.Select(x =>
+                {
+                    var change = x.Value.OriginalSize - x.Value.FinalSize;
+                    if (change > 0)
+                        return 0;
+                    return change * -1;
+                }).ToArray() }
+            },
+            labels = groups.Select(x => x.Key.Replace("###TOTAL###", "Total")).ToArray(),
+        };
+    }
+
+    /// <summary>
     /// Get library file shrinkage grouped by library
     /// </summary>
     /// <returns>the library file shrinkage data</returns>
@@ -752,7 +825,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
             libraries.Add("###OTHER###", other);
         }
-#if (DEBUG)
+#if (DEBUG && false)
         if (libraries.Any() == false)
         {
             Random rand = new Random(DateTime.Now.Millisecond);
@@ -857,6 +930,5 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             x.DateCreated >= filter.FromDate && x.DateCreated <= filter.ToDate && (string.IsNullOrEmpty(filter.Path) ||
                 x.Name.ToLowerInvariant().Contains(filter.Path.ToLowerInvariant()))).Take(500);
         return results;
-
     }
 }

@@ -1,4 +1,4 @@
-﻿.fillspace {
+.fillspace {
   flex-grow: 1;
 }
 
@@ -89,7 +89,7 @@
   line-height: 2.2rem;
 }
 .flowtable-row > span.pre-text {
-  white-space: pre-wrap;
+  white-space: pre-line;
   height: unset;
   line-height: unset;
   margin: 0.3rem 0;
@@ -144,3 +144,5 @@
     top: 3.5rem;
   }
 }
+
+/*# sourceMappingURL=FlowTable.razor.css.map */

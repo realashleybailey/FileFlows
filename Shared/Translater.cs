@@ -27,7 +27,7 @@ public class Translater
     public static string TranslateIfNeeded(string value)
     {
         if (string.IsNullOrEmpty(value))
-            return String.Empty;
+            return string.Empty;
         if (NeedsTranslating(value) == false)
             return value;
         return Instant(value);

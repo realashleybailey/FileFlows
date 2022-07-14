@@ -9,9 +9,10 @@ window.ff = {
         let message = parameters[0]
         parameters.splice(0, 1);
 
-        if (level === 1) parameters.length > 0 ? console.error(message, parameters) : console.error(message);
-        else if (level === 2) parameters.length > 0 ? console.warn(message, parameters) : console.warn(message);
-        else if (level === 3) parameters.length > 0 ? console.info(message, parameters) : console.info(message);
+        if (level === 0) parameters.length > 0 ? console.error(message, parameters) : console.error(message);
+        else if (level === 1) parameters.length > 0 ? console.warn(message, parameters) : console.warn(message);
+        else if (level === 2) parameters.length > 0 ? console.info(message, parameters) : console.info(message);
+        else if (level === 3) parameters.length > 0 ? console.log(message, parameters) : console.log(message);
         else parameters.length > 0 ? console.error(message, parameters) : console.log(message);
     },
     deviceDimensions: function () {
@@ -129,5 +130,46 @@ window.ff = {
             el.dispatchEvent(window.dashboardElementResized);
             saveGrid();
         });
+    },
+    
+    nearBottom: function(element){
+        let ele = element;
+        if(typeof(element) === 'string')
+            ele = document.getElementById(element);
+        if(!ele)
+            ele = document.querySelector(element);
+        if(!ele)
+            return false;
+
+        const threshold = 100;
+        const position = ele.scrollTop + ele.offsetHeight;
+        const height = ele.scrollHeight;
+        return position > height - threshold;
+    },
+    scrollToBottom: function(element) {
+        let ele = element;
+        if(typeof(element) === 'string')
+            ele = document.getElementById(element);
+        if(!ele)
+            ele = document.querySelector(element);
+        if(!ele)
+            return false;
+        ele.scrollTo({ top: ele.scrollHeight, behavior: 'smooth' })
+    },
+    codeCaptureSave: function(csharp) {
+        window.CodeCaptureListener = (e) => {
+            if(e.ctrlKey ===  false || e.shiftKey || e.altKey || e.code != 'KeyS')
+                return;
+            e.preventDefault();
+            e.stopPropagation();
+            setTimeout(() => {                
+                csharp.invokeMethodAsync("SaveCode");
+            },1);
+            return true;
+        };
+        document.addEventListener("keydown", window.CodeCaptureListener);
+    },
+    codeUncaptureSave: function(){
+        document.removeEventListener("keydown", window.CodeCaptureListener);        
     }
 };

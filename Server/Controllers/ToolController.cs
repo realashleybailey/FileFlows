@@ -57,5 +57,5 @@ public class ToolController : ControllerStore<Tool>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public Task Delete([FromBody] ReferenceModel model) => DeleteAll(model);
+    public Task Delete([FromBody] ReferenceModel<Guid> model) => DeleteAll(model);
 }

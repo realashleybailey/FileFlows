@@ -1,20 +1,14 @@
-﻿using System.Threading;
+﻿using System.Text;
+using FileFlows.Plugin;
+using FileFlows.Server;
 using FileFlows.ServerShared;
 using FileFlows.ServerShared.Models;
-using Microsoft.Extensions.Logging;
-
-namespace FileFlows.Node.Workers;
-
 using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
-using FileFlows.Shared;
 using FileFlows.Shared.Models;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
+
+namespace FileFlows.Node.Workers;
 
 
 /// <summary>
@@ -112,6 +106,9 @@ public class FlowWorker : Worker
             return;
         }
 
+        var settingsService = SettingsService.Load();
+        var ffStatus = settingsService.GetFileFlowsStatus().Result;
+
         string nodeName = node?.Name == "FileFlowsServer" ? "Internal Processing Node" : (node?.Name ?? "Unknown");
 
         if (node?.Enabled != true)
@@ -155,6 +152,12 @@ public class FlowWorker : Worker
                 Logger.Instance?.ELog($"Temp Path does not exist on on node '{nodeName}', and failed to create it: {tempPath}");
                 return;
             }
+        }
+
+        if (ffStatus?.Licensed == true && string.IsNullOrWhiteSpace(node.PreExecuteScript) == false)
+        {
+            if (PreExecuteScriptTest(node) == false)
+                return;
         }
         
         var libFileService = LibraryFileService.Load();
@@ -274,6 +277,26 @@ public class FlowWorker : Worker
                 Trigger();
             }
         });
+    }
+
+    private bool PreExecuteScriptTest(ProcessingNode node)
+    {
+        var scriptService  = ScriptService.Load();
+        string code = scriptService.GetCode(node.PreExecuteScript).Result;
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            Logger.Instance.ELog("Failed to load pre-execute script code");
+            return false;
+        }
+        var scriptNode = new ScriptNode();
+        scriptNode.Code = code;
+        var args = new NodeParameters(Logger.Instance);
+        args.ScriptExecutor = new FileFlows.ServerShared.ScriptExecution.ScriptExecutor();
+        var output = scriptNode.Execute(args);
+        if (output == 1)
+            return true;
+        Logger.Instance.ELog("Output from pre-execute script not expected: " + output);
+        return false;
     }
 
 

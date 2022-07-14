@@ -1,3 +1,5 @@
+using Microsoft.JSInterop;
+
 namespace FileFlows.Client.Components.Inputs
 {
     using System;
@@ -20,6 +22,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private Timer RefreshTimer;
         private bool Refreshing = false;
+        private bool scrollToBottom = false;
 
         protected override void OnInitialized()
         {
@@ -34,6 +37,15 @@ namespace FileFlows.Client.Components.Inputs
                 this.RefreshTimer.Interval = RefreshSeconds > 0 ? RefreshSeconds * 1000 : 10_000;
                 this.RefreshTimer.Elapsed += RefreshTimerElapsed;
                 this.RefreshTimer.Start();
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (scrollToBottom)
+            {
+                await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{  ".editor .fields"});
+                scrollToBottom = false;
             }
         }
 
@@ -55,11 +67,14 @@ namespace FileFlows.Client.Components.Inputs
             {
                 try
                 {
+                    bool nearBottom = await jsRuntime.InvokeAsync<bool>("ff.nearBottom", new object[]{ ".editor .fields"});
+                    
                     var refreshResult = await HttpHelper.Get<string>(this.RefreshUrl);
                     if (refreshResult.Success == false)
                         return;
                     this.Value = refreshResult.Data;
-                    this.Colorized = Colorize(this.Value); 
+                    this.Colorized = Colorize(this.Value);
+                    this.scrollToBottom = nearBottom;
                     this.StateHasChanged();
                 }
                 catch (Exception) { }

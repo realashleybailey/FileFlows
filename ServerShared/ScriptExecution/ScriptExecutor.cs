@@ -32,11 +32,6 @@ public class ScriptExecutor:IScriptExecutor
         var args = execArgs.Args;
         try
         {
-            long fileSize = 0;
-            var fileInfo = new FileInfo(args.WorkingFile);
-            if (fileInfo.Exists)
-                fileSize = fileInfo.Length;
-
             // replace Variables. with dictionary notation
             string tcode = execArgs.Code;
             foreach (string k in args.Variables.Keys.OrderByDescending(x => x.Length))
@@ -78,7 +73,9 @@ public class ScriptExecutor:IScriptExecutor
             })
             .SetValue("Logger", args.Logger)
             .SetValue("Variables", args.Variables)
+            .SetValue("Sleep", (int milliseconds) => Thread.Sleep(milliseconds))
             .SetValue("Flow", args)
+            .SetValue("Hostname", Environment.MachineName)
             .SetValue("Execute", (object eArgs) => {
                 args.Logger.ILog("eArgsType:", eArgs.GetType().FullName);
                 args.Logger.ILog("eArgsType Json:", JsonSerializer.Serialize(eArgs));

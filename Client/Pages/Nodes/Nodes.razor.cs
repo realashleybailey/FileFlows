@@ -5,7 +5,7 @@ using FileFlows.Client.Components;
 /// <summary>
 /// Page for processing nodes
 /// </summary>
-public partial class Nodes : ListPage<ProcessingNode>
+public partial class Nodes : ListPage<Guid, ProcessingNode>
 {
     public override string ApiUrl => "/api/node";
     const string FileFlowsServer = "FileFlowsServer";

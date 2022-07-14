@@ -6,12 +6,12 @@
     const string KEY_OTHER = "###OTHER###";
     var total = Data.Where(x => x.Key == KEY_TOTAL).Select(x => x.Value).FirstOrDefault() ?? new ShrinkageData();
     double max = Math.Max(total.OriginalSize, total.FinalSize);
-    <div class="portlet">
+    <div class="Widget">
         <div class="title">
             <i class="fas fa-hdd"></i>
             <span>@lblShrinkageTitle</span>
         </div>
-        <div class="portlet-body">
+        <div class="Widget-body">
             @foreach(var group in Data.OrderBy(x => x.Key == KEY_TOTAL ? 2 : x.Key == KEY_OTHER ? 1 : 0).ThenByDescending(x => x.Value.Items))
             {
                 max = Math.Max(group.Value.OriginalSize, group.Value.FinalSize);

@@ -22,7 +22,7 @@ public class SettingsController : Controller
     /// </summary>
     /// <returns>the system status of FileFlows</returns>
     [HttpGet("fileflows-status")]
-    public FileFlowsStatus GetFileFlowsStatus()
+    public async Task<FileFlowsStatus> GetFileFlowsStatus()
     {
         FileFlowsStatus status = new();
         
@@ -34,9 +34,19 @@ public class SettingsController : Controller
             status.ExternalDatabase = (string.IsNullOrWhiteSpace(dbConnStr) || dbConnStr.ToLower().Contains("sqlite")) == false;
         }
 
-        var libs = new LibraryController().GetData().Result?.Any() == true;
-        var flows = new FlowController().GetData().Result?.Any() == true;
-        
+        bool libs, flows;
+
+        if (DbHelper.UseMemoryCache)
+        {
+            libs = new LibraryController().GetData().Result?.Any() == true;
+            flows = new FlowController().GetData().Result?.Any() == true;
+        }
+        else
+        {
+            flows = await DbHelper.HasAny<Flow>();
+            libs = await DbHelper.HasAny<Library>();
+        }
+
         if (flows)
             status.ConfigurationStatus |= ConfigurationStatus.Flows;
         if (libs)
@@ -90,8 +100,8 @@ public class SettingsController : Controller
             uiModel.DbType = DatabaseType.Sqlite;
         else if (dbConnStr.Contains(";Uid="))
             new MySqlDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
-        else
-            new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
+        // else
+        //     new SqlServerDbManager(string.Empty).PopulateSettings(uiModel, dbConnStr);
         uiModel.RecreateDatabase = AppSettings.Instance.RecreateDatabase;
         
         return uiModel;
@@ -214,9 +224,9 @@ public class SettingsController : Controller
 
     private string GetConnectionString(SettingsUiModel settings, DatabaseType dbType)
     {
-        if (dbType == DatabaseType.SqlServer)
-            return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
-                settings.DbPassword);
+        // if (dbType == DatabaseType.SqlServer)
+        //     return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+        //         settings.DbPassword);
         if (dbType == DatabaseType.MySql)
             return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
                 settings.DbPassword);
@@ -235,9 +245,9 @@ public class SettingsController : Controller
         if (model == null)
             throw new ArgumentException(nameof(model));
 
-        if (model.Type == DatabaseType.SqlServer)
-            return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
-                ?.EmptyAsNull() ?? "OK";
+        // if (model.Type == DatabaseType.SqlServer)
+        //     return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+        //         ?.EmptyAsNull() ?? "OK";
         if (model.Type == DatabaseType.MySql)
             return new MySqlDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
                 ?.EmptyAsNull() ?? "OK";

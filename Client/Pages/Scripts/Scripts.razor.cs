@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -9,7 +10,7 @@ using FileFlows.Client.Components;
 /// <summary>
 /// Page for processing nodes
 /// </summary>
-public partial class Scripts : ListPage<Script>
+public partial class Scripts : ListPage<string, Script>
 {
     public override string ApiUrl => "/api/script";
 
@@ -72,25 +73,26 @@ public partial class Scripts : ListPage<Script>
 #if (DEBUG)
         url = "http://localhost:6868" + url;
 #endif
-        await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".json" });
+        await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".js" });
 #endif
     }
 
     private async Task Import()
     {
 #if (!DEMO)
-        var json = await ImportDialog.Show();
-        if (string.IsNullOrEmpty(json))
+        var idResult = await ImportDialog.Show("js");
+        string js = idResult.content;
+        if (string.IsNullOrEmpty(js))
             return;
 
         Blocker.Show();
         try
         {
-            var newItem = await HttpHelper.Post<Script>("/api/script/import", json);
+            var newItem = await HttpHelper.Post<Script>("/api/script/import?filename=" + UrlEncoder.Create().Encode(idResult.filename), js);
             if (newItem != null && newItem.Success)
             {
                 await this.Refresh();
-                Toast.ShowSuccess(Translater.Instant("Pages.Script.Messages.Imported",
+                Toast.ShowSuccess(Translater.Instant("Pages.Scripts.Messages.Imported",
                     new { name = newItem.Data.Name }));
             }
             else
@@ -136,5 +138,35 @@ public partial class Scripts : ListPage<Script>
             Blocker.Hide();
         }
 #endif
+    }
+
+    public override async Task Delete()
+    {
+        var system = Table.GetSelected()?.Any(x => x.System) == true;
+        if (system)
+        {
+            Toast.ShowError("Pages.Scripts.Messages.DeleteSystem");
+            return;
+        }
+        
+        
+        var used = Table.GetSelected()?.Any(x => x.UsedBy?.Any() == true) == true;
+        if (used)
+        {
+            Toast.ShowError("Pages.Scripts.Messages.DeleteUsed");
+            return;
+        }
+
+
+        await base.Delete();
+    }
+
+
+    private async Task UsedBy()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item?.UsedBy?.Any() != true)
+            return;
+        await UsedByDialog.Show(item.UsedBy);
     }
 }

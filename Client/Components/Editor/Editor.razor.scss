@@ -7,7 +7,10 @@
     max-width: 100%;
     background:var(--base-darker);
     z-index:6;
-    left:0;
+    left:0;    
+    &.maximised {
+        width:100vw !important;
+    }
 }
 .background-overlay {
     z-index: 5 !important;
@@ -53,6 +56,9 @@
         .row + .row, .row + .input-text-variables, .input-text-variables + .row {
             margin-top: 1rem;
         }
+        .row.error {
+            height:auto;
+        } 
     }
 }
 @media screen and (max-width:578px) {
@@ -67,4 +73,9 @@
 
 .empty {
     margin-top:1rem;
+}
+
+.btn-download {
+    width:8rem !important;
+    margin-right: 1rem;
 }

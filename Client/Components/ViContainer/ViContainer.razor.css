@@ -90,4 +90,14 @@
   margin-left: 1rem;
 }
 
+.fa-window-maximize {
+  margin-right: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  top: 0.25rem;
+}
+.fa-window-maximize:hover {
+  color: var(--accent);
+}
+
 /*# sourceMappingURL=ViContainer.razor.css.map */

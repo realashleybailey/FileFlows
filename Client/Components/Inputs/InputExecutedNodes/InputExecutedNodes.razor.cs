@@ -21,6 +21,7 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
     private string PartialLog;
     private ExecutedNode PartialLogNode;
     private string lblClose, lblLogPartialNotAvailable, lblViewLog;
+    private bool Maximised { get; set; }
 
     private List<string> _LogLines;
     private List<string> LogLines
@@ -60,8 +61,8 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
         if (string.IsNullOrEmpty(node.NodeName))
             return FormatNodeUid(node.NodeUid);
         
-        string nodeUid = Regex.Match(node.NodeUid.Substring(node.NodeUid.LastIndexOf(".") + 1), "[a-zA-Z0-9]").Value.ToLower();
-        string nodeName = Regex.Match(node.NodeName ?? string.Empty, "[a-zA-Z0-9]").Value.ToLower();
+        string nodeUid = Regex.Match(node.NodeUid.Substring(node.NodeUid.LastIndexOf(".") + 1), "[a-zA-Z0-9]+").Value.ToLower();
+        string nodeName = Regex.Match(node.NodeName ?? string.Empty, "[a-zA-Z0-9]+").Value.ToLower();
 
         if (string.IsNullOrEmpty(node.NodeName) || nodeUid == nodeName)
             return FormatNodeUid(node.NodeUid);
@@ -84,6 +85,7 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
             return;
         }
 
+        this.Maximised = false;
         ++index;
         var lines  = LogLines;
         int startIndex = lines.FindIndex(x => x.IndexOf($"Executing Node {index}:") > 0);
@@ -112,5 +114,11 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
 
         PartialLog = sublog;
         PartialLogNode = node;
+    }
+    
+    
+    void OnMaximised(bool maximised)
+    {
+        this.Maximised = maximised;
     }
 }

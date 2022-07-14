@@ -1,16 +1,22 @@
 @namespace FileFlows.Client.Components
 @using FileFlows.Shared
 @using FileFlows.Plugin;
+@using Humanizer
 
 @if (Visible)
 {
     <div class="editor-wrapper">
         <div class="background-overlay"></div>
-        <div class="editor @(Large ? "large" : "")">
+        <div class="editor @(Maximised ? "maximised" : "") @(Large ? "large" : "") @(TypeName?.Dehumanize())">
 
-            <ViContainer Title="@Title" Icon="@Icon" FullWidth=@true AlwaysShowTitle=@true>
+            <ViContainer Title="@Title" Icon="@Icon" FullWidth=@true AlwaysShowTitle=@true Maximise=true OnMaximised=@OnMaximised>
 
                 <Head>
+                    @if (ShowDownload)
+                    {
+                        <a href="@DownloadUrl" class="btn btn-download" target="_blank"><span>@lblDownloadButton</span></a>
+                    }
+                    
                     @if (ReadOnly)
                     {
                         <button @onclick=@Cancel>@lblClose</button>
@@ -44,7 +50,7 @@
                             }
                             @if (Fields?.Any() == true)
                             {
-                                <FlowPanel Fields=@Fields OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
+                                <FlowPanel Fields=@Fields OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>  
 
                                 @if (AdditionalFields != null)
                                 {

@@ -56,7 +56,7 @@ namespace FileFlows.Client.Helpers
 
                 model = result.Data;
                 if (model.Status == FileStatus.Processing)
-                    logUrl += "?lines=300";
+                    logUrl += "?lines=5000";
 
                 var logResult = await GetLibraryFileLog(logUrl);
                 model.Log = (logResult.Success ? logResult.Data : string.Empty) ?? string.Empty;
@@ -89,7 +89,13 @@ namespace FileFlows.Client.Helpers
                     }
                 });
 
-                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true, noTranslateTitle: true);
+                string downloadUrl = $"{ApIUrl}/{libraryItemUid}/log/download";
+                #if(DEBUG)
+                downloadUrl = "http://localhost:6868" + downloadUrl;
+                #endif
+
+                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true, noTranslateTitle: true,
+                    lblDownloadButton: "Labels.DownloadLog", downloadUrl: downloadUrl);
             }
             else
             {
@@ -116,6 +122,11 @@ namespace FileFlows.Client.Helpers
                     Name = nameof(item.OutputPath)
                 });
             }
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.TextLabel,
+                Name = nameof(item.CreationTime)
+            });
 
             fields.Add(new ElementField
             {

@@ -8,7 +8,7 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
 
-    public partial class Tools : ListPage<Tool>
+    public partial class Tools : ListPage<Guid, Tool>
     {
         public override string ApiUrl => "/api/tool";
 

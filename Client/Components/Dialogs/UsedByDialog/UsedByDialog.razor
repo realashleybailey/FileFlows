@@ -1,0 +1,28 @@
+@using FileFlows.Plugin
+@namespace FileFlows.Client.Components.Dialogs
+
+<Modal Title="@lblTitle" Visible="Visible" Styling="width: min(650px, 90vw);">
+
+    <Body>
+        <table class="flow-table">
+            <thead>
+            <tr>
+                <th>@lblName</th>
+                <th>@lblType</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in UsedBy)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@GetTypeName(item.Type)</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </Body>
+    <Footer>
+        <button @onclick=@Close>@lblClose</button>
+    </Footer>
+</Modal>

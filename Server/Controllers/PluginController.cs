@@ -30,6 +30,8 @@ public class PluginController : ControllerStore<PluginInfo>
         var plugins = (await GetDataList()).Where(x => x.Deleted == false);
         List<PluginInfoModel> pims = new List<PluginInfoModel>();
         var packages = await GetPluginPackages();
+
+        Dictionary<string, PluginInfoModel> pluginDict = new();
         foreach (var plugin in plugins)
         {
             var pim = new PluginInfoModel
@@ -51,6 +53,33 @@ public class PluginController : ControllerStore<PluginInfo>
             var package = packages.FirstOrDefault(x => x.Name.ToLower().Replace(" ", "") == plugin.Name.ToLower().Replace(" ", ""));
             pim.LatestVersion = package?.Version ?? "";
             pims.Add(pim);
+
+            foreach (var ele in plugin.Elements)
+            {
+                if (pluginDict.ContainsKey(ele.Uid) == false)
+                    pluginDict.Add(ele.Uid, pim);
+            }
+        }
+
+        string flowTypeName = typeof(Flow).FullName;
+        var flows = await new FlowController().GetAll();
+        foreach (var flow in flows)
+        {
+            foreach (var p in flow.Parts)
+            {
+                if (pluginDict.ContainsKey(p.FlowElementUid) == false)
+                    continue;
+                var plugin = pluginDict[p.FlowElementUid];
+                if (plugin.UsedBy != null && plugin.UsedBy.Any(x => x.Uid == flow.Uid))
+                    continue;
+                plugin.UsedBy ??= new();
+                plugin.UsedBy.Add(new ()
+                {
+                    Name = flow.Name,
+                    Type = flowTypeName,
+                    Uid = flow.Uid
+                });
+            }
         }
         return pims.OrderBy(x => x.Name);
     }
@@ -145,7 +174,7 @@ public class PluginController : ControllerStore<PluginInfo>
     /// <param name="model">The list of plugins to update</param>
     /// <returns>if the updates were successful or not</returns>
     [HttpPost("update")]
-    public async Task<bool> Update([FromBody] ReferenceModel model)
+    public async Task<bool> Update([FromBody] ReferenceModel<Guid> model)
     {
         bool updated = false;
         var plugins = await GetPluginPackages();
@@ -197,7 +226,7 @@ public class PluginController : ControllerStore<PluginInfo>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public async Task Delete([FromBody] ReferenceModel model)
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete

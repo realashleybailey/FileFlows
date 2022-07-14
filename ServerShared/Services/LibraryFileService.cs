@@ -88,7 +88,7 @@ public class LibraryFileService : Service, ILibraryFileService
     {
         try
         {
-            var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel { Uids = new[] { uid } });                
+            var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel<Guid> { Uids = new[] { uid } });                
         }
         catch (Exception)
         {

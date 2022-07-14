@@ -19,6 +19,11 @@ public class ProcessingNode: FileFlowObject
     public string Address { get; set; }
 
     /// <summary>
+    /// Gets or sets when the node was last seen
+    /// </summary>
+    public DateTime LastSeen { get; set; }
+
+    /// <summary>
     /// Gets or sets if this node is enabled
     /// </summary>
     public bool Enabled { get; set; }
@@ -31,6 +36,11 @@ public class ProcessingNode: FileFlowObject
     /// Gets or sets the FileFlows version of this node
     /// </summary>
     public string Version { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a script to execute before a runner can start
+    /// </summary>
+    public string PreExecuteScript { get; set; }
 
     /// <summary>
     /// Gets or sets the number of flow runners this node can run simultaneously 

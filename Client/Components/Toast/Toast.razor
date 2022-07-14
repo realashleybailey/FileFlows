@@ -7,7 +7,7 @@
     {
         <div class="flow-toast @toast.Class @(toast.Dismissing ? "dismissing" : "")">
             <span class="dismiss fas fa-times" @onclick="() => Dismiss(toast)"></span>
-            @toast.Message
+            <span class="flow-toast-msg">@toast.Message</span>
         </div>
     }
     </div>

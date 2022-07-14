@@ -78,7 +78,7 @@ public class FlowService : Service, IFlowService
     {
         try
         {
-            var result = await HttpHelper.Get<Flow>($"{ServiceBaseUrl}/api/flow/failure-flow/by-library/" + libraryUid.ToString());
+            var result = await HttpHelper.Get<Flow>($"{ServiceBaseUrl}/api/flow/failure-flow/by-library/" + libraryUid);
             if (result.Success == false)
                 throw new Exception("Failed to locate flow: " + result.Body);
             return result.Data;

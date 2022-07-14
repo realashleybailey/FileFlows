@@ -82,6 +82,11 @@ public class LibraryFile : FileFlowObject
     public FileStatus Status { get; set; }
     
     /// <summary>
+    /// Gets or sets if the file no longer exists after it was processed
+    /// </summary>
+    public bool NoLongerExistsAfterProcessing { get; set; }
+    
+    /// <summary>
     /// Gets or sets the order of the file when the file should be processed
     /// </summary>
     public int Order { get; set; }
@@ -125,6 +130,10 @@ public class LibraryFile : FileFlowObject
 /// </summary>
 public enum FileStatus
 {
+    /// <summary>
+    /// The file is on hold by its libraries hold interval
+    /// </summary>
+    OnHold = -3,
     /// <summary>
     /// The library is disabled and the file will not be processed
     /// </summary>

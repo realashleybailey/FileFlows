@@ -1,0 +1,16 @@
+@namespace FileFlows.Client.Components.Common
+@typeparam TItem
+
+
+<div class="skybox">
+    @foreach (var item in Items)
+    {
+        <div class="skybox-item @item.ClassName @(item == SelectedItem ? "active" : "")"
+             @onclick="() => SetSelected(item)">
+            
+            <span class="icon @item.Icon"></span>
+            <span class="count">@item.Count</span>
+            <span class="name">@item.Name</span>
+        </div>
+    }
+</div>

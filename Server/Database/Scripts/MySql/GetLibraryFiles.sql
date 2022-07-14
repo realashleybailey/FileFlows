@@ -14,6 +14,7 @@ BEGIN
     select Uid, Name, js_ProcessingOrder as ProcessingOrder,
            js_Enabled as Enabled,
            js_Priority as Priority,
+           ifnull(cast(JSON_EXTRACT(Data, '$.HoldMinutes') as INT), 0) as HoldMinutes,
            case when substring(js_Schedule, IntervalIndex, 1) <> '0' then 0 else 1 end as Unscheduled
     from DbObject where Type = 'FileFlows.Shared.Models.Library';
 
@@ -40,7 +41,8 @@ BEGIN
         from (
                  select case
                             when tempLibraries.Uid is null then 7
-                            when js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0 then 0
+                            when js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0 and DateCreated <= DATE_ADD(NOW(), INTERVAL -tempLibraries.HoldMinutes minute) then 0
+                            when js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0 and DateCreated > DATE_ADD(NOW(), INTERVAL -tempLibraries.HoldMinutes minute) then -3
                             when js_Status = 0 and tempLibraries.Enabled = false then -1
                             when js_Status = 0 then -2
                             else js_Status end as Status, DbObject.Uid
@@ -52,11 +54,13 @@ BEGIN
     else
 
         if FileStatus = 0 then
-            set sWhere = ' and js_Status = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0';
+            set sWhere = ' and js_Status = 0 and tempLibraries.Enabled = 1 and tempLibraries.Unscheduled = 0 and DateCreated <= DATE_ADD(NOW(), INTERVAL -tempLibraries.HoldMinutes minute)';
         elseif FileStatus = -1 then -- out of schedule
-            set sWhere = ' and js_Status  = 0 and tempLibraries.Enabled = true and tempLibraries.Unscheduled = 0';
+            set sWhere = ' and js_Status = 0 and tempLibraries.Enabled = 1 and tempLibraries.Unscheduled = 0';
         elseif FileStatus = -2 then -- disabled
-            set sWhere = ' and js_Status  = 0 and tempLibraries.Enabled = false';
+            set sWhere = ' and js_Status = 0 and (tempLibraries.Enabled is null or tempLibraries.Enabled = 0)';
+        elseif FileStatus = -3 then -- on hold
+            set sWhere = ' and js_Status = 0 and tempLibraries.Enabled = 1 and tempLibraries.Unscheduled = 0 and DateCreated > DATE_ADD(NOW(), INTERVAL -tempLibraries.HoldMinutes minute)';
         elseif FileStatus = 7 then -- missing libraries
             set sWhere= ' and tempLibraries.Uid is null ';
         else
@@ -64,7 +68,7 @@ BEGIN
         end if;
 
         if FileStatus = 0 or FileStatus = -1 then
-            set sOrder = ' order by tempLibraries.Priority asc, 
+            set sOrder = ' order by case when js_Order <> -1 then js_Order else 1000000 end, tempLibraries.Priority desc, 
 		  case
 			    when js_Status > 0 then 0
 				when js_Order <> -1 then js_Order

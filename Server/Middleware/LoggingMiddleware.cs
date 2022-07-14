@@ -1,3 +1,4 @@
+using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 
 namespace FileFlows.Server.Middleware;
@@ -8,6 +9,11 @@ namespace FileFlows.Server.Middleware;
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
+    
+    /// <summary>
+    /// Gets the logger for the request logger
+    /// </summary>
+    public static FileLogger RequestLogger { get; private set; }
 
     /// <summary>
     /// Constructs a instance of the exception middleware
@@ -16,6 +22,7 @@ public class LoggingMiddleware
     public LoggingMiddleware(RequestDelegate next)
     {
         _next = next;
+        RequestLogger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsHTTP", register: false);
     }
 
     /// <summary>
@@ -35,7 +42,7 @@ public class LoggingMiddleware
                 var settings = new SettingsController().Get().Result;
                 if (settings.LogEveryRequest)
                 {
-                    Logger.Instance.ILog(
+                    RequestLogger.Log((LogType) 999,
                         $"REQUEST [{context.Request?.Method}] [{context.Response?.StatusCode}]: {context.Request?.Path.Value}");
                 }
             }

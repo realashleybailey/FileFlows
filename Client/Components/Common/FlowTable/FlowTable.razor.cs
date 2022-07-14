@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel.Design;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 
@@ -77,6 +78,8 @@ namespace FileFlows.Client.Components.Common
         List<FlowTableColumn<TItem>> ColumnList = new ();
         List<FlowTableButton<TItem>> Buttons = new();
 
+        private TItem LastSelected;
+
         public delegate void SelectionChangedEvent(List<TItem> items);
         public event SelectionChangedEvent SelectionChanged;
 
@@ -140,6 +143,11 @@ namespace FileFlows.Client.Components.Common
             }
         }
 
+        /// <summary>
+        /// Calls StateHasChanged on the component
+        /// </summary>
+        public void TriggerStateHasChanged() => this.StateHasChanged();
+
         private void CheckItem(ChangeEventArgs e, TItem item)
         {
             bool @checked = e.Value as bool? == true;
@@ -183,13 +191,77 @@ namespace FileFlows.Client.Components.Common
             CurrentFilter = filter;
         }
 
-        private async Task OnClick(TItem item)
+        private async Task OnClick(MouseEventArgs e, TItem item)
         {
-            if (this.SelectedItems.Contains(item) == false)
+            bool changed = false;
+            bool wasSelected = this.SelectedItems.Contains(item);
+            if (e.CtrlKey == false && e.ShiftKey == false)
             {
-                this.SelectedItems.Add(item);
-                this.NotifySelectionChanged();
+                // just select/unselect this one
+                if(wasSelected && this.SelectedItems.Count == 1)
+                    this.SelectedItems.Clear();
+                else
+                {
+                    this.SelectedItems.Clear();
+                    this.SelectedItems.Add(item);
+                }
+                changed = true;
             }
+            else if (e.CtrlKey)
+            {
+                // multiselect changing one item
+                if (wasSelected)
+                {
+                    this.SelectedItems.Remove(item);
+                }
+                else
+                {
+                    this.SelectedItems.Add(item);
+                }
+                changed = true;
+            }
+            else
+            {
+
+                if (wasSelected == false)
+                {
+                    this.SelectedItems.Add(item);
+                    changed = true;
+                }
+
+                if (this.LastSelected != null && e.ShiftKey)
+                {
+                    // select everything in between
+                    int last = this.Data.IndexOf(this.LastSelected);
+                    int current = this.Data.IndexOf(item);
+                    int start = last > current ? current : last;
+                    int end = last > current ? last : current;
+
+                    bool unselecting = e.CtrlKey;
+                    for (int i = start; i <= end && i < Data.Count - 1; i++)
+                    {
+                        var tItem = this.Data[i];
+                        if (unselecting)
+                        {
+                            if (this.SelectedItems.Contains(tItem))
+                            {
+                                this.SelectedItems.Remove(tItem);
+                                changed = true;
+                            }
+                        }
+                        else if (this.SelectedItems.Contains(tItem) == false)
+                        {
+                            this.SelectedItems.Add(tItem);
+                            changed = true;
+                        }
+                    }
+                }
+            }
+
+            if(changed)
+                this.NotifySelectionChanged();
+
+            this.LastSelected = item;
         }
 
         private async Task OnDoubleClick(TItem item)

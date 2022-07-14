@@ -29,10 +29,9 @@ public class Upgrader
                 new Upgrade0_8_3().Run(settings);
             if (currentVersion < new Version(0, 8, 4))
                 new Upgrade0_8_4().Run(settings);
+            if (currentVersion < new Version(0, 9, 0))
+                new Upgrade0_9_0().Run(settings);
         }
-        
-        // always check on default scripts
-        new DefaultScripts().Run(settings);
         
         // save the settings
         if (settings.Version != Globals.Version)

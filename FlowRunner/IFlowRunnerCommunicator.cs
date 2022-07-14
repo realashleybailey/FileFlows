@@ -127,14 +127,15 @@ public class FlowRunnerCommunicator : IFlowRunnerCommunicator
     /// Sends a hello to the server saying this runner is still executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    public async Task Hello(Guid runnerUid)
+    public async Task<bool> Hello(Guid runnerUid)
     {
         try
         {
-            await connection.InvokeAsync("Hello", runnerUid, LibraryFileUid);
+            return await connection.InvokeAsync<bool>("Hello", runnerUid, LibraryFileUid);
         }
         catch(Exception)
         {
+            return false;
         }
     }
 

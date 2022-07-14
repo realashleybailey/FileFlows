@@ -26,6 +26,11 @@ namespace FileFlows.Client
         public static FileFlows.Shared.Models.Settings Settings;
 
         public FileFlowsStatus FileFlowsSystem { get; private set; }
+        
+        /// <summary>
+        /// Gets or sets if the nav menu is collapsed
+        /// </summary>
+        public bool NavMenuCollapsed { get; set; }
 
         public delegate void FileFlowsSystemUpdated(FileFlowsStatus system);
 
@@ -59,6 +64,7 @@ namespace FileFlows.Client
         {
             Instance = this;
             ClientConsoleLogger.jsRuntime = jsRuntime;
+            new ClientConsoleLogger();
             HttpHelper.Client = Client;
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;

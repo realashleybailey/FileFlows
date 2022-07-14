@@ -92,6 +92,8 @@ public partial class Dashboard : ComponentBase
     private async Task AddDashboard()
     {
         string name = await Prompt.Show("New Dashboard", "Enter a name of the new dashboard");
+        if (string.IsNullOrWhiteSpace(name))
+            return; // was canceled
         this.Blocker.Show();
         try
         {

@@ -555,11 +555,7 @@ public partial class Flows : ListPage<Guid, FlowListModel>
 #endif
     }
 
-    protected override Task PostDelete()
-    {
-        UpdateTypeData();
-        return Task.CompletedTask;
-    }
+    protected override Task PostDelete() => Refresh();
 
     public override Task PostLoad()
     {

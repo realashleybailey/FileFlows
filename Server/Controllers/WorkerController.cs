@@ -203,7 +203,7 @@ public class WorkerController : Controller
             WorkingFile = x.WorkingFile
         }).ToList();
         #if(DEBUG)
-        if (results.Any() != true)
+        if (false && results.Any() != true)
         {
             results = Enumerable.Range(1, 2).Select(x => new FlowExecutorInfo
             {

@@ -399,7 +399,7 @@
       },
       "Messages": {
         "DeleteUsed":"You cannot delete a plugin that is in use",
-        "DeletePlugins": "Are you sure you want to delete the selected {count, plural, one {plugin} other {plugins}}?\n\nDoing so will cause any Flows that use these plugins to stop working and processing will fail."
+        "DeletePlugins": "Are you sure you want to delete the selected {count, plural, one {plugin} other {plugins}}?"
       },
       "Fields": {
         "Authors": "Authors",

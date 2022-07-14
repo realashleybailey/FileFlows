@@ -274,7 +274,7 @@ public class ScriptController : Controller
 
     private string GetNewUniqueName(string name)
     {
-        List<string> names = new DirectoryInfo(DirectoryHelper.ScriptsDirectory).GetFiles("*.js").Select(x => x.Name.Replace(".js", "")).ToList();
+        List<string> names = new DirectoryInfo(DirectoryHelper.ScriptsDirectory).GetFiles("*.js", SearchOption.AllDirectories).Select(x => x.Name.Replace(".js", "")).ToList();
         return UniqueNameHelper.GetUnique(name, names);
     }
     

@@ -825,7 +825,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
 
             libraries.Add("###OTHER###", other);
         }
-#if (DEBUG)
+#if (DEBUG && false)
         if (libraries.Any() == false)
         {
             Random rand = new Random(DateTime.Now.Millisecond);

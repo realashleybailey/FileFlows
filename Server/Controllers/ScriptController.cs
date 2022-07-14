@@ -80,8 +80,8 @@ public class ScriptController : Controller
     /// </summary>
     /// <param name="name">The name of the script</param>
     /// <returns>the script instance</returns>
-    [HttpGet("{uid}")]
-    public async Task<Script> Get(string name)
+    [HttpGet("{name}")]
+    public async Task<Script> Get([FromRoute] string name)
     {
         var result = FindScript(name);
         string code = await System.IO.File.ReadAllTextAsync(result.File);

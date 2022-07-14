@@ -1,14 +1,11 @@
-
-using System.Security.Cryptography.Xml;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using FileFlows.Shared.Models;
 using FileFlows.Server.Helpers;
+using FileFlows.Server.Hubs;
 
 namespace FileFlows.Server.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
-using FileFlows.Shared.Models;
-using Microsoft.AspNetCore.SignalR;
-using FileFlows.Server.Hubs;
-using FileFlows.Shared;
 
 /// <summary>
 /// This controller will be responsible for knowing about the workers and the nodes
@@ -100,6 +97,20 @@ public class WorkerController : Controller
                 Logger.Instance.ILog($"Recording final size for '{info.LibraryFile.FinalSize}' for '{info.LibraryFile.Name}'");
                 if(info.LibraryFile.FinalSize > 0)
                     libfile.FinalSize = info.LibraryFile.FinalSize;
+
+
+                if (info.WorkingFile == libfile.Name)
+                {
+                    var file = new FileInfo(info.WorkingFile);
+                    if (file.Exists)
+                    {
+                        // if file replaced original update the creation time to match
+                        if (libfile.CreationTime != file.CreationTime)
+                            libfile.CreationTime = file.CreationTime;
+                        if(libfile.LastWriteTime != file.LastWriteTime)
+                            libfile.LastWriteTime = file.LastWriteTime;
+                    }
+                }
 
                 libfile.NoLongerExistsAfterProcessing = new FileInfo(libfile.Name).Exists == false;
                 libfile.OutputPath = info.LibraryFile.OutputPath;

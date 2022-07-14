@@ -31,8 +31,6 @@ a.btn {
   place-items: center;
   color: var(--color) !important;
   text-align: center;
-}
-a.btn span {
   min-width: 6rem;
 }
 

@@ -56,7 +56,9 @@ public class ScriptService:Service, IScriptService
         try
         {
             string encoded = UrlEncoder.Create().Encode(name);
-            var result = await HttpHelper.Get<Script>($"{ServiceBaseUrl}/api/script/{encoded}");
+            string url = $"{ServiceBaseUrl}/api/script/{encoded}";
+            Logger.Instance.ILog("Request script from: " + url);
+            var result = await HttpHelper.Get<Script>(url);
             if (result.Success == false)
                 throw new Exception(result.Body);
             return result.Data;
@@ -78,7 +80,9 @@ public class ScriptService:Service, IScriptService
         try
         {
             string encoded = UrlEncoder.Create().Encode(name);
-            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/script/{encoded}/code");
+            string url = $"{ServiceBaseUrl}/api/script/{encoded}/code";
+            Logger.Instance.ILog("Request script code from: " + url);
+            var result = await HttpHelper.Get<string>(url);
             if (result.Success == false)
                 throw new Exception(result.Body);
             return result.Data;

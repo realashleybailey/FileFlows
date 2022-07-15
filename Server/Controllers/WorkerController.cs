@@ -113,6 +113,8 @@ public class WorkerController : Controller
                 }
 
                 libfile.NoLongerExistsAfterProcessing = new FileInfo(libfile.Name).Exists == false;
+                if(info.LibraryFile.FinalSize > 0)
+                    libfile.FinalSize = info.LibraryFile.FinalSize;
                 libfile.OutputPath = info.LibraryFile.OutputPath;
                 libfile.Fingerprint = info.LibraryFile.Fingerprint;
                 libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();

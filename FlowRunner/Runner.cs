@@ -250,6 +250,7 @@ public class Runner
             try
             {
                 var service = FlowRunnerService.Load();
+                CalculateFinalSize();
                 service.Update(Info);
                 Logger.Instance?.DLog("Set final status to: " + status);
                 return;
@@ -448,11 +449,10 @@ public class Runner
                     var outputNode = part.OutputConnections?.Where(x => x.Output == output)?.FirstOrDefault();
                     if (outputNode == null)
                     {
-                        nodeParameters.Logger?.DLog("flow completed");
+                        nodeParameters.Logger?.DLog("Flow completed");
                         // flow has completed
                         nodeParameters.Result = NodeResult.Success;
-                        nodeParameters.Logger?.DLog("flow completed 1");
-                        nodeParameters.Logger?.DLog("flow status set to processed");
+                        nodeParameters.Logger?.DLog("File status set to processed");
                         return FileStatus.Processed;
                     }
 

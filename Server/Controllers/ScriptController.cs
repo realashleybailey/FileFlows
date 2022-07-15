@@ -24,6 +24,7 @@ public class ScriptController : Controller
         List<Script> scripts = new();
         scripts.AddRange(await GetSystemScripts());
         scripts.AddRange(await GetUserScripts());
+        scripts = scripts.DistinctBy(x => x.Name).ToList();
         var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
         var flows = await new FlowController().GetAll();
         string flowTypeName = typeof(Flow).FullName;

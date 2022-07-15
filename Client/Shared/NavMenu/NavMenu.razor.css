@@ -2,7 +2,7 @@
   background-color: transparent;
   outline: none !important;
 }
-.navbar-toggler .fas, .navbar-toggler .far {
+.navbar-toggler .fas, .navbar-toggler .far, .navbar-toggler .fab {
   font-size: 1.3rem;
   padding-top: 0.2rem;
 }
@@ -36,7 +36,7 @@
   color: var(--accent);
 }
 
-.fas, .far {
+.nav .fas, .nav .far, .nav .fab {
   width: 2rem;
   font-size: 1.1rem;
   vertical-align: text-top;
@@ -80,6 +80,32 @@
   background-color: rgba(var(--accent-rgb), 0.1);
 }
 
+.support-links {
+  position: absolute;
+  bottom: 3rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+}
+.support-links a {
+  color: rgba(var(--color-rgb), 0.4) !important;
+  padding: 0 0.25rem;
+}
+.support-links a:hover {
+  color: var(--accent) !important;
+}
+
+.nav-item.discord, .nav-item.forum {
+  display: none;
+}
+
+.page.collapsed .support-links {
+  display: none;
+}
+.page.collapsed .nav-item.discord, .page.collapsed .nav-item.forum {
+  display: unset;
+}
+
 .version-info {
   display: none;
 }
@@ -121,7 +147,7 @@
   }
 }
 @media screen and (max-height: 534px) {
-  .version-info {
+  .support-links, .version-info {
     display: none !important;
   }
 }
@@ -137,7 +163,7 @@
     padding-top: 0.25rem;
   }
 }
-@media screen and (max-height: 678px) {
+@media screen and (max-height: 686px) {
   .nav-menu-group {
     display: none;
   }

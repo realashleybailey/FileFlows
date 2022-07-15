@@ -1,7 +1,7 @@
 .navbar-toggler {
     background-color: transparent;
     outline:none !important;
-    .fas, .far {
+    .fas, .far, .fab {
         font-size:1.3rem;
         padding-top:0.2rem;
     }
@@ -35,11 +35,13 @@
     }
 }
 
-.fas, .far {
-    width: 2rem;
-    font-size: 1.1rem;
-    vertical-align: text-top;
-    top: -2px;
+.nav {
+    .fas, .far, .fab {
+        width: 2rem;
+        font-size: 1.1rem;
+        vertical-align: text-top;
+        top: -2px;
+    }
 }
 
 .nav-menu-group, .nav-item {
@@ -81,6 +83,31 @@
         
     }
 }
+.support-links {
+    position: absolute;
+    bottom: 3rem;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    a {
+        color: rgba(var(--color-rgb), 0.4) !important;
+        padding: 0 0.25rem;
+        &:hover {
+            color:var(--accent) !important;
+        }
+    }
+}
+.nav-item.discord, .nav-item.forum{
+    display:none;
+}
+.page.collapsed {
+    .support-links {
+        display: none;
+    }
+    .nav-item.discord, .nav-item.forum {
+        display:unset;
+    }
+}
 .version-info { 
     display:none;
 }
@@ -118,7 +145,7 @@
 }
 
 @media screen and (max-height:534px){
-    .version-info {
+    .support-links, .version-info {
         display: none !important;
     }
 }
@@ -135,7 +162,7 @@
     }
 }
 
-@media screen and (max-height:678px) 
+@media screen and (max-height:686px) 
 {
     .nav-menu-group {
         display:none;

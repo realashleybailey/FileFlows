@@ -17,7 +17,7 @@ public partial class NavMenu
 
     public NavMenuItem Active { get; private set; }
 
-    private string lblVersion, lblHelp;
+    private string lblVersion, lblHelp, lblForum, lblDiscord;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private NavMenuItem nmiFlows, nmiLibraries;
@@ -26,6 +26,8 @@ public partial class NavMenu
     {
         lblVersion = Translater.Instant("Labels.VersionNumber", new { version = Globals.Version });
         lblHelp = Translater.Instant("Labels.Help");
+        lblForum = Translater.Instant("Labels.Forum");
+        lblDiscord = Translater.Instant("Labels.Discord");
 
         App.Instance.OnFileFlowsSystemUpdated += FileFlowsSystemUpdated;
         

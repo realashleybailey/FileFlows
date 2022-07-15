@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace FileFlows.Client.Components
 {
     using System;
@@ -201,6 +203,12 @@ namespace FileFlows.Client.Components
 
         private async Task Save()
         {
+            if (ReadOnly)
+            {
+                Logger.Instance.ILog("Cannot save, readonly");
+                return;
+            }
+
             bool valid = true;
             foreach (var input in RegisteredInputs)
             {

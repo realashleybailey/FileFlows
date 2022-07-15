@@ -786,7 +786,7 @@ public abstract class DbManager
     protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
     {
         Dictionary<string, string> scripts = new();
-        foreach (string script in new[] { "GetLibraryFiles", "GetShrinkageData", "DeleteOldLogs" })
+        foreach (string script in new[] { "GetLibraryFiles", "SearchLibraryFiles", "GetShrinkageData", "DeleteOldLogs" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
             scripts.Add(script, sql);

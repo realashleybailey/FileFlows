@@ -109,6 +109,7 @@ public class MySqlDbManager: DbManager
         db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");
         db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);");
         db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);");
+        db.Execute($"ALTER TABLE {nameof(DbObject)} ADD FULLTEXT NameIndex(Name);");
         return true;
     }
 
@@ -230,23 +231,13 @@ public class MySqlDbManager: DbManager
     {
         if (filter.Limit <= 0 || filter.Limit > 10_000)
             filter.Limit = 1000;
-        string sql = $"select * from {nameof(DbObject)} ";
-        sql += " where Type = 'FileFlows.Shared.Models.LibraryFile'";
-        sql += " and (DateCreated between @0 and @1) ";
-        if (string.IsNullOrWhiteSpace(filter.Path) == false)
-            sql += " and Name like @2 ";
-        if (string.IsNullOrWhiteSpace(filter.LibraryName) == false)
-            sql += " and JSON_EXTRACT(Data, '$.Library.Name') like @3 ";
-        sql += $" limit {filter.Limit};" ;
-        var from = filter.FromDate;
-        var to = filter.ToDate < new DateTime(2000, 1, 1) ? DateTime.MaxValue : filter.ToDate;
-
+        
+        
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            dbObjects = await db.Db.FetchAsync<DbObject>(sql, from, to,
-                string.IsNullOrEmpty(filter.Path) ? string.Empty : "%" + filter.Path + "%",
-                string.IsNullOrEmpty(filter.LibraryName) ? string.Empty : "%" + filter.LibraryName + "%");
+            string sql = $"call SearchLibraryFiles(@0, @1, @2, @3, @4)";
+            dbObjects = (await db.Db.FetchAsync<DbObject>(sql, filter.LibraryName ?? string.Empty, filter.Path ?? string.Empty, filter.FromDate, filter.ToDate, filter.Limit)).ToList();
         }
 
         return ConvertFromDbObject<LibraryFile>(dbObjects);

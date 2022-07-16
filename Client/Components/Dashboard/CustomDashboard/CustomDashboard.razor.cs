@@ -238,7 +238,7 @@ libpostproc    55.  3.100 / 55.  3.100"
     {
         if (string.IsNullOrWhiteSpace(step))
             return "Starting...";
-        string humanized = step.Humanize().Replace("Ffmpeg", "FFMPEG");
+        string humanized = step.Humanize(LetterCasing.Title).Replace("Ffmpeg", "FFMPEG");
         return humanized;
     }
 }

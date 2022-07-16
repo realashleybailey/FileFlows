@@ -65,7 +65,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
 
     public virtual async Task Load(U selectedUid)
     {
-        Blocker.Show();
+        Blocker.Show("Loading Data");
         await this.WaitForRender();
         try
         {

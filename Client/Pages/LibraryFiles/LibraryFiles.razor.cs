@@ -364,6 +364,20 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             date.Value.Minute, date.Value.Second);
         return localDate.ToUniversalTime().Humanize();
     }
+
+    private async Task Rescan()
+    {
+        this.Blocker.Show("Scanning Libraries");
+        try
+        {
+            await HttpHelper.Post("/api/library/rescan-enabled");
+            await Refresh();
+        }
+        finally
+        {
+            this.Blocker.Hide();   
+        }
+    }
     
     
     Task Search() => NavigationService.NavigateTo("/library-files/search");

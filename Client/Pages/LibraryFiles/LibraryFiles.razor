@@ -43,6 +43,7 @@
         @if (SelectedStatus == FileStatus.Unprocessed)
         {
             <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop"/>
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=Rescan Icon="fas fa-search-plus" Label="Labels.Rescan" />
         }
         else if (SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
         {

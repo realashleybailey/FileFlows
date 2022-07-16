@@ -1211,8 +1211,6 @@ export class Processing extends FFChart
     timer;
     existing;
     runners = {};
-    eleInfo;
-    eleChart;
     infoTemplate;
 
     constructor(uid, args) {
@@ -1231,7 +1229,7 @@ export class Processing extends FFChart
         
         this.timer = setTimeout(() => this.getData(), 5000);
     }
-
+    
     createChart(data) {
         let json = data ? JSON.stringify(data) : '';
         if(json === this.existing)
@@ -1364,9 +1362,6 @@ export class Processing extends FFChart
             });
         });
         buttons.appendChild(btnCancel);
-        
-        this.eleInfo = document.getElementById(`runner-${runner.Uid}-info`);
-        this.eleChart = document.getElementById(`runner-${runner.Uid}-chart`);
     }
 
     infoTemplateHtml = `
@@ -1393,15 +1388,20 @@ export class Processing extends FFChart
 `;
     
     updateRunner(runner)
-    {    
-        let args = {
-            file: runner.LibraryFile.Name,
-            node: runner.NodeName,
-            library: runner.Library.Name,
-            step: runner.CurrentPartName || 'Starting...',
-            time: this.timeDiff( Date.parse(runner.StartedAt), Date.now())
-        };
-        this.eleInfo.innerHTML = this.infoTemplate(args);
+    {
+        this.csharp.invokeMethodAsync("HumanizeStepName", runner.CurrentPartName).then((step) =>
+        {            
+            let args = {
+                file: runner.LibraryFile.Name,
+                node: runner.NodeName,
+                library: runner.Library.Name,
+                step: step,
+                time: this.timeDiff( Date.parse(runner.StartedAt), Date.now())
+            };
+            let eleInfo = document.getElementById('runner-' + runner.Uid + '-info');
+            if(eleInfo)
+                eleInfo.innerHTML = this.infoTemplate(args);
+        });
     }
     
     timeDiff(start, end)
@@ -1474,18 +1474,18 @@ export class Processing extends FFChart
         }
 
         let updated = false;
+        
+        let eleChart = document.getElementById(`runner-${runner.Uid}-chart`);
 
-        if (this.eleChart.querySelector('.apexcharts-canvas')) {
+        if (eleChart.querySelector('.apexcharts-canvas')) {
             try {
                 ApexCharts.exec(chartUid, 'updateOptions', options, false, false);
                 updated = true;
             } catch (err) { }
         }
 
-        if (updated === false) {
-            
-            if (this.eleChart)
-                new ApexCharts(this.eleChart, options).render();
+        if (updated === false && eleChart) {
+            new ApexCharts(eleChart, options).render();
         }
     }
 }

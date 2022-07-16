@@ -1,5 +1,6 @@
 using FileFlows.Client.Components.Dialogs;
 using FileFlows.Plugin;
+using Humanizer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -225,5 +226,19 @@ libpostproc    55.  3.100 / 55.  3.100"
         }).ToArray();
         
         await HttpHelper.Put($"/api/dashboard/{dashboardUid}", pActual);
+    }
+
+    /// <summary>
+    /// Humanzies a step name
+    /// </summary>
+    /// <param name="step">The unhumanized step name</param>
+    /// <returns>the humanized step name</returns>
+    [JSInvokable]
+    public string HumanizeStepName(string step)
+    {
+        if (string.IsNullOrWhiteSpace(step))
+            return "Starting...";
+        string humanized = step.Humanize().Replace("Ffmpeg", "FFMPEG");
+        return humanized;
     }
 }

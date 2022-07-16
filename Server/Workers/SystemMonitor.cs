@@ -131,9 +131,11 @@ public class SystemMonitor:Worker
         string logPath = DirectoryHelper.LoggingDirectory;
         string libFileLogPath = DirectoryHelper.LibraryFilesLoggingDirectory;
         if(libFileLogPath == null || logPath.Contains(libFileLogPath))
+            return GetDirectorySize(libFileLogPath, logginDir: true);
+        if(libFileLogPath == null || libFileLogPath.Contains(logPath))
             return GetDirectorySize(logPath, logginDir: true);
-        long logPathLength = GetDirectorySize(logPath);
-        long libFileLogPathLength = GetDirectorySize(libFileLogPath);
+        long logPathLength = GetDirectorySize(logPath, true);
+        long libFileLogPathLength = GetDirectorySize(libFileLogPath, true);
         return logPathLength + libFileLogPathLength;
     }
     
@@ -141,28 +143,41 @@ public class SystemMonitor:Worker
     private long GetDirectorySize(string path, bool logginDir = false)
     {
         long size = 0;
-        if (string.IsNullOrEmpty(path) == false)
+        try
         {
-            try
+            if (string.IsNullOrEmpty(path) == false)
             {
-                var dir = new DirectoryInfo(path);
-                if (dir.Exists)
-                    size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        lock (NodeStatistics)
-        {
-            foreach (var nts in NodeStatistics.Values)
-            {
-                if (nts.RecordedAt > DateTime.Now.AddMinutes(-5))
+                try
                 {
-                    size += logginDir ? nts.LogDirectorySize : nts.TemporaryDirectorySize;
+                    var dir = new DirectoryInfo(path);
+                    if (dir.Exists)
+                        size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+                }
+                catch (Exception)
+                {
                 }
             }
+
+            Logger.Instance.DLog(
+                $"Getting directory size {(logginDir ? "(LOGGING DIR)" : "(TEMP DIR)")} '{path}': {Humanize(size)}");
+
+            lock (NodeStatistics)
+            {
+                foreach (var nts in NodeStatistics.Values)
+                {
+                    if (nts.RecordedAt > DateTime.Now.AddMinutes(-5))
+                    {
+                        var npath = logginDir ? nts.LogDirectorySize : nts.TemporaryDirectorySize;
+                        Logger.Instance.DLog(
+                            $"Getting node '{nts.Uid}' size {(logginDir ? "(LOGGING DIR)" : "(TEMP DIR)")} '{npath.Path}': {Humanize(npath.Size)}");
+                        size += npath.Size;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.WLog($"Failed reading directory '{path} size: " + ex.Message);
         }
 
         return size;
@@ -182,6 +197,19 @@ public class SystemMonitor:Worker
             else
                 NodeStatistics.Add(args.Uid, args);
         }
+    }
+
+    private string Humanize(long bytes)
+    {
+        var sizes = new string[] { "B", "KB", "MB", "GB", "TB" };
+
+        var order = 0;
+        decimal num = bytes;
+        while (num >= 1000 && order < sizes.Length - 1) {
+            order++;
+            num /= 1000;
+        }
+        return num.ToString("0.##") + ' ' + sizes[order];
     }
 }
 

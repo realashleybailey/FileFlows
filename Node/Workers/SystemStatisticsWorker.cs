@@ -3,6 +3,7 @@ using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Node.Workers;
 
@@ -31,29 +32,29 @@ public class SystemStatisticsWorker:Worker
                 return;
         }
         
-        var storage = GetTempStorageSize().Result;
+        var tempStorage = GetTempStorageSize();
         var logStorage = GetLogStorageSize();
         new SystemService().RecordNodeSystemStatistics(new()
         {
             Uid = processingNode.Uid,
-            TemporaryDirectorySize = storage,
+            TemporaryDirectorySize = tempStorage,
             LogDirectorySize = logStorage
         }).Wait();
     }
 
-    private async Task<long> GetTempStorageSize()
+    private DirectorySize GetTempStorageSize()
     {
         var tempPath = processingNode?.TempPath;
         return GetDirectorySize(tempPath);
     }
 
-    private long GetLogStorageSize()
+    private DirectorySize GetLogStorageSize()
     {
         string path = DirectoryHelper.LoggingDirectory;
-        return GetDirectorySize(path);
+        return GetDirectorySize(path, pattern: "*.log");
     }
     
-    private long GetDirectorySize(string path)
+    private DirectorySize GetDirectorySize(string path, string pattern = "*.*")
     {
         long size = 0;
         if (string.IsNullOrEmpty(path) == false)
@@ -62,14 +63,20 @@ public class SystemStatisticsWorker:Worker
             {
                 var dir = new DirectoryInfo(path);
                 if (dir.Exists)
-                    size = dir.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(x => x.Length);
+                {
+                    size = dir.EnumerateFiles(pattern, SearchOption.AllDirectories).Sum(x => x.Length);
+                    Logger.Instance.DLog($"Directory '{dir.FullName} size: " + size);
+                }
             }
             catch (Exception)
             {
             }
         }
 
-
-        return size;
+        return new()
+        {
+            Path = path,
+            Size = size
+        };
     }
 }

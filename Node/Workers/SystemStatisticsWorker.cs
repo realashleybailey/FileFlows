@@ -2,6 +2,7 @@ using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
+using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using Microsoft.Extensions.Logging;
 
@@ -65,7 +66,7 @@ public class SystemStatisticsWorker:Worker
                 if (dir.Exists)
                 {
                     size = dir.EnumerateFiles(pattern, SearchOption.AllDirectories).Sum(x => x.Length);
-                    Logger.Instance.DLog($"Directory '{dir.FullName} size: " + size);
+                    Logger.Instance.DLog($"Directory '{dir.FullName} size: " + FileSizeHelper.Humanize(size));
                 }
             }
             catch (Exception)

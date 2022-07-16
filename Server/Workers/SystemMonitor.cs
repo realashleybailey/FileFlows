@@ -5,6 +5,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
+using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using JsonSerializer = Jint.Native.Json.JsonSerializer;
 
@@ -159,7 +160,7 @@ public class SystemMonitor:Worker
             }
 
             Logger.Instance.DLog(
-                $"Getting directory size {(logginDir ? "(LOGGING DIR)" : "(TEMP DIR)")} '{path}': {Humanize(size)}");
+                $"Getting directory size {(logginDir ? "(LOGGING DIR)" : "(TEMP DIR)")} '{path}': {FileSizeHelper.Humanize(size)}");
 
             lock (NodeStatistics)
             {
@@ -169,7 +170,7 @@ public class SystemMonitor:Worker
                     {
                         var npath = logginDir ? nts.LogDirectorySize : nts.TemporaryDirectorySize;
                         Logger.Instance.DLog(
-                            $"Getting node '{nts.Uid}' size {(logginDir ? "(LOGGING DIR)" : "(TEMP DIR)")} '{npath.Path}': {Humanize(npath.Size)}");
+                            $"Getting node '{nts.Uid}' size {(logginDir ? "(LOGGING DIR)" : "(TEMP DIR)")} '{npath.Path}': {FileSizeHelper.Humanize(npath.Size)}");
                         size += npath.Size;
                     }
                 }
@@ -197,19 +198,6 @@ public class SystemMonitor:Worker
             else
                 NodeStatistics.Add(args.Uid, args);
         }
-    }
-
-    private string Humanize(long bytes)
-    {
-        var sizes = new string[] { "B", "KB", "MB", "GB", "TB" };
-
-        var order = 0;
-        decimal num = bytes;
-        while (num >= 1000 && order < sizes.Length - 1) {
-            order++;
-            num /= 1000;
-        }
-        return num.ToString("0.##") + ' ' + sizes[order];
     }
 }
 

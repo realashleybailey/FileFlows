@@ -231,7 +231,7 @@ class FFChart {
     }
     getHeight() {
         let chartDiv = this.ele.querySelector('.content');
-        return chartDiv.clientHeight - this.chartBottomPad;
+        return chartDiv.clientHeight - this.chartBottomPad - 10;
     }
 
     dashboardElementResized(event) {

@@ -154,14 +154,16 @@ function addWidget(dashboard, p, csharp){
     });
 
     let content = document.createElement('div');
-    content.className = 'content';
+    content.className = 'content wt' + p.type;
     div.appendChild(content);
     if(p.type === 105){
         let top = document.createElement('div');
         top.setAttribute('id', p.uid + '-top');
+        top.className = 'top';
         content.appendChild(top);
 
         let bottom = document.createElement('div');
+        bottom.className = 'bottom';
         bottom.setAttribute('id', p.uid + '-bottom');
         content.appendChild(bottom);
     }
@@ -646,7 +648,7 @@ export class TimeSeriesChart extends FFChart
     
     getBottomHeight(){
         let height = this.getHeight();
-        return height > 200 ? 50 : 30;
+        return height > 200 ? 30 : 18;
     }
 
     async getData() {

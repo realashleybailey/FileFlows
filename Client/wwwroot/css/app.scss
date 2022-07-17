@@ -409,9 +409,16 @@ input[type=file]{
         height:calc(100% - 3rem);
         padding-left: 0.25rem;
         width: calc(100% - 0.25rem);
-        > div {
+        &:not(.wt105) > div {
             max-height: 100%;
             height: 100%;
+        }
+        &.wt105 {
+            display:flex;
+            flex-direction: column;
+            .top {
+                flex-grow: 1;
+            }            
         }
         
         table {

@@ -3,7 +3,7 @@ namespace FileFlows.Shared.Models;
 /// <summary>
 /// A revisioned object is a saved state of a object
 /// </summary>
-public class RevisionedObject 
+public class RevisionedObject : IUniqueObject<Guid>
 {
     /// <summary>
     /// Gets or sets the UID of the item

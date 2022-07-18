@@ -416,6 +416,9 @@
         "Elements": "Nodes"
       }
     },
+    "Revisions":{
+      "Title":"Revisions"
+    },
     "Scripts":{
       "Title":"Scripts",
       "Messages": {

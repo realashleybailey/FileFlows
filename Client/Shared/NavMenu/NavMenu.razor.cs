@@ -77,6 +77,7 @@ public partial class NavMenu
                 new ("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                 new ("Pages.Tools.Title", "fas fa-tools", "tools"),
                 new ("Pages.Settings.Title", "fas fa-cogs", "settings"),
+                App.Instance.FileFlowsSystem.Licensed ? new ("Pages.Revisions.Title", "fas fa-history", "revisions") : null
             }
         });
 

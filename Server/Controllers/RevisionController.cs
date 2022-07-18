@@ -29,10 +29,25 @@ public class RevisionController:Controller
         return data.ToArray();
     }
     
-    
+    /// <summary>
+    /// Get latest revisions for all objects
+    /// </summary>
+    /// <returns>A list of latest revisions for all objects</returns>
+    [HttpGet("list")]
+    public async Task<IEnumerable<RevisionedObject>> ListAll()
+    {
+        if (LicenseHelper.IsLicensed() == false)
+            return new RevisionedObject[] { };
+        
+        var manager = DbHelper.GetDbManager();
+        using var db = await manager.GetDb();
+        var data = await db.Db.FetchAsync<RevisionedObject>(
+            "select distinct RevisionUid, Uid, RevisionType, RevisionName, RevisionDate from RevisionedObject group by RevisionUid order by RevisionType, RevisionName");
+        return data.ToArray();
+    }
 
     /// <summary>
-    /// Gets a specific reviosion
+    /// Gets a specific revision
     /// </summary>
     /// <param name="uid">The UID of the object</param>
     /// <param name="revisionUid">the UID of the revision</param>

@@ -2,6 +2,7 @@ using FileFlows.Client.Components;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components.Common;
+using Humanizer;
 
 namespace FileFlows.Client.Pages;
 
@@ -207,12 +208,31 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         var selected = items.First();
         if (selected == null)
             return;
-        if (selected.Uid is Guid guid)
-        {
-            bool changed = await RevisionExplorer.Instance.Show(guid, "Revisions");
-            if (changed)
-                await Load(selected.Uid);
-        }
+        Guid guid = Guid.Empty;
+        if (selected is RevisionedObject ro)
+            guid = ro.RevisionUid;
+        else if (selected.Uid is Guid sGuid)
+            guid = sGuid;
+        else
+            return;
+        
+        bool changed = await RevisionExplorer.Instance.Show(guid, "Revisions");
+        if (changed)
+            await Load(selected.Uid);
+    }
+    
+    
+    /// <summary>
+    /// Humanizes a date, eg 11 hours ago
+    /// </summary>
+    /// <param name="date">the date</param>
+    /// <returns>the humanized date</returns>
+    protected string DateString(DateTime? date)
+    {
+        if (date == null) return string.Empty;
+        var localDate = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, date.Value.Hour,
+            date.Value.Minute, date.Value.Second);
+        return localDate.ToUniversalTime().Humanize();
     }
 
 }

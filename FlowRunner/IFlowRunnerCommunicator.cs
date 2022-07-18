@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using FileFlows.Shared;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace FileFlows.FlowRunner;
 
@@ -131,10 +132,14 @@ public class FlowRunnerCommunicator : IFlowRunnerCommunicator
     {
         try
         {
-            return await connection.InvokeAsync<bool>("Hello", runnerUid, LibraryFileUid);
+            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, LibraryFileUid);
+            if(helloResult == false)
+                Logger.Instance.WLog("Received a false from the hello request to the server");
+            return helloResult;
         }
-        catch(Exception)
+        catch(Exception ex)
         {
+            Logger.Instance.ELog("Failed to send hello to server: " + ex.Message);
             return false;
         }
     }

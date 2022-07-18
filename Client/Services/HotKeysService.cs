@@ -53,7 +53,9 @@ namespace FileFlows.Client.Services
             Logger.Instance.ILog("Hot keys registered: " + RegisteredHotKeys.Count);
             if (RegisteredHotKeys.Any() == false)
                 return;
-            foreach(var rhk in RegisteredHotKeys)
+            var list = RegisteredHotKeys.Select(x => x).ToList();
+            list.Reverse();
+            foreach(var rhk in list)
             {
                 if (rhk.Key.ToLower() != hotkey.Key.ToLower())
                     continue;
@@ -66,6 +68,7 @@ namespace FileFlows.Client.Services
                 try
                 {
                     rhk?.Callback();
+                    break;
                 }
                 catch (Exception) { }
             }

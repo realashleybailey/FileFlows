@@ -5,6 +5,7 @@ using FileFlows.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 
 namespace FileFlows.FlowRunner
@@ -19,6 +20,7 @@ namespace FileFlows.FlowRunner
         public static void Main(string[] args)
         {
             int exitCode = 0;
+            ServicePointManager.DefaultConnectionLimit = 50;
             try
             {
                 args ??= new string[] { };

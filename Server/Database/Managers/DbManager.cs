@@ -1,6 +1,7 @@
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
@@ -83,7 +84,7 @@ public abstract class DbManager
     /// Get an instance of the IDatabase
     /// </summary>
     /// <returns>an instance of the IDatabase</returns>
-    protected async Task<FlowDbConnection> GetDb()
+    internal async Task<FlowDbConnection> GetDb()
     {
         if (UseMemoryCache)
             return await FlowDbConnection.Get(GetDbInstance);
@@ -444,6 +445,21 @@ public abstract class DbManager
     }
 
     /// <summary>
+    /// Select a single DbObject
+    /// </summary>
+    /// <param name="uid">The UID of the object</param>
+    /// <returns>a single instance</returns>
+    internal virtual async Task<DbObject> SingleDbo(Guid uid)
+    {
+        DbObject dbObject;
+        using (var db = await GetDb())
+        {
+            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Uid=@0", uid);
+        }
+        return dbObject;
+    }
+    
+    /// <summary>
     /// Selects a single instance
     /// </summary>
     /// <param name="uid">the UID of the item to select</param>
@@ -497,12 +513,14 @@ public abstract class DbManager
         };
         // need to case obj to (ViObject) here so the DataConverter is used
         string json = JsonSerializer.Serialize((FileFlowObject)obj, serializerOptions);
+        bool changed = false;
 
         var type = obj.GetType();
         obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
         var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid);
         if (dbObject == null)
         {
+            changed = true;
             if(obj.Uid == Guid.Empty)
                 obj.Uid = Guid.NewGuid();
             obj.DateCreated = DateTime.Now;
@@ -523,18 +541,73 @@ public abstract class DbManager
         else
         {
             obj.DateModified = DateTime.Now;
+            if (dbObject.Name != obj.Name)
+                changed = true;
+            if (DataHasChanged(dbObject.Type, dbObject.Data, json))
+                changed = true;
             dbObject.Name = obj.Name;
             dbObject.DateModified = obj.DateModified;
             dbObject.Data = json;
             await db.UpdateAsync(dbObject);
         }
 
+        if (changed && (dbObject.Type != typeof(LibraryFile).FullName && dbObject.Type != typeof(PluginInfo).FullName))
+            await RevisionController.SaveRevision(dbObject);
+
         if (UseMemoryCache == false)
             return await Single<T>(dbObject.Uid);//return await Single<T>(Guid.Parse(dbObject.Uid));
         
         return obj;
     }
+
     
+    /// <summary>
+    /// Adds or updates a DbObject directly in the database
+    /// Note: NO revision will be saved
+    /// </summary>
+    /// <param name="dbObject">the object to add or update</param>
+    internal async Task AddOrUpdateDbo(DbObject dbObject)
+    {
+        using var db = await GetDb();
+        bool updated = await db.Db.UpdateAsync(dbObject) > 0;
+        if (updated)
+            return;
+        await db.Db.InsertAsync(dbObject);
+    }
+    /// <summary>
+    /// Tests if the data has changed
+    /// </summary>
+    /// <param name="type">the type of object</param>
+    /// <param name="origJson">the original json</param>
+    /// <param name="newJson">the new json</param>
+    /// <returns>true if the data has changed</returns>
+    private bool DataHasChanged(string type, string origJson, string newJson)
+    {
+        // filter out some properties that do not trigger a change
+        List<string> ignored = new();
+        if (type == typeof(Library).FullName)
+        {
+            ignored.Add(nameof(Library.LastScanned));
+            ignored.Add(nameof(Library.LastScannedAgo));
+        }
+        else if (type == typeof(ProcessingNode).FullName)
+        {
+            ignored.Add(nameof(ProcessingNode.LastSeen));
+            ignored.Add(nameof(ProcessingNode.Version));
+            ignored.Add(nameof(ProcessingNode.OperatingSystem));
+            ignored.Add(nameof(ProcessingNode.SignalrUrl));
+        }
+
+        foreach (string prop in ignored)
+        {
+            Regex rgx = new Regex($",\"{prop}\":\"[^\"]+\"");
+            origJson = rgx.Replace(origJson, string.Empty);
+            newJson = rgx.Replace(newJson, string.Empty);
+        }
+
+        return origJson != newJson;
+    }
+
 
     /// <summary>
     /// Updates the last modified date of an object

@@ -40,6 +40,13 @@
 
 <Editor @ref="Editor"></Editor>
 
+@if (Blocker != null)
+{
+    <CascadingValue Value="Blocker" IsFixed="true">
+        <RevisionExplorer/>
+    </CascadingValue>
+}
+
 <FileFlows.Client.Components.Dialogs.Confirm />
 <FileFlows.Client.Components.Dialogs.Prompt />
 <FileFlows.Client.Components.Dialogs.PausePrompt />

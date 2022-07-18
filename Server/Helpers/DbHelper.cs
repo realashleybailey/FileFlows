@@ -93,6 +93,13 @@ public class DbHelper
         => Manager.Single<T>();
 
     /// <summary>
+    /// Select a single DbObject
+    /// </summary>
+    /// <param name="uid">The UID of the object</param>
+    /// <returns>a single instance</returns>
+    internal static Task<DbObject> SingleDbo(Guid uid) => Manager.SingleDbo(uid);
+    
+    /// <summary>
     /// Selects a single instance
     /// </summary>
     /// <param name="uid">the UID of the item to select</param>

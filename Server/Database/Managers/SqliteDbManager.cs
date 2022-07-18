@@ -32,6 +32,17 @@ public class SqliteDbManager : DbManager
             NumberValue     REAL               NOT NULL
         );
 ";
+    internal readonly string CreateDbRevisionedObjectTableScript = @$"
+        CREATE TABLE {nameof(RevisionedObject)}(
+            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
+            RevisionUid     VARCHAR(36)        NOT NULL,
+            RevisionName    VARCHAR(1024)      NOT NULL,
+            RevisionType    VARCHAR(255)       NOT NULL,
+            RevisionDate    datetime           default           current_timestamp,
+            RevisionCreated datetime           default           current_timestamp,
+            RevisionData    TEXT               NOT NULL
+        );
+";
     
     /// <summary>
     /// Constructs a new Sqlite Database Manager
@@ -135,7 +146,8 @@ public class SqliteDbManager : DbManager
             foreach (var tbl in new[]
                      {
                          (nameof(DbObject), CreateDbObjectTableScript),
-                         (nameof(DbStatistic), CreateDbStaticTableScript: CreateDbStatisticTableScript)
+                         (nameof(DbStatistic), CreateDbStaticTableScript: CreateDbStatisticTableScript),
+                         (nameof(RevisionedObject), CreateDbRevisionedObjectTableScript),
                      })
             {
                 using var cmdExists =

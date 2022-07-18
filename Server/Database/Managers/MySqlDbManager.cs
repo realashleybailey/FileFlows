@@ -39,6 +39,18 @@ public class MySqlDbManager: DbManager
             NumberValue     double             NOT NULL
         );
 ";
+    internal readonly string CreateDbRevisionedObjectTableScript = @$"
+        CREATE TABLE {nameof(RevisionedObject)}(
+            Uid             VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
+            RevisionUid     VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL,
+            RevisionName    VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
+            RevisionType    VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
+            RevisionDate    datetime           default           now(),
+            RevisionCreated datetime           default           now(),
+            RevisionData    MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
+        );
+";
+    
     /// <summary>
     /// Creates an instance of a MySqlDbManager
     /// </summary>
@@ -104,6 +116,7 @@ public class MySqlDbManager: DbManager
         // createDbSql = createDbSql.Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         db.Execute(CreateMySqlDbScript);
+        db.Execute(CreateDbRevisionedObjectTableScript);
 
         db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Type ON {nameof(DbObject)}(Type)");
         db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");

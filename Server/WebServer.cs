@@ -49,7 +49,6 @@ public class WebServer
             options.JsonSerializerOptions.PropertyNamingPolicy = null;
             options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault | System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
         });
-
         builder.Services.AddMvc();
         builder.Services.AddSwaggerGen(c =>
         {

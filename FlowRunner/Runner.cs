@@ -383,7 +383,7 @@ public class Runner
                 StepChanged(step, CurrentNode.Name);
 
                 nodeParameters.Logger?.ILog(new string('=', 70));
-                nodeParameters.Logger?.ILog($"Executing Node {(Info.LibraryFile.ExecutedNodes.Count + 1)}: {part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name}");
+                nodeParameters.Logger?.ILog($"Executing Node {(Info.LibraryFile.ExecutedNodes.Count + 1)}: {part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name} [{part.GetType().FullName}]");
                 nodeParameters.Logger?.ILog(new string('=', 70));
 
                 gotoFlow = null; // clear it, incase this node requests going to a different flow

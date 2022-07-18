@@ -197,4 +197,20 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         await Task.CompletedTask;
     }
 
+    protected async Task Revisions()
+    {
+        var items = Table.GetSelected();
+        if (items?.Any() != true)
+            return;
+        var selected = items.First();
+        if (selected == null)
+            return;
+        if (selected.Uid is Guid guid)
+        {
+            bool changed = await RevisionExplorer.Instance.Show(guid, "Revisions");
+            if (changed)
+                await Refresh();
+        }
+    }
+
 }

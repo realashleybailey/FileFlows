@@ -1,0 +1,46 @@
+@namespace FileFlows.Client.Components
+
+
+@if (Visible)
+{
+    <div class="revision-explorer-wrapper">
+        <div class="background-overlay"></div>
+        <div class="revision-explorer">
+
+            <ViContainer Title="@Title" Icon="fas fa-history" FullWidth=@true AlwaysShowTitle=@true>
+
+                <Head>
+                    <button @onclick=@Close>@lblClose</button>
+                </Head>
+
+                <Body>
+                <FlowTable @ref=Table TItem="RevisionedObject" Selection="SelectionMode.Single" Data=@Revisions>
+                    <ToolBar>
+                        <FlowTableButton TItem="RevisionedObject" Clicked=Restore SelectedOne="true" Icon="fas fa-check" Label="Labels.Restore"/>
+                    </ToolBar>
+
+                    <Columns>
+                        <FlowTableColumn TItem="RevisionedObject" Width="14rem">
+                            <Header>
+                                Date
+                            </Header>
+                            <Cell Context="item">
+                                <span>@item.RevisionDate.ToString("h:mm:ss tt, d MMMM yyyy")</span>
+                            </Cell>
+                        </FlowTableColumn>
+                        <FlowTableColumn TItem="RevisionedObject">
+                            <Header>
+                                Name
+                            </Header>
+                            <Cell Context="item">
+                                <span>@item.RevisionName</span>
+                            </Cell>
+                        </FlowTableColumn>
+                    </Columns>
+                </FlowTable>
+                </Body>
+            </ViContainer>
+        </div>
+
+    </div>
+}

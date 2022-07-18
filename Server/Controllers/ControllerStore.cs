@@ -14,7 +14,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
 {
     protected static Dictionary<Guid, T> _Data;
     protected static SemaphoreSlim _mutex = new SemaphoreSlim(1);
-
+    
     protected async Task<IEnumerable<string>> GetNames(Guid? uid = null)
     {
         if (DbHelper.UseMemoryCache)

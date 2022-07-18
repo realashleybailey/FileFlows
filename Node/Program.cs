@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Avalonia;
 using FileFlows.Node.Ui;
@@ -33,6 +34,7 @@ public class Program
             return;
         }
         Shared.Helpers.HttpHelper.Client = new HttpClient();
+        ServicePointManager.DefaultConnectionLimit = 50;
 
         var options = CommandLineOptions.Parse(args);
         if (Globals.IsLinux && options.InstallService)

@@ -163,8 +163,7 @@ public partial class Libraries : ListPage<Guid, Library>
             this.StateHasChanged();
         }
     }
-    
-    
+
     public override async Task Delete()
     {
 #if (!DEMO)

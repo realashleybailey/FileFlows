@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Net;
 using System.Reflection;
 using Avalonia;
 using FileFlows.Plugin;
@@ -63,6 +64,7 @@ public class Program
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "server-upgrade.sh"));
 
+            ServicePointManager.DefaultConnectionLimit = 50;
 
             InitializeLoggers();
 

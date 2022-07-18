@@ -15,11 +15,13 @@
             DoubleClick="@DoubleClick">
             <ToolBar>            
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
-                <FlowTableButton TItem="PluginInfoModel" Clicked=AboutAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.About" />                
-                <FlowTableButton TItem="PluginInfoModel" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />                
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
-                <FlowTableButton TItem="PluginInfoModel" Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy" />   
+                <FlowTableButtonSeparator />                    
+                <FlowTableButton TItem="PluginInfoModel" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />
+                <FlowTableButton TItem="PluginInfoModel" Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy" />
+                <FlowTableButtonSeparator />    
+                <FlowTableButton TItem="PluginInfoModel" Clicked=AboutAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.About" />                
                 <FlowTableHelpButton TItem="PluginInfoModel" HelpUrl="plugins" />
             </ToolBar>
 

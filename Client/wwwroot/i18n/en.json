@@ -30,6 +30,7 @@
     "Import": "Import",
     "Browse": "Browse",
     "Rescan": "Rescan",
+    "Revisions":"Revisions",
     "Restore":"Restore",
     "RestoredMessage":"{type} restored",
     "RestoredFailedMessage":"Failed to restore {type}",

@@ -19,6 +19,9 @@ public class RevisionController:Controller
     [HttpGet("{uid}")]
     public async Task<IEnumerable<RevisionedObject>> GetAll([FromRoute] Guid uid)
     {
+        if (LicenseHelper.IsLicensed() == false)
+            return new RevisionedObject[] { };
+        
         var manager = DbHelper.GetDbManager();
         using var db = await manager.GetDb();
         var data = await db.Db.FetchAsync<RevisionedObject>(
@@ -37,6 +40,8 @@ public class RevisionController:Controller
     [HttpGet("{uid}/revision/{revisionUid}")]
     public async Task<RevisionedObject> GetRevision([FromRoute] Guid uid, [FromRoute] Guid revisionUid)
     {
+        if (LicenseHelper.IsLicensed() == false)
+            return null;
         var manager = DbHelper.GetDbManager();
         using var db = await manager.GetDb();
         var data = await db.Db.SingleAsync<RevisionedObject>("select * from RevisionedObject where RevisionUid = @0 and Uid = @1", uid, revisionUid);
@@ -51,6 +56,9 @@ public class RevisionController:Controller
     [HttpPut("{uid}/restore/{revisionUid}")]
     public async Task Restore([FromRoute] Guid uid, [FromRoute] Guid revisionUid)
     {
+        if (LicenseHelper.IsLicensed() == false)
+            return;
+        
         var revision = await GetRevision(uid, revisionUid);
         if (revision == null)
             throw new Exception("Revision not found");
@@ -70,7 +78,10 @@ public class RevisionController:Controller
         if (DbHelper.UseMemoryCache)
         {
             // sqlite.. have to update any in memory objects...
-            
+            if (dbo.Type == typeof(Library).FullName)
+                await new LibraryController().Refresh(dbo);
+            else if (dbo.Type == typeof(Flow).FullName)
+                await new FlowController().Refresh(dbo);
         }
     }
     
@@ -99,6 +110,9 @@ public class RevisionController:Controller
     /// <param name="dbo">the DbObject to save a revision of</param>
     internal static async Task SaveRevision(DbObject dbo)
     {
+        if (LicenseHelper.IsLicensed() == false)
+            return;
+        
         var ro = From(dbo);
         await Save(ro);
     }

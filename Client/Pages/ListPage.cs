@@ -75,14 +75,16 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
                 this.Data = result.Data;
                 if (Table != null)
                 {
-                    Table.Data = this.Data;
-                    if (selectedUid != null && selectedUid.Equals(default(U)) == false)
+                    Table.SetData(this.Data);
+                    var item = this.Data.Where(x => x.Uid.Equals(selectedUid)).FirstOrDefault();
+                    if (item != null)
                     {
-                        int index = result.Data.FindIndex(x => x.Uid.Equals(selectedUid));
-                        if (index >= 0)
+                        _ = Task.Run(async () =>
                         {
-                            this.Table.SetSelectedIndex(index);
-                        }
+                            // need a delay here since setdata and the inner works of FlowTable will clear this without it
+                            await Task.Delay(50);
+                            Table.SelectItem(item);
+                        });
                     }
                 }
             }
@@ -209,7 +211,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         {
             bool changed = await RevisionExplorer.Instance.Show(guid, "Revisions");
             if (changed)
-                await Refresh();
+                await Load(selected.Uid);
         }
     }
 

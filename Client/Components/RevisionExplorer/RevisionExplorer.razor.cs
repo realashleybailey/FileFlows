@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using FileFlows.Client.Components.Common;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
 namespace FileFlows.Client.Components;
@@ -43,6 +44,7 @@ public partial class RevisionExplorer
                 Restored = true;
                 Toast.ShowSuccess(Translater.Instant("Labels.RestoredMessage",
                     new { type = item.RevisionType[(item.RevisionType.LastIndexOf(".") + 1)..].Humanize(LetterCasing.Title) }));
+                this.Close();
             }
             else
             {

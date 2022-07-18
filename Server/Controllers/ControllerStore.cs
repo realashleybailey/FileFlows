@@ -180,4 +180,38 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
 
         await DbHelper.UpdateLastModified(uid);
     }
+    
+    
+
+    /// <summary>
+    /// Refreshes a object from the DbObject
+    /// Called by the revision controller when a revision is restored
+    /// </summary>
+    /// <param name="dbo">the DbObject</param>
+    internal async Task Refresh(DbObject dbo)
+    {
+        if (DbHelper.UseMemoryCache == false)
+            return;
+        var to = DbHelper.GetDbManager().ConvertFromDbObject<T>(dbo);
+        
+        await _mutex.WaitAsync();
+
+        try
+        {
+            if (_Data.ContainsKey(dbo.Uid))
+            {
+                // update it
+                _Data[dbo.Uid] = to;
+            }
+            else
+            {
+                // insert it
+                _Data.Add(dbo.Uid, to);
+            }
+        }
+        finally
+        {
+            _mutex.Release();
+        }
+    }
 }

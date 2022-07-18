@@ -11,6 +11,15 @@
   white-space: nowrap;
   overflow: hidden;
 }
+.flowtable-toolbar ::deep .flow-table-button-separator {
+  border-left: 1px solid var(--border-color);
+  height: 1rem;
+  display: inline-block;
+  position: relative;
+  top: 4px;
+  width: 1px;
+  margin: 0 0.25rem;
+}
 .flowtable-toolbar .flowtable-toolbar-filter {
   width: 16rem;
   position: relative;

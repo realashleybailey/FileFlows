@@ -42,13 +42,16 @@
 
         @if (SelectedStatus == FileStatus.Unprocessed)
         {
+            <FlowTableButtonSeparator />    
             <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop"/>
             <FlowTableButton TItem="LibaryFileListModel" Clicked=Rescan Icon="fas fa-search-plus" Label="Labels.Rescan" />
         }
         else if (SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
         {
+            <FlowTableButtonSeparator />    
             <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess"/>
         }
+        <FlowTableButtonSeparator />    
         <FlowTableHelpButton TItem="LibaryFileListModel" HelpUrl="library-files"/>
     </ToolBar>
 

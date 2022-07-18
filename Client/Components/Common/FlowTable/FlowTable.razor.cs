@@ -20,26 +20,47 @@ namespace FileFlows.Client.Components.Common
         private Dictionary<TItem, string> DataDictionary;
         private List<TItem> _Data;
         [Parameter]
-        public List<TItem> Data // the original data, not filterd
+        public List<TItem> Data // the original data, not filtered
         {
             get => this._Data;
             set
             {
                 if (this._Data == value)
                     return;
-                this._FilterText = string.Empty;
-                this._Data = value ?? new();
-                var jsonOptions = new System.Text.Json.JsonSerializerOptions()
-                {   
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                };
-                this.DataDictionary = this._Data.ToDictionary(x => x, x =>
-                {
-                    string result = JsonSerializer.Serialize(x, jsonOptions);  
-                    return result.ToLowerExplicit();
-                });
-                FilterData();
+                SetData(value);
             }
+        }
+
+        public void SetData(List<TItem> value, bool clearSelected = true)
+        {
+            this._FilterText = string.Empty;
+            this._Data = value ?? new();
+            var jsonOptions = new System.Text.Json.JsonSerializerOptions()
+            {   
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            this.DataDictionary = this._Data.ToDictionary(x => x, x =>
+            {
+                string result = JsonSerializer.Serialize(x, jsonOptions);  
+                return result.ToLowerExplicit();
+            });
+            FilterData(clearSelected : clearSelected);
+            
+            // need to reselect the items here!
+            var keys = this.SelectedItems.Select(x =>
+            {
+                if (x is IUniqueObject<Guid> unique)
+                    return unique.Uid as Guid?;
+                return null;
+            }).Where(x => x != null).Select(x => x.Value).ToList();
+            
+            var selection = this.Data.Where(x =>
+            {
+                if (x is IUniqueObject<Guid> unique && keys.Contains(unique.Uid))
+                    return true;
+                return false;
+            }).ToList();
+            this.SelectedItems.AddRange(selection);
         }
 
         [Parameter]
@@ -131,7 +152,7 @@ namespace FileFlows.Client.Components.Common
             this.NotifySelectionChanged();
         }
 
-        internal void SetSelectedIndex(int index)
+        internal async Task SetSelectedIndex(int index)
         {
             if (index < 0 || index > this.Data.Count - 1)
                 return;
@@ -141,6 +162,17 @@ namespace FileFlows.Client.Components.Common
                 this.SelectedItems.Add(item);
                 this.NotifySelectionChanged();
             }
+        }
+
+        /// <summary>
+        /// Selects a single item
+        /// </summary>
+        /// <param name="item">the item to select</param>
+        internal void SelectItem(TItem item)
+        {
+            this.SelectedItems.Clear();
+            this.SelectedItems.Add(item);
+            this.StateHasChanged();
         }
 
         /// <summary>
@@ -174,7 +206,6 @@ namespace FileFlows.Client.Components.Common
                 this.NotifySelectionChanged();
             }
             string filter = this.FilterText.ToLowerExplicit();
-            Logger.Instance.ILog("Filter: " + filter);
             if (filter == string.Empty)
                 this.DisplayData = this.DataDictionary;
             else if (filter.StartsWith(CurrentFilter))

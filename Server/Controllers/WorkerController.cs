@@ -136,13 +136,13 @@ public class WorkerController : Controller
         if (info.LibraryFile != null)
         {
             var lfController = new LibraryFileController();
-            var existing = lfController.Get(info.LibraryFile.Uid).Result;
+            var existing = lfController.GetCached(info.LibraryFile.Uid).Result;
             if (existing != null)
             {
                 bool recentUpdate = existing.DateModified > DateTime.Now.AddSeconds(-10);
                 if ((existing.Status == FileStatus.ProcessingFailed && info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
                 {
-                    existing = lfController.Update(info.LibraryFile).Result; // incase the status of the library file has changed                        
+                    existing = lfController.Update(info.LibraryFile).Result; // in case the status of the library file has changed                        
                 }
 
                 if (existing.Status == FileStatus.ProcessingFailed || existing.Status == FileStatus.Processed)

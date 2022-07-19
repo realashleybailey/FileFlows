@@ -4,6 +4,7 @@ using FileFlows.Shared.Models;
 using FileFlows.Plugin;
 using FileFlows.Shared.Formatters;
 using FileFlows.ServerShared.Models;
+using FileFlows.Shared.Helpers;
 
 namespace FileFlows.Server.Controllers;
 
@@ -13,6 +14,8 @@ namespace FileFlows.Server.Controllers;
 [Route("/api/library-file")]
 public class LibraryFileController : ControllerStore<LibraryFile>
 {
+
+    private static CacheStore CacheStore = new();
 
     /// <summary>
     /// Gets the next library file for processing, and puts it into progress
@@ -497,6 +500,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     public async Task<LibraryFile> Get(Guid uid)
     {
         var result = await GetByUid(uid);
+        if(DbHelper.UseMemoryCache == false && result != null)
+            CacheStore.Store(result.Uid, result);
         if(result != null && (result.Status == FileStatus.ProcessingFailed || result.Status == FileStatus.Processed))
         {
             if (LibraryFileLogHelper.HtmlLogExists(uid))
@@ -541,7 +546,12 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;
         existing.ExecutedNodes = file.ExecutedNodes ?? new List<ExecutedNode>();
-        return await base.Update(existing);
+        var updated = await base.Update(existing);
+        
+        if(DbHelper.UseMemoryCache == false)
+            CacheStore.Store(updated.Uid, updated);
+        
+        return updated;
     }
 
 
@@ -695,6 +705,12 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
         await DeleteAll(model);
+
+        if (DbHelper.UseMemoryCache == false)
+        {
+            foreach(var uid in model.Uids)
+                CacheStore.Remove(uid);
+        }
     }
 
     /// <summary>
@@ -963,5 +979,28 @@ public class LibraryFileController : ControllerStore<LibraryFile>
             x.DateCreated >= filter.FromDate && x.DateCreated <= filter.ToDate && (string.IsNullOrEmpty(filter.Path) ||
                 x.Name.ToLowerInvariant().Contains(filter.Path.ToLowerInvariant()))).Take(500);
         return results;
+    }
+    
+    
+    
+
+    /// <summary>
+    /// Get a specific library file using cache
+    /// </summary>
+    /// <param name="uid">The UID of the library file</param>
+    /// <returns>the library file instance</returns>
+    internal async Task<LibraryFile> GetCached(Guid uid)
+    {
+        if(DbHelper.UseMemoryCache)
+            return await GetByUid(uid);
+        
+        // using mysql, a little more complicated
+        var cached = CacheStore.Get<LibraryFile>(uid);
+        if (cached == null)
+        {
+            cached = await GetByUid(uid);
+            CacheStore.Store(uid, cached);
+        }
+        return cached;
     }
 }

@@ -548,4 +548,36 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         settings.DbUser = builder["Uid"].ToString();
         settings.DbPassword = builder["Pwd"].ToString();
     }
+
+    private readonly Dictionary<Guid, DateTime> NodeLastSeen = new();
+
+    /// <summary>
+    /// Updates the last seen of a node
+    /// </summary>
+    /// <param name="uid">the UID of the node</param>
+    public override async Task UpdateNodeLastSeen(Guid uid)
+    {
+        lock (NodeLastSeen)
+        {
+            if (NodeLastSeen.ContainsKey(uid))
+            {
+                 if(NodeLastSeen[uid] > DateTime.Now.AddSeconds(-10))
+                     return; // so recent, don't record it
+                 NodeLastSeen[uid] = DateTime.Now;
+            }
+            else
+            {
+                NodeLastSeen.Add(uid, DateTime.Now);
+            }
+        }
+        
+
+        string dt = DateTime.Now.ToString("o"); // same format as json
+        
+        using (var db = await GetDb())
+        {
+            string sql = $"update DbObject set Data = json_set(Data, '$.LastSeen', '{dt}') where Type = 'FileFlows.Shared.Models.ProcessingNode' and Uid = '{uid}'";
+            await db.Db.ExecuteAsync(sql);
+        }
+    }
 }

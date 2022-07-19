@@ -370,9 +370,16 @@ public class NodeController : ControllerStore<ProcessingNode>
     /// <param name="uid">The node to update</param>
     internal async Task UpdateLastSeen(Guid uid)
     {
-        var node = await GetByUid(uid);
-        node.LastSeen = DateTime.Now;
-        await DbHelper.Update(node);
+        if (DbHelper.UseMemoryCache)
+        {
+            var node = await GetByUid(uid);
+            node.LastSeen = DateTime.Now;
+            await DbHelper.Update(node);
+        }
+        else
+        {
+            await DbHelper.UpdateNodeLastSeen(uid);
+        }
     }
 }
 

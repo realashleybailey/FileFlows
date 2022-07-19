@@ -99,7 +99,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         if (useCache == null)
             useCache = DbHelper.UseMemoryCache;
         if(useCache == true)
-            return (await GetData()).Values.ToList();
+            return (await GetData(useCache: true)).Values.ToList();
         return await DbHelper.Select<T>();
     } 
 
@@ -109,7 +109,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
             useCache = DbHelper.UseMemoryCache;
         if(useCache == true)
         {
-            var data = await GetData();
+            var data = await GetData(useCache: true);
             if (data.ContainsKey(uid))
                 return data[uid];
             return default;

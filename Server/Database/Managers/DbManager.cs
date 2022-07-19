@@ -1038,6 +1038,16 @@ public abstract class DbManager
         return result;
     }
     
+    /// <summary>
+    /// Updates the last seen of a node
+    /// </summary>
+    /// <param name="uid">the UID of the node</param>
+    /// <exception cref="NotImplementedException">not implemented yet</exception>
+    public virtual Task UpdateNodeLastSeen(Guid uid)
+    {
+        throw new NotImplementedException();
+    }
+    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

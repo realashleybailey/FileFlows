@@ -315,6 +315,13 @@ public class DbHelper
         int count = await manager.ExecuteScalar<int>("select count(uid) from DbObject where Type = @0", typeof(T).FullName);
         return count > 0;
     }
+
+    /// <summary>
+    /// Updates the last seen of a node
+    /// </summary>
+    /// <param name="uid">the UID of the node</param>
+    public static Task UpdateNodeLastSeen(Guid uid) => Manager.UpdateNodeLastSeen(uid);
+    
 #if (DEBUG)
     /// <summary>
     /// Clean the database and purge old data

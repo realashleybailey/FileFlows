@@ -38,7 +38,7 @@ public class Upgrade0_9_2
     private void AddRevisions()
     {
         var manager = DbHelper.GetDbManager();
-        foreach (string type in new string[] { nameof(Library), nameof(Flow) })
+        foreach (string type in new string[] { nameof(Library), nameof(Flow), nameof(PluginSettingsModel) })
         {
             var dbObjects = manager
                 .Fetch<DbObject>($"select * from DbObject where Type = 'FileFlows.Shared.Models.{type}'").Result;

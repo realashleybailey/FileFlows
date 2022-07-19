@@ -318,7 +318,8 @@
         "Process": "Process",
         "View": "View",
         "MoveToTop": "Move To Top",
-        "Reprocess": "Reprocess"
+        "Reprocess": "Reprocess",
+        "Unhold": "Release"
       }
     },
     "Log": {

@@ -51,6 +51,11 @@
             <FlowTableButtonSeparator />    
             <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess"/>
         }
+        else if (SelectedStatus == FileStatus.OnHold)
+        {
+            <FlowTableButtonSeparator />    
+            <FlowTableButton TItem="LibaryFileListModel" Clicked=Unhold SelectedOneOrMore="true" Icon="fas fa-running" Label="Pages.LibraryFiles.Buttons.Unhold"/>
+        }
         <FlowTableButtonSeparator />    
         <FlowTableHelpButton TItem="LibaryFileListModel" HelpUrl="library-files"/>
     </ToolBar>

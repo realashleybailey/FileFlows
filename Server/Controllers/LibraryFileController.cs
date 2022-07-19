@@ -535,6 +535,8 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         existing.Flow = file.Flow;
         if(file.Library != null && file.Library.Uid == existing.Library.Uid)
             existing.Library = file.Library; // name may have changed and is being updated
+        
+        existing.DateCreated = file.DateCreated; // this can be changed if library file is unheld
         existing.ProcessingEnded = file.ProcessingEnded;
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;
@@ -725,6 +727,37 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         }
     }
 
+    /// <summary>
+    /// Unhold library files
+    /// </summary>
+    /// <param name="model">A reference model containing UIDs to reprocess</param>
+    /// <returns>an awaited task</returns>
+    [HttpPost("unhold")]
+    public async Task Unhold([FromBody] ReferenceModel<Guid> model)
+    {
+        if (model == null || model.Uids?.Any() != true)
+            return; // nothing to delete
+        var list = model.Uids.ToList();
+
+        // clear the list to make sure its upt to date
+        var libraryFiles = await GetData();
+        foreach (var uid in model.Uids)
+        {
+            LibraryFile item;
+            lock (libraryFiles)
+            {
+                if (libraryFiles.ContainsKey(uid) == false)
+                    continue;
+                item = libraryFiles[uid];
+                if (item.Status != FileStatus.OnHold && item.Status != FileStatus.Unprocessed)
+                    continue;
+                item.Status = FileStatus.Unprocessed;
+                // dirty hack, by setting creation time to 30 days, then the hold time will be up
+                item.DateCreated = DateTime.Now.AddDays(-30);
+            }
+            await Update(item);
+        }
+    }
     /// <summary>
     /// Gets total shrinkage of all processed library files
     /// </summary>

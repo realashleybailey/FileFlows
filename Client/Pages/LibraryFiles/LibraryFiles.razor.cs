@@ -370,6 +370,29 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             this.Blocker.Hide();   
         }
     }
+
+    private async Task Unhold()
+    {
+#if (DEMO)
+        return;
+#else
+        var selected = Table.GetSelected();
+        var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
+        if (uids.Length == 0)
+            return; // nothing to unhold
+
+        Blocker.Show();
+        try
+        {
+            await HttpHelper.Post(ApiUrl + "/unhold", new ReferenceModel<Guid> { Uids = uids });
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
+        await Refresh();
+#endif
+    }
     
     
     Task Search() => NavigationService.NavigateTo("/library-files/search");

@@ -547,6 +547,8 @@ public abstract class DbManager
                 changed = true;
             dbObject.Name = obj.Name;
             dbObject.DateModified = obj.DateModified;
+            if(obj.DateCreated  != dbObject.DateCreated && obj.DateCreated > new DateTime(2020,1,1))
+                dbObject.DateCreated = obj.DateCreated; // OnHeld moving to process now can change this date
             dbObject.Data = json;
             await db.UpdateAsync(dbObject);
         }

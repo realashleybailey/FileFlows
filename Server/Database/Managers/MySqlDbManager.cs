@@ -580,4 +580,44 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
             await db.Db.ExecuteAsync(sql);
         }
     }
+    
+    
+    
+    /// <summary>
+    /// Updates work on a library file
+    /// </summary>
+    /// <param name="libraryFile">The library file to update</param>
+    public override async Task UpdateWork(LibraryFile libraryFile)
+    {
+        if (libraryFile == null)
+            return;
+        
+        using (var db = await GetDb())
+        {
+            string sql = "update DbObject set Data = " +
+                         "json_set(Data" +
+                         $", '$.Status', {(int)libraryFile.Status}" +
+                         $", '$.FinalSize', {libraryFile.FinalSize}" +
+                         (libraryFile.Node == null ? "" : (
+                             $@", '$.Node', JSON_OBJECT('Uid', '{libraryFile.Node.Uid}', 'Name', '{MySqlHelper.EscapeString(libraryFile.Node.Name)}', 'Type', '{typeof(ProcessingNode).FullName}')"
+                         )) +
+                         $", '$.WorkerUid', '{libraryFile.WorkerUid}'" +
+                         (libraryFile.ExecutedNodes?.Any() != true ? "" : (
+                             $", '$.ExecutedNodes', JSON_ARRAY(" +
+                                string.Join(",", libraryFile.ExecutedNodes.Select(x => 
+                                    "JSON_OBJECT(" +
+                                    $"'NodeName', '{MySqlHelper.EscapeString(x.NodeName)}', " +
+                                    $"'NodeUid', '{x.NodeUid}', " +
+                                    $"'ProcessingTime', '{x.ProcessingTime}', " +
+                                    $"'Output', {x.Output})")
+                                ) +
+                             ")"
+                         )) +
+                         $", '$.ProcessingStarted', '{libraryFile.ProcessingStarted.ToString("o")}'" +
+                         $", '$.ProcessingEnded', '{libraryFile.ProcessingEnded.ToString("o")}'" +
+                         $") where Type = 'FileFlows.Shared.Models.LibraryFile' and Uid = '{libraryFile.Uid}'";
+            await db.Db.ExecuteAsync(sql);
+        }
+        
+    }
 }

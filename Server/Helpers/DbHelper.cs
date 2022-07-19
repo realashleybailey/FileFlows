@@ -329,4 +329,10 @@ public class DbHelper
     /// <returns>True if successful</returns>
     public Task<bool> CleanDatabase() => Manager.CleanDatabase();
 #endif
+
+    /// <summary>
+    /// Updates work on a library file
+    /// </summary>
+    /// <param name="libraryFile">The library file to update</param>
+    public static Task UpdateWork(LibraryFile libraryFile) => Manager.UpdateWork(libraryFile);
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using FileFlows.Shared.Models;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Hubs;
+using FileFlows.Shared.Helpers;
 
 namespace FileFlows.Server.Controllers;
 
@@ -126,40 +127,48 @@ public class WorkerController : Controller
         }
     }
 
+    private static CacheStore LibraryFileCacheStore = new();
+
     /// <summary>
     /// Update work, tells the server about updated work on a flow runner
     /// </summary>
     /// <param name="info">The updated work information</param>
     [HttpPost("work/update")]
-    public void UpdateWork([FromBody] FlowExecutorInfo info)
+    public async Task UpdateWork([FromBody] FlowExecutorInfo info)
     {
         _ = new NodeController().UpdateLastSeen(info.NodeUid);
         
+        
         if (info.LibraryFile != null)
         {
-            var lfController = new LibraryFileController();
-            FlowDatabase.Logger.Log(LogType.Debug, "Getting existing file: " + info.LibraryFile.Uid);
-            var existing = lfController.GetCached(info.LibraryFile.Uid).Result;
-            FlowDatabase.Logger.Log(LogType.Debug, "Got existing file: " + info.LibraryFile.Uid);
-            if (existing != null)
+            if (LibraryFileHasChanged(info.LibraryFile))
             {
-                bool recentUpdate = existing.DateModified > DateTime.Now.AddSeconds(-10);
-                if ((existing.Status == FileStatus.ProcessingFailed && info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
+                if (DbHelper.UseMemoryCache == false)
+                    await DbHelper.UpdateWork(info.LibraryFile);
+                else
                 {
-                    FlowDatabase.Logger.Log(LogType.Debug, "Updating status on file: " + info.LibraryFile.Uid);
-                    existing = lfController.Update(info.LibraryFile).Result; // in case the status of the library file has changed
-                    FlowDatabase.Logger.Log(LogType.Debug, "Updated status on file: " + info.LibraryFile.Uid);
-                }
-
-                if (existing.Status == FileStatus.ProcessingFailed || existing.Status == FileStatus.Processed)
-                {
-                    lock (Executors)
+                    var lfController = new LibraryFileController();
+                    var existing = lfController.GetCached(info.LibraryFile.Uid).Result;
+                    if (existing != null)
                     {
-                        CompletedExecutors.Append(info.Uid);
-                        if (Executors.ContainsKey(info.Uid))
-                            Executors.Remove(info.Uid);
-                        return;
+                        bool recentUpdate = existing.DateModified > DateTime.Now.AddSeconds(-10);
+                        if ((existing.Status == FileStatus.ProcessingFailed &&
+                             info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
+                        {
+                            existing = await lfController.Update(info.LibraryFile);
+                        }
                     }
+                }
+            }
+
+            if (info.LibraryFile.Status == FileStatus.ProcessingFailed || info.LibraryFile.Status == FileStatus.Processed)
+            {
+                lock (Executors)
+                {
+                    CompletedExecutors.Append(info.Uid);
+                    if (Executors.ContainsKey(info.Uid))
+                        Executors.Remove(info.Uid);
+                    return;
                 }
             }
         }
@@ -175,6 +184,29 @@ public class WorkerController : Controller
             //else // this is causing a finished executors to stick around.
             //    Executors.Add(info.Uid, info);
         }
+    }
+
+    private bool LibraryFileHasChanged(LibraryFile file)
+    {
+        var cached = LibraryFileCacheStore.Get<LibraryFile>(file.Uid);
+        LibraryFileCacheStore.Store(file.Uid, file);
+        if (cached == null)
+            return true;
+        if (file.Status != cached.Status)
+            return true;
+        if (file.ExecutedNodes?.Count != cached.ExecutedNodes?.Count)
+            return true;
+        if(file.WorkerUid != cached.WorkerUid)
+            return true;
+        if(file.Node?.Uid != cached.Node?.Uid)
+            return true;
+        if(file.FinalSize != cached.FinalSize)
+            return true;
+        if(file.ProcessingStarted != cached.ProcessingStarted)
+            return true;
+        if(file.ProcessingEnded != cached.ProcessingEnded)
+            return true;
+        return false;
     }
 
     /// <summary>

@@ -377,8 +377,10 @@ public class FlowWorker : Worker
     {
         if(string.IsNullOrEmpty(Dotnet))
         {
-            if (Globals.IsWindows == false && File.Exists("/root/.dotnet/dotnet"))
-                Dotnet = "/root/.dotnet/dotnet"; // location of docker
+            if (Globals.IsWindows == false && File.Exists("/dotnet/dotnet"))
+                Dotnet = "/dotnet/dotnet"; // location of docker
+            else if (Globals.IsWindows == false && File.Exists("/root/.dotnet/dotnet"))
+                Dotnet = "/root/.dotnet/dotnet"; // location of legacy docker
             else
                 Dotnet = "dotnet";// assume in PATH
         }

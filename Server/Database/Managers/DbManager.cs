@@ -1071,4 +1071,13 @@ public abstract class DbManager
         }
     }
 #endif
+    
+    /// <summary>
+    /// Updates work on a library file
+    /// </summary>
+    /// <param name="libraryFile">The library file to update</param>
+    public virtual Task UpdateWork(LibraryFile libraryFile)
+    {
+        throw new NotImplementedException();
+    }
 }

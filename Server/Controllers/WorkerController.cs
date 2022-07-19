@@ -1,3 +1,5 @@
+using FileFlows.Plugin;
+using FileFlows.Server.Database.Managers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using FileFlows.Shared.Models;
@@ -136,13 +138,17 @@ public class WorkerController : Controller
         if (info.LibraryFile != null)
         {
             var lfController = new LibraryFileController();
+            FlowDatabase.Logger.Log(LogType.Debug, "Getting existing file: " + info.LibraryFile.Uid);
             var existing = lfController.GetCached(info.LibraryFile.Uid).Result;
+            FlowDatabase.Logger.Log(LogType.Debug, "Got existing file: " + info.LibraryFile.Uid);
             if (existing != null)
             {
                 bool recentUpdate = existing.DateModified > DateTime.Now.AddSeconds(-10);
                 if ((existing.Status == FileStatus.ProcessingFailed && info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
                 {
-                    existing = lfController.Update(info.LibraryFile).Result; // in case the status of the library file has changed                        
+                    FlowDatabase.Logger.Log(LogType.Debug, "Updating status on file: " + info.LibraryFile.Uid);
+                    existing = lfController.Update(info.LibraryFile).Result; // in case the status of the library file has changed
+                    FlowDatabase.Logger.Log(LogType.Debug, "Updated status on file: " + info.LibraryFile.Uid);
                 }
 
                 if (existing.Status == FileStatus.ProcessingFailed || existing.Status == FileStatus.Processed)

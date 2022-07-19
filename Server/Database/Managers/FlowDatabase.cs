@@ -45,6 +45,11 @@ public class FlowDatabase:NPoco.Database
 
         string sql = GetCommandText(cmd);
         //Logger.Log((LogType) 999, $"Executing [{hashCode.ToString("00000000")}]: " + sql);
+        if (sql.StartsWith(
+                "SELECT `Uid` AS `Uid`, `Name` AS `Name`, `Type` AS `Type`, `DateCreated` AS `DateCreated`, `DateModified` AS `DateModified`, `Data` AS `Data` FROM `DbObject` where Type=\"FileFlows.Shared.Models.LibraryFile\" and Uid"))
+        {
+            Logger.Log(LogType.Debug, "SQL: " + sql + Environment.NewLine + Environment.StackTrace);
+        }
         
     }
 

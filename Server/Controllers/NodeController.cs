@@ -22,7 +22,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     [HttpGet]
     public async Task<IEnumerable<ProcessingNode>> GetAll()
     {
-        var nodes = (await GetDataList()).OrderBy(x => x.Address == Globals.InternalNodeName ? 0 : 1).ThenBy(x => x.Name);
+        var nodes = (await GetDataList(useCache:true)).OrderBy(x => x.Address == Globals.InternalNodeName ? 0 : 1).ThenBy(x => x.Name);
         var internalNode = nodes.Where(x => x.Uid == Globals.InternalNodeUid).FirstOrDefault();
         if(internalNode != null)
         {
@@ -64,7 +64,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     /// <param name="uid">The UID of the processing node</param>
     /// <returns>The processing node instance</returns>
     [HttpGet("{uid}")]
-    public Task<ProcessingNode> Get(Guid uid) => GetByUid(uid);
+    public Task<ProcessingNode> Get(Guid uid) => GetByUid(uid, useCache:true);
 
     /// <summary>
     /// Saves a processing node
@@ -108,7 +108,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 
                 internalNode.Libraries = node.Libraries;
                 await CheckLicensedNodes(internalNode.Uid, internalNode.Enabled);
-                return await Update(internalNode, checkDuplicateName: true);
+                return await Update(internalNode, checkDuplicateName: true, useCache:true);
             }
             else
             {
@@ -119,9 +119,9 @@ public class NodeController : ControllerStore<ProcessingNode>
                 node.Mappings = null; // no mappings for internal
             }
         }
-        var result = await Update(node, checkDuplicateName: true);
+        var result = await Update(node, checkDuplicateName: true, useCache:true);
         await CheckLicensedNodes(result.Uid, result.Enabled);
-        return await GetByUid(result.Uid);
+        return await GetByUid(result.Uid, useCache:true);
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     [HttpPut("state/{uid}")]
     public async Task<ProcessingNode> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
     {
-        var node = await GetByUid(uid);
+        var node = await GetByUid(uid, useCache:true);
         if (node == null)
             throw new Exception("Node not found.");
         if (enable != null)
@@ -156,7 +156,7 @@ public class NodeController : ControllerStore<ProcessingNode>
             await DbHelper.Update(node);
         }
         await CheckLicensedNodes(uid, enable == true);
-        return await GetByUid(uid);;
+        return await GetByUid(uid, useCache:true);;
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public class NodeController : ControllerStore<ProcessingNode>
             throw new ArgumentNullException(nameof(address));
 
         address = address.Trim();
-        var data = await GetData();
+        var data = await GetData(useCache:true);
         var node = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
         if (node == null)
             return node;
@@ -279,7 +279,7 @@ public class NodeController : ControllerStore<ProcessingNode>
             throw new ArgumentNullException(nameof(model.TempPath));
 
         var address = model.Address.Trim();
-        var data = await GetData();
+        var data = await GetData(useCache: true);
         var existing = data.Where(x => x.Value.Address.ToLower() == address.ToLower()).Select(x => x.Value).FirstOrDefault();
         if (existing != null)
         {
@@ -326,25 +326,17 @@ public class NodeController : ControllerStore<ProcessingNode>
             Mappings = model.Mappings?.Select(x => new KeyValuePair<string, string>(x.Server, x.Local))?.ToList() ?? tools?.Select(x => new
                KeyValuePair<string, string>(x.Path, "")
             )?.ToList() ?? new()
-        });
+        }, useCache: true);
         result.SignalrUrl = "flow";
         return result;
     }
 
     internal async Task<ProcessingNode> GetServerNode()
     {
-        ProcessingNode? node;
-        if (DbHelper.UseMemoryCache)
-        {
-            var data = await GetData();
-            node = data.Where(x => x.Value.Uid == Globals.InternalNodeUid).Select(x => x.Value).FirstOrDefault();
-        }
-        else
-        {
-            node = await DbHelper.Single<ProcessingNode>(Globals.InternalNodeUid);
-            if (node?.Uid == Guid.Empty)
-                node = null; // clear it so it can be inserted, DbHelper will return default
-        }
+        var data = await GetData(useCache:true);
+        ProcessingNode node = data.Where(x => x.Value.Uid == Globals.InternalNodeUid)
+            .Select(x => x.Value)
+            .FirstOrDefault();
 
         if (node == null)
         {
@@ -352,6 +344,7 @@ public class NodeController : ControllerStore<ProcessingNode>
             bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);                
             node = await Update(new ProcessingNode
             {
+            
                 Uid = Globals.InternalNodeUid,
                 Name = Globals.InternalNodeName,
                 Address = Globals.InternalNodeName,
@@ -365,7 +358,7 @@ public class NodeController : ControllerStore<ProcessingNode>
 #else
                 TempPath = DirectoryHelper.IsDocker ? "/temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),
 #endif
-            });
+            }, useCache:true);
         }
         node.SignalrUrl = "flow";
         return node;

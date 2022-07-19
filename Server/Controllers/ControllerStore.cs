@@ -68,9 +68,11 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
     /// Gets all the data indexed by the items UID
     /// </summary>
     /// <returns>all the data indexed by the items UID</returns>
-    internal async Task<Dictionary<Guid, T>> GetData()
+    internal async Task<Dictionary<Guid, T>> GetData(bool? useCache = null)
     {
-        if (DbHelper.UseMemoryCache == false)
+        if (useCache == null)
+            useCache = DbHelper.UseMemoryCache;
+        if(useCache == false)
             return (await DbHelper.Select<T>()).ToDictionary(x => x.Uid, x => x);
         
         if (_Data == null)
@@ -92,16 +94,20 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         return _Data;
     }
 
-    internal virtual async Task<IEnumerable<T>> GetDataList()
+    internal virtual async Task<IEnumerable<T>> GetDataList(bool? useCache = false)
     {
-        if(DbHelper.UseMemoryCache)
+        if (useCache == null)
+            useCache = DbHelper.UseMemoryCache;
+        if(useCache == true)
             return (await GetData()).Values.ToList();
         return await DbHelper.Select<T>();
     } 
 
-    protected async Task<T> GetByUid(Guid uid)
+    protected async Task<T> GetByUid(Guid uid, bool? useCache = false)
     {
-        if (DbHelper.UseMemoryCache)
+        if (useCache == null)
+            useCache = DbHelper.UseMemoryCache;
+        if(useCache == true)
         {
             var data = await GetData();
             if (data.ContainsKey(uid))
@@ -121,9 +127,9 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
 
     internal async Task DeleteAll(params Guid[] uids)
     {
-        if (DbHelper.UseMemoryCache)
+        if (_Data?.Any() == true)
         {
-            var data = await GetData();
+            var data = await GetData(useCache: true);
             foreach (var uid in uids)
             {
                 await _mutex.WaitAsync();
@@ -142,7 +148,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         await DbHelper.Delete(uids);
     }
 
-    internal async Task<T> Update(T model, bool checkDuplicateName = false)
+    internal async Task<T> Update(T model, bool checkDuplicateName = false, bool? useCache = null)
     {
         if (checkDuplicateName)
         {
@@ -150,7 +156,10 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
                 throw new Exception("ErrorMessages.NameInUse");
         }
         var updated = await DbHelper.Update(model);
-        if (DbHelper.UseMemoryCache)
+        
+        if (useCache == null)
+            useCache = DbHelper.UseMemoryCache;
+        if(useCache == true)
         {
             await _mutex.WaitAsync();
             try
@@ -168,9 +177,11 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         return updated;
     }
     
-    internal async Task UpdateDateModified(Guid uid)
+    internal async Task UpdateDateModified(Guid uid, bool? useCache = null)
     {
-        if (DbHelper.UseMemoryCache)
+        if (useCache == null)
+            useCache = DbHelper.UseMemoryCache;
+        if(useCache == true)
         {
             var item = await GetByUid(uid);
             if (item == null)
@@ -188,9 +199,11 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
     /// Called by the revision controller when a revision is restored
     /// </summary>
     /// <param name="dbo">the DbObject</param>
-    internal async Task Refresh(DbObject dbo)
+    internal async Task Refresh(DbObject dbo, bool? useCache = false)
     {
-        if (DbHelper.UseMemoryCache == false)
+        if (useCache == null)
+            useCache = DbHelper.UseMemoryCache;
+        if(useCache == false)
             return;
         var to = DbHelper.GetDbManager().ConvertFromDbObject<T>(dbo);
         

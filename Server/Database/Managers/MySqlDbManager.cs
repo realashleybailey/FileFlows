@@ -2,8 +2,10 @@ using System.Numerics;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
+using FileFlows.Server.Helpers;
 using FileFlows.Shared;
 using FileFlows.Shared.Models;
+using MySqlConnector;
 using NPoco;
 using DatabaseType = FileFlows.Shared.Models.DatabaseType;
 
@@ -345,6 +347,8 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         return results;
     }
 
+    private readonly List<string> LogMessages = new();
+    
     /// <summary>
     /// Logs a message to the database
     /// </summary>
@@ -353,12 +357,35 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// <param name="message">the message to log</param>
     public override async Task Log(Guid clientUid, LogType type, string message)
     {
-        using (var db = await GetDb())
+        // by bucketing this it greatly improves speed
+        string sql = null;
+        lock (LogMessages)
         {
-            await db.Db.ExecuteAsync(
-                $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
-                $" values (@0, @1, @2)", clientUid, type, message);
+            message = MySqlHelper.EscapeString(message);
+            LogMessages.Add(
+                $"('{clientUid}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}', {(int)type}, '{message}')");
+
+            if (LogMessages.Count > 20)
+            {
+                sql =
+                    $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.LogDate)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) values "
+                    + string.Join("," + Environment.NewLine, LogMessages);
+                LogMessages.Clear();
+            }
         }
+        if(sql != null)
+        {
+            using (var db = await GetDb())
+            {
+                await db.Db.ExecuteAsync(sql);
+            }
+        }
+        // using (var db = await GetDb())
+        // {
+        //     await db.Db.ExecuteAsync(
+        //         $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) " +
+        //         $" values (@0, @1, @2)", clientUid, type, message);
+        // }
     }
 
     /// <summary>

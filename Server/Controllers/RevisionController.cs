@@ -97,6 +97,8 @@ public class RevisionController:Controller
                 await new LibraryController().Refresh(dbo);
             else if (dbo.Type == typeof(Flow).FullName)
                 await new FlowController().Refresh(dbo);
+            else if (dbo.Type == typeof(Dashboard).FullName)
+                await new DashboardController().Refresh(dbo);
         }
     }
     

@@ -553,7 +553,12 @@ public abstract class DbManager
             await db.UpdateAsync(dbObject);
         }
 
-        if (changed && (dbObject.Type != typeof(LibraryFile).FullName && dbObject.Type != typeof(PluginInfo).FullName))
+        if (changed && (
+            dbObject.Type == typeof(Library).FullName ||
+            dbObject.Type != typeof(Flow).FullName ||
+            dbObject.Type != typeof(PluginSettingsModel).FullName ||
+            dbObject.Type != typeof(Dashboard).FullName
+        ))
             await RevisionController.SaveRevision(dbObject);
 
         if (UseMemoryCache == false)

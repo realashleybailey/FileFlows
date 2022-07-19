@@ -35,6 +35,7 @@ public class DbMigrater
 
             MigrateDbObjects(source, dest);
             MigrateDbStatistics(source, dest);
+            MigrateRevisions(source, dest);
             MigrateDbLogs(source, dest);
 
             Logger.Instance?.ILog("Database Migration complete");
@@ -123,6 +124,32 @@ public class DbMigrater
         }
     }
     
+    private static void MigrateRevisions(NPoco.Database source, NPoco.Database dest)
+    {
+        var dbRevisions = source.Fetch<RevisionedObject>($"select * from {nameof(RevisionedObject)}")?.ToArray();
+        if (dbRevisions?.Any() != true)
+            return;
+
+        foreach (var obj in dbRevisions)
+        {
+            try
+            {
+                dest.Execute(
+                    $"insert into {nameof(RevisionedObject)} (Uid, RevisionType, RevisionUid, RevisionName, RevisionDate, RevisionCreated, RevisionData) values (@0, @1, @2, @3, @4, @5, @6)",
+                    obj.Uid,
+                    obj.RevisionType,
+                    obj.RevisionUid,
+                    obj.RevisionName,
+                    obj.RevisionDate,
+                    obj.RevisionCreated,
+                    obj.RevisionData);
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
+
     
     private static void MigrateDbLogs(NPoco.Database source, NPoco.Database dest)
     {

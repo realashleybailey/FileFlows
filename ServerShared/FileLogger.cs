@@ -68,6 +68,10 @@ public class FileLogger : ILogWriter
                     x.GetType().IsPrimitive ? x.ToString() :
                     x is string ? x.ToString() :
                     System.Text.Json.JsonSerializer.Serialize(x)));
+            if (message.IndexOf((char)0) >= 0)
+            {
+                message = message.Replace(new string((char)0, 1), string.Empty);
+            }
             Console.WriteLine(message);
             
             

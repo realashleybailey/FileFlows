@@ -555,9 +555,9 @@ public abstract class DbManager
 
         if (changed && (
             dbObject.Type == typeof(Library).FullName ||
-            dbObject.Type != typeof(Flow).FullName ||
-            dbObject.Type != typeof(PluginSettingsModel).FullName ||
-            dbObject.Type != typeof(Dashboard).FullName
+            dbObject.Type == typeof(Flow).FullName ||
+            dbObject.Type == typeof(PluginSettingsModel).FullName ||
+            dbObject.Type == typeof(Dashboard).FullName
         ))
             await RevisionController.SaveRevision(dbObject);
 

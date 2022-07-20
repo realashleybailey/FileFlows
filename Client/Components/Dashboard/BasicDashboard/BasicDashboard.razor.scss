@@ -84,6 +84,13 @@
   flex-direction: column;
 }
 
+@media  screen and (max-width:849.999px)
+{
+  ::deep .widget + .widget {
+    margin-top:1.5rem;
+  }
+}
+
 @media screen and (min-width: 850px)
 {
   .worker-wrapper {
@@ -163,3 +170,4 @@
     display: none !important;
   }
 }
+

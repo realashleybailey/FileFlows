@@ -121,7 +121,7 @@ function addWidget(dashboard, p, csharp){
 
     let div = document.createElement("div");
     div.setAttribute('id', p.uid);
-    div.className = 'grid-stack-item Widget';
+    div.className = 'grid-stack-item widget';
     div.setAttribute('gs-w', p.width);
     div.setAttribute('gs-h', p.height);
     div.setAttribute('gs-x', p.x);

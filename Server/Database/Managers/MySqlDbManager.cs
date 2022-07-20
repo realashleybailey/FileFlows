@@ -601,17 +601,19 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
                              $@", '$.Node', JSON_OBJECT('Uid', '{libraryFile.Node.Uid}', 'Name', '{MySqlHelper.EscapeString(libraryFile.Node.Name)}', 'Type', '{typeof(ProcessingNode).FullName}')"
                          )) +
                          $", '$.WorkerUid', '{libraryFile.WorkerUid}'" +
-                         (libraryFile.ExecutedNodes?.Any() != true ? "" : (
-                             $", '$.ExecutedNodes', JSON_ARRAY(" +
-                                string.Join(",", libraryFile.ExecutedNodes.Select(x => 
-                                    "JSON_OBJECT(" +
-                                    $"'NodeName', '{MySqlHelper.EscapeString(x.NodeName)}', " +
-                                    $"'NodeUid', '{x.NodeUid}', " +
-                                    $"'ProcessingTime', '{x.ProcessingTime}', " +
-                                    $"'Output', {x.Output})")
+                         $", '$.ExecutedNodes'," + 
+                             $"JSON_ARRAY(" +
+                                (libraryFile.ExecutedNodes?.Any() == true ? 
+                                    string.Join(",", libraryFile.ExecutedNodes.Select(x => 
+                                        "JSON_OBJECT(" +
+                                        $"'NodeName', '{MySqlHelper.EscapeString(x.NodeName)}', " +
+                                        $"'NodeUid', '{x.NodeUid}', " +
+                                        $"'ProcessingTime', '{x.ProcessingTime}', " +
+                                        $"'Output', {x.Output})")
+                                    ) 
+                                    : ""
                                 ) +
-                             ")"
-                         )) +
+                            ")" +
                          $", '$.ProcessingStarted', '{libraryFile.ProcessingStarted.ToString("o")}'" +
                          $", '$.ProcessingEnded', '{libraryFile.ProcessingEnded.ToString("o")}'" +
                          $") where Type = 'FileFlows.Shared.Models.LibraryFile' and Uid = '{libraryFile.Uid}'";

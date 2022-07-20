@@ -47,7 +47,7 @@
         {
             <CustomDashboard ActiveDashboardUid=@ActiveDashboardUid />
         }
-        else if(ActiveDashboardSet)
+        else if(ActiveDashboardSet || App.Instance.IsMobile)
         {
             @if (App.Instance.IsMobile)
             {

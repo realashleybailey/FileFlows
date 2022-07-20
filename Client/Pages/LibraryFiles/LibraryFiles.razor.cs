@@ -1,23 +1,11 @@
-using System.Text.Json;
-using BlazorDateRangePicker;
 using FileFlows.Client.Components.Common;
 using Humanizer;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using FileFlows.Client.Components;
+using FileFlows.Client.Components.Dialogs;
 
 namespace FileFlows.Client.Pages;
-
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using FileFlows.Client.Components;
-using FileFlows.Shared.Helpers;
-using FileFlows.Shared;
-using FileFlows.Shared.Models;
-using System.Linq;
-using System;
-using FileFlows.Client.Components.Dialogs;
-using FileFlows.Plugin;
 
 public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 {

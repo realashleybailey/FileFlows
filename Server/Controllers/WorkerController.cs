@@ -307,11 +307,15 @@ public class WorkerController : Controller
             if (executorId == Guid.Empty)
                 executorId = Executors.Where(x => x.Value == null).Select(x => x.Key).FirstOrDefault();
         }
-        if (executorId == Guid.Empty)
+        if (executorId == Guid.Empty || Executors.TryGetValue(executorId, out FlowExecutorInfo info)  == false || info == null)
         {
-            Logger.Instance?.WLog("Failed to locate Flow executor with library file: " + uid);
-            foreach (var executor in Executors)
-                Logger.Instance?.WLog($"Flow Executor: {executor.Key} = {executor.Value?.LibraryFile?.Uid} = {executor.Value?.LibraryFile?.Name}");
+            if(executorId == Guid.Empty)
+            {
+                Logger.Instance?.WLog("Failed to locate Flow executor with library file: " + uid);
+                foreach (var executor in Executors)
+                    Logger.Instance?.WLog(
+                        $"Flow Executor: {executor.Key} = {executor.Value?.LibraryFile?.Uid} = {executor.Value?.LibraryFile?.Name}");
+            }
             // may not have an executor, just update the status
             var libfileController = new LibraryFileController();
             var libFile = await libfileController.Get(uid);
@@ -320,7 +324,8 @@ public class WorkerController : Controller
                 libFile.Status = FileStatus.ProcessingFailed;
                 await libfileController.Update(libFile);
             }
-            return;
+            if(executorId == Guid.Empty)
+                return;
         }
         await Abort(executorId, uid);
     }
@@ -425,13 +430,10 @@ public class WorkerController : Controller
         {
             if (Executors.TryGetValue(runnerUid, out var executorInfo) == false)
             {
-                if (Executors.TryAdd(runnerUid, executorInfo) == false)
-                {
-                    Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
-                    foreach (var executor in Executors.Values)
-                        Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
-                    return false; // unknown executor
-                }
+                Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
+                foreach (var executor in Executors.Values)
+                    Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
+                return false; // unknown executor
             }
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;

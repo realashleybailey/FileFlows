@@ -43,8 +43,8 @@ public class SettingsController : Controller
         }
         else
         {
-            flows = await DbHelper.HasAny<Flow>();
-            libs = await DbHelper.HasAny<Library>();
+            flows = FlowController.HasFlows;
+            libs = LibraryController.HasLibraries;
         }
 
         if (flows)

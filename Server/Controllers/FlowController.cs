@@ -1,9 +1,5 @@
 using FileFlows.Server.Workers;
-
-namespace FileFlows.Server.Controllers;
-
 using FileFlows.Plugin.Models;
-using System;
 using Microsoft.AspNetCore.Mvc;
 using FileFlows.Shared.Models;
 using FileFlows.Server.Helpers;
@@ -11,9 +7,8 @@ using System.Dynamic;
 using FileFlows.Plugin;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using FileFlows.Shared;
-using System.Text.Json;
 
+namespace FileFlows.Server.Controllers;
 /// <summary>
 /// Controller for Flows
 /// </summary>
@@ -23,6 +18,21 @@ public class FlowController : ControllerStore<Flow>
     const int DEFAULT_XPOS = 450;
     const int DEFAULT_YPOS = 50;
 
+    private static bool? _HasFlows;
+    /// <summary>
+    /// Gets if there are any flows
+    /// </summary>
+    internal static bool HasFlows
+    {
+        get
+        {
+            if (_HasFlows == null)
+                UpdateHasFlows().Wait();
+            return _HasFlows == true;
+        }
+        private set => _HasFlows = value;
+    }
+    
     /// <summary>
     /// Get all flows in the system
     /// </summary>
@@ -297,7 +307,14 @@ public class FlowController : ControllerStore<Flow>
         if (model == null || model.Uids?.Any() != true)
             return; // nothing to delete
         await DeleteAll(model);
+        await UpdateHasFlows();
     }
+
+    private static async Task UpdateHasFlows()
+    {
+        _HasFlows = await DbHelper.HasAny<Flow>("JSON_EXTRACT(Data, '$.Type') = 0");
+    }
+
 
     /// <summary>
     /// Get a flow

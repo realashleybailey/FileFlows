@@ -21,6 +21,25 @@ public class LibraryController : ControllerStore<Library>
             return x;
         }).ToList();
     }
+    
+    private static bool? _HasLibraries;
+    /// <summary>
+    /// Gets if there are any libraries
+    /// </summary>
+    internal static bool HasLibraries
+    {
+        get
+        {
+            if (_HasLibraries == null)
+                UpdateHasLibraries().Wait();
+            return _HasLibraries == true;
+        }
+        private set => _HasLibraries = value;
+    }
+    private static async Task UpdateHasLibraries()
+    {
+        _HasLibraries = await DbHelper.HasAny<Flow>();
+    }
 
     /// <summary>
     /// Gets all libraries in the system
@@ -107,6 +126,8 @@ public class LibraryController : ControllerStore<Library>
         {
             await new LibraryFileController().DeleteFromLibraries(model.Uids);
         }
+
+        await UpdateHasLibraries();
     }
 
     /// <summary>

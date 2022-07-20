@@ -308,11 +308,15 @@ public class DbHelper
     /// Checks if the database has any of the type
     /// </summary>
     /// <typeparam name="T">The type</typeparam>
+    /// <param name="where">additional where clause</param>
     /// <returns>true if has any of the time</returns>
-    public static async Task<bool> HasAny<T>() where T : FileFlowObject
+    public static async Task<bool> HasAny<T>(string where = "") where T : FileFlowObject
     {
         var manager = GetDbManager();
-        int count = await manager.ExecuteScalar<int>("select count(uid) from DbObject where Type = @0", typeof(T).FullName);
+        string sql = $"select count(uid) from DbObject where Type = '{typeof(T).FullName}'";
+        if (string.IsNullOrWhiteSpace(where) == false)
+            sql += " and " + where;
+        int count = await manager.ExecuteScalar<int>(sql);
         return count > 0;
     }
 

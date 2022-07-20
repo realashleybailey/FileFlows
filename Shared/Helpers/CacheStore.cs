@@ -5,7 +5,7 @@ namespace FileFlows.Shared.Helpers;
 /// </summary>
 public class CacheStore
 {
-    private readonly Dictionary<Guid, CachedObject> Cache = new();
+    private readonly Dictionary<string, CachedObject> Cache = new();
 
     /// <summary>
     /// Gets an item from the cache store
@@ -13,7 +13,15 @@ public class CacheStore
     /// <param name="uid">The UID of the object to get</param>
     /// <typeparam name="T">The type of object to get</typeparam>
     /// <returns>The object, or default if not found</returns>
-    public T Get<T>(Guid uid)
+    public T Get<T>(Guid uid) => Get<T>(uid.ToString());
+    
+    /// <summary>
+    /// Gets an item from the cache store
+    /// </summary>
+    /// <param name="uid">The UID of the object to get</param>
+    /// <typeparam name="T">The type of object to get</typeparam>
+    /// <returns>The object, or default if not found</returns>
+    public T Get<T>(string uid)
     {
         if (Cache.ContainsKey(uid) == false)
             return default;
@@ -37,7 +45,16 @@ public class CacheStore
     /// <param name="value">The item to store</param>
     /// <param name="expirySeconds">How long to keep the item in the cache store</param>
     /// <typeparam name="T">The type of item being stored</typeparam>
-    public void Store<T>(Guid uid, T value, int expirySeconds = 60)
+    public void Store<T>(Guid uid, T value, int expirySeconds = 60) => Store(uid.ToString(), value, expirySeconds);
+    
+    /// <summary>
+    /// Stores an item in the cache store
+    /// </summary>
+    /// <param name="uid">The UID of the item to store</param>
+    /// <param name="value">The item to store</param>
+    /// <param name="expirySeconds">How long to keep the item in the cache store</param>
+    /// <typeparam name="T">The type of item being stored</typeparam>
+    public void Store<T>(string uid, T value, int expirySeconds = 60)
     {
         var co = new CachedObject()
         {
@@ -58,7 +75,14 @@ public class CacheStore
     /// If it does not exist, it will just return, no exception
     /// </summary>
     /// <param name="uid">the UID of the item to remove</param>
-    public void Remove(Guid uid)
+    public void Remove(Guid uid) => Remove(uid.ToString());
+    
+    /// <summary>
+    /// Removes an item from the cache store if exists in it
+    /// If it does not exist, it will just return, no exception
+    /// </summary>
+    /// <param name="uid">the UID of the item to remove</param>
+    public void Remove(string uid)
     {
         lock (Cache)
         {

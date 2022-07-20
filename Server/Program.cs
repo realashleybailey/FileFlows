@@ -9,6 +9,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
+using NPoco;
 
 namespace FileFlows.Server;
 
@@ -20,6 +21,10 @@ public class Program
     public static bool Docker => ServerShared.Globals.IsDocker;
     private static Mutex appMutex = null;
     const string appName = "FileFlowsServer";
+    /// <summary>
+    /// General cache used by the server
+    /// </summary>
+    internal static CacheStore GeneralCache = new ();
 
     public static void Main(string[] args)
     {

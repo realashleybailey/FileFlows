@@ -26,7 +26,6 @@ public partial class FlowSkyBox<TItem>
             _Items.Clear();
             if (value?.Any() == true)
                 _Items.AddRange(value);
-            Logger.Instance.ILog("Setting items to: ", _Items);
             this.StateHasChanged();
         }
     }
@@ -51,7 +50,6 @@ public partial class FlowSkyBox<TItem>
     /// <param name="selected">the selected value</param>
     public void SetItems(List<FlowSkyBoxItem<TItem>> items, TItem selected)
     {
-        Logger.Instance.ILog("Setting items", items, selected);
         this._Items.Clear();
         if(items?.Any() == true)
             this._Items.AddRange(items);

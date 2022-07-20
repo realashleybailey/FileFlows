@@ -80,7 +80,6 @@ export function dispose(uid) {
 export function disposeAll(){
     if(!window.FlowCharts)
         return;
-    console.log('disposing all charts')
     Object.keys(window.FlowCharts).forEach(uid => {
         try {
             window.FlowCharts[uid].dispose();

@@ -143,7 +143,7 @@
                 Status
             </Header>
             <Cell Context="item">
-                <span>@Translater.Instant("Enums.FileStatus." + item.Status)</span>
+                <span>@(item.Status == null ? string.Empty : Translater.Instant("Enums.FileStatus." + item.Status))</span>
             </Cell>
         </FlowTableColumn>
         <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">

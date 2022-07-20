@@ -317,11 +317,12 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         var days = new List<Dictionary<int, int>>();
         for (int i = 0; i < 7; i++)
         {
-            Dictionary<int, int> hours = new Dictionary<int, int>();
             var results = new Dictionary<int, int>();
             for (int j = 0; j < 24; j++)
             {
-                int count = data.Where(x => x.day == i && x.hour == j).Select(x => x.count).FirstOrDefault();
+                // mysql DAYOFWEEK, sun=1, mon=2, sat =7
+                // so we use x.day - 1 here to convert sun=0
+                int count = data.Where(x => (x.day - 1) == i && x.hour == j).Select(x => x.count).FirstOrDefault();
                 results.Add(j, count);
             }
 

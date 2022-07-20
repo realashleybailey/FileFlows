@@ -22,7 +22,7 @@ public class Upgrader
                     try
                     {
                         string source = SqliteDbManager.SqliteDbFile;
-                        File.Copy(source, source.Replace(".sqlite", "-" + currentVersion.Major + "." + currentVersion.Minor + "." + currentVersion.Revision + ".backup"));
+                        File.Copy(source, source.Replace(".sqlite", "-" + currentVersion.Major + "." + currentVersion.Minor + "." + currentVersion.Build + ".sqlite.backup"));
                     }
                     catch (Exception)
                     {

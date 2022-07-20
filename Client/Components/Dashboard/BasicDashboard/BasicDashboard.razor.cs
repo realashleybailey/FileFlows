@@ -2,6 +2,7 @@ using System.Timers;
 using FileFlows.Client.Components.Dialogs;
 using FileFlows.Plugin;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Components.Dashboard;
@@ -43,6 +44,7 @@ public partial class BasicDashboard
     
     protected override async Task OnInitializedAsync()
     {
+        Logger.Instance.ILog("basic dashboard!");
         AutoRefreshTimer = new Timer();
         AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;
         AutoRefreshTimer.Interval = 5_000;

@@ -75,58 +75,6 @@ export function InitChart(data, lblOverall, lblCurrent) {
     }
 }
 
-var PieCharts = {};
-
-export function InitPieChart(elementId, series, labels) {
-    if (PieCharts[elementId]) {
-        PieCharts[elementId].updateSeries(series);
-        return;
-    }
-    var options = {
-        series: series,
-        colors: ['var(--accent)', 'var(--input-background)'],
-        chart: {
-            width: 280,
-            type: 'pie',
-            foreColor: 'var(--color)',
-        },
-        labels: labels,
-        legend: {
-            show: false
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            show: false,
-            colors: ['black']
-        },
-        yaxis: {
-            labels: {
-                formatter: function (val) {
-                    let sizes = ["B", "KB", "MB", "GB", "TB"];
-                    let order = 0;
-                    while (val >= 1024 && order < sizes.length - 1) {
-                        order++;
-                        val = val / 1024;
-                    }
-                    return val.toFixed(2) + " " + sizes[order];
-                }
-            },
-        },
-    };
-    try {
-        DestroyChart(elementId);
-        let eleChart = document.getElementById(elementId);
-        if (eleChart)
-        {
-            PieCharts[elementId] = new ApexCharts(eleChart, options);
-            PieCharts[elementId].render();
-        }
-    } catch (err) {
-    } // can throw if being destroyed when navigating away
-}
-
 export function DestroyChart(id) {
     try {
         ApexCharts.exec(id, 'destroy');

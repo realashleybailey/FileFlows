@@ -19,14 +19,16 @@ public partial class Dashboard : ComponentBase
     
     private List<ListOption> Dashboards;
 
-    private Guid _ActiveDashboardUid;
+    private Guid? _ActiveDashboardUid = null;
+
+    private bool ActiveDashboardSet => _ActiveDashboardUid != null;
 
     /// <summary>
     /// Gets the UID of the active dashboard
     /// </summary>
     public Guid ActiveDashboardUid
     {
-        get => _ActiveDashboardUid;
+        get => _ActiveDashboardUid ?? Guid.Empty;
         private set
         {
             _ActiveDashboardUid = value;
@@ -45,9 +47,11 @@ public partial class Dashboard : ComponentBase
         ConfiguredStatus = App.Instance.FileFlowsSystem.ConfigurationStatus;
 #endif
         lblAddWidget = Translater.Instant("Pages.Dashboard.Labels.AddWidget");
-        
-        if(Unlicensed == false)
+
+        if (Unlicensed == false)
             await LoadDashboards();
+        else
+            ActiveDashboardUid = Guid.Empty;
     }
 
     private async Task LoadDashboards()

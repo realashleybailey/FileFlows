@@ -517,7 +517,7 @@ public abstract class DbManager
 
         var type = obj.GetType();
         obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
-        var dbObject = db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid);
+        var dbObject = obj.Uid == Guid.Empty ? null : db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid);
         if (dbObject == null)
         {
             changed = true;

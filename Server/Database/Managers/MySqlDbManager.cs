@@ -561,7 +561,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         {
             if (NodeLastSeen.ContainsKey(uid))
             {
-                 if(NodeLastSeen[uid] > DateTime.Now.AddSeconds(-10))
+                 if(NodeLastSeen[uid] > DateTime.Now.AddSeconds(-20))
                      return; // so recent, don't record it
                  NodeLastSeen[uid] = DateTime.Now;
             }

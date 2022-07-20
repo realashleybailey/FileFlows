@@ -32,6 +32,22 @@ public class FlowDatabase:NPoco.Database
 
     private Dictionary<int, DateTime> ExecutedCommands = new Dictionary<int, DateTime>();
 
+    private readonly Dictionary<string, string> NodeNames = new();
+
+    private string GetNodeName(string uid)
+    {
+        if (NodeNames.ContainsKey(uid))
+            return NodeNames[uid];
+        string name = this.ExecuteScalar<string>("select Name from DbObject where Uid = @0", uid)?.EmptyAsNull() ?? "UNKNOWN";
+        lock (NodeNames)
+        {
+            if(NodeNames.ContainsKey(uid) == false)
+                NodeNames.Add(uid, name);
+        }
+
+        return name;
+    }
+
     protected override void OnExecutingCommand(DbCommand cmd)
     {
         int hashCode = cmd.GetHashCode();
@@ -69,6 +85,13 @@ public class FlowDatabase:NPoco.Database
         string sql = GetCommandText(cmd);
         if (sql.Contains("LogMessage"))
             sql = "LOGMESSAGE";
+        else if(sql.StartsWith("update DbObject set Data = json_set(Data, '$.LastSeen', "))
+        {
+            string lastSeen = Regex.Match(sql, @"(?<=('\$\.LastSeen', '))[^']+").Value;
+            string node = Regex.Match(sql, @"(?<=(and Uid = '))[^']+").Value;
+            node = GetNodeName(node);
+            sql = $"LastSeen '{node}': {lastSeen}";
+        }
         else if(sql.StartsWith("UPDATE `DbObject` SET `Name` = \""))
         {
             string name = Regex.Match(sql, @"(?<=(UPDATE `DbObject` SET `Name` = ""))[^""]+").Value;

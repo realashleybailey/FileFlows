@@ -1076,13 +1076,17 @@ export class LibraryFileTable extends FFChart
         }
         return num.toFixed(2) + ' ' + sizes[order];
     }
+    
+    getTimerInterval() {
+        return document.hasFocus() ? 10000 : 20000;
+    }
 
     async getData() {
         if(this.disposed)
             return;
         super.getData();
         
-        this.timer = setTimeout(() => this.getData(), 5000);
+        this.timer = setTimeout(() => this.getData(), this.getTimerInterval());
     }
 
     createChart(data) {
@@ -1229,7 +1233,7 @@ export class Processing extends FFChart
             return;
         super.getData();
         
-        this.timer = setTimeout(() => this.getData(), 5000);
+        this.timer = setTimeout(() => this.getData(), document.hasFocus() ? 5000 : 10000);
     }
     
     createChart(data) {

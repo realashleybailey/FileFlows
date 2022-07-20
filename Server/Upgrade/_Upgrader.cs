@@ -1,4 +1,5 @@
 ﻿using FileFlows.Server.Controllers;
+using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 
@@ -13,6 +14,22 @@ public class Upgrader
         // so on a clean install these do not run
         if (currentVersion > new Version(0, 4, 0))
         {
+            if (settings.Version != Globals.Version)
+            {
+                // first backup the database
+                if (DbHelper.UseMemoryCache)
+                {
+                    try
+                    {
+                        string source = SqliteDbManager.SqliteDbFile;
+                        File.Copy(source, source.Replace(".sqlite", "-" + currentVersion.Major + "." + currentVersion.Minor + "." + currentVersion.Revision + ".backup"));
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+
             if (currentVersion < new Version(0, 5, 3))
                 new Upgrade0_5_3().Run();
             if (currentVersion < new Version(0, 6, 0))

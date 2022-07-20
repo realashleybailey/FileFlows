@@ -1,4 +1,3 @@
-using System.Reflection;
 using BlazorDateRangePicker;
 using FileFlows.Plugin;
 using Microsoft.AspNetCore.Components;
@@ -66,6 +65,14 @@ public partial class Log : ComponentBase
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(100);
+                await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content", true});
+            });
+        }
         if (scrollToBottom)
         {
             await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content"});

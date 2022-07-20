@@ -146,7 +146,7 @@ window.ff = {
         const height = ele.scrollHeight;
         return position > height - threshold;
     },
-    scrollToBottom: function(element) {
+    scrollToBottom: function(element, notSmooth) {
         let ele = element;
         if(typeof(element) === 'string')
             ele = document.getElementById(element);
@@ -154,7 +154,10 @@ window.ff = {
             ele = document.querySelector(element);
         if(!ele)
             return false;
-        ele.scrollTo({ top: ele.scrollHeight, behavior: 'smooth' })
+        if(notSmooth)
+            ele.scrollTo({ top: ele.scrollHeight })
+        else
+            ele.scrollTo({ top: ele.scrollHeight, behavior: 'smooth' })
     },
     codeCaptureSave: function(csharp) {
         window.CodeCaptureListener = (e) => {

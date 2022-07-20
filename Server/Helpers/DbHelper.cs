@@ -1,4 +1,3 @@
-using System.Data.Entity.Infrastructure.Design;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;

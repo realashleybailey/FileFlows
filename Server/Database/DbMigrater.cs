@@ -1,6 +1,7 @@
 using System.Data.SQLite;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
+using Microsoft.Data.SqlClient;
 using DatabaseType = NPoco.DatabaseType;
 
 namespace FileFlows.Server.Database;
@@ -195,6 +196,6 @@ public class DbMigrater
                 null,
                 MySqlConnector.MySqlConnectorFactory.Instance);
         
-        return new NPoco.Database(connectionString, null, System.Data.SqlClient.SqlClientFactory.Instance);
+        return new NPoco.Database(connectionString, null, SqlClientFactory.Instance);
     }
 }

@@ -304,9 +304,7 @@ public class MySqlDbManager: DbManager
     public override async Task<List<Dictionary<int, int>>> GetHourProcessingTotals()
     {
         List<(int day, int hour, int count)> data;
-        string sql = @"SELECT 
-DAYOFWEEK(js_ProcessingStarted) AS day, 
-HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
+        string sql = @"SELECT DAYOFWEEK(js_ProcessingStarted) AS day, HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
  from DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
 AND js_Status = 1 AND js_ProcessingStarted IS not NULL
 GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";

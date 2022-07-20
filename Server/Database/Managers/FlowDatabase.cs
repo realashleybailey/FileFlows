@@ -85,6 +85,10 @@ public class FlowDatabase:NPoco.Database
         string sql = GetCommandText(cmd);
         if (sql.Contains("LogMessage"))
             sql = "LOGMESSAGE";
+        else if (sql == "call GetLibraryFiles(1, 365, 0, 10, \"\", 0)")
+            sql = "DASHBOARD: RECENTLY FINISHED";
+        else if (sql == "call GetLibraryFiles(0, 365, 0, 10, \"\", 0)")
+            sql = "DASHBOARD: UPCOMING";
         else if(sql.StartsWith("update DbObject set Data = json_set(Data, '$.LastSeen', "))
         {
             string lastSeen = Regex.Match(sql, @"(?<=('\$\.LastSeen', '))[^']+").Value;

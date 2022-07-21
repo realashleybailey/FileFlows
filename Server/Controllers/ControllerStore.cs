@@ -161,6 +161,8 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
             useCache = DbHelper.UseMemoryCache;
         if(useCache == true)
         {
+            if(_Data == null)
+                await GetData();
             await _mutex.WaitAsync();
             try
             {

@@ -19,7 +19,7 @@ namespace FileFlows.Server.Controllers;
 public class WorkerController : Controller
 {
     private readonly static Dictionary<Guid, FlowExecutorInfo> Executors = new();
-    private Queue<Guid> CompletedExecutors = new Queue<Guid>(50);
+    private readonly Queue<Guid> CompletedExecutors = new Queue<Guid>(50);
 
     private IHubContext<FlowHub> Context;
 
@@ -71,7 +71,7 @@ public class WorkerController : Controller
         
         if (string.IsNullOrEmpty(info.Log) == false)
         {
-            // this contains the full log file, save it incase a message was lost or recieved out of order during processing
+            // this contains the full log file, save it in case a message was lost or received out of order during processing
             try
             {
                 _ = LibraryFileLogHelper.SaveLog(info.LibraryFile.Uid, info.Log, saveHtml: true);

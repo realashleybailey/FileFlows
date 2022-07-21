@@ -94,7 +94,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         return _Data;
     }
 
-    internal virtual async Task<IEnumerable<T>> GetDataList(bool? useCache = false)
+    internal virtual async Task<IEnumerable<T>> GetDataList(bool? useCache = null)
     {
         if (useCache == null)
             useCache = DbHelper.UseMemoryCache;
@@ -103,7 +103,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         return await DbHelper.Select<T>();
     } 
 
-    protected async Task<T> GetByUid(Guid uid, bool? useCache = false)
+    protected async Task<T> GetByUid(Guid uid, bool? useCache = null)
     {
         if (useCache == null)
             useCache = DbHelper.UseMemoryCache;
@@ -201,7 +201,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
     /// Called by the revision controller when a revision is restored
     /// </summary>
     /// <param name="dbo">the DbObject</param>
-    internal async Task Refresh(DbObject dbo, bool? useCache = false)
+    internal async Task Refresh(DbObject dbo, bool? useCache = null)
     {
         if (useCache == null)
             useCache = DbHelper.UseMemoryCache;

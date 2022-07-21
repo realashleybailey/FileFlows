@@ -460,9 +460,16 @@ public class LibraryFileController : ControllerStore<LibraryFile>
     [HttpGet("status")]
     public async Task<IEnumerable<LibraryStatus>> GetStatus()
     {
-        var libraryFiles = await GetDataList();
-        var libraries = await new LibraryController().GetData();
-        return GetStatusData(libraryFiles, libraries);
+        if (DbHelper.UseMemoryCache)
+        {
+            var libraryFiles = await GetDataList();
+            var libraries = await new LibraryController().GetData();
+            return GetStatusData(libraryFiles, libraries);
+        }
+        else
+        {
+            return await DbHelper.GetLibraryFileOverview();
+        }
     }
     
     private IEnumerable<LibraryStatus> GetStatusData(IEnumerable<LibraryFile> libraryFiles, IDictionary<Guid, Library> libraries)

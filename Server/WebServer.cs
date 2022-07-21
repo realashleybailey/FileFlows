@@ -100,13 +100,15 @@ public class WebServer
 
         app.UseMiddleware<ExceptionMiddleware>();
         app.UseMiddleware<LoggingMiddleware>();
+        // this is an experiment, may reuse it one day
+        //app.UseMiddleware<UiMiddleware>();
         app.UseRouting();
 
 
         Globals.IsDevelopment = app.Environment.IsDevelopment();
 
         if (Globals.IsDevelopment)
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("*"));
 
         app.MapControllerRoute(
              name: "default",

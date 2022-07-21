@@ -1,3 +1,4 @@
+using System.Collections;
 using System.IO;
 
 namespace FileFlows.Shared.Helpers;
@@ -15,6 +16,10 @@ using FileFlows.Shared.Models;
 /// </summary>
 public class HttpHelper
 {
+    //public delegate void RemainingFilesHeader(int count);
+
+    //public static event RemainingFilesHeader OnRemainingFilesHeader;
+    
     /// <summary>
     /// Gets or sets the HTTP Client used
     /// </summary>
@@ -188,7 +193,7 @@ public class HttpHelper
             }
 
             if(noLog == false)
-                Log("Making request[" + method + "]: " + url);
+                Log("Making request [" + method + "]: " + url);
             HttpResponseMessage response;
             if (timeoutSeconds > 0)
             {
@@ -206,7 +211,24 @@ public class HttpHelper
                 return new RequestResult<T> { Success = false };
             }
 
+            // if (TryGetHeader(response, "x-files-remaining", out int filesRemaining))
+            // {
+            //     if (OnRemainingFilesHeader != null)
+            //     {
+            //         try
+            //         {
+            //             OnRemainingFilesHeader.Invoke(filesRemaining);
+            //         }
+            //         catch (Exception)
+            //         {
+            //         }
+            //     }
+            // }
+            
+            
             string body = await response.Content.ReadAsStringAsync();
+            
+
             if (response.IsSuccessStatusCode && (body.Contains("INFO") == false && body.Contains("An unhandled error has occurred.")) == false)
             {
                 var options = new JsonSerializerOptions
@@ -237,6 +259,36 @@ public class HttpHelper
         {
             throw;
         }
+    }
+
+    private static bool TryGetHeader<T>(HttpResponseMessage response, string header, out T result)
+    {
+        result = default;
+        try
+        {
+            if (response.Headers.TryGetValues(header, out IEnumerable<string> values))
+            {
+                var first = values.FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(first) == false)
+                {
+                    if (typeof(T) == typeof(int))
+                    {
+                        result = (T)(object)int.Parse(first);
+                        return true;
+                    }
+                    if (typeof(T) == typeof(string))
+                    {
+                        result = (T)(object)first;
+                        return true;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log("TryGetHeader error: " + ex.Message);
+        }
+        return false;
     }
 
     /// <summary>

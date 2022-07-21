@@ -1,3 +1,6 @@
+using System.Threading;
+using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Shared;
@@ -7,7 +10,7 @@ using System.Linq;
 using FileFlows.Shared;
 using Microsoft.AspNetCore.Components;
 
-public partial class NavMenu
+public partial class NavMenu : IDisposable
 {
     [Inject] private INavigationService NavigationService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
@@ -22,18 +25,37 @@ public partial class NavMenu
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private NavMenuItem nmiFlows, nmiLibraries;
 
+    private int Unprocessed = -1, Processing = -1, Failed = -1;
+
+    private BackgroundTask bubblesTask;
+
     protected override void OnInitialized()
     {
         lblVersion = Translater.Instant("Labels.VersionNumber", new { version = Globals.Version });
         lblHelp = Translater.Instant("Labels.Help");
         lblForum = Translater.Instant("Labels.Forum");
         lblDiscord = Translater.Instant("Labels.Discord");
-
+        
         App.Instance.OnFileFlowsSystemUpdated += FileFlowsSystemUpdated;
+
+        bubblesTask = new BackgroundTask(TimeSpan.FromMilliseconds(10_000), () => _ = RefreshBubbles());
+        _ = RefreshBubbles();
+        bubblesTask.Start();
         
         this.LoadMenu();
     }
-    
+
+    private async Task RefreshBubbles()
+    {
+        var sResult = await HttpHelper.Get<List<LibraryStatus>>("/api/library-file/status");
+        if (sResult.Success == false || sResult.Data?.Any() != true)
+            return;
+        Unprocessed = sResult.Data.Where(x => x.Status == FileStatus.Unprocessed).Select(x => x.Count).FirstOrDefault();
+        Processing = sResult.Data.Where(x => x.Status == FileStatus.Processing).Select(x => x.Count).FirstOrDefault();
+        Failed = sResult.Data.Where(x => x.Status == FileStatus.ProcessingFailed).Select(x => x.Count).FirstOrDefault();
+        this.StateHasChanged();
+    }
+
     void LoadMenu()
     {
         this.MenuItems.Clear();
@@ -151,6 +173,13 @@ public partial class NavMenu
     {
         Active = item;
         this.StateHasChanged();
+    }
+
+
+    public void Dispose()
+    {
+        _ = bubblesTask?.StopAsync();
+        bubblesTask = null;
     }
 }
 

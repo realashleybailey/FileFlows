@@ -1488,6 +1488,7 @@ export class Processing extends FFChart
                 updated = true;
             } catch (err) { }
         }
+        console.log('eleChart', eleChart, updated);
 
         if (updated === false && eleChart) {
             new ApexCharts(eleChart, options).render();

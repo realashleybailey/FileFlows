@@ -47,6 +47,10 @@ public partial class NavMenu : IDisposable
 
     private async Task RefreshBubbles()
     {
+        bool hasFocus = await jSRuntime.InvokeAsync<bool>("eval", "document.hasFocus()");
+        if (hasFocus == false)
+            return;
+        
         var sResult = await HttpHelper.Get<List<LibraryStatus>>("/api/library-file/status");
         if (sResult.Success == false || sResult.Data?.Any() != true)
             return;

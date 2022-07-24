@@ -103,6 +103,7 @@ public partial class NavMenu : IDisposable
                 new ("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                 new ("Pages.Variables.Title", "fas fa-at", "tools"),
                 App.Instance.FileFlowsSystem.Licensed ? new ("Pages.Revisions.Title", "fas fa-history", "revisions") : null,
+                App.Instance.FileFlowsSystem.Licensed ? new ("Pages.Tasks.Title", "fas fa-clock", "tasks") : null,
                 new ("Pages.Settings.Title", "fas fa-cogs", "settings"),
             }
         });

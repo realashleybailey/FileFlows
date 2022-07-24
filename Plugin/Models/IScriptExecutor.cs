@@ -24,6 +24,11 @@ public class ScriptExecutionArgs
     public string Code { get; set; }
 
     /// <summary>
+    /// Gets or sets the type of script being executed
+    /// </summary>
+    public ScriptType ScriptType { get; set; }
+
+    /// <summary>
     /// Gets or sets teh NodeParameters
     /// </summary>
     public NodeParameters Args { get; set; }

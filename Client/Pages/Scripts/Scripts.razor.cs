@@ -2,6 +2,7 @@ using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using FileFlows.Client.Components.Common;
 using FileFlows.Client.Components.Dialogs;
+using FileFlows.Plugin;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 

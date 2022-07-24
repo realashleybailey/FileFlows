@@ -291,7 +291,7 @@ public class FlowWorker : Worker
         var scriptNode = new ScriptNode();
         scriptNode.Code = code;
         var args = new NodeParameters(Logger.Instance);
-        args.ScriptExecutor = new FileFlows.ServerShared.ScriptExecution.ScriptExecutor();
+        args.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor();
         var output = scriptNode.Execute(args);
         if (output == 1)
             return true;

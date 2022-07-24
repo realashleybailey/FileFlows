@@ -550,6 +550,18 @@
         "OpenDbConnections":"Open Database Connections"
       }
     },
+    "Tasks": {
+      "Title": "Tasks"
+    },
+    "Task":{ 
+      "Title":"Task",
+      "Fields": {
+        "Script": "Script",
+        "Script-Help":"The script to execute at the configured schedule",
+        "Schedule": "Schedule",
+        "Schedule-Help": "When this script should execute"
+      }
+    },
     "Variables": {
       "Title": "Variables"
     },

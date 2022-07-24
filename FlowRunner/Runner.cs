@@ -23,6 +23,7 @@ public class Runner
     private CancellationTokenSource CancellationToken = new CancellationTokenSource();
     private bool Canceled = false;
     private string WorkingDir;
+    private string ScriptDir, ScriptSharedDir;
 
     /// <summary>
     /// Creates an instance of a Runner
@@ -269,7 +270,10 @@ public class Runner
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
         nodeParameters.PathMapper = (string path) => Node.Map(path);
         nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
-        nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecution.ScriptExecutor();
+        nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()
+        {
+            SharedDirectory = ScriptSharedDir
+        };
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;
         FileHelper.DontSetPermissions = Node.DontSetPermissions;
@@ -288,6 +292,7 @@ public class Runner
         nodeParameters.Logger!.ILog("Executing Flow: " + Flow.Name);
 
         DownloadPlugins();
+        DownloadScripts();
 
         nodeParameters.Result = NodeResult.Success;
         nodeParameters.GetToolPathActual = (string name) =>
@@ -477,6 +482,41 @@ public class Runner
         return FileStatus.ProcessingFailed;
     }
 
+    private void DownloadScripts()
+    {
+        var service = ScriptService.Load();
+        DateTime start = DateTime.Now;
+        if (Directory.Exists(nodeParameters.TempPath) == false)
+            Directory.CreateDirectory(nodeParameters.TempPath);
+
+        string scriptsDir = Path.Combine(nodeParameters.TempPath, "Scripts");
+        if (Directory.Exists(scriptsDir) == false)
+            Directory.CreateDirectory(scriptsDir);
+        
+        ScriptSharedDir = Path.Combine(scriptsDir, "Shared");
+        if (Directory.Exists(ScriptSharedDir) == false)
+            Directory.CreateDirectory(ScriptSharedDir);
+        
+        scriptsDir = Path.Combine(scriptsDir, "Flow");
+        if (Directory.Exists(scriptsDir) == false)
+            Directory.CreateDirectory(scriptsDir);
+        
+        var shared = service.GetSharedScripts().Result;
+        foreach (var script in shared)
+        {
+            File.WriteAllText(Path.Combine(ScriptSharedDir, script.Name + ".js"), script.Code);
+        }
+
+        var flowScripts = service.GetFlowScripts().Result;
+        foreach (var script in flowScripts)
+        {
+            File.WriteAllText(Path.Combine(scriptsDir, script.Name + ".js"), script.Code);
+        }
+        
+        TimeSpan timeTaken = DateTime.Now - start;
+        nodeParameters.Logger?.ILog("Time taken to download scripts: " + timeTaken.ToString());
+    }
+    
     private void DownloadPlugins()
     {
         var service = PluginService.Load();

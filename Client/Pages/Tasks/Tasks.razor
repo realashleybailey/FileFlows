@@ -1,0 +1,45 @@
+@namespace FileFlows.Client.Pages
+@using FileFlows.Shared.Models
+@inherits ListPage<Guid, ScheduledTask>
+
+@page "/tasks"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+    <FlowTable @ref="Table" Data="@Data" TItem="ScheduledTask" Selection="SelectionMode.Multiple"
+               DoubleClick="@OnDoubleClick">
+        <ToolBar>            
+            <FlowTableButton TItem="ScheduledTask" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+            <FlowTableButton TItem="ScheduledTask" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+            <FlowTableButton TItem="ScheduledTask" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />       
+            <FlowTableButtonSeparator />             
+            <FlowTableHelpButton TItem="ScheduledTask" HelpUrl="ScheduledTasks" />
+        </ToolBar>
+
+        <Columns>
+            <FlowTableColumn TItem="ScheduledTask" Width="14rem" MobileWidth="auto">
+                <Header>
+                    @Globals.lblName
+                </Header>
+                <Cell Context="item">
+                    <span>@item.Name</span>
+                </Cell>
+            </FlowTableColumn>
+            <FlowTableColumn TItem="ScheduledTask" MobileWidth="0">
+                <Header>
+                    Schedule
+                </Header>
+                <Cell Context="item">
+                    <span>todo</span>
+                </Cell>
+            </FlowTableColumn>
+        </Columns>
+    </FlowTable>
+
+    </Body>
+
+</PageView>

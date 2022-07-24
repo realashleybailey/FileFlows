@@ -57,6 +57,17 @@ public class ScriptController : Controller
 
         return scripts.OrderBy(x => x.Name);
     }
+    
+    /// <summary>
+    /// Gets all scripts in the system
+    /// </summary>
+    /// <returns>a list of all scripts</returns>
+    [HttpGet("shared")]
+    public async Task<IEnumerable<Script>> GetShared()
+    {
+        List<Script> scripts = new();
+        return await GetAll(DirectoryHelper.ScriptsDirectoryShared, ScriptType.Shared);
+    }
 
     private Task<IEnumerable<Script>> GetRepositoryScripts(ScriptType type) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemRepository : DirectoryHelper.ScriptsDirectoryFlowRepository, type, repository: true);
     private Task<IEnumerable<Script>> GetUserScripts(ScriptType type) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemUser : DirectoryHelper.ScriptsDirectoryFlowUser, type);

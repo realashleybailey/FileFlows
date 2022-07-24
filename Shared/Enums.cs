@@ -57,18 +57,3 @@ public enum ProcessingLibraries
     /// </summary>
     AllExcept = 2
 }
-
-/// <summary>
-/// A type of script
-/// </summary>
-public enum ScriptType
-{
-    /// <summary>
-    /// A script used in a flow
-    /// </summary>
-    Flow = 0,
-    /// <summary>
-    /// A script used by the system to process something
-    /// </summary>
-    System = 1
-}

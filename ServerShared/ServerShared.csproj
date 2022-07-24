@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Plugin\Plugin.csproj" />
+    <ProjectReference Include="..\ScriptExecution\ScriptExecution.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 

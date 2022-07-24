@@ -39,7 +39,7 @@ public partial class ScriptBrowser: ComponentBase
     internal Task<bool> Open(ScriptType type)
     {
         this.ScriptType = type;
-        lblTitle = Translater.Instant("Pages.Scripts.Labels.ScriptBrowser") + " - " + type;
+        lblTitle = Translater.Instant("Pages.Scripts.Labels.ScriptBrowser") + " - " + type  + " Scripts";
         this.Visible = true;
         this.Loading = true;
         this.Table.Data = new List<RepositoryScript>();

@@ -1,6 +1,7 @@
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using SkiaSharp;
 
 namespace FileFlows.Server.Controllers;
 
@@ -23,6 +24,27 @@ public class ScriptRepositoryController : Controller
     {
         var repo = await GetRepository();
         var scripts = (type == ScriptType.System ? repo.SystemScripts : repo.FlowScripts);
+        if (missing)
+        {
+            List<string> known = new();
+            foreach (string file in Directory.GetFiles(
+                         type == ScriptType.System
+                             ? DirectoryHelper.ScriptsDirectorySystemRepository
+                             : DirectoryHelper.ScriptsDirectoryFlowRepository, "*.js"))
+            {
+                try
+                {
+                    string line = System.IO.File.ReadAllLines(file).First();
+                    if(line?.StartsWith("// path:") == true)
+                        known.Add(line[9..].Trim());
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            scripts = scripts.Where(x => known.Contains(x.Path) == false).ToList();
+        }
         return scripts;
     }
 
@@ -71,25 +93,29 @@ public class ScriptRepositoryController : Controller
             await DownloadScript(script.Path, Path.Combine(DirectoryHelper.ScriptsDirectoryShared, output));
         }
 
-        foreach(var script in model.Scripts)
+        Dictionary<string, RepositoryScript> scripts =
+            repo.SystemScripts.Union(repo.FlowScripts).ToDictionary(x => x.Path, x => x); 
+
+        foreach(var spath in model.Scripts)
         {
             try
             {
-                int slashIndex = script.IndexOf("/");
-                var type = Enum.Parse<ScriptType>(script[0..slashIndex]);
-                string file = script[(slashIndex + 1)..].Replace("/", " - ");
-                if (file.EndsWith(".js") == false)
-                    file += ".js";
+                if (scripts.ContainsKey(spath) == false)
+                    throw new Exception("Failed to locate script: " + spath);
+                int slashIndex = spath.IndexOf("/");
+                var type = Enum.Parse<ScriptType>(spath[0..slashIndex]);
+                var script = scripts[spath];
+                string file = script.Name + ".js";
                 string output =
                     Path.Combine(
                         type == ScriptType.System
                             ? DirectoryHelper.ScriptsDirectorySystemRepository
                             : DirectoryHelper.ScriptsDirectoryFlowRepository, file);
-                await DownloadScript(script, output);
+                await DownloadScript(spath, output);
             }
             catch (Exception ex)
             { 
-                Logger.Instance?.ELog($"Failed downloading script: '{script}' => {ex.Message}");
+                Logger.Instance?.ELog($"Failed downloading script: '{spath}' => {ex.Message}");
             }
         }
     }
@@ -99,6 +125,7 @@ public class ScriptRepositoryController : Controller
         try
         {
             string code = await GetCode(path);
+            code = "// path: " + path + "\n\n" + code;
             await System.IO.File.WriteAllTextAsync(output, code);
         }
         catch (Exception ex)

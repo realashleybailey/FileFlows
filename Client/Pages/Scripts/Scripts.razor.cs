@@ -1,4 +1,5 @@
 using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using FileFlows.Client.Components.Common;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
@@ -31,9 +32,7 @@ public partial class Scripts : ListPage<string, Script>
 
     private async Task Add()
     {
-#if (!DEMO)
         await Edit(new Script());
-#endif
     }
 
 
@@ -73,7 +72,6 @@ public partial class Scripts : ListPage<string, Script>
 
     private async Task Export()
     {
-#if (!DEMO)
         var item = Table.GetSelected()?.FirstOrDefault();
         if (item == null)
             return;
@@ -82,12 +80,10 @@ public partial class Scripts : ListPage<string, Script>
         url = "http://localhost:6868" + url;
 #endif
         await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".js" });
-#endif
     }
 
     private async Task Import()
     {
-#if (!DEMO)
         var idResult = await ImportDialog.Show("js");
         string js = idResult.content;
         if (string.IsNullOrEmpty(js))
@@ -112,20 +108,18 @@ public partial class Scripts : ListPage<string, Script>
         {
             Blocker.Hide();
         }
-#endif
     }
 
 
     private async Task Duplicate()
     {
-#if (!DEMO)
         Blocker.Show();
         try
         {
             var item = Table.GetSelected()?.FirstOrDefault();
             if (item == null)
                 return;
-            string url = $"/api/script/duplicate/{item.Uid}";
+            string url = $"/api/script/duplicate/{item.Uid}?type={SelectedType}";
 #if (DEBUG)
             url = "http://localhost:6868" + url;
 #endif
@@ -145,7 +139,6 @@ public partial class Scripts : ListPage<string, Script>
         {
             Blocker.Hide();
         }
-#endif
     }
 
     public override async Task Delete()
@@ -181,6 +174,11 @@ public partial class Scripts : ListPage<string, Script>
     {
         this.DataFlow = this.Data.Where(x => x.Type == ScriptType.Flow).ToList();
         this.DataProcess = this.Data.Where(x => x.Type == ScriptType.System).ToList();
+        foreach (var script in this.Data)
+        {
+            if (script.Code?.StartsWith("// path: ") == true)
+                script.Code = Regex.Replace(script.Code, @"^\/\/ path:(.*?)$", string.Empty, RegexOptions.Multiline).Trim();
+        }
         this.Skybox.SetItems(new List<FlowSkyBoxItem<ScriptType>>()
         {
             new ()
@@ -203,6 +201,8 @@ public partial class Scripts : ListPage<string, Script>
     async Task Browser()
     {
         bool result = await ScriptBrowser.Open(this.SelectedType);
+        if (result)
+            await this.Refresh();
     }
 
     

@@ -91,6 +91,7 @@ public class ScriptController : Controller
     {
         var result = FindScript(name, type);
         string code = await System.IO.File.ReadAllTextAsync(result.File);
+        
         return new Script()
         {
             Uid = name,
@@ -153,6 +154,9 @@ public class ScriptController : Controller
     [HttpPost]
     public Script Save([FromBody] Script script)
     {
+        if (script?.Code?.StartsWith("// path: ") == true)
+            script.Code = Regex.Replace(script.Code, @"^\/\/ path:(.*?)$", string.Empty, RegexOptions.Multiline).Trim();
+        
         if(ValidScriptName(script.Name) == false)
             throw new Exception("Invalid script name\nCannot contain: " + UnsafeCharacters);
         
@@ -162,7 +166,7 @@ public class ScriptController : Controller
         {
             if (DeleteScript(script.Uid, false, script.Type))
             {
-                UpdateScriptReferences(script.Uid, script.Name);
+                _ = UpdateScriptReferences(script.Uid, script.Name);
             }
             script.Uid = script.Name;
         }
@@ -274,19 +278,21 @@ public class ScriptController : Controller
     /// <summary>
     /// Duplicates a script
     /// </summary>
-    /// <param name="uid">The name of the script to duplicate</param>
+    /// <param name="name">The name of the script to duplicate</param>
+    /// <param name="type">the script type</param>
     /// <returns>The duplicated script</returns>
     [HttpGet("duplicate/{name}")]
-    public async Task<Script> Duplicate([FromRoute] string name)
+    public async Task<Script> Duplicate([FromRoute] string name, [FromQuery] ScriptType type = ScriptType.Flow)
     {
         // use DbHelper to avoid the cache, otherwise we would update the in memory object 
-        var script = await Get(name);
+        var script = await Get(name, type);
         if (script == null)
             return null;
         
         script.Name = GetNewUniqueName(name);
         script.Repository = false;
         script.Uid = script.Name;
+        script.Type = type;
         return Save(script);
     }
 
@@ -329,7 +335,8 @@ public class ScriptController : Controller
     {
         try
         {
-            new ScriptParser().Parse(name ?? string.Empty, code);
+            if(type == ScriptType.Flow) // system scripts dont need to be parsed as they have no parameters
+                new ScriptParser().Parse(name ?? string.Empty, code);
             
             if(ValidScriptName(name) == false)
                 throw new Exception("Invalid script name:" + name);

@@ -81,7 +81,7 @@ public class Upgrade0_9_0
                 continue;
             string code = JsonSerializer.Deserialize<CodeObject>(dbo.Data).Code;
             string safeName = GetNewScriptName(dbo.Name);
-            string name = new FileInfo(Path.Combine(DirectoryHelper.ScriptsDirectoryUser, safeName + ".js")).FullName;
+            string name = new FileInfo(Path.Combine(DirectoryHelper.ScriptsDirectoryFlowUser, safeName + ".js")).FullName;
             File.WriteAllText(name, code);
             Logger.Instance.ILog($"Exported script '{dbo.Name}' to: {name}");
         }

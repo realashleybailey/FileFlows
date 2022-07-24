@@ -1,0 +1,45 @@
+@namespace FileFlows.Client.Pages
+@using FileFlows.Shared.Models
+@inherits ListPage<Guid, Variable>
+
+@page "/tools"
+
+<PageView>
+
+    <Head>
+    </Head>
+
+    <Body>
+        <FlowTable @ref="Table" Data="@Data" TItem="Variable" Selection="SelectionMode.Multiple"
+            DoubleClick="@OnDoubleClick">
+            <ToolBar>            
+                <FlowTableButton TItem="Variable" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton TItem="Variable" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton TItem="Variable" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />       
+                <FlowTableButtonSeparator />             
+                <FlowTableHelpButton TItem="Variable" HelpUrl="variables" />
+            </ToolBar>
+
+            <Columns>
+                <FlowTableColumn TItem="Variable" Width="14rem" MobileWidth="auto">
+                    <Header>
+                        @Globals.lblName
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Name</span>
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Variable" MobileWidth="0">
+                    <Header>
+                        Value
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Value</span>
+                    </Cell>
+                </FlowTableColumn>
+            </Columns>
+        </FlowTable>
+
+    </Body>
+
+</PageView>

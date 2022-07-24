@@ -24,6 +24,7 @@
     "Refresh": "Refresh",
     "Download": "Download",
     "Default":"Default",
+    "Type": "Type",
     "DownloadLog": "Download Log",
     "Enabled": "Enabled",
     "Export": "Export",
@@ -428,6 +429,12 @@
         "DeleteSystem":"You cannot delete a system script",
         "DeleteUsed":"You cannot delete a script that is in use"
       },
+      "Labels": {
+        "ScriptBrowser":"Script Repository"
+      },
+      "Buttons": {
+        "ScriptBrowser": "Repository"
+      },
       "Fields":{
       }
     },
@@ -543,11 +550,11 @@
         "OpenDbConnections":"Open Database Connections"
       }
     },
-    "Tools": {
-      "Title": "Tools"
+    "Variables": {
+      "Title": "Variables"
     },
-    "Tool": {
-      "Title": "Tool"
+    "Variable": {
+      "Title": "Variable"
     }
   },
   "Validators":{

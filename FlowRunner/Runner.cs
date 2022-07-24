@@ -293,7 +293,7 @@ public class Runner
         nodeParameters.GetToolPathActual = (string name) =>
         {
             var nodeService = NodeService.Load();
-            return Node.Map(nodeService.GetToolPath(name).Result);
+            return Node.Map(nodeService.GetVariable(name).Result);
         };
         nodeParameters.GetPluginSettingsJson = (string pluginSettingsType) =>
         {

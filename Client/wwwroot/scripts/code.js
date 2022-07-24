@@ -17,7 +17,6 @@ window.ffCode = {
             "SetWorkingFile: function (filename: string, dontDelete: bool), " +
             "SetParameter: function (key:string, value:any)," +
             "NewGuid: function ():string," +
-            "GetToolPath: function(name:string):string," + 
             "Execute: function(args:{command:string, arguments: string, argumentList:string[], timeout:number, workingDirectory:string}):{completed:bool, exitCode:number, output:string, standardOutput:string, starndardError:string}," +
             "TempPath:string," +
             "WorkingFile:string," +

@@ -18,9 +18,14 @@ public class Script:IUniqueObject<string>, IInUse
     public string Code { get; set; }
 
     /// <summary>
-    /// Gets or sets if this script is a system script
+    /// Gets or sets if this script is a from a repository and cannot be modified
     /// </summary>
-    public bool System { get; set; }
+    public bool Repository { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of script
+    /// </summary>
+    public ScriptType Type { get; set; }
 
     /// <summary>
     /// Gets or sets the UID of this script, which is the original name of it

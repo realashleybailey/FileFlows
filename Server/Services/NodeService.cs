@@ -30,10 +30,10 @@ public class NodeService : INodeService
     /// </summary>
     /// <param name="name">The name of the tool</param>
     /// <returns>a tool path</returns>
-    public async Task<string> GetToolPath(string name)
+    public async Task<string> GetVariable(string name)
     {
-        var result = await new ToolController().GetByName(name);
-        return result?.Path ?? string.Empty;
+        var result = await new VariableController().GetByName(name);
+        return result?.Value ?? string.Empty;
     }
 
     /// <summary>

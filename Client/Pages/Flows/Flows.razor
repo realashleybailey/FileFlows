@@ -19,7 +19,6 @@ FileFlows will search for the 'Default' Failure Flow to use if a flow fails, if 
     </div>
 }
     
-    
     <FlowTable @ref="Table" Data="@(SelectedType == FlowType.Failure ? DataFailure : DataStandard)" TItem="FlowListModel" Selection="SelectionMode.Multiple"
             DoubleClick="@OnDoubleClick">
             <ToolBar>            

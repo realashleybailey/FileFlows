@@ -1,0 +1,54 @@
+@namespace FileFlows.Client.Components
+
+
+<div class="browser-wrapper @(Visible ? "visible" : "")">
+    <div class="background-overlay"></div>
+    <div class="browser">
+
+        <ViContainer Title="@lblTitle" Icon="fas fa-code" FullWidth=@true AlwaysShowTitle=@true>
+
+            <Head>
+                <button @onclick=@Close>@lblClose</button>
+            </Head>
+
+            <Body>
+                <div class="browser-content">
+                    <FlowTable @ref="Table" TItem="RepositoryScript" Selection="SelectionMode.Multiple" DoubleClick="@View">
+                        <ToolBar>                    
+                            <FlowTableButton TItem="RepositoryScript" Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
+                            <FlowTableButton TItem="RepositoryScript" Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                
+                        </ToolBar>
+
+                        <Columns>
+                            <FlowTableColumn TItem="RepositoryScript" Width="16rem">
+                                <Header>
+                                    @Globals.lblName
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@item.Name</span>
+                                </Cell>
+                            </FlowTableColumn>
+                            <FlowTableColumn TItem="RepositoryScript" Width="5rem">
+                                <Header>
+                                    Revision
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@item.Revision</span>
+                                </Cell>
+                            </FlowTableColumn>
+                            <FlowTableColumn TItem="RepositoryScript" Pre=@true>
+                                <Header>
+                                    Description
+                                </Header>
+                                <Cell Context="item">
+                                    <span>@item.Description</span>
+                                </Cell>
+                            </FlowTableColumn>
+                        </Columns>
+                    </FlowTable>
+                </div>
+            </Body>
+        </ViContainer>
+    </div>
+
+</div>

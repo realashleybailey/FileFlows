@@ -205,10 +205,10 @@ public abstract class DbManager
         using var flowDb = await GetDb();
         var db = flowDb.Db;
         bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
-        await AddOrUpdateObject(db, new Tool
+        await AddOrUpdateObject(db, new Variable
         {
             Name = "FFMpeg",
-            Path = windows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
+            Value = windows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
             DateCreated = DateTime.Now,
             DateModified = DateTime.Now
         });

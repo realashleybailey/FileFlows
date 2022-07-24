@@ -8,42 +8,42 @@ namespace FileFlows.Client.Pages
     using FileFlows.Shared;
     using FileFlows.Shared.Models;
 
-    public partial class Tools : ListPage<Guid, Tool>
+    public partial class Variables : ListPage<Guid, Variable>
     {
-        public override string ApiUrl => "/api/tool";
+        public override string ApiUrl => "/api/variable";
 
-        private Tool EditingItem = null;
+        private Variable EditingItem = null;
 
         private async Task Add()
         {
 #if (!DEMO)
-            await Edit(new Tool());
+            await Edit(new Variable());
 #endif
         }
 
 
-        public override async Task<bool> Edit(Tool Tool)
+        public override async Task<bool> Edit(Variable variable)
         {
 #if (!DEMO)
-            this.EditingItem = Tool;
+            this.EditingItem = variable;
             List<ElementField> fields = new List<ElementField>();
             fields.Add(new ElementField
             {
                 InputType = FileFlows.Plugin.FormInputType.Text,
-                Name = nameof(Tool.Name),
+                Name = nameof(variable.Name),
                 Validators = new List<FileFlows.Shared.Validators.Validator> {
                     new FileFlows.Shared.Validators.Required()
                 }
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.File,
-                Name = nameof(Tool.Path),
+                InputType = FileFlows.Plugin.FormInputType.Text,
+                Name = nameof(variable.Value),
                 Validators = new List<FileFlows.Shared.Validators.Validator> {
                     new FileFlows.Shared.Validators.Required()
                 }
             });
-            var result = await Editor.Open("Pages.Tool", "Pages.Tool.Title", fields, Tool,
+            var result = await Editor.Open("Pages.Variable", "Pages.Variable.Title", fields, variable,
               saveCallback: Save);
 #endif
             return false;
@@ -59,7 +59,7 @@ namespace FileFlows.Client.Pages
 
             try
             {
-                var saveResult = await HttpHelper.Post<Tool>($"{ApiUrl}", model);
+                var saveResult = await HttpHelper.Post<Variable>($"{ApiUrl}", model);
                 if (saveResult.Success == false)
                 {
                     Toast.ShowError( saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));

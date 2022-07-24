@@ -216,7 +216,7 @@ public class NodeController : ControllerStore<ProcessingNode>
         }
         var settings = await new SettingsController().Get();
         // doesnt exist, register a new node.
-        var tools = await new ToolController().GetAll();
+        var variables = await new VariableController().GetAll();
         bool isSystem = address == Globals.InternalNodeName;
         var result = await Update(new ProcessingNode
         {
@@ -225,8 +225,8 @@ public class NodeController : ControllerStore<ProcessingNode>
             Enabled = isSystem, // default to disabled so they have to configure it first
             FlowRunners = 1,
             Schedule = new string('1', 672),
-            Mappings = isSystem  ? null : tools.Select(x => new
-                KeyValuePair<string, string>(x.Path, "")
+            Mappings = isSystem  ? null : variables.Select(x => new
+                KeyValuePair<string, string>(x.Value, "")
             ).ToList()
         });
         result.SignalrUrl = "flow";
@@ -297,18 +297,18 @@ public class NodeController : ControllerStore<ProcessingNode>
         }
         var settings = await new SettingsController().Get();
         // doesnt exist, register a new node.
-        var tools = await new ToolController().GetAll();
+        var variables = await new VariableController().GetAll();
 
         if(model.Mappings?.Any() == true)
         {
-            var ffmpegTool = tools.Where(x => x.Name.ToLower() == "ffmpeg").FirstOrDefault();
+            var ffmpegTool = variables.Where(x => x.Name.ToLower() == "ffmpeg").FirstOrDefault();
             if (ffmpegTool != null)
             {
                 // update ffmpeg with actual location
                 var mapping = model.Mappings.Where(x => x.Server.ToLower() == "ffmpeg").FirstOrDefault();
                 if(mapping != null)
                 {
-                    mapping.Server = ffmpegTool.Path;
+                    mapping.Server = ffmpegTool.Value;
                 }
             }
         }
@@ -323,8 +323,8 @@ public class NodeController : ControllerStore<ProcessingNode>
             OperatingSystem = model.OperatingSystem,
             Version = model.Version,
             Schedule = new string('1', 672),
-            Mappings = model.Mappings?.Select(x => new KeyValuePair<string, string>(x.Server, x.Local))?.ToList() ?? tools?.Select(x => new
-               KeyValuePair<string, string>(x.Path, "")
+            Mappings = model.Mappings?.Select(x => new KeyValuePair<string, string>(x.Server, x.Local))?.ToList() ?? variables?.Select(x => new
+               KeyValuePair<string, string>(x.Value, "")
             )?.ToList() ?? new()
         }, useCache: true);
         result.SignalrUrl = "flow";

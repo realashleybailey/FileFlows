@@ -22,8 +22,11 @@ public class ScriptController : Controller
     public async Task<IEnumerable<Script>> GetAll()
     {
         List<Script> scripts = new();
-        scripts.AddRange(await GetSystemScripts());
-        scripts.AddRange(await GetUserScripts());
+        scripts.AddRange(await GetRepositoryScripts(ScriptType.Flow));
+        scripts.AddRange(await GetUserScripts(ScriptType.Flow));
+        scripts.AddRange(await GetRepositoryScripts(ScriptType.System));
+        scripts.AddRange(await GetUserScripts(ScriptType.System));
+        
         scripts = scripts.DistinctBy(x => x.Name).ToList();
         var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
         var flows = await new FlowController().GetAll();
@@ -55,10 +58,10 @@ public class ScriptController : Controller
         return scripts.OrderBy(x => x.Name);
     }
 
-    private Task<IEnumerable<Script>> GetSystemScripts() => GetAll(DirectoryHelper.ScriptsDirectorySystem, system: true);
-    private Task<IEnumerable<Script>> GetUserScripts() => GetAll(DirectoryHelper.ScriptsDirectoryUser);
+    private Task<IEnumerable<Script>> GetRepositoryScripts(ScriptType type) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemRepository : DirectoryHelper.ScriptsDirectoryFlowRepository, type, repository: true);
+    private Task<IEnumerable<Script>> GetUserScripts(ScriptType type) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemUser : DirectoryHelper.ScriptsDirectoryFlowUser, type);
 
-    async Task<IEnumerable<Script>> GetAll(string directory, bool system = false)
+    async Task<IEnumerable<Script>> GetAll(string directory, ScriptType type, bool repository = false)
     {
         List<Script> scripts = new();
         foreach (var file in new DirectoryInfo(directory).GetFiles("*.js"))
@@ -68,7 +71,8 @@ public class ScriptController : Controller
             {
                 Uid = name,
                 Name = name,
-                System = system,
+                Repository = repository,
+                Type = type,
                 Code = await System.IO.File.ReadAllTextAsync(file.FullName)
             });
         }
@@ -80,22 +84,23 @@ public class ScriptController : Controller
     /// Get a script
     /// </summary>
     /// <param name="name">The name of the script</param>
+    /// <param name="type">The type of script</param>
     /// <returns>the script instance</returns>
     [HttpGet("{name}")]
-    public async Task<Script> Get([FromRoute] string name)
+    public async Task<Script> Get([FromRoute] string name, ScriptType type = ScriptType.Flow)
     {
-        var result = FindScript(name);
+        var result = FindScript(name, type);
         string code = await System.IO.File.ReadAllTextAsync(result.File);
         return new Script()
         {
             Uid = name,
             Name = name,
-            System = result.System,
+            Repository = result.System,
             Code = code
         };
     }
 
-    private (bool System, string File) FindScript(string name)
+    private (bool System, string File) FindScript(string name, ScriptType type)
     {
         if (ValidScriptName(name) == false)
         {
@@ -103,16 +108,16 @@ public class ScriptController : Controller
             throw new Exception("Script not found");
         }
 
-        string sysFilename = GetFullFilename(name, system: true);
-        if (System.IO.File.Exists(sysFilename))
+        string repoFilename = GetFullFilename(name, true, type);
+        if (System.IO.File.Exists(repoFilename))
         {
-            return (true, sysFilename);
+            return (true, repoFilename);
         }
 
-        string userFilename = GetFullFilename(name, system: false);
+        string userFilename = GetFullFilename(name, false, type);
         if (System.IO.File.Exists(userFilename))
             return (false, userFilename);
-        Logger.Instance.ELog($"Script '{name}' not found: {sysFilename}");
+        Logger.Instance.ELog($"Script '{name}' not found: {repoFilename}");
         Logger.Instance.ELog($"Script '{name}' not found: {userFilename}");
         throw new Exception("Script not found");
 
@@ -122,15 +127,16 @@ public class ScriptController : Controller
     /// Gets the code for a script
     /// </summary>
     /// <param name="name">The name of the script</param>
+    /// <param name="type">The type of script</param>
     /// <returns>the code for a script</returns>
     [HttpGet("{name}/code")]
-    public async Task<string> GetCode(string name)
+    public async Task<string> GetCode(string name, [FromQuery] ScriptType type = ScriptType.Flow)
     {
         if (ValidScriptName(name) == false)
             return $"Logger.ELog('invalid name: {name.Replace("'", "''")}');\nreturn -1";
         try
         {
-            var result = FindScript(name);
+            var result = FindScript(name, type);
             return await System.IO.File.ReadAllTextAsync(result.File);
         }
         catch (Exception ex)
@@ -150,11 +156,11 @@ public class ScriptController : Controller
         if(ValidScriptName(script.Name) == false)
             throw new Exception("Invalid script name\nCannot contain: " + UnsafeCharacters);
         
-        if (SaveScript(script.Name, script.Code) == false)
+        if (SaveScript(script.Name, script.Code, script.Type) == false)
             throw new Exception("Failed to save script");
         if (script.Uid != script.Name)
         {
-            if (DeleteScript(script.Uid))
+            if (DeleteScript(script.Uid, false, script.Type))
             {
                 UpdateScriptReferences(script.Uid, script.Name);
             }
@@ -192,16 +198,18 @@ public class ScriptController : Controller
     /// Delete scripts from the system
     /// </summary>
     /// <param name="model">A reference model containing UIDs to delete</param>
+    /// <param name="type">The type of scripts being deleted</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public void Delete([FromBody] ReferenceModel<string> model)
+    public void Delete([FromBody] ReferenceModel<string> model, [FromQuery] ScriptType type = ScriptType.Flow)
     {
-        
         foreach (string m in model.Uids)
         {
             if (ValidScriptName(m) == false)
                 continue;
-            string file = GetFullFilename(m, system: false);
+            string file = GetFullFilename(m, false, type);
+            if (System.IO.File.Exists(file) == false)
+                file = GetFullFilename(m, true, type);
             if (System.IO.File.Exists(file) == false)
                 continue;
             try
@@ -215,11 +223,11 @@ public class ScriptController : Controller
         }
     }
 
-    private bool DeleteScript(string script)
+    private bool DeleteScript(string script, bool repository, ScriptType type)
     {
         if (ValidScriptName(script) == false)
             return false;
-        string file = GetFullFilename(script, system: false);
+        string file = GetFullFilename(script, repository, type);
         if (System.IO.File.Exists(file) == false)
             return false;
         try
@@ -260,7 +268,7 @@ public class ScriptController : Controller
         // will throw if any errors
         name = name.Replace(".js", "").Replace(".JS", "");
         name = GetNewUniqueName(name);
-        return Save(new () { Name = name, Code = code, System = false});
+        return Save(new () { Name = name, Code = code, Repository = false});
     }
 
     /// <summary>
@@ -277,7 +285,7 @@ public class ScriptController : Controller
             return null;
         
         script.Name = GetNewUniqueName(name);
-        script.System = false;
+        script.Repository = false;
         script.Uid = script.Name;
         return Save(script);
     }
@@ -301,11 +309,23 @@ public class ScriptController : Controller
         }
         return true;
     }
-    
-    private string GetFullFilename(string name, bool system) => 
-        new DirectoryInfo(Path.Combine(system ? DirectoryHelper.ScriptsDirectorySystem : DirectoryHelper.ScriptsDirectoryUser, name + ".js")).FullName;
 
-    private bool SaveScript(string name, string code)
+    private string GetFullFilename(string name, bool repository, ScriptType type)
+    {
+        string baseDir;
+        if (repository && type == ScriptType.Flow)
+            baseDir = DirectoryHelper.ScriptsDirectoryFlowRepository;
+        else if (repository && type == ScriptType.System)
+            baseDir = DirectoryHelper.ScriptsDirectorySystemRepository;
+        else if (repository == false && type == ScriptType.System)
+            baseDir = DirectoryHelper.ScriptsDirectorySystemUser;
+        else
+            baseDir = DirectoryHelper.ScriptsDirectoryFlowUser;
+        
+        return new FileInfo(Path.Combine(baseDir, name + ".js")).FullName;
+    } 
+
+    private bool SaveScript(string name, string code, ScriptType type)
     {
         try
         {
@@ -313,7 +333,7 @@ public class ScriptController : Controller
             
             if(ValidScriptName(name) == false)
                 throw new Exception("Invalid script name:" + name);
-            string file = GetFullFilename(name, false);
+            string file = GetFullFilename(name, false, type);
             System.IO.File.WriteAllText(file, code);
             return true;
         }

@@ -1,18 +1,20 @@
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Components;
 using ffElement = FileFlows.Shared.Models.FlowElement;
 using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
 using FileFlows.Client.Components.Common;
 
+
 namespace FileFlows.Client.Components;
 
-public partial class PluginBrowser : ComponentBase
+public partial class ScriptBrowser: ComponentBase
 {
-    const string ApiUrl = "/api/plugin";
+    const string ApiUrl = "/api/script-repo";
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] public Editor Editor { get; set; }
 
-    public FlowTable<PluginPackageInfo> Table { get; set; }
+    public FlowTable<RepositoryScript> Table { get; set; }
 
     public bool Visible { get; set; }
 
@@ -26,17 +28,21 @@ public partial class PluginBrowser : ComponentBase
 
     private bool Loading = false;
 
+    private ScriptType ScriptType;
+
     protected override void OnInitialized()
     {
         lblClose = Translater.Instant("Labels.Close");
-        lblTitle = Translater.Instant("Pages.Plugins.Labels.PluginBrowser");
+        lblTitle = Translater.Instant("Pages.Scripts.Labels.ScriptBrowser");
     }
 
-    internal Task<bool> Open()
+    internal Task<bool> Open(ScriptType type)
     {
+        this.ScriptType = type;
+        lblTitle = Translater.Instant("Pages.Scripts.Labels.ScriptBrowser") + " - " + type;
         this.Visible = true;
         this.Loading = true;
-        this.Table.Data = new List<PluginPackageInfo>();
+        this.Table.Data = new List<RepositoryScript>();
         OpenTask = new TaskCompletionSource<bool>();
         _ = LoadData();
         this.StateHasChanged();
@@ -50,7 +56,7 @@ public partial class PluginBrowser : ComponentBase
         this.StateHasChanged();
         try
         {
-            var result = await HttpHelper.Get<List<PluginPackageInfo>>(ApiUrl + "/plugin-packages?missing=true");
+            var result = await HttpHelper.Get<List<RepositoryScript>>(ApiUrl + "/scripts?missing=true&type=" + ScriptType);
             if (result.Success == false)
             {
                 // close this and show message
@@ -85,9 +91,8 @@ public partial class PluginBrowser : ComponentBase
 
     private async Task Download()
     {
-#if (!DEMO)
         var selected = Table.GetSelected().ToArray();
-        var items = selected.Select(x => x.Package).ToList();
+        var items = selected.Select(x => x.Path).ToList();
         if (items.Any() == false)
             return;
         this.Blocker.Show();
@@ -95,7 +100,7 @@ public partial class PluginBrowser : ComponentBase
         try
         {
             this.Updated = true;
-            var result = await HttpHelper.Post(ApiUrl + "/download", new { Packages = items });
+            var result = await HttpHelper.Post(ApiUrl + "/download", new { Scripts = items });
             if (result.Success == false)
             {
                 // close this and show message
@@ -111,8 +116,8 @@ public partial class PluginBrowser : ComponentBase
             this.Blocker.Hide();
             this.StateHasChanged();
         }
-        await LoadData();
-#endif
+        this.Close();
+        //await LoadData();
     }
 
     private async Task ViewAction()
@@ -122,57 +127,30 @@ public partial class PluginBrowser : ComponentBase
             await View(item);
     }
 
-    private async Task View(PluginPackageInfo plugin)
+    private async Task View(RepositoryScript script)
     {
-        await Editor.Open("Pages.Plugins", plugin.Name, new List<ElementField>
+        Blocker.Show();
+        string code;
+        try
         {
-            new ElementField
-            {
-                Name = nameof(plugin.Name),
-                InputType = FormInputType.TextLabel
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Authors),
-                InputType = FormInputType.TextLabel
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Version),
-                InputType = FormInputType.TextLabel
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Url),
-                InputType = FormInputType.TextLabel,
-                Parameters = new Dictionary<string, object>
-                {
-                    { nameof(InputTextLabel.Link), true }
-                }
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Description),                    
-                InputType = FormInputType.TextLabel,
-                Parameters = new Dictionary<string, object>
-                {
-                    { nameof(InputTextLabel.Pre), true }
-                }
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Elements),
-                InputType = FormInputType.Checklist,
-                Parameters = new Dictionary<string, object>
-                {
-                    { nameof(InputChecklist.ListOnly), true },
-                    { 
-                        nameof(InputChecklist.Options), 
-                        plugin.Elements.Select(x => new ListOption{ Label = x, Value = x }).ToList()
-                    }
-                }
-            },
-        }, plugin, readOnly: true);
-    }
+            var response =
+                await HttpHelper.Get<string>(ApiUrl + "/code?path=" + UrlEncoder.Create().Encode(script.Path));
+            if (response.Success == false)
+                return;
+            code = response.Data;
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
 
+        await Editor.Open("Pages.Scripts", script.Name, new List<ElementField>
+        {
+            new()
+            {
+                Name = "Code",
+                InputType = FormInputType.Code
+            },
+        }, new { Code = code }, readOnly: true);
+    }
 }

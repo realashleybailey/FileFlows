@@ -56,7 +56,7 @@ public class DirectoryHelper
 #if(DEBUG && false)
         return;
 #else
-        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectorySystem, ScriptsDirectoryUser })
+        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectoryFlowRepository, ScriptsDirectoryFlowUser, ScriptsDirectorySystemRepository, ScriptsDirectorySystemUser, ScriptsDirectoryShared })
         {
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
@@ -217,14 +217,29 @@ public class DirectoryHelper
     }
 
     /// <summary>
-    /// Gets the scripts directory for system scripts
+    /// Gets the scripts directory for scripts from the repository
     /// </summary>
-    public static string ScriptsDirectorySystem => Path.Combine(ScriptsDirectory, "System");
+    public static string ScriptsDirectoryFlowRepository => Path.Combine(ScriptsDirectory, "Flow", "Repository");
     
     /// <summary>
     /// Gets the scripts directory for user scripts
     /// </summary>
-    public static string ScriptsDirectoryUser => Path.Combine(ScriptsDirectory, "User");
+    public static string ScriptsDirectoryFlowUser => Path.Combine(ScriptsDirectory, "Flow", "User");
+    
+    /// <summary>
+    /// Gets the scripts directory for user system scripts
+    /// </summary>
+    public static string ScriptsDirectorySystemUser => Path.Combine(ScriptsDirectory, "System", "User");
+    
+    /// <summary>
+    /// Gets the scripts directory for system scripts from the repository
+    /// </summary>
+    public static string ScriptsDirectorySystemRepository => Path.Combine(ScriptsDirectory, "System", "Repository");
+
+    /// <summary>
+    /// Gets the scripts directory for scripts from the repository
+    /// </summary>
+    public static string ScriptsDirectoryShared => Path.Combine(ScriptsDirectory, "Shared");
     
     /// <summary>
     /// Gets the location of the encryption key file

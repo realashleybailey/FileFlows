@@ -1,4 +1,5 @@
 using System.Text.Encodings.Web;
+using FileFlows.Client.Components.Common;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -15,10 +16,17 @@ public partial class Scripts : ListPage<string, Script>
     public override string ApiUrl => "/api/script";
 
     const string FileFlowsServer = "FileFlowsServer";
+    
+    private FlowSkyBox<ScriptType> Skybox;
 
     private Script EditingItem = null;
     [Inject] public IJSRuntime jsRuntime { get; set; }
+    
+    private List<Script> DataFlow = new();
+    private List<Script> DataProcess = new();
+    private ScriptType SelectedType = ScriptType.Flow;
 
+    private ScriptBrowser ScriptBrowser { get; set; }
 
 
     private async Task Add()
@@ -142,14 +150,6 @@ public partial class Scripts : ListPage<string, Script>
 
     public override async Task Delete()
     {
-        var system = Table.GetSelected()?.Any(x => x.System) == true;
-        if (system)
-        {
-            Toast.ShowError("Pages.Scripts.Messages.DeleteSystem");
-            return;
-        }
-        
-        
         var used = Table.GetSelected()?.Any(x => x.UsedBy?.Any() == true) == true;
         if (used)
         {
@@ -157,8 +157,8 @@ public partial class Scripts : ListPage<string, Script>
             return;
         }
 
-
         await base.Delete();
+        await Refresh();
     }
 
 
@@ -168,5 +168,49 @@ public partial class Scripts : ListPage<string, Script>
         if (item?.UsedBy?.Any() != true)
             return;
         await UsedByDialog.Show(item.UsedBy);
+    }
+    
+    
+    public override Task PostLoad()
+    {
+        UpdateTypeData();
+        return Task.CompletedTask;
+    }
+    
+    private void UpdateTypeData()
+    {
+        this.DataFlow = this.Data.Where(x => x.Type == ScriptType.Flow).ToList();
+        this.DataProcess = this.Data.Where(x => x.Type == ScriptType.System).ToList();
+        this.Skybox.SetItems(new List<FlowSkyBoxItem<ScriptType>>()
+        {
+            new ()
+            {
+                Name = "Flow Scripts",
+                Icon = "fas fa-sitemap",
+                Count = this.DataFlow.Count,
+                Value = ScriptType.Flow
+            },
+            new ()
+            {
+                Name = "System Scripts",
+                Icon = "fas fa-microchip",
+                Count = this.DataProcess.Count,
+                Value = ScriptType.System
+            }
+        }, this.SelectedType);
+    }
+    
+    async Task Browser()
+    {
+        bool result = await ScriptBrowser.Open(this.SelectedType);
+    }
+
+    
+    private void SetSelected(FlowSkyBoxItem<ScriptType> item)
+    {
+        SelectedType = item.Value;
+        // need to tell table to update so the "Default" column is shown correctly
+        Table.TriggerStateHasChanged();
+        this.StateHasChanged();
     }
 }

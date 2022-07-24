@@ -746,4 +746,21 @@ input[type=file]{
     }
 }
 
+@media screen and (min-width: 1000px){
+    .editor.PagesScripts {
+        width: 900px !important;
+    }
+}
+
+@media screen and (min-width: 1200px){
+    .editor.PagesScripts {
+        width: 1100px !important;
+    }
+}
+
+@media screen and (min-width: 1300px){
+    .editor.PagesScripts {
+        width: 1200px !important;
+    }    
+}
 

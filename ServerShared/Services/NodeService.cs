@@ -24,11 +24,11 @@ public interface INodeService
     Task<ProcessingNode> GetServerNode();
 
     /// <summary>
-    /// Gets a tool path by name
+    /// Gets a variable value
     /// </summary>
-    /// <param name="name">The name of the tool</param>
-    /// <returns>a tool path</returns>
-    Task<string> GetToolPath(string name);
+    /// <param name="name">The name of the variable</param>
+    /// <returns>a variable value</returns>
+    Task<string> GetVariable(string name);
 
     /// <summary>
     /// Clears all workers on the node.
@@ -98,20 +98,20 @@ public class NodeService : Service, INodeService
     }
 
     /// <summary>
-    /// Gets a tool path by name
+    /// Gets a variable value
     /// </summary>
-    /// <param name="name">The name of the tool</param>
-    /// <returns>a tool path</returns>
-    public async Task<string> GetToolPath(string name)
+    /// <param name="name">The name of the variable</param>
+    /// <returns>a variable value</returns>
+    public async Task<string> GetVariable(string name)
     {
         try
         {
-            var result = await HttpHelper.Get<Tool>(ServiceBaseUrl + "/api/tool/name/" + Uri.EscapeDataString(name));
-            return result.Data.Path;
+            var result = await HttpHelper.Get<Variable>(ServiceBaseUrl + "/api/variable/name/" + Uri.EscapeDataString(name));
+            return result.Data.Value;
         }
         catch (Exception ex)
         {
-            Logger.Instance?.ELog("Failed to locate tool: " + name + " => " + ex.Message);
+            Logger.Instance?.ELog("Failed to locate variable: " + name + " => " + ex.Message);
             return string.Empty;
         }
     }

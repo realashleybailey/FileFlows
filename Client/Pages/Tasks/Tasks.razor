@@ -1,6 +1,7 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
-@inherits ListPage<Guid, ScheduledTask>
+@using Humanizer
+@inherits ListPage<Guid, FileFlowsTask>
 
 @page "/tasks"
 
@@ -10,18 +11,18 @@
     </Head>
 
     <Body>
-    <FlowTable @ref="Table" Data="@Data" TItem="ScheduledTask" Selection="SelectionMode.Multiple"
+    <FlowTable @ref="Table" Data="@Data" TItem="FileFlowsTask" Selection="SelectionMode.Multiple"
                DoubleClick="@OnDoubleClick">
         <ToolBar>            
-            <FlowTableButton TItem="ScheduledTask" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
-            <FlowTableButton TItem="ScheduledTask" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-            <FlowTableButton TItem="ScheduledTask" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />       
+            <FlowTableButton TItem="FileFlowsTask" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+            <FlowTableButton TItem="FileFlowsTask" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+            <FlowTableButton TItem="FileFlowsTask" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />       
             <FlowTableButtonSeparator />             
-            <FlowTableHelpButton TItem="ScheduledTask" HelpUrl="ScheduledTasks" />
+            <FlowTableHelpButton TItem="FileFlowsTask" HelpUrl="ScheduledTasks" />
         </ToolBar>
 
         <Columns>
-            <FlowTableColumn TItem="ScheduledTask" Width="14rem" MobileWidth="auto">
+            <FlowTableColumn TItem="FileFlowsTask" Width="14rem" MobileWidth="auto">
                 <Header>
                     @Globals.lblName
                 </Header>
@@ -29,7 +30,15 @@
                     <span>@item.Name</span>
                 </Cell>
             </FlowTableColumn>
-            <FlowTableColumn TItem="ScheduledTask" MobileWidth="0">
+            <FlowTableColumn TItem="FileFlowsTask" MobileWidth="0">
+                <Header>
+                    Type
+                </Header>
+                <Cell Context="item">
+                    <span>@item.Type.Humanize()</span>
+                </Cell>
+            </FlowTableColumn>
+            <FlowTableColumn TItem="FileFlowsTask" MobileWidth="0">
                 <Header>
                     Schedule
                 </Header>

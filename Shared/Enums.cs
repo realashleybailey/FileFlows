@@ -57,3 +57,34 @@ public enum ProcessingLibraries
     /// </summary>
     AllExcept = 2
 }
+
+/// <summary>
+/// Types of schedules a task can be triggered at
+/// </summary>
+public enum TaskType
+{
+    /// <summary>
+    /// At a configured time
+    /// </summary>
+    Time = 0,
+    /// <summary>
+    /// When a file is added to the system
+    /// </summary>
+    FileAdded = 1,
+    /// <summary>
+    /// When a file starts processing
+    /// </summary>
+    FileProcessing = 2,
+    /// <summary>
+    /// When a file has been processed
+    /// </summary>
+    FileProcessed = 3,
+    /// <summary>
+    /// When a file was successfully processed
+    /// </summary>
+    FileProcessSuccess = 4,
+    /// <summary>
+    /// When a file failed processing
+    /// </summary>
+    FileProcessFailed = 5
+}

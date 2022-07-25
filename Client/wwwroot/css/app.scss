@@ -746,6 +746,37 @@ input[type=file]{
     }
 }
 
+.editor.PagesScript .content
+{
+    padding:0.5rem;
+    .fields {
+        overflow: hidden;
+        padding:0;
+    }
+}
+.editor.PagesScript:not(.readonly) .fields
+{
+    .input-label {
+        display: none;
+    }
+    .row:first-child {
+        .input-value {
+            width: calc(100% - 2rem);
+            padding: 0 1rem;
+
+            input {
+                max-width: unset;
+            }
+        }
+    }
+    .row.error {
+        .input-value {
+            width: calc(100% - 2rem);
+            padding: 0 1rem;
+        }        
+    }
+}
+
 @media screen and (min-width: 1000px){
     .editor.PagesScripts {
         width: 900px !important;

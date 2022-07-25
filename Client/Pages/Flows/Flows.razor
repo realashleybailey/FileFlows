@@ -32,19 +32,19 @@ FileFlows will search for the 'Default' Failure Flow to use if a flow fails, if 
                 }
                 @if (App.Instance.IsMobile == false)
                 {
-                    <FlowTableButton TItem="FlowListModel" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
+                    <FlowTableButton TItem="FlowListModel" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate" />
                     <FlowTableButton TItem="FlowListModel" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import" />
                     <FlowTableButton TItem="FlowListModel" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export" />
                     if (DEBUG)
                     {
-                        <FlowTableButton TItem="FlowListModel" Clicked=Template SelectedOne="true" Icon="fas fa-file-export" Label="Template"/>
+                        <FlowTableButton TItem="FlowListModel" Clicked=Template SelectedOne="true" Icon="fas fa-file-export" Label="Template" />
                     }
                 }
                 <FlowTableButtonSeparator />
                 <FlowTableButton TItem="FlowListModel" Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy" />   
                 @if (App.Instance.FileFlowsSystem.Licensed)
                 {
-                    <FlowTableButton TItem="FlowListModel" Clicked=Revisions SelectedOne="true" Icon="fas fa-history" Label="Labels.Revisions"/>
+                    <FlowTableButton TItem="FlowListModel" Clicked=Revisions SelectedOne="true" Icon="fas fa-history" Label="Labels.Revisions" />
                 }
                 <FlowTableButtonSeparator />
                 <FlowTableHelpButton TItem="FlowListModel" HelpUrl="flows" />

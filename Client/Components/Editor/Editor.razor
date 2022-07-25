@@ -7,7 +7,7 @@
 {
     <div class="editor-wrapper">
         <div class="background-overlay"></div>
-        <div class="editor @(Maximised ? "maximised" : "") @(Large ? "large" : "") @(TypeName?.Dehumanize())">
+        <div class="editor @(Maximised ? "maximised" : "") @(Large ? "large" : "") @(TypeName?.Dehumanize()) @(ReadOnly ? "readonly" : "")">
 
             <ViContainer Title="@Title" Icon="@Icon" FullWidth=@true AlwaysShowTitle=@true Maximise=true OnMaximised=@OnMaximised>
 

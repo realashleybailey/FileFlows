@@ -11,18 +11,11 @@ namespace FileFlows.Server.Services;
 public class ScriptService:IScriptService
 {
     /// <summary>
-    /// Get all flow scripts
+    /// Get all scripts
     /// </summary>
-    /// <returns>a collection of flow scripts</returns>
-    public async Task<IEnumerable<Script>> GetFlowScripts() =>
-        (await new ScriptController().GetAll()).Where(x => x.Type == ScriptType.Flow);
-
-    /// <summary>
-    /// Get all shared scripts
-    /// </summary>
-    /// <returns>a collection of shared scripts</returns>
-    public Task<IEnumerable<Script>> GetSharedScripts() => new ScriptController().GetShared();
-
+    /// <returns>a collection of scripts</returns>
+    public Task<IEnumerable<Script>> GetScripts() => new ScriptController().GetAll();
+    
     /// <summary>
     /// Get a script
     /// </summary>

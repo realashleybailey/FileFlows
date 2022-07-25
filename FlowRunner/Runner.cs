@@ -501,13 +501,14 @@ public class Runner
         if (Directory.Exists(scriptsDir) == false)
             Directory.CreateDirectory(scriptsDir);
         
-        var shared = service.GetSharedScripts().Result;
+        var allScripts = service.GetScripts().Result;
+        var shared = allScripts.Where(x => x.Type == ScriptType.Shared);
         foreach (var script in shared)
         {
             File.WriteAllText(Path.Combine(ScriptSharedDir, script.Name + ".js"), script.Code);
         }
 
-        var flowScripts = service.GetFlowScripts().Result;
+        var flowScripts = allScripts.Where(x => x.Type == ScriptType.Flow);
         foreach (var script in flowScripts)
         {
             File.WriteAllText(Path.Combine(scriptsDir, script.Name + ".js"), script.Code);

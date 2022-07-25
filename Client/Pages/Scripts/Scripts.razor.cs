@@ -25,7 +25,8 @@ public partial class Scripts : ListPage<string, Script>
     [Inject] public IJSRuntime jsRuntime { get; set; }
     
     private List<Script> DataFlow = new();
-    private List<Script> DataProcess = new();
+    private List<Script> DataSystem = new();
+    private List<Script> DataShared = new();
     private ScriptType SelectedType = ScriptType.Flow;
 
     private ScriptBrowser ScriptBrowser { get; set; }
@@ -174,7 +175,8 @@ public partial class Scripts : ListPage<string, Script>
     private void UpdateTypeData()
     {
         this.DataFlow = this.Data.Where(x => x.Type == ScriptType.Flow).ToList();
-        this.DataProcess = this.Data.Where(x => x.Type == ScriptType.System).ToList();
+        this.DataSystem = this.Data.Where(x => x.Type == ScriptType.System).ToList();
+        this.DataShared = this.Data.Where(x => x.Type == ScriptType.Shared).ToList();
         foreach (var script in this.Data)
         {
             if (script.Code?.StartsWith("// path: ") == true)
@@ -192,9 +194,16 @@ public partial class Scripts : ListPage<string, Script>
             new ()
             {
                 Name = "System Scripts",
-                Icon = "fas fa-microchip",
-                Count = this.DataProcess.Count,
+                Icon = "fas fa-laptop-code",
+                Count = this.DataSystem.Count,
                 Value = ScriptType.System
+            },
+            new ()
+            {
+                Name = "Shared Scripts",
+                Icon = "fas fa-handshake",
+                Count = this.DataShared.Count,
+                Value = ScriptType.Shared
             }
         }, this.SelectedType);
     }

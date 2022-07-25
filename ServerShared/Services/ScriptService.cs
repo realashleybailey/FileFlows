@@ -11,16 +11,11 @@ namespace FileFlows.ServerShared.Services;
 public interface IScriptService
 {
     /// <summary>
-    /// Get all flow scripts
+    /// Get all scripts
     /// </summary>
-    /// <returns>a collection of flow scripts</returns>
-    Task<IEnumerable<Script>> GetFlowScripts();
+    /// <returns>a collection of scripts</returns>
+    Task<IEnumerable<Script>> GetScripts();
     
-    /// <summary>
-    /// Get all shared scripts
-    /// </summary>
-    /// <returns>a collection of shared scripts</returns>
-    Task<IEnumerable<Script>> GetSharedScripts();
     
     /// <summary>
     /// Get a script
@@ -60,10 +55,10 @@ public class ScriptService:Service, IScriptService
     }
 
     /// <summary>
-    /// Get all flow scripts
+    /// Get all scripts
     /// </summary>
-    /// <returns>a collection of flow scripts</returns>
-    public async Task<IEnumerable<Script>> GetFlowScripts()
+    /// <returns>a collection of scripts</returns>
+    public async Task<IEnumerable<Script>> GetScripts()
     {
         try
         {
@@ -71,32 +66,11 @@ public class ScriptService:Service, IScriptService
             var result = await HttpHelper.Get<List<Script>>(url);
             if (result.Success == false)
                 throw new Exception(result.Body);
-            return result.Data.Where(x => x.Type == ScriptType.Flow).ToList();
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance?.WLog("Failed to get scripts: " + ex.Message);
-            return new List<Script>();
-        }
-    }
-
-    /// <summary>
-    /// Get all shared scripts
-    /// </summary>
-    /// <returns>a collection of shared scripts</returns>
-    public async Task<IEnumerable<Script>> GetSharedScripts()
-    {
-        try
-        {
-            string url = $"{ServiceBaseUrl}/api/script/shared";
-            var result = await HttpHelper.Get<List<Script>>(url);
-            if (result.Success == false)
-                throw new Exception(result.Body);
             return result.Data;
         }
         catch (Exception ex)
         {
-            Logger.Instance?.WLog("Failed to get shared scripts: " + ex.Message);
+            Logger.Instance?.WLog("Failed to get scripts: " + ex.Message);
             return new List<Script>();
         }
     }

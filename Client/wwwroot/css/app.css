@@ -1072,6 +1072,29 @@ hr {
   overflow: hidden;
 }
 
+.editor.PagesScript .content {
+  padding: 0.5rem;
+}
+.editor.PagesScript .content .fields {
+  overflow: hidden;
+  padding: 0;
+}
+
+.editor.PagesScript:not(.readonly) .fields .input-label {
+  display: none;
+}
+.editor.PagesScript:not(.readonly) .fields .row:first-child .input-value {
+  width: calc(100% - 2rem);
+  padding: 0 1rem;
+}
+.editor.PagesScript:not(.readonly) .fields .row:first-child .input-value input {
+  max-width: unset;
+}
+.editor.PagesScript:not(.readonly) .fields .row.error .input-value {
+  width: calc(100% - 2rem);
+  padding: 0 1rem;
+}
+
 @media screen and (min-width: 1000px) {
   .editor.PagesScripts {
     width: 900px !important;

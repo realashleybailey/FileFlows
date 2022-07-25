@@ -551,7 +551,10 @@
       }
     },
     "Tasks": {
-      "Title": "Tasks"
+      "Title": "Tasks",
+      "Messages": {
+        "NoScripts":"No scripts found to create a task for"
+      }
     },
     "Task":{ 
       "Title":"Task",

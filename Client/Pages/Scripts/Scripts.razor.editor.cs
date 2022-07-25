@@ -35,17 +35,27 @@ function Script(NumberParameter)
 
         item.Code = item.Code.Replace("\r\n", "\n").Trim();
 
-        fields.Add(new ElementField
-        {
-            InputType = FormInputType.Text,
-            Name = nameof(item.Name),
-            Validators = new List<FileFlows.Shared.Validators.Validator>
-            {
-                new FileFlows.Shared.Validators.Required()
-            }
-        });
+        bool readOnly = item.Repository || item.Type == ScriptType.Shared;
+        string title = "Pages.Script.Title";
 
-        
+        if (readOnly)
+        {
+            title = Translater.Instant("Pages.Script.Title") + ": " + item.Name;
+        }
+        else
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Text,
+                Name = nameof(item.Name),
+                Validators = new List<FileFlows.Shared.Validators.Validator>
+                {
+                    new FileFlows.Shared.Validators.Required()
+                }
+            });
+        }
+
+
         fields.Add(new ElementField
         {
             InputType = FormInputType.Code,
@@ -56,7 +66,7 @@ function Script(NumberParameter)
             }
         });
 
-        var result = await Editor.Open("Pages.Script", "Pages.Script.Title", fields, item, large: true, readOnly: item.Repository,
+        var result = await Editor.Open("Pages.Script", title, fields, item, large: true, readOnly: readOnly,
             saveCallback: Save, helpUrl: "https://docs.fileflows.com/scripts");
         
         return false;

@@ -28,6 +28,7 @@ public class ScriptController : Controller
         scripts.AddRange(await GetUserScripts(ScriptType.Flow));
         scripts.AddRange(await GetRepositoryScripts(ScriptType.System));
         scripts.AddRange(await GetUserScripts(ScriptType.System));
+        scripts.AddRange(await GetSharedScripts());
         
         scripts = scripts.DistinctBy(x => x.Name).ToList();
         var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
@@ -59,22 +60,29 @@ public class ScriptController : Controller
 
         return scripts.OrderBy(x => x.Name);
     }
-    
+
     /// <summary>
-    /// Gets all scripts in the system
+    /// Returns a basic list of scripts
     /// </summary>
-    /// <returns>a list of all scripts</returns>
-    [HttpGet("shared")]
-    public async Task<IEnumerable<Script>> GetShared()
+    /// <param name="type">the type of scripts to return</param>
+    /// <returns>a basic list of scripts</returns>
+    [HttpGet("list/{type}")]
+    public async Task<IEnumerable<Script>> List([FromRoute] ScriptType type)
     {
-        List<Script> scripts = new();
-        return await GetAll(DirectoryHelper.ScriptsDirectoryShared, ScriptType.Shared);
+        if (type == ScriptType.Shared)
+            return await GetSharedScripts(loadCode: false);
+        var user = GetUserScripts(type, loadCode: false);
+        var shared = GetUserScripts(type, loadCode: false);
+        return shared.Result.Union(user.Result).OrderBy(x => x.Name);
     }
 
-    private Task<IEnumerable<Script>> GetRepositoryScripts(ScriptType type) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemRepository : DirectoryHelper.ScriptsDirectoryFlowRepository, type, repository: true);
-    private Task<IEnumerable<Script>> GetUserScripts(ScriptType type) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemUser : DirectoryHelper.ScriptsDirectoryFlowUser, type);
+    private Task<IEnumerable<Script>> GetRepositoryScripts(ScriptType type, bool loadCode = true) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemRepository : DirectoryHelper.ScriptsDirectoryFlowRepository, type, repository: true, loadCode: loadCode);
+    private Task<IEnumerable<Script>> GetUserScripts(ScriptType type, bool loadCode = true) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemUser : DirectoryHelper.ScriptsDirectoryFlowUser, type, loadCode: loadCode);
 
-    async Task<IEnumerable<Script>> GetAll(string directory, ScriptType type, bool repository = false)
+    private Task<IEnumerable<Script>> GetSharedScripts(bool loadCode = true) =>
+        GetAll(DirectoryHelper.ScriptsDirectoryShared, ScriptType.Shared, loadCode: loadCode);
+
+    async Task<IEnumerable<Script>> GetAll(string directory, ScriptType type, bool repository = false, bool loadCode = true)
     {
         List<Script> scripts = new();
         foreach (var file in new DirectoryInfo(directory).GetFiles("*.js"))
@@ -86,7 +94,7 @@ public class ScriptController : Controller
                 Name = name,
                 Repository = repository,
                 Type = type,
-                Code = await System.IO.File.ReadAllTextAsync(file.FullName)
+                Code = loadCode ? await System.IO.File.ReadAllTextAsync(file.FullName) : null
             });
         }
 

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using FileFlows.Plugin;
+using FileFlows.ScriptExecution;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 

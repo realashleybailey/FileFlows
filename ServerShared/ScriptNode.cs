@@ -1,3 +1,5 @@
+using FileFlows.ScriptExecution;
+
 namespace FileFlows.Server;
 
 using FileFlows.Plugin;
@@ -40,7 +42,8 @@ public class ScriptNode:Node
         // build up the entry point
         string epParams = string.Join(", ", script.Parameters?.Select(x => x.Name).ToArray());
         // all scripts must contain the "Script" method we then add this to call that 
-        string entryPoint = $"Script({epParams});";
+        //string entryPoint = $"Script({epParams});";
+        string entryPoint = $"var scriptResult = Script({epParams});\nexport const result = scriptResult;";
 
         var execArgs = new FileFlows.Plugin.Models.ScriptExecutionArgs
         {

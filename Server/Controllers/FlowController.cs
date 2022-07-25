@@ -7,6 +7,8 @@ using System.Dynamic;
 using FileFlows.Plugin;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using FileFlows.ScriptExecution;
+using Logger = FileFlows.Shared.Logger;
 
 namespace FileFlows.Server.Controllers;
 /// <summary>
@@ -424,6 +426,7 @@ public class FlowController : ControllerStore<Flow>
 
         // get scripts 
         var scripts = (await new ScriptController().GetAll())?
+            .Where(x => x.Type == ScriptType.Flow)
             .Select(x => ScriptToFlowElement(x))
             .Where(x => x != null)
             .OrderBy(x => x.Name); // can be null if failed to parse

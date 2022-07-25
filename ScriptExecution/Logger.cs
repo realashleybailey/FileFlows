@@ -15,19 +15,20 @@ public class Logger
     /// <summary>
     /// Gets or sets error info action
     /// </summary>
-    public Action<object[]> ILogAction { get; set; }
+    public Action<object[]> ILogAction { get; set; } = _ => {};
+
     /// <summary>
     /// Gets or sets debug log action
     /// </summary>
-    public Action<object[]> DLogAction { get; set; }
+    public Action<object[]> DLogAction { get; set; } = _ => {};
     /// <summary>
     /// Gets or sets warning log action
     /// </summary>
-    public Action<object[]> WLogAction { get; set; }
+    public Action<object[]> WLogAction { get; set; } = _ => {};
     /// <summary>
     /// Gets or sets error log action
     /// </summary>
-    public Action<object[]> ELogAction { get; set; }
+    public Action<object[]> ELogAction { get; set; } = _ => {};
 
     /// <summary>
     /// Logs a info message

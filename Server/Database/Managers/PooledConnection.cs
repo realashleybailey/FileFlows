@@ -48,7 +48,7 @@ public class PooledConnection: IDatabase, IDisposable, IDisposablePooledObject
         set { Db.PocoDataFactory = value; }
     }
 
-    public DatabaseType DatabaseType => Db.DatabaseType;
+    public NPoco.DatabaseType DatabaseType => Db.DatabaseType;
     public List<IInterceptor> Interceptors => Db.Interceptors;
     public string ConnectionString => Db.ConnectionString;
     public DbParameter CreateParameter() => Db.CreateParameter();

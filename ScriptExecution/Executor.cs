@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Jint;
@@ -26,17 +27,17 @@ public class Executor
     /// <summary>
     /// Gets or sets the logger for the code execution
     /// </summary>
-    public Logger Logger { get; set; }
-    
+    public Logger Logger { get; set; } = null!;
+
     /// <summary>
     /// Gets or sets the code to execute
     /// </summary>
-    public string Code { get; set; }
+    public string Code { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the HTTP client to be used in the code execution
     /// </summary>
-    public HttpClient HttpClient { get; set; }
+    public HttpClient HttpClient { get; set; } = null!;
     
     
     /// <summary>
@@ -47,7 +48,32 @@ public class Executor
     /// <summary>
     /// Gets or sets the directory where shared modules will be loaded from
     /// </summary>
-    public string SharedDirectory { get; set; }
+    public string SharedDirectory { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the process executor that is used by script to execute an external process
+    /// </summary>
+    public IProcessExecutor ProcessExecutor { get; set; } = null!;
+    
+    static Executor()
+    {
+        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+        {
+            string resourceName = new AssemblyName(args.Name).Name + ".dll";
+            var resource = Array.Find(typeof(Executor).Assembly.GetManifestResourceNames(),
+                element => element.EndsWith(resourceName));
+            if (resource == null)
+                return null;
+
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource);
+            if (stream == null)
+                return null;
+            
+            byte[] assemblyData = new byte[stream.Length];
+            var read = stream.Read(assemblyData, 0, assemblyData.Length);
+            return Assembly.Load(assemblyData);
+        };
+    }
 
     /// <summary>
     /// Executes javascript
@@ -81,6 +107,21 @@ public class Executor
             }
 
             tcode = tcode.Replace("Flow.Execute(", "Execute(");
+
+
+            string sharedDir = SharedDirectory.Replace("\\", "/");
+            if (sharedDir.EndsWith("/") == false)
+                sharedDir += "/";
+            tcode = Regex.Replace(tcode, @"(\.\.\/)+Shared\/", sharedDir);
+
+            foreach(Match match in Regex.Matches(tcode, @"import[\s]+{[^}]+}[\s]+from[\s]+['""]([^'""]+)['""]"))
+            {
+                var importFile = match.Groups[1].Value;
+                if(importFile.EndsWith(".js") == false)
+                    tcode = tcode.Replace(importFile, importFile + ".js");
+            }
+
+            var processExecutor = this.ProcessExecutor ?? new BasicProcessExecutor(Logger);
                 
 
             var sb = new StringBuilder();
@@ -105,17 +146,17 @@ public class Executor
                 throw new MissingVariableException();
             })
             .SetValue("Hostname", Environment.MachineName)
-            // .SetValue("Execute", (object eArgs) => {
-            //     string json = JsonSerializer.Serialize(eArgs);
-            //     var jsonOptions = new JsonSerializerOptions()
-            //     {
-            //         PropertyNameCaseInsensitive = true
-            //     };
-            //     var eeARgs = JsonSerializer.Deserialize<ExecuteArgs>(JsonSerializer.Serialize(eArgs), jsonOptions);
-            //     var result = args.Execute(eeARgs);
-            //     Logger.ILog("result:", result);
-            //     return result;
-            //  })
+            .SetValue("Execute", (object eArgs) => {
+               string json = JsonSerializer.Serialize(eArgs);
+               var jsonOptions = new JsonSerializerOptions()
+               {
+                   PropertyNameCaseInsensitive = true
+               };
+               var eeARgs = JsonSerializer.Deserialize<ProcessExecuteArgs>(JsonSerializer.Serialize(eArgs), jsonOptions) ?? new ProcessExecuteArgs();
+               var result = processExecutor.Execute(eeARgs);
+               Logger.ILog("Exit Code: " + (result.ExitCode?.ToString() ?? "null"));
+               return result;
+            })
             .SetValue(nameof(FileInfo), new Func<string, FileInfo>((string file) => new FileInfo(file)))
             .SetValue(nameof(DirectoryInfo), new Func<string, DirectoryInfo>((string path) => new DirectoryInfo(path))); ;
             
@@ -144,7 +185,7 @@ public class Executor
             // print out the code block for debugging
             int lineNumber = 0;
             var lines = Code.Split('\n');
-            string pad = "D" + (lines.ToString().Length);
+            string pad = "D" + (lines.ToString()!.Length);
             Logger.DLog("Code: " + Environment.NewLine +
                 string.Join("\n", lines.Select(x => (++lineNumber).ToString("D3") + ": " + x)));
 
@@ -154,7 +195,8 @@ public class Executor
         }
         catch (Exception ex)
         {
-            Logger.ELog("Failed executing script: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            if(ex is MissingVariableException == false)
+                Logger.ELog("Failed executing script: " + ex.Message + Environment.NewLine + ex.StackTrace);
             return false;
         }
     }

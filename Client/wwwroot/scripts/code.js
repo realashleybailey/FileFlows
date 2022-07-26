@@ -1,6 +1,14 @@
 window.ffCode = {
-
-    initModel: function (variables) {
+    
+    initModel: function (variables, sharedScripts) {
+        
+        // console.log('sharedScripts', sharedScripts);
+        // if(sharedScripts?.length){
+        //     for(let script of sharedScripts){
+        //         monaco.editor.languages.typescript.javascriptDefaults.addExtraLib(`declare module '../Shared/${script.name}' {{ export interface ${script.name} {{}} }}`, `/script/code/${script.Name}`);
+        //     }
+        // }
+        
         monaco.editor.createModel(
             "const Logger = { ILog: function(...any), DLog: function(...any), WLog: function(...any), ELog: function(...any) }",
             "javascript"

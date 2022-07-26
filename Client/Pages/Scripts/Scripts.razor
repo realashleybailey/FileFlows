@@ -70,6 +70,16 @@
                         }
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="Script" Width="36rem" MobileWidth="0" Hidden=@(SelectedType != ScriptType.Shared)>
+                    <Header>
+                        Import
+                    </Header>
+                    <Cell Context="item">
+                        <span>
+                            import { @item.Name } from '../Shared/@(item.Name).js';
+                        </span>
+                    </Cell>
+                </FlowTableColumn>
             </Columns>
         </FlowTable>
 

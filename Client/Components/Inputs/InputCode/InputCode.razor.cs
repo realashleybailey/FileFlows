@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace FileFlows.Client.Components.Inputs
 {
     using System.Threading.Tasks;
@@ -10,8 +12,6 @@ namespace FileFlows.Client.Components.Inputs
 
     public partial class InputCode : Input<string>, IDisposable
     {
-
-        const string API_URL = "/api/code-eval";
         private bool Updating = false;
         private string InitialValue;
 
@@ -39,7 +39,11 @@ namespace FileFlows.Client.Components.Inputs
 
         private void OnEditorInit(MonacoEditorBase e)
         {
-            _ = jsRuntime.InvokeVoidAsync("ffCode.initModel", Variables);
+            _ = Task.Run(async () =>
+            {
+                var shared = await HttpHelper.Get<Script[]>("/api/script/list/shared");
+                await jsRuntime.InvokeVoidAsync("ffCode.initModel", Variables, shared.Success ? shared.Data : null);
+            });
             InitialValue = this.Value;
         }
 

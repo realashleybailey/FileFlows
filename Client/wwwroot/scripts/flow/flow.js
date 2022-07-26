@@ -221,8 +221,7 @@ window.ffFlow = {
                     part.outputConnections = [];
 
                 if (ffFlow.SingleOutputConnection) {
-                    console.log('removing output connections on output: ' + output);
-                    // remove any duplciates from the output
+                    // remove any duplicates from the output
                     part.outputConnections = part.outputConnections.filter(x => x.output != output);
                 }
 

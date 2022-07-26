@@ -99,7 +99,7 @@ public class FileFlowTasksWorker: Worker
             Logger.Instance.WLog($"No code found for Task '{task.Name}' using script: {task.Script}");
             return;
         }
-        Logger.Instance.ILog(LogType.Info, "Executing task: " + task.Name);
+        Logger.Instance.ILog("Executing task: " + task.Name);
         DateTime dtStart = DateTime.Now;
         Executor executor = new Executor();
         executor.Code = code;
@@ -114,7 +114,7 @@ public class FileFlowTasksWorker: Worker
         try
         {
             executor.Execute();
-            Logger.Instance.ILog(LogType.Info, $"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)));
+            Logger.Instance.ILog($"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)));
         }
         catch (Exception ex)
         {

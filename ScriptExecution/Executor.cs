@@ -146,7 +146,7 @@ public class Executor
             {
                 if (content is string == false)
                     content = JsonSerializer.Serialize(content);
-                return new StringContent(content as string, Encoding.UTF8, "application/json");
+                return new StringContent(content as string ?? string.Empty, Encoding.UTF8, "application/json");
             })
             .SetValue("FormUrlEncodedContent", (IEnumerable<KeyValuePair<string, string>> content) => new System.Net.Http.FormUrlEncodedContent(content))
             .SetValue("MissingVariable", (string variableName) => {

@@ -22,10 +22,10 @@ public class FileFlowTasksWorker: Worker
     /// </summary>
     private Dictionary<Guid, int> TaskLastRun = new ();
     
-    /// <summary>
-    /// Gets the logger for the database
-    /// </summary>
-    public static FileLogger TaskLogger { get;private set; }
+    // /// <summary>
+    // /// Gets the logger for the database
+    // /// </summary>
+    // public static FileLogger TaskLogger { get; private set; }
     
     /// <summary>
     /// Creates a new instance of the Scheduled Task Worker
@@ -33,7 +33,7 @@ public class FileFlowTasksWorker: Worker
     public FileFlowTasksWorker() : base(ScheduleType.Minute, 1)
     {
         Instance = this;
-        TaskLogger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsTasks", register: false);
+        //TaskLogger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsTasks", register: false);
         ReloadTasks();
         ReloadVariables();
     }
@@ -99,7 +99,7 @@ public class FileFlowTasksWorker: Worker
             Logger.Instance.WLog($"No code found for Task '{task.Name}' using script: {task.Script}");
             return;
         }
-        TaskLogger.Log(LogType.Info, "Executing task: " + task.Name);
+        Logger.Instance.ILog(LogType.Info, "Executing task: " + task.Name);
         DateTime dtStart = DateTime.Now;
         Executor executor = new Executor();
         executor.Code = code;
@@ -114,7 +114,7 @@ public class FileFlowTasksWorker: Worker
         try
         {
             executor.Execute();
-            TaskLogger.Log(LogType.Info, $"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)));
+            Logger.Instance.ILog(LogType.Info, $"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)));
         }
         catch (Exception ex)
         {

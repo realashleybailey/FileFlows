@@ -146,7 +146,7 @@ public class SqliteDbManager : DbManager
             foreach (var tbl in new[]
                      {
                          (nameof(DbObject), CreateDbObjectTableScript),
-                         (nameof(DbStatistic), CreateDbStaticTableScript: CreateDbStatisticTableScript),
+                         (nameof(DbStatistic), CreateDbStatisticTableScript),
                          (nameof(RevisionedObject), CreateDbRevisionedObjectTableScript),
                      })
             {
@@ -167,9 +167,6 @@ public class SqliteDbManager : DbManager
         {
             con.Close();
         }
-            
-
-        return true;// tables exist, all good
     }
 
     public override Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()

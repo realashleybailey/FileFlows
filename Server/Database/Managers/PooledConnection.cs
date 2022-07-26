@@ -316,10 +316,9 @@ public class PooledConnection: IDatabase, IDisposable, IDisposablePooledObject
 
     public T FirstOrDefaultInto<T>(T instance, Sql sql) => Db.FirstOrDefaultInto<T>(instance, sql);
 
-    public Dictionary<TKey, TValue> Dictionary<TKey, TValue>(Sql Sql) => Db.Dictionary<TKey, TValue>(Sql);
+    public Dictionary<TKey, TValue> Dictionary<TKey, TValue>(Sql Sql) where TKey : notnull => Db.Dictionary<TKey, TValue>(Sql);
 
-    public Dictionary<TKey, TValue> Dictionary<TKey, TValue>(string sql, params object[] args)
-        => Db.Dictionary<TKey, TValue>(sql, args);
+    public Dictionary<TKey, TValue> Dictionary<TKey, TValue>(string sql, params object[] args) where TKey : notnull => Db.Dictionary<TKey, TValue>(sql, args);
 
     public bool Exists<T>(object primaryKey) => Db.Exists<T>(primaryKey);
 

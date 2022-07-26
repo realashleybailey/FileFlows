@@ -49,7 +49,7 @@ CREATE TABLE DbStatistic(
     Type            int                NOT NULL,            
     StringValue     TEXT               COLLATE utf8_unicode_ci      NOT NULL,            
     NumberValue     double             NOT NULL
-);", null);
+);", null).Wait();
         }
         catch (Exception)
         {

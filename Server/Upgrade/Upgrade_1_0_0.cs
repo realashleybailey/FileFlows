@@ -28,9 +28,9 @@ public class Upgrade_1_0_0
     {
         var manager = DbHelper.GetDbManager();
         manager.Execute(
-            "update DbObject set Type = 'FileFlows.Shared.Models.Variable', Data = replace(Data, 'Path', 'Value') where Type = 'FileFlows.Shared.Models.Tool'", null);
+            "update DbObject set Type = 'FileFlows.Shared.Models.Variable', Data = replace(Data, 'Path', 'Value') where Type = 'FileFlows.Shared.Models.Tool'", null).Wait();
         manager.Execute(
-            "update DbObject set Name = 'ffmpeg' where Type = 'FileFlows.Shared.Models.Variable' and Name = 'FFMpeg'", null);
+            "update DbObject set Name = 'ffmpeg' where Type = 'FileFlows.Shared.Models.Variable' and Name = 'FFMpeg'", null).Wait();
     }
 
     private void MoveUserScripts()

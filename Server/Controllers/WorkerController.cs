@@ -307,7 +307,7 @@ public class WorkerController : Controller
             if (executorId == Guid.Empty)
                 executorId = Executors.Where(x => x.Value == null).Select(x => x.Key).FirstOrDefault();
         }
-        if (executorId == Guid.Empty || Executors.TryGetValue(executorId, out FlowExecutorInfo info)  == false || info == null)
+        if (executorId == Guid.Empty || Executors.TryGetValue(executorId, out FlowExecutorInfo? info) == false || info == null)
         {
             if(executorId == Guid.Empty)
             {

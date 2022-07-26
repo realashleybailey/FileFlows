@@ -94,7 +94,7 @@ public class MySqlDbManager: DbManager
     protected override void CreateStoredProcedures()
     {
         Logger.Instance.ILog("Adding virtual columns");
-        AddVirtualColumns();
+        AddVirtualColumns().Wait();
         
         Logger.Instance.ILog("Creating Stored Procedures");
         using var db = new NPoco.Database(ConnectionString + ";Allow User Variables=True", null, MySqlConnector.MySqlConnectorFactory.Instance);
@@ -357,7 +357,7 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     public override async Task Log(Guid clientUid, LogType type, string message)
     {
         // by bucketing this it greatly improves speed
-        string sql = null;
+        string? sql = null;
         lock (LogMessages)
         {
             message = MySqlHelper.EscapeString(message);

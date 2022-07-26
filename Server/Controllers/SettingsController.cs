@@ -22,7 +22,7 @@ public class SettingsController : Controller
     /// </summary>
     /// <returns>the system status of FileFlows</returns>
     [HttpGet("fileflows-status")]
-    public async Task<FileFlowsStatus> GetFileFlowsStatus()
+    public FileFlowsStatus GetFileFlowsStatus()
     {
         FileFlowsStatus status = new();
         

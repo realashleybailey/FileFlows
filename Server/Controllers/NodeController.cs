@@ -334,7 +334,7 @@ public class NodeController : ControllerStore<ProcessingNode>
     internal async Task<ProcessingNode> GetServerNode()
     {
         var data = await GetData(useCache:true);
-        ProcessingNode node = data.Where(x => x.Value.Uid == Globals.InternalNodeUid)
+        var node = data.Where(x => x.Value.Uid == Globals.InternalNodeUid)
             .Select(x => x.Value)
             .FirstOrDefault();
 

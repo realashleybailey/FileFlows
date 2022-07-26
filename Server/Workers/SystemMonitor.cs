@@ -235,8 +235,7 @@ public class FixedSizedQueue<T> : ConcurrentQueue<T>
         {
             while (base.Count > Size)
             {
-                T outObj;
-                base.TryDequeue(out outObj);
+                base.TryDequeue(out _);
             }
         }
     }

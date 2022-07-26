@@ -15,11 +15,11 @@ public class ObjectPool<T>
     private readonly Func<T> ObjectGenerator;
     private int ObjectsTaken;
     private readonly int Max;
-    private readonly ConcurrentQueue<string> Queue = new ();
+    private readonly ConcurrentQueue<string?> Queue = new ();
 
-    private class TakenObject<T>
+    private class TakenObject<U>
     {
-        public T Value { get; set; }
+        public U Value { get; set; }
         public DateTime TakenAt { get; set; }
         public string StackTrace { get; set; }
     }
@@ -46,7 +46,7 @@ public class ObjectPool<T>
     public async Task<T> Get()
     {
         await WaitTurn();
-        var obj = Objects.TryTake(out T item) ? item : ObjectGenerator();
+        var obj = Objects.TryTake(out T? item) ? item : ObjectGenerator();
         Taken.Add(new()
         {
             TakenAt = DateTime.Now,
@@ -58,14 +58,14 @@ public class ObjectPool<T>
 
     private async Task WaitTurn()
     {
-        string guid = Guid.NewGuid().ToString();
+        string? guid = Guid.NewGuid().ToString();
         Queue.Enqueue(guid);
         int count = 0;
         do
         {
             if (ObjectsTaken < Max)
             {
-                if (Queue.TryPeek(out string top) && top == guid)
+                if (Queue.TryPeek(out string? top) && top == guid)
                 {
                     // we're first in the queue
                     lock (this)
@@ -73,7 +73,7 @@ public class ObjectPool<T>
                         ++ObjectsTaken;
                     }
 
-                    Queue.TryDequeue(out string dequeued);
+                    Queue.TryDequeue(out _);
                     return;
                 }
             }

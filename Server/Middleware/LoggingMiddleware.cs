@@ -42,7 +42,7 @@ public class LoggingMiddleware
                 var settings = new SettingsController().Get().Result;
                 if (settings.LogEveryRequest)
                 {
-                    RequestLogger.Log((LogType) 999,
+                    _ = RequestLogger.Log((LogType) 999,
                         $"REQUEST [{context.Request?.Method}] [{context.Response?.StatusCode}]: {context.Request?.Path.Value}");
                 }
             }

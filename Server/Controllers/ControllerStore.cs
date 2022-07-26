@@ -201,6 +201,7 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
     /// Called by the revision controller when a revision is restored
     /// </summary>
     /// <param name="dbo">the DbObject</param>
+    /// <param name="useCache">if the cache should be used</param>
     internal async Task Refresh(DbObject dbo, bool? useCache = null)
     {
         if (useCache == null)

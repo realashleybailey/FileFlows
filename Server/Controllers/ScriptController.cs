@@ -35,7 +35,7 @@ public class ScriptController : Controller
         scripts = scripts.DistinctBy(x => x.Name).ToList();
         var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
         var flows = await new FlowController().GetAll();
-        string flowTypeName = typeof(Flow).FullName;
+        string flowTypeName = typeof(Flow).FullName ?? string.Empty;
         foreach (var flow in flows)
         {
             if (flow?.Parts?.Any() != true)
@@ -174,7 +174,7 @@ public class ScriptController : Controller
     /// <summary>
     /// Validates a script has valid code
     /// </summary>
-    /// <param name="script">the script to validate</param>
+    /// <param name="args">the arguments to validate</param>
     [HttpPost("validate")]
     public void ValidateScript([FromBody] ValidateScriptModel args)
     {

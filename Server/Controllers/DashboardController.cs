@@ -86,7 +86,7 @@ public class DashboardController:ControllerStore<Dashboard>
                 #endif
                 Widgets.Add(pui);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // can throw if Widget definition is not found
                 Logger.Instance.WLog("Widget definition not found: " + p.WidgetDefinitionUid);

@@ -38,9 +38,8 @@ public class FlowRunnerService : IFlowRunnerService
     /// </summary>
     /// <param name="info">The information about the flow execution</param>
     /// <returns>a completed task</returns>
-    public Task Update(FlowExecutorInfo info)
+    public async Task Update(FlowExecutorInfo info)
     {
-        new WorkerController(null).UpdateWork(info);
-        return Task.CompletedTask;
+        await new WorkerController(null).UpdateWork(info);
     }
 }

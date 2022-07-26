@@ -61,7 +61,7 @@ public class FlowController : ControllerStore<Flow>
         }
         var dictFlows  = list.ToDictionary(x => x.Uid, x => x);
         
-        string flowTypeName = typeof(Flow).FullName;
+        string flowTypeName = typeof(Flow).FullName ?? string.Empty;
         foreach (var flow in flows)
         {
             if (flow?.Parts?.Any() != true)
@@ -96,7 +96,7 @@ public class FlowController : ControllerStore<Flow>
             }
         }
 
-        string libTypeName = typeof(Library).FullName;
+        string libTypeName = typeof(Library).FullName ?? string.Empty;
         foreach (var lib in libraries)
         {
             if (lib.Flow == null)
@@ -482,7 +482,7 @@ public class FlowController : ControllerStore<Flow>
             ele.Model = model as ExpandoObject;
             return ele;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

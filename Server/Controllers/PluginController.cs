@@ -61,7 +61,7 @@ public class PluginController : ControllerStore<PluginInfo>
             }
         }
 
-        string flowTypeName = typeof(Flow).FullName;
+        string flowTypeName = typeof(Flow).FullName ?? string.Empty;
         var flows = await new FlowController().GetAll();
         foreach (var flow in flows)
         {

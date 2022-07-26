@@ -63,7 +63,7 @@ public class Upgrade_0_9_0
     private void AddStatisticsTable()
     {
         if(DbHelper.GetDbManager() is SqliteDbManager sqlite)
-            sqlite.Execute(sqlite.CreateDbStatisticTableScript, new object[]{});
+            sqlite.Execute(sqlite.CreateDbStatisticTableScript, new object[]{}).Wait();
     }
 
     private void ExportScripts()
@@ -86,7 +86,7 @@ public class Upgrade_0_9_0
             Logger.Instance.ILog($"Exported script '{dbo.Name}' to: {name}");
         }
 
-        manager.Execute("delete from DbObject where Type = 'FileFlows.Shared.Models.Script'", null);
+        manager.Execute("delete from DbObject where Type = 'FileFlows.Shared.Models.Script'", null).Wait();
     }
 
     private string GetNewScriptName(string oldName)

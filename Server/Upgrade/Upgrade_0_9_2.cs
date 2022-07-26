@@ -30,9 +30,9 @@ public class Upgrade_0_9_2
     private void AddRevisionedObjectTable()
     {
         if(DbHelper.GetDbManager() is MySqlDbManager mysql)
-            mysql.Execute(mysql.CreateDbRevisionedObjectTableScript, null);
+            mysql.Execute(mysql.CreateDbRevisionedObjectTableScript, null).Wait();
         else if(DbHelper.GetDbManager() is SqliteDbManager sqlite)
-            sqlite.Execute(sqlite.CreateDbRevisionedObjectTableScript, null);
+            sqlite.Execute(sqlite.CreateDbRevisionedObjectTableScript, null).Wait();
     }
 
     private void AddRevisions()

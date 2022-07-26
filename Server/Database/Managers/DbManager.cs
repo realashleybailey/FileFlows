@@ -909,7 +909,7 @@ public abstract class DbManager
     /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
     /// </summary>
     /// <returns>heatmap data</returns>
-    public virtual async Task<List<Dictionary<int, int>>> GetHourProcessingTotals() =>
+    public virtual Task<List<Dictionary<int, int>>> GetHourProcessingTotals() =>
         throw new NotImplementedException();
 
     /// <summary>

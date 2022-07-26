@@ -26,6 +26,6 @@ public class Upgrade_0_9_1
     private void AddNameIndexToMySql()
     {
         if(DbHelper.GetDbManager() is MySqlDbManager mysql)
-            mysql.Execute($"ALTER TABLE {nameof(DbObject)} ADD FULLTEXT NameIndex(Name);", null);
+            mysql.Execute($"ALTER TABLE {nameof(DbObject)} ADD FULLTEXT NameIndex(Name);", null).Wait();
     }
 }

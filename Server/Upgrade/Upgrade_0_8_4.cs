@@ -27,7 +27,7 @@ public class Upgrade_0_8_4
         if (DbHelper.UseMemoryCache)
             return; // not using external database
         var manager = DbHelper.GetDbManager();
-        manager.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);", null);
-        manager.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);", null);
+        manager.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);", null).Wait();
+        manager.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);", null).Wait();
     }
 }

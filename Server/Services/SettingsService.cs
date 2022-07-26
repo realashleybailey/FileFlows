@@ -22,5 +22,5 @@ public class SettingsService : ISettingsService
     /// </summary>
     /// <returns>the file flows status</returns>
     public Task<FileFlowsStatus> GetFileFlowsStatus() =>
-        new SettingsController().GetFileFlowsStatus();
+        Task.FromResult(new SettingsController().GetFileFlowsStatus());
 }

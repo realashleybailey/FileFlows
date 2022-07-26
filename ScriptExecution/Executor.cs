@@ -141,6 +141,14 @@ public class Executor
             .SetValue("Variables", Variables)
             .SetValue("Sleep", (int milliseconds) => Thread.Sleep(milliseconds))
             .SetValue("http", HttpClient)
+            .SetValue("StringContent", (string content) => new System.Net.Http.StringContent(content))
+            .SetValue("JsonContent", (object content) =>
+            {
+                if (content is string == false)
+                    content = JsonSerializer.Serialize(content);
+                return new StringContent(content as string, Encoding.UTF8, "application/json");
+            })
+            .SetValue("FormUrlEncodedContent", (IEnumerable<KeyValuePair<string, string>> content) => new System.Net.Http.FormUrlEncodedContent(content))
             .SetValue("MissingVariable", (string variableName) => {
                 Logger.ELog("MISSING VARIABLE: " + variableName + Environment.NewLine + $"The required variable '{variableName}' is missing and needs to be added via the Variables page.");
                 throw new MissingVariableException();

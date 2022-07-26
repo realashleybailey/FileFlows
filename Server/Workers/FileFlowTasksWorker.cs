@@ -23,11 +23,17 @@ public class FileFlowTasksWorker: Worker
     private Dictionary<Guid, int> TaskLastRun = new ();
     
     /// <summary>
+    /// Gets the logger for the database
+    /// </summary>
+    public static FileLogger TaskLogger { get;private set; }
+    
+    /// <summary>
     /// Creates a new instance of the Scheduled Task Worker
     /// </summary>
     public FileFlowTasksWorker() : base(ScheduleType.Minute, 1)
     {
         Instance = this;
+        TaskLogger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsTasks", register: false);
         ReloadTasks();
         ReloadVariables();
     }
@@ -87,12 +93,14 @@ public class FileFlowTasksWorker: Worker
 
     private async Task RunTask(FileFlowsTask task)
     {
-        string code = await new ScriptController().GetCode(task.Name, type: ScriptType.System);
+        string code = await new ScriptController().GetCode(task.Script, type: ScriptType.System);
         if (string.IsNullOrWhiteSpace(code))
         {
             Logger.Instance.WLog($"No code found for Task '{task.Name}' using script: {task.Script}");
             return;
         }
+        TaskLogger.Log(LogType.Info, "Executing task: " + task.Name);
+        DateTime dtStart = DateTime.Now;
         Executor executor = new Executor();
         executor.Code = code;
         executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
@@ -106,11 +114,13 @@ public class FileFlowTasksWorker: Worker
         try
         {
             executor.Execute();
+            TaskLogger.Log(LogType.Info, $"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)));
         }
         catch (Exception ex)
         {
             Logger.Instance.ELog($"Error executing task '{task.Name}: " + ex.Message);
         }
+        
 
     }
 }

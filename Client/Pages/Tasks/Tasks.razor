@@ -22,7 +22,7 @@
         </ToolBar>
 
         <Columns>
-            <FlowTableColumn TItem="FileFlowsTask" Width="14rem" MobileWidth="auto">
+            <FlowTableColumn TItem="FileFlowsTask">
                 <Header>
                     @Globals.lblName
                 </Header>
@@ -30,7 +30,7 @@
                     <span>@item.Name</span>
                 </Cell>
             </FlowTableColumn>
-            <FlowTableColumn TItem="FileFlowsTask" MobileWidth="0">
+            <FlowTableColumn TItem="FileFlowsTask" Width="14rem" MobileWidth="0" >
                 <Header>
                     Type
                 </Header>
@@ -38,12 +38,12 @@
                     <span>@item.Type.Humanize()</span>
                 </Cell>
             </FlowTableColumn>
-            <FlowTableColumn TItem="FileFlowsTask" MobileWidth="0">
+            <FlowTableColumn TItem="FileFlowsTask" Width="14rem"  MobileWidth="0">
                 <Header>
                     Schedule
                 </Header>
                 <Cell Context="item">
-                    <span>todo</span>
+                    <span>@GetSchedule(item)</span>
                 </Cell>
             </FlowTableColumn>
         </Columns>

@@ -2,7 +2,9 @@ using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.ScriptExecution;
 using FileFlows.Server.Helpers;
+using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
+using FileFlows.Shared.Validators;
 using Microsoft.AspNetCore.Mvc;
 using Logger = FileFlows.Shared.Logger;
 
@@ -72,7 +74,7 @@ public class ScriptController : Controller
         if (type == ScriptType.Shared)
             return await GetSharedScripts(loadCode: false);
         var user = GetUserScripts(type, loadCode: false);
-        var shared = GetUserScripts(type, loadCode: false);
+        var shared = GetRepositoryScripts(type, loadCode: false);
         return shared.Result.Union(user.Result).OrderBy(x => x.Name);
     }
 
@@ -117,6 +119,7 @@ public class ScriptController : Controller
         {
             Uid = name,
             Name = name,
+            Type = type,
             Repository = result.System,
             Code = code
         };
@@ -167,6 +170,46 @@ public class ScriptController : Controller
         }
     }
 
+
+    /// <summary>
+    /// Validates a script has valid code
+    /// </summary>
+    /// <param name="script">the script to validate</param>
+    [HttpPost("validate")]
+    public void ValidateScript([FromBody] ValidateScriptModel args)
+    {
+        var executor = new FileFlows.ScriptExecution.Executor();
+        executor.Code = args.Code;
+        
+        if (args.IsFunction  && executor.Code.IndexOf("function Script") < 0)
+        {
+            executor.Code = "function Script() { " + executor.Code + "\n}\n";
+            executor.Code += $"var scriptResult = Script();\nexport const result = scriptResult;";
+        }
+        
+        executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
+        executor.HttpClient = HttpHelper.Client;
+        executor.Logger = new ScriptExecution.Logger();
+        executor.Logger.DLogAction = (_) => { };
+        executor.Logger.ILogAction = (_) => { };
+        executor.Logger.WLogAction = (_) => { };
+        string error = string.Empty;
+        executor.Logger.ELogAction = (args) =>
+        {
+            error = string.Join(", ", args.Select(x =>
+                x == null ? "null" :
+                x.GetType().IsPrimitive ? x.ToString() :
+                x is string ? x.ToString() :
+                System.Text.Json.JsonSerializer.Serialize(x)));
+        };
+        executor.Variables = args.Variables ?? new Dictionary<string, object>();
+        if (executor.Execute() as bool? == false)
+        {
+            if(error.Contains("MISSING VARIABLE:") == false) // missing variables we don't care about
+                throw new Exception(error?.EmptyAsNull() ?? "Invalid script");
+        }
+    }
+
     /// <summary>
     /// Saves a script
     /// </summary>
@@ -175,6 +218,8 @@ public class ScriptController : Controller
     [HttpPost]
     public Script Save([FromBody] Script script)
     {
+        ValidateScript(new ValidateScriptModel() { Code = script.Code, Variables = new Dictionary<string, object>()});
+        
         if (script?.Code?.StartsWith("// path: ") == true)
             script.Code = Regex.Replace(script.Code, @"^\/\/ path:(.*?)$", string.Empty, RegexOptions.Multiline).Trim();
         
@@ -311,6 +356,10 @@ public class ScriptController : Controller
             return null;
         
         script.Name = GetNewUniqueName(name);
+        if (script.Type != ScriptType.Flow)
+            script.Code = script.Code.Replace("@name ", "@basedOn ");
+        else
+            script.Code = Regex.Replace(script.Code, "@name(.*?)$", "@name " + script.Name, RegexOptions.Multiline);
         script.Repository = false;
         script.Uid = script.Name;
         script.Type = type;
@@ -370,5 +419,30 @@ public class ScriptController : Controller
             Logger.Instance.ELog($"Failed saving script '{name}': {ex.Message}");
             return false;
         }
+    }
+    
+    
+    
+
+
+    /// <summary>
+    /// Model used to validate a script
+    /// </summary>
+    public class ValidateScriptModel
+    {
+        /// <summary>
+        /// Gets or sets the code to validate
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// Gets or sets if this is a function being validated
+        /// </summary>
+        public bool IsFunction { get; set; }
+
+        /// <summary>
+        /// Gets or sets optional variables to use when validating a script
+        /// </summary>
+        public Dictionary<string, object> Variables { get; set; }
     }
 }

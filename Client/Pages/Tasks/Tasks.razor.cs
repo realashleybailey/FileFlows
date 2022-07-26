@@ -25,6 +25,18 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
     private static readonly string SCHEDULE_6_HOURLY = string.Concat(Enumerable.Repeat("1" + new string('0', 23), 4 * 7));
     private static readonly string SCHEDULE_12_HOURLY = string.Concat(Enumerable.Repeat("1" + new string('0', 47), 2 * 7));
     private static readonly string SCHEDULE_DAILY = string.Concat(Enumerable.Repeat("1" + new string('0', 95), 7));
+
+    private string GetSchedule(FileFlowsTask task)
+    {
+        if (task.Type != TaskType.Time)
+            return string.Empty;
+        if (task.Schedule == SCHEDULE_HOURLY) return "Hourly";
+        if (task.Schedule == SCHEDULE_3_HOURLY) return "Every 3 Hours";
+        if (task.Schedule == SCHEDULE_6_HOURLY) return "Every 6 Hours";
+        if (task.Schedule == SCHEDULE_12_HOURLY) return "Every 12 Hours";
+        if (task.Schedule == SCHEDULE_DAILY) return "Daily";
+        return "Custom";
+    }
     
     private async Task Add()
     {
@@ -178,9 +190,6 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
     
     async Task<bool> Save(ExpandoObject model)
     {
-#if (DEMO)
-            return true;
-#else
         Blocker.Show();
         this.StateHasChanged();
         var task = new FileFlowsTask();
@@ -233,6 +242,5 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             Blocker.Hide();
             this.StateHasChanged();
         }
-#endif
     }
 }

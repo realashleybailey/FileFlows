@@ -1,5 +1,6 @@
 using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
+using FileFlows.Shared.Validators;
 
 namespace FileFlows.Client.Pages;
 
@@ -61,10 +62,10 @@ function Script(NumberParameter)
         {
             InputType = FormInputType.Code,
             Name = "Code",
-            Validators = new List<FileFlows.Shared.Validators.Validator>
+            Validators = item.Type == ScriptType.Flow ? new List<FileFlows.Shared.Validators.Validator>
             {
                 new FileFlows.Shared.Validators.ScriptValidator()
-            }
+            } : new List<Validator>()
         });
 
         var result = await Editor.Open("Pages.Script", title, fields, item, large: true, readOnly: readOnly,

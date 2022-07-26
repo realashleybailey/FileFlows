@@ -266,7 +266,7 @@ public class HttpHelper
         result = default;
         try
         {
-            if (response.Headers.TryGetValues(header, out IEnumerable<string> values))
+            if (response.Headers.TryGetValues(header, out IEnumerable<string>? values))
             {
                 var first = values.FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(first) == false)

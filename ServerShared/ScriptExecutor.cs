@@ -24,7 +24,12 @@ public class ScriptExecutor:IScriptExecutor
     /// Gets or sets the shared directory 
     /// </summary>
     public string SharedDirectory { get; set; }
-
+    
+    /// <summary>
+    /// Gets or sets the URL to the FileFlows server 
+    /// </summary>
+    public string FileFlowsUrl { get; set; }
+    
     /// <summary>
     /// Executes javascript
     /// </summary>
@@ -44,6 +49,14 @@ public class ScriptExecutor:IScriptExecutor
         executor.Logger.ILogAction = (largs) => args.Logger.ILog(largs);
         executor.Logger.DLogAction = (largs) => args.Logger.DLog(largs);
         executor.HttpClient = HttpHelper.Client;
+        if (string.IsNullOrWhiteSpace(FileFlowsUrl) == false)
+        {
+            if (args.Variables.ContainsKey("FileFlowsUrl"))
+                args.Variables["FileFlowsUrl"] = FileFlowsUrl;
+            else
+                args.Variables.Add("FileFlowsUrl", FileFlowsUrl);
+        }
+
         executor.Variables = args.Variables;
         executor.SharedDirectory = SharedDirectory;
 

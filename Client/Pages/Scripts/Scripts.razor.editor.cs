@@ -16,10 +16,11 @@ public partial class Scripts
         this.EditingItem = item;
 
         List<ElementField> fields = new List<ElementField>();
+        bool flowScript = item.Type == ScriptType.Flow;
 
         if (string.IsNullOrEmpty(item.Code))
         {
-            item.Code = @"
+            item.Code = flowScript ? @"
 /**
  * Description of this script
  * @param {int} NumberParameter Description of this input
@@ -30,7 +31,7 @@ function Script(NumberParameter)
 {
     return 1;
 }
-";
+" : string.Empty;
         }
 
         item.Code = item.Code.Replace("\r\n", "\n").Trim();
@@ -48,10 +49,10 @@ function Script(NumberParameter)
             {
                 InputType = FormInputType.Text,
                 Name = nameof(item.Name),
-                Validators = new List<FileFlows.Shared.Validators.Validator>
+                Validators = flowScript ? new List<FileFlows.Shared.Validators.Validator>
                 {
                     new FileFlows.Shared.Validators.Required()
-                }
+                } : new ()
             });
         }
 

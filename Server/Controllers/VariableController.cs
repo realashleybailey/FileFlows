@@ -47,7 +47,12 @@ public class VariableController : ControllerStore<Variable>
     /// <param name="variable">The variable to save</param>
     /// <returns>The saved instance</returns>
     [HttpPost]
-    public Task<Variable> Save([FromBody] Variable variable) => Update(variable, checkDuplicateName: true);
+    public async Task<Variable> Save([FromBody] Variable variable)
+    {
+        var result = await Update(variable, checkDuplicateName: true);
+        Workers.FileFlowTasksWorker.ReloadVariables();
+        return result;
+    }
 
     /// <summary>
     /// Delete variables from the system
@@ -55,5 +60,9 @@ public class VariableController : ControllerStore<Variable>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public Task Delete([FromBody] ReferenceModel<Guid> model) => DeleteAll(model);
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
+    {
+        await DeleteAll(model);
+        Workers.FileFlowTasksWorker.ReloadVariables();
+    }
 }

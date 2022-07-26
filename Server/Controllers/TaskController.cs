@@ -47,7 +47,12 @@ public class TaskController  : ControllerStore<FileFlowsTask>
     /// <param name="fileFlowsTask">The scheduled task to save</param>
     /// <returns>The saved instance</returns>
     [HttpPost]
-    public Task<FileFlowsTask> Save([FromBody] FileFlowsTask fileFlowsTask) => Update(fileFlowsTask, checkDuplicateName: true);
+    public async Task<FileFlowsTask> Save([FromBody] FileFlowsTask fileFlowsTask)
+    {
+        var result = await Update(fileFlowsTask, checkDuplicateName: true);
+        Workers.FileFlowTasksWorker.ReloadTasks();
+        return result;
+    }
 
     /// <summary>
     /// Delete scheduled tasks from the system
@@ -55,5 +60,9 @@ public class TaskController  : ControllerStore<FileFlowsTask>
     /// <param name="model">A reference model containing UIDs to delete</param>
     /// <returns>an awaited task</returns>
     [HttpDelete]
-    public Task Delete([FromBody] ReferenceModel<Guid> model) => DeleteAll(model);
+    public async Task Delete([FromBody] ReferenceModel<Guid> model)
+    {
+        await DeleteAll(model);
+        Workers.FileFlowTasksWorker.ReloadTasks();
+    }
 }

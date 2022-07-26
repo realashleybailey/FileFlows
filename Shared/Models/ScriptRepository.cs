@@ -5,6 +5,7 @@ namespace FileFlows.Shared.Models;
 /// </summary>
 public class ScriptRepository
 {
+    /// <summary>
     /// Gets or sets the shared scripts
     /// </summary>
     public List<RepositoryScript> SharedScripts { get; set; } = new ();

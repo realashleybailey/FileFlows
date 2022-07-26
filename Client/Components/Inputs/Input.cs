@@ -1,5 +1,7 @@
+using System.Security;
 using System.Text.Json;
 using FileFlows.Client.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Client.Components.Inputs
 {
@@ -241,6 +243,14 @@ namespace FileFlows.Client.Components.Inputs
 
         private void Field_ConditionsChange(bool state)
         {
+            if (this.Field.Conditions.Count > 1)
+            {
+                state = true;
+                foreach (var condition in this.Field.Conditions)
+                {
+                    state &= condition.IsMatch == false; // is false since condition was for disabled state
+                }
+            }
             if(this.Visible != state)
             {
                 this.Visible = state;

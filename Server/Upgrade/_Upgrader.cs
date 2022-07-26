@@ -31,29 +31,29 @@ public class Upgrader
             }
 
             if (currentVersion < new Version(0, 5, 3))
-                new Upgrade0_5_3().Run();
+                new Upgrade_0_5_3().Run();
             if (currentVersion < new Version(0, 6, 0))
-                new Upgrade0_6_0().Run();
+                new Upgrade_0_6_0().Run();
             if (currentVersion < new Version(0, 6, 1))
-                new Upgrade0_6_1().Run(settings);
+                new Upgrade_0_6_1().Run(settings);
             if (currentVersion < new Version(0, 7, 0))
-                new Upgrade0_7_0().Run(settings);
+                new Upgrade_0_7_0().Run(settings);
             if (currentVersion < new Version(0, 8, 0))
-                new Upgrade0_8_0().Run(settings);
+                new Upgrade_0_8_0().Run(settings);
             if (currentVersion < new Version(0, 8, 1))
-                new Upgrade0_8_1().Run(settings);
+                new Upgrade_0_8_1().Run(settings);
             if (currentVersion < new Version(0, 8, 3))
-                new Upgrade0_8_3().Run(settings);
+                new Upgrade_0_8_3().Run(settings);
             if (currentVersion < new Version(0, 8, 4))
-                new Upgrade0_8_4().Run(settings);
+                new Upgrade_0_8_4().Run(settings);
             if (currentVersion < new Version(0, 9, 0))
-                new Upgrade0_9_0().Run(settings);
+                new Upgrade_0_9_0().Run(settings);
             if (currentVersion < new Version(0, 9, 1))
-                new Upgrade0_9_1().Run(settings);
+                new Upgrade_0_9_1().Run(settings);
             if (currentVersion < new Version(0, 9, 2, 1792))
-                new Upgrade0_9_2().Run(settings);
-            if (currentVersion < new Version(0, 9, 4))
-                new Upgrade0_9_4().Run(settings);
+                new Upgrade_0_9_2().Run(settings);
+            if (currentVersion < new Version(0, 9, 4)) // 0.9.4 because 1.0.0 was originally 0.9.4 
+                new Upgrade_1_0_0().Run(settings);
         }
         
         // save the settings

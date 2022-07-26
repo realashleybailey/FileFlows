@@ -207,7 +207,7 @@ public abstract class DbManager
         bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
         await AddOrUpdateObject(db, new Variable
         {
-            Name = "FFMpeg",
+            Name = "ffmpeg",
             Value = windows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
             DateCreated = DateTime.Now,
             DateModified = DateTime.Now

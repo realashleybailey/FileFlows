@@ -562,7 +562,13 @@
         "Script": "Script",
         "Script-Help":"The script to execute at the configured schedule",
         "Schedule": "Schedule",
-        "Schedule-Help": "When this script should execute"
+        "Schedule-Help": "When this script should execute",
+        "CustomSchedule":"Custom Schedule",
+        "CustomSchedule-Help": "This task will run once per 15 minute block at the start of that block",
+        "Type":"Type",
+        "Type-Help":"The type of task this.  Time based tasks will run at the configured times.  Other tasks are event based",
+        "TimeSchedule":"Schedule",
+        "TimeSchedule-Help":"When the task will be run"
       }
     },
     "Variables": {

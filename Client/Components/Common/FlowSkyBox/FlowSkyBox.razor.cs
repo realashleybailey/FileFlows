@@ -52,7 +52,7 @@ public partial class FlowSkyBox<TItem>
     {
         this._Items.Clear();
         if(items?.Any() == true)
-            this._Items.AddRange(items);
+            this._Items.AddRange(items.Where(x => x != null));
         this.SelectedItem = items.Where(x => x.Value.Equals(selected)).FirstOrDefault();
         this.StateHasChanged();
     }

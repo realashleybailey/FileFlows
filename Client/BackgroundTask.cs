@@ -18,7 +18,6 @@ public class BackgroundTask
     public void Start()
     {
         _timerTask = DoWorkAsync();
-        Console.WriteLine("background task start");
     }
 
     private async Task DoWorkAsync()
@@ -27,7 +26,6 @@ public class BackgroundTask
         {
             while (await _timer.WaitForNextTickAsync(_cts.Token))
             {
-                Console.WriteLine("background task do work");
                 try
                 {
                     this._action();
@@ -35,7 +33,6 @@ public class BackgroundTask
                 catch (Exception)
                 {
                 }
-                Console.WriteLine("background task finished work");
             }
         }
         catch (OperationCanceledException)
@@ -45,7 +42,6 @@ public class BackgroundTask
 
     public async Task StopAsync()
     {
-        Console.WriteLine("Stopping background task");
         if (_timerTask is null)
             return;
         _cts.Cancel();

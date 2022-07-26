@@ -241,6 +241,7 @@ public class Program
         // run any upgrade code that may need to be run
         var settings = DbHelper.Single<Settings>().Result;
         new Upgrade.Upgrader().Run(settings);
+        DbHelper.RestoreDefaults();
 
         new DatabaseLogger();
         

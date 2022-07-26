@@ -33,7 +33,7 @@
 }
 @if (string.IsNullOrEmpty(HelpHtml) == false)
 {
-    <div class="row mt-0 @(invalid ? "error" : "") @(Input?.Disabled == true ? "disabled" : "")">
+    <div class="row mt-0 @(invalid ? "error" : "") @(Input?.Disabled == true ? "disabled" : "") @(Input?.HideLabel == true ? "hide-label": "")">
         <div class="input-label"></div>
         <div class="input-value">
             <span class="help-text">

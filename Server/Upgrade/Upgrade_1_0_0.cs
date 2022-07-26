@@ -8,9 +8,9 @@ using FileFlows.Shared.Models;
 namespace FileFlows.Server.Upgrade;
 
 /// <summary>
-/// Upgrade to FileFlows v0.9.4
+/// Upgrade to FileFlows v1.0.0
 /// </summary>
-public class Upgrade0_9_4
+public class Upgrade_1_0_0
 {
     /// <summary>
     /// Runs the update
@@ -18,7 +18,7 @@ public class Upgrade0_9_4
     /// <param name="settings">the settings</param>
     public void Run(Settings settings)
     {
-        Logger.Instance.ILog("Upgrade running, running 0.9.4 upgrade script");
+        Logger.Instance.ILog("Upgrade running, running 1.0.0 upgrade script");
         RenameToolsToVariables();
         MoveUserScripts();
         MoveSystemScripts();
@@ -29,6 +29,8 @@ public class Upgrade0_9_4
         var manager = DbHelper.GetDbManager();
         manager.Execute(
             "update DbObject set Type = 'FileFlows.Shared.Models.Variable', Data = replace(Data, 'Path', 'Value') where Type = 'FileFlows.Shared.Models.Tool'", null);
+        manager.Execute(
+            "update DbObject set Name = 'ffmpeg' where Type = 'FileFlows.Shared.Models.Variable' and Name = 'FFMpeg'", null);
     }
 
     private void MoveUserScripts()

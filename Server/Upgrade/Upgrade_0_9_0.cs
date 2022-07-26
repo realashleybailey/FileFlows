@@ -9,7 +9,7 @@ namespace FileFlows.Server.Upgrade;
 /// <summary>
 /// Upgrade to FileFlows v0.9.0
 /// </summary>
-public class Upgrade0_9_0
+public class Upgrade_0_9_0
 {
     /// <summary>
     /// Runs the update

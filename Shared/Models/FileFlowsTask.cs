@@ -19,9 +19,4 @@ public class FileFlowsTask : FileFlowObject
     /// Gets or sets the schedule this script runs at
     /// </summary>
     public string Schedule { get; set; }
-
-    /// <summary>
-    /// Gets or sets when this script was last run
-    /// </summary>
-    public DateTime LastRunAt { get; set; }
 }

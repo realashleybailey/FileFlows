@@ -140,7 +140,29 @@ public class ElementField
         if(this.DisabledConditions?.Any(x => x == condition) == true)
             this.DisabledChange?.Invoke(state);
         if (this.Conditions?.Any(x => x == condition) == true)
+        {
             this.ConditionsChange?.Invoke(state == false); // state is the "disabled" state, for conditions we want the inverse
+        }
+    }
+
+    /// <summary>
+    /// Tests if all the conditions on this field match
+    /// </summary>
+    /// <returns>if all the conditions on this field match</returns>
+    public bool ConditionsAllMatch()
+    {
+        if (this.Conditions?.Any() != true)
+            return true;
+        bool matches = true;
+        foreach (var condition in this.Conditions)
+        {
+            if (condition.IsMatch == false)
+            {
+                matches = false;
+            }
+        }
+
+        return matches;
     }
 }
 

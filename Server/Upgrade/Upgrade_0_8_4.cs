@@ -6,7 +6,7 @@ namespace FileFlows.Server.Upgrade;
 /// <summary>
 /// Upgrade to FileFlows v0.8.4
 /// </summary>
-public class Upgrade0_8_4
+public class Upgrade_0_8_4
 {
     /// <summary>
     /// Runs the update

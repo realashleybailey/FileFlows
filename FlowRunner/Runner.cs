@@ -272,7 +272,8 @@ public class Runner
         nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
         nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()
         {
-            SharedDirectory = ScriptSharedDir
+            SharedDirectory = ScriptSharedDir,
+            FileFlowsUrl = Service.ServiceBaseUrl
         };
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;

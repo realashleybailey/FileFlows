@@ -191,13 +191,13 @@ public partial class Scripts : ListPage<string, Script>
                 Count = this.DataFlow.Count,
                 Value = ScriptType.Flow
             },
-            new ()
+            App.Instance.FileFlowsSystem.Licensed ? new ()
             {
                 Name = "System Scripts",
                 Icon = "fas fa-laptop-code",
                 Count = this.DataSystem.Count,
                 Value = ScriptType.System
-            },
+            } : null,
             new ()
             {
                 Name = "Shared Scripts",

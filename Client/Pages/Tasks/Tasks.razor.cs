@@ -1,3 +1,4 @@
+using System.Data;
 using FileFlows.Client.Components;
 using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
@@ -27,7 +28,10 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
     
     private async Task Add()
     {
-        await Edit(new FileFlowsTask());
+        await Edit(new FileFlowsTask()
+        {
+            Schedule = SCHEDULE_DAILY
+        });
     }
     
     public override async Task<bool> Edit(FileFlowsTask item)
@@ -122,7 +126,26 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             }
         };
         fields.Add(efSchedule);
-        
+
+        string customSchedule = SCHEDULE_HOURLY;
+        if (item.Type == TaskType.Time)
+        {
+            if (item.Schedule == SCHEDULE_DAILY)
+                timeSchedule = TimeSchedule.Daily;
+            else if (item.Schedule == SCHEDULE_3_HOURLY)
+                timeSchedule = TimeSchedule.Every3Hours;
+            else if (item.Schedule == SCHEDULE_6_HOURLY)
+                timeSchedule = TimeSchedule.Every6Hours;
+            else if (item.Schedule == SCHEDULE_12_HOURLY)
+                timeSchedule = TimeSchedule.Every12Hours;
+            else if (item.Schedule == SCHEDULE_DAILY)
+                timeSchedule = TimeSchedule.Daily;
+            else if (item.Schedule == SCHEDULE_HOURLY)
+                timeSchedule = TimeSchedule.Hourly;
+            else
+                timeSchedule = TimeSchedule.Custom;
+            customSchedule = item.Schedule?.EmptyAsNull() ?? SCHEDULE_HOURLY;
+        }
         
         fields.Add(new ElementField
         {
@@ -135,11 +158,18 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             Conditions = new List<Condition>
             {
                 new (efTaskType, item.Type, value: TaskType.Time),
-                new (efSchedule, timeSchedule, value: TimeSchedule.Custom),
-                
+                new (efSchedule, timeSchedule, value: TimeSchedule.Custom)
             }
         });
-        var result = await Editor.Open("Pages.Task", "Pages.Task.Title", fields, item,
+        var result = await Editor.Open("Pages.Task", "Pages.Task.Title", fields, new
+            {
+                item.Uid,
+                item.Name,
+                item.Script,
+                item.Type,
+                CustomSchedule = customSchedule,
+                TimeSchedule = timeSchedule
+            },
             saveCallback: Save);
         
         return false;
@@ -153,10 +183,36 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
 #else
         Blocker.Show();
         this.StateHasChanged();
+        var task = new FileFlowsTask();
+        var dict = model as IDictionary<string, object>;
+        task.Name = dict["Name"].ToString();
+        task.Script = dict["Script"].ToString();
+        task.Uid = (Guid)dict["Uid"];
+        task.Type = (TaskType)dict["Type"];
+        if (task.Type == TaskType.Time)
+        {
+            var timeSchedule = (TimeSchedule)dict["TimeSchedule"];
+            switch (timeSchedule)
+            {
+                case TimeSchedule.Daily: task.Schedule = SCHEDULE_DAILY;
+                    break;
+                case TimeSchedule.Hourly: task.Schedule = SCHEDULE_HOURLY;
+                    break;
+                case TimeSchedule.Every3Hours: task.Schedule = SCHEDULE_3_HOURLY;
+                    break;
+                case TimeSchedule.Every6Hours: task.Schedule = SCHEDULE_6_HOURLY;
+                    break;
+                case TimeSchedule.Every12Hours: task.Schedule = SCHEDULE_12_HOURLY;
+                    break;
+                default:
+                    task.Schedule = (string)dict["CustomSchedule"];
+                    break;
+            }
+        }
 
         try
         {
-            var saveResult = await HttpHelper.Post<FileFlowsTask>($"{ApiUrl}", model);
+            var saveResult = await HttpHelper.Post<FileFlowsTask>($"{ApiUrl}", task);
             if (saveResult.Success == false)
             {
                 Toast.ShowError( saveResult.Body?.EmptyAsNull() ?? Translater.Instant("ErrorMessages.SaveFailed"));

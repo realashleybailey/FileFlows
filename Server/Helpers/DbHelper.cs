@@ -3,6 +3,7 @@ using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
+using Jint.Native.Symbol;
 
 namespace FileFlows.Server.Helpers;
 
@@ -338,4 +339,32 @@ public class DbHelper
     /// </summary>
     /// <param name="libraryFile">The library file to update</param>
     public static Task UpdateWork(LibraryFile libraryFile) => Manager.UpdateWork(libraryFile);
+
+
+    /// <summary>
+    /// Restores defaults from the database if they have been removed
+    /// </summary>
+    public static void RestoreDefaults()
+    {
+        var manager = GetDbManager();
+        using var db = manager.GetDb().Result;
+        var ffmpeg = db.Db.ExecuteScalar<string>(
+            "select name from DbObject where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
+        if (string.IsNullOrEmpty(ffmpeg))
+        {
+            // doesnt exist, insert it
+            manager.Update(new Variable()
+            {
+                Name = "ffmpeg",
+                Value = Globals.IsWindows
+                    ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
+                    : "/usr/local/bin/ffmpeg"
+            }).Wait();
+        }
+        else if (ffmpeg != "ffmpeg")
+        {
+            // not lower case
+            db.Db.Execute("update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
+        }
+    }
 }

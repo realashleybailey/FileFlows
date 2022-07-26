@@ -61,8 +61,8 @@ public class FileFlowTasksWorker: Worker
             Instance.Variables.Add(var.Name, var.Value);
         }
         
-        if(Instance.Variables.ContainsKey("FileFlowsUrl") == false)
-            Instance.Variables.Add("FileFlowsUrl", ServerShared.Services.Service.ServiceBaseUrl);
+        if(Instance.Variables.ContainsKey("FileFlows.Url") == false)
+            Instance.Variables.Add("FileFlows.Url", ServerShared.Services.Service.ServiceBaseUrl);
     }
 
     /// <summary>

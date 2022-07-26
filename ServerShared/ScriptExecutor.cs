@@ -51,10 +51,10 @@ public class ScriptExecutor:IScriptExecutor
         executor.HttpClient = HttpHelper.Client;
         if (string.IsNullOrWhiteSpace(FileFlowsUrl) == false)
         {
-            if (args.Variables.ContainsKey("FileFlowsUrl"))
-                args.Variables["FileFlowsUrl"] = FileFlowsUrl;
+            if (args.Variables.ContainsKey("FileFlows.Url"))
+                args.Variables["FileFlows.Url"] = FileFlowsUrl;
             else
-                args.Variables.Add("FileFlowsUrl", FileFlowsUrl);
+                args.Variables.Add("FileFlows.Url", FileFlowsUrl);
         }
 
         executor.Variables = args.Variables;

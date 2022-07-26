@@ -155,7 +155,6 @@ public class Executor
             })
             .SetValue("Hostname", Environment.MachineName)
             .SetValue("Execute", (object eArgs) => {
-               string json = JsonSerializer.Serialize(eArgs);
                var jsonOptions = new JsonSerializerOptions()
                {
                    PropertyNameCaseInsensitive = true

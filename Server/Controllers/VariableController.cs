@@ -15,7 +15,7 @@ public class VariableController : ControllerStore<Variable>
     /// </summary>
     /// <returns>A list of all configured variables</returns>
     [HttpGet]
-    public async Task<IEnumerable<Variable>> GetAll() => (await GetDataList()).OrderBy(x => x.Name);
+    public async Task<IEnumerable<Variable>> GetAll() => (await GetDataList()).OrderBy(x => x.Name.ToLowerInvariant());
 
     /// <summary>
     /// Get variable

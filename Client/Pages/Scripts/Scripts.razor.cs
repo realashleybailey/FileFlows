@@ -143,6 +143,8 @@ public partial class Scripts : ListPage<string, Script>
         }
     }
 
+    protected override string DeleteUrl => $"{ApiUrl}?type={SelectedType}";
+
     public override async Task Delete()
     {
         var used = Table.GetSelected()?.Any(x => x.UsedBy?.Any() == true) == true;

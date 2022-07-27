@@ -157,6 +157,8 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
     }
 
     protected virtual string DeleteMessage => "Labels.DeleteItems";
+    
+    protected virtual string DeleteUrl => ApiUrl;
 
     public virtual async Task Delete()
     {
@@ -173,7 +175,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         try
         {
 #if (!DEMO)
-            var deleteResult = await HttpHelper.Delete($"{ApiUrl}", new ReferenceModel<U> { Uids = uids });
+            var deleteResult = await HttpHelper.Delete(DeleteUrl, new ReferenceModel<U> { Uids = uids });
             if (deleteResult.Success == false)
             {
                 if(Translater.NeedsTranslating(deleteResult.Body))

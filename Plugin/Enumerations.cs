@@ -59,5 +59,9 @@ public enum ScriptType
     /// <summary>
     /// A shared script which can be imported into other scripts
     /// </summary>
-    Shared = 2
+    Shared = 2,
+    /// <summary>
+    /// Template scripts used in the Function editor
+    /// </summary>
+    Template = 3
 }

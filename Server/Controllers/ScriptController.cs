@@ -4,7 +4,6 @@ using FileFlows.ScriptExecution;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
-using FileFlows.Shared.Validators;
 using Microsoft.AspNetCore.Mvc;
 using Logger = FileFlows.Shared.Logger;
 
@@ -112,6 +111,13 @@ public class ScriptController : Controller
     }
 
     /// <summary>
+    /// Get script templates for the function editor
+    /// </summary>
+    /// <returns>a list of script templates</returns>
+    [HttpGet("templates")]
+    public Task<IEnumerable<Script>> GetTemplates() => GetAll(ScriptType.Template);
+
+    /// <summary>
     /// Returns a basic list of scripts
     /// </summary>
     /// <param name="type">the type of scripts to return</param>
@@ -122,7 +128,10 @@ public class ScriptController : Controller
     async Task<IEnumerable<Script>> GetAll(ScriptType type, bool loadCode = true)
     {
         List<Script> scripts = new();
-        foreach (var file in new DirectoryInfo(type == ScriptType.Flow ? DirectoryHelper.ScriptsDirectoryFlow : type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : DirectoryHelper.ScriptsDirectorySystem).GetFiles("*.js"))
+        foreach (var file in new DirectoryInfo(type == ScriptType.Flow ? DirectoryHelper.ScriptsDirectoryFlow : 
+                     type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : 
+                     type == ScriptType.Template ? DirectoryHelper.ScriptsDirectoryTemplate : 
+                     DirectoryHelper.ScriptsDirectorySystem).GetFiles("*.js"))
         {
             var script = await GetScript(type, file, loadCode);
             scripts.Add(script);

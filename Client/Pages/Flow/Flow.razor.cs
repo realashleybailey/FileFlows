@@ -573,10 +573,15 @@ namespace FileFlows.Client.Pages
             return false;
         }
 
-        private void FunctionNode(List<ElementField> fields)
+        private async Task FunctionNode(List<ElementField> fields)
         {
-            var templates = GetCodeTemplates();
-            templates.Insert(0, new ListOption
+            var templates = await GetCodeTemplates();
+            var templatesOptions = templates.Select(x => new ListOption()
+            {
+                Label = x.Name,
+                Value = x
+            }).ToList();
+            templatesOptions.Insert(0, new ListOption
             {
                 Label = Translater.Instant("Labels.None"),
                 Value = null
@@ -589,7 +594,7 @@ namespace FileFlows.Client.Pages
                 Parameters = new Dictionary<string, object>
                 {
                     { nameof(Components.Inputs.InputSelect.AllowClear), false },
-                    { nameof(Components.Inputs.InputSelect.Options), templates }
+                    { nameof(Components.Inputs.InputSelect.Options), templatesOptions }
                 }
             };
             efTemplate.ValueChanged += (object sender, object value) =>
@@ -620,235 +625,37 @@ namespace FileFlows.Client.Pages
             fields.Insert(2, efTemplate);
         }
 
-        private List<ListOption> GetCodeTemplates()
+        private async Task<List<CodeTemplate>> GetCodeTemplates()
         {
-            var templates = new List<ListOption>();
+            var templateResponse = await HttpHelper.Get<List<Script>>("/api/script/templates");
+            if (templateResponse.Success == false || templateResponse.Data?.Any() != true)
+                return new List<CodeTemplate>();
 
-            templates.Add(new ListOption
+            List<CodeTemplate> templates = new();
+            var rgxComments = new Regex(@"\/\*(\*)?(.*?)\*\/", RegexOptions.Singleline);
+            var rgxOutputs = new Regex(@"@outputs ([\d]+)");
+            foreach (var template in templateResponse.Data)
             {
-                Label = "Video: Resolution",
-                Value = new CodeTemplate
-                {
-                    Outputs = 4,
-                    Code =
-@"
-// get the first video stream, likely the only one
-let video = Variables.vi?.VideoInfo?.VideoStreams[0];
-if(!video)
-    return -1; // no video streams detected
-if(video.Width > 3700)
-    return 1; // 4k 
-if(video.Width > 1800)
-    return 2; // 1080p
-if(video.Width > 1200)
-    return 3; // 720p
-return 4; // SD
-"
-                }
-            });
-            templates.Add(new ListOption
-            {
-                Label = "Video: Downscale greater than 1080P",
-                Value = new CodeTemplate
-                {
-                    Outputs = 2,
-                    Code =
-@"
-// this template downscales a video with a width larger than 1920 down to 1920
-// it is suppose to be used before a 'Video Encode' node and can create a variable
-// to use in that node
-// It uses NVIDIA hardware encoding to encode to HEVC/H265
-// output 1 = needs to downscale
-// output 2 = does not need to downscale
-
-// get the first video stream, likely the only one
-let video = Variables.vi?.VideoInfo?.VideoStreams[0];
-if (!video)
-    return -1; // no video streams detected
-
-if (video.Width > 1920)
-{
-    // down scale to 1920 and encodes using NVIDIA
-	// then add a 'Video Encode' node and in that node 
-	// set 
-	// 'Video Codec' to 'hevc'
-	// 'Video Codec Parameters' to '{EncodingParameters}'
-	Logger.ILog(`Need to downscale from ${video.Width}x${video.Height}`);
-    Variables.EncodingParameters = '-vf scale=1920:-2:flags=lanczos -c:v hevc_nvenc -preset hq -crf 23'
-	return 1;
-}
-
-Logger.ILog('Do not need to downscale');
-return 2;
-"
-                }
-            });
-
-            templates.Add(new ListOption
-            {
-                Label = "Video: Bitrate greater than",
-                Value = new CodeTemplate
-                {
-                    Outputs = 2,
-                    Code =
-@"
-// check if the bitrate for a video is over a certain amount
-let MAX_BITRATE = 3_000_000; // bitrate is 3,000 KBps
-
-let vi = Variables.vi?.VideoInfo;
-if(!vi || !vi.VideoStreams || !vi.VideoStreams[0])
-	return -1; // no video information found
-
-// get the video stream
-let bitrate = vi.VideoStreams[0].Bitrate;
-
-if(!bitrate)
-{
-	// video stream doesn't have bitrate information
-	// need to use the overall bitrate
-	let overall = vi.Bitrate;
-	if(!overall)
-		return 0; // couldn't get overall bitrate either
-
-	// overall bitrate includes all audio streams, so we try and subtract those
-	let calculated = overall;
-	if(vi.AudioStreams?.length) // check there are audio streams
-	{
-		for(let audio of vi.AudioStreams)
-		{
-			if(audio.Bitrate > 0)
-				calculated -= audio.Bitrate;
-			else{
-				// audio doesn't have bitrate either, so we just subtract 5% of the original bitrate
-				// this is a guess, but it should get us close
-				calculated -= (overall * 0.05);
-			}
-		}
-	}
-	bitrate = calculated;
-}
-
-// check if the bitrate is over the maximum bitrate
-if(bitrate > MAX_BITRATE)
-	return 1; // it is, so call output 1
-return 2; // it isn't so call output 2
-"
-                }
-            });
-            templates.Add(new ListOption
-            {
-                Label = "File: Larger than 1GB",
-                Value = new CodeTemplate
-                {
-                    Outputs = 2,
-                    Code =
-@"
-if(Variables.file.Size > 1_000_000_000)
-	return 1;
-return 2;
-"
-                }
-            });
-            templates.Add(new ListOption
-            {
-                Label = "Video: Manual FFMPEG",
-                Value = new CodeTemplate
-                {
-                    Outputs = 1,
-                    Code = @"
-let output = Flow.TempPath + '/' + Flow.NewGuid() + '.mkv';
-let ffmpeg = Flow.GetToolPath('ffmpeg');
-let process = Flow.Execute({
-	command: ffmpeg,
-	argumentList: [
-		'-i',
-		Variables.file.FullName,
-		'-c:v',
-		'libx265',
-		'-c:a',
-		'copy',
-		output
-	]
-});
-
-if(process.standardOutput)
-	Logger.ILog('Standard output: ' + process.standardOutput);
-if(process.starndardError)
-	Logger.ILog('Standard error: ' + process.starndardError);
-
-if(process.exitCode !== 0){
-	Logger.ELog('Failed processing ffmpeg: ' + process.exitCode);
-	return -1;
-}
-
-Flow.SetWorkingFile(output);
-return 1;
-"
-                }
-            });
-
-
-            templates.Add(new ListOption
-            {
-                Label = "Video: Manual HandBrakeCLI",
-                Value = new CodeTemplate
-                {
-                    Outputs = 1,
-                    Code = @"
-// You need to configure HandBrakeCLI as a tool under the tools page for this to work
-// refer to the FFMPEG tool as a reference
-let handbrakecli = Flow.GetToolPath('HandBrakeCLI');
-
-// generate a unique filename to save the output from handbrakecli to
-let output = Flow.TempPath + '/' + Flow.NewGuid() + '.mkv';
-
-let process = Flow.Execute({
-	command: handbrakecli,
-	argumentList: [
-		'-i',
-		Variables.file.FullName,
-		'-o',
-		output,
-		'-Z',
-		'H.265 MKV 1080p30',
-        '-e',
-        'x265',
-        '-E',
-        'copy',
-        '�audio-fallback',
-        'aac',
-        '--all-audio',
-        '--all-subtitles',
-        '--decomb',
-        '--enable-qsv-decoding'
-	]
-});
-
-// ensure handbrake exited with a success exit code
-if(process.exitCode !== 0)
-{
-	Logger.ELog('Failed processing HandBrakeCLI: ' + process.exitCode);
-	return -1;
-}
-
-// ensure the output file exists
-if(Flow.FileExists(output) !== true)
-{
-	Logger.ELog('Output file does not exist from HandBrakeCLI: ' + output);
-	return -1;
-}
-
-// update the working file in the flow to the newly created file
-Flow.SetWorkingFile(output);
-return 1;
-"
-                }
-            });
-            return templates.OrderBy(x => x.Label).ToList();
+                var commentBlock = rgxComments.Match(template.Code);
+                if (commentBlock.Success == false)
+                    continue;
+                var outputs = rgxOutputs.Match(commentBlock.Value);
+                if (outputs.Success == false)
+                    continue;
+                
+                var ct = new CodeTemplate();
+                ct.Name = template.Name;
+                ct.Code = template.Code.Replace(commentBlock.Value, string.Empty).Trim();
+                ct.Outputs = int.Parse(outputs.Groups[1].Value);
+                templates.Add(ct);
+            }
+            
+            return templates.OrderBy(x => x.Name).ToList();
         }
 
         private class CodeTemplate
         {
+            public string Name { get; set; }
             public string Code { get; set; }
             public int Outputs { get; set; }
         }

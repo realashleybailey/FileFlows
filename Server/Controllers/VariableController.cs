@@ -50,7 +50,7 @@ public class VariableController : ControllerStore<Variable>
     public async Task<Variable> Save([FromBody] Variable variable)
     {
         var result = await Update(variable, checkDuplicateName: true);
-        Workers.FileFlowTasksWorker.ReloadVariables();
+        Workers.FileFlowsTasksWorker.ReloadVariables();
         return result;
     }
 
@@ -63,6 +63,6 @@ public class VariableController : ControllerStore<Variable>
     public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         await DeleteAll(model);
-        Workers.FileFlowTasksWorker.ReloadVariables();
+        Workers.FileFlowsTasksWorker.ReloadVariables();
     }
 }

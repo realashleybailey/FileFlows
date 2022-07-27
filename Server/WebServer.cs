@@ -156,7 +156,7 @@ public class WebServer
             new TempFileCleaner(string.Empty),
             new FlowRunnerMonitor(),
             new ObjectReferenceUpdater(),
-            new FileFlowTasksWorker()
+            new FileFlowsTasksWorker()
         );
 
         app.MapHub<Hubs.FlowHub>("/flow");

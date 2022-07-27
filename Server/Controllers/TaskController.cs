@@ -50,7 +50,7 @@ public class TaskController  : ControllerStore<FileFlowsTask>
     public async Task<FileFlowsTask> Save([FromBody] FileFlowsTask fileFlowsTask)
     {
         var result = await Update(fileFlowsTask, checkDuplicateName: true);
-        Workers.FileFlowTasksWorker.ReloadTasks();
+        Workers.FileFlowsTasksWorker.ReloadTasks();
         return result;
     }
 
@@ -63,6 +63,6 @@ public class TaskController  : ControllerStore<FileFlowsTask>
     public async Task Delete([FromBody] ReferenceModel<Guid> model)
     {
         await DeleteAll(model);
-        Workers.FileFlowTasksWorker.ReloadTasks();
+        Workers.FileFlowsTasksWorker.ReloadTasks();
     }
 }

@@ -11,11 +11,11 @@ using Logger = FileFlows.Shared.Logger;
 namespace FileFlows.Server.Workers;
 
 /// <summary>
-/// A worker that runs FileFlow Tasks
+/// A worker that runs FileFlows Tasks
 /// </summary>
-public class FileFlowTasksWorker: Worker
+public class FileFlowsTasksWorker: Worker
 {
-    private static FileFlowTasksWorker Instance;
+    private static FileFlowsTasksWorker Instance;
     private readonly List<FileFlowsTask> Tasks = new ();
     private readonly Dictionary<string, object> Variables = new ();
     /// <summary>
@@ -23,18 +23,13 @@ public class FileFlowTasksWorker: Worker
     /// </summary>
     private Dictionary<Guid, int> TaskLastRun = new ();
     
-    // /// <summary>
-    // /// Gets the logger for the database
-    // /// </summary>
-    // public static FileLogger TaskLogger { get; private set; }
     
     /// <summary>
     /// Creates a new instance of the Scheduled Task Worker
     /// </summary>
-    public FileFlowTasksWorker() : base(ScheduleType.Minute, 1)
+    public FileFlowsTasksWorker() : base(ScheduleType.Minute, 1)
     {
         Instance = this;
-        //TaskLogger = new FileLogger(DirectoryHelper.LoggingDirectory, "FileFlowsTasks", register: false);
         ReloadTasks();
         ReloadVariables();
     }

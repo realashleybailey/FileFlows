@@ -48,6 +48,28 @@
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="Script" Width="10rem">
+                    <Header>
+                        Revision
+                    </Header>
+                    <Cell Context="item">
+                        @if (item.Revision > 0)
+                        {
+                            <span>@item.Revision</span>
+                        }
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="Script" Width="10rem">
+                    <Header>
+                        Latest Revision
+                    </Header>
+                    <Cell Context="item">
+                        @if (item.LatestRevision > 0)
+                        {
+                            <span>@item.LatestRevision</span>
+                        }
+                    </Cell>
+                </FlowTableColumn>
                 <FlowTableColumn TItem="Script" Width="10rem" Hidden=@(SelectedType == ScriptType.Shared)>
                     <Header>
                         Read Only

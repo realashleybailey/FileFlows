@@ -26,17 +26,49 @@ public class ScriptController : Controller
     public async Task<IEnumerable<Script>> GetAll()
     {
         List<Script> scripts = new();
-        scripts.AddRange(await GetRepositoryScripts(ScriptType.Flow));
-        scripts.AddRange(await GetUserScripts(ScriptType.Flow));
-        scripts.AddRange(await GetRepositoryScripts(ScriptType.System));
-        scripts.AddRange(await GetUserScripts(ScriptType.System));
-        scripts.AddRange(await GetSharedScripts());
+        var taskScriptsFlow = GetAll(ScriptType.Flow);
+        var taskScriptsSystem = GetAll(ScriptType.System);
+        var taskScriptsShared = GetAll(ScriptType.Shared);
+        var taskFlows = new FlowController().GetAll();
+        var taskTasks = new TaskController().GetAll();
+
+        ScriptRepository repo = new ScriptRepository();
+        try
+        {
+            repo = new ScriptRepositoryController().GetRepository().Result;
+        }
+        catch (Exception)
+        {
+            // silently fail
+        }
+
+        scripts.AddRange(taskScriptsFlow.Result);
+        scripts.AddRange(taskScriptsSystem.Result);
+        scripts.AddRange(taskScriptsShared.Result);
+
+        var dictFlowScripts = repo.FlowScripts?.ToDictionary(x => x.Path, x => x.Revision) ?? new ();
+        var dictSystemScripts = repo.SystemScripts?.ToDictionary(x => x.Path, x => x.Revision) ?? new ();
+        var dictSharedScripts = repo.SharedScripts?.ToDictionary(x => x.Path, x => x.Revision) ?? new ();
+        foreach (var script in scripts)
+        {
+            if (string.IsNullOrEmpty(script.Path))
+                continue;
+            var dict = script.Type switch
+            {
+                ScriptType.Shared => dictSharedScripts,
+                ScriptType.System => dictSystemScripts,
+                _ => dictFlowScripts
+            };
+            if (dict.ContainsKey(script.Path) == false)
+                continue;
+            script.LatestRevision = dict[script.Path];
+        }
         
         scripts = scripts.DistinctBy(x => x.Name).ToList();
         var dictScripts = scripts.ToDictionary(x => x.Name.ToLower(), x => x);
-        var flows = await new FlowController().GetAll();
+        var flows = taskFlows.Result;
         string flowTypeName = typeof(Flow).FullName ?? string.Empty;
-        foreach (var flow in flows)
+        foreach (var flow in flows ?? new Flow[] {})
         {
             if (flow?.Parts?.Any() != true)
                 continue;
@@ -60,6 +92,22 @@ public class ScriptController : Controller
             }
         }
 
+        var tasks = taskTasks.Result;
+        string taskTypeName = typeof(FileFlowsTask).FullName ?? string.Empty;
+        foreach (var task in tasks ?? new FileFlowsTask[] { })
+        {
+            if (dictScripts.ContainsKey(task.Script.ToLower()) == false)
+                continue;
+            var script = dictScripts[task.Script.ToLower()];
+            script.UsedBy ??= new();
+            script.UsedBy.Add(new ()
+            {
+                Name = task.Name,
+                Type = taskTypeName,
+                Uid = task.Uid
+            });
+        }
+
         return scripts.OrderBy(x => x.Name);
     }
 
@@ -69,38 +117,56 @@ public class ScriptController : Controller
     /// <param name="type">the type of scripts to return</param>
     /// <returns>a basic list of scripts</returns>
     [HttpGet("list/{type}")]
-    public async Task<IEnumerable<Script>> List([FromRoute] ScriptType type)
-    {
-        if (type == ScriptType.Shared)
-            return await GetSharedScripts(loadCode: false);
-        var user = GetUserScripts(type, loadCode: false);
-        var shared = GetRepositoryScripts(type, loadCode: false);
-        return shared.Result.Union(user.Result).OrderBy(x => x.Name);
-    }
+    public Task<IEnumerable<Script>> List([FromRoute] ScriptType type) => GetAll(type, loadCode: false);
 
-    private Task<IEnumerable<Script>> GetRepositoryScripts(ScriptType type, bool loadCode = true) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemRepository : DirectoryHelper.ScriptsDirectoryFlowRepository, type, repository: true, loadCode: loadCode);
-    private Task<IEnumerable<Script>> GetUserScripts(ScriptType type, bool loadCode = true) => GetAll(type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystemUser : DirectoryHelper.ScriptsDirectoryFlowUser, type, loadCode: loadCode);
-
-    private Task<IEnumerable<Script>> GetSharedScripts(bool loadCode = true) =>
-        GetAll(DirectoryHelper.ScriptsDirectoryShared, ScriptType.Shared, loadCode: loadCode);
-
-    async Task<IEnumerable<Script>> GetAll(string directory, ScriptType type, bool repository = false, bool loadCode = true)
+    async Task<IEnumerable<Script>> GetAll(ScriptType type, bool loadCode = true)
     {
         List<Script> scripts = new();
-        foreach (var file in new DirectoryInfo(directory).GetFiles("*.js"))
+        foreach (var file in new DirectoryInfo(type == ScriptType.Flow ? DirectoryHelper.ScriptsDirectoryFlow : type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : DirectoryHelper.ScriptsDirectorySystem).GetFiles("*.js"))
         {
-            string name = file.Name.Replace(".js", "");
-            scripts.Add(new()
-            {
-                Uid = name,
-                Name = name,
-                Repository = repository,
-                Type = type,
-                Code = loadCode ? await System.IO.File.ReadAllTextAsync(file.FullName) : null
-            });
+            var script = await GetScript(type, file, loadCode);
+            scripts.Add(script);
         }
 
         return scripts.OrderBy(x => x.Name);
+    }
+
+    private async Task<Script> GetScript(ScriptType type, FileInfo file, bool loadCode)
+    {
+        string name = file.Name.Replace(".js", "");
+        string code = loadCode ? await System.IO.File.ReadAllTextAsync(file.FullName) : null;
+        bool repository = false;
+        int revision = 0;
+        string path = string.Empty;
+        if (loadCode)
+        {
+            repository = code.StartsWith("// path:");
+            if (repository)
+            {
+                var match = Regex.Match(code, @"@revision ([\d]+)");
+                if (match.Success)
+                    revision = int.Parse(match.Groups[1].Value);
+                path = code.Split('\n').First().Substring("// path:".Length).Trim();
+            }
+        }
+        else
+        {
+            string line = (await System.IO.File.ReadAllLinesAsync(file.FullName)).First();
+            repository = line?.StartsWith("// path:") == true;
+            if(repository)
+                path = line.Substring("// path:".Length).Trim();
+        }
+
+        return new Script
+        {
+            Uid = name,
+            Name = name,
+            Repository = repository,
+            Type = type,
+            Revision = revision,
+            Path = path,
+            Code = code
+        };
     }
 
     /// <summary>
@@ -113,16 +179,7 @@ public class ScriptController : Controller
     public async Task<Script> Get([FromRoute] string name, ScriptType type = ScriptType.Flow)
     {
         var result = FindScript(name, type);
-        string code = await System.IO.File.ReadAllTextAsync(result.File);
-        
-        return new Script()
-        {
-            Uid = name,
-            Name = name,
-            Type = type,
-            Repository = result.System,
-            Code = code
-        };
+        return await GetScript(type, new FileInfo(result.File), true);
     }
 
     private (bool System, string File) FindScript(string name, ScriptType type)
@@ -133,17 +190,11 @@ public class ScriptController : Controller
             throw new Exception("Script not found");
         }
 
-        string repoFilename = GetFullFilename(name, true, type);
-        if (System.IO.File.Exists(repoFilename))
-        {
-            return (true, repoFilename);
-        }
+        string file = GetFullFilename(name, type);
+        if (System.IO.File.Exists(file))
+            return (true, file);
 
-        string userFilename = GetFullFilename(name, false, type);
-        if (System.IO.File.Exists(userFilename))
-            return (false, userFilename);
-        Logger.Instance.ELog($"Script '{name}' not found: {repoFilename}");
-        Logger.Instance.ELog($"Script '{name}' not found: {userFilename}");
+        Logger.Instance.ELog($"Script '{name}' not found: {file}");
         throw new Exception("Script not found");
 
     }
@@ -230,7 +281,7 @@ public class ScriptController : Controller
             throw new Exception("Failed to save script");
         if (script.Uid != script.Name)
         {
-            if (DeleteScript(script.Uid, false, script.Type))
+            if (DeleteScript(script.Uid, script.Type))
             {
                 _ = UpdateScriptReferences(script.Uid, script.Name);
             }
@@ -262,6 +313,16 @@ public class ScriptController : Controller
                 await controller.Update(flow);
             }
         }
+
+        var taskController = new TaskController();
+        var tasks = await taskController.GetAll();
+        foreach (var task in tasks)
+        {
+            if (task.Script != oldName)
+                continue;
+            task.Script = newName;
+            await taskController.Update(task);
+        }
     }
 
     /// <summary>
@@ -277,9 +338,7 @@ public class ScriptController : Controller
         {
             if (ValidScriptName(m) == false)
                 continue;
-            string file = GetFullFilename(m, false, type);
-            if (System.IO.File.Exists(file) == false)
-                file = GetFullFilename(m, true, type);
+            string file = GetFullFilename(m, type);
             if (System.IO.File.Exists(file) == false)
                 continue;
             try
@@ -293,11 +352,11 @@ public class ScriptController : Controller
         }
     }
 
-    private bool DeleteScript(string script, bool repository, ScriptType type)
+    private bool DeleteScript(string script, ScriptType type)
     {
         if (ValidScriptName(script) == false)
             return false;
-        string file = GetFullFilename(script, repository, type);
+        string file = GetFullFilename(script, type);
         if (System.IO.File.Exists(file) == false)
             return false;
         try
@@ -386,17 +445,17 @@ public class ScriptController : Controller
         return true;
     }
 
-    private string GetFullFilename(string name, bool repository, ScriptType type)
+    private string GetFullFilename(string name, ScriptType type)
     {
         string baseDir;
-        if (repository && type == ScriptType.Flow)
-            baseDir = DirectoryHelper.ScriptsDirectoryFlowRepository;
-        else if (repository && type == ScriptType.System)
-            baseDir = DirectoryHelper.ScriptsDirectorySystemRepository;
-        else if (repository == false && type == ScriptType.System)
-            baseDir = DirectoryHelper.ScriptsDirectorySystemUser;
+        if (type == ScriptType.Flow)
+            baseDir = DirectoryHelper.ScriptsDirectoryFlow;
+        else if (type == ScriptType.System)
+            baseDir = DirectoryHelper.ScriptsDirectorySystem;
+        else if (type == ScriptType.Shared)
+            baseDir = DirectoryHelper.ScriptsDirectoryShared;
         else
-            baseDir = DirectoryHelper.ScriptsDirectoryFlowUser;
+            baseDir = DirectoryHelper.ScriptsDirectoryFlow;
         
         return new FileInfo(Path.Combine(baseDir, name + ".js")).FullName;
     } 
@@ -410,7 +469,7 @@ public class ScriptController : Controller
             
             if(ValidScriptName(name) == false)
                 throw new Exception("Invalid script name:" + name);
-            string file = GetFullFilename(name, false, type);
+            string file = GetFullFilename(name, type);
             System.IO.File.WriteAllText(file, code);
             return true;
         }

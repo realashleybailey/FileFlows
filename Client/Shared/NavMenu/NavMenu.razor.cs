@@ -95,13 +95,21 @@ public partial class NavMenu : IDisposable
 #if (!DEMO)
         MenuItems.Add(new NavMenuGroup
         {
-            Name = "System",
-            Icon = "fas fa-hdd",
+            Name = "Extensions",
+            Icon = "fas fa-laptop-house",
             Items = new List<NavMenuItem>
             {
-                new ("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
-                new ("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
-                new ("Pages.Variables.Title", "fas fa-at", "tools"),
+                new("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
+                new("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
+                new("Pages.Variables.Title", "fas fa-at", "tools"),
+            }
+        });
+        MenuItems.Add(new NavMenuGroup
+        {
+            Name = "System",
+            Icon = "fas fa-desktop",
+            Items = new List<NavMenuItem>
+            {
                 App.Instance.FileFlowsSystem.Licensed ? new ("Pages.Revisions.Title", "fas fa-history", "revisions") : null,
                 App.Instance.FileFlowsSystem.Licensed ? new ("Pages.Tasks.Title", "fas fa-clock", "tasks") : null,
                 new ("Pages.Settings.Title", "fas fa-cogs", "settings"),

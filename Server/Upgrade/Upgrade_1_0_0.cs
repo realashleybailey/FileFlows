@@ -40,7 +40,7 @@ public class Upgrade_1_0_0
             return;
         foreach (var file in oldDir.GetFiles())
         {
-            file.MoveTo(Path.Combine(DirectoryHelper.ScriptsDirectoryFlowUser));
+            file.MoveTo(Path.Combine(DirectoryHelper.ScriptsDirectoryFlow));
         }
         oldDir.Delete();
     }
@@ -68,7 +68,7 @@ public class Upgrade_1_0_0
                 continue;
             }
             string content = "// path: " + path + "\n\n" + File.ReadAllText(file.FullName);
-            File.WriteAllText(Path.Combine(DirectoryHelper.ScriptsDirectoryFlowUser, file.Name), content);
+            File.WriteAllText(Path.Combine(DirectoryHelper.ScriptsDirectoryFlow, file.Name), content);
         }
         oldDir.Delete();
     }

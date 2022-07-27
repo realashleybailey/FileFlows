@@ -31,6 +31,21 @@ public class Script:IUniqueObject<string>, IInUse
     /// Gets or sets the UID of this script, which is the original name of it
     /// </summary>
     public string Uid { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the revision of the script
+    /// </summary>
+    public int Revision { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the latest revision of the script
+    /// </summary>
+    public int LatestRevision { get; set; }
+
+    /// <summary>
+    /// Gets or sets the remote path of the script
+    /// </summary>
+    public string Path { get; set; }
 
     /// <summary>
     /// Gets or sets what is using this object

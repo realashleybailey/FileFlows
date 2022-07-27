@@ -30,13 +30,13 @@ public class ScriptRepositoryController : Controller
             List<string> known = new();
             foreach (string file in Directory.GetFiles(
                          type == ScriptType.System
-                             ? DirectoryHelper.ScriptsDirectorySystemRepository
-                             : DirectoryHelper.ScriptsDirectoryFlowRepository, "*.js"))
+                             ? DirectoryHelper.ScriptsDirectorySystem
+                             : DirectoryHelper.ScriptsDirectoryFlow, "*.js"))
             {
                 try
                 {
                     string line = System.IO.File.ReadAllLines(file).First();
-                    if(line?.StartsWith("// path:") == true)
+                    if (line?.StartsWith("// path:") == true)
                         known.Add(line[9..].Trim());
                 }
                 catch (Exception)
@@ -49,7 +49,12 @@ public class ScriptRepositoryController : Controller
         return scripts;
     }
 
-    private async Task<ScriptRepository> GetRepository()
+    /// <summary>
+    /// Get the repository data which contains information on all the scripts
+    /// </summary>
+    /// <returns>the repository data which contains information on all the scripts</returns>
+    /// <exception cref="Exception">If failed to load the repository</exception>
+    internal async Task<ScriptRepository> GetRepository()
     {
         string url = BASE_URL + "repo.json?ts=" + DateTime.UtcNow.ToFileTimeUtc();
         var srResult = await HttpHelper.Get<ScriptRepository>(url);
@@ -110,8 +115,9 @@ public class ScriptRepositoryController : Controller
                 string output =
                     Path.Combine(
                         type == ScriptType.System
-                            ? DirectoryHelper.ScriptsDirectorySystemRepository
-                            : DirectoryHelper.ScriptsDirectoryFlowRepository, file);
+                            ? DirectoryHelper.ScriptsDirectorySystem
+                            : type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared
+                            : DirectoryHelper.ScriptsDirectoryFlow, file);
                 await DownloadScript(spath, output);
             }
             catch (Exception ex)

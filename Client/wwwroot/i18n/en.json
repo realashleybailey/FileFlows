@@ -557,6 +557,9 @@
         "NoScripts":"No scripts found to create a task for"
       }
     },
+    "FileFlowsTask":{
+      "Title":"Task"
+    },
     "Task":{ 
       "Title":"Task",
       "Fields": {

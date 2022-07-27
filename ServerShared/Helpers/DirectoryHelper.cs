@@ -57,7 +57,7 @@ public class DirectoryHelper
 #if(DEBUG && false)
         return;
 #else
-        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectoryFlowRepository, ScriptsDirectoryFlowUser, ScriptsDirectorySystemRepository, ScriptsDirectorySystemUser, ScriptsDirectoryShared })
+        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectoryFlow, ScriptsDirectorySystem, ScriptsDirectoryShared })
         {
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
@@ -216,26 +216,16 @@ public class DirectoryHelper
             return Path.Combine(BaseDirectory, "Scripts");
         }
     }
-
-    /// <summary>
-    /// Gets the scripts directory for scripts from the repository
-    /// </summary>
-    public static string ScriptsDirectoryFlowRepository => Path.Combine(ScriptsDirectory, "Flow", "Repository");
     
     /// <summary>
-    /// Gets the scripts directory for user scripts
+    /// Gets the scripts directory for flow scripts
     /// </summary>
-    public static string ScriptsDirectoryFlowUser => Path.Combine(ScriptsDirectory, "Flow", "User");
+    public static string ScriptsDirectoryFlow => Path.Combine(ScriptsDirectory, "Flow");
     
     /// <summary>
-    /// Gets the scripts directory for user system scripts
+    /// Gets the scripts directory for system scripts
     /// </summary>
-    public static string ScriptsDirectorySystemUser => Path.Combine(ScriptsDirectory, "System", "User");
-    
-    /// <summary>
-    /// Gets the scripts directory for system scripts from the repository
-    /// </summary>
-    public static string ScriptsDirectorySystemRepository => Path.Combine(ScriptsDirectory, "System", "Repository");
+    public static string ScriptsDirectorySystem => Path.Combine(ScriptsDirectory, "System");
 
     /// <summary>
     /// Gets the scripts directory for scripts from the repository

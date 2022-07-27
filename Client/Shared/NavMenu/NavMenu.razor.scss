@@ -66,10 +66,10 @@
     position: relative;
     ::deep a {
         padding-left:2rem;
-        height: 2.5rem;
+        height: 2.3rem;
         display: flex;
         align-items: center;
-        line-height: 2.5rem;
+        line-height: 2.3rem;
         color: var(--color) !important;
         border-left:solid 0.5rem transparent;
         &.active {
@@ -151,13 +151,13 @@
     }
 }
 
-@media screen and (max-height:572px){
+@media screen and (max-height:610px){
     .support-links, .version-info {
         display: none !important;
     }
 }
 
-@media screen and (max-height:856px){
+@media screen and (max-height:890px){
     .nav-item {
         padding-bottom:0.25rem;
         ::deep a {
@@ -169,7 +169,7 @@
     }
 }
 
-@media screen and (max-height:726px) 
+@media screen and (max-height:796px) 
 {
     .nav-menu-group {
         display:none;

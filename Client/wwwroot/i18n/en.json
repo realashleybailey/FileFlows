@@ -431,10 +431,12 @@
         "DeleteUsed":"You cannot delete a script that is in use"
       },
       "Labels": {
-        "ScriptBrowser":"Script Repository"
+        "ScriptBrowser":"Script Repository",
+        "UpdatingScripts": "Updating Scripts"
       },
       "Buttons": {
-        "ScriptBrowser": "Repository"
+        "ScriptBrowser": "Repository",
+        "UpdateScripts": "Update Scripts"
       },
       "Fields":{
       }

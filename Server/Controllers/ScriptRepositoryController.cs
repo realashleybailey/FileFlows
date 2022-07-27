@@ -91,38 +91,37 @@ public class ScriptRepositoryController : Controller
 
         // always re-download all the shared scripts to ensure they are up to date
         var repo = await GetRepository();
-        foreach (var script in repo.SharedScripts)
-        {
-            string output = script.Path;
-            if (output.StartsWith("Shared/"))
-                output = output[7..];
-            await DownloadScript(script.Path, Path.Combine(DirectoryHelper.ScriptsDirectoryShared, output));
-        }
+        await DownloadSharedScripts(repo);
 
+        await DownloadScripts(model.Scripts, repo);
+    }
+
+    private async Task DownloadScripts(List<string> paths, ScriptRepository repo)
+    {
         Dictionary<string, RepositoryScript> scripts =
             repo.SystemScripts.Union(repo.FlowScripts).ToDictionary(x => x.Path, x => x); 
 
-        foreach(var spath in model.Scripts)
+        foreach(var path in paths)
         {
             try
             {
-                if (scripts.ContainsKey(spath) == false)
-                    throw new Exception("Failed to locate script: " + spath);
-                int slashIndex = spath.IndexOf("/");
-                var type = Enum.Parse<ScriptType>(spath[0..slashIndex]);
-                var script = scripts[spath];
+                if (scripts.ContainsKey(path) == false)
+                    throw new Exception("Failed to locate script: " + path);
+                int slashIndex = path.IndexOf("/", StringComparison.Ordinal);
+                var type = Enum.Parse<ScriptType>(path[0..slashIndex]);
+                var script = scripts[path];
                 string file = script.Name + ".js";
                 string output =
                     Path.Combine(
-                        type == ScriptType.System
-                            ? DirectoryHelper.ScriptsDirectorySystem
-                            : type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared
-                            : DirectoryHelper.ScriptsDirectoryFlow, file);
-                await DownloadScript(spath, output);
+                        type == ScriptType.System ? DirectoryHelper.ScriptsDirectorySystem : 
+                        type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : 
+                        type == ScriptType.Template ? DirectoryHelper.ScriptsDirectoryTemplate : 
+                        DirectoryHelper.ScriptsDirectoryFlow, file);
+                await DownloadScript(path, output);
             }
             catch (Exception ex)
             { 
-                Logger.Instance?.ELog($"Failed downloading script: '{spath}' => {ex.Message}");
+                Logger.Instance?.ELog($"Failed downloading script: '{path}' => {ex.Message}");
             }
         }
     }
@@ -133,6 +132,9 @@ public class ScriptRepositoryController : Controller
         {
             string code = await GetCode(path);
             code = "// path: " + path + "\n\n" + code;
+            var dir = new FileInfo(output).Directory;
+            if(dir.Exists == false)
+                dir.Create();
             await System.IO.File.WriteAllTextAsync(output, code);
         }
         catch (Exception ex)
@@ -140,7 +142,51 @@ public class ScriptRepositoryController : Controller
             Logger.Instance?.ELog($"Failed downloading script: '{path}' => {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Update the scripts from th repository
+    /// </summary>
+    [HttpPost("update-scripts")]
+    public async Task UpdateScripts()
+    {
+        var repo = await GetRepository();
+        await DownloadSharedScripts(repo);
+        await DownloadTemplateScripts(repo);
+        var scripts = await new ScriptController().GetAll();
+        List<string> paths = new();
+        foreach (var script in scripts)
+        {
+            if (script.Repository == false)
+                continue;
+            if (string.IsNullOrEmpty(script.Path))
+                continue;
+            paths.Add(script.Path);
+        }
+
+        await DownloadScripts(paths, repo);
+    }
+
+    private async Task DownloadSharedScripts(ScriptRepository repo)
+    {
+        foreach (var script in repo.SharedScripts)
+        {
+            string output = script.Path;
+            if (output.StartsWith("Shared/"))
+                output = output[7..];
+            await DownloadScript(script.Path, Path.Combine(DirectoryHelper.ScriptsDirectoryShared, output));
+        }
+    }
     
+    private async Task DownloadTemplateScripts(ScriptRepository repo)
+    {
+        foreach (var script in repo.Templates)
+        {
+            string output = script.Path;
+            if (output.StartsWith("Templates/"))
+                output = output[("Templates/".Length)..];
+            await DownloadScript(script.Path, Path.Combine(DirectoryHelper.ScriptsDirectoryTemplate, output));
+        }
+    }
     /// <summary>
     /// Download model
     /// </summary>

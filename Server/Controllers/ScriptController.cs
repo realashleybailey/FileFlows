@@ -128,10 +128,11 @@ public class ScriptController : Controller
     async Task<IEnumerable<Script>> GetAll(ScriptType type, bool loadCode = true)
     {
         List<Script> scripts = new();
-        foreach (var file in new DirectoryInfo(type == ScriptType.Flow ? DirectoryHelper.ScriptsDirectoryFlow : 
-                     type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : 
-                     type == ScriptType.Template ? DirectoryHelper.ScriptsDirectoryTemplate : 
-                     DirectoryHelper.ScriptsDirectorySystem).GetFiles("*.js"))
+        string dir = type == ScriptType.Flow ? DirectoryHelper.ScriptsDirectoryFlow : 
+            type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : 
+            type == ScriptType.Template ? DirectoryHelper.ScriptsDirectoryTemplate : 
+            DirectoryHelper.ScriptsDirectorySystem;
+        foreach (var file in new DirectoryInfo(dir).GetFiles("*.js", SearchOption.AllDirectories))
         {
             var script = await GetScript(type, file, loadCode);
             scripts.Add(script);

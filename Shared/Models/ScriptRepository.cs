@@ -17,6 +17,10 @@ public class ScriptRepository
     /// Gets or sets the flow scripts
     /// </summary>
     public List<RepositoryScript> FlowScripts { get; set; } = new ();
+    /// <summary>
+    /// Gets or sets the template scripts
+    /// </summary>
+    public List<RepositoryScript> Templates { get; set; } = new ();
 }
 
 /// <summary>

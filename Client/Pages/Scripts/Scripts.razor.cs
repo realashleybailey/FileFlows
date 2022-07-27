@@ -29,7 +29,16 @@ public partial class Scripts : ListPage<string, Script>
     private List<Script> DataShared = new();
     private ScriptType SelectedType = ScriptType.Flow;
 
+    private string lblUpdateScripts, lblUpdatingScripts;
+
     private ScriptBrowser ScriptBrowser { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.lblUpdateScripts = Translater.Instant("Pages.Scripts.Buttons.UpdateScripts");
+        this.lblUpdatingScripts = Translater.Instant("Pages.Scripts.Labels.UpdatingScripts");
+    }
 
 
     private async Task Add()
@@ -224,5 +233,19 @@ public partial class Scripts : ListPage<string, Script>
         // need to tell table to update so the "Default" column is shown correctly
         Table.TriggerStateHasChanged();
         this.StateHasChanged();
+    }
+
+    private async Task UpdateScripts()
+    {
+        this.Blocker.Show(lblUpdatingScripts);
+        try
+        {
+            await HttpHelper.Post("/api/script-repo/update-scripts");
+            await Refresh();
+        }
+        finally
+        {
+            this.Blocker.Hide();
+        }
     }
 }

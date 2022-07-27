@@ -51,9 +51,13 @@ public partial class FlowSkyBox<TItem>
     public void SetItems(List<FlowSkyBoxItem<TItem>> items, TItem selected)
     {
         this._Items.Clear();
-        if(items?.Any() == true)
+        items = items?.Where(x => x != null)?.ToList() ?? new();
+        if(items.Any() == true)
             this._Items.AddRange(items.Where(x => x != null));
-        this.SelectedItem = items.Where(x => x.Value.Equals(selected)).FirstOrDefault();
+        if(selected != null)
+            this.SelectedItem = items.Where(x => x.Value.Equals(selected)).FirstOrDefault();
+        else
+            this.SelectedItem = items.FirstOrDefault();
         this.StateHasChanged();
     }
 

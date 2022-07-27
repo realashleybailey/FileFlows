@@ -69,7 +69,13 @@ public partial class Log : ComponentBase
         {
             _ = Task.Run(async () =>
             {
-                await Task.Delay(100);
+                await Task.Delay(100); // 100ms
+                await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content", true});
+                await Task.Delay(400); // 500ms
+                await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content", true});
+                await Task.Delay(200); // 700ms
+                await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content", true});
+                await Task.Delay(300); // 1second
                 await jsRuntime.InvokeVoidAsync("ff.scrollToBottom", new object[]{ ".page .content", true});
             });
         }

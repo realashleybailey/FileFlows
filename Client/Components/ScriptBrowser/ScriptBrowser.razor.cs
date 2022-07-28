@@ -10,7 +10,7 @@ namespace FileFlows.Client.Components;
 
 public partial class ScriptBrowser: ComponentBase
 {
-    const string ApiUrl = "/api/script-repo";
+    const string ApiUrl = "/api/repository";
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] public Editor Editor { get; set; }
 

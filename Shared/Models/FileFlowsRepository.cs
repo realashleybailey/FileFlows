@@ -18,9 +18,11 @@ public class FileFlowsRepository
     /// </summary>
     public List<RepositoryObject> FlowScripts { get; set; } = new ();
     /// <summary>
-    /// Gets or sets the function template scripts
+    /// Gets or sets the function scripts
     /// </summary>
-    public List<RepositoryObject> FunctionTemplates { get; set; } = new ();
+    public List<RepositoryObject> FunctionScripts { get; set; } = new ();
+    
+    
     /// <summary>
     /// Gets or sets the flow templates
     /// </summary>

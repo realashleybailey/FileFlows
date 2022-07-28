@@ -58,7 +58,7 @@ public class DirectoryHelper
 #if(DEBUG && false)
         return;
 #else
-        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectoryFlow, ScriptsDirectorySystem, ScriptsDirectoryShared, ScriptsDirectoryTemplate })
+        foreach (var dir in new[] { ScriptsDirectory, ScriptsDirectoryFlow, ScriptsDirectorySystem, ScriptsDirectoryShared, ScriptsDirectoryFunction })
         {
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
@@ -272,7 +272,7 @@ public class DirectoryHelper
     /// <summary>
     /// Gets the scripts directory for template scripts
     /// </summary>
-    public static string ScriptsDirectoryTemplate => Path.Combine(ScriptsDirectory, "Template");
+    public static string ScriptsDirectoryFunction => Path.Combine(ScriptsDirectory, "Function");
     
     /// <summary>
     /// Gets the location of the encryption key file

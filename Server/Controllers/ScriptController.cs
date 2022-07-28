@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.ScriptExecution;
 using FileFlows.Server.Helpers;
+using FileFlows.Server.Services;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ public class ScriptController : Controller
         FileFlowsRepository repo = new FileFlowsRepository();
         try
         {
-            repo = new ScriptRepositoryController().GetRepository().Result;
+            repo = await new RepositoryService().GetRepository();
         }
         catch (Exception)
         {
@@ -130,7 +131,7 @@ public class ScriptController : Controller
         List<Script> scripts = new();
         string dir = type == ScriptType.Flow ? DirectoryHelper.ScriptsDirectoryFlow : 
             type == ScriptType.Shared ? DirectoryHelper.ScriptsDirectoryShared : 
-            type == ScriptType.Template ? DirectoryHelper.ScriptsDirectoryTemplate : 
+            type == ScriptType.Template ? DirectoryHelper.ScriptsDirectoryFunction : 
             DirectoryHelper.ScriptsDirectorySystem;
         foreach (var file in new DirectoryInfo(dir).GetFiles("*.js", SearchOption.AllDirectories))
         {
@@ -144,7 +145,7 @@ public class ScriptController : Controller
     private async Task<Script> GetScript(ScriptType type, FileInfo file, bool loadCode)
     {
         string name = file.Name.Replace(".js", "");
-        string code = loadCode ? await System.IO.File.ReadAllTextAsync(file.FullName) : null;
+        var code = loadCode ? await System.IO.File.ReadAllTextAsync(file.FullName) : null;
         bool repository = false;
         int revision = 0;
         string path = string.Empty;

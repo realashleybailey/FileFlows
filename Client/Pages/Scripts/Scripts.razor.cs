@@ -240,7 +240,7 @@ public partial class Scripts : ListPage<string, Script>
         this.Blocker.Show(lblUpdatingScripts);
         try
         {
-            await HttpHelper.Post("/api/script-repo/update-scripts");
+            await HttpHelper.Post("/api/repository/update");
             await Refresh();
         }
         finally

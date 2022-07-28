@@ -1,4 +1,5 @@
 using FileFlows.Server.Controllers;
+using FileFlows.Server.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 
@@ -26,42 +27,10 @@ public class RepositoryUpdaterWorker: Worker
     /// </summary>
     protected override void Execute()
     {
-        var repo = GetRepository();
-        UpdateFunctionScripts(repo);
-        UpdateFlowTemplates(repo);
-        UpdateLibraryTemplates(repo);
-    }
-
-    private FileFlowsRepository GetRepository()
-    {
-        var controller = new ScriptRepositoryController();
-        return controller.GetRepository().Result;
-    }
-
-    private void UpdateFunctionScripts(FileFlowsRepository repo = null)
-    {
-        repo ??= GetRepository();
-        Logger.Instance.ILog("Downloading Function Templates");
-        var controller = new ScriptRepositoryController();
-        controller.DownloadTemplateScripts(repo).Wait();
-        Logger.Instance.ILog("Downloaded Function Templates");
-    }
-
-    private void UpdateFlowTemplates(FileFlowsRepository repo = null)
-    {
-        repo ??= GetRepository();
-        Logger.Instance.ILog("Downloading Flow Templates");
-        var controller = new ScriptRepositoryController();
-        controller.DownloadFlowTemplates(repo).Wait();
-        Logger.Instance.ILog("Downloaded Flow Templates");
-    }
-
-    private void UpdateLibraryTemplates(FileFlowsRepository repo = null)
-    {
-        repo ??= GetRepository();
-        Logger.Instance.ILog("Downloading Library Templates");
-        var controller = new ScriptRepositoryController();
-        controller.DownloadLibraryTemplates(repo).Wait();
-        Logger.Instance.ILog("Downloaded Library Templates");
+        var service = new RepositoryService();
+        service.Init().Wait();
+        service.DownloadFlowTemplates().Wait();
+        service.DownloadFunctionScripts().Wait();
+        service.DownloadLibraryTemplates().Wait();
     }
 }

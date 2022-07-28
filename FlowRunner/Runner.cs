@@ -1,4 +1,5 @@
-﻿using FileFlows.Server;
+﻿using System.Text.RegularExpressions;
+using FileFlows.Server;
 using Microsoft.Extensions.Logging;
 
 namespace FileFlows.FlowRunner;
@@ -23,7 +24,7 @@ public class Runner
     private CancellationTokenSource CancellationToken = new CancellationTokenSource();
     private bool Canceled = false;
     private string WorkingDir;
-    private string ScriptDir, ScriptSharedDir;
+    private string ScriptDir, ScriptSharedDir, ScriptFlowDir;
 
     /// <summary>
     /// Creates an instance of a Runner
@@ -275,6 +276,12 @@ public class Runner
             SharedDirectory = ScriptSharedDir,
             FileFlowsUrl = Service.ServiceBaseUrl
         };
+        var systemVariables = new VariableService().GetAll().Result?.ToArray() ?? new Variable []{ };
+        foreach (var variable in systemVariables)
+        {
+            if (nodeParameters.Variables.ContainsKey(variable.Name) == false)
+                nodeParameters.Variables.Add(variable.Name, variable.Value);
+        }
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;
         FileHelper.DontSetPermissions = Node.DontSetPermissions;
@@ -392,7 +399,7 @@ public class Runner
                 nodeParameters.Logger?.ILog($"Executing Node {(Info.LibraryFile.ExecutedNodes.Count + 1)}: {part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name} [{part.GetType().FullName}]");
                 nodeParameters.Logger?.ILog(new string('=', 70));
 
-                gotoFlow = null; // clear it, incase this node requests going to a different flow
+                gotoFlow = null; // clear it, in case this node requests going to a different flow
                 
                 DateTime nodeStartTime = DateTime.Now;
                 int output = 0;
@@ -490,19 +497,19 @@ public class Runner
         if (Directory.Exists(nodeParameters.TempPath) == false)
             Directory.CreateDirectory(nodeParameters.TempPath);
 
-        string scriptsDir = Path.Combine(nodeParameters.TempPath, "Scripts");
-        if (Directory.Exists(scriptsDir) == false)
-            Directory.CreateDirectory(scriptsDir);
+        ScriptDir = Path.Combine(nodeParameters.TempPath, "Scripts");
+        if (Directory.Exists(ScriptDir) == false)
+            Directory.CreateDirectory(ScriptDir);
         
-        ScriptSharedDir = Path.Combine(scriptsDir, "Shared");
+        ScriptSharedDir = Path.Combine(ScriptDir, "Shared");
         if (Directory.Exists(ScriptSharedDir) == false)
             Directory.CreateDirectory(ScriptSharedDir);
         
-        scriptsDir = Path.Combine(scriptsDir, "Flow");
-        if (Directory.Exists(scriptsDir) == false)
-            Directory.CreateDirectory(scriptsDir);
-        
-        var allScripts = service.GetScripts().Result;
+        ScriptFlowDir = Path.Combine(ScriptDir, "Flow");
+        if (Directory.Exists(ScriptFlowDir) == false)
+            Directory.CreateDirectory(ScriptFlowDir);
+
+        var allScripts = service.GetScripts().Result?.ToArray() ?? new Script[] { };
         var shared = allScripts.Where(x => x.Type == ScriptType.Shared);
         foreach (var script in shared)
         {
@@ -512,7 +519,7 @@ public class Runner
         var flowScripts = allScripts.Where(x => x.Type == ScriptType.Flow);
         foreach (var script in flowScripts)
         {
-            File.WriteAllText(Path.Combine(scriptsDir, script.Name + ".js"), script.Code);
+            File.WriteAllText(Path.Combine(ScriptFlowDir, script.Name + ".js"), script.Code);
         }
         
         TimeSpan timeTaken = DateTime.Now - start;
@@ -628,13 +635,12 @@ public class Runner
             var nodeScript = new ScriptNode();
             nodeScript.Model = part.Model;
             string scriptName = part.FlowElementUid[7..]; // 7 to remove "Scripts." 
-            var script  = ScriptService.Load().Get(scriptName).Result;
-            if (string.IsNullOrEmpty(script?.Code))
+            nodeScript.Code = GetScriptCode(scriptName);
+            if (string.IsNullOrEmpty(nodeScript.Code))
                 throw new Exception("Script not found");
-            nodeScript.Code = script.Code;
             
             if(string.IsNullOrWhiteSpace(part.Name))
-                part.Name = script.Name;
+                part.Name = scriptName;
             return nodeScript;
         }
         
@@ -672,5 +678,20 @@ public class Runner
             return default;
         return (Node)node;
 
+    }
+
+    /// <summary>
+    /// Loads the code for a script
+    /// </summary>
+    /// <param name="scriptName">the name of the script</param>
+    /// <returns>the code of the script</returns>
+    private string GetScriptCode(string scriptName)
+    {
+        if (scriptName.EndsWith(".js") == false)
+            scriptName += ".js";
+        var file = new FileInfo(Path.Combine(ScriptFlowDir, scriptName));
+        if (file.Exists == false)
+            return string.Empty;
+        return File.ReadAllText(file.FullName);
     }
 }

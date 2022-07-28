@@ -115,6 +115,7 @@ public class WorkerController : Controller
                     }
                 }
 
+
                 libfile.NoLongerExistsAfterProcessing = new FileInfo(libfile.Name).Exists == false;
                 if(info.LibraryFile.FinalSize > 0)
                     libfile.FinalSize = info.LibraryFile.FinalSize;
@@ -122,6 +123,12 @@ public class WorkerController : Controller
                 libfile.Fingerprint = info.LibraryFile.Fingerprint;
                 libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
                 libfile.Status = info.LibraryFile.Status;
+                if (info.LibraryFile.ProcessingStarted > new DateTime(2020, 1, 1))
+                    libfile.ProcessingStarted = info.LibraryFile.ProcessingStarted;
+                if (info.LibraryFile.ProcessingEnded > new DateTime(2020, 1, 1))
+                    libfile.ProcessingEnded = info.LibraryFile.ProcessingEnded;
+                if (libfile.ProcessingEnded < new DateTime(2020, 1, 1))
+                    libfile.ProcessingEnded = DateTime.Now; // this avoid a "2022 years ago" issue
                 await libfileController.Update(libfile);
             }
         }

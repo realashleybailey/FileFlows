@@ -25,12 +25,12 @@ public class RepositoryUpdaterWorker: Worker
     /// <summary>
     /// Executes any tasks
     /// </summary>
-    protected override void Execute()
+    protected sealed override void Execute()
     {
         var service = new RepositoryService();
         service.Init().Wait();
         service.DownloadFlowTemplates().Wait();
-        service.DownloadFunctionScripts().Wait();
         service.DownloadLibraryTemplates().Wait();
+        service.DownloadFunctionScripts().Wait();
     }
 }

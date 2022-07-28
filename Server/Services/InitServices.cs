@@ -21,5 +21,6 @@ internal class InitServices
         ServerShared.Services.LibraryFileService.Loader = () => new LibraryFileService();
         ServerShared.Services.ScriptService.Loader = () => new ScriptService();
         ServerShared.Services.StatisticService.Loader = () => new StatisticService();
+        ServerShared.Services.VariableService.Loader = () => new VariableService();
     }
 }

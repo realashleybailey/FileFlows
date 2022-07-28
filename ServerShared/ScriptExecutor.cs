@@ -69,7 +69,12 @@ public class ScriptExecutor:IScriptExecutor
         }
         
         executor.ProcessExecutor = new ScriptProcessExecutor(args);
-        executor.AdditionalArguments.Add("Flow", args);
+        foreach (var arg in execArgs.AdditionalArguments ?? new ())
+            executor.AdditionalArguments.Add(arg.Key, arg.Value);
+        if(executor.AdditionalArguments.ContainsKey("Flow"))
+            executor.AdditionalArguments["Flow"] = args;
+        else
+            executor.AdditionalArguments.Add("Flow", args);
         executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
         try
         {

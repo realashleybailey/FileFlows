@@ -32,6 +32,7 @@ public class DirectoryHelper
         InitDataDirectory();
         InitPluginsDirectory();
         InitScriptsDirectory();
+        InitTemplatesDirectory();
 
         FlowRunnerDirectory = Path.Combine(BaseDirectory, "FlowRunner");
     }
@@ -66,6 +67,19 @@ public class DirectoryHelper
         
     }
 
+    private static void InitTemplatesDirectory()
+    {
+#if(DEBUG && false)
+        return;
+#else
+        foreach (var dir in new[] { TemplateDirectory, TemplateDirectoryFlow, TemplateDirectoryLibrary })
+        {
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
+        }
+#endif
+        
+    }
     private static string _BaseDirectory;
 
     /// <summary>
@@ -202,6 +216,29 @@ public class DirectoryHelper
             #endif
         }
     }
+    /// <summary>
+    /// Gets the templates directory
+    /// </summary>
+    public static string TemplateDirectory
+    {
+        get
+        {
+            // docker we expose this in the data directory so we
+            // reduce how many things we have to map out
+            if (IsDocker) 
+                return Path.Combine(DataDirectory, "Templates");
+            return Path.Combine(BaseDirectory, "Templates");
+        }
+    }
+    /// <summary>
+    /// Gets the directory for flow templates
+    /// </summary>
+    public static string TemplateDirectoryFlow => Path.Combine(TemplateDirectory, "Flow");
+    /// <summary>
+    /// Gets the directory for library templates
+    /// </summary>
+    public static string TemplateDirectoryLibrary => Path.Combine(TemplateDirectory, "Library");
+    
     /// <summary>
     /// Gets the scripts directory
     /// </summary>

@@ -12,7 +12,7 @@ namespace FileFlows.Server.Controllers;
 [Route("/api/script-repo")]
 public class ScriptRepositoryController : Controller
 {
-    const string BASE_URL = "https://raw.githubusercontent.com/revenz/FileFlowsScripts/master/";
+    const string BASE_URL = "https://raw.githubusercontent.com/revenz/FileFlowsRepository/master/";
     
     /// <summary>
     /// Gets the scripts
@@ -21,7 +21,7 @@ public class ScriptRepositoryController : Controller
     /// <param name="missing">only include scripts not downloaded</param>
     /// <returns>a collection of scripts</returns>
     [HttpGet("scripts")]
-    public async Task<IEnumerable<RepositoryScript>> GetScripts([FromQuery] ScriptType type, [FromQuery] bool missing = true)
+    public async Task<IEnumerable<RepositoryObject>> GetScripts([FromQuery] ScriptType type, [FromQuery] bool missing = true)
     {
         var repo = await GetRepository();
         var scripts = (type == ScriptType.System ? repo.SystemScripts : repo.FlowScripts);
@@ -54,10 +54,10 @@ public class ScriptRepositoryController : Controller
     /// </summary>
     /// <returns>the repository data which contains information on all the scripts</returns>
     /// <exception cref="Exception">If failed to load the repository</exception>
-    internal async Task<ScriptRepository> GetRepository()
+    internal async Task<FileFlowsRepository> GetRepository()
     {
         string url = BASE_URL + "repo.json?ts=" + DateTime.UtcNow.ToFileTimeUtc();
-        var srResult = await HttpHelper.Get<ScriptRepository>(url);
+        var srResult = await HttpHelper.Get<FileFlowsRepository>(url);
         if (srResult.Success == false)
             throw new Exception(srResult.Body);
         return srResult.Data;
@@ -96,9 +96,9 @@ public class ScriptRepositoryController : Controller
         await DownloadScripts(model.Scripts, repo);
     }
 
-    private async Task DownloadScripts(List<string> paths, ScriptRepository repo)
+    private async Task DownloadScripts(List<string> paths, FileFlowsRepository repo)
     {
-        Dictionary<string, RepositoryScript> scripts =
+        Dictionary<string, RepositoryObject> scripts =
             repo.SystemScripts.Union(repo.FlowScripts).ToDictionary(x => x.Path, x => x); 
 
         foreach(var path in paths)
@@ -107,8 +107,9 @@ public class ScriptRepositoryController : Controller
             {
                 if (scripts.ContainsKey(path) == false)
                     throw new Exception("Failed to locate script: " + path);
-                int slashIndex = path.IndexOf("/", StringComparison.Ordinal);
-                var type = Enum.Parse<ScriptType>(path[0..slashIndex]);
+                int scriptLength = "Scripts/".Length;
+                int slashIndex = path.IndexOf("/", scriptLength, StringComparison.Ordinal);
+                var type = Enum.Parse<ScriptType>(path[scriptLength..slashIndex]);
                 var script = scripts[path];
                 string file = script.Name + ".js";
                 string output =
@@ -166,20 +167,24 @@ public class ScriptRepositoryController : Controller
         await DownloadScripts(paths, repo);
     }
 
-    private async Task DownloadSharedScripts(ScriptRepository repo)
+    private async Task DownloadSharedScripts(FileFlowsRepository repo)
     {
         foreach (var script in repo.SharedScripts)
         {
             string output = script.Path;
-            if (output.StartsWith("Shared/"))
-                output = output[7..];
+            if (output.StartsWith("Scripts/Shared/"))
+                output = output[("Scripts/Shared/".Length)..];
             await DownloadScript(script.Path, Path.Combine(DirectoryHelper.ScriptsDirectoryShared, output));
         }
     }
     
-    private async Task DownloadTemplateScripts(ScriptRepository repo)
+    /// <summary>
+    /// Downloads the template scripts from the repository
+    /// </summary>
+    /// <param name="repo">the repository instance</param>
+    internal async Task DownloadTemplateScripts(FileFlowsRepository repo)
     {
-        foreach (var script in repo.Templates)
+        foreach (var script in repo.FunctionTemplates)
         {
             string output = script.Path;
             if (output.StartsWith("Templates/"))
@@ -187,6 +192,38 @@ public class ScriptRepositoryController : Controller
             await DownloadScript(script.Path, Path.Combine(DirectoryHelper.ScriptsDirectoryTemplate, output));
         }
     }
+    
+    /// <summary>
+    /// Downloads the flow templates from the repository
+    /// </summary>
+    /// <param name="repo">the repository instance</param>
+    internal async Task DownloadFlowTemplates(FileFlowsRepository repo)
+    {
+        foreach (var script in repo.FlowTemplates)
+        {
+            string output = script.Path;
+            if (output.StartsWith("Templates/Flow/"))
+                output = output[("Templates/Flow/".Length)..];
+            await DownloadScript(script.Path, Path.Combine(DirectoryHelper.TemplateDirectoryFlow, output));
+        }
+    }
+    
+    /// <summary>
+    /// Downloads the library templates from the repository
+    /// </summary>
+    /// <param name="repo">the repository instance</param>
+    internal async Task DownloadLibraryTemplates(FileFlowsRepository repo)
+    {
+        foreach (var script in repo.LibraryTemplates)
+        {
+            string output = script.Path;
+            if (output.StartsWith("Templates/Library/"))
+                output = output[("Templates/Library/".Length)..];
+            await DownloadScript(script.Path, Path.Combine(DirectoryHelper.TemplateDirectoryLibrary, output));
+        }
+    }
+    
+    
     /// <summary>
     /// Download model
     /// </summary>

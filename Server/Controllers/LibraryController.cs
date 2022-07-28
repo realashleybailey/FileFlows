@@ -174,7 +174,7 @@ public class LibraryController : ControllerStore<Library>
     }
 
 
-    private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo("Templates/LibraryTemplates").GetFiles("*.json");
+    private FileInfo[] GetTemplateFiles() => new System.IO.DirectoryInfo(DirectoryHelper.TemplateDirectoryLibrary).GetFiles("*.json", SearchOption.AllDirectories);
 
     /// <summary>
     /// Gets a list of library templates
@@ -189,32 +189,29 @@ public class LibraryController : ControllerStore<Library>
         {
             try
             {
-                string json = System.IO.File.ReadAllText(tf.FullName);
+                string json = string.Join("\n", System.IO.File.ReadAllText(tf.FullName).Split('\n').Skip(1)); // remove the //path comment
                 json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
-                var jsTemplates = System.Text.Json.JsonSerializer.Deserialize<LibraryTemplate[]>(json, new System.Text.Json.JsonSerializerOptions
+                var jst = System.Text.Json.JsonSerializer.Deserialize<LibraryTemplate>(json, new System.Text.Json.JsonSerializerOptions
                 {
                     AllowTrailingCommas = true,
                     PropertyNameCaseInsensitive = true
                 });
-                foreach(var jst in jsTemplates ?? new LibraryTemplate[] { })
+                string group = jst.Group ?? string.Empty;
+                if (templates.ContainsKey(group) == false)
+                    templates.Add(group, new List<Library>());
+                templates[group].Add(new Library
                 {
-                    string group = jst.Group ?? string.Empty;
-                    if (templates.ContainsKey(group) == false)
-                        templates.Add(group, new List<Library>());
-                    templates[group].Add(new Library
-                    {
-                        Enabled = true,
-                        FileSizeDetectionInterval = jst.FileSizeDetectionInterval,
-                        Filter = jst.Filter ?? string.Empty,
-                        ExclusionFilter = jst.ExclusionFilter ?? string.Empty,
-                        Name = jst.Name,
-                        Description = jst.Description,
-                        Path = jst.Path,
-                        Priority = jst.Priority,
-                        ScanInterval = jst.ScanInterval,
-                        ReprocessRecreatedFiles = jst.ReprocessRecreatedFiles
-                    });
-                }
+                    Enabled = true,
+                    FileSizeDetectionInterval = jst.FileSizeDetectionInterval,
+                    Filter = jst.Filter ?? string.Empty,
+                    ExclusionFilter = jst.ExclusionFilter ?? string.Empty,
+                    Name = jst.Name,
+                    Description = jst.Description,
+                    Path = jst.Path,
+                    Priority = jst.Priority,
+                    ScanInterval = jst.ScanInterval,
+                    ReprocessRecreatedFiles = jst.ReprocessRecreatedFiles
+                });
             }
             catch (Exception) { }
         }

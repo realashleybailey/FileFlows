@@ -14,7 +14,7 @@ public partial class ScriptBrowser: ComponentBase
     [CascadingParameter] public Blocker Blocker { get; set; }
     [CascadingParameter] public Editor Editor { get; set; }
 
-    public FlowTable<RepositoryScript> Table { get; set; }
+    public FlowTable<RepositoryObject> Table { get; set; }
 
     public bool Visible { get; set; }
 
@@ -42,7 +42,7 @@ public partial class ScriptBrowser: ComponentBase
         lblTitle = Translater.Instant("Pages.Scripts.Labels.ScriptBrowser") + " - " + type  + " Scripts";
         this.Visible = true;
         this.Loading = true;
-        this.Table.Data = new List<RepositoryScript>();
+        this.Table.Data = new List<RepositoryObject>();
         OpenTask = new TaskCompletionSource<bool>();
         _ = LoadData();
         this.StateHasChanged();
@@ -56,7 +56,7 @@ public partial class ScriptBrowser: ComponentBase
         this.StateHasChanged();
         try
         {
-            var result = await HttpHelper.Get<List<RepositoryScript>>(ApiUrl + "/scripts?missing=true&type=" + ScriptType);
+            var result = await HttpHelper.Get<List<RepositoryObject>>(ApiUrl + "/scripts?missing=true&type=" + ScriptType);
             if (result.Success == false)
             {
                 // close this and show message
@@ -127,14 +127,14 @@ public partial class ScriptBrowser: ComponentBase
             await View(item);
     }
 
-    private async Task View(RepositoryScript script)
+    private async Task View(RepositoryObject @object)
     {
         Blocker.Show();
         string code;
         try
         {
             var response =
-                await HttpHelper.Get<string>(ApiUrl + "/code?path=" + UrlEncoder.Create().Encode(script.Path));
+                await HttpHelper.Get<string>(ApiUrl + "/code?path=" + UrlEncoder.Create().Encode(@object.Path));
             if (response.Success == false)
                 return;
             code = response.Data;
@@ -144,7 +144,7 @@ public partial class ScriptBrowser: ComponentBase
             Blocker.Hide();
         }
 
-        await Editor.Open("Pages.Scripts", script.Name, new List<ElementField>
+        await Editor.Open("Pages.Scripts", @object.Name, new List<ElementField>
         {
             new()
             {

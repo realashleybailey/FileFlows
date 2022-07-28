@@ -13,14 +13,14 @@
 
             <Body>
                 <div class="browser-content">
-                    <FlowTable @ref="Table" TItem="RepositoryScript" Selection="SelectionMode.Multiple" DoubleClick="@View">
+                    <FlowTable @ref="Table" TItem="RepositoryObject" Selection="SelectionMode.Multiple" DoubleClick="@View">
                         <ToolBar>                    
-                            <FlowTableButton TItem="RepositoryScript" Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
-                            <FlowTableButton TItem="RepositoryScript" Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                
+                            <FlowTableButton TItem="RepositoryObject" Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
+                            <FlowTableButton TItem="RepositoryObject" Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                
                         </ToolBar>
 
                         <Columns>
-                            <FlowTableColumn TItem="RepositoryScript" Width="16rem">
+                            <FlowTableColumn TItem="RepositoryObject" Width="16rem">
                                 <Header>
                                     @Globals.lblName
                                 </Header>
@@ -28,7 +28,7 @@
                                     <span>@item.Name</span>
                                 </Cell>
                             </FlowTableColumn>
-                            <FlowTableColumn TItem="RepositoryScript" Width="5rem">
+                            <FlowTableColumn TItem="RepositoryObject" Width="5rem">
                                 <Header>
                                     Revision
                                 </Header>
@@ -36,7 +36,7 @@
                                     <span>@item.Revision</span>
                                 </Cell>
                             </FlowTableColumn>
-                            <FlowTableColumn TItem="RepositoryScript" Pre=@true>
+                            <FlowTableColumn TItem="RepositoryObject" Pre=@true>
                                 <Header>
                                     Description
                                 </Header>

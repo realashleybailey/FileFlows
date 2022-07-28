@@ -31,7 +31,7 @@ public class ScriptController : Controller
         var taskFlows = new FlowController().GetAll();
         var taskTasks = new TaskController().GetAll();
 
-        ScriptRepository repo = new ScriptRepository();
+        FileFlowsRepository repo = new FileFlowsRepository();
         try
         {
             repo = new ScriptRepositoryController().GetRepository().Result;

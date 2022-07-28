@@ -727,7 +727,7 @@ public class FlowController : ControllerStore<Flow>
     /// Gets all the flow template files
     /// </summary>
     /// <returns>a array of all flow template files</returns>
-    private FileInfo[] GetTemplateFiles() => new DirectoryInfo("Templates/FlowTemplates").GetFiles("*.json");
+    private FileInfo[] GetTemplateFiles() => new DirectoryInfo(DirectoryHelper.TemplateDirectoryFlow).GetFiles("*.json", SearchOption.AllDirectories);
 
     /// <summary>
     /// Get flow templates
@@ -739,106 +739,107 @@ public class FlowController : ControllerStore<Flow>
         var elements = await GetElements((FlowType)(-1)); // special case to load all template typs
         var parts = elements.ToDictionary(x => x.Uid.Substring(x.Uid.LastIndexOf(".") + 1), x => x);
 
-        SortedDictionary<string, List<FlowTemplateModel>> templates = new();
+        Dictionary<string, List<FlowTemplateModel>> templates = new();
         string group = string.Empty;
         templates.Add(group, new List<FlowTemplateModel>());
+        templates.Add("Basic", new List<FlowTemplateModel>());
         foreach (var tf in GetTemplateFiles())
         {
             try
             {
-                string json = System.IO.File.ReadAllText(tf.FullName);
+                string json = string.Join("\n", System.IO.File.ReadAllText(tf.FullName).Split('\n').Skip(1));
                 json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
-                var jsTemplates = JsonSerializer.Deserialize<FlowTemplate[]>(json, new JsonSerializerOptions
+                var _jst = JsonSerializer.Deserialize<FlowTemplate>(json, new JsonSerializerOptions
                 {
                     AllowTrailingCommas = true,
                     PropertyNameCaseInsensitive = true
-                }) ?? new FlowTemplate[] { };
-                foreach (var _jst in jsTemplates)
+                });
+                if (_jst == null)
+                    continue;
+                try
                 {
-                    try
+                    var jstJson = JsonSerializer.Serialize(_jst);
+                    List<TemplateField> fields = _jst.Fields ?? new List<TemplateField>();
+                    // replace all the guids with unique guides
+                    for (int i = 1; i < 50; i++)
                     {
-                        var jstJson = JsonSerializer.Serialize(_jst);
-                        List<TemplateField> fields = _jst.Fields ?? new List<TemplateField>();
-                        // replace all the guids with unique guides
-                        for (int i = 1; i < 50; i++)
+                        Guid oldUid = new Guid("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i);
+                        Guid newUid = Guid.NewGuid();
+                        foreach (var field in fields)
                         {
-                            Guid oldUid = new Guid("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i);
-                            Guid newUid = Guid.NewGuid();
-                            foreach (var field in fields)
-                            {
-                                if (field.Uid == oldUid)
-                                    field.Uid = newUid;
-                            }
-
-                            jstJson = jstJson.Replace(oldUid.ToString(), newUid.ToString());
+                            if (field.Uid == oldUid)
+                                field.Uid = newUid;
                         }
 
-                        var jst = JsonSerializer.Deserialize<FlowTemplate>(jstJson);
+                        jstJson = jstJson.Replace(oldUid.ToString(), newUid.ToString());
+                    }
 
-                        List<FlowPart> flowParts = new List<FlowPart>();
-                        int y = DEFAULT_YPOS;
-                        bool invalid = false;
-                        foreach (var jsPart in jst.Parts)
+                    var jst = JsonSerializer.Deserialize<FlowTemplate>(jstJson);
+
+                    List<FlowPart> flowParts = new List<FlowPart>();
+                    int y = DEFAULT_YPOS;
+                    bool invalid = false;
+                    foreach (var jsPart in jst.Parts)
+                    {
+                        if (jsPart.Node == null || parts.ContainsKey(jsPart.Node) == false)
                         {
-                            if (jsPart.Node == null || parts.ContainsKey(jsPart.Node) == false)
-                            {
-                                invalid = true;
-                                break;
-                            }
-
-                            var element = parts[jsPart.Node];
-
-                            flowParts.Add(new FlowPart
-                            {
-                                yPos = jsPart.yPos ?? y,
-                                xPos = jsPart.xPos ?? DEFAULT_XPOS,
-                                FlowElementUid = element.Uid,
-                                Outputs = jsPart.Outputs ?? element.Outputs,
-                                Inputs = element.Inputs,
-                                Type = element.Type,
-                                Name = jsPart.Name ?? string.Empty,
-                                Uid = jsPart.Uid,
-                                Icon = element.Icon,
-                                Model = jsPart.Model,
-                                OutputConnections = jsPart.Connections?.Select(x => new FlowConnection
-                                {
-                                    Input = x.Input,
-                                    Output = x.Output,
-                                    InputNode = x.Node
-                                }).ToList() ?? new List<FlowConnection>()
-                            });
-                            y += 150;
+                            invalid = true;
+                            break;
                         }
 
-                        if (invalid)
-                            continue;
+                        var element = parts[jsPart.Node];
 
-                        if (templates.ContainsKey(_jst.Group ?? String.Empty) == false)
-                            templates.Add(_jst.Group ?? String.Empty, new List<FlowTemplateModel>());
-
-                        templates[_jst.Group ?? String.Empty].Add(new FlowTemplateModel
+                        flowParts.Add(new FlowPart
                         {
-                            Fields = fields,
-                            Order = _jst.Order,
-                            Save = jst.Save,
-                            Type = jst.Type,
-                            Flow = new Flow
+                            yPos = jsPart.yPos ?? y,
+                            xPos = jsPart.xPos ?? DEFAULT_XPOS,
+                            FlowElementUid = element.Uid,
+                            Outputs = jsPart.Outputs ?? element.Outputs,
+                            Inputs = element.Inputs,
+                            Type = element.Type,
+                            Name = jsPart.Name ?? string.Empty,
+                            Uid = jsPart.Uid,
+                            Icon = element.Icon,
+                            Model = jsPart.Model,
+                            OutputConnections = jsPart.Connections?.Select(x => new FlowConnection
                             {
-                                Name = jst.Name,
-                                Template = jst.Name,
-                                Enabled = true,
-                                Description = jst.Description,
-                                Parts = flowParts
-                            }
+                                Input = x.Input,
+                                Output = x.Output,
+                                InputNode = x.Node
+                            }).ToList() ?? new List<FlowConnection>()
                         });
+                        y += 150;
                     }
-                    catch (Exception ex)
+
+                    if (invalid)
+                        continue;
+
+                    if (templates.ContainsKey(_jst.Group ?? String.Empty) == false)
+                        templates.Add(_jst.Group ?? String.Empty, new List<FlowTemplateModel>());
+
+                    templates[_jst.Group ?? String.Empty].Add(new FlowTemplateModel
                     {
-                        Logger.Instance.ELog("Template: " + _jst.Name);
-                        Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine +
-                                             ex.StackTrace);
-                    }
+                        Fields = fields,
+                        Order = _jst.Order,
+                        Save = jst.Save,
+                        Type = jst.Type,
+                        Flow = new Flow
+                        {
+                            Name = jst.Name,
+                            Template = jst.Name,
+                            Enabled = true,
+                            Description = jst.Description,
+                            Parts = flowParts
+                        }
+                    });
                 }
+                catch (Exception ex)
+                {
+                    Logger.Instance.ELog("Template: " + _jst.Name);
+                    Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine +
+                                         ex.StackTrace);
+                }
+                
             }
             catch (Exception ex)
             {

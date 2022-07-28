@@ -1,32 +1,40 @@
 namespace FileFlows.Shared.Models;
 
 /// <summary>
-/// The script repository
+/// The FileFlows repository
 /// </summary>
-public class ScriptRepository
+public class FileFlowsRepository
 {
     /// <summary>
     /// Gets or sets the shared scripts
     /// </summary>
-    public List<RepositoryScript> SharedScripts { get; set; } = new ();
+    public List<RepositoryObject> SharedScripts { get; set; } = new ();
     /// <summary>
     /// Gets or sets the system scripts
     /// </summary>
-    public List<RepositoryScript> SystemScripts { get; set; } = new ();
+    public List<RepositoryObject> SystemScripts { get; set; } = new ();
     /// <summary>
     /// Gets or sets the flow scripts
     /// </summary>
-    public List<RepositoryScript> FlowScripts { get; set; } = new ();
+    public List<RepositoryObject> FlowScripts { get; set; } = new ();
     /// <summary>
-    /// Gets or sets the template scripts
+    /// Gets or sets the function template scripts
     /// </summary>
-    public List<RepositoryScript> Templates { get; set; } = new ();
+    public List<RepositoryObject> FunctionTemplates { get; set; } = new ();
+    /// <summary>
+    /// Gets or sets the flow templates
+    /// </summary>
+    public List<RepositoryObject> FlowTemplates { get; set; } = new ();
+    /// <summary>
+    /// Gets or sets the library templates
+    /// </summary>
+    public List<RepositoryObject> LibraryTemplates { get; set; } = new ();
 }
 
 /// <summary>
 /// A Remote script
 /// </summary>
-public class RepositoryScript
+public class RepositoryObject
 {
     /// <summary>
     /// Gets or sets the path of the script

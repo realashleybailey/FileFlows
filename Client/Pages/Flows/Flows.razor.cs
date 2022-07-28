@@ -34,24 +34,8 @@ public partial class Flows : ListPage<Guid, FlowListModel>
     public override string FetchUrl => ApiUrl + "/list-all";
 
 
-#if (DEMO)
-    protected override Task<RequestResult<List<FlowListModel>>> FetchData()
-    {
-        var results = Enumerable.Range(1, 10).Select(x => new FlowListModel
-        {
-            Uid = Guid.NewGuid(),
-            Name = "Demo Flow " + x,
-            Enabled = x < 5
-        }).ToList();
-        return Task.FromResult(new RequestResult<List<FlowListModel>> { Success = true, Data = results });
-    }
-#endif
-
     async Task Enable(bool enabled, ffFlow flow)
     {
-#if (DEMO)
-        return;
-#else
         Blocker.Show();
         try
         {
@@ -61,14 +45,10 @@ public partial class Flows : ListPage<Guid, FlowListModel>
         {
             Blocker.Hide();
         }
-#endif
     }
 
     private async void Add()
     {
-#if (DEMO)
-        NavigationManager.NavigateTo("flows/" + Guid.Empty);
-#else
         Blocker.Show();
         List<Plugin.ListOption> templates = null;
         try
@@ -167,7 +147,6 @@ public partial class Flows : ListPage<Guid, FlowListModel>
             App.Instance.NewFlowTemplate = newFlowTemplate;
             NavigationManager.NavigateTo("flows/" + Guid.Empty);
         }
-#endif
     }
 
     private async Task<ffFlow> GetNewFlowTemplate(ExpandoObject newModel)
@@ -225,7 +204,6 @@ public partial class Flows : ListPage<Guid, FlowListModel>
 
         if (newTemplate?.Save == true)
         {
-#if (DEMO == false)
             Blocker.Show();
             try
             {
@@ -237,7 +215,6 @@ public partial class Flows : ListPage<Guid, FlowListModel>
             {
                 Blocker.Hide();
             }
-#endif
         }
 
 

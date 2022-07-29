@@ -8,5 +8,6 @@ public class Variable : FileFlowObject
     /// <summary>
     /// Gets or sets the value of the variable
     /// </summary>
+    [Encrypted]
     public string Value { get; set; }
 }

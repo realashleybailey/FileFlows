@@ -7,27 +7,41 @@ public class Decrypter
 {
     internal static string EncryptionKey => AppSettings.Instance.EncryptionKey;
 
+    /// <summary>
+    /// Decrypts a string
+    /// </summary>
+    /// <param name="text">the string to decrypt</param>
+    /// <returns>the decrypted string</returns>
     public static string Decrypt(string text)
     {
-        byte[] IV = Convert.FromBase64String(text.Substring(0, 20));
-        text = text.Substring(20).Replace(" ", "+");
-        byte[] cipherBytes = Convert.FromBase64String(text);
-        using (Aes encryptor = Aes.Create())
+        try
         {
-            Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, IV);
-            encryptor.Key = pdb.GetBytes(32);
-            encryptor.IV = pdb.GetBytes(16);
-            using (MemoryStream ms = new MemoryStream())
+            byte[] IV = Convert.FromBase64String(text.Substring(0, 20));
+            string work = text.Substring(20).Replace(" ", "+");
+            byte[] cipherBytes = Convert.FromBase64String(work);
+            using (Aes encryptor = Aes.Create())
             {
-                using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, IV);
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    cs.Write(cipherBytes, 0, cipherBytes.Length);
-                    cs.Close();
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(cipherBytes, 0, cipherBytes.Length);
+                        cs.Close();
+                    }
+
+                    work = Encoding.Unicode.GetString(ms.ToArray());
                 }
-                text = Encoding.Unicode.GetString(ms.ToArray());
             }
+
+            return work;
         }
-        return text;
+        catch (Exception)
+        {
+            return text;
+        }
 
     }
 

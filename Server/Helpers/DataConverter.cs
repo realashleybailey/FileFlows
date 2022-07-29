@@ -1,4 +1,6 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
+using FileFlows.Shared.Attributes;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Helpers;
@@ -56,6 +58,10 @@ public class DataConverter : JsonConverter<FileFlowObject>
                     continue; // dont write defaults
                 if (propValue as bool? == false)
                     continue; // don't write default false booleans
+
+                var encrypted = prop.GetCustomAttribute<EncryptedAttribute>();
+                if (encrypted != null)
+                    propValue = Helpers.Decrypter.Encrypt(propValue as string);
 
                 writer.WritePropertyName(prop.Name);
                 JsonSerializer.Serialize(writer, propValue, prop.PropertyType, options);

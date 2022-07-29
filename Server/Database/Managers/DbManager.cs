@@ -6,6 +6,7 @@ using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared;
+using FileFlows.Shared.Attributes;
 using FileFlows.Shared.Models;
 using NPoco;
 
@@ -701,13 +702,27 @@ public abstract class DbManager
     {
         var serializerOptions = new JsonSerializerOptions
         {
-            Converters = { new BoolConverter(), new Shared.Json.ValidatorConverter() }
+            Converters = { new BoolConverter(), new Shared.Json.ValidatorConverter(), new DataConverter() }
         };
 
         // need to case obj to (ViObject) here so the DataConverter is used
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         T result = JsonSerializer.Deserialize<T>(dbObject.Data, serializerOptions);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+        foreach (var prop in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        {
+            var dbencrypted = prop.GetCustomAttribute<EncryptedAttribute>();
+            if(dbencrypted != null)
+            {
+                var value = prop.GetValue(result) as string;
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    string decrypted  = Decrypter.Decrypt(value);
+                    if(decrypted != value)
+                        prop.SetValue(result, decrypted);
+                }
+            }
+        }
         //result.Uid = Guid.Parse(dbObject.Uid);
         result.Uid = dbObject.Uid;
         result.Name = dbObject.Name;

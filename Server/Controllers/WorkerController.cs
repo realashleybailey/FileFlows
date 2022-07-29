@@ -55,6 +55,15 @@ public class WorkerController : Controller
             Executors.Add(info.Uid, info);
         }
         Logger.Instance.ILog($"Starting processing on {info.NodeName}: {info.LibraryFile.Name}");
+        if (info.LibraryFile != null)
+        {
+            var lf = info.LibraryFile;
+            _ = Task.Run(async () =>
+            {
+                var library = await new LibraryController().Get(lf.Uid);
+                SystemEvents.TriggerLibraryFileProcessingStarted(lf, library);
+            });
+        }
         return info;
     }
 
@@ -129,7 +138,13 @@ public class WorkerController : Controller
                     libfile.ProcessingEnded = info.LibraryFile.ProcessingEnded;
                 if (libfile.ProcessingEnded < new DateTime(2020, 1, 1))
                     libfile.ProcessingEnded = DateTime.Now; // this avoid a "2022 years ago" issue
-                await libfileController.Update(libfile);
+                var updated = await libfileController.Update(libfile);
+                var library = await new LibraryController().Get(updated.Library.Uid);
+                if (updated.Status == FileStatus.ProcessingFailed)
+                    SystemEvents.TriggerLibraryFileProcessedFailed(libfile, library);
+                else
+                    SystemEvents.TriggerLibraryFileProcessedSuccess(libfile, library);
+                SystemEvents.TriggerLibraryFileProcessed(libfile, library);
             }
         }
     }

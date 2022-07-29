@@ -16,13 +16,12 @@ public partial class PauseResume: IDisposable
     private BackgroundTask bkgTask;
     private TimeSpan TimeDiff;
     private DateTime LastUpdated = DateTime.MinValue;
-    private string lblPause, lblResume, lblPaused;
+    private string lblPause, lblPaused;
 
     protected override async Task OnInitializedAsync()
     {
         lblPause = Translater.Instant("Labels.Pause");
         lblPaused = Translater.Instant("Labels.Paused");
-        lblResume = Translater.Instant("Labels.Resume");
         await this.Refresh();
         bkgTask = new BackgroundTask(TimeSpan.FromMilliseconds(1_000), () => _ = DoWork());
         bkgTask.Start();

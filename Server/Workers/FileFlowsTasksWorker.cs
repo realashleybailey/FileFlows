@@ -6,6 +6,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Logger = FileFlows.Shared.Logger;
 
 namespace FileFlows.Server.Workers;
@@ -32,8 +33,14 @@ public class FileFlowsTasksWorker: Worker
         Instance = this;
         ReloadTasks();
         ReloadVariables();
+        
+        SystemEvents.OnLibraryFileAdd += SystemEventsOnOnLibraryFileAdd;
+        SystemEvents.OnLibraryFileProcessed += SystemEventsOnOnLibraryFileProcessed;
+        SystemEvents.OnLibraryFileProcessedFailed += SystemEventsOnOnLibraryFileProcessedFailed;
+        SystemEvents.OnLibraryFileProcessedSuceess += SystemEventsOnOnLibraryFileProcessedSuceess;
+        SystemEvents.OnLibraryFileProcessingStarted += SystemEventsOnOnLibraryFileProcessingStarted;
     }
-    
+
     /// <summary>
     /// Reloads the stored list of tasks
     /// </summary>
@@ -87,7 +94,7 @@ public class FileFlowsTasksWorker: Worker
         }
     }
 
-    private async Task RunTask(FileFlowsTask task)
+    private async Task RunTask(FileFlowsTask task, Dictionary<string, object> additionalVariables = null)
     {
         string code = await new ScriptController().GetCode(task.Script, type: ScriptType.System);
         if (string.IsNullOrWhiteSpace(code))
@@ -97,11 +104,49 @@ public class FileFlowsTasksWorker: Worker
         }
         Logger.Instance.ILog("Executing task: " + task.Name);
         DateTime dtStart = DateTime.Now;
-        var result = ScriptExecutor.Execute(code, Variables);
+
+        var variables = Variables.ToDictionary(x => x.Key, x => x.Value);
+        if (additionalVariables?.Any() == true)
+        {
+            foreach (var variable in additionalVariables)
+            {
+                if (variables.ContainsKey(variable.Key))
+                    variables[variable.Key] = variable.Value;
+                else
+                    variables.Add(variable.Key, variable.Value);
+            }
+        }
+
+        var result = ScriptExecutor.Execute(code, variables);
         if(result.Success)
             Logger.Instance.ILog($"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)) + "\n" + result.Log);
         else
             Logger.Instance.ELog($"Error executing task '{task.Name}: " + result.ReturnValue + "\n" + result.Log);
     }
+
+    private void LibraryFileEventTriggered(TaskType type, SystemEvents.LibraryFileEventArgs args)
+    {
+        var tasks = this.Tasks.Where(x => x.Type == type).ToArray();
+        foreach (var task in tasks)
+        {
+            _ = RunTask(task, new Dictionary<string, object>
+            {
+                { "FileName", args.File.Name },
+                { "LibraryFile", args.File },
+                { "Library", args.Library }
+            });
+        }
+    }
+
+    private void SystemEventsOnOnLibraryFileAdd(SystemEvents.LibraryFileEventArgs args) =>
+        LibraryFileEventTriggered(TaskType.FileAdded, args);
+    private void SystemEventsOnOnLibraryFileProcessingStarted(SystemEvents.LibraryFileEventArgs args)
+        => LibraryFileEventTriggered(TaskType.FileProcessing, args);
+    private void SystemEventsOnOnLibraryFileProcessed(SystemEvents.LibraryFileEventArgs args)
+        => LibraryFileEventTriggered(TaskType.FileProcessed, args);
+    private void SystemEventsOnOnLibraryFileProcessedSuceess(SystemEvents.LibraryFileEventArgs args)
+        => LibraryFileEventTriggered(TaskType.FileProcessSuccess, args);
+    private void SystemEventsOnOnLibraryFileProcessedFailed(SystemEvents.LibraryFileEventArgs args)
+        => LibraryFileEventTriggered(TaskType.FileProcessFailed, args);
 
 }

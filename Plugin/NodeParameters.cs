@@ -47,7 +47,7 @@ public class NodeParameters
         }
     }
 
-/// <summary>
+    /// <summary>
     /// Gets or sets the logger used by the flow during execution
     /// </summary>
     public ILogger? Logger { get; set; }

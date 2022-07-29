@@ -222,6 +222,7 @@ public class WatchedLibrary:IDisposable
 
             if (result != null && result.Uid != Guid.Empty)
             {
+                SystemEvents.TriggerFileAdded(result, Library);
                 Logger.Instance.DLog(
                     $"Time taken \"{(DateTime.Now.Subtract(dtTotal))}\" to successfully add new library file: \"{fullpath}\"");
             }

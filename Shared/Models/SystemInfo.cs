@@ -24,4 +24,9 @@ public class SystemInfo
     /// Gets or sets when the system is paused until
     /// </summary>
     public DateTime PausedUntil { get; set; }
+
+    /// <summary>
+    /// Gets the current time on the server
+    /// </summary>
+    public DateTime CurrentTime => DateTime.Now;
 }

@@ -5,12 +5,14 @@
     <button @onclick=@TogglePaused class="btn btn-pause">
         @if (SystemInfo.IsPaused)
         {
-            <i class="fas fa-play"></i>
+            <i class="fas fa-pause"></i>
         }
         else
         {
-            <i class="fas fa-pause"></i>
+            <i class="fas fa-play"></i>
         }
-        @lblPauseLabel
+        <span class="btn-pause-label">
+            @lblPauseLabel
+        </span>
     </button>
 }

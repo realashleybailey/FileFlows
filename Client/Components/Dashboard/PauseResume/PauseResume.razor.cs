@@ -1,45 +1,71 @@
+using System.ComponentModel.DataAnnotations;
 using System.Timers;
 using FileFlows.Client.Components.Dialogs;
+using FileFlows.Shared.Json;
+using Humanizer;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Client.Components.Dashboard;
 
 public partial class PauseResume: IDisposable
 {
     private SystemInfo SystemInfo = new SystemInfo();
-    private Timer AutoRefreshTimer;
     private bool Refreshing = false;
     
     private string lblPauseLabel;
+    private BackgroundTask bkgTask;
+    private TimeSpan TimeDiff;
+    private DateTime LastUpdated = DateTime.MinValue;
+    private string lblPause, lblResume, lblPaused;
 
     protected override async Task OnInitializedAsync()
     {
-        AutoRefreshTimer = new Timer();
-        AutoRefreshTimer.Elapsed += AutoRefreshTimerElapsed;
-        AutoRefreshTimer.Interval = 5_000;
-        AutoRefreshTimer.AutoReset = true;
-        AutoRefreshTimer.Start();
+        lblPause = Translater.Instant("Labels.Pause");
+        lblPaused = Translater.Instant("Labels.Paused");
+        lblResume = Translater.Instant("Labels.Resume");
         await this.Refresh();
+        bkgTask = new BackgroundTask(TimeSpan.FromMilliseconds(1_000), () => _ = DoWork());
+        bkgTask.Start();
+    }
+
+    private async Task DoWork()
+    {
+        if (LastUpdated < DateTime.Now.AddSeconds(-5))
+        {
+            await Refresh();
+        }
+        UpdateTime();
     }
     
     public void Dispose()
     {
-        if (AutoRefreshTimer != null)
-        {
-            AutoRefreshTimer.Stop();
-            AutoRefreshTimer.Elapsed -= AutoRefreshTimerElapsed;
-            AutoRefreshTimer.Dispose();
-            AutoRefreshTimer = null;
-        }
+        _ = bkgTask?.StopAsync();
+        bkgTask = null;
     }
 
-    void AutoRefreshTimerElapsed(object sender, ElapsedEventArgs e)
+    private void UpdateTime()
     {
-        _ = Refresh();
-    }
+        if (SystemInfo.IsPaused == false)
+        {
+            lblPauseLabel = lblPause;
+            return;
+        }
 
+        if (SystemInfo.PausedUntil > SystemInfo.CurrentTime.AddYears(1))
+        {
+            lblPauseLabel = lblPaused;
+            return;
+        }
+        
+        var pausedToLocal = SystemInfo.PausedUntil.Add(TimeDiff);
+        var time = pausedToLocal.Subtract(DateTime.Now);
+        //lblPauseLabel = time.Humanize();
+        lblPauseLabel = lblPaused + " (" + time.ToString(@"h\:mm\:ss") + ")";
+        this.StateHasChanged();
+    }
+    
     async Task Refresh()
     {
-        
         if (Refreshing)
             return;
         Refreshing = true;
@@ -50,9 +76,9 @@ public partial class PauseResume: IDisposable
             
             if (systemInfoResult.Success)
             {
+                TimeDiff = DateTime.Now - systemInfoResult.Data.CurrentTime;
                 this.SystemInfo = systemInfoResult.Data;
-                this.lblPauseLabel =
-                    Translater.Instant(systemInfoResult.Data.IsPaused ? "Labels.Resume" : "Labels.Pause");
+                UpdateTime();
             }
                 
         }
@@ -61,19 +87,12 @@ public partial class PauseResume: IDisposable
         }
         finally
         {
+            LastUpdated = DateTime.Now;
             Refreshing = false;
         }
     }
 
-    async Task<RequestResult<SystemInfo>> GetSystemInfo()
-    {
-#if (DEMO)
-            var random = new Random(DateTime.Now.Millisecond);
-            return new SystemInfo { CpuUsage = random.Next() * 100f, MemoryUsage = random.Next() * 1_000_000_000 };
-#else
-        return await HttpHelper.Get<SystemInfo>("/api/system/info");
-#endif
-    }
+    Task<RequestResult<SystemInfo>> GetSystemInfo() => HttpHelper.Get<SystemInfo>("/api/system/info");
 
     private async Task TogglePaused()
     {
@@ -92,8 +111,9 @@ public partial class PauseResume: IDisposable
         var systemInfoResult = await GetSystemInfo();
         if (systemInfoResult.Success)
         {
+            TimeDiff = DateTime.Now - systemInfoResult.Data.CurrentTime;
             SystemInfo = systemInfoResult.Data;
-            this.lblPauseLabel = Translater.Instant(SystemInfo.IsPaused ? "Labels.Resume" : "Labels.Pause");
+            this.UpdateTime();
             this.StateHasChanged();
         }
     }

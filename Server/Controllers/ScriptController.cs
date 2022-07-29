@@ -117,6 +117,14 @@ public class ScriptController : Controller
     /// <returns>a list of script templates</returns>
     [HttpGet("templates")]
     public Task<IEnumerable<Script>> GetTemplates() => GetAll(ScriptType.Template);
+    
+    /// <summary>
+    /// Returns a list of scripts
+    /// </summary>
+    /// <param name="type">the type of scripts to return</param>
+    /// <returns>a list of scripts</returns>
+    [HttpGet("all-by-type/{type}")]
+    public Task<IEnumerable<Script>> GetAllByType([FromRoute] ScriptType type) => GetAll(type, loadCode: true);
 
     /// <summary>
     /// Returns a basic list of scripts

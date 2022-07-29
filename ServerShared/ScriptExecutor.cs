@@ -89,6 +89,68 @@ public class ScriptExecutor:IScriptExecutor
             return -1;
         }
     }
+    
+
+    /// <summary>
+    /// Executes code and returns the result
+    /// </summary>
+    /// <param name="code">the code to execute</param>
+    /// <param name="variables">any variables to be passed to the executor</param>
+    /// <returns>the result of the execution</returns>
+    public static RunScriptResult Execute(string code, Dictionary<string, object> variables)
+    {
+        Executor executor = new Executor();
+        executor.Code = code;
+        executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
+        executor.HttpClient = HttpHelper.Client;
+        executor.Logger = new ScriptExecution.Logger();
+        StringBuilder sbLog = new();
+        executor.Logger.DLogAction = (args) => StringBuilderLog(sbLog, LogType.Debug, args);
+        executor.Logger.ILogAction = (args) => StringBuilderLog(sbLog, LogType.Info, args);
+        executor.Logger.WLogAction = (args) => StringBuilderLog(sbLog, LogType.Warning, args);
+        executor.Logger.ELogAction = (args) => StringBuilderLog(sbLog, LogType.Error, args);
+        executor.Variables = variables;
+        try
+        {
+            object returnValue = executor.Execute();
+            return new RunScriptResult()
+            {
+                Log = sbLog.ToString(),
+                Success = true,
+                ReturnValue = returnValue
+            };
+        }
+        catch (Exception ex)
+        {
+            return new RunScriptResult()
+            {
+                Log = sbLog.ToString(),
+                Success = false,
+                ReturnValue = ex.Message
+            };
+        }
+    }
+    
+        
+        
+        
+    private static void StringBuilderLog(StringBuilder builder, LogType type, params object[] args)
+    {
+        string typeString = type switch
+        {
+            LogType.Debug => "[DBUG] ",
+            LogType.Info => "[INFO] ",
+            LogType.Warning => "[WARN] ",
+            LogType.Error => "[ERRR] ",
+            _ => "",
+        };
+        string message = typeString + string.Join(", ", args.Select(x =>
+            x == null ? "null" :
+            x.GetType().IsPrimitive ? x.ToString() :
+            x is string ? x.ToString() :
+            System.Text.Json.JsonSerializer.Serialize(x)));
+        builder.AppendLine(message);
+    }
 
     /// <summary>
     /// Script Process Executor that executes the process using node parameters
@@ -130,5 +192,25 @@ public class ScriptExecutor:IScriptExecutor
                 StandardOutput = result.StandardOutput,
             };
         }
+    }
+
+    /// <summary>
+    /// Results of a run script
+    /// </summary>
+    public class RunScriptResult
+    {
+        /// <summary>
+        /// Gets the execution log
+        /// </summary>
+        public string Log { get; init; }
+        /// <summary>
+        /// Gets the return value
+        /// </summary>
+        public object ReturnValue { get; init; }
+
+        /// <summary>
+        /// Gets if the script ran successfully
+        /// </summary>
+        public bool Success { get; init; }
     }
 }

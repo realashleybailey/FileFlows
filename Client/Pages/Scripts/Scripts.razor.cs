@@ -43,7 +43,10 @@ public partial class Scripts : ListPage<string, Script>
 
     private async Task Add()
     {
-        await Edit(new Script());
+        await Edit(new Script()
+        {
+            Type = SelectedType
+        });
     }
 
 

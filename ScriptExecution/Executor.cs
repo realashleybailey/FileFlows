@@ -112,7 +112,7 @@ public class Executor
             string sharedDir = SharedDirectory.Replace("\\", "/");
             if (sharedDir.EndsWith("/") == false)
                 sharedDir += "/";
-            tcode = Regex.Replace(tcode, @"(\.\.\/)+Shared\/", sharedDir);
+            tcode = Regex.Replace(tcode, @"(?<=(from[\s](['""])))(\.\.\/)*Shared\/", sharedDir);
 
             foreach(Match match in Regex.Matches(tcode, @"import[\s]+{[^}]+}[\s]+from[\s]+['""]([^'""]+)['""]"))
             {

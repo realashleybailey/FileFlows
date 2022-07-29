@@ -288,17 +288,46 @@ public class FlowWorker : Worker
             Logger.Instance.ELog("Failed to load pre-execute script code");
             return false;
         }
-        var scriptNode = new ScriptNode();
-        scriptNode.Code = code;
-        var args = new NodeParameters(Logger.Instance);
-        args.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor();
-        var output = scriptNode.Execute(args);
-        if (output == 1)
-            return true;
-        Logger.Instance.ELog("Output from pre-execute script not expected: " + output);
-        return false;
+
+        var variableService = new VariableService();
+        var variables = variableService.GetAll().Result?.ToDictionary(x => x.Name, x => (object)x.Value) ?? new ();
+        if (variables.ContainsKey("FileFlows.Url"))
+            variables["FileFlows.Url"] = ServerShared.Services.Service.ServiceBaseUrl;
+        else
+            variables.Add("FileFlows.Url", ServerShared.Services.Service.ServiceBaseUrl);
+        var result = ScriptExecutor.Execute(code, variables);
+        if (result.Success == false)
+        {
+            Logger.Instance.ELog("Pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
+            return false;
+        }
+
+        if (result.ReturnValue as bool? == false)
+        {
+            Logger.Instance.ELog("Output from pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
+            return false;
+        }
+        Logger.Instance.ILog("Pre-execute scrip passed: \n"+ result.Log);
+        return true;
     }
 
+    private void StringBuilderLog(StringBuilder builder, LogType type, params object[] args)
+    {
+        string typeString = type switch
+        {
+            LogType.Debug => "[DBUG] ",
+            LogType.Info => "[INFO] ",
+            LogType.Warning => "[WARN] ",
+            LogType.Error => "[ERRR] ",
+            _ => "",
+        };
+        string message = typeString + string.Join(", ", args.Select(x =>
+            x == null ? "null" :
+            x.GetType().IsPrimitive ? x.ToString() :
+            x is string ? x.ToString() :
+            System.Text.Json.JsonSerializer.Serialize(x)));
+        builder.AppendLine(message);
+    }
 
     /// <summary>
     /// Adds an executing runner to the list of currently running flow runners

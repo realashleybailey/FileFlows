@@ -32,7 +32,11 @@ function Script(NumberParameter)
 {
     return 1;
 }
-" : string.Empty;
+" : @"
+import { FileFlowsApi } from 'Shared/FileFlowsApi';
+
+let ffApi = new FileFlowsApi();
+";
         }
 
         item.Code = item.Code.Replace("\r\n", "\n").Trim();

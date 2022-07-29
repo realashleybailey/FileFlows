@@ -41,7 +41,7 @@ namespace FileFlows.Client.Components.Inputs
         {
             _ = Task.Run(async () =>
             {
-                var shared = await HttpHelper.Get<Script[]>("/api/script/list/shared");
+                var shared = await HttpHelper.Get<Script[]>("/api/script/all-by-type/shared");
                 await jsRuntime.InvokeVoidAsync("ffCode.initModel", Variables, shared.Success ? shared.Data : null);
             });
             InitialValue = this.Value;

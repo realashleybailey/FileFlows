@@ -97,43 +97,11 @@ public class FileFlowsTasksWorker: Worker
         }
         Logger.Instance.ILog("Executing task: " + task.Name);
         DateTime dtStart = DateTime.Now;
-        Executor executor = new Executor();
-        executor.Code = code;
-        executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
-        executor.HttpClient = HttpHelper.Client;
-        executor.Logger = new ScriptExecution.Logger();
-        StringBuilder sbLog = new();
-        executor.Logger.DLogAction = (args) => StringBuilderLog(sbLog, LogType.Debug, args);
-        executor.Logger.ILogAction = (args) => StringBuilderLog(sbLog, LogType.Info, args);
-        executor.Logger.WLogAction = (args) => StringBuilderLog(sbLog, LogType.Warning, args);
-        executor.Logger.ELogAction = (args) => StringBuilderLog(sbLog, LogType.Error, args);
-        executor.Variables = Variables;
-        try
-        {
-            executor.Execute();
-            Logger.Instance.ILog($"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)) + "\n" + sbLog);
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.ELog($"Error executing task '{task.Name}: " + ex.Message + "\n" + sbLog);
-        }
+        var result = ScriptExecutor.Execute(code, Variables);
+        if(result.Success)
+            Logger.Instance.ILog($"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)) + "\n" + result.Log);
+        else
+            Logger.Instance.ELog($"Error executing task '{task.Name}: " + result.ReturnValue + "\n" + result.Log);
     }
 
-    private void StringBuilderLog(StringBuilder builder, LogType type, params object[] args)
-    {
-        string typeString = type switch
-        {
-            LogType.Debug => "[DBUG] ",
-            LogType.Info => "[INFO] ",
-            LogType.Warning => "[WARN] ",
-            LogType.Error => "[ERRR] ",
-            _ => "",
-        };
-        string message = typeString + string.Join(", ", args.Select(x =>
-            x == null ? "null" :
-            x.GetType().IsPrimitive ? x.ToString() :
-            x is string ? x.ToString() :
-            System.Text.Json.JsonSerializer.Serialize(x)));
-        builder.AppendLine(message);
-    }
 }

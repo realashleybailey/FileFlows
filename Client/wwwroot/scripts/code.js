@@ -1,13 +1,33 @@
 window.ffCode = {
     
-    initModel: function (variables, sharedScripts) {
+    initModel: function (variables, sharedScripts) 
+    {        
+        monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+            target: monaco.languages.typescript.ScriptTarget.ES6,
+            allowNonTsExtensions: true
+        });
+        if(sharedScripts?.length)
+        {
+            for(let script of sharedScripts)
+            {
+                let path = script.path.replace('Scripts/', '');
+                path = path.replace('.js', '');
+                let genCode = `declare module '${path}' { ${script.code} }`;
+                monaco.languages.typescript.javascriptDefaults.addExtraLib(
+                    genCode,
+                    path + '/index.d.ts');
+            }
+        //     console.log('at end!!!');
+        //     monaco.editor.createModel(
+        //         "declare class Tester2 { print: function(), multiple: function(any, any), list: function() }",
+        //         "javascript"
+        //     );
+        //     monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare class Car{ 
+        //     start()
+        //     stop()
+        // }`, "Car");
+        }
         
-        // console.log('sharedScripts', sharedScripts);
-        // if(sharedScripts?.length){
-        //     for(let script of sharedScripts){
-        //         monaco.editor.languages.typescript.javascriptDefaults.addExtraLib(`declare module '../Shared/${script.name}' {{ export interface ${script.name} {{}} }}`, `/script/code/${script.Name}`);
-        //     }
-        // }
         
         monaco.editor.createModel(
             "const Logger = { ILog: function(...any), DLog: function(...any), WLog: function(...any), ELog: function(...any) }",

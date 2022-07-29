@@ -59,7 +59,6 @@ public partial class PauseResume: IDisposable
         
         var pausedToLocal = SystemInfo.PausedUntil.Add(TimeDiff);
         var time = pausedToLocal.Subtract(DateTime.Now);
-        //lblPauseLabel = time.Humanize();
         lblPauseLabel = lblPaused + " (" + time.ToString(@"h\:mm\:ss") + ")";
         this.StateHasChanged();
     }

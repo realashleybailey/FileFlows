@@ -293,6 +293,8 @@ public class ScriptController : Controller
         if (script?.Code?.StartsWith("// path: ") == true)
             script.Code = Regex.Replace(script.Code, @"^\/\/ path:(.*?)$", string.Empty, RegexOptions.Multiline).Trim();
         
+        script.Code = Regex.Replace(script.Code, @"(?<=(from[\s](['""])))(\.\.\/)*Shared\/", "Shared/");
+        
         if(ValidScriptName(script.Name) == false)
             throw new Exception("Invalid script name\nCannot contain: " + UnsafeCharacters);
         
@@ -475,8 +477,12 @@ public class ScriptController : Controller
             baseDir = DirectoryHelper.ScriptsDirectoryShared;
         else
             baseDir = DirectoryHelper.ScriptsDirectoryFlow;
-        
-        return new FileInfo(Path.Combine(baseDir, name + ".js")).FullName;
+
+        var file = new DirectoryInfo(baseDir).GetFiles("*.js", SearchOption.AllDirectories)
+            .Where(x => x.Name.ToLower() == name.ToLower() + ".js").FirstOrDefault();
+        if (file != null)
+            return file.FullName;
+        return Path.Combine(baseDir, name + ".js");
     } 
 
     private bool SaveScript(string name, string code, ScriptType type)

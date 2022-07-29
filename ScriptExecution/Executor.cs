@@ -10,7 +10,6 @@ namespace FileFlows.ScriptExecution;
 /// <summary>
 /// A Javascript code executor
 /// </summary>
-/// 
 public class Executor
 {
     /// <summary>
@@ -38,8 +37,7 @@ public class Executor
     /// Gets or sets the HTTP client to be used in the code execution
     /// </summary>
     public HttpClient HttpClient { get; set; } = null!;
-    
-    
+
     /// <summary>
     /// Gets or sets the additional arguments that will be passed into the code execution
     /// </summary>
@@ -55,6 +53,9 @@ public class Executor
     /// </summary>
     public IProcessExecutor ProcessExecutor { get; set; } = null!;
     
+    /// <summary>
+    /// Static constructor for the executor
+    /// </summary>
     static Executor()
     {
         AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
@@ -122,7 +123,6 @@ public class Executor
             }
 
             var processExecutor = this.ProcessExecutor ?? new BasicProcessExecutor(Logger);
-                
 
             var sb = new StringBuilder();
             var log = new
@@ -209,8 +209,10 @@ public class Executor
     }
 }
 
-
-public class MissingVariableException:Exception
+/// <summary>
+/// Exception that is thrown when a script is missing a Variable
+/// </summary>
+public class MissingVariableException : Exception
 {
 
 }

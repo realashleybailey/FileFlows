@@ -103,10 +103,21 @@ public abstract class UpdaterWorker : Worker
     {
     }
 
+    /// <summary>
+    /// Called before the update script is run
+    /// </summary>
+    /// <param name="updateScript">the update script about to be run</param>
+    protected virtual void PreRunUpdateScript(string updateScript)
+    {
+        
+    }
+
     private void RunUpdateScript(string updateScript)
     {
         try
         {
+            PreRunUpdateScript(updateScript);
+            
             // if inside docker or systemd we just restart, the restart policy should automatically kick in then run the upgrade script when it starts
             if (Globals.IsDocker == false && Globals.IsSystemd == false)
             {
@@ -141,10 +152,19 @@ public abstract class UpdaterWorker : Worker
     /// <returns>if auto updates are enabled</returns>
     protected abstract bool GetAutoUpdatesEnabled();
 
+    /// <summary>
+    /// Gets if an update is available
+    /// </summary>
+    /// <returns>if an update is available</returns>
+    protected abstract bool GetUpdateAvailable();
+
     private string DownloadUpdate()
     {
         try
         {
+            if (GetUpdateAvailable() == false)
+                return string.Empty;
+            
             if (GetAutoUpdatesEnabled() == false)
                 return string.Empty;
 

@@ -64,27 +64,42 @@ public enum ProcessingLibraries
 public enum TaskType
 {
     /// <summary>
-    /// At a configured time
+    /// At a configured schedule
     /// </summary>
-    Time = 0,
+    Schedule = 0,
+
     /// <summary>
     /// When a file is added to the system
     /// </summary>
     FileAdded = 1,
+
     /// <summary>
     /// When a file starts processing
     /// </summary>
     FileProcessing = 2,
+
     /// <summary>
     /// When a file has been processed
     /// </summary>
     FileProcessed = 3,
+
     /// <summary>
     /// When a file was successfully processed
     /// </summary>
     FileProcessSuccess = 4,
+
     /// <summary>
     /// When a file failed processing
     /// </summary>
-    FileProcessFailed = 5
+    FileProcessFailed = 5,
+
+    /// <summary>
+    /// When a update to FileFlows is available
+    /// </summary>
+    FileFlowsServerUpdateAvailable = 100,
+    /// <summary>
+    /// When FileFlows is updating
+    /// </summary>
+    FileFlowsServerUpdating = 101
+
 }

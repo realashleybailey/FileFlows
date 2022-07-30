@@ -16,6 +16,8 @@ public class ServerUpdater : UpdaterWorker
     private static string UpdateUrl = "https://fileflows.com/auto-update";
 
     internal static ServerUpdater Instance;
+    private Version? NotifiedUpdateVersion;
+    private Version? DownloadedVersion;
     
     /// <summary>
     /// Creates an instance of a worker to automatically update FileFlows Server
@@ -77,6 +79,26 @@ public class ServerUpdater : UpdaterWorker
         WorkerManager.StopWorkers();
     }
 
+    protected override void PreRunUpdateScript(string updateScript)
+    {
+        if(DownloadedVersion != null)
+            SystemEvents.TriggerServerUpdating(DownloadedVersion.ToString());
+    }
+
+    protected override bool GetUpdateAvailable()
+    {
+        var result = GetLatestOnlineVersion();
+        if (result.updateAvailable)
+        {
+            if (NotifiedUpdateVersion != result.onlineVersion)
+            {
+                SystemEvents.TriggerServerUpdateAvailable(result.onlineVersion.ToString());
+                NotifiedUpdateVersion = result.onlineVersion;
+            }
+        }
+        return result.updateAvailable;
+    }
+
     protected override string DownloadUpdateBinary()
     {
         var result = GetLatestOnlineVersion();
@@ -112,6 +134,7 @@ public class ServerUpdater : UpdaterWorker
 
         string dlSize = FileSizeFormatter.Format(new FileInfo(file).Length);
         Logger.Instance.ILog($"{UpdaterName}: Download complete: {file} ({dlSize})");
+        DownloadedVersion = result.onlineVersion;
         return file;
     }
 

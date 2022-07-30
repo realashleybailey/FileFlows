@@ -89,4 +89,12 @@ public class NodeUpdater:UpdaterWorker
         var settings = settingsService.Get().Result;
         return settings?.AutoUpdateNodes == true;
     }
+
+    protected override bool GetUpdateAvailable()
+    {
+        var systemService = SystemService.Load();
+        var serverVersion = systemService.GetNodeUpdateVersion().Result;
+        Logger.Instance.DLog("Checking for auto update: " + serverVersion);
+        return serverVersion > CurrentVersion;
+    }
 }

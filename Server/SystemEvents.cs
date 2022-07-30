@@ -8,7 +8,37 @@ namespace FileFlows.Server;
 public class SystemEvents
 {
     internal delegate void LibraryFileEvent(LibraryFileEventArgs args);
+    internal delegate void UpdateEvent(UpdateEventArgs args);
 
+    /// <summary>
+    /// Event that is fired when a server update is available
+    /// </summary>
+    internal static event UpdateEvent OnServerUpdateAvailable;
+    
+    /// <summary>
+    /// Event that is fired when the server is updating
+    /// </summary>
+    internal static event UpdateEvent OnServerUpdating;
+    
+    /// <summary>
+    /// Triggers the server update event
+    /// </summary>
+    /// <param name="version">the version of the update available</param>
+    internal static void TriggerServerUpdateAvailable(string version)
+    {
+        OnServerUpdateAvailable?.Invoke(new () { Version = version, CurrentVersion = Globals.Version });
+    }
+
+    
+    /// <summary>
+    /// Triggers the server updating event
+    /// </summary>
+    /// <param name="version">the version of the update</param>
+    internal static void TriggerServerUpdating(string version)
+    {
+        OnServerUpdating?.Invoke(new () { Version = version, CurrentVersion = Globals.Version });
+    }
+    
     /// <summary>
     /// Event that is fired when a library file is added to the system
     /// </summary>
@@ -99,5 +129,21 @@ public class SystemEvents
         /// </summary>
         public Library Library { get; set; }
         
+    }
+
+    /// <summary>
+    /// Event fired for update events
+    /// </summary>
+    public class UpdateEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the version
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current version
+        /// </summary>
+        public string CurrentVersion { get; set; }
     }
 }

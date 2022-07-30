@@ -43,7 +43,7 @@
                     Trigger
                 </Header>
                 <Cell Context="item">
-                    @if (item.Type == TaskType.Time)
+                    @if (item.Type == TaskType.Schedule)
                     {
                         <span>@GetSchedule(item)</span>
                     }

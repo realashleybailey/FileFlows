@@ -28,7 +28,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
 
     private string GetSchedule(FileFlowsTask task)
     {
-        if (task.Type != TaskType.Time)
+        if (task.Type != TaskType.Schedule)
             return string.Empty;
         if (task.Schedule == SCHEDULE_HOURLY) return "Hourly";
         if (task.Schedule == SCHEDULE_3_HOURLY) return "Every 3 Hours";
@@ -96,14 +96,14 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
                 {
                     nameof(InputSelect.Options),
                     Enum.GetValues<TaskType>().Select(x => new ListOption()
-                        { Label = x.Humanize(LetterCasing.Title), Value = x }).ToList()
+                        { Label = x.Humanize(LetterCasing.Title).Replace("File Flows", "FileFlows"), Value = x }).ToList()
                 }
             }
         };
         fields.Add(efTaskType);
 
         TimeSchedule timeSchedule = TimeSchedule.Hourly;
-        if (item.Type == TaskType.Time)
+        if (item.Type == TaskType.Schedule)
         {
             if (item.Schedule == SCHEDULE_DAILY)
                 timeSchedule = TimeSchedule.Daily;
@@ -134,13 +134,13 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             },
             Conditions = new List<Condition>
             {
-                new(efTaskType, item.Type, value: TaskType.Time)
+                new(efTaskType, item.Type, value: TaskType.Schedule)
             }
         };
         fields.Add(efSchedule);
 
         string customSchedule = SCHEDULE_HOURLY;
-        if (item.Type == TaskType.Time)
+        if (item.Type == TaskType.Schedule)
         {
             if (item.Schedule == SCHEDULE_DAILY)
                 timeSchedule = TimeSchedule.Daily;
@@ -169,7 +169,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             },
             Conditions = new List<Condition>
             {
-                new (efTaskType, item.Type, value: TaskType.Time),
+                new (efTaskType, item.Type, value: TaskType.Schedule),
                 new (efSchedule, timeSchedule, value: TimeSchedule.Custom)
             }
         });
@@ -198,7 +198,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         task.Script = dict["Script"].ToString();
         task.Uid = (Guid)dict["Uid"];
         task.Type = (TaskType)dict["Type"];
-        if (task.Type == TaskType.Time)
+        if (task.Type == TaskType.Schedule)
         {
             var timeSchedule = (TimeSchedule)dict["TimeSchedule"];
             switch (timeSchedule)

@@ -80,7 +80,7 @@ public class FileFlowsTasksWorker: Worker
         // 0, 1, 2, 3, 4
         foreach (var task in this.Tasks)
         {
-            if (task.Type != TaskType.Time)
+            if (task.Type != TaskType.Schedule)
                 continue;
             if (task.Schedule[quarter] != '1')
                 continue;

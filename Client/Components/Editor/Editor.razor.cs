@@ -52,7 +52,10 @@ namespace FileFlows.Client.Components
         private SaveDelegate SaveCallback;
 
         private bool ShowDownload { get; set; }
-        private bool ReadOnly { get; set; }
+        /// <summary>
+        /// Gets if this editor is readonly
+        /// </summary>
+        public bool ReadOnly { get; private set; }
         public bool Large { get; set; }
 
         public string EditorDescription { get; set; }

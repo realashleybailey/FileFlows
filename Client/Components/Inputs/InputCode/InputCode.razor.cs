@@ -33,7 +33,8 @@ namespace FileFlows.Client.Components.Inputs
                 Minimap = new EditorMinimapOptions { Enabled = false },
                 Theme = "vs-dark",
                 Language = "javascript",
-                Value = this.Value?.Trim() ?? ""
+                Value = this.Value?.Trim() ?? "",
+                ReadOnly = this.Editor.ReadOnly
             };
         }
 
@@ -69,6 +70,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private Task Editor_Closed()
         {
+            Logger.Instance.ILog("Editor_Closed!");
             this.Editor.OnCancel -= Editor_OnCancel;
             this.Editor.OnClosed -= Editor_Closed;
             return Task.CompletedTask;
@@ -128,6 +130,11 @@ namespace FileFlows.Client.Components.Inputs
         public void Dispose()
         {
             jsRuntime.InvokeVoidAsync("ff.codeUncaptureSave");
+            if (this.Editor != null)
+            {
+                this.Editor.OnCancel -= Editor_OnCancel;
+                this.Editor.OnClosed -= Editor_Closed;
+            }
         }
     }
 }

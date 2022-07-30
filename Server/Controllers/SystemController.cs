@@ -23,7 +23,7 @@ public class SystemController:Controller
     /// Gets the version of FileFlows
     /// </summary>
     [HttpGet("version")]
-    public string GetVersion() => Globals.Version;
+    public string GetVersion() => Globals.Version.ToString();
 
     /// <summary>
     /// Gets the version an node update available
@@ -34,7 +34,7 @@ public class SystemController:Controller
     {
         if (LicenseHelper.IsLicensed(LicenseFlags.AutoUpdates) == false)
             return string.Empty;
-        return Globals.Version;
+        return Globals.Version.ToString();
     }
     
     /// <summary>
@@ -50,7 +50,7 @@ public class SystemController:Controller
             return new ContentResult();
         if (string.IsNullOrWhiteSpace(version))
             return new ContentResult();
-        var current = new Version(Globals.Version);
+        var current = Globals.Version;
         var node =  new Version(version);
         if (node >= current)
             return new ContentResult();

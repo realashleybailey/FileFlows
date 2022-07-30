@@ -32,6 +32,10 @@ class RepositoryService
         return srResult.Data;
     }
 
+    /// <summary>
+    /// Downloads the shared scripts from the repository
+    /// </summary>
+    /// <returns></returns>
     internal Task DownloadSharedScripts() =>
         DownloadObjects(repo.SharedScripts, DirectoryHelper.ScriptsDirectoryShared);
     
@@ -58,6 +62,8 @@ class RepositoryService
     {
         foreach (var obj in objects)
         {
+            if (obj.MinimumVersion > Globals.Version)
+                continue;
             string output = obj.Path;
             output = Regex.Replace(output, @"^Scripts\/[^\/]+\/", string.Empty);
             output = Regex.Replace(output, @"^Templates\/[^\/]+\/", string.Empty);
@@ -66,7 +72,7 @@ class RepositoryService
     }
 
     /// <summary>
-    /// Downlaods an object and saves it to disk
+    /// Downloads an object and saves it to disk
     /// </summary>
     /// <param name="path">the path identifier in the repository</param>
     /// <param name="outputFile">the filename where to save the file</param>
@@ -117,7 +123,7 @@ class RepositoryService
     {
         var files = Directory.GetFiles(DirectoryHelper.ScriptsDirectory, "*.js", SearchOption.AllDirectories);
         List<string> knownPaths = repo.FlowScripts.Union(repo.FunctionScripts).Union(repo.SharedScripts)
-            .Union(repo.SystemScripts).Select(x => x.Path).ToList();
+            .Union(repo.SystemScripts).Where(x => Globals.Version >= x.MinimumVersion).Select(x => x.Path).ToList();
         await UpdateObjects(files, knownPaths);
     }
     
@@ -128,7 +134,7 @@ class RepositoryService
     internal async Task UpdateTemplates()
     {
         var files = Directory.GetFiles(DirectoryHelper.TemplateDirectory, "*.json", SearchOption.AllDirectories);
-        List<string> knownPaths = repo.LibraryTemplates.Union(repo.FlowTemplates).Select(x => x.Path).ToList();
+        List<string> knownPaths = repo.LibraryTemplates.Union(repo.FlowTemplates).Where(x => Globals.Version >= x.MinimumVersion).Select(x => x.Path).ToList();
         await UpdateObjects(files, knownPaths);
     }
 

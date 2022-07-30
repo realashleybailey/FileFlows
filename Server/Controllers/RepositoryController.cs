@@ -23,14 +23,15 @@ public class RepositoryController : Controller
     public async Task<IEnumerable<RepositoryObject>> GetScripts([FromQuery] ScriptType type, [FromQuery] bool missing = true)
     {
         var repo = await new RepositoryService().GetRepository();
-        var scripts = (type == ScriptType.System ? repo.SystemScripts : repo.FlowScripts);
+        var scripts = (type == ScriptType.System ? repo.SystemScripts : repo.FlowScripts)
+            .Where(x => Globals.Version >= x.MinimumVersion);
         if (missing)
         {
             List<string> known = new();
             foreach (string file in Directory.GetFiles(
                          type == ScriptType.System
                              ? DirectoryHelper.ScriptsDirectorySystem
-                             : DirectoryHelper.ScriptsDirectoryFlow, "*.js"))
+                             : DirectoryHelper.ScriptsDirectoryFlow, "*.js", SearchOption.AllDirectories))
             {
                 try
                 {

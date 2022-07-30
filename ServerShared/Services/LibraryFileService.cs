@@ -154,7 +154,7 @@ public class LibraryFileService : Service, ILibraryFileService
                 NodeName = nodeName,
                 NodeUid = nodeUid,
                 WorkerUid = workerUid,
-                NodeVersion = Globals.Version
+                NodeVersion = Globals.Version.ToString()
             });
             if (result.Success == false)
                 return null; 

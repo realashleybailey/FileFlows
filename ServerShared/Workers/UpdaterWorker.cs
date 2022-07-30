@@ -27,7 +27,7 @@ public abstract class UpdaterWorker : Worker
     /// <param name="interval">the interval of this worker</param>
     public UpdaterWorker(string upgradeScriptPrefix, ScheduleType schedule, int interval) : base(schedule, interval)
     {
-        CurrentVersion = Version.Parse(Globals.Version);
+        CurrentVersion = Globals.Version;
         this.UpgradeScriptPrefix = upgradeScriptPrefix;
         UpdaterName = this.GetType().Name;
         RunCheck();

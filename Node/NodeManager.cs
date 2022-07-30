@@ -54,7 +54,7 @@ public class NodeManager
         if (updater.RunCheck())
             return;
 
-        Version nodeVersion = Version.Parse(Globals.Version);
+        Version nodeVersion = Globals.Version;
 
         var flowWorker = new FlowWorker(AppSettings.Instance.HostName)
         {

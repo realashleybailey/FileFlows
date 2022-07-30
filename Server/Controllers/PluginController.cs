@@ -127,7 +127,7 @@ public class PluginController : ControllerStore<PluginInfo>
     [HttpGet("plugin-packages")]
     public async Task<IEnumerable<PluginPackageInfo>> GetPluginPackages([FromQuery] bool missing = false)
     {
-        Version ffVersion = new Version(Globals.Version);
+        Version ffVersion = Globals.Version;
         List<PluginPackageInfo> data = new List<PluginPackageInfo>();
         var repos = GetRepositories();
         foreach (string repo in repos)

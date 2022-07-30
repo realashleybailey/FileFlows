@@ -43,7 +43,7 @@ public class LibraryFileService : ILibraryFileService
                  NodeName   = nodeName,
                  NodeUid = nodeUid,
                  WorkerUid = workerUid,
-                 NodeVersion = Globals.Version
+                 NodeVersion = Globals.Version.ToString()
             });
 
     /// <summary>

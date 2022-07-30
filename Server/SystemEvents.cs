@@ -26,7 +26,7 @@ public class SystemEvents
     /// <param name="version">the version of the update available</param>
     internal static void TriggerServerUpdateAvailable(string version)
     {
-        OnServerUpdateAvailable?.Invoke(new () { Version = version, CurrentVersion = Globals.Version });
+        OnServerUpdateAvailable?.Invoke(new () { Version = version, CurrentVersion = Globals.Version.ToString() });
     }
 
     
@@ -36,7 +36,7 @@ public class SystemEvents
     /// <param name="version">the version of the update</param>
     internal static void TriggerServerUpdating(string version)
     {
-        OnServerUpdating?.Invoke(new () { Version = version, CurrentVersion = Globals.Version });
+        OnServerUpdating?.Invoke(new () { Version = version, CurrentVersion = Globals.Version.ToString() });
     }
     
     /// <summary>

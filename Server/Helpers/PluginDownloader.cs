@@ -28,7 +28,7 @@ public class PluginDownloader
     internal (bool Success, byte[] Data) Download(string packageName)
     {
         Logger.Instance.ILog("Downloading Plugin Package: " + packageName);
-        Version ffVersion = new Version(Globals.Version);
+        Version ffVersion = Globals.Version;
         foreach (string repo in Repositories)
         {
             try

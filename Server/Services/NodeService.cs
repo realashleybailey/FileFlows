@@ -43,7 +43,7 @@ public class NodeService : INodeService
     /// <returns>An instance of the processing node</returns>
     public async Task<ProcessingNode> GetByAddress(string address)
     {
-        var result = await new NodeController().GetByAddress(address, Globals.Version);
+        var result = await new NodeController().GetByAddress(address, Globals.Version.ToString());
         result.SignalrUrl = $"http://localhost:{WebServer.Port}/flow";
         return result;
     }

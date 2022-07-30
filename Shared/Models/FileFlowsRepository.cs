@@ -57,4 +57,9 @@ public class RepositoryObject
     /// Gets or sets the revision of the script
     /// </summary>
     public int Revision { get; set; }
+
+    /// <summary>
+    /// Gets or sets the minimum version of FileFlows this object requires
+    /// </summary>
+    public Version MinimumVersion { get; set; }
 }

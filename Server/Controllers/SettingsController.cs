@@ -200,7 +200,7 @@ public class SettingsController : Controller
         var settings = await Get() ?? model;
         model.Name = settings.Name;
         model.Uid = settings.Uid;
-        model.Version = Globals.Version;
+        model.Version = Globals.Version.ToString();
         model.DateCreated = settings.DateCreated;
         model.IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         model.IsDocker = Program.Docker;

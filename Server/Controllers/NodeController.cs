@@ -27,9 +27,9 @@ public class NodeController : ControllerStore<ProcessingNode>
         if(internalNode != null)
         {
             bool update = false;
-            if (internalNode.Version != Globals.Version)
+            if (internalNode.Version != Globals.Version.ToString())
             {
-                internalNode.Version = Globals.Version;
+                internalNode.Version = Globals.Version.ToString();
                 update = true;
             }
 
@@ -351,7 +351,7 @@ public class NodeController : ControllerStore<ProcessingNode>
                 Schedule = new string('1', 672),
                 Enabled = true,
                 FlowRunners = 1,
-                Version = Globals.Version,
+                Version = Globals.Version.ToString(),
                 AllLibraries = ProcessingLibraries.All,
 #if (DEBUG)
                 TempPath = windows ? @"d:\videos\temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp"),

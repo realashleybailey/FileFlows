@@ -154,7 +154,7 @@ public class ServerUpdater : UpdaterWorker
                 return (false, new Version(0, 0, 0, 0));
             }
 
-            Version current = Version.Parse(Globals.Version);
+            Version current = Globals.Version;
             Version? onlineVersion;
             if (Version.TryParse(result.Data, out onlineVersion) == false)
             {

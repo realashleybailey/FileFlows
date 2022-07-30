@@ -14,7 +14,7 @@ public class Upgrader
         // so on a clean install these do not run
         if (currentVersion > new Version(0, 4, 0))
         {
-            if (settings.Version != Globals.Version)
+            if (settings.Version != Globals.Version.ToString())
             {
                 // first backup the database
                 if (DbHelper.UseMemoryCache)
@@ -57,9 +57,9 @@ public class Upgrader
         }
         
         // save the settings
-        if (settings.Version != Globals.Version)
+        if (settings.Version != Globals.Version.ToString())
         {
-            settings.Version = Globals.Version;
+            settings.Version = Globals.Version.ToString();
             DbHelper.Update(settings).Wait();
         }
     }

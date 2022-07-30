@@ -172,7 +172,7 @@ public class NodeService : Service, INodeService
             FlowRunners = runners,
             Enabled = enabled,
             Mappings = mappings,
-            Version = Globals.Version,
+            Version = Globals.Version.ToString(),
             OperatingSystem = isWindows ? Shared.OperatingSystemType.Windows : 
                  isLinux ? Shared.OperatingSystemType.Linux :       
                  isMacOs ? Shared.OperatingSystemType.Mac :

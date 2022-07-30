@@ -39,6 +39,8 @@ public class FileFlowsTasksWorker: Worker
         SystemEvents.OnLibraryFileProcessedFailed += SystemEventsOnOnLibraryFileProcessedFailed;
         SystemEvents.OnLibraryFileProcessedSuceess += SystemEventsOnOnLibraryFileProcessedSuceess;
         SystemEvents.OnLibraryFileProcessingStarted += SystemEventsOnOnLibraryFileProcessingStarted;
+        SystemEvents.OnServerUpdating += SystemEventsOnOnServerUpdating;
+        SystemEvents.OnServerUpdateAvailable += SystemEventsOnOnServerUpdateAvailable;
     }
 
     /// <summary>
@@ -123,19 +125,38 @@ public class FileFlowsTasksWorker: Worker
         else
             Logger.Instance.ELog($"Error executing task '{task.Name}: " + result.ReturnValue + "\n" + result.Log);
     }
-
-    private void LibraryFileEventTriggered(TaskType type, SystemEvents.LibraryFileEventArgs args)
+    
+    private void TriggerTaskType(TaskType type, Dictionary<string, object> variables)
     {
         var tasks = this.Tasks.Where(x => x.Type == type).ToArray();
         foreach (var task in tasks)
         {
-            _ = RunTask(task, new Dictionary<string, object>
-            {
-                { "FileName", args.File.Name },
-                { "LibraryFile", args.File },
-                { "Library", args.Library }
-            });
+            _ = RunTask(task, variables);
         }
+    }
+
+    private void UpdateEventTriggered(TaskType type, SystemEvents.UpdateEventArgs args)
+    {
+        TriggerTaskType(type, new Dictionary<string, object>
+        {
+            { nameof(args.Version), args.Version },
+            { nameof(args.CurrentVersion), args.CurrentVersion },
+        });
+    }
+
+    private void SystemEventsOnOnServerUpdateAvailable(SystemEvents.UpdateEventArgs args)
+        => UpdateEventTriggered(TaskType.FileFlowsServerUpdateAvailable, args);
+    private void SystemEventsOnOnServerUpdating(SystemEvents.UpdateEventArgs args)
+        => UpdateEventTriggered(TaskType.FileFlowsServerUpdating, args);
+
+    private void LibraryFileEventTriggered(TaskType type, SystemEvents.LibraryFileEventArgs args)
+    {
+        TriggerTaskType(type, new Dictionary<string, object>
+        {
+            { "FileName", args.File.Name },
+            { "LibraryFile", args.File },
+            { "Library", args.Library }
+        });
     }
 
     private void SystemEventsOnOnLibraryFileAdd(SystemEvents.LibraryFileEventArgs args) =>

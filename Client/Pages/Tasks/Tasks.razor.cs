@@ -35,7 +35,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         if (task.Schedule == SCHEDULE_6_HOURLY) return "Every 6 Hours";
         if (task.Schedule == SCHEDULE_12_HOURLY) return "Every 12 Hours";
         if (task.Schedule == SCHEDULE_DAILY) return "Daily";
-        return "Custom";
+        return "Custom Schedule";
     }
     
     private async Task Add()

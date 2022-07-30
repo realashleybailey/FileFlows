@@ -40,18 +40,17 @@
             </FlowTableColumn>
             <FlowTableColumn TItem="FileFlowsTask" Width="14rem" MobileWidth="0" >
                 <Header>
-                    Type
+                    Trigger
                 </Header>
                 <Cell Context="item">
-                    <span>@item.Type.Humanize()</span>
-                </Cell>
-            </FlowTableColumn>
-            <FlowTableColumn TItem="FileFlowsTask" Width="14rem"  MobileWidth="0">
-                <Header>
-                    Schedule
-                </Header>
-                <Cell Context="item">
-                    <span>@GetSchedule(item)</span>
+                    @if (item.Type == TaskType.Time)
+                    {
+                        <span>@GetSchedule(item)</span>
+                    }
+                    else
+                    {
+                        <span>@item.Type.Humanize()</span>
+                    }
                 </Cell>
             </FlowTableColumn>
         </Columns>

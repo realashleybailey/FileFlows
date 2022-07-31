@@ -428,7 +428,8 @@
         "Imported": "Script ''{name}'' imported",
         "Duplicated":"Scripts ''{name}'' duplicated",
         "DeleteSystem":"You cannot delete a system script",
-        "DeleteUsed":"You cannot delete a script that is in use"
+        "DeleteUsed":"You cannot delete a script that is in use",
+        "NoRepositoryScriptsToUpdate":"No repository scripts selected to update"
       },
       "Labels": {
         "ScriptBrowser":"Script Repository",
@@ -436,7 +437,7 @@
       },
       "Buttons": {
         "ScriptBrowser": "Repository",
-        "UpdateScripts": "Update Scripts"
+        "UpdateAllScripts": "Update All Scripts"
       },
       "Fields":{
       }

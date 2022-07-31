@@ -1,9 +1,7 @@
 using FileFlows.Plugin;
 using FileFlows.Server.Services;
-using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-using SkiaSharp;
 
 namespace FileFlows.Server.Controllers;
 
@@ -86,7 +84,28 @@ public class RepositoryController : Controller
         await service.Init();
         await service.Update();
     }
-    
+
+    /// <summary>
+    /// Download the latest revisions for the specified scripts
+    /// </summary>
+    /// <param name="model">The list of scripts to update</param>
+    /// <returns>if the updates were successful or not</returns>
+    [HttpPost("update-specific-scripts")]
+    public async Task<bool> UpdateSpecificScripts([FromBody] ReferenceModel<string> model)
+    {
+        var service = new RepositoryService();
+        await service.Init();
+        var repo = await service.GetRepository();
+        var objects = repo.FlowScripts.Union(repo.SystemScripts).Where(x => x.MinimumVersion <= Globals.Version)
+            .Where(x => model.Uids.Contains(x.Path)).ToList();
+        if (objects.Any() == false)
+            return false; // nothing to update
+        await Download(new()
+        {
+            Scripts = objects.Select(x => x.Path).ToList()
+        });
+        return true;
+    }
     
     /// <summary>
     /// Download model

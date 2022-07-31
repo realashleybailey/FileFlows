@@ -8,7 +8,7 @@
 <PageView Flex="@true">
     
     <Head>
-         <button class="btn" @onclick=@UpdateScripts>@lblUpdateScripts</button>
+         <button class="btn btn-update-all-scripts" @onclick=@UpdateScripts>@lblUpdateScripts</button>
     </Head>
 
     <Body>
@@ -30,6 +30,7 @@
                 @if (App.Instance.IsMobile == false)
                 {
                     <FlowTableButtonSeparator/>
+                    <FlowTableButton TItem="Script" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />
                     <FlowTableButton TItem="Script" Clicked=Browser Icon="fas fa-code-branch" Label="Pages.Scripts.Buttons.ScriptBrowser"/>
                     <FlowTableButtonSeparator/>
                     <FlowTableButton TItem="Script" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import"/>

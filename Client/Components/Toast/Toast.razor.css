@@ -44,8 +44,8 @@
 }
 
 .flow-toast-warning {
-  border-color: orangered;
-  background-color: orangered;
+  border-color: darkorange;
+  background-color: darkorange;
 }
 .flow-toast-warning::before {
   content: "\f071";

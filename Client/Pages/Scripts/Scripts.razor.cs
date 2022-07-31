@@ -36,7 +36,7 @@ public partial class Scripts : ListPage<string, Script>
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        this.lblUpdateScripts = Translater.Instant("Pages.Scripts.Buttons.UpdateScripts");
+        this.lblUpdateScripts = Translater.Instant("Pages.Scripts.Buttons.UpdateAllScripts");
         this.lblUpdatingScripts = Translater.Instant("Pages.Scripts.Labels.UpdatingScripts");
     }
 
@@ -227,6 +227,31 @@ public partial class Scripts : ListPage<string, Script>
         bool result = await ScriptBrowser.Open(this.SelectedType);
         if (result)
             await this.Refresh();
+    }
+
+    async Task Update()
+    {
+        var scripts = Table.GetSelected()?.Where(x => string.IsNullOrEmpty(x.Path) == false)?.Select(x => x.Path)?.ToArray() ?? new string[] { };
+        if (scripts?.Any() != true)
+        {
+            Toast.ShowWarning("Pages.Scripts.Messages.NoRepositoryScriptsToUpdate");
+            return;
+        }
+
+        Blocker.Show("Pages.Scripts.Labels.UpdatingScripts");
+        this.StateHasChanged();
+        Data.Clear();
+        try
+        {
+            var result = await HttpHelper.Post($"/api/repository/update-specific-scripts", new ReferenceModel<string> { Uids = scripts });
+            if (result.Success)
+                await Refresh();
+        }
+        finally
+        {
+            Blocker.Hide();
+            this.StateHasChanged();
+        }
     }
 
     

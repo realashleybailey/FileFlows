@@ -482,8 +482,9 @@ public class FlowController : ControllerStore<Flow>
             ele.Model = model as ExpandoObject;
             return ele;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.Instance.ELog("Failed converting script to flow element: " + ex.Message + "\n" + ex.StackTrace);
             return null;
         }
     }

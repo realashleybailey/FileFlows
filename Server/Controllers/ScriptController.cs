@@ -430,16 +430,37 @@ public class ScriptController : Controller
     [HttpGet("duplicate/{name}")]
     public async Task<Script> Duplicate([FromRoute] string name, [FromQuery] ScriptType type = ScriptType.Flow)
     {
-        // use DbHelper to avoid the cache, otherwise we would update the in memory object 
         var script = await Get(name, type);
         if (script == null)
             return null;
-        
+        bool isRepositoryScript = script.Repository;
+
         script.Name = GetNewUniqueName(name);
-        if (script.Type != ScriptType.Flow)
+
+        if (isRepositoryScript)
+        {
+            var rgxComments = new Regex(@"\/\*(\*)?(.*?)\*\/", RegexOptions.Singleline);
+            string replacement = $"/**\n * @basedOn {(name)}\n";
+            var commentMatch = rgxComments.Match(script.Code);
+            if (commentMatch.Success)
+            {
+                var descMatch = Regex.Match(commentMatch.Value, "(?<=(@description ))[^@]+");
+                if (descMatch.Success)
+                {
+                    string desc = descMatch.Value.Trim();
+                    if (desc.EndsWith("*"))
+                        desc = desc[..^1].Trim();
+                    replacement += " * @description " + desc + "\n";
+                }
+            }
+            replacement += " */";
+            script.Code = rgxComments.Replace(script.Code, replacement);
+        }
+        else if (script.Type != ScriptType.Flow)
             script.Code = script.Code.Replace("@name ", "@basedOn ");
         else
             script.Code = Regex.Replace(script.Code, "@name(.*?)$", "@name " + script.Name, RegexOptions.Multiline);
+        
         script.Repository = false;
         script.Uid = script.Name;
         script.Type = type;

@@ -53,8 +53,6 @@ public class ScriptParser
                 continue;
             if (line.StartsWith("@author ") || line.StartsWith("@version ") || line.StartsWith("@revision "))
                 continue;
-            Console.WriteLine("Unexpected line [" + line + "]");
-            throw new Exception("Unexpected line: " + line);
         }
 
         if (model.Outputs.Count == 0)

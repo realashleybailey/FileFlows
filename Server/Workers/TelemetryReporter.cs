@@ -33,7 +33,7 @@ public class TelemetryReporter: Worker
 
         TelemetryData data = new TelemetryData();
         data.ClientUid = settings.Uid;
-        data.Version = Globals.Version;
+        data.Version = Globals.Version.ToString();
         data.ProcessingNodes = new NodeController().GetAll().Result.Count();
         data.Architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString();
         data.OS = isDocker ? "Docker" :

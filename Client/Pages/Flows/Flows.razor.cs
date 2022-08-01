@@ -1,3 +1,4 @@
+using System.Reflection;
 using FileFlows.Client.Components.Common;
 using Microsoft.AspNetCore.Components;
 using FileFlows.Client.Components;
@@ -8,6 +9,7 @@ using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using ffFlow = FileFlows.Shared.Models.Flow;
 
 namespace FileFlows.Client.Pages;
@@ -17,6 +19,8 @@ public partial class Flows : ListPage<Guid, FlowListModel>
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] public IJSRuntime jsRuntime { get; set; }
 
+    private NewFlowEditor AddEditor;
+
     public override string ApiUrl => "/api/flow";
 
     private FlowSkyBox<FlowType> Skybox;
@@ -25,6 +29,8 @@ public partial class Flows : ListPage<Guid, FlowListModel>
     private List<FlowListModel> DataFailure = new();
     private FlowType SelectedType = FlowType.Standard;
 
+    private Dictionary<string, List<FlowTemplateModel>> Templates = new ();
+
     #if(DEBUG)
     private bool DEBUG = true;
     #else
@@ -32,6 +38,27 @@ public partial class Flows : ListPage<Guid, FlowListModel>
     #endif
 
     public override string FetchUrl => ApiUrl + "/list-all";
+
+    protected override async Task OnInitializedAsync()
+    {
+         await base.OnInitializedAsync();
+         
+         this.Blocker.Show();
+         this.StateHasChanged();
+         try
+         {
+             var flowResult = await HttpHelper.Get<Dictionary<string, List<FlowTemplateModel>>>("/api/flow/templates");
+             if (flowResult.Success)
+             {
+                 Templates = flowResult.Data ?? new();
+             }
+         }
+         finally
+         {
+             this.Blocker.Hide();
+             this.StateHasChanged();
+         }
+    }
 
 
     async Task Enable(bool enabled, ffFlow flow)
@@ -49,6 +76,33 @@ public partial class Flows : ListPage<Guid, FlowListModel>
 
     private async void Add()
     {
+        if (AddEditor == null)
+        {
+            NavigationManager.NavigateTo("flows/" + Guid.Empty);
+            return;
+        }
+        var  newFlow = await AddEditor.Show();
+        if (newFlow == null)
+            return; // was canceled
+        
+        if (newFlow.Uid != Guid.Empty)
+        {
+            if ((App.Instance.FileFlowsSystem.ConfigurationStatus & ConfigurationStatus.Flows) != ConfigurationStatus.Flows)
+            {
+                // refresh the app configuration status
+                await App.Instance.LoadAppInfo();
+            }
+            // was saved, refresh list
+            await this.Refresh();
+        }
+        else
+        {
+            // edit it
+            App.Instance.NewFlowTemplate = newFlow;
+            NavigationManager.NavigateTo("flows/" + Guid.Empty);
+        }
+        return;
+        
         Blocker.Show();
         List<Plugin.ListOption> templates = null;
         try
@@ -296,8 +350,13 @@ public partial class Flows : ListPage<Guid, FlowListModel>
         return flowTemplate.GetHashCode() + ";" + field.Uid + ";" + field.Name;
     }
 
+    private delegate void FieldValueUpdate(TemplateField field, object value);
+
+    private event FieldValueUpdate OnFieldValueUpdate;
+
     private void SetFieldValue(FlowTemplateModel flowTemplate, TemplateField field, Editor editor, object value)
     {
+        Logger.Instance.ILog("Setting field value", field.Name);
         var em = editor.Model as IDictionary<string, object>;
         if (em == null)
             return;
@@ -347,6 +406,26 @@ public partial class Flows : ListPage<Guid, FlowListModel>
             em[key] = value;
         else
             em.Add(key, value);
+        
+        OnFieldValueUpdate?.Invoke(field, value);
+    }
+
+    private Dictionary<string, bool> HiddenTemplateFields = new Dictionary<string, bool>();
+
+    private void HideTemplateField(string name, bool visible)
+    {
+        if (HiddenTemplateFields.ContainsKey(name))
+            HiddenTemplateFields[name] = visible;
+        else
+            HiddenTemplateFields.Add(name, visible);
+    }
+
+    private bool FieldIsVisbile(string name)
+    {
+        Logger.Instance.ILog("Checking is visible: " + name);
+        if (HiddenTemplateFields.ContainsKey(name) == false)
+            return true;
+        return HiddenTemplateFields[name];
     }
 
 
@@ -372,6 +451,24 @@ public partial class Flows : ListPage<Guid, FlowListModel>
         {
             SetFieldValue(flowTemplate, field, editor, arg);
         }));
+        if (field.Conditions?.Any() == true)
+        {
+            builder.AddAttribute(++fieldCount, nameof(InputFile.Visible), FieldIsVisbile(field.Uid.ToString()));
+            OnFieldValueUpdate += (tf, val) =>
+            {
+                foreach (var condition in field.Conditions)
+                {
+                    Logger.Instance.ILog("Checking condition", condition.Property, tf);
+                    if (condition.Property != tf.Uid.ToString())
+                        continue;
+                    bool isMatch = condition.Matches(val);
+                    if (condition.IsMatch == isMatch)
+                        continue;
+                    condition.IsMatch = isMatch;
+                    this.StateHasChanged();
+                }
+            };
+        }
         builder.CloseComponent();
     }
 

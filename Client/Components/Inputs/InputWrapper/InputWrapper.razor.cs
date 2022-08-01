@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace FileFlows.Client.Components.Inputs
 {
     using Microsoft.AspNetCore.Components;

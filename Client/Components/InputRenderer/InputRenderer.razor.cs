@@ -1,32 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Components;
 
 namespace FileFlows.Client.Components;
 
-using FileFlows.Shared.Models;
-using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
-
-/// <summary>
-/// A flow panel is container that contains fields for an editor form
-/// </summary>
-public partial class FlowPanel:ComponentBase
+public partial class InputRenderer
 {
-    private List<ElementField> _Fields;
+    /// <summary>
+    /// Gets or sets if this input belongs to a script editor
+    /// </summary>
+    public bool IsScript { get; set; }
 
     /// <summary>
-    /// Gets or sets the fields in the flow panel
+    /// Gets or sets the field this is rendering
     /// </summary>
     [Parameter]
-    public List<ElementField> Fields
-    {
-        get => _Fields;
-        set
-        {
-            _Fields = value;
-            this.StateHasChanged();
-        }
-    }
-
+    public ElementField field { get; set; }
+    
     /// <summary>
     /// Gets or sets the Editor this flow panel is used in
     /// </summary>
@@ -89,10 +78,9 @@ public partial class FlowPanel:ComponentBase
     /// </summary>
     protected string TypeName => Editor.TypeName;
 
-    public void SetFields(List<ElementField> fields)
+    protected override Task OnParametersSetAsync()
     {
-        Logger.Instance.ILog("Setting fields", fields);
-        this._Fields = fields;
-        this.StateHasChanged();
+        this.IsScript = Regex.IsMatch(TypeName, @"^Flow\.Parts\.([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})");
+        return base.OnParametersSetAsync();
     }
 }

@@ -24,6 +24,19 @@ public class ElementField
     /// Gets or sets the name of this field
     /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional label that should be used
+    /// If set, this field won't be translated
+    /// </summary>
+    public string Label { get; set; }
+
+    /// <summary>
+    /// Gets or sets optional help text to show
+    /// If set, then translated help will not be looked for
+    /// </summary>
+    public string HelpText { get; set; }
+
     /// <summary>
     /// Gets or sets optional place holder text, this can be a translation key
     /// </summary>
@@ -195,7 +208,7 @@ public class Condition
     public bool IsMatch { get; set; }
 
     /// <summary>
-    /// Gets or sets the owner who owns this conditoin
+    /// Gets or sets the owner who owns this condition
     /// </summary>
     [JsonIgnore]
     public ElementField Owner { get; set; }

@@ -1,0 +1,81 @@
+.editor-wrapper {
+
+  .editor {
+    position:fixed;
+    right:0;
+    top:0;
+    bottom:0;
+    max-width: 100%;
+    background:var(--base-darker);
+    z-index:6;
+    left:0;
+    &.maximised {
+      width:100vw !important;
+    }
+  }
+  .background-overlay {
+    z-index: 5 !important;
+  }
+
+  .top-row button + button {
+    margin-left:0.25rem;
+  }
+
+
+  @media screen and (min-width: 850px) {
+    .editor {
+      left: unset;
+      width: 700px;
+      border-left: solid 1px var(--border-color);
+
+      &.large {
+        width: 70vw;
+      }
+    }
+  }
+
+  .fields {
+    flex-direction: column;
+    padding-right: 0.5rem;
+    display: flex;
+    height: 100%;
+    overflow: auto;
+
+    .description {
+      white-space: pre-wrap;
+      padding-bottom: 1rem;
+      font-size: 0.8rem;
+      border-bottom: solid 1px rgba(var(--color-rgb), 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .row {
+      margin: 1px 0 0; /* 1px top for input outline border to be visible */
+    }
+
+    .row + .row, .row + .input-text-variables, .input-text-variables + .row {
+      margin-top: 1rem;
+    }
+    .row.error {
+      height:auto;
+    }
+  }
+  @media screen and (max-width:578px) {
+    .content {
+      padding: 1.5rem .5rem 1.5rem 1.5rem !important;
+      .fields {
+        padding-right:0.5rem;
+      }
+    }
+  }
+
+
+  .empty {
+    margin-top:1rem;
+  }
+
+  .btn-download {
+    width:8rem !important;
+    margin-right: 1rem;
+  }
+}

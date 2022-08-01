@@ -30,28 +30,28 @@ namespace FileFlows.Client.Components
         public string HelpUrl { get; set; }
         public string Icon { get; set; }
         
-        private bool Maximised { get; set; }
+        protected bool Maximised { get; set; }
 
         /// <summary>
         /// Get the name of the type this editor is editing
         /// </summary>
         public string TypeName { get; set; }
-        private bool IsSaving { get; set; }
+        protected bool IsSaving { get; set; }
 
-        private string lblSave, lblSaving, lblCancel, lblClose, lblHelp, lblDownloadButton;
+        protected string lblSave, lblSaving, lblCancel, lblClose, lblHelp, lblDownloadButton;
 
-        private List<ElementField> Fields { get; set; }
+        protected List<ElementField> Fields { get; set; }
 
-        private Dictionary<string, List<ElementField>> Tabs { get; set; }
+        protected Dictionary<string, List<ElementField>> Tabs { get; set; }
 
         public ExpandoObject Model { get; set; }
 
         TaskCompletionSource<ExpandoObject> OpenTask;
 
         public delegate Task<bool> SaveDelegate(ExpandoObject model);
-        private SaveDelegate SaveCallback;
+        protected SaveDelegate SaveCallback;
 
-        private bool ShowDownload { get; set; }
+        protected bool ShowDownload { get; set; }
         /// <summary>
         /// Gets if this editor is readonly
         /// </summary>
@@ -60,9 +60,9 @@ namespace FileFlows.Client.Components
 
         public string EditorDescription { get; set; }
 
-        private readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
+        protected readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
-        private bool FocusFirst = false;
+        protected bool FocusFirst = false;
         private bool _needsRendering = false;
 
         public delegate Task<bool> CancelDeletgate();
@@ -106,7 +106,7 @@ namespace FileFlows.Client.Components
             }
         }
 
-        private ExpandoObject ConverToExando(object model)
+        private ExpandoObject ConvertToExando(object model)
         {
             if (model == null)
                 return new ExpandoObject();
@@ -142,7 +142,7 @@ namespace FileFlows.Client.Components
         internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null, bool noTranslateTitle = false, string lblDownloadButton = "Labels.Download", string downloadUrl = null)
         {
             this.RegisteredInputs.Clear();
-            var expandoModel = ConverToExando(model);
+            var expandoModel = ConvertToExando(model);
             this.Model = expandoModel;
             this.SaveCallback = saveCallback;
             this.TypeName = typeName;
@@ -183,7 +183,7 @@ namespace FileFlows.Client.Components
             return OpenTask.Task;
         }
 
-        private async Task WaitForRender()
+        protected async Task WaitForRender()
         {
             _needsRendering = true;
             StateHasChanged();
@@ -193,18 +193,24 @@ namespace FileFlows.Client.Components
             }
         }
 
+        protected override Task OnAfterRenderAsync(bool firstRender)
+        {
+            _needsRendering = false;
+            return base.OnAfterRenderAsync(firstRender);
+        }
 
-        private async Task OnSubmit()
+
+        protected async Task OnSubmit()
         {
             await this.Save();
         }
 
-        private async Task OnClose()
+        protected async Task OnClose()
         {
             this.Cancel();
         }
 
-        private async Task Save()
+        protected async Task Save()
         {
             if (ReadOnly)
             {
@@ -231,7 +237,7 @@ namespace FileFlows.Client.Components
                 if (saved == false)
                     return;
             }
-            OpenTask.TrySetResult(this.Model);
+            OpenTask?.TrySetResult(this.Model);
 
             this.Visible = false;
             this.Fields?.Clear();
@@ -239,7 +245,7 @@ namespace FileFlows.Client.Components
             this.OnClosed?.Invoke();
         }
 
-        private async void Cancel()
+        protected async void Cancel()
         {
             if(OnCancel != null)
             {
@@ -248,7 +254,7 @@ namespace FileFlows.Client.Components
                     return;
             }
 
-            OpenTask.TrySetCanceled();
+            OpenTask?.TrySetCanceled();
             this.Visible = false;
             if(this.Fields != null)
                 this.Fields.Clear();
@@ -459,14 +465,14 @@ namespace FileFlows.Client.Components
             }
         }
 
-        void OpenHelp()
+        protected void OpenHelp()
         {
             if (string.IsNullOrWhiteSpace(HelpUrl))
                 return;
             _ = jsRuntime.InvokeVoidAsync("open", HelpUrl.ToLower(), "_blank");
         }
 
-        void OnMaximised(bool maximised)
+        protected void OnMaximised(bool maximised)
         {
             this.Maximised = maximised;
         }

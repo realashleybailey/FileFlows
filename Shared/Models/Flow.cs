@@ -55,7 +55,7 @@ public class FlowTemplateModel
     /// Gets or sets fields used in the template
     /// </summary>
     public List<TemplateField> Fields { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the order this template appears
     /// </summary>
@@ -120,7 +120,12 @@ public class TemplateField
     /// <summary>
     /// Gets or sets the parameters for this field
     /// </summary>
-    public object Parameters { get; set; }  
+    public object Parameters { get; set; }
+
+    /// <summary>
+    /// Gets or sets teh conditions of the field
+    /// </summary>
+    public List<Condition> Conditions { get; set; }
 }
 
 /// <summary>

@@ -233,6 +233,9 @@
           "Template": "Template"
         }
       },
+      "Fields": {
+        "Template":"Template"
+      },
       "Messages": {
         "FlowImported": "Flow ''{name}'' imported",
         "Duplicated": "Flow ''{name}'' duplicated",

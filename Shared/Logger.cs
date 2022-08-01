@@ -85,16 +85,21 @@ public class Logger : ILogger
         {
             foreach (var writer in Writers)
             {
-                _ = Task.Run(async () =>
+                if (writer.GetType().Name == "ClientConsoleLogger")
+                    writer.Log(type, args).Wait();
+                else
                 {
-                    try
+                    _ = Task.Run(async () =>
                     {
-                        await writer.Log(type, args);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                });
+                        try
+                        {
+                            await writer.Log(type, args);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    });
+                }
             }
         }
         catch (Exception) // so cant crash

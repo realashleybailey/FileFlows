@@ -748,34 +748,30 @@ public class FlowController : ControllerStore<Flow>
         {
             try
             {
-                string json = string.Join("\n", System.IO.File.ReadAllText(tf.FullName).Split('\n').Skip(1));
+                string json = System.IO.File.ReadAllText(tf.FullName);
+                if (json.StartsWith("// path"))
+                {
+                    json = string.Join("\n", json.Split('\n').Skip(1)).Trim();
+                }
+                
+                for (int i = 1; i < 50; i++)
+                {
+                    Guid oldUid = new Guid("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i);
+                    Guid newUid = Guid.NewGuid();
+                    json = json.Replace(oldUid.ToString(), newUid.ToString());
+                }
+
                 json = TemplateHelper.ReplaceWindowsPathIfWindows(json);
-                var _jst = JsonSerializer.Deserialize<FlowTemplate>(json, new JsonSerializerOptions
+                var jst = JsonSerializer.Deserialize<FlowTemplate>(json, new JsonSerializerOptions
                 {
                     AllowTrailingCommas = true,
                     PropertyNameCaseInsensitive = true
                 });
-                if (_jst == null)
+                if (jst == null)
                     continue;
                 try
                 {
-                    var jstJson = JsonSerializer.Serialize(_jst);
-                    List<TemplateField> fields = _jst.Fields ?? new List<TemplateField>();
-                    // replace all the guids with unique guides
-                    for (int i = 1; i < 50; i++)
-                    {
-                        Guid oldUid = new Guid("00000000-0000-0000-0000-0000000000" + (i < 10 ? "0" : "") + i);
-                        Guid newUid = Guid.NewGuid();
-                        foreach (var field in fields)
-                        {
-                            if (field.Uid == oldUid)
-                                field.Uid = newUid;
-                        }
-
-                        jstJson = jstJson.Replace(oldUid.ToString(), newUid.ToString());
-                    }
-
-                    var jst = JsonSerializer.Deserialize<FlowTemplate>(jstJson);
+                    List<TemplateField> fields = jst.Fields ?? new List<TemplateField>();
 
                     List<FlowPart> flowParts = new List<FlowPart>();
                     int y = DEFAULT_YPOS;
@@ -815,13 +811,13 @@ public class FlowController : ControllerStore<Flow>
                     if (invalid)
                         continue;
 
-                    if (templates.ContainsKey(_jst.Group ?? String.Empty) == false)
-                        templates.Add(_jst.Group ?? String.Empty, new List<FlowTemplateModel>());
+                    if (templates.ContainsKey(jst.Group ?? String.Empty) == false)
+                        templates.Add(jst.Group ?? String.Empty, new List<FlowTemplateModel>());
 
-                    templates[_jst.Group ?? String.Empty].Add(new FlowTemplateModel
+                    templates[jst.Group ?? String.Empty].Add(new FlowTemplateModel
                     {
                         Fields = fields,
-                        Order = _jst.Order,
+                        Order = jst.Order,
                         Save = jst.Save,
                         Type = jst.Type,
                         Flow = new Flow
@@ -836,7 +832,7 @@ public class FlowController : ControllerStore<Flow>
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.ELog("Template: " + _jst.Name);
+                    Logger.Instance.ELog("Template: " + jst.Name);
                     Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine +
                                          ex.StackTrace);
                 }

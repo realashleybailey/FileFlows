@@ -93,6 +93,8 @@ namespace FileFlows.Client.Components.Inputs
 
         [Parameter]
         public bool Disabled { get; set; }
+
+        //[Parameter] // dont not make this a parameter, it sets it to false unexpectedly
         public bool Visible { get; set; }
 
         [Parameter]
@@ -228,8 +230,18 @@ namespace FileFlows.Client.Components.Inputs
                     value = je.GetInt32();
                 else if (typeof(T) == typeof(string))
                     value = je.GetString();
+                else if (typeof(T) == typeof(bool))
+                    value = je.GetBoolean();
             }
-            this.Value = (T)value;
+
+            try
+            {
+                this.Value = (T)value;
+            }
+            catch (InvalidCastException ex)
+            {
+                Logger.Instance.ILog($"Could not cast '{value.GetType().FullName}' to '{typeof(T).FullName}'");
+            }
         }
 
         private void Field_DisabledChange(bool state)

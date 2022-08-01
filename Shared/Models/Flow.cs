@@ -65,7 +65,7 @@ public class FlowTemplateModel
     /// Gets or sets if this flow template should be saved after creation
     /// </summary>
     public bool Save { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the type of flow
     /// </summary>

@@ -16,8 +16,24 @@ namespace FileFlows.Client.Components.Inputs
         [Parameter] public RenderFragment ChildContent { get; set; }
 
         private string HelpHtml = string.Empty;
+        private string CurrentHelpText;
         protected override void OnInitialized()
         {
+            InitHelpText();
+        }
+
+        protected override void OnParametersSet()
+        {
+            if (CurrentHelpText != Input?.Help)
+            {
+                InitHelpText();
+                this.StateHasChanged();
+            }
+        }
+
+        private void InitHelpText()
+        {
+            CurrentHelpText = Input?.Help;
             string help = Regex.Replace(Input?.Help ?? string.Empty, "<.*?>", string.Empty);
             foreach (Match match in Regex.Matches(help, @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)", RegexOptions.Multiline))
             {

@@ -1,5 +1,7 @@
+using System.ComponentModel.Design.Serialization;
 using System.Security;
 using System.Text.Json;
+using FileFlows.Client.Components.Common;
 using FileFlows.Client.Helpers;
 using Microsoft.Extensions.Logging;
 
@@ -24,6 +26,8 @@ namespace FileFlows.Client.Components.Inputs
         bool Disabled { get; set; }
         bool Visible { get; set; }
 
+        void Dispose();
+
         EventCallback OnSubmit { get; set; }
 
         FileFlows.Shared.Models.ElementField Field { get; set; }
@@ -35,7 +39,7 @@ namespace FileFlows.Client.Components.Inputs
         bool Focus();
     }
 
-    public abstract class Input<T> : ComponentBase, IInput
+    public abstract class Input<T> : ComponentBase, IInput, IDisposable
     {
         [CascadingParameter] protected Editor Editor { get; set; }
 
@@ -51,6 +55,7 @@ namespace FileFlows.Client.Components.Inputs
 
         protected string LabelOriginal => _LabelOriginal;
 
+
         [Parameter] public EventCallback OnSubmit { get; set; }
         [Parameter] public EventCallback OnClose { get; set; }
 
@@ -63,6 +68,7 @@ namespace FileFlows.Client.Components.Inputs
             get => _Label;
             set
             {
+                if (Disposed) return;
                 if (_LabelOriginal == value)
                     return;
                 _LabelOriginal = value;
@@ -135,6 +141,7 @@ namespace FileFlows.Client.Components.Inputs
             {
                 try
                 {
+                    if (Disposed) return;
                     _ValueUpdating = true;
 
                     if (_Value == null && value == null)
@@ -222,6 +229,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private void FieldOnValueChanged(object sender, object value)
         {
+            if (Disposed) return;
             if (_ValueUpdating)
                 return;
             if (value is JsonElement je)
@@ -246,6 +254,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private void Field_DisabledChange(bool state)
         {
+            if (Disposed) return;
             if(this.Disabled != state)
             {
                 this.Disabled = state;
@@ -255,6 +264,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private void Field_ConditionsChange(bool state)
         {
+            if (Disposed) return;
             if (this.Field.Conditions.Count > 1)
             {
                 state = true;
@@ -274,6 +284,7 @@ namespace FileFlows.Client.Components.Inputs
 
         public virtual async Task<bool> Validate()
         {
+            if (Disposed) return false;
             if (this.Validators?.Any() != true)
                 return true;
             if (this.Visible == false)
@@ -301,8 +312,22 @@ namespace FileFlows.Client.Components.Inputs
 
         protected bool FocusUid()
         {
+            if (Disposed) return false;
             _ = jsRuntime.InvokeVoidAsync("eval", $"document.getElementById('{Uid}').focus()");
             return true;
+        }
+
+        private bool Disposed = false;
+        public void Dispose()
+        {
+            Disposed = true;
+            if (this.Field != null)
+            {
+                this.Field.ConditionsChange -= Field_ConditionsChange;
+                this.Field.DisabledChange -= Field_DisabledChange;
+                this.Field.ValueChanged -= FieldOnValueChanged;
+                this.Field = null;
+            }
         }
     }
 }

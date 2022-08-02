@@ -59,24 +59,26 @@ public partial class NewFlowEditor : Editor
 
     private async Task InitTemplate(FlowTemplateModel template)
     {
-        if (this.Model is IDictionary<string, object> oldDict && oldDict.TryGetValue("Name", out object oName) &&
-            oName is string sName && string.IsNullOrWhiteSpace(sName) == false)
-        {
-            this.Model = new ExpandoObject();
-            ((IDictionary<string, object>)this.Model).Add("Name", sName);
-        }
-        else
-        {
-            this.Model = new ExpandoObject();
-        }
 
         if (Fields?.Any() == true && template == this.CurrentTemplate)
             return;
+        
         this.InitializingTemplate = true;
-        this.CurrentTemplate = template;
         try
         {
             DisposeCurrentTemplate();
+            this.CurrentTemplate = template;
+            
+            if (this.Model is IDictionary<string, object> oldDict && oldDict.TryGetValue("Name", out object oName) &&
+                oName is string sName && string.IsNullOrWhiteSpace(sName) == false)
+            {
+                this.Model = new ExpandoObject();
+                ((IDictionary<string, object>)this.Model).Add("Name", sName);
+            }
+            else
+            {
+                this.Model = new ExpandoObject();
+            }
 
             var fields = new List<ElementField>();
             fields.Add(new ElementField
@@ -208,6 +210,16 @@ public partial class NewFlowEditor : Editor
 
     private void DisposeCurrentTemplate()
     {
+        for(int i=RegisteredInputs.Count -1;i >= 0;i--)
+        {
+            var input = RegisteredInputs[i];
+            if (input.Field.Name == "Name")
+                continue;
+            if (input.Field.Name == "Template")
+                continue;
+            input.Dispose();
+            this.RegisteredInputs.Remove(input);
+        }
         Fields?.Clear();
         TemplateFields?.Clear();
         Fields ??= new();

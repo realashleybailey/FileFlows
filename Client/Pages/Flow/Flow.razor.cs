@@ -11,6 +11,7 @@ using System.Text.Json;
 using FileFlows.Plugin;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Client.Pages;
 
@@ -589,6 +590,7 @@ public partial class Flow : ComponentBase, IDisposable
                 { nameof(Components.Inputs.InputSelect.Options), templatesOptions }
             }
         };
+        var efCode = fields.FirstOrDefault(x => x.InputType == FormInputType.Code);
         efTemplate.ValueChanged += (object sender, object value) =>
         {
             if (value == null)
@@ -605,6 +607,8 @@ public partial class Flow : ComponentBase, IDisposable
 
             SetModelProperty(nameof(template.Outputs), template.Outputs);
             SetModelProperty(nameof(template.Code), template.Code);
+            if (efCode != null)
+                efCode.InvokeValueChanged(this, template.Code);
 
             void SetModelProperty(string property, object value)
             {
@@ -634,11 +638,18 @@ public partial class Flow : ComponentBase, IDisposable
             var outputs = rgxOutputs.Match(commentBlock.Value);
             if (outputs.Success == false)
                 continue;
-            
-            var ct = new CodeTemplate();
-            ct.Name = template.Name;
-            ct.Code = template.Code.Replace(commentBlock.Value, string.Empty).Trim();
-            ct.Outputs = int.Parse(outputs.Groups[1].Value);
+
+            string code = template.Code;
+            if (code.StartsWith("// path:"))
+                code = string.Join("\n", code.Split('\n').Skip(1));
+            code = code.Replace(commentBlock.Value, string.Empty).Trim();
+
+            var ct = new CodeTemplate
+            {
+                Name = template.Name,
+                Code = code,
+                Outputs = int.Parse(outputs.Groups[1].Value),
+            };
             templates.Add(ct);
         }
         
@@ -647,9 +658,9 @@ public partial class Flow : ComponentBase, IDisposable
 
     private class CodeTemplate
     {
-        public string Name { get; set; }
-        public string Code { get; set; }
-        public int Outputs { get; set; }
+        public string Name { get; init; }
+        public string Code { get; init; }
+        public int Outputs { get; init; }
     }
 
 }

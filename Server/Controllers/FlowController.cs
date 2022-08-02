@@ -738,7 +738,7 @@ public class FlowController : ControllerStore<Flow>
     public async Task<IDictionary<string, List<FlowTemplateModel>>> GetTemplates()
     {
         var elements = await GetElements((FlowType)(-1)); // special case to load all template typs
-        var parts = elements.ToDictionary(x => x.Uid.Substring(x.Uid.LastIndexOf(".") + 1), x => x);
+        var parts = elements.ToDictionary(x => x.Uid, x => x);
 
         Dictionary<string, List<FlowTemplateModel>> templates = new();
         string group = string.Empty;

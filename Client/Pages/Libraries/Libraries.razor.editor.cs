@@ -74,11 +74,17 @@ public partial class Libraries : ListPage<Guid, Library>
                             Value = x
                         }));
                     }
-                    templates.Insert(0, new ListOption
+                    var loCustom = new ListOption
                     {
                         Label = "Custom",
                         Value = null
-                    });
+                    };
+                    
+                    if(templates.Any() && templates[0].Value == Globals.LIST_OPTION_GROUP)
+                        templates.Insert(1, loCustom);
+                    else
+                        templates.Insert(0, loCustom);
+                    
                     efTemplate = new ElementField
                     {
                         Name = "Template",

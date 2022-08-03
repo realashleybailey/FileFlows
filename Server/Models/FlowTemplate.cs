@@ -33,11 +33,6 @@ class FlowTemplate
     public List<TemplateField> Fields { get; set; }
     
     /// <summary>
-    /// Gets or sets the order this template appears
-    /// </summary>
-    public int? Order { get; set; }
-    
-    /// <summary>
     /// Gets or sets if this template should be saved or go to the editor
     /// </summary>
     public bool Save { get; set; }

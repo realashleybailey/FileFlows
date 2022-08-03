@@ -12,6 +12,7 @@ namespace FileFlows.Client.Components;
 public partial class NewFlowEditor : Editor
 {
     [Inject] NavigationManager NavigationManager { get; set; }
+    [CascadingParameter] public Blocker Blocker { get; set; }
     TaskCompletionSource<Flow> ShowTask;
     
     /// <summary>
@@ -22,7 +23,7 @@ public partial class NewFlowEditor : Editor
     private const string FIELD_NAME = "Name";
     private const string FIELD_TEMPLATE = "Template";
 
-    private List<ListOption> TemplateOptions = new ();
+    private List<ListOption> TemplateOptions;
     private string lblDescription;
     
     private ElementField efTemplate;
@@ -38,23 +39,6 @@ public partial class NewFlowEditor : Editor
         this.lblDescription = Translater.Instant("Pages.Flows.Template.Fields.PageDescription");
         
         base.SaveCallback = SaveCallback;
-
-        foreach (var group in Templates)
-        {
-            if (string.IsNullOrEmpty(group.Key) == false)
-            {
-                TemplateOptions.Add(new Plugin.ListOption
-                {
-                    Value = Globals.LIST_OPTION_GROUP,
-                    Label = group.Key
-                });
-            }
-            TemplateOptions.AddRange(group.Value.Select(x => new Plugin.ListOption
-            {
-                Label = x.Flow.Name,
-                Value = x
-            }));
-        }
     }
 
     private async Task InitTemplate(FlowTemplateModel template)
@@ -192,19 +176,61 @@ public partial class NewFlowEditor : Editor
     /// </summary>
     public Task<Flow> Show()
     {
-        if (efTemplate != null)
-            efTemplate.ValueChanged -= EfTemplateOnValueChanged;
-        if (this.TemplateOptions?.Any() == false)
-        {
-            // no templates, give them a blank
-            NavigationManager.NavigateTo("flows/" + Guid.Empty);
-            return Task.FromResult(default(Flow));
-        }
-
-        this.CurrentTemplate = null;
-        this.Visible = true;
-        _ = this.InitTemplate(null);
         ShowTask = new TaskCompletionSource<Flow>();
+        _ = Task.Run(async () =>
+        {
+            if (this.Templates == null)
+            {
+                this.Blocker.Show("Pages.Flows.Messages.LoadingTemplates");
+                this.StateHasChanged();
+                try
+                {
+                    var flowResult =
+                        await HttpHelper.Get<Dictionary<string, List<FlowTemplateModel>>>("/api/flow/templates");
+                    if (flowResult.Success)
+                        Templates = flowResult.Data ?? new();
+                    else
+                        Templates = new();
+                    TemplateOptions ??= new();
+
+                    foreach (var group in Templates)
+                    {
+                        if (string.IsNullOrEmpty(group.Key) == false)
+                        {
+                            TemplateOptions.Add(new Plugin.ListOption
+                            {
+                                Value = Globals.LIST_OPTION_GROUP,
+                                Label = group.Key
+                            });
+                        }
+                        TemplateOptions.AddRange(group.Value.Select(x => new Plugin.ListOption
+                        {
+                            Label = x.Flow.Name,
+                            Value = x
+                        }));
+                    }
+                }
+                finally
+                {
+                    this.Blocker.Hide();
+                }
+            }
+
+            if (efTemplate != null)
+                efTemplate.ValueChanged -= EfTemplateOnValueChanged;
+            if (this.TemplateOptions.Any() == false)
+            {
+                // no templates, give them a blank
+                NavigationManager.NavigateTo("flows/" + Guid.Empty);
+                ShowTask.TrySetResult(default(Flow));
+                return;
+            }
+            this.Model = null;
+            this.CurrentTemplate = null;
+            this.Visible = true;
+            await this.InitTemplate(null);
+            this.StateHasChanged();
+        });
         return ShowTask.Task;
     }
 
@@ -213,9 +239,11 @@ public partial class NewFlowEditor : Editor
         for(int i=RegisteredInputs.Count -1;i >= 0;i--)
         {
             var input = RegisteredInputs[i];
-            if (input.Field.Name == "Name")
+            if (input == null)
                 continue;
-            if (input.Field.Name == "Template")
+            if (input?.Field?.Name == "Name")
+                continue;
+            if (input?.Field?.Name == "Template")
                 continue;
             input.Dispose();
             this.RegisteredInputs.Remove(input);

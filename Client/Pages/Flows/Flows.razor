@@ -96,7 +96,4 @@ FileFlows will search for the 'Default' Failure Flow to use if a flow fails, if 
     <div class="pointer-add" style="top:155px">Add</div>
 }
 
-@if (Templates.Any())
-{
-    <NewFlowEditor @ref=AddEditor Templates=@Templates/>
-}
+<NewFlowEditor @ref=AddEditor />

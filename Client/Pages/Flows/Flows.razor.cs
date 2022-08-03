@@ -39,27 +39,6 @@ public partial class Flows : ListPage<Guid, FlowListModel>
 
     public override string FetchUrl => ApiUrl + "/list-all";
 
-    protected override async Task OnInitializedAsync()
-    {
-         await base.OnInitializedAsync();
-         
-         this.Blocker.Show();
-         this.StateHasChanged();
-         try
-         {
-             var flowResult = await HttpHelper.Get<Dictionary<string, List<FlowTemplateModel>>>("/api/flow/templates");
-             if (flowResult.Success)
-             {
-                 Templates = flowResult.Data ?? new();
-             }
-         }
-         finally
-         {
-             this.Blocker.Hide();
-             this.StateHasChanged();
-         }
-    }
-
 
     async Task Enable(bool enabled, ffFlow flow)
     {

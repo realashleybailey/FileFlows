@@ -238,7 +238,7 @@ public class FlowController : ControllerStore<Flow>
 
         json = json.Replace("OutputConnections", "connections");
         json = json.Replace("InputNode", "node");
-        json = Regex.Replace(json, "\"FlowElementUid\": \"([\\w]+\\.)*([\\w]+)\"", "\"node\": \"$2\"");
+        json = Regex.Replace(json, "\"FlowElementUid\":", "\"node\":");
         json = Regex.Replace(json,
             "\"(Icon|Label|Inputs|Template|Type|Enabled|DateCreated|DateModified)\": [^,}]+,[\\s]*", string.Empty);
 
@@ -744,6 +744,39 @@ public class FlowController : ControllerStore<Flow>
         string group = string.Empty;
         templates.Add(group, new List<FlowTemplateModel>());
         templates.Add("Basic", new List<FlowTemplateModel>());
+
+        var templateList = GetFlowTemplates(parts)
+            .OrderBy(x => x.Template.Group.ToLowerInvariant())
+            .ThenBy(x => x.Template.Name == x.Template.Group + " File" ? 0 : 1)
+            .ThenBy(x => x.Template.Name.ToLowerInvariant());
+        foreach (var item in templateList)
+        {
+
+            if (templates.ContainsKey(item.Template.Group ?? String.Empty) == false)
+                templates.Add(item.Template.Group ?? String.Empty, new List<FlowTemplateModel>());
+
+            templates[item.Template.Group ?? String.Empty].Add(new FlowTemplateModel
+            {
+                Fields = item.Template.Fields,
+                Save = item.Template.Save,
+                Type = item.Template.Type,
+                Flow = new Flow
+                {
+                    Name = item.Template.Name,
+                    Template = item.Template.Name,
+                    Enabled = true,
+                    Description = item.Template.Description,
+                    Parts = item.Parts
+                }
+            });
+        }
+
+        return templates;
+    }
+
+    private List<(FlowTemplate Template, List<FlowPart> Parts)> GetFlowTemplates(Dictionary<string, FlowElement> parts)
+    {
+        var templates = new List<(FlowTemplate, List<FlowPart>)>();
         foreach (var tf in GetTemplateFiles())
         {
             try
@@ -771,7 +804,6 @@ public class FlowController : ControllerStore<Flow>
                     continue;
                 try
                 {
-                    List<TemplateField> fields = jst.Fields ?? new List<TemplateField>();
 
                     List<FlowPart> flowParts = new List<FlowPart>();
                     int y = DEFAULT_YPOS;
@@ -811,24 +843,7 @@ public class FlowController : ControllerStore<Flow>
                     if (invalid)
                         continue;
 
-                    if (templates.ContainsKey(jst.Group ?? String.Empty) == false)
-                        templates.Add(jst.Group ?? String.Empty, new List<FlowTemplateModel>());
-
-                    templates[jst.Group ?? String.Empty].Add(new FlowTemplateModel
-                    {
-                        Fields = fields,
-                        Order = jst.Order,
-                        Save = jst.Save,
-                        Type = jst.Type,
-                        Flow = new Flow
-                        {
-                            Name = jst.Name,
-                            Template = jst.Name,
-                            Enabled = true,
-                            Description = jst.Description,
-                            Parts = flowParts
-                        }
-                    });
+                    templates.Add((jst, flowParts));
                 }
                 catch (Exception ex)
                 {
@@ -843,17 +858,6 @@ public class FlowController : ControllerStore<Flow>
                 Logger.Instance.ELog("Error reading template: " + ex.Message + Environment.NewLine + ex.StackTrace);
             }
         }
-
-        foreach (var gn in templates.Keys.ToArray())
-        {
-            templates[gn] = templates[gn].OrderBy(x =>
-            {
-                if (x.Order == null)
-                    return int.MaxValue;
-                return x.Order;
-            }).ThenBy(x => x.Flow.Name).ToList();
-        }
-
         return templates;
     }
 }

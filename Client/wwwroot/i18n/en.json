@@ -239,7 +239,8 @@
       "Messages": {
         "FlowImported": "Flow ''{name}'' imported",
         "Duplicated": "Flow ''{name}'' duplicated",
-        "DeleteUsed":"You cannot delete a flow that is in use"
+        "DeleteUsed":"You cannot delete a flow that is in use",
+        "LoadingTemplates":"Loading Templates"
       }
     },
     "Libraries": {

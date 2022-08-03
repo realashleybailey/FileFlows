@@ -185,6 +185,7 @@ public class LibraryController : ControllerStore<Library>
     {
         Dictionary<string, List<Library>> templates = new();
         templates.Add(string.Empty, new List<Library>());
+        templates.Add("General", new List<Library>());
         foreach (var tf in GetTemplateFiles())
         {
             try
@@ -215,7 +216,8 @@ public class LibraryController : ControllerStore<Library>
             }
             catch (Exception) { }
         }
-        return templates;
+
+        return templates.Where(x => x.Value.Any()).ToDictionary(x => x.Key, x => x.Value);
     }
 
     /// <summary>

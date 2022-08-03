@@ -55,11 +55,6 @@ public class FlowTemplateModel
     /// Gets or sets fields used in the template
     /// </summary>
     public List<TemplateField> Fields { get; set; }
-
-    /// <summary>
-    /// Gets or sets the order this template appears
-    /// </summary>
-    public int? Order { get; set; }
     
     /// <summary>
     /// Gets or sets if this flow template should be saved after creation

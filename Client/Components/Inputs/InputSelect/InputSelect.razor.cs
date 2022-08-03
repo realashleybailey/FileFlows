@@ -1,3 +1,5 @@
+using Humanizer.DateTimeHumanizeStrategy;
+
 namespace FileFlows.Client.Components.Inputs
 {
     using System.Collections.Generic;
@@ -195,6 +197,9 @@ namespace FileFlows.Client.Components.Inputs
 
             if (dict?.ContainsKey("Description") == true)
                 Description = dict["Description"]?.ToString() ?? string.Empty;
+
+            this.Help = Description;
+            this.StateHasChanged();
         }
 
 

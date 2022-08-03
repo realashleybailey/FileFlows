@@ -161,7 +161,7 @@ window.ff = {
     },
     codeCaptureSave: function(csharp) {
         window.CodeCaptureListener = (e) => {
-            if(e.ctrlKey ===  false || e.shiftKey || e.altKey || e.code != 'KeyS')
+            if(e.ctrlKey === false || e.shiftKey || e.altKey || e.code != 'KeyS')
                 return;
             e.preventDefault();
             e.stopPropagation();
@@ -174,5 +174,21 @@ window.ff = {
     },
     codeUncaptureSave: function(){
         document.removeEventListener("keydown", window.CodeCaptureListener);        
-    }
+    },
+    onEscapeListener: function(csharp) {
+        window.CodeCaptureListener = (e) => {
+            if(e.ctrlKey || e.shiftKey || e.altKey || e.code != 'Escape')
+                return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            hasModal = !!document.querySelector('.flow-modal');
+            
+            setTimeout(() => {
+                csharp.invokeMethodAsync("OnEscape", { hasModal: hasModal });
+            },1);
+            return true;
+        };
+        document.addEventListener("keydown", window.CodeCaptureListener);
+    },
 };

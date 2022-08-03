@@ -7,7 +7,7 @@ namespace FileFlows.Client.Components.Dialogs;
 /// <summary>
 /// Confirm dialog that prompts the user for confirmation 
 /// </summary>
-public partial class UsedByDialog : ComponentBase
+public partial class UsedByDialog : ComponentBase, IDisposable
 {
     private string lblTitle, lblClose, lblName, lblType;
     TaskCompletionSource ShowTask;
@@ -24,6 +24,16 @@ public partial class UsedByDialog : ComponentBase
         this.lblName = Translater.TranslateIfNeeded("Labels.Name");
         this.lblType = Translater.TranslateIfNeeded("Labels.Type");
         Instance = this;
+        App.Instance.OnEscapePushed += InstanceOnOnEscapePushed;
+    }
+
+    private void InstanceOnOnEscapePushed(OnEscapeArgs args)
+    {
+        if (Visible)
+        {
+            Close();
+            this.StateHasChanged();
+        }
     }
 
     /// <summary>
@@ -60,5 +70,10 @@ public partial class UsedByDialog : ComponentBase
     {
         type = type.Substring(type.LastIndexOf(".") + 1);
         return Translater.Instant($"Pages.{type}.Title");
+    }
+
+    public void Dispose()
+    {
+        App.Instance.OnEscapePushed -= InstanceOnOnEscapePushed;
     }
 }

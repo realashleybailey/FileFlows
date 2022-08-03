@@ -9,7 +9,7 @@ namespace FileFlows.Client.Components.Dialogs;
 /// <summary>
 /// Confirm dialog that prompts the user for confirmation 
 /// </summary>
-public partial class Confirm : ComponentBase
+public partial class Confirm : ComponentBase, IDisposable
 {
     [Inject] public IJSRuntime jsRuntime { get; set; }
     
@@ -31,7 +31,17 @@ public partial class Confirm : ComponentBase
     {
         this.lblYes = Translater.Instant("Labels.Yes");
         this.lblNo = Translater.Instant("Labels.No");
+        App.Instance.OnEscapePushed += InstanceOnOnEscapePushed;
         Instance = this;
+    }
+
+    private void InstanceOnOnEscapePushed(OnEscapeArgs args)
+    {
+        if (Visible)
+        {
+            No();
+            this.StateHasChanged();
+        }
     }
 
     /// <summary>
@@ -66,13 +76,19 @@ public partial class Confirm : ComponentBase
 
     private Task<bool> ShowInstance(string title, string message)
     {
-        this.btnYesUid = Guid.NewGuid().ToString();
-        this.focused = false;
-        this.Title = Translater.TranslateIfNeeded(title?.EmptyAsNull() ?? "Labels.Confirm");
-        this.Message = Translater.TranslateIfNeeded(message ?? "");
-        this.ShowSwitch = false;
-        this.Visible = true;
-        this.StateHasChanged();
+        Task.Run(async () =>
+        {
+            // wait a short delay this is in case a "Close" from an escape key is in the middle
+            // of processing, and if we show this confirm too soon, it may automatically be closed
+            await Task.Delay(5);
+            this.btnYesUid = Guid.NewGuid().ToString();
+            this.focused = false;
+            this.Title = Translater.TranslateIfNeeded(title?.EmptyAsNull() ?? "Labels.Confirm");
+            this.Message = Translater.TranslateIfNeeded(message ?? "");
+            this.ShowSwitch = false;
+            this.Visible = true;
+            this.StateHasChanged();
+        });
 
         Instance.ShowTask = new TaskCompletionSource<bool>();
         return Instance.ShowTask.Task;
@@ -130,5 +146,10 @@ public partial class Confirm : ComponentBase
             Instance.ShowTask.TrySetResult(false);
             await Task.CompletedTask;
         }
+    }
+
+    public void Dispose()
+    {
+        App.Instance.OnEscapePushed -= InstanceOnOnEscapePushed;
     }
 }

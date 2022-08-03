@@ -25,6 +25,16 @@ namespace FileFlows.Client
 
         public static FileFlows.Shared.Models.Settings Settings;
 
+        /// <summary>
+        /// Delegate for the on escape event
+        /// </summary>
+        public delegate void EscapePushed(OnEscapeArgs args);
+
+        /// <summary>
+        /// Event that is fired when the escape key is pushed
+        /// </summary>
+        public event EscapePushed OnEscapePushed;
+
         public FileFlowsStatus FileFlowsSystem { get; private set; }
         
         /// <summary>
@@ -69,6 +79,8 @@ namespace FileFlows.Client
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;
             DisplayHeight = dimensions.height;
+            var dotNetObjRef = DotNetObjectReference.Create(this);
+            jsRuntime.InvokeVoidAsync("ff.onEscapeListener", new object[] { dotNetObjRef });
 
 #if (DEMO)
             Settings = new FileFlows.Shared.Models.Settings
@@ -85,5 +97,25 @@ namespace FileFlows.Client
         }
 
         record Dimensions(int width, int height);
+
+        /// <summary>
+        /// Escape was pushed
+        /// </summary>
+        [JSInvokable]
+        public async Task OnEscape(OnEscapeArgs args)
+        {
+            OnEscapePushed?.Invoke(args);
+        }
     }
+}
+
+/// <summary>
+/// Args for on escape event
+/// </summary>
+public class OnEscapeArgs
+{
+    /// <summary>
+    /// Gets or sets if there is a modal visible
+    /// </summary>
+    public bool HasModal { get; set; }
 }

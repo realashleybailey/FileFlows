@@ -102,7 +102,7 @@ public partial class Editor : ComponentBase, IDisposable
 
     private void InstanceOnOnEscapePushed(OnEscapeArgs args)
     {
-        if (args.HasModal || this.Visible == false)
+        if (args.HasModal || this.Visible == false || args.HasLogPartialViewer)
             return;
         Cancel();
     }

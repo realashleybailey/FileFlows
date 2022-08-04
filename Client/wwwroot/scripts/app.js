@@ -183,9 +183,10 @@ window.ff = {
             e.stopPropagation();
             
             hasModal = !!document.querySelector('.flow-modal');
+            logPartialViewer = !!document.querySelector('.log-partial-viewer');
             
             setTimeout(() => {
-                csharp.invokeMethodAsync("OnEscape", { hasModal: hasModal });
+                csharp.invokeMethodAsync("OnEscape", { hasModal: hasModal, hasLogPartialViewer: logPartialViewer });
             },1);
             return true;
         };

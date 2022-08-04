@@ -43,8 +43,18 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
         this.lblClose = Translater.Instant("Labels.Close");
         this.lblLogPartialNotAvailable = Translater.Instant("Labels.LogPartialNotAvailable");
         this.lblViewLog = Translater.Instant("Labels.ViewLog");
+        App.Instance.OnEscapePushed += InstanceOnOnEscapePushed;
     }
-    
+
+    private void InstanceOnOnEscapePushed(OnEscapeArgs args)
+    {
+        if (args.HasModal == false)
+        {
+            ClosePartialLog();
+            this.StateHasChanged();
+        }
+    }
+
 
     private string FormatNodeUid(string name)
     {
@@ -120,5 +130,11 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
     void OnMaximised(bool maximised)
     {
         this.Maximised = maximised;
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        App.Instance.OnEscapePushed -= InstanceOnOnEscapePushed;
     }
 }

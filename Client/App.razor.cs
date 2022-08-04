@@ -115,7 +115,12 @@ namespace FileFlows.Client
 public class OnEscapeArgs
 {
     /// <summary>
-    /// Gets or sets if there is a modal visible
+    /// Gets if there is a modal visible
     /// </summary>
-    public bool HasModal { get; set; }
+    public bool HasModal { get; init; }
+
+    /// <summary>
+    /// Gets if the log partial viewer is open 
+    /// </summary>
+    public bool HasLogPartialViewer { get; init; }
 }

@@ -318,7 +318,7 @@ namespace FileFlows.Client.Components.Inputs
         }
 
         private bool Disposed = false;
-        public void Dispose()
+        public virtual void Dispose()
         {
             Disposed = true;
             if (this.Field != null)

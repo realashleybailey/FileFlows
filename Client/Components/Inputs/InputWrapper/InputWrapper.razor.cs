@@ -1,3 +1,5 @@
+using Markdig;
+using Markdig.Extensions.AutoLinks;
 using Microsoft.Extensions.Logging;
 
 namespace FileFlows.Client.Components.Inputs
@@ -17,6 +19,7 @@ namespace FileFlows.Client.Components.Inputs
 
         private string HelpHtml = string.Empty;
         private string CurrentHelpText;
+        
         protected override void OnInitialized()
         {
             InitHelpText();
@@ -34,12 +37,23 @@ namespace FileFlows.Client.Components.Inputs
         private void InitHelpText()
         {
             CurrentHelpText = Input?.Help;
-            string help = Regex.Replace(Input?.Help ?? string.Empty, "<.*?>", string.Empty);
-            foreach (Match match in Regex.Matches(help, @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)", RegexOptions.Multiline))
+            // string help = Regex.Replace(Input?.Help ?? string.Empty, "<.*?>", string.Empty);
+            // foreach (Match match in Regex.Matches(help, @"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)", RegexOptions.Multiline))
+            // {
+            //     help = help.Replace(match.Value, $"<a rel=\"noreferrer\" target=\"_blank\" href=\"{HttpUtility.HtmlAttributeEncode(match.Value)}\">{HttpUtility.HtmlEncode(match.Value)}</a>");
+            // }
+            if (string.IsNullOrEmpty(Input?.Help))
             {
-                help = help.Replace(match.Value, $"<a rel=\"noreferrer\" target=\"_blank\" href=\"{HttpUtility.HtmlAttributeEncode(match.Value)}\">{HttpUtility.HtmlEncode(match.Value)}</a>");
+                this.HelpHtml = string.Empty;
             }
-            this.HelpHtml = help;
+            else
+            {
+                string help = Markdig.Markdown.ToHtml(Input.Help).Trim();
+                if (help.StartsWith("<p>") && help.EndsWith("</p>"))
+                    help = help[3..^4].Trim();
+                help = help.Replace("<a ", "<a rel=\"noreferrer\" target=\"_blank\" ");
+                this.HelpHtml = help;
+            }
         }
     }
 }

@@ -73,6 +73,7 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
             .Replace("File Flows", "FileFlows")
             .Replace("MKV", "MKV")
             .Replace("Mp4", "MP4")
+            .Replace("MP 4", "MP4")
             .Replace("Ffmpeg Builder", "FFMPEG Builder:");
     }
     

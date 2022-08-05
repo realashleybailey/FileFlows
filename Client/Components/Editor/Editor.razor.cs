@@ -186,7 +186,7 @@ public partial class Editor : ComponentBase, IDisposable
         this.SaveCallback = saveCallback;
         this.PromptUnsavedChanges = promptUnsavedChanges;
         if (promptUnsavedChanges && readOnly == false) 
-            this.CleanModelJson = expandoModel == null ? string.Empty : JsonSerializer.Serialize(expandoModel);
+            this.CleanModelJson = ModelToJsonForCompare(expandoModel);
         this.TypeName = typeName;
         this.Maximised = false;
         this.Uid = Guid.NewGuid().ToString();
@@ -300,9 +300,13 @@ public partial class Editor : ComponentBase, IDisposable
 
         if (PromptUnsavedChanges && ReadOnly == false)
         {
-            string currentModelJson = Model == null ? string.Empty : JsonSerializer.Serialize(Model);
+            string currentModelJson = ModelToJsonForCompare(Model);
             if(currentModelJson != CleanModelJson)
             {
+                Logger.Instance.ILog("CleanModelJson");
+                Logger.Instance.ILog(CleanModelJson);
+                Logger.Instance.ILog("currentModelJson");
+                Logger.Instance.ILog(currentModelJson);
                 bool confirmResult = await Confirm.Show("Labels.Confirm", "Labels.CancelMessage");
                 if(confirmResult == false)
                     return;
@@ -318,6 +322,13 @@ public partial class Editor : ComponentBase, IDisposable
 
         await this.WaitForRender();
         this.OnClosed?.Invoke();
+    }
+
+    private string ModelToJsonForCompare(ExpandoObject model)
+    {
+        string json = model == null ? string.Empty : JsonSerializer.Serialize(Model);
+        json = json.Replace("[]", "null");
+        return json;
     }
 
     /// <summary>

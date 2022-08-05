@@ -22,7 +22,17 @@
             }
         }
 
-        [Parameter] public string Title { get; set; }
+        private string _Title;
+
+        [Parameter]
+        public string Title
+        {
+            get => _Title;
+            set
+            {
+                _Title = Translater.TranslateIfNeeded(value);
+            }
+        }
 
         [Parameter]
         public RenderFragment ChildContent { get; set; }

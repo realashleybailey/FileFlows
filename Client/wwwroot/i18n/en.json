@@ -299,6 +299,10 @@
       }
     },
     "LibraryFile": {
+      "Tabs":{
+        "OriginalMetadata": "Original",
+        "FinalMetadata": "Final"
+      },
       "Fields": {
         "Name": "Original File",
         "Log": "Log",
@@ -314,7 +318,9 @@
         "ProcessingTime": "Processing Time",
         "OutputPath": "Output Path",
         "ExecutedNodes": "Executed Nodes",
-        "Node": "Processing Node"
+        "Node": "Processing Node",
+        "FinalMetadata": "Final Metadata",
+        "OriginalMetadata": "Original Metadata"
       }
     },
     "LibraryFiles": {

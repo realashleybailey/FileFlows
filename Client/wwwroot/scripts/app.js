@@ -196,6 +196,9 @@ window.ff = {
         let panel = document.getElementById(uid);
         if(!panel)
             return;
+        
+        if(panel.classList.contains('maximised'))
+            return;
 
         const BORDER_SIZE = 4;
 

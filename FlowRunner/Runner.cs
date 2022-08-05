@@ -147,6 +147,8 @@ public class Runner
 
         if(nodeParameters.OriginalMetadata != null)
             Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;
+        if (nodeParameters.Metadata != null)
+            Info.LibraryFile.FinalMetadata = nodeParameters.Metadata;
 
         await Complete();
         OnFlowCompleted?.Invoke(this, Info.LibraryFile.Status == FileStatus.Processed);

@@ -135,7 +135,24 @@ public class NodeParameters
     /// <summary>
     /// Gets or sets the original metadata for the input file
     /// </summary>
-    public Dictionary<string, object> OriginalMetadata { get; set; }
+    public Dictionary<string, object> OriginalMetadata { get; private set; }
+    
+    /// <summary>
+    /// Gets or sets the metadata for the file
+    /// </summary>
+    public Dictionary<string, object> Metadata { get; private set; }
+
+    /// <summary>
+    /// Sets the metadata for the file
+    /// </summary>
+    /// <param name="metadata">the metadata for the file</param>
+    public void SetMetadata(Dictionary<string, object> metadata)
+    {
+        if (OriginalMetadata == null)
+            OriginalMetadata = metadata;
+        else
+            Metadata = metadata;
+    }
 
 
     /// <summary>

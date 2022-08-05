@@ -1179,7 +1179,7 @@ hr {
     width: 1200px !important;
   }
 }
-.editor::after {
+.editor:not(.maximised)::after {
   content: "";
   background-color: var(--border-color);
   position: absolute;

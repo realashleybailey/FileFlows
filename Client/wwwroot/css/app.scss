@@ -797,7 +797,7 @@ input[type=file]{
 }
 
 
-.editor::after {
+.editor:not(.maximised)::after {
     content: '';
     background-color: var(--border-color);
     position: absolute;

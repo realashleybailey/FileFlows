@@ -127,6 +127,11 @@ public class LibraryFile : FileFlowObject
     /// Gets or sets the original metadata for a file
     /// </summary>
     public Dictionary<string, object> OriginalMetadata { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the final metadata for the file
+    /// </summary>
+    public Dictionary<string, object> FinalMetadata { get; set; }
 
 }
 

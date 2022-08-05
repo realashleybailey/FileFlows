@@ -91,12 +91,23 @@ namespace FileFlows.Client.Helpers
 
                 if (model.OriginalMetadata?.Any() == true)
                 {
-                    tabs.Add("Metadata", new List<ElementField>
+                    tabs.Add("Pages.LibraryFile.Tabs.OriginalMetadata", new List<ElementField>
                     {
                         new ()
                         {
                             InputType = FormInputType.Metadata,
                             Name = nameof(model.OriginalMetadata)
+                        }
+                    });
+                }
+                if (model.FinalMetadata?.Any() == true)
+                {
+                    tabs.Add("Pages.LibraryFile.Tabs.FinalMetadata", new List<ElementField>
+                    {
+                        new ()
+                        {
+                            InputType = FormInputType.Metadata,
+                            Name = nameof(model.FinalMetadata)
                         }
                     });
                 }

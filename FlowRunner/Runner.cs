@@ -145,6 +145,9 @@ public class Runner
         if (nodeParameters?.Logger is FlowLogger fl)
             Info.Log = fl.ToString();
 
+        if(nodeParameters.OriginalMetadata != null)
+            Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;
+
         await Complete();
         OnFlowCompleted?.Invoke(this, Info.LibraryFile.Status == FileStatus.Processed);
     }

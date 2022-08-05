@@ -1,0 +1,7 @@
+::deep .flow-tabs 
+{
+  max-height:100%;
+  .flow-tabs-content {
+    overflow: auto;
+  }
+}

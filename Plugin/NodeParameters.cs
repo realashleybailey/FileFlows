@@ -132,7 +132,12 @@ public class NodeParameters
     /// </summary>
     private bool Fake = false;
 
-    
+    /// <summary>
+    /// Gets or sets the original metadata for the input file
+    /// </summary>
+    public Dictionary<string, object> OriginalMetadata { get; set; }
+
+
     /// <summary>
     /// Constructs a node parameters instance used by the flow runner
     /// </summary>

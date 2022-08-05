@@ -1,56 +1,22 @@
-.table {
-  color: var(--color);
-}
-.table td {
-  color: rgba(var(--color-rgb), 0.7);
-}
-.table thead th {
-  border-color: var(--border-color);
-  font-weight: 600;
-  background: rgba(var(--input-background-rgb), 0.3);
-  padding: 0.25rem;
-}
-.table thead th:first-child {
-  border-left: 1px solid var(--border-color);
-}
-.table thead th:last-child {
-  border-right: 1px solid var(--border-color);
-}
-.table tbody td {
-  border-color: var(--border-color);
-  padding: 0.25rem;
-  border-top: none;
-  border-bottom: 1px solid var(--border-color);
-}
-.table tbody td:first-child {
-  border-left: 1px solid var(--border-color);
-}
-.table tbody td:last-child {
-  border-right: 1px solid var(--border-color);
-}
-.table tbody tr:hover td {
-  color: var(--input);
-  background: rgba(var(--accent-rgb), 0.3);
-}
-.table .output {
+.flowtable .output {
   width: 6rem;
   text-align: center;
 }
-.table .node {
+.flowtable .node {
   width: auto;
 }
-.table .time {
+.flowtable .time {
   width: 10rem;
 }
-.table .output-error td {
+.flowtable .output-error td {
   color: var(--error);
   font-weight: bold;
 }
-.table .output-exit td {
+.flowtable .output-exit td {
   color: var(--success);
   font-weight: bold;
 }
-.table .view-log i {
+.flowtable .view-log i {
   cursor: pointer;
 }
 

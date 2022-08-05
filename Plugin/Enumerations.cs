@@ -39,7 +39,8 @@ public enum FormInputType
     Password = 21,
     ExecutedNodes = 22,
     Table = 23,
-    Widget = 24
+    Widget = 24,
+    Metadata = 25
 }
 
 

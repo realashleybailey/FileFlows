@@ -131,6 +131,8 @@ public class WorkerController : Controller
                 libfile.OutputPath = info.LibraryFile.OutputPath;
                 libfile.Fingerprint = info.LibraryFile.Fingerprint;
                 libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
+                if (info.LibraryFile.OriginalMetadata != null)
+                    libfile.OriginalMetadata = info.LibraryFile.OriginalMetadata;
                 libfile.Status = info.LibraryFile.Status;
                 if (info.LibraryFile.ProcessingStarted > new DateTime(2020, 1, 1))
                     libfile.ProcessingStarted = info.LibraryFile.ProcessingStarted;

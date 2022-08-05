@@ -196,6 +196,12 @@
                 <InputExecutedNodes Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel Log=@log />
             }
             break;
+        case FormInputType.Metadata:
+            {
+                var oValue = GetValue<Dictionary<string, object>>(field.Name);
+                <InputMetadata Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel />
+            }
+            break;
         case FormInputType.Table:
             {
                 <p>ADDING A TABLE</p>

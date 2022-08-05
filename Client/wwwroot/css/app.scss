@@ -807,3 +807,59 @@ input[type=file]{
     height: 100%;
     cursor: ew-resize;
 }
+
+
+.flowtable 
+{
+    color: var(--color);
+    width:100%;
+    line-height:1.75rem;
+    
+    tr {
+        th:first-child, td:first-child {
+            padding-left:0.5rem;
+        }
+    }
+
+    td {
+        color: rgba(var(--color-rgb), 0.7);
+    }
+
+    thead th {
+        border-color: var(--border-color);
+
+        &:first-child {
+            border-left: 1px solid var(--border-color);
+        }
+
+        &:last-child {
+            border-right: 1px solid var(--border-color);
+        }
+
+        font-weight: 600;
+        background: rgba(var(--input-background-rgb), 0.3);
+        padding: 0.25rem;
+    }
+
+    tbody td {
+        border-color: var(--border-color);
+        padding: 0.25rem;
+        border-top: none;
+        border-bottom: 1px solid var(--border-color);
+
+        &:first-child {
+            border-left: 1px solid var(--border-color);
+        }
+
+        &:last-child {
+            border-right: 1px solid var(--border-color);
+        }
+    }
+
+    tbody tr:hover {
+        td {
+            color:var(--input);
+            background: rgba(var(--accent-rgb), 0.3);
+        }
+    }
+}

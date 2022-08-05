@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
 using Humanizer;
 using Microsoft.AspNetCore.Components;
@@ -106,6 +107,7 @@ public partial class NewFlowEditor : Editor
                             "Directory" => FormInputType.Folder,
                             "Switch" => FormInputType.Switch,
                             "Select" => FormInputType.Select,
+                            "Int" => FormInputType.Int,
                             _ => FormInputType.Text
                         }
                     };
@@ -117,6 +119,18 @@ public partial class NewFlowEditor : Editor
                                 PropertyNameCaseInsensitive = true
                             });
                         ef.Parameters.Add("Options", parameters.Options);
+                    }
+                    else if (ef.InputType == FormInputType.Int && field.Parameters != null)
+                    {
+                        var parameters = JsonSerializer.Deserialize<IntParameters>(
+                            JsonSerializer.Serialize(field.Parameters), new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            });
+                        if(parameters.Minimum != 0)
+                            ef.Parameters.Add("Min", parameters.Minimum);
+                        if(parameters.Maximum != 0)
+                            ef.Parameters.Add("Max", parameters.Maximum);
                     }
                     TemplateFields.Add(efName, new (field, ef));
                 }
@@ -419,6 +433,12 @@ public partial class NewFlowEditor : Editor
     private class SelectParameters
     {
         public List<ListOption> Options { get; set; }
+    }
+
+    private class IntParameters
+    {
+        public int Minimum { get; set; }
+        public int Maximum { get; set; }
     }
     
     private record TemplateFieldModel(TemplateField TemplateField, ElementField ElementField);

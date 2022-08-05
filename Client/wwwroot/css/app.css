@@ -1190,4 +1190,44 @@ hr {
   cursor: ew-resize;
 }
 
+.flowtable {
+  color: var(--color);
+  width: 100%;
+  line-height: 1.75rem;
+}
+.flowtable tr th:first-child, .flowtable tr td:first-child {
+  padding-left: 0.5rem;
+}
+.flowtable td {
+  color: rgba(var(--color-rgb), 0.7);
+}
+.flowtable thead th {
+  border-color: var(--border-color);
+  font-weight: 600;
+  background: rgba(var(--input-background-rgb), 0.3);
+  padding: 0.25rem;
+}
+.flowtable thead th:first-child {
+  border-left: 1px solid var(--border-color);
+}
+.flowtable thead th:last-child {
+  border-right: 1px solid var(--border-color);
+}
+.flowtable tbody td {
+  border-color: var(--border-color);
+  padding: 0.25rem;
+  border-top: none;
+  border-bottom: 1px solid var(--border-color);
+}
+.flowtable tbody td:first-child {
+  border-left: 1px solid var(--border-color);
+}
+.flowtable tbody td:last-child {
+  border-right: 1px solid var(--border-color);
+}
+.flowtable tbody tr:hover td {
+  color: var(--input);
+  background: rgba(var(--accent-rgb), 0.3);
+}
+
 /*# sourceMappingURL=app.css.map */

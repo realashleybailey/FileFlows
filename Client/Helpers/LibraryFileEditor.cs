@@ -89,6 +89,18 @@ namespace FileFlows.Client.Helpers
                     }
                 });
 
+                if (model.OriginalMetadata?.Any() == true)
+                {
+                    tabs.Add("Metadata", new List<ElementField>
+                    {
+                        new ()
+                        {
+                            InputType = FormInputType.Metadata,
+                            Name = nameof(model.OriginalMetadata)
+                        }
+                    });
+                }
+
                 string downloadUrl = $"{ApIUrl}/{libraryItemUid}/log/download";
                 #if(DEBUG)
                 downloadUrl = "http://localhost:6868" + downloadUrl;

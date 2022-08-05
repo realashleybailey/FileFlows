@@ -1,0 +1,35 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<Dictionary<string, object>>
+
+@if (Value?.Any() == true)
+{
+    <table class="flowtable input-metadata">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var kv in Value)
+            {
+                if (kv.Value == null)
+                {
+                    continue;
+                }
+                <tr>
+                    <td>@kv.Key</td>
+                    @if (kv.Key.Contains("Bitrate"))
+                    {
+                        <td>@FormatBitrate(kv.Value)</td>
+                    }
+                    else
+                    {
+                        <td>@kv.Value?.ToString()</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

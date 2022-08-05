@@ -123,6 +123,11 @@ public class LibraryFile : FileFlowObject
     /// </summary>
     public DateTime LastWriteTime { get; set; }
     
+    /// <summary>
+    /// Gets or sets the original metadata for a file
+    /// </summary>
+    public Dictionary<string, object> OriginalMetadata { get; set; }
+
 }
 
 /// <summary>

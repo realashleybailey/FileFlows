@@ -7,7 +7,7 @@
 {
     <div class="editor-wrapper">
         <div class="background-overlay"></div>
-        <div class="editor @(Maximised ? "maximised" : "") @(Large ? "large" : "") @(TypeName?.Dehumanize()) @(ReadOnly ? "readonly" : "")">
+        <div id=@Uid class="editor @(Maximised ? "maximised" : "") @(Large ? "large" : "") @(TypeName?.Dehumanize()) @(ReadOnly ? "readonly" : "")">
 
             <ViContainer Title="@Title" Icon="@Icon" FullWidth=@true AlwaysShowTitle=@true Maximise=true OnMaximised=@OnMaximised>
 
@@ -16,14 +16,14 @@
                     {
                         <a href="@DownloadUrl" class="btn btn-download" target="_blank"><span>@lblDownloadButton</span></a>
                     }
-                    
+
                     @if (ReadOnly)
                     {
                         <button @onclick=@Cancel>@lblClose</button>
                     }
                     else
                     {
-                        <button @onclick=@Save> 
+                        <button @onclick=@Save>
                             @if (IsSaving)
                             {
                                 @lblSaving
@@ -36,42 +36,43 @@
                         <button @onclick=@Cancel>@lblCancel</button>
                     }
 
-                    @if(string.IsNullOrEmpty(HelpUrl) == false)
+                    @if (string.IsNullOrEmpty(HelpUrl) == false)
                     {
                         <button @onclick=@OpenHelp>@lblHelp</button>
                     }
                 </Head>
 
                 <Body>
-                    <CascadingValue IsFixed="true" Value="this">
-                        <div class="fields">
-                            @if(string.IsNullOrEmpty(EditorDescription) == false){
-                                <div class="description">@EditorDescription</div>
-                            }
-                            @if (Fields?.Any() == true)
-                            {
-                                <FlowPanel Fields=@Fields OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>  
+                <CascadingValue IsFixed="true" Value="this">
+                    <div class="fields">
+                        @if (string.IsNullOrEmpty(EditorDescription) == false)
+                        {
+                            <div class="description">@EditorDescription</div>
+                        }
+                        @if (Fields?.Any() == true)
+                        {
+                            <FlowPanel Fields=@Fields OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
 
-                                @if (AdditionalFields != null)
-                                {
-                                    @AdditionalFields
-                                }
-                                <div class="empty"></div>
-                            }
-                            @if(Tabs?.Any() == true)
+                            @if (AdditionalFields != null)
                             {
-                                <FlowTabs>
-                                @foreach(var tab in Tabs)
+                                @AdditionalFields
+                            }
+                            <div class="empty"></div>
+                        }
+                        @if (Tabs?.Any() == true)
+                        {
+                            <FlowTabs>
+                                @foreach (var tab in Tabs)
                                 {
                                     <FlowTab Title=@tab.Key>
                                         <FlowPanel Fields=@tab.Value OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
 
                                     </FlowTab>
                                 }
-                                </FlowTabs>
-                            }
-                        </div>
-                    </CascadingValue>
+                            </FlowTabs>
+                        }
+                    </div>
+                </CascadingValue>
                 </Body>
             </ViContainer>
         </div>

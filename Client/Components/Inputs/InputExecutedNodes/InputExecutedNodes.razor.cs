@@ -23,6 +23,9 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
     private string lblClose, lblLogPartialNotAvailable, lblViewLog;
     private bool Maximised { get; set; }
 
+    private bool InitializeResizer = false;
+    private string ResizerUid;
+
     private List<string> _LogLines;
     private List<string> LogLines
     {
@@ -44,6 +47,13 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
         this.lblLogPartialNotAvailable = Translater.Instant("Labels.LogPartialNotAvailable");
         this.lblViewLog = Translater.Instant("Labels.ViewLog");
         App.Instance.OnEscapePushed += InstanceOnOnEscapePushed;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (InitializeResizer)
+            await jsRuntime.InvokeVoidAsync("ff.resizableEditor", ResizerUid);
     }
 
     private void InstanceOnOnEscapePushed(OnEscapeArgs args)
@@ -124,6 +134,8 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
 
         PartialLog = sublog;
         PartialLogNode = node;
+        ResizerUid = Guid.NewGuid().ToString();
+        InitializeResizer = true;
     }
     
     

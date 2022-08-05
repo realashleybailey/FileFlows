@@ -469,13 +469,15 @@ public class Runner
                         return FileStatus.Processed;
                     }
 
-                    part = outputNode == null ? null : flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
-                    if (part == null)
+                    var newPart = outputNode == null ? null : flow.Parts.Where(x => x.Uid == outputNode.InputNode).FirstOrDefault();
+                    if (newPart == null)
                     {
                         // couldn't find the connection, maybe bad data, but flow has now finished
                         nodeParameters.Logger?.WLog("Couldn't find output node, flow completed: " + outputNode?.Output);
                         return FileStatus.Processed;
                     }
+
+                    part = newPart;
                 }
             }
             catch (Exception ex)

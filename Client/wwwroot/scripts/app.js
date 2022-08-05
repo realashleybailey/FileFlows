@@ -192,4 +192,32 @@ window.ff = {
         };
         document.addEventListener("keydown", window.CodeCaptureListener);
     },
+    resizableEditor: function(uid) {
+        let panel = document.getElementById(uid);
+        if(!panel)
+            return;
+
+        const BORDER_SIZE = 4;
+
+        function resize(e){
+            let bWidth = document.body.clientWidth;
+            let width = bWidth - e.x;
+            panel.style.width = width + "px";
+        }
+
+        panel.addEventListener("mousedown", function(e){
+            if(e.target !== panel)
+                return;
+            if (e.offsetX < BORDER_SIZE) {
+                document.addEventListener("mousemove", resize, false);
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, false);
+
+        document.addEventListener("mouseup", function(){
+            document.removeEventListener("mousemove", resize, false);
+        }, false);        
+    }
 };

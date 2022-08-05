@@ -28,6 +28,9 @@ public partial class Editor : ComponentBase, IDisposable
     public string Title { get; set; }
     public string HelpUrl { get; set; }
     public string Icon { get; set; }
+
+    private string Uid = Guid.NewGuid().ToString();
+    private bool UpdateResizer; // when set to true, the afterrender method will reinitailize the resizer in javascript
     
     protected bool Maximised { get; set; }
 
@@ -109,6 +112,8 @@ public partial class Editor : ComponentBase, IDisposable
 
     protected override void OnAfterRender(bool firstRender)
     {
+        if(UpdateResizer)
+            jsRuntime.InvokeVoidAsync("ff.resizableEditor", this.Uid);
         if (FocusFirst)
         {
             foreach (var input in RegisteredInputs)
@@ -184,6 +189,8 @@ public partial class Editor : ComponentBase, IDisposable
             this.CleanModelJson = expandoModel == null ? string.Empty : JsonSerializer.Serialize(expandoModel);
         this.TypeName = typeName;
         this.Maximised = false;
+        this.Uid = Guid.NewGuid().ToString();
+        this.UpdateResizer = true;
         if (noTranslateTitle)
             this.Title = title;
         else

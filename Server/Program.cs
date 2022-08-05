@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Net;
-using System.Reflection;
 using Avalonia;
 using FileFlows.Plugin;
 using FileFlows.Server.Database;
@@ -9,7 +8,6 @@ using FileFlows.Server.Helpers;
 using FileFlows.Server.Ui;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
-using NPoco;
 
 namespace FileFlows.Server;
 

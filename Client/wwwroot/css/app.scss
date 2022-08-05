@@ -796,3 +796,14 @@ input[type=file]{
     }    
 }
 
+
+.editor::after {
+    content: '';
+    background-color: var(--border-color);
+    position: absolute;
+    left: 0;
+    top:0;
+    width: 4px;
+    height: 100%;
+    cursor: ew-resize;
+}

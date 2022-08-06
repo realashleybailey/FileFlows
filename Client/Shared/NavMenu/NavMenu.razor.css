@@ -11,19 +11,11 @@
   height: 3.5rem;
 }
 
-.navbar-brand {
-  margin: 0.25rem 0 0 0.75rem;
-}
-
 .navbar-brand, .page-title {
   font-size: 1.5rem;
   font-weight: bold;
   display: none;
   cursor: pointer;
-}
-.navbar-brand.navbar-brand, .page-title.navbar-brand {
-  font-style: italic;
-  color: var(--accent) !important;
 }
 .navbar-brand svg, .page-title svg {
   margin-right: 0.25rem;
@@ -51,6 +43,8 @@
 .nav-menu-group {
   padding-left: 1rem;
   text-transform: uppercase;
+  font-weight: 700;
+  padding-top: 0.5rem;
 }
 .nav-menu-group:first-of-type {
   padding-top: 1.5rem;
@@ -67,7 +61,6 @@
   height: 2.3rem;
   display: flex;
   align-items: center;
-  line-height: 2.3rem;
   color: var(--color) !important;
   border-left: solid 0.5rem transparent;
 }

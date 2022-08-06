@@ -12,6 +12,12 @@
     src:url('webfonts/SourceSansPro-Regular.woff') format('woff');
 }
 
+@font-face {
+    font-family: 'Inter';
+    src: url("webfonts/Inter-VariableFont_slnt,wght.ttf") format("truetype-variations");
+}
+
+
 html {
     overflow: hidden;
 }
@@ -22,9 +28,16 @@ html {
     }
 }
 
+//@import url('https://rsms.me/inter/inter.css');
+//html { font-family: 'Inter', sans-serif; }
+//@supports (font-variation-settings: normal) {
+//    html { font-family: 'Inter var', sans-serif; }
+//}
+
 html, body {
-    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 16px;
+    //font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 14px;
     font-weight:400;
     color: var(--color) !important;
     background: var(--base) !important;
@@ -386,6 +399,7 @@ input[type=file]{
         height: 2.5rem;
         color: var(--color);
         padding: 0.75rem 0.75rem 0;
+        font-weight:600;
         i:not(.fa-trash) {
             color:var(--accent);
             margin-right: 0.5rem;
@@ -424,13 +438,14 @@ input[type=file]{
         
         table {
             width:100%;
-            font-size:0.85rem !important;
+            font-size:0.9rem !important;
             max-height: 100%;
             height: 100%;
+            margin:0.5rem 0.25rem 0;
         }
         tr td {
             border-top: solid 1px rgba(var(--color-rgb), 0.1);
-            padding: 0.18rem;
+            padding: 0.25rem;
         }
         td a {
             cursor:pointer;
@@ -593,9 +608,19 @@ input[type=file]{
         > div {
             max-width:1400px;
         }
-    }
-    
+    }    
 }
+
+.page:not(.collapsed) .navbar-brand 
+{
+    margin: .75rem 0 0 .75rem;
+    background:url('/logo.svg');
+    width: 11rem;
+    height: 2.5rem;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 
 .draghandle {
     cursor:grab;
@@ -672,7 +697,7 @@ input[type=file]{
     display: inline-block;
     border: solid 1px var(--accent);
     position:relative;
-    top:2px;
+    top:1px;
     margin-left:0.5rem;
     *
     {
@@ -702,7 +727,7 @@ input[type=file]{
         border:none;
         background:transparent;
         color:var(--color);
-        height:2.076rem;
+        height:2rem;
         outline:none !important;
         padding-right:4rem;
         padding-left:2rem;

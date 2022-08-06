@@ -67,9 +67,6 @@
         }
     }
 }
-.flowtable-data {
-    overflow:hidden;
-}
 @media screen and (max-width: 578px) {
     .flowtable-data {
         font-size: 0.85rem;
@@ -134,10 +131,12 @@
 
 .flowtable-data {
     position: absolute;
+    overflow:hidden;
     top: 1.75rem;
     bottom: 0;
     left: 0;
     right: 0;
+    font-size:0.9rem;
 }
 
 .flowtable-body::-webkit-scrollbar-track {

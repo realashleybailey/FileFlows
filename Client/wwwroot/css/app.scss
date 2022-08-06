@@ -8,13 +8,8 @@
 @use 'editor';
 
 @font-face {
-    font-family: 'Source Sans Pro';
-    src:url('webfonts/SourceSansPro-Regular.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'Inter';
-    src: url("webfonts/Inter-VariableFont_slnt,wght.ttf") format("truetype-variations");
+    font-family: 'Montserrat';
+    src: url("webfonts/Montserrat-VariableFont_wght.ttf") format("truetype-variations"); 
 }
 
 
@@ -28,15 +23,8 @@ html {
     }
 }
 
-//@import url('https://rsms.me/inter/inter.css');
-//html { font-family: 'Inter', sans-serif; }
-//@supports (font-variation-settings: normal) {
-//    html { font-family: 'Inter var', sans-serif; }
-//}
-
 html, body {
-    //font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 14px;
     font-weight:400;
     color: var(--color) !important;
@@ -394,6 +382,7 @@ input[type=file]{
 .widget {
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base), 0.2);
+    font-size:0.9rem;
 
     .title {
         height: 2.5rem;
@@ -697,7 +686,7 @@ input[type=file]{
     display: inline-block;
     border: solid 1px var(--accent);
     position:relative;
-    top:1px;
+    height: 2.1875rem;
     margin-left:0.5rem;
     *
     {
@@ -726,14 +715,15 @@ input[type=file]{
         width:18rem;
         border:none;
         background:transparent;
+        font-size:0.8rem;
+        text-transform: uppercase;
         color:var(--color);
-        height:2rem;
         outline:none !important;
-        padding-right:4rem;
-        padding-left:2rem;
+        padding: 1px 4rem 0 2rem;
         -moz-appearance: none;
         -webkit-appearance: none;
         appearance:none;
+        height:100%;
     }
     button {
         width:2rem !important;

@@ -467,6 +467,14 @@ export class BarChart extends FFChart
                 },
                 labels : {
                     show: false
+                },
+                axisBorder: {
+                    show: false
+                },
+            },
+            yaxis: {
+                axisBorder: {
+                    show: false
                 }
             }
         };

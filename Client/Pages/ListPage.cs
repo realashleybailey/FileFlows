@@ -156,7 +156,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
 #endif
     }
 
-    protected virtual string DeleteMessage => "Labels.DeleteItems";
+    protected virtual string DeleteMessage => "Labels.DeleteLibraryFiles";
     
     protected virtual string DeleteUrl => ApiUrl;
 
@@ -165,7 +165,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new U[] { };
         if (uids.Length == 0)
             return; // nothing to delete
-        if (await Confirm.Show("Labels.Delete",
+        if (await Confirm.Show("Labels.Remove",
             Translater.Instant(DeleteMessage, new { count = uids.Length })) == false)
             return; // rejected the confirm
 

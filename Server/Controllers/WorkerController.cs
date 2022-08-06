@@ -133,6 +133,8 @@ public class WorkerController : Controller
                 libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
                 if (info.LibraryFile.OriginalMetadata != null)
                     libfile.OriginalMetadata = info.LibraryFile.OriginalMetadata;
+                if (info.LibraryFile.FinalMetadata != null)
+                    libfile.FinalMetadata = info.LibraryFile.FinalMetadata;
                 libfile.Status = info.LibraryFile.Status;
                 if (info.LibraryFile.ProcessingStarted > new DateTime(2020, 1, 1))
                     libfile.ProcessingStarted = info.LibraryFile.ProcessingStarted;

@@ -300,8 +300,8 @@
     },
     "LibraryFile": {
       "Tabs":{
-        "OriginalMetadata": "Original",
-        "FinalMetadata": "Final"
+        "OriginalMetadata": "Input",
+        "FinalMetadata": "Output"
       },
       "Fields": {
         "Name": "Original File",

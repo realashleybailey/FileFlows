@@ -14,6 +14,7 @@ using System.ComponentModel;
 using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.JSInterop;
 
@@ -328,6 +329,11 @@ public partial class Editor : ComponentBase, IDisposable
     {
         string json = model == null ? string.Empty : JsonSerializer.Serialize(Model);
         json = json.Replace("[]", "null");
+        // remove default values, templates do not always set these
+        json = Regex.Replace(json, @"\""[^\""]+""[\s]*:[\s]*(null|false|0)(,)?", string.Empty);
+        while (json.IndexOf(",,") > 0)
+            json = json.Replace(",,", ",");
+        json = json.Replace(",}", "}");
         return json;
     }
 

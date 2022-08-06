@@ -402,14 +402,19 @@ public partial class NewFlowEditor : Editor
 
         // shake lose any nodes that have no connections
         // stop at one to skip the input node
-        var inputNodes = flow.Parts.SelectMany(x => x.OutputConnections.Select(x => x.InputNode)).ToList();
-        for (int i = flow.Parts.Count - 1; i >= 1; i--)
+        int count;
+        do
         {
-            if (inputNodes.Contains(flow.Parts[i].Uid) == false)
+            var inputNodes = flow.Parts.SelectMany(x => x.OutputConnections.Select(x => x.InputNode)).ToList();
+            count = flow.Parts.Count;
+            for (int i = flow.Parts.Count - 1; i >= 1; i--)
             {
-                flow.Parts.RemoveAt(i);
+                if (inputNodes.Contains(flow.Parts[i].Uid) == false)
+                {
+                    flow.Parts.RemoveAt(i);
+                }
             }
-        }
+        } while (count != flow.Parts.Count); // loop over as we may have removed a connection that now makes other nodes disconnected/redundant
 
         Logger.Instance.ILog("Flow", flow);
 

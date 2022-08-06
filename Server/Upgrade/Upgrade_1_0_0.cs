@@ -18,6 +18,7 @@ public class Upgrade_1_0_0
         RenameToolsToVariables();
         MoveUserScripts();
         RemoveOldSystemScripts();
+        RemoveOldTemplates();
     }
 
     private void RenameToolsToVariables()
@@ -50,6 +51,17 @@ public class Upgrade_1_0_0
         if (oldDir.Exists == false)
             return;
         foreach(var file in oldDir.GetFiles("*.js"))
+            file.Delete();
+    }
+
+    private void RemoveOldTemplates()
+    {
+        // templates are now in sub folders
+        Logger.Instance.ILog("Removing old system scripts");
+        var oldDir = new DirectoryInfo(DirectoryHelper.TemplateDirectoryFlow);
+        if (oldDir.Exists == false)
+            return;
+        foreach(var file in oldDir.GetFiles("*.json"))
             file.Delete();
     }
 }

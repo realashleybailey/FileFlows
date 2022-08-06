@@ -12,9 +12,9 @@ public partial class InputMetadata : Input<Dictionary<string, object>>
         {
             var bitrate = je.GetDouble();
             if (bitrate > 1_000_000)
-                return bitrate / 1_000_000 + " Mbps";
+                return Math.Round(bitrate / 1_000_000, 1) + " Mbps";
             else if(bitrate > 1_000)
-                return bitrate / 1_000 + " Kbps";
+                return Math.Round(bitrate / 1_000, 1) + " Kbps";
             return bitrate + " bps";
         }
 

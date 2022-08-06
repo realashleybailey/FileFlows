@@ -183,9 +183,8 @@ public class LibraryController : ControllerStore<Library>
     [HttpGet("templates")]
     public Dictionary<string, List<Library>> GetTemplates()
     {
-        Dictionary<string, List<Library>> templates = new();
-        templates.Add(string.Empty, new List<Library>());
-        templates.Add("General", new List<Library>());
+        SortedDictionary<string, List<Library>> templates = new(StringComparer.OrdinalIgnoreCase);
+        var lstGeneral = new List<Library>();
         foreach (var tf in GetTemplateFiles())
         {
             try
@@ -198,9 +197,7 @@ public class LibraryController : ControllerStore<Library>
                     PropertyNameCaseInsensitive = true
                 });
                 string group = jst.Group ?? string.Empty;
-                if (templates.ContainsKey(group) == false)
-                    templates.Add(group, new List<Library>());
-                templates[group].Add(new Library
+                var library = new Library
                 {
                     Enabled = true,
                     FileSizeDetectionInterval = jst.FileSizeDetectionInterval,
@@ -212,12 +209,29 @@ public class LibraryController : ControllerStore<Library>
                     Priority = jst.Priority,
                     ScanInterval = jst.ScanInterval,
                     ReprocessRecreatedFiles = jst.ReprocessRecreatedFiles
-                });
+                };
+                if (group == "General")
+                    lstGeneral.Add(library);
+                else
+                {
+                    if (templates.ContainsKey(group) == false)
+                        templates.Add(group, new List<Library>());
+                    templates[group].Add(library);
+                }
             }
             catch (Exception) { }
         }
 
-        return templates.Where(x => x.Value.Any()).ToDictionary(x => x.Key, x => x.Value);
+        var dict = new Dictionary<string, List<Library>>();
+        if(lstGeneral.Any())
+            dict.Add("General", lstGeneral.OrderBy(x => x.Name.ToLowerInvariant()).ToList());
+        foreach (var kv in templates)
+        {
+            if(kv.Value.Any())
+                dict.Add(kv.Key, kv.Value.OrderBy(x => x.Name.ToLowerInvariant()).ToList());
+        }
+
+        return dict;
     }
 
     /// <summary>

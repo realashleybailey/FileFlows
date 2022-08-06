@@ -553,6 +553,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;
         existing.ExecutedNodes = file.ExecutedNodes ?? new List<ExecutedNode>();
+        if (file.OriginalMetadata?.Any() == true)
+            existing.OriginalMetadata = file.OriginalMetadata;
+        if (file.FinalMetadata?.Any() == true)
+            existing.FinalMetadata = file.FinalMetadata;
         var updated = await base.Update(existing);
         
         if(DbHelper.UseMemoryCache == false)

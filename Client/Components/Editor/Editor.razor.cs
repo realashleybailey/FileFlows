@@ -191,15 +191,15 @@ public partial class Editor : ComponentBase, IDisposable
         this.ReadOnly = args.ReadOnly;
         this.Large = args.Large;
         this.ShowDownload = string.IsNullOrWhiteSpace(args.DownloadUrl) == false;
-        this.lblDownloadButton = Translater.TranslateIfNeeded(lblDownloadButton);
+        this.lblDownloadButton = Translater.TranslateIfNeeded(args.DownloadButtonLabel);
         this.DownloadUrl = args.DownloadUrl;
         this.Visible = true;
         this.HelpUrl = args.HelpUrl ?? string.Empty;
         this.AdditionalFields = args.AdditionalFields;
 
 
-        lblSave = lblSave.EmptyAsNull() ?? "Labels.Save";
-        this.lblCancel = Translater.TranslateIfNeeded(lblCancel.EmptyAsNull() ?? "Labels.Cancel");
+        this.lblSave = args.SaveLabel.EmptyAsNull() ?? "Labels.Save";
+        this.lblCancel = Translater.TranslateIfNeeded(args.CancelLabel.EmptyAsNull() ?? "Labels.Cancel");
 
         if (lblSave == "Labels.Save") {
             this.lblSaving = Translater.Instant("Labels.Saving");

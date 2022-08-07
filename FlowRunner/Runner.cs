@@ -587,20 +587,22 @@ public class Runner
             File.Delete(file);
 
             // check if there are runtime specific files that need to be moved
-            foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64" })
+            foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
             {
                 var runtimeDir = new DirectoryInfo(Path.Combine(destDir, "runtimes", rdir));
                 nodeParameters.Logger?.ILog("Searching for runtime directory: " + runtimeDir.FullName);
                 if (runtimeDir.Exists)
                 {
-                    foreach (var dll in runtimeDir.GetFiles("*.dll", SearchOption.AllDirectories))
+                    foreach (var rfile in runtimeDir.GetFiles("*.*", SearchOption.AllDirectories))
                     {
                         try
                         {
+                            if (Regex.IsMatch(rfile.Name, @"\.(dll|so)$") == false)
+                                continue;
 
-                            nodeParameters.Logger?.ILog("Trying to move file: \"" + dll.FullName + "\" to \"" + destDir + "\"");
-                            dll.MoveTo(Path.Combine(destDir, dll.Name));
-                            nodeParameters.Logger?.ILog("Moved file: \"" + dll.FullName + "\" to \"" + destDir + "\"");
+                            nodeParameters.Logger?.ILog("Trying to move file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
+                            rfile.MoveTo(Path.Combine(destDir, rfile.Name));
+                            nodeParameters.Logger?.ILog("Moved file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
                         }
                         catch (Exception ex)
                         {

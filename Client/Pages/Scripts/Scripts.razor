@@ -103,7 +103,7 @@
                 </Header>
                 <Cell Context="item">
                     <span>
-                        import { @item.Name } from 'Shared/@(item.Name).js';
+                        import { @item.Name } from 'Shared/@(item.Name)';
                     </span>
                 </Cell>
             </FlowTableColumn>
@@ -115,3 +115,4 @@
 </PageView>
 
 <ScriptBrowser @ref="ScriptBrowser" />
+<FileFlows.Client.Components.Dialogs.ImportScript @ref="ScriptImporter" />

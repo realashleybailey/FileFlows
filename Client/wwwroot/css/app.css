@@ -391,7 +391,11 @@ a.btn {
 .editor-wrapper .background-overlay {
   z-index: 5 !important;
 }
-.editor-wrapper .top-row button + button {
+.editor-wrapper .top-row .other {
+  display: flex;
+  flex-direction: row;
+}
+.editor-wrapper .top-row a, .editor-wrapper .top-row button, .editor-wrapper .top-row input {
   margin-left: 0.25rem;
 }
 @media screen and (min-width: 850px) {

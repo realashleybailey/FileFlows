@@ -124,7 +124,7 @@ public partial class PluginBrowser : ComponentBase
 
     private async Task View(PluginPackageInfo plugin)
     {
-        await Editor.Open("Pages.Plugins", plugin.Name, new List<ElementField>
+        await Editor.Open(new () { TypeName = "Pages.Plugins", Title = plugin.Name, Fields = new List<ElementField>
         {
             new ElementField
             {
@@ -172,7 +172,7 @@ public partial class PluginBrowser : ComponentBase
                     }
                 }
             },
-        }, plugin, readOnly: true);
+        }, Model = plugin, ReadOnly= true});
     }
 
 }

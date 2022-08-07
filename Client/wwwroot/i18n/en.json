@@ -97,6 +97,12 @@
       "Title": "Import Flow",
       "Message": "Select an exported flow to import into the system."
     },
+    "ImportScript":{
+      "Title":"Import Script",
+      "Messages":{
+        "NoMoreImports":"There are no additional imports available to this script"
+      }
+    },
     "PauseDialog":
     {
       "Title":"Pause Processing",

@@ -34,7 +34,10 @@ public partial class Libraries : ListPage<Guid, Library>
         tabs.Add("General", tabGeneral);
         tabs.Add("Schedule", TabSchedule(library));
         tabs.Add("Advanced", TabAdvanced(library));
-        var result = await Editor.Open("Pages.Library", "Pages.Library.Title", null, library, saveCallback: Save, tabs: tabs);
+        var result = await Editor.Open(new()
+        {
+            TypeName = "Pages.Library", Title = "Pages.Library.Title", Model = library, SaveCallback = Save, Tabs = tabs
+        });
         if (efTemplate != null)
         {
             efTemplate.ValueChanged -= TemplateValueChanged;

@@ -17,8 +17,14 @@
     z-index: 5 !important;
   }
 
-  .top-row button + button {
-    margin-left:0.25rem;
+  .top-row {
+    .other {
+      display: flex;
+      flex-direction: row;
+    }
+    a, button, input {
+      margin-left: 0.25rem;
+    }
   }
 
 

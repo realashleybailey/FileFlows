@@ -13,10 +13,11 @@ public partial class InputCode : Input<string>, IDisposable
 {
     private bool Updating = false;
     private string InitialValue;
-
+    
     private MonacoEditor CodeEditor { get; set; }
 
-    private Dictionary<string, object> _Variables = new Dictionary<string, object>();
+    private Dictionary<string, object> _Variables = new ();
+    
     [Parameter]
     public Dictionary<string, object> Variables
     {
@@ -138,4 +139,31 @@ public partial class InputCode : Input<string>, IDisposable
             this.Editor.OnClosed -= Editor_Closed;
         }
     }
+
+    /// <summary>
+    /// Adds imports to the current code
+    /// </summary>
+    /// <param name="imports">the imports to add</param>
+    public async Task AddImports(List<string> imports)
+    {
+        bool changed = false;
+        string code = await CodeEditor.GetValue() ?? string.Empty;
+        foreach (var item in imports)
+        {
+            string import = $"import {{ {item} }} from 'Shared/{item}'";
+            if (code.IndexOf(import, StringComparison.Ordinal) >= 0)
+                continue;
+            code = import + "\n" + code;
+            changed = true;
+        }
+
+        if(changed)
+            this.Value = code;
+    }
+    
+    /// <summary>
+    /// Gets the code from the editor
+    /// </summary>
+    /// <returns>the code from the editor</returns>
+    public Task<string> GetCode() => CodeEditor.GetValue() ; 
 }

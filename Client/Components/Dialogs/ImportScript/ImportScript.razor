@@ -1,0 +1,24 @@
+@namespace FileFlows.Client.Components.Dialogs
+
+<Modal Title="@Title" Visible="Visible">
+
+    <Body>
+    <ul>
+        @foreach (var opt in AvailableScript ?? new List<FileFlows.Plugin.ListOption>())
+        {
+            <li>
+                <label>
+                    <span>
+                        <input type="checkbox" checked=@(CheckedItems.Contains(opt.Value) ? "checked" : null) @onchange="(e) => OnChange(e, opt)" @onclick:stopPropagation />
+                    </span>
+                    <span>@opt.Label</span>
+                </label>
+            </li>
+        }
+        </ul>
+    </Body>
+    <Footer>
+        <button @onclick=@Accept disabled="@(CheckedItems.Count > 0 ? null : "disabled")">@lblImport</button>
+        <button @onclick=@Cancel>@lblCancel</button>
+    </Footer>
+</Modal>

@@ -91,7 +91,6 @@ window.ffCode = {
             }
             let js = "const Variables = " + JSON.stringify(actualVaraibles);
             monaco.editor.createModel(js, "javascript");
-
         }
     }
 }

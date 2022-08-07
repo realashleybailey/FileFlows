@@ -30,8 +30,12 @@ public partial class Nodes : ListPage<Guid, ProcessingNode>
             ? string.Empty
             : "http://docs.fileflows.com/guides/external-processing-node";
 
-        var result = await Editor.Open("Pages.ProcessingNode", "Pages.ProcessingNode.Title", null, node, tabs: tabs, large: true,
-          saveCallback: Save, helpUrl: helpUrl);
+        var result = await Editor.Open(new()
+        {
+            TypeName = "Pages.ProcessingNode", Title = "Pages.ProcessingNode.Title", Model = node, Tabs = tabs,
+            Large = true,
+            SaveCallback = Save, HelpUrl = helpUrl
+        });
 #endif
         return false;
     }

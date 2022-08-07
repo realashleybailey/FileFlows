@@ -16,6 +16,11 @@
                     {
                         <a href="@DownloadUrl" class="btn btn-download" target="_blank"><span>@lblDownloadButton</span></a>
                     }
+                    
+                    @foreach (var btn in AdditionalButtons)
+                    {
+                        <button @onclick=@((e) => btn.Clicked(this, e))>@btn.Label</button>
+                    }
 
                     @if (ReadOnly)
                     {

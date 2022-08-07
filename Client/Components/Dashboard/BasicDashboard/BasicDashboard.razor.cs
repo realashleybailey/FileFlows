@@ -250,7 +250,11 @@ public partial class BasicDashboard
             }
         });
 
-        await Editor.Open("Pages.Dashboard", worker.LibraryFile.Name, fields, new { Log = log }, large: true, readOnly: true);
+        await Editor.Open(new()
+        {
+            TypeName = "Pages.Dashboard", Title = worker.LibraryFile.Name, Fields = fields, Model = new { Log = log },
+            Large = true, ReadOnly = true
+        });
     }
 
     private async Task<RequestResult<string>> GetLog(string url)

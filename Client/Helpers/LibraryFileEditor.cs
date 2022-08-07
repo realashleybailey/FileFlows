@@ -117,13 +117,13 @@ namespace FileFlows.Client.Helpers
                 downloadUrl = "http://localhost:6868" + downloadUrl;
                 #endif
 
-                await editor.Open("Pages.LibraryFile", model.RelativePath, null, model, tabs: tabs, large: true, readOnly: true, noTranslateTitle: true,
-                    lblDownloadButton: "Labels.DownloadLog", downloadUrl: downloadUrl);
+                await editor.Open(new () { TypeName = "Pages.LibraryFile", Title = model.RelativePath, Model = model, Tabs = tabs, Large = true, ReadOnly = true, NoTranslateTitle = true,
+                    DownloadButtonLabel = "Labels.DownloadLog", DownloadUrl = downloadUrl});
             }
             else
             {
                 // just show basic info
-                await editor.Open("Pages.LibraryFile", model.RelativePath, GetInfoTab(model), model, large: true, readOnly: true, noTranslateTitle: true);
+                await editor.Open(new () { TypeName = "Pages.LibraryFile", Title = model.RelativePath, Fields = GetInfoTab(model), Model = model, Large = true, ReadOnly = true, NoTranslateTitle = true});
             }
         }
 

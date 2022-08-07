@@ -517,7 +517,12 @@ public partial class Flow : ComponentBase, IDisposable
         string title = typeDisplayName;
         EditorOpen = true;
         EditorVariables = variables;
-        var newModelTask = Editor.Open("Flow.Parts." + typeName, title, fields, model, large: fields.Count > 1, helpUrl: flowElement.HelpUrl, saveCallback: isFunctionNode ? FunctionSaveCallback : null);           
+        var newModelTask = Editor.Open(new()
+        {
+            TypeName = "Flow.Parts." + typeName, Title = title, Fields = fields, Model = model,
+            Large = fields.Count > 1, HelpUrl = flowElement.HelpUrl,
+            SaveCallback = isFunctionNode ? FunctionSaveCallback : null
+        });           
         try
         {
             await newModelTask;

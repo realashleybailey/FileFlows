@@ -13,7 +13,7 @@ public partial class CustomDashboard
     {
         return Widgets?.Any(x => x.Uid == uid) != true;
     }
-    
+
     private async Task AddWidgetDialog()
     {
         List<ElementField> fields = new List<ElementField>();
@@ -71,7 +71,8 @@ public partial class CustomDashboard
             });
         }
 
-        if (App.Instance.FileFlowsSystem.ExternalDatabase && DoesntHaveWidget(FileFlows.Shared.Widgets.OpenDatabaseConnections.WD_UID))
+        if (App.Instance.FileFlowsSystem.ExternalDatabase &&
+            DoesntHaveWidget(FileFlows.Shared.Widgets.OpenDatabaseConnections.WD_UID))
         {
             fields.Add(new ElementField
             {
@@ -122,7 +123,7 @@ public partial class CustomDashboard
                 }
             });
         }
-        
+
         if (DoesntHaveWidget(FileFlows.Shared.Widgets.StorageSaved.WD_UID))
         {
             fields.Add(new ElementField
@@ -175,7 +176,8 @@ public partial class CustomDashboard
             });
         }
 
-        if (App.Instance.FileFlowsSystem.ExternalDatabase && DoesntHaveWidget(FileFlows.Shared.Widgets.ProcessingTimes.WD_UID))
+        if (App.Instance.FileFlowsSystem.ExternalDatabase &&
+            DoesntHaveWidget(FileFlows.Shared.Widgets.ProcessingTimes.WD_UID))
         {
             fields.Add(new ElementField
             {
@@ -188,7 +190,8 @@ public partial class CustomDashboard
             });
         }
 
-        if (App.Instance.FileFlowsSystem.ExternalDatabase && DoesntHaveWidget(FileFlows.Shared.Widgets.LibraryProcessingTimes.WD_UID))
+        if (App.Instance.FileFlowsSystem.ExternalDatabase &&
+            DoesntHaveWidget(FileFlows.Shared.Widgets.LibraryProcessingTimes.WD_UID))
         {
             fields.Add(new ElementField
             {
@@ -226,82 +229,91 @@ public partial class CustomDashboard
                 }
             });
         }
+
         var origModel = new AddWidgetModel();
-        var result = await Editor.Open("Pages.Widget", "Pages.Widget.Title", fields, null, lblSave: "Labels.Add", saveCallback:
-            async (model) =>
-            {
-                var dict = model as IDictionary<string, object>;
-                var dotNetObjRef = DotNetObjectReference.Create(this);
-                if (dict == null)
-                    return true;
-            
-                var newWidgets = new List<WidgetUiModel>();
-                foreach (var key in dict.Keys)
+        var result = await Editor.Open(new()
+        {
+            TypeName = "Pages.Widget", Title = "Pages.Widget.Title", Fields = fields, SaveLabel = "Labels.Add",
+            SaveCallback =
+                async (model) =>
                 {
-                    if (dict[key] as bool? != true)
-                        continue;
-                    
-                    switch (key)
+                    var dict = model as IDictionary<string, object>;
+                    var dotNetObjRef = DotNetObjectReference.Create(this);
+                    if (dict == null)
+                        return true;
+
+                    var newWidgets = new List<WidgetUiModel>();
+                    foreach (var key in dict.Keys)
                     {
-                        case nameof(CpuUsage):
-                            newWidgets.Add(CreateNewWidgetModel(CpuUsage.WD_UID, 3, 1));
-                            break;
-                        case nameof(MemoryUsage):
-                            newWidgets.Add(CreateNewWidgetModel(MemoryUsage.WD_UID, 3, 1));
-                            break;
-                        case nameof(LogStorage):
-                            newWidgets.Add(CreateNewWidgetModel(LogStorage.WD_UID, 3, 1));
-                            break;
-                        case nameof(TempStorage):
-                            newWidgets.Add(CreateNewWidgetModel(TempStorage.WD_UID, 3, 1));
-                            break;
-                        case nameof(OpenDatabaseConnections):
-                            newWidgets.Add(CreateNewWidgetModel(OpenDatabaseConnections.WD_UID, 3, 1));
-                            break;
-                        case nameof(Processing):
-                            newWidgets.Add(CreateNewWidgetModel(Processing.WD_UID, 12, 1));
-                            break;
-                        case nameof(FilesUpcoming):
-                            newWidgets.Add(CreateNewWidgetModel(FilesUpcoming.WD_UID, 6, 2));
-                            break;
-                        case nameof(FilesRecentlyFinished):
-                            newWidgets.Add(CreateNewWidgetModel(FilesRecentlyFinished.WD_UID, 6, 2));
-                            break;
-                        case nameof(StorageSaved):
-                            newWidgets.Add(CreateNewWidgetModel(StorageSaved.WD_UID, 6, 2));
-                            break;
-                        case nameof(Codecs):
-                            newWidgets.Add(CreateNewWidgetModel(Codecs.WD_UID, 6, 2));
-                            break;
-                        case nameof(VideoCodecs):
-                            newWidgets.Add(CreateNewWidgetModel(VideoCodecs.WD_UID, 6, 2));
-                            break;
-                        case nameof(AudioCodecs):
-                            newWidgets.Add(CreateNewWidgetModel(AudioCodecs.WD_UID, 6, 2));
-                            break;
-                        case nameof(ProcessingTimes):
-                            newWidgets.Add(CreateNewWidgetModel(ProcessingTimes.WD_UID, 6, 2));
-                            break;
-                        case nameof(VideoContainers):
-                            newWidgets.Add(CreateNewWidgetModel(VideoContainers.WD_UID, 4, 2));
-                            break;
-                        case nameof(VideoResolution):
-                            newWidgets.Add(CreateNewWidgetModel(VideoResolution.WD_UID, 4, 2));
-                            break;
-                        case nameof(LibraryProcessingTimes):
-                            newWidgets.Add(CreateNewWidgetModel(LibraryProcessingTimes.WD_UID, 4, 2));
-                            break;
+                        if (dict[key] as bool? != true)
+                            continue;
+
+                        switch (key)
+                        {
+                            case nameof(CpuUsage):
+                                newWidgets.Add(CreateNewWidgetModel(CpuUsage.WD_UID, 3, 1));
+                                break;
+                            case nameof(MemoryUsage):
+                                newWidgets.Add(CreateNewWidgetModel(MemoryUsage.WD_UID, 3, 1));
+                                break;
+                            case nameof(LogStorage):
+                                newWidgets.Add(CreateNewWidgetModel(LogStorage.WD_UID, 3, 1));
+                                break;
+                            case nameof(TempStorage):
+                                newWidgets.Add(CreateNewWidgetModel(TempStorage.WD_UID, 3, 1));
+                                break;
+                            case nameof(OpenDatabaseConnections):
+                                newWidgets.Add(CreateNewWidgetModel(OpenDatabaseConnections.WD_UID, 3, 1));
+                                break;
+                            case nameof(Processing):
+                                newWidgets.Add(CreateNewWidgetModel(Processing.WD_UID, 12, 1));
+                                break;
+                            case nameof(FilesUpcoming):
+                                newWidgets.Add(CreateNewWidgetModel(FilesUpcoming.WD_UID, 6, 2));
+                                break;
+                            case nameof(FilesRecentlyFinished):
+                                newWidgets.Add(CreateNewWidgetModel(FilesRecentlyFinished.WD_UID, 6, 2));
+                                break;
+                            case nameof(StorageSaved):
+                                newWidgets.Add(CreateNewWidgetModel(StorageSaved.WD_UID, 6, 2));
+                                break;
+                            case nameof(Codecs):
+                                newWidgets.Add(CreateNewWidgetModel(Codecs.WD_UID, 6, 2));
+                                break;
+                            case nameof(VideoCodecs):
+                                newWidgets.Add(CreateNewWidgetModel(VideoCodecs.WD_UID, 6, 2));
+                                break;
+                            case nameof(AudioCodecs):
+                                newWidgets.Add(CreateNewWidgetModel(AudioCodecs.WD_UID, 6, 2));
+                                break;
+                            case nameof(ProcessingTimes):
+                                newWidgets.Add(CreateNewWidgetModel(ProcessingTimes.WD_UID, 6, 2));
+                                break;
+                            case nameof(VideoContainers):
+                                newWidgets.Add(CreateNewWidgetModel(VideoContainers.WD_UID, 4, 2));
+                                break;
+                            case nameof(VideoResolution):
+                                newWidgets.Add(CreateNewWidgetModel(VideoResolution.WD_UID, 4, 2));
+                                break;
+                            case nameof(LibraryProcessingTimes):
+                                newWidgets.Add(CreateNewWidgetModel(LibraryProcessingTimes.WD_UID, 4, 2));
+                                break;
+                        }
                     }
+
+                    if (newWidgets.Any())
+                    {
+                        this.Widgets.AddRange(newWidgets);
+                        await jsCharts.InvokeVoidAsync($"addWidgets", ActiveDashboardUid, newWidgets, dotNetObjRef);
+                        var gridWidgets =
+                            await jsCharts.InvokeAsync<WidgetUiModel[]>($"getGridData", ActiveDashboardUid,
+                                dotNetObjRef);
+                        await SaveDashboard(ActiveDashboardUid, gridWidgets);
+                    }
+
+                    return true;
                 }
-                if (newWidgets.Any())
-                {
-                    this.Widgets.AddRange(newWidgets);
-                    await jsCharts.InvokeVoidAsync($"addWidgets", ActiveDashboardUid, newWidgets, dotNetObjRef); 
-                    var gridWidgets = await jsCharts.InvokeAsync<WidgetUiModel[]>($"getGridData", ActiveDashboardUid, dotNetObjRef);
-                    await SaveDashboard(ActiveDashboardUid, gridWidgets);
-                }
-                return true;
-            });
+        });
     }
 
     private WidgetUiModel CreateNewWidgetModel(Guid widgetDefinitionUid, int width, int height)

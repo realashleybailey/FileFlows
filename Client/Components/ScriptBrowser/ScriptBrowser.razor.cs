@@ -144,13 +144,13 @@ public partial class ScriptBrowser: ComponentBase
             Blocker.Hide();
         }
 
-        await Editor.Open("Pages.Scripts", @object.Name, new List<ElementField>
+        await Editor.Open(new () { TypeName = "Pages.Scripts", Title = @object.Name, Fields = new List<ElementField>
         {
             new()
             {
                 Name = "Code",
                 InputType = FormInputType.Code
             },
-        }, new { Code = code }, readOnly: true);
+        }, Model = new { Code = code }, ReadOnly = true});
     }
 }

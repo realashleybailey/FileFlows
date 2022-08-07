@@ -115,8 +115,11 @@ public partial class Plugins : ListPage<Guid, PluginInfoModel>
         // clone the fields as they get wiped
         var fields = plugin.Settings.ToList();
 
-        var result = await Editor.Open("Plugins." + plugin.PackageName, plugin.Name, fields, model,
-            saveCallback: SaveSettings);
+        var result = await Editor.Open(new()
+        {
+            TypeName = "Plugins." + plugin.PackageName, Title = plugin.Name, Fields = fields, Model = model,
+            SaveCallback = SaveSettings
+        });
         return false; // we dont need to reload the list
 #else
         return false;
@@ -140,55 +143,60 @@ public partial class Plugins : ListPage<Guid, PluginInfoModel>
 
     private async Task About(PluginInfoModel plugin)
     {
-        await Editor.Open("Pages.Plugins", plugin.Name, new List<ElementField>
+        await Editor.Open(new()
         {
-            new ElementField
+            TypeName = "Pages.Plugins", Title = plugin.Name, Fields = new List<ElementField>
             {
-                Name = nameof(plugin.Name),
-                InputType = FormInputType.TextLabel
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Authors),
-                InputType = FormInputType.TextLabel
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Version),
-                InputType = FormInputType.TextLabel
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Url),
-                InputType = FormInputType.TextLabel,
-                Parameters = new Dictionary<string, object>
+                new ElementField
                 {
-                    { nameof(InputTextLabel.Link), true }
-                }
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Description),
-                InputType = FormInputType.TextLabel,
-                Parameters = new Dictionary<string, object>
+                    Name = nameof(plugin.Name),
+                    InputType = FormInputType.TextLabel
+                },
+                new ElementField
                 {
-                    { nameof(InputTextLabel.Pre), true }
-                }
-            },
-            new ElementField
-            {
-                Name = nameof(plugin.Elements),
-                InputType = FormInputType.Checklist,
-                Parameters = new Dictionary<string, object>
+                    Name = nameof(plugin.Authors),
+                    InputType = FormInputType.TextLabel
+                },
+                new ElementField
                 {
-                    { nameof(InputChecklist.ListOnly), true },
+                    Name = nameof(plugin.Version),
+                    InputType = FormInputType.TextLabel
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Url),
+                    InputType = FormInputType.TextLabel,
+                    Parameters = new Dictionary<string, object>
                     {
-                        nameof(InputChecklist.Options),
-                        plugin.Elements?.Select(x => new ListOption{ Label = x.Name, Value = x })?.ToList() ?? new List<ListOption>()
+                        { nameof(InputTextLabel.Link), true }
                     }
-                }
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Description),
+                    InputType = FormInputType.TextLabel,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputTextLabel.Pre), true }
+                    }
+                },
+                new ElementField
+                {
+                    Name = nameof(plugin.Elements),
+                    InputType = FormInputType.Checklist,
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { nameof(InputChecklist.ListOnly), true },
+                        {
+                            nameof(InputChecklist.Options),
+                            plugin.Elements?.Select(x => new ListOption { Label = x.Name, Value = x })?.ToList() ??
+                            new List<ListOption>()
+                        }
+                    }
+                },
             },
-        }, plugin, readOnly: true);;
+            Model = plugin, ReadOnly = true
+        });
     }
 
     

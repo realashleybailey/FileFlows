@@ -1,0 +1,1 @@
+ul{list-style:none;margin:.25rem 0 0;max-height:300px;overflow:auto;height:300px;border:1px solid var(--border-color);padding:.5rem}li{padding:0 0 .5rem;margin:0}span{display:inline-block}span+span{margin-left:.25rem}::deep input{top:0;left:0}

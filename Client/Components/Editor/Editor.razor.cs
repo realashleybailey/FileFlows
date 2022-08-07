@@ -24,6 +24,8 @@ public partial class Editor : ComponentBase, IDisposable
 {
     [Inject] IJSRuntime jsRuntime { get; set; }
 
+    private readonly  List<ActionButton> AdditionalButtons = new();
+
     public bool Visible { get; set; }
 
     public string Title { get; set; }
@@ -162,50 +164,38 @@ public partial class Editor : ComponentBase, IDisposable
     /// <summary>
     /// Opens an editor
     /// </summary>
-    /// <param name="typeName">the type name of the bound model, used for translations</param>
-    /// <param name="title">the title of the editor</param>
-    /// <param name="fields">the main fields to show in the editor</param>
-    /// <param name="model">the model to bind to the editor</param>
-    /// <param name="saveCallback">a callback that is called when the editor is saved</param>
-    /// <param name="readOnly">if the editor is readonly</param>
-    /// <param name="large">if the editor is a large editor and takes up more width</param>
-    /// <param name="lblSave">the label to show on the save button</param>
-    /// <param name="lblCancel">the label to show on the cancel button</param>
-    /// <param name="additionalFields">any additional fields ot show</param>
-    /// <param name="tabs">the tabs for the editor</param>
-    /// <param name="helpUrl">the URL for the help button</param>
-    /// <param name="noTranslateTitle">it the title should not be translated</param>
-    /// <param name="lblDownloadButton">the label to shown on the download button</param>
-    /// <param name="downloadUrl">the URL for the download button</param>
-    /// <param name="promptUnsavedChanges">if a prompt should be shown the the user if they try to close the editor with changes</param>
+    /// <param name="args">the opening arguments</param>
     /// <returns>the updated model from the edit</returns>
-    internal Task<ExpandoObject> Open(string typeName, string title, List<ElementField> fields, object model, SaveDelegate saveCallback = null, bool readOnly = false, bool large = false, string lblSave = null, string lblCancel = null, RenderFragment additionalFields = null, Dictionary<string, List<ElementField>> tabs = null, string helpUrl = null, bool noTranslateTitle = false, string lblDownloadButton = "Labels.Download", string downloadUrl = null, bool promptUnsavedChanges = true)
+    internal Task<ExpandoObject> Open(EditorOpenArgs args)
     {
         this.RegisteredInputs.Clear();
-        var expandoModel = ConvertToExando(model);
+        var expandoModel = ConvertToExando(args.Model);
         this.Model = expandoModel;
-        this.SaveCallback = saveCallback;
-        this.PromptUnsavedChanges = promptUnsavedChanges;
-        if (promptUnsavedChanges && readOnly == false) 
+        this.SaveCallback = args.SaveCallback;
+        this.PromptUnsavedChanges = args.PromptUnsavedChanges;
+        if (args.PromptUnsavedChanges && args.ReadOnly == false) 
             this.CleanModelJson = ModelToJsonForCompare(expandoModel);
-        this.TypeName = typeName;
+        this.TypeName = args.TypeName;
         this.Maximised = false;
         this.Uid = Guid.NewGuid().ToString();
         this.UpdateResizer = true;
-        if (noTranslateTitle)
-            this.Title = title;
+        this.AdditionalButtons.Clear();
+        if(args.AdditionalButtons?.Any() == true)
+            this.AdditionalButtons.AddRange(args.AdditionalButtons);
+        if (args.NoTranslateTitle)
+            this.Title = args.Title;
         else
-            this.Title = Translater.TranslateIfNeeded(title);
-        this.Fields = fields;
-        this.Tabs = tabs;
-        this.ReadOnly = readOnly;
-        this.Large = large;
-        this.ShowDownload = string.IsNullOrWhiteSpace(downloadUrl) == false;
+            this.Title = Translater.TranslateIfNeeded(args.Title);
+        this.Fields = args.Fields;
+        this.Tabs = args.Tabs;
+        this.ReadOnly = args.ReadOnly;
+        this.Large = args.Large;
+        this.ShowDownload = string.IsNullOrWhiteSpace(args.DownloadUrl) == false;
         this.lblDownloadButton = Translater.TranslateIfNeeded(lblDownloadButton);
-        this.DownloadUrl = downloadUrl;
+        this.DownloadUrl = args.DownloadUrl;
         this.Visible = true;
-        this.HelpUrl = helpUrl ?? string.Empty;
-        this.AdditionalFields = additionalFields;
+        this.HelpUrl = args.HelpUrl ?? string.Empty;
+        this.AdditionalFields = args.AdditionalFields;
 
 
         lblSave = lblSave.EmptyAsNull() ?? "Labels.Save";
@@ -221,7 +211,7 @@ public partial class Editor : ComponentBase, IDisposable
             this.lblSaving = lblSave;
         }
 
-        this.EditorDescription = Translater.Instant(typeName + ".Description");
+        this.EditorDescription = Translater.Instant(args.TypeName + ".Description");
         OpenTask = new TaskCompletionSource<ExpandoObject>();
         this.FocusFirst = true;
         this.StateHasChanged();
@@ -346,6 +336,17 @@ public partial class Editor : ComponentBase, IDisposable
     {
         var field = this.Fields?.Where(x => x.Name == name)?.FirstOrDefault();
         return field;
+    }
+
+    /// <summary>
+    /// Finds an input by name and its type
+    /// </summary>
+    /// <param name="name">the element field of the input</param>
+    /// <typeparam name="T">the type of field</typeparam>
+    /// <returns>the input if found</returns>
+    internal T FindInput<T>(string name)
+    {
+        return (T)this.RegisteredInputs.FirstOrDefault(x => x.Field?.Name == name && x is T);
     }
     
     /// <summary>
@@ -553,4 +554,101 @@ public partial class Editor : ComponentBase, IDisposable
     {
         App.Instance.OnEscapePushed -= InstanceOnOnEscapePushed;
     }
+}
+
+/// <summary>
+/// UI Button
+/// </summary>
+public class ActionButton
+{
+    private string _Label;
+
+    /// <summary>
+    /// Gets or sets the label of the button
+    /// </summary>
+    public string Label
+    {
+        get => _Label;
+        set => _Label = Translater.TranslateIfNeeded(value);
+    }
+
+    /// <summary>
+    /// Gets or sets the click action
+    /// </summary>
+    public Action<object, EventArgs> Clicked { get; set; }
+}
+
+/// <summary>
+/// Arguments used when opening the editor
+/// </summary>
+public class EditorOpenArgs
+{
+    /// <summary>
+    /// Gets or sets the type name used in translation
+    /// </summary>
+    public string TypeName { get; set; }
+    /// <summary>
+    /// Gets or sets the title of the editor
+    /// </summary>
+    public string Title { get; set; }
+    /// <summary>
+    /// Gets or sets the main fields to show in the editor
+    /// </summary>
+    public List<ElementField> Fields { get; set; }
+    /// <summary>
+    /// Gets or sets the model to bind to the editor
+    /// </summary>
+    public object Model { get; set; }
+    /// <summary>
+    /// Gets or sets a callback that is called when the editor is saved
+    /// </summary>
+    public Editor.SaveDelegate SaveCallback  { get; set; }
+    /// <summary>
+    /// Gets or sets if the editor is readonly
+    /// </summary>
+    public bool ReadOnly  { get; set; }
+    /// <summary>
+    /// Gets or sets if the editor is a large editor and takes up more width
+    /// </summary>
+    public bool Large  { get; set; }
+    /// <summary>
+    /// Gets or sets the label to show on the save button
+    /// </summary>
+    public string SaveLabel  { get; set; }
+    /// <summary>
+    /// Gets or sets the label to show on the cancel button
+    /// </summary>
+    public string CancelLabel  { get; set; }
+    /// <summary>
+    /// Gets or sets any additional fields ot show
+    /// </summary>
+    public RenderFragment AdditionalFields  { get; set; }
+    /// <summary>
+    /// Gets or sets the tabs for the editor
+    /// </summary>
+    public Dictionary<string, List<ElementField>> Tabs { get; set; }
+    /// <summary>
+    /// Gets or sets the URL for the help button
+    /// </summary>
+    public string HelpUrl  { get; set; }
+    /// <summary>
+    /// Gets or sets it the title should not be translated
+    /// </summary>
+    public bool NoTranslateTitle  { get; set; }
+    /// <summary>
+    /// Gets or sets the label to shown on the download button
+    /// </summary>
+    public string DownloadButtonLabel { get; set; } = "Labels.Download";
+    /// <summary>
+    /// Gets or sets the URL for the download button
+    /// </summary>
+    public string DownloadUrl { get; set; }
+    /// <summary>
+    /// Gets or sets if a prompt should be shown the the user if they try to close the editor with changes
+    /// </summary>
+    public bool PromptUnsavedChanges  { get; set; }
+    /// <summary>
+    /// Gets or sets 
+    /// </summary>
+    public IEnumerable<ActionButton> AdditionalButtons { get; set; }
 }

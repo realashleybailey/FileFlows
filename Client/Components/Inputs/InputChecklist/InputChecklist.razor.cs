@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace FileFlows.Client.Components.Inputs
 {
     using FileFlows.Plugin;

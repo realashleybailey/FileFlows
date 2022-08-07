@@ -43,8 +43,7 @@ namespace FileFlows.Client.Pages
                     new FileFlows.Shared.Validators.Required()
                 }
             });
-            var result = await Editor.Open("Pages.Variable", "Pages.Variable.Title", fields, variable,
-              saveCallback: Save);
+            var result = await Editor.Open(new () { TypeName = "Pages.Variable", Title = "Pages.Variable.Title", Fields = fields, Model = variable, SaveCallback = Save});
 #endif
             return false;
         }

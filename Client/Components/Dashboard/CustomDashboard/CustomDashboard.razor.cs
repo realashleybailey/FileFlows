@@ -134,7 +134,11 @@ public partial class CustomDashboard : IDisposable
             }
         });
 
-        await Editor.Open("Pages.Dashboard", libraryFileName, fields, new { Log = log }, large: true, readOnly: true);
+        await Editor.Open(new()
+        {
+            TypeName = "Pages.Dashboard", Title = libraryFileName, Fields = fields, Model = new { Log = log },
+            Large = true, ReadOnly = true
+        });
     }
 
     private async Task<RequestResult<string>> GetLog(string url)

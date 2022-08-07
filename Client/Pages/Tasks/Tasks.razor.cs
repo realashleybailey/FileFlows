@@ -173,7 +173,9 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
                 new (efSchedule, timeSchedule, value: TimeSchedule.Custom)
             }
         });
-        var result = await Editor.Open("Pages.Task", "Pages.Task.Title", fields, new
+        var result = await Editor.Open(new()
+        {
+            TypeName = "Pages.Task", Title = "Pages.Task.Title", Fields = fields, Model = new
             {
                 item.Uid,
                 item.Name,
@@ -182,7 +184,8 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
                 CustomSchedule = customSchedule,
                 TimeSchedule = timeSchedule
             },
-            saveCallback: Save);
+            SaveCallback = Save
+        });
         
         return false;
     }

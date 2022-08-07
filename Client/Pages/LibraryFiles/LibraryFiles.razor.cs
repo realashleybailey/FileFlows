@@ -68,35 +68,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         _ = this.Refresh();
     }
 
-
-#if (DEMO)
-    public override async Task Load(Guid? selectedUid = null)
-    {
-        this.Data = Enumerable.Range(1, SelectedStatus == FileStatus.Processing ? 1 : 10).Select(x => new LibraryFile
-        {
-            DateCreated = DateTime.Now,
-            DateModified = DateTime.Now,
-            Flow = new ObjectReference
-            {
-                Name = "Flow",
-                Uid = Guid.NewGuid()
-            },
-            Library = new ObjectReference
-            {
-                Name = "Library",
-                Uid = Guid.NewGuid(),
-            },
-            Name = "File_" + x + ".ext",
-            RelativePath = "File_" + x + ".ext",
-            Uid = Guid.NewGuid(),
-            Status = SelectedStatus,
-            OutputPath = SelectedStatus == FileStatus.Processed ? "output/File_" + x + ".ext" : string.Empty
-        }).ToList();
-
-        await PostLoad();
-    }
-#endif
-
     public override string FetchUrl => $"{ApiUrl}/list-all?status={Skybox?.SelectedItem?.Value}&page={PageIndex}&pageSize={PageSize}";
 
     private string NameMinWidth = "20ch";
@@ -107,7 +78,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length / 2) ?? 0))) + "ch" : "20ch";
         else
             this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
-        //await RefreshStatus();
+        
         CheckPager();
         await jsRuntime.InvokeVoidAsync("ff.scrollTableToTop");
     }
@@ -132,21 +103,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
     }
 
-    private async Task<RequestResult<List<LibraryStatus>>> GetStatus()
-    {
-#if (DEMO)
-
-         var results = new List<LibraryStatus>
-         {
-             new LibraryStatus { Status = FileStatus.Unprocessed, Count = 10 },
-             new LibraryStatus { Status = FileStatus.Processing, Count = 1 },
-             new LibraryStatus { Status = FileStatus.Processed, Count = 10 },
-             new LibraryStatus { Status = FileStatus.ProcessingFailed, Count = 10 }
-         };
-         return new RequestResult<List<LibraryStatus>> { Success = true, Data = results };
-#endif
-        return await HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
-    }
+    private Task<RequestResult<List<LibraryStatus>>> GetStatus() => HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");
 
     /// <summary>
     /// Refreshes the top status bar
@@ -219,10 +176,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
     public async Task MoveToTop()
     {
-#if (DEMO)
-        return;
-#else
-
         var selected = Table.GetSelected();
         var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
         if (uids.Length == 0)
@@ -238,15 +191,11 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             Blocker.Hide();
         }
         await Refresh();
-#endif
     }
 
 
     public async Task Cancel()
     {
-#if (DEMO)
-        return;
-#else
         var selected = Table.GetSelected().ToArray();
         if (selected.Length == 0)
             return; // nothing to cancel
@@ -269,15 +218,10 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             this.StateHasChanged();
         }
         await Refresh();
-#endif
     }
 
     public async Task Reprocess()
     {
-#if (DEMO)
-        return;
-#else
-
         var selected = Table.GetSelected();
         var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
         if (uids.Length == 0)
@@ -293,7 +237,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             Blocker.Hide();
         }
         await Refresh();
-#endif
     }
 
     protected override async Task<RequestResult<List<LibaryFileListModel>>> FetchData()
@@ -361,9 +304,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
     private async Task Unhold()
     {
-#if (DEMO)
-        return;
-#else
         var selected = Table.GetSelected();
         var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
         if (uids.Length == 0)
@@ -379,7 +319,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             Blocker.Hide();
         }
         await Refresh();
-#endif
     }
     
     

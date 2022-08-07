@@ -8,7 +8,8 @@
         .btn-test {
             margin:2rem 0 0 14rem;
             .btn {
-                width:9rem;
+                width: auto;
+                min-width: 9rem;
                 + .btn {
                     margin-left:1rem;
                 }

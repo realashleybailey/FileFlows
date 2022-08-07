@@ -1109,6 +1109,8 @@ export class LibraryFileTable extends FFChart
 
     createNoData(data){
         let chartDiv = document.getElementById(this.chartUid);
+        if(chartDiv == null)
+            return;
         chartDiv.textContent = '';
         
         let div = document.createElement('div');

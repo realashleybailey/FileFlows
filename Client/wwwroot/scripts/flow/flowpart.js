@@ -256,6 +256,7 @@ window.ffFlowPart = {
             if (!divOutputs) {
                 divOutputs = document.createElement('div');
                 divOutputs.classList.add('outputs');
+                divOutputs.classList.add('outputs-' + Math.max(part.outputs, 1));
                 div.appendChild(divOutputs);
             }
             else {

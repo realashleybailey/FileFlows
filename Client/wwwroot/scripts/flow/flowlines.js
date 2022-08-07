@@ -44,6 +44,7 @@ class ffFlowLines {
         this.ioCanvasBounds = canvas.getBoundingClientRect();
         var srcBounds = this.ioNode.getBoundingClientRect();
         let srcX = (srcBounds.left - this.ioCanvasBounds.left) + this.ioOffset;
+        srcX = Math.round(srcX / 10) * 10;
         let srcY = (srcBounds.top - this.ioCanvasBounds.top) + this.ioOffset;
         this.ioSourceBounds = { left: srcX, top: srcY };
 

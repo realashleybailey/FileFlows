@@ -440,7 +440,7 @@ a.btn {
   margin-top: 1rem;
 }
 .editor-wrapper .btn-download {
-  width: 8rem !important;
+  width: auto !important;
   margin-right: 1rem;
 }
 

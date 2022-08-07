@@ -40,6 +40,7 @@ public partial class ImportScript : ComponentBase, IDisposable
     {
         this.Visible = true;
         this.Focus = true;
+        this.CheckedItems.Clear();
         this.AvailableScript = availableScripts?.Select(x => new ListOption()
         {
             Label = x,

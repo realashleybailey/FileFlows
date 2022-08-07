@@ -385,6 +385,7 @@ public class Runner
                 return FileStatus.ProcessingFailed;
             }
 
+            DateTime nodeStartTime = DateTime.Now;
             try
             {
 
@@ -406,26 +407,19 @@ public class Runner
 
                 gotoFlow = null; // clear it, in case this node requests going to a different flow
                 
-                DateTime nodeStartTime = DateTime.Now;
+                nodeStartTime = DateTime.Now;
                 int output = 0;
                 try
                 {
                     if (CurrentNode.PreExecute(nodeParameters) == false)
                         throw new Exception("PreExecute failed");
                     output = CurrentNode.Execute(nodeParameters);
+                    RecordNodeFinish(nodeStartTime, output);
                 }
                 catch(Exception)
                 {
                     output = -1;
                     throw;
-                }
-                finally
-                {
-                    TimeSpan executionTime = DateTime.Now.Subtract(nodeStartTime);
-                    if(failure == false)
-                        RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime, part);
-                    nodeParameters.Logger?.ILog("Node execution time: " + executionTime);
-                    nodeParameters.Logger?.ILog(new string('=', 70));
                 }
 
                 if (gotoFlow != null)
@@ -490,11 +484,21 @@ public class Runner
                 nodeParameters.Result = NodeResult.Failure;
                 nodeParameters.Logger?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
                 Logger.Instance?.ELog("Execution error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                RecordNodeFinish(nodeStartTime, -1);
                 return FileStatus.ProcessingFailed;
             }
         }
         nodeParameters.Logger?.ELog("Too many nodes in flow, processing aborted");
         return FileStatus.ProcessingFailed;
+
+        void RecordNodeFinish(DateTime nodeStartTime, int output)
+        {
+            TimeSpan executionTime = DateTime.Now.Subtract(nodeStartTime);
+            if(failure == false)
+                RecordNodeExecution(part.Label?.EmptyAsNull() ?? part.Name?.EmptyAsNull() ?? CurrentNode.Name, part.FlowElementUid, output, executionTime, part);
+            nodeParameters.Logger?.ILog("Node execution time: " + executionTime);
+            nodeParameters.Logger?.ILog(new string('=', 70));
+        }
     }
 
     private void DownloadScripts()

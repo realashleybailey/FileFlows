@@ -74,7 +74,8 @@ public partial class InputExecutedNodes: Input<IEnumerable<ExecutedNode>>
             .Replace("MKV", "MKV")
             .Replace("Mp4", "MP4")
             .Replace("MP 4", "MP4")
-            .Replace("Ffmpeg Builder", "FFMPEG Builder:");
+            .Replace("Ffmpeg Builder", "FFMPEG Builder:")
+            .Replace("Audio Track Remover", "Track Remover"); // FF-235
     }
     
     private string FormatNodeName(ExecutedNode node)

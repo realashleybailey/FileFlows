@@ -92,6 +92,7 @@ public partial class Flows : ListPage<Guid, FlowListModel>
         var items = Table.GetSelected();
         if (items?.Any() != true)
             return;
+        var last = items.Last();
         foreach (var item in items)
         {
             string url = $"/api/flow/export/{item.Uid}";
@@ -99,7 +100,8 @@ public partial class Flows : ListPage<Guid, FlowListModel>
             url = "http://localhost:6868" + url;
 #endif
             await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".json" });
-            await Task.Delay(500); // need to actually allow the browser to download the additional flows
+            if(item != last)
+                await Task.Delay(1000); // need to actually allow the browser to download the additional flows
         }
     }
 

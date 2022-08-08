@@ -25,6 +25,12 @@
   top: 1.5rem;
 }
 
+.preview.BellCurve {
+  transform: scale(0.65, 0.45);
+  top: -4rem;
+  left: -2rem;
+}
+
 .preview.HeatMap {
   top: -1rem;
   transform: scale(1.35);

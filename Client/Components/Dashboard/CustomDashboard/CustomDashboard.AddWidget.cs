@@ -229,8 +229,43 @@ public partial class CustomDashboard
                 }
             });
         }
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.ImageFormats.WD_UID))
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.ImageFormats),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputWidget.Type), WidgetType.PieChart }
+                }
+            });
+        }
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.ComicFormats.WD_UID))
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.ComicFormats),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputWidget.Type), WidgetType.PieChart }
+                }
+            });
+        }
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.ComicPages.WD_UID))
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.ComicPages),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputWidget.Type), WidgetType.BellCurve }
+                }
+            });
+        }
 
-        var origModel = new AddWidgetModel();
         var result = await Editor.Open(new()
         {
             TypeName = "Pages.Widget", Title = "Pages.Widget.Title", Fields = fields, SaveLabel = "Labels.Add",
@@ -298,6 +333,15 @@ public partial class CustomDashboard
                             case nameof(LibraryProcessingTimes):
                                 newWidgets.Add(CreateNewWidgetModel(LibraryProcessingTimes.WD_UID, 4, 2));
                                 break;
+                            case nameof(ComicFormats):
+                                newWidgets.Add(CreateNewWidgetModel(ComicFormats.WD_UID, 4, 2));
+                                break;
+                            case nameof(ComicPages):
+                                newWidgets.Add(CreateNewWidgetModel(ComicPages.WD_UID, 4, 2));
+                                break;
+                            case nameof(ImageFormats):
+                                newWidgets.Add(CreateNewWidgetModel(ImageFormats.WD_UID, 4, 2));
+                                break;
                         }
                     }
 
@@ -336,22 +380,4 @@ public partial class CustomDashboard
 #endif
         return wui;
     }
-}
-
-public class AddWidgetModel
-{
-    public bool CpuUsage { get; set; }
-    public bool MemoryUsage { get; set; }
-    public bool LogStorage { get; set; }
-    public bool TempStorage { get; set; }
-    public bool Processing { get; set; }
-    public bool FilesUpcoming { get; set; }
-    public bool FilesRecentlyFinished { get; set; }
-    public bool Codecs { get; set; }
-    public bool AudioCodecs { get; set; }
-    public bool VideoCodecs { get; set; }
-    public bool ProcessingTimes { get; set; }
-    public bool LibraryProcessingTimes { get; set; }
-    public bool VideoContainers { get; set; }
-    public bool VideoResolution { get; set; }
 }

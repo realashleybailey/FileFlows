@@ -3,14 +3,14 @@ using FileFlows.Shared.Models;
 namespace FileFlows.Shared.Widgets;
 
 /// <summary>
-/// Widget for Video Containers
+/// Widget for Image Formats
 /// </summary>
-public class VideoContainers:WidgetDefinition
+public class ImageFormats:WidgetDefinition
 {
     /// <summary>
     /// The Widget Definition UID
     /// </summary>
-    public static readonly Guid WD_UID = new ("eca4b7ed-97bd-4947-bd30-9307abba7900");
+    public static readonly Guid WD_UID = new ("c84c39d9-a954-4d88-8de9-22f3aa825e91");
     
     /// <summary>
     /// Gets the UID 
@@ -20,17 +20,17 @@ public class VideoContainers:WidgetDefinition
     /// <summary>
     /// Gets the URL
     /// </summary>
-    public override string Url => "/api/statistics/by-name/VIDEO_CONTAINER";
+    public override string Url => "/api/statistics/by-name/IMAGE_FORMAT";
     
     /// <summary>
     /// Gets the Icon
     /// </summary>
-    public override string Icon => "fas fa-file-video";
+    public override string Icon => "fas fa-book";
 
     /// <summary>
     /// Gets the Name
     /// </summary>
-    public override string Name => "Video Containers";
+    public override string Name => "Image Formats";
 
     /// <summary>
     /// Gets the type of Widget

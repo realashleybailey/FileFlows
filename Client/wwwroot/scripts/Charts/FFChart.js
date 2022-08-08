@@ -197,6 +197,8 @@ function newChart(type, uid, args){
         window.FlowCharts[uid] = new TimeSeriesChart(uid, args);
     else if(type == 'Bar' || type === 106)
         window.FlowCharts[uid] = new BarChart(uid, args);
+    else if(type == 'BellCurve' || type === 107)
+        window.FlowCharts[uid] = new BellCurve(uid, args);
     else 
         console.log('unknown type: ' + type);
     
@@ -478,6 +480,132 @@ export class BarChart extends FFChart
                 }
             }
         };
+    }
+}
+
+
+
+export class BellCurve extends FFChart
+{
+    constructor(uid, args) {
+        super(uid, args);
+    }
+
+    hasData(data) {
+        return !!data?.labels?.length;
+    }
+
+    calcMean(data, useY) {
+        const sum = data.reduce((a, b) => a + (useY ? b.y : b), 0);
+        return sum / data.length;
+    }
+
+
+    hasData(data) {
+        return !!data;
+    }
+    
+    fixData(data) {
+        data = data.map((x, index) => ({ x: index, y: x.Value}));
+        const mean = this.calcMean(data, true);
+        const tmp = data.map(p => Math.pow(p.y - mean, 2));
+        const variance = this.calcMean(data.map(p => Math.pow(p.y - mean, 2)));
+        const stddev = Math.sqrt(variance);
+        const pdf = (x) => {
+            const m = stddev * Math.sqrt(2 * Math.PI);
+            const e = Math.exp(-Math.pow(x - mean, 2) / (2 * variance));
+            return e / m;
+        };
+        const bell = [];
+        const startX = mean - 3.5 * stddev;
+        const endX = mean + 3.5 * stddev;
+        const step = stddev / 7;
+        let x;
+        for(x = startX; x <= mean; x += step) {
+            bell.push({x, y: pdf(x)});
+        }
+        for(x = mean + step; x <= endX; x += step) {
+            bell.push({x, y: pdf(x)});
+        }
+        
+        return bell;
+    }    
+
+    getChartOptions(data)
+    {
+        var options = {
+            chart: {
+                type: 'area',
+                background: 'transparent',
+                sparkline: {
+                    enabled: true
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            series: [
+                {
+                    name: 'Series 1',
+                    data: data
+                }
+            ],
+            theme: {
+                mode: 'dark',
+                palette: 'palette3'
+            },
+            tooltip: {
+                y: {
+                    formatter: (value, x) => {
+                        return;
+                    }
+                },
+                x: {
+                    formatter: (value, x) => {
+                        return value.toFixed(0);
+                    }
+                }
+            },
+            grid: {
+                padding: {
+                    top: 0,
+                    right:0,
+                    bottom: 0,
+                    left:0,
+                },
+                show:false
+            },
+            stroke: {
+                curve: 'straight',
+                width: 3,
+                colors: ['#33b2df']
+            },
+            fill: {
+                type: "gradient",
+                gradient: {
+                    OpacityFrom: 0.55,
+                    opacityTo: 0
+                }
+            },
+            markers: {
+                colors: ["#00BAEC"],
+                strokeColors: "#00BAEC",
+                strokeWidth: 3
+            },
+            yaxis: {
+                show: false                
+            },
+            xaxis: {
+                show: false,
+                axisTicks : {
+                    show: false
+                },
+                labels : {
+                    show: false
+                }
+            }
+        };
+        return options;
     }
 }
 
@@ -843,6 +971,11 @@ export class TimeSeriesChart extends FFChart
                     opacityTo: 0
                 }
             },
+            markers: {
+                colors: ["#00BAEC"],
+                strokeColors: "#00BAEC",
+                strokeWidth: 3
+            },
             xaxis: {
                 type:'datetime',
                 axisTicks : {
@@ -856,11 +989,6 @@ export class TimeSeriesChart extends FFChart
                 show: false,
                 min:0,
                 max: this.maxValue === 0.001 ? 1 : this.maxValue
-            },
-            markers: {
-                colors: ["#00BAEC"],
-                strokeColors: "#00BAEC",
-                strokeWidth: 3
             },
             tooltip: {
                 x: {

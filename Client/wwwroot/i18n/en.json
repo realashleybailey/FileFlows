@@ -379,7 +379,10 @@
         "VideoCodecs": "Video Codecs",
         "VideoContainers": "Video Container",
         "VideoResolution": "Video Resolution",
-        "OpenDatabaseConnections": "Open Database Connections"        
+        "OpenDatabaseConnections": "Open Database Connections",
+        "ComicFormats": "Comic Formats",
+        "ComicPages": "Comic Pages",
+        "ImageFormats": "Image Formats"
       }
     },
     "ProcessingNode": {

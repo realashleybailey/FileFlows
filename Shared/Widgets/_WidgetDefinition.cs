@@ -24,8 +24,14 @@ public abstract class WidgetDefinition
             return new AudioCodecs();
         if (uid == Codecs.WD_UID)
             return new Codecs();
+        if (uid == ComicFormats.WD_UID)
+            return new ComicFormats();
+        if (uid == ComicPages.WD_UID)
+            return new ComicPages();
         if (uid == CpuUsage.WD_UID)
             return new CpuUsage();
+        if (uid == ImageFormats.WD_UID)
+            return new ImageFormats();
         if (uid == LibraryProcessingTimes.WD_UID)
             return new LibraryProcessingTimes();
         if (uid == LogStorage.WD_UID)
@@ -112,5 +118,9 @@ public enum WidgetType
     /// <summary>
     /// Bar graph
     /// </summary>
-    Bar = 106
+    Bar = 106,
+    /// <summary>
+    /// Bell curve
+    /// </summary>
+    BellCurve = 107
 }

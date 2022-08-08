@@ -11,23 +11,21 @@
         </tr>
         </thead>
         <tbody>
-            @foreach (var kv in Value)
+            @foreach (var md in metadata)
             {
-                if (kv.Value == null)
+                @if (md.Name != "General")
                 {
-                    continue;
+                    <tr>
+                        <td class="title" colspan="2">@md.Name</td>
+                    </tr>
                 }
-                <tr>
-                    <td>@kv.Key</td>
-                    @if (kv.Key.Contains("Bitrate"))
-                    {
-                        <td>@FormatBitrate(kv.Value)</td>
-                    }
-                    else
-                    {
-                        <td>@kv.Value?.ToString()</td>
-                    }
-                </tr>
+                @foreach (var item in md.Values)
+                {
+                    <tr>
+                        <td>@item.Key</td>
+                        <td>@item.Value</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

@@ -1,0 +1,1 @@
+td.title{font-weight:600;background:rgba(var(--input-background-rgb),.3)}tr td:first-of-type{max-width:min(30vw,16rem);width:min(30vw,16rem);min-width:min(30vw,16rem);overflow:hidden;text-overflow:ellipsis}tr td:first-of-type:not(.title){padding-left:1rem}

@@ -1,5 +1,4 @@
 using FileFlows.Client.Components.Common;
-using Humanizer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using FileFlows.Client.Components;
@@ -20,8 +19,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     private FileFlows.Shared.Models.FileStatus SelectedStatus;
 
     private string lblMoveToTop = "";
-
-    //private readonly List<LibraryStatus> Statuses = new List<LibraryStatus>();
 
     private int Count;
     private string lblSearch;
@@ -49,23 +46,15 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             return pages;
         }
     }
-
-    private void SelectUnprocessed()
-    {
-        if (this.SelectedStatus == FileStatus.Unprocessed)
-            return;
-        SelectedStatus = FileStatus.Unprocessed;
-        Skybox.SetSelectedValue(SelectedStatus);
-        Title = lblLibraryFiles + ": " + SelectedStatus.Humanize();
-        _ = this.Refresh();
-    }
-
-    private void SetSelected(FlowSkyBoxItem<FileStatus> status)
+    
+    private async Task SetSelected(FlowSkyBoxItem<FileStatus> status)
     {
         SelectedStatus = status.Value;
         this.PageIndex = 0;
         Title = lblLibraryFiles + ": " + status.Name;
-        _ = this.Refresh();
+        await this.Refresh();
+        Logger.Instance.ILog("SetSelected: " + this.Data?.Count);
+        this.StateHasChanged();
     }
 
     public override string FetchUrl => $"{ApiUrl}/list-all?status={Skybox?.SelectedItem?.Value}&page={PageIndex}&pageSize={PageSize}";
@@ -78,7 +67,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length / 2) ?? 0))) + "ch" : "20ch";
         else
             this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
-        
+        Logger.Instance.ILog("PostLoad: " + this.Data.Count);
         CheckPager();
         await jsRuntime.InvokeVoidAsync("ff.scrollTableToTop");
     }
@@ -192,8 +181,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         }
         await Refresh();
     }
-
-
+    
     public async Task Cancel()
     {
         var selected = Table.GetSelected().ToArray();
@@ -254,12 +242,14 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
         RefreshStatus(request.Data?.Status?.ToList() ?? new List<LibraryStatus>());
         
-        return new RequestResult<List<LibaryFileListModel>>
+        var result = new RequestResult<List<LibaryFileListModel>>
         {
             Body = request.Body,
             Success = request.Success,
             Data = request.Data.LibraryFiles.ToList()
         };
+        Logger.Instance.ILog("FetchData: " + result.Data.Count);
+        return result;
     }
 
     /// <summary>

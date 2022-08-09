@@ -372,6 +372,7 @@ public class DbHelper
         
         foreach (var variable in new[]
                  {
+                     ("ffprobe", Globals.IsWindows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffprobe.exe") : "/usr/local/bin/ffprobe"), 
                      ("unrar", Globals.IsWindows ? Path.Combine(programFiles, "WinRAR", "UnRAR.exe") : "unrar"), 
                      ("rar", Globals.IsWindows ? Path.Combine(programFiles, "WinRAR", "Rar.exe") : "rar"), 
                      ("7zip", Globals.IsWindows ? Path.Combine(programFiles, "7-Zip", "7z.exe") : "7z")

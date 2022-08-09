@@ -281,7 +281,8 @@ public class NodeParameters
                 var fi = new FileInfo(filename);
                 UpdateVariables(new Dictionary<string, object> {
                     { "ext", fi.Extension ?? "" },
-                    { "file.Name", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
+                    { "file.Name", fi.Name ?? "" },
+                    { "file.NameNoExtension", Path.GetFileNameWithoutExtension(fi.Name ?? "") },
                     { "file.FullName", fi.FullName ?? "" },
                     { "file.Extension", fi.Extension ?? "" },
                     { "file.Size", fi.Exists ? fi.Length : 0 },
@@ -306,7 +307,8 @@ public class NodeParameters
                         { "file.Modified.Day", fiOriginal.LastWriteTime.Day },
 
                         { "file.Orig.Extension", fiOriginal.Extension ?? "" },
-                        { "file.Orig.FileName", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
+                        { "file.Orig.FileName", fiOriginal.Name ?? "" },
+                        { "file.Orig.FileNameNoExtension", Path.GetFileNameWithoutExtension(fiOriginal.Name ?? "") },
                         { "file.Orig.FullName", fiOriginal.FullName ?? "" },
                         { "file.Orig.Size", fiOriginal.Exists? fiOriginal.Length: 0 },
 

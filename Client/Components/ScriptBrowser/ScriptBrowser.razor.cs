@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Components;
 using ffElement = FileFlows.Shared.Models.FlowElement;
@@ -44,9 +45,18 @@ public partial class ScriptBrowser: ComponentBase
         this.Loading = true;
         this.Table.Data = new List<RepositoryObject>();
         OpenTask = new TaskCompletionSource<bool>();
+        App.Instance.OnEscapePushed += InstanceOnOnEscapePushed;
         _ = LoadData();
         this.StateHasChanged();
         return OpenTask.Task;
+    }
+
+    private void InstanceOnOnEscapePushed(OnEscapeArgs args)
+    {
+        if (args.HasModal || Editor.Visible)
+            return;
+        
+        this.Close();
     }
 
     private async Task LoadData()
@@ -85,8 +95,10 @@ public partial class ScriptBrowser: ComponentBase
 
     private void Close()
     {
+        App.Instance.OnEscapePushed -= InstanceOnOnEscapePushed;
         OpenTask.TrySetResult(Updated);
         this.Visible = false;
+        this.StateHasChanged();
     }
 
     private async Task Download()
@@ -134,7 +146,7 @@ public partial class ScriptBrowser: ComponentBase
         try
         {
             var response =
-                await HttpHelper.Get<string>(ApiUrl + "/code?path=" + UrlEncoder.Create().Encode(@object.Path));
+                await HttpHelper.Get<string>(ApiUrl + "/content?path=" + UrlEncoder.Create().Encode(@object.Path));
             if (response.Success == false)
                 return;
             code = response.Data;

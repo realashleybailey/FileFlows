@@ -62,7 +62,11 @@
                             {
                                 @AdditionalFields
                             }
-                            <div class="empty"></div>
+                            
+                            @if (Fields.Count > 4)
+                            {
+                                <div class="empty"></div>
+                            }
                         }
                         @if (Tabs?.Any() == true)
                         {

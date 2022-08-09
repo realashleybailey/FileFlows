@@ -428,6 +428,7 @@
         "PluginBrowser": "Plugin Browser"
       },
       "Messages": {
+        "UpdatingPlugins": "Updating Plugins",
         "DeleteUsed":"You cannot delete a plugin that is in use",
         "DeletePlugins": "Are you sure you want to delete the selected {count, plural, one {plugin} other {plugins}}?"
       },

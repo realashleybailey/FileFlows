@@ -22,20 +22,17 @@ public partial class Plugins : ListPage<Guid, PluginInfoModel>
 
     async Task Add()
     {
-#if (!DEMO)
         bool result = await PluginBrowser.Open();
         if (result)
             await PluginsUpdated();
-#endif
     }
 
     async Task Update()
     {
-#if (!DEMO)
         var plugins = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new System.Guid[] { };
         if (plugins?.Any() != true)
             return;
-        Blocker.Show();
+        Blocker.Show("Pages.Plugins.Messages.UpdatingPlugins");
         this.StateHasChanged();
         Data.Clear();
         try
@@ -49,7 +46,6 @@ public partial class Plugins : ListPage<Guid, PluginInfoModel>
             Blocker.Hide();
             this.StateHasChanged();
         }
-#endif
     }
 
     async Task PluginsUpdated()

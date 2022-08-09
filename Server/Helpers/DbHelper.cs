@@ -348,9 +348,11 @@ public class DbHelper
     {
         var manager = GetDbManager();
         using var db = manager.GetDb().Result;
-        var ffmpeg = db.Db.ExecuteScalar<string>(
-            "select name from DbObject where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
-        if (string.IsNullOrEmpty(ffmpeg))
+        var variables  = db.Db.Fetch<string>(
+            "select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'");
+
+        var ffmpeg = variables.FirstOrDefault(x => x.ToLowerInvariant() == "ffmpeg");
+        if (ffmpeg == null)
         {
             // doesnt exist, insert it
             manager.Update(new Variable()
@@ -365,6 +367,24 @@ public class DbHelper
         {
             // not lower case
             db.Db.Execute("update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
+        }
+        string programFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");
+        
+        foreach (var variable in new[]
+                 {
+                     ("unrar", Globals.IsWindows ? Path.Combine(programFiles, "WinRAR", "UnRAR.exe") : "unrar"), 
+                     ("rar", Globals.IsWindows ? Path.Combine(programFiles, "WinRAR", "Rar.exe") : "rar"), 
+                     ("7zip", Globals.IsWindows ? Path.Combine(programFiles, "7-Zip", "7z.exe") : "7z")
+                 })
+        {
+            if (variables.Contains(variable.Item1))
+                continue;
+            // doesnt exist, insert it
+            manager.Update(new Variable()
+            {
+                Name = variable.Item1,
+                Value = variable.Item2
+            }).Wait();
         }
     }
 }

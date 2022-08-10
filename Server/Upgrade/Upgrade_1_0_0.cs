@@ -39,7 +39,10 @@ public class Upgrade_1_0_0
             return;
         foreach (var file in oldDir.GetFiles())
         {
-            file.MoveTo(Path.Combine(DirectoryHelper.ScriptsDirectoryFlow));
+            string dest = Path.Combine(DirectoryHelper.ScriptsDirectoryFlow);
+            if (dest == file.FullName)
+                continue;
+            file.MoveTo(dest, true);
         }
         oldDir.Delete();
     }

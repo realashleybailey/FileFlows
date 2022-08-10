@@ -40,9 +40,7 @@ public class Upgrade_1_0_0
         foreach (var file in oldDir.GetFiles())
         {
             string dest = Path.Combine(DirectoryHelper.ScriptsDirectoryFlow, file.Name);
-            if (dest == file.FullName)
-                continue;
-            Logger.Instance.ILog($"Moving script '{file.FullName}' to: {dest}");
+            Logger.Instance.ILog($"Moving script '{file.FullName}' to '{dest}'");
             file.MoveTo(dest, true);
         }
         oldDir.Delete();

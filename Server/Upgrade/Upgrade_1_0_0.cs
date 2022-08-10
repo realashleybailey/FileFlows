@@ -39,7 +39,7 @@ public class Upgrade_1_0_0
             return;
         foreach (var file in oldDir.GetFiles())
         {
-            string dest = Path.Combine(DirectoryHelper.ScriptsDirectoryFlow);
+            string dest = Path.Combine(DirectoryHelper.ScriptsDirectoryFlow, file.Name);
             if (dest == file.FullName)
                 continue;
             Logger.Instance.ILog($"Moving script '{file.FullName}' to: {dest}");

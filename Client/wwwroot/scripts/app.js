@@ -222,5 +222,49 @@ window.ff = {
         document.addEventListener("mouseup", function(){
             document.removeEventListener("mousemove", resize, false);
         }, false);        
+    },
+    resizableTable: function(uid){
+        let table = document.getElementById(uid);
+        if(!table)
+            return;
+        if(table.tagName.toLowerCase() !== 'table')
+            table = table.querySelector('table');
+
+        const createResizableColumn = function (col, resizer) {
+            let x = 0;
+            let w = 0;
+
+            const mouseDownHandler = function (e) {
+                x = e.clientX;
+                const styles = window.getComputedStyle(col);
+                w = parseInt(styles.width, 10);
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+                resizer.classList.add('resizing');
+            };
+
+            const mouseMoveHandler = function (e) {app.scs
+                const dx = e.clientX - x;
+                col.style.width = `${w + dx}px`;
+            };
+
+            const mouseUpHandler = function () {
+                resizer.classList.remove('resizing');
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+            };
+
+            resizer.addEventListener('mousedown', mouseDownHandler);
+        }
+        
+        const cols = table.querySelectorAll('th');
+        for(let col of cols) 
+        {
+            const resizer = document.createElement('div');
+            resizer.classList.add('resizer');
+            resizer.style.height = `${table.offsetHeight}px`;
+            col.appendChild(resizer);
+            createResizableColumn(col, resizer);
+        }
     }
 };

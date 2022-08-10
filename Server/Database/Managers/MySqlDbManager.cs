@@ -491,15 +491,18 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// </summary>
     /// <param name="server">the server address</param>
     /// <param name="name">the database name</param>
+    /// <param name="port">the database port</param>
     /// <param name="user">the connecting user</param>
     /// <param name="password">the password to use</param>
     /// <returns>any error or empty string if successful</returns>
-    public string Test(string server, string name, string user, string password)
+    public string Test(string server, string name, int port, string user, string password)
     {
         try
         {
             var builder = new MySqlConnector.MySqlConnectionStringBuilder();
             builder["Server"] = server;
+            if (port > 0)
+                builder["Port"] = port;
             builder["Uid"] = user;
             builder["Pwd"] = password;
             string connString = builder.ConnectionString;
@@ -518,13 +521,16 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
     /// </summary>
     /// <param name="server">the database server</param>
     /// <param name="database">the database name</param>
+    /// <param name="port">the database port</param>
     /// <param name="user">the connecting user</param>
     /// <param name="password">the password for the connection</param>
     /// <returns>the database connection string</returns>
-    public string GetConnectionString(string server, string database, string user, string password)
+    public string GetConnectionString(string server, string database, int port, string user, string password)
     {
         var builder = new MySqlConnector.MySqlConnectionStringBuilder();
         builder["Server"] = server;
+        if (port > 0)
+            builder["Port"] = port;
         builder["Database"] = database?.EmptyAsNull() ?? "FileFlows";
         builder["Uid"] = user;
         builder["Pwd"] = password;
@@ -546,6 +552,10 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         settings.DbName = builder["Database"].ToString();
         settings.DbUser = builder["Uid"].ToString();
         settings.DbPassword = builder["Pwd"].ToString();
+        if (builder.ContainsKey("Port") && int.TryParse(builder["Port"].ToString(), out int port))
+            settings.DbPort = port;
+        else
+            settings.DbPort = 3306;
     }
 
     private readonly Dictionary<Guid, DateTime> NodeLastSeen = new();

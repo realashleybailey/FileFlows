@@ -228,7 +228,7 @@ public class SettingsController : Controller
         //     return new SqlServerDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
         //         settings.DbPassword);
         if (dbType == DatabaseType.MySql)
-            return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbUser,
+            return new MySqlDbManager(string.Empty).GetConnectionString(settings.DbServer, settings.DbName, settings.DbPort, settings.DbUser,
                 settings.DbPassword);
         return string.Empty;
     }
@@ -249,7 +249,7 @@ public class SettingsController : Controller
         //     return new SqlServerDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
         //         ?.EmptyAsNull() ?? "OK";
         if (model.Type == DatabaseType.MySql)
-            return new MySqlDbManager(string.Empty).Test(model.Server, model.Name, model.User, model.Password)
+            return new MySqlDbManager(string.Empty).Test(model.Server, model.Name, model.Port, model.User, model.Password)
                 ?.EmptyAsNull() ?? "OK";
         
         return "Unsupported database type";
@@ -289,6 +289,10 @@ public class DbConnectionInfo
     /// Gets or sets the database name
     /// </summary>
     public string Name { get; set; }
+    /// <summary>
+    /// Gets or sets the port
+    /// </summary>
+    public int Port { get; set; }
     /// <summary>
     /// Gets or sets the connecting user
     /// </summary>

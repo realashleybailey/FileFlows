@@ -487,7 +487,8 @@
           "NoDatabase":"Name is required",
           "NoUser":"User is required",
           "NoPassword":"Password is required",
-          "TestSuccess":"Successfully connected to database"
+          "TestSuccess":"Successfully connected to database",
+          "TestingDatabase":"Testing Database Connection"
         },
         "Restart":{
           "Title":"Restart FileFlows",
@@ -538,6 +539,8 @@
           "Type-Help":"The type of database to use, the default type is SQLite which requires not additional setup or configuration",
           "Server":"Server",
           "Server-Help":"The address of the Database server and the port or named instance if required",
+          "Port":"Port",
+          "Port-Help":"The default port for MySQL is 3306",
           "Name":"Name",
           "Name-Help":"The name of the database to created, if left blank ''FileFlows'' will be used",
           "User":"User",

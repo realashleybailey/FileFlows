@@ -23,7 +23,7 @@ public partial class Settings : ComponentBase
 
     private string lblSave, lblSaving, lblHelp, lblGeneral, lblAdvanced, lblNode, lblDatabase, lblLogging, 
         lblInternalProcessingNodeDescription, lblDbDescription, lblTest, lblRestart, lblLicense, lblUpdates, 
-        lblCheckNow;
+        lblCheckNow, lblTestingDatabase;
 
     private string OriginalDatabase, OriginalServer;
 
@@ -72,6 +72,7 @@ public partial class Settings : ComponentBase
         lblRestart= Translater.Instant("Pages.Settings.Labels.Restart");
         lblLogging= Translater.Instant("Pages.Settings.Labels.Logging");
         lblCheckNow = Translater.Instant("Pages.Settings.Labels.CheckNow");
+        lblTestingDatabase = Translater.Instant("Pages.Settings.Messages.Database.TestingDatabase");
         Blocker.Show("Loading Settings");
 
         RequiredValidator.Add(new Required());
@@ -93,6 +94,8 @@ public partial class Settings : ComponentBase
             this.Model.LicenseFlags = string.Join(", ", flags.OrderBy(x => x).Select(FlowHelper.FormatLabel));
             this.OriginalServer = this.Model?.DbServer;
             this.OriginalDatabase = this.Model?.DbName;
+            if (this.Model != null && this.Model.DbPort < 1)
+                this.Model.DbPort = 3306;
         }
 
         var nodesResponse = await HttpHelper.Get<ProcessingNode[]>("/api/node");
@@ -145,6 +148,7 @@ public partial class Settings : ComponentBase
         string name = Model?.DbName?.Trim();
         string user = Model?.DbUser?.Trim();
         string password = Model?.DbPassword?.Trim();
+        int port = Model?.DbPort ?? 0;
         if (string.IsNullOrWhiteSpace(server))
         {
             Toast.ShowError(Translater.Instant("Pages.Settings.Messages.Database.NoServer"));
@@ -166,12 +170,12 @@ public partial class Settings : ComponentBase
             return;
         }
 
-        Blocker.Show();
+        Blocker.Show(lblTestingDatabase);
         try
         {
             var result = await HttpHelper.Post<string>("/api/settings/test-db-connection", new
             {
-                server, name, user, password, Type = DbType
+                server, name, port, user, password, Type = DbType
             });
             if (result.Success == false)
                 throw new Exception(result.Body);

@@ -44,6 +44,11 @@ public class SettingsUiModel:Settings
     public string DbServer { get; set; }
     
     /// <summary>
+    /// Gets or sets the db port to use
+    /// </summary>
+    public int DbPort { get; set; }
+    
+    /// <summary>
     /// Gets or sets the name of the database
     /// </summary>
     public string DbName { get; set; }

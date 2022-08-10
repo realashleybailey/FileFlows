@@ -1,4 +1,4 @@
-using System.Data.SQLite;
+using System.Data.Common;
 using System.Text.RegularExpressions;
 using FileFlows.Server.Controllers;
 using FileFlows.Shared.Models;
@@ -79,7 +79,13 @@ public class SqliteDbManager : DbManager
     /// </summary>
     /// <param name="dbFile">the filename of the sqlite db file</param>
     /// <returns>a sqlite connection string</returns>
-    public static string GetConnetionString(string dbFile) => $"Data Source={dbFile};Version=3;PRAGMA journal_mode=WAL;";
+    public static string GetConnetionString(string dbFile)
+    {
+        if (Globals.IsArm)
+            return $"Data Source={dbFile}";
+        return $"Data Source={dbFile};Version=3;PRAGMA journal_mode=WAL;";
+    } 
+        
 
     /// <summary>
     /// Gets if the database manager should use a memory cache
@@ -102,7 +108,8 @@ public class SqliteDbManager : DbManager
     {
         try
         {
-            using var db = new NPoco.Database(connectionString, null, SQLiteFactory.Instance);
+            var db = new NPoco.Database(connectionString, null,
+                Globals.IsArm ? Microsoft.Data.Sqlite.SqliteFactory.Instance : System.Data.SQLite.SQLiteFactory.Instance);
             db.Mappers.Add(new GuidConverter());
             return db;
         }
@@ -124,7 +131,8 @@ public class SqliteDbManager : DbManager
     {
         if (File.Exists(DbFilename) == false)
         {
-            SQLiteConnection.CreateFile(DbFilename);
+            FileStream fs = File.Create(DbFilename);
+            fs.Close();
             return DbCreateResult.Created;
         }
         
@@ -139,7 +147,9 @@ public class SqliteDbManager : DbManager
     /// <returns>true if successfully created</returns>
     protected override bool CreateDatabaseStructure()
     {
-        using var con = new SQLiteConnection(GetConnetionString(DbFilename));
+        string connString = GetConnetionString(DbFilename);
+        using DbConnection con = Globals.IsArm ? new Microsoft.Data.Sqlite.SqliteConnection(connString) :
+            new System.Data.SQLite.SQLiteConnection(connString);
         con.Open();
         try
         {
@@ -150,14 +160,16 @@ public class SqliteDbManager : DbManager
                          (nameof(RevisionedObject), CreateDbRevisionedObjectTableScript),
                      })
             {
-                using var cmdExists =
-                    new SQLiteCommand(
-                        $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tbl.Item1}'",
-                        con);
+                string sqlExists = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tbl.Item1}'";
+                using DbCommand cmdExists = Globals.IsArm
+                    ? new Microsoft.Data.Sqlite.SqliteCommand(sqlExists, (Microsoft.Data.Sqlite.SqliteConnection)con)
+                    : new System.Data.SQLite.SQLiteCommand(sqlExists, (System.Data.SQLite.SQLiteConnection)con);
                 if (cmdExists.ExecuteScalar() != null)
                     continue;
 
-                using var cmd = new SQLiteCommand(tbl.Item2, con);
+                using DbCommand cmd = Globals.IsArm
+                    ? new Microsoft.Data.Sqlite.SqliteCommand(tbl.Item2, (Microsoft.Data.Sqlite.SqliteConnection)con) 
+                    : new System.Data.SQLite.SQLiteCommand(tbl.Item2, (System.Data.SQLite.SQLiteConnection)con);
                 cmd.ExecuteNonQuery();
             }
 

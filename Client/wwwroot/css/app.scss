@@ -12,7 +12,6 @@
     src: url("webfonts/Montserrat-VariableFont_wght.ttf") format("truetype-variations"); 
 }
 
-
 html {
     overflow: hidden;
 }
@@ -877,7 +876,6 @@ input[type=file]{
             background: rgba(var(--accent-rgb), 0.3);
         }
     }
-    
 }
 
 .editor.PagesScripts .fields {

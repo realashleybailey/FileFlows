@@ -35,6 +35,13 @@ public class Globals
     public static bool IsMac => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     /// <summary>
+    /// Gets if this is running on an ARM CPU
+    /// </summary>
+    public static bool IsArm =>
+        System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture == Architecture.Arm
+        || System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
+
+    /// <summary>
     /// Gets or sets if this node is running inside a docker container
     /// </summary>
     public static bool IsDocker { get; set; }

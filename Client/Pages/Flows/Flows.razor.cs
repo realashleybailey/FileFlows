@@ -20,6 +20,7 @@ public partial class Flows : ListPage<Guid, FlowListModel>
     [Inject] public IJSRuntime jsRuntime { get; set; }
 
     private NewFlowEditor AddEditor;
+    private string TableIdentifier => "Flows-" + this.SelectedType;
 
     public override string ApiUrl => "/api/flow";
 

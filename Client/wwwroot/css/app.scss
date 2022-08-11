@@ -881,23 +881,3 @@ input[type=file]{
 .editor.PagesScripts .fields {
     overflow:hidden !important;
 }
-
-.resizer {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 5px;
-    cursor: col-resize;
-    user-select: none;
-}
-.resizer:hover,
-.resizing {
-    border-right: 2px solid blue;
-}
-
-.resizable {
-    border: 1px solid gray;
-    height: 100px;
-    width: 100px;
-    position: relative;
-}

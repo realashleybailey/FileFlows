@@ -11,7 +11,7 @@
     </Head>
 
     <Body>
-        <FlowTable @ref="Table" Data="@Data" TItem="ProcessingNode" Selection="SelectionMode.Multiple"
+        <FlowTable @ref="Table" Data="@Data" TItem="ProcessingNode" Selection="SelectionMode.Multiple" TableIdentifier="Nodes"
             DoubleClick="@OnDoubleClick">
             <ToolBar>            
                 <FlowTableButton TItem="ProcessingNode" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />

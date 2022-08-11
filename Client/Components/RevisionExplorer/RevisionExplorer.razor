@@ -14,7 +14,7 @@
                 </Head>
 
                 <Body>
-                <FlowTable @ref=Table TItem="RevisionedObject" Selection="SelectionMode.Single" Data=@Revisions>
+                <FlowTable @ref=Table TItem="RevisionedObject" Selection="SelectionMode.Single" Data=@Revisions TableIdentifier="RevisionExplorer">
                     <ToolBar>
                         <FlowTableButton TItem="RevisionedObject" Clicked=Restore SelectedOne="true" Icon="fas fa-check" Label="Labels.Restore" />
                     </ToolBar>

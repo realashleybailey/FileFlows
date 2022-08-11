@@ -12,7 +12,7 @@
     <Body>
         
         <FlowTable @ref="Table" Data="@Data" TItem="PluginInfoModel" Selection="SelectionMode.Multiple"
-            DoubleClick="@DoubleClick">
+            DoubleClick="@DoubleClick" TableIdentifier="Plugins">
             <ToolBar>            
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
                 <FlowTableButton TItem="PluginInfoModel" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />

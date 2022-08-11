@@ -104,6 +104,10 @@
         height: 2.2rem;
         line-height: 2.2rem;
 
+        &:not(.flowtable-select) {
+            padding-left: 0.5rem;
+        }
+
         &.pre-text {
             white-space: pre-line;
             height: unset;
@@ -163,5 +167,23 @@
 
     .flowtable-data {
         top: 3.5rem;
+    }
+}
+
+
+::deep {
+    .resizer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 5px;
+        cursor: col-resize;
+        user-select: none;
+        border-right: 2px solid rgba(var(--color-rgb), 0.05);
+    }
+
+    .resizer:hover,
+    .resizing {
+        border-right: 2px solid var(--accent);
     }
 }

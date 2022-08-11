@@ -14,7 +14,7 @@
 
             <Body>
                 <div class="browser-content">
-                    <FlowTable @ref="Table" TItem="PluginPackageInfo" Selection="SelectionMode.Multiple" DoubleClick="@View">
+                    <FlowTable @ref="Table" TItem="PluginPackageInfo" Selection="SelectionMode.Multiple" DoubleClick="@View" TableIdentifier="PluginBrowser">
                         <ToolBar>                    
                             <FlowTableButton TItem="PluginPackageInfo" Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
                             <FlowTableButton TItem="PluginPackageInfo" Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                

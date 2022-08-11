@@ -16,7 +16,7 @@
     <FlowSkyBox TItem="ScriptType" @ref=Skybox OnSelected=@SetSelected/>
 
     <FlowTable @ref="Table" Data="@(SelectedType == ScriptType.Flow ? DataFlow : SelectedType == ScriptType.Shared ? DataShared : DataSystem)" TItem="Script" Selection="SelectionMode.Multiple"
-               DoubleClick="@OnDoubleClick">
+               DoubleClick="@OnDoubleClick" TableIdentifier="@TableIdentifier">
         <ToolBar>
             @if (SelectedType == ScriptType.Shared)
             {

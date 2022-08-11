@@ -23,6 +23,8 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     private int Count;
     private string lblSearch;
 
+    private string TableIdentifier => "LibraryFiles_" + this.SelectedStatus; 
+
     SearchPane SearchPane { get; set; }
     private readonly LibraryFileSearchModel SearchModel = new()
     {

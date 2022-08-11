@@ -24,7 +24,7 @@
 }
 
 <FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
-           DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
+           TableIdentifier=@TableIdentifier DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
     <ToolBar>
         <FlowTableButton TItem="LibaryFileListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
         @if (Skybox?.SelectedItem?.Value == FileStatus.Duplicate)

@@ -12,7 +12,7 @@
 
     <Body>
     <FlowTable @ref="Table" Data="@Data" TItem="FileFlowsTask" Selection="SelectionMode.Multiple"
-               DoubleClick="@OnDoubleClick">
+               DoubleClick="@OnDoubleClick" TableIdentifier="Tasks">
         <ToolBar>            
             <FlowTableButton TItem="FileFlowsTask" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
             <FlowTableButton TItem="FileFlowsTask" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />

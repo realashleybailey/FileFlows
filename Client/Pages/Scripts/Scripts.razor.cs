@@ -18,6 +18,8 @@ public partial class Scripts : ListPage<string, Script>
     public override string ApiUrl => "/api/script";
 
     const string FileFlowsServer = "FileFlowsServer";
+
+    private string TableIdentifier => "Scripts-" + this.SelectedType;
     
     private FlowSkyBox<ScriptType> Skybox;
 

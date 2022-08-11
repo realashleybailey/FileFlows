@@ -223,48 +223,131 @@ window.ff = {
             document.removeEventListener("mousemove", resize, false);
         }, false);        
     },
-    resizableTable: function(uid){
-        let table = document.getElementById(uid);
-        if(!table)
+    resetTable: function(uid, tableIdentifier) {
+        console.log('reset table');
+        localStorage.removeItem(tableIdentifier);        
+        this.resizableTable(uid, tableIdentifier, true);
+    },
+    resizableTable: function(uid, tableIdentifier, reset){
+        let div = document.getElementById(uid);
+        if(!div)
             return;
-        if(table.tagName.toLowerCase() !== 'table')
-            table = table.querySelector('table');
+        
+        let existing = div.querySelectorAll('.resizer');
+        for(let item of existing)
+            item.remove();
 
-        const createResizableColumn = function (col, resizer) {
+        const getCssClass = function(name) {
+            for(let ss of document.styleSheets)
+            {
+                for(let rule of ss.cssRules)
+                {
+                    if(rule.selectorText === '.' + name)
+                        return rule;
+                }
+            }
+        }
+        
+        const saveColumnInfo = function()
+        {
+            if(!tableIdentifier)
+                return;
+            const cols = div.querySelectorAll('.flowtable-header-row > span:not(.hidden)');
+            let widths = [];
+            for(let col of cols){
+                const styles = window.getComputedStyle(col);
+                w = parseInt(styles.width, 10);
+                widths.push(w);
+            }
+            localStorage.setItem(tableIdentifier, JSON.stringify(widths));            
+        }
+        
+        const getClassName = function(col){
+            return col.className.match(/col\-[\d]+/)[0]
+        } 
+                
+        const createResizableColumn = function (col, resizer, next) {
             let x = 0;
             let w = 0;
+            let nW = 0;
 
+            let colClassName = getClassName(col);
+            let nextClassName = getClassName(next);
+            let colClass = getCssClass(colClassName);
+            let nextClass = getCssClass(nextClassName);
+            
             const mouseDownHandler = function (e) {
                 x = e.clientX;
                 const styles = window.getComputedStyle(col);
                 w = parseInt(styles.width, 10);
+                const nextStyles = window.getComputedStyle(next);
+                nW = parseInt(nextStyles.width, 10);
                 document.addEventListener('mousemove', mouseMoveHandler);
                 document.addEventListener('mouseup', mouseUpHandler);
                 resizer.classList.add('resizing');
             };
 
-            const mouseMoveHandler = function (e) {app.scs
+            const mouseMoveHandler = function (e) {
                 const dx = e.clientX - x;
-                col.style.width = `${w + dx}px`;
+                colClass.style.width = `${w + dx}px`;
+                colClass.style.minWidth = `${w + dx}px`;
+                nextClass.style.width = `${nW - dx}px`;
+                nextClass.style.minWidth = `${nW - dx}px`;                
             };
 
             const mouseUpHandler = function () {
                 resizer.classList.remove('resizing');
                 document.removeEventListener('mousemove', mouseMoveHandler);
                 document.removeEventListener('mouseup', mouseUpHandler);
+                saveColumnInfo();
             };
 
             resizer.addEventListener('mousedown', mouseDownHandler);
         }
         
-        const cols = table.querySelectorAll('th');
-        for(let col of cols) 
-        {
-            const resizer = document.createElement('div');
-            resizer.classList.add('resizer');
-            resizer.style.height = `${table.offsetHeight}px`;
-            col.appendChild(resizer);
-            createResizableColumn(col, resizer);
+        const cols = div.querySelectorAll('.flowtable-header-row > span:not(.hidden)');
+        let savedWidths = [];
+        if(tableIdentifier != null){
+            let saved = localStorage.getItem(tableIdentifier);
+            if(saved){
+                savedWidths = JSON.parse(saved);
+            }
+        }
+
+        for(let i=0;i<cols.length;i++) {
+            let col = cols[i];
+            if (col.classList.contains('flowtable-select'))
+                continue;
+
+            let colClassName = getClassName(col);
+            let colClass = getCssClass(colClassName);
+            if (colClass) {
+                if (reset) 
+                {
+                    let width = col.getAttribute('data-width');
+                    if(width) {
+                        colClass.style.width = width;
+                        colClass.style.minWidth = width;
+                    }
+                    else
+                    {
+                        colClass.style.width = 'unset';
+                        colClass.style.minWidth = 'unset';
+                    }
+                }
+                else if (i < savedWidths.length && savedWidths[i] > 0) {
+                    colClass.style.width = `${savedWidths[i]}px`;
+                    colClass.style.minWidth = `${savedWidths[i]}px`;
+                }
+            }
+            if(i < cols.length - 1) {
+                const resizer = document.createElement('div');
+                col.style.position = 'relative';
+                resizer.classList.add('resizer');
+                resizer.style.height = `${div.offsetHeight}px`;
+                col.appendChild(resizer);
+                createResizableColumn(col, resizer, cols[i + 1]);
+            }
         }
     }
 };

@@ -16,6 +16,12 @@
             <div class="flowtable-toolbar-buttons">
                 @ToolBar
             </div>
+            <div class="flowtable-toolbar-reset-layout">
+                <button class="flowtable-button" @onclick=@ResetLayout>
+                    <span class="icon fas fa-table"></span>
+                    Reset Layout
+                </button>
+            </div>
             <div class="flowtable-toolbar-filter">
                 <input @ref="eleFilter" type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" placeholder="@lblFilter" autocomplete="off" />
                 <i class="fas fa-search"></i>
@@ -27,16 +33,18 @@
         @foreach(var col in this.ColumnList)
         {
             string hashcode = ".col-" + col.GetHashCode();
-            if(string.IsNullOrEmpty(col.Width) == false)
-            {
-                <text>
-                @hashcode { 
-                    min-width:@col.Width;
-                    max-width:@col.Width;
-                    width:@col.Width;
+            <text>
+            @hashcode { 
+                @if(string.IsNullOrEmpty(col.Width) == false)
+                {
+                    <text>
+                        min-width:@col.Width;
+                        max-width:@col.Width;
+                        width:@col.Width;
+                    </text>
                 }
-                </text>
             }
+            </text>
             @if(string.IsNullOrEmpty(col.MobileWidth) == false)
             {
                 <text>
@@ -53,20 +61,20 @@
         }
     </style>
 
-    <div class="flowtable-data">
+    <div id="@Uid" class="flowtable-data">
 
         <div class="flowtable-header">
             <div class="flowtable-row flowtable-header-row">
                 @if(Selection != SelectionMode.None)
                 {
-                    <span style="width:2rem;min-width:2rem;max-width:2rem">
+                    <span class="flowtable-select" style="width:2rem;min-width:2rem;max-width:2rem">
                         <input type="checkbox" @onchange="(e) => SelectAll(e)" checked="@(DisplayData.Any(i => SelectedItems != null && SelectedItems.Contains(i.Key)))"  />                        
                     </span>
                 }
                 @foreach(var col in ColumnList)
                 {
                     string hashcode = "col-" + col.GetHashCode();
-                    <span class="@col.ClassName @hashcode @(col.Hidden ? "hidden" : "")" style="@col.Style">
+                    <span class="@col.ClassName @hashcode @(col.Hidden ? "hidden" : "")" data-width="@col.Width" style="@col.Style">
                         @col.Header
                     </span>
                 }
@@ -82,7 +90,7 @@
                     <div class="flowtable-row @(selected ? "selected" : "")" @ondblclick="() => OnDoubleClick(item.Key)" @onclick="(e) => OnClick(e, item.Key)">
                         @if(Selection!= SelectionMode.None)
                         {
-                            <span style="width:2rem;min-width:2rem;max-width:2rem">
+                            <span class="flowtable-select" style="width:2rem;min-width:2rem;max-width:2rem">
                                 <input type="checkbox" @onchange="(e) => CheckItem(e, item.Key)" checked="@(SelectedItems?.Contains(item.Key) == true)"
                                        @onclick:stopPropagation
                                        />                        

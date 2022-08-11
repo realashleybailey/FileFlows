@@ -15,7 +15,7 @@
 
 <Body>
 
-<FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple"
+<FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple" TableIdentifier="LibraryFilesSearch"
            DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
     <ToolBar>                    
         <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />

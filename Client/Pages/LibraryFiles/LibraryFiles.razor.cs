@@ -18,6 +18,8 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
     private FileFlows.Shared.Models.FileStatus SelectedStatus;
 
+    private int PageIndex;
+
     private string lblMoveToTop = "";
 
     private int Count;
@@ -34,20 +36,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     private string Title;
     private string lblLibraryFiles, lblFileFlowsServer;
     private int TotalItems;
-    private int PageSize = 2000;
-    private int PageIndex;
-    private int PageCount 
-    {
-        get
-        {
-            if (TotalItems == 0) return 0;
-            if (TotalItems <= PageSize) return 1;
-            int pages = TotalItems / PageSize;
-            if (TotalItems % PageSize > 0)
-                ++pages;
-            return pages;
-        }
-    }
     
     private async Task SetSelected(FlowSkyBoxItem<FileStatus> status)
     {
@@ -59,7 +47,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         this.StateHasChanged();
     }
 
-    public override string FetchUrl => $"{ApiUrl}/list-all?status={Skybox?.SelectedItem?.Value}&page={PageIndex}&pageSize={PageSize}";
+    public override string FetchUrl => $"{ApiUrl}/list-all?status={Skybox?.SelectedItem?.Value}&page={PageIndex}&pageSize={App.PageSize}";
 
     private string NameMinWidth = "20ch";
 
@@ -88,9 +76,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         lblFileFlowsServer = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
         Title = lblLibraryFiles + ": " + Translater.Instant("Enums.FileStatus." + FileStatus.Unprocessed);
         this.lblSearch = Translater.Instant("Labels.Search");
-        this.PageSize = await LocalStorage.GetItemAsync<int>(nameof(PageSize));
-        if (this.PageSize < 100 || this.PageSize > 5000)
-            this.PageSize = 1000;
 
     }
 
@@ -261,6 +246,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     {
         var status = Skybox.SelectedItem;
         this.TotalItems = status?.Count ?? 0;
+        Logger.Instance.ILog("TotalItems: " + TotalItems);
         this.StateHasChanged();
     }
 
@@ -270,12 +256,8 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         await this.Refresh();
     }
 
-    private async Task PageSizeChange(ChangeEventArgs e)
+    private async Task PageSizeChange(int size)
     {
-        if (int.TryParse(e.Value?.ToString(), out int pageSize) == false)
-            return;
-        await LocalStorage.SetItemAsync(nameof(PageSize), pageSize);
-        this.PageSize = pageSize;
         this.PageIndex = 0;
         await this.Refresh();
     }

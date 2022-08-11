@@ -8,17 +8,57 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FileFlows.Client.Components.Common;
 
-public partial class FlowTable<TItem>: ComponentBase,IDisposable
+public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropertyChanged
 {
     private readonly string Uid = Guid.NewGuid().ToString();
     private Dictionary<TItem, string> DataDictionary;
     private List<TItem> _Data;
+
+    /// <summary>
+    /// Gets or sets if the pager should be shown
+    /// </summary>
+    [Parameter] public bool ShowPager { get; set; }
+
+    private int _TotalItems;
+
+    /// <summary>
+    /// Gets or sets the total items, needed for the pager to know how many pages to show
+    /// </summary>
+    [Parameter]
+    public int TotalItems
+    {
+        get => _TotalItems;
+        set
+        {
+            if (_TotalItems != value)
+            {
+                _TotalItems = value;
+                OnPropertyChanged(nameof(TotalItems));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets callback when the page size is changed
+    /// </summary>
+    [Parameter] public EventCallback<int> OnPageSizeChange { get; set; }
+    
+    /// <summary>
+    /// Gets or sets callback when the page is changed
+    /// </summary>
+    [Parameter] public EventCallback<int> OnPageChange { get; set; }
+
+    /// <summary>
+    /// Gets or sets the data
+    /// </summary>
     [Parameter]
     public List<TItem> Data // the original data, not filtered
     {
@@ -36,8 +76,15 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable
     /// </summary>
     [Parameter] public string TableIdentifier { get; set; }
 
+    /// <summary>
+    /// Sets the data
+    /// </summary>
+    /// <param name="value">the data to set</param>
+    /// <param name="clearSelected">if the selected items should be cleared</param>
     public void SetData(List<TItem> value, bool clearSelected = true)
     {
+        if(value?.Any() != true)
+            Logger.Instance.ILog("## SetData to nothing!");
         this._FilterText = string.Empty;
         this._Data = value ?? new();
         var jsonOptions = new System.Text.Json.JsonSerializerOptions()
@@ -68,14 +115,34 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable
         this.SelectedItems.AddRange(selection);
     }
 
-    [Parameter]
-    public string MinWidth { get; set; }
+    /// <summary>
+    /// Gets or sets the minimum width of the table
+    /// </summary>
+    [Parameter] public string MinWidth { get; set; }
 
     private ElementReference eleFilter { get; set; }
 
+    /// <summary>
+    /// Gets or sets the callback when an item is double clicked
+    /// </summary>
     [Parameter] public EventCallback<TItem> DoubleClick { get; set; }
 
-    private Dictionary<TItem, string> DisplayData = new ();
+    
+    private Dictionary<TItem, string> _DisplayData = new ();
+
+    private Dictionary<TItem, string> DisplayData
+    {
+        get => _DisplayData;
+        set
+        {
+            if (value?.Any() != true)
+            {
+                Logger.Instance.ILog("Setting display data to nothing! previous : " + _DisplayData?.Count);
+            }
+
+            _DisplayData = value;
+        }
+    }
     private readonly List<TItem> SelectedItems = new ();
 
     private string CurrentFilter = string.Empty;
@@ -91,13 +158,24 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the selection mode for the table
+    /// </summary>
     [Parameter] public SelectionMode Selection { get; set; }
 
-    [Parameter]
-    public RenderFragment ToolBar { get; set; }
-    [Parameter]
-    public RenderFragment Columns { get; set; }
+    /// <summary>
+    /// Gets or sets the toolbar of the table
+    /// </summary>
+    [Parameter] public RenderFragment ToolBar { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the columns for the table
+    /// </summary>
+    [Parameter] public RenderFragment Columns { get; set; }
 
+    /// <summary>
+    /// The JavaScript runtime
+    /// </summary>
     [Inject] IJSRuntime jsRuntime{ get; set; }
     [Inject] IHotKeysService HotKeyService { get; set; }
 
@@ -230,7 +308,7 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable
             this.NotifySelectionChanged();
         }
         string filter = this.FilterText.ToLowerExplicit();
-        if (filter == string.Empty)
+        if (string.IsNullOrWhiteSpace(filter))
             this.DisplayData = this.DataDictionary;
         else if (filter.StartsWith(CurrentFilter))
         {
@@ -339,6 +417,33 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable
         {
             this.FilterText = String.Empty;
         }
+    }
+
+    /// <summary>
+    /// Triggers the page change event
+    /// </summary>
+    /// <param name="page">the page to change to</param>
+    public void TriggerPageChange(int page) => _ = OnPageChange.InvokeAsync(page);
+    
+    /// <summary>
+    /// Triggers the page size change event
+    /// </summary>
+    /// <param name="size">the new size</param>
+    public void TriggerPageSizeChange(int size) => _ = OnPageSizeChange.InvokeAsync(size);
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }
 public enum SelectionMode

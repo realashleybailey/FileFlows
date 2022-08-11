@@ -81,7 +81,7 @@
             </div>
         </div>
         <div class="flowtable-body">
-            @if (Data != null)
+            @if (DisplayData?.Any() == true)
             {
                 <Virtualize Items="@DisplayData" Context="item" ItemSize="25"  OverscanCount="4">
                     @{
@@ -93,7 +93,7 @@
                             <span class="flowtable-select" style="width:2rem;min-width:2rem;max-width:2rem">
                                 <input type="checkbox" @onchange="(e) => CheckItem(e, item.Key)" checked="@(SelectedItems?.Contains(item.Key) == true)"
                                        @onclick:stopPropagation
-                                       />                        
+                                />                        
                             </span>
                         }
                         @foreach (var col in ColumnList)
@@ -106,7 +106,17 @@
                     </div>                        
                 </Virtualize>
             }
+            else
+            {
+                <div class="no-data">No data</div>
+            }
         </div>
+        @if (ShowPager && TotalItems > Math.Min(250, App.PageSize))
+        {
+            <CascadingValue Value="this" IsFixed="true">
+                <FlowPager TItem="TItem" />
+            </CascadingValue>
+        }
     </div>
     
 

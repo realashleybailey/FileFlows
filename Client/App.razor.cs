@@ -14,6 +14,7 @@ namespace FileFlows.Client
         [Inject] public HttpClient Client { get; set; }
         [Inject] public IJSRuntime jsRuntime { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
+        [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
         public bool LanguageLoaded { get; set; } = false;
 
         public int DisplayWidth { get; private set; }
@@ -24,6 +25,8 @@ namespace FileFlows.Client
         public FileFlows.Shared.Models.Flow NewFlowTemplate { get; set; }
 
         public static FileFlows.Shared.Models.Settings Settings;
+
+        public static int PageSize { get; set; }
 
         /// <summary>
         /// Delegate for the on escape event
@@ -70,12 +73,22 @@ namespace FileFlows.Client
             return (await HttpHelper.Get<string>(url)).Data ?? "";
         }
 
+        public async Task SetPageSize(int pageSize)
+        {
+            PageSize = pageSize;
+            await LocalStorage.SetItemAsync(nameof(PageSize), pageSize);
+        }
+
         protected override async Task OnInitializedAsync()
         {
             Instance = this;
             ClientConsoleLogger.jsRuntime = jsRuntime;
             new ClientConsoleLogger();
             HttpHelper.Client = Client;
+            PageSize = await LocalStorage.GetItemAsync<int>(nameof(PageSize));
+            if (PageSize < 100 || PageSize > 5000)
+                PageSize = 1000;
+            
             var dimensions = await jsRuntime.InvokeAsync<Dimensions>("ff.deviceDimensions");
             DisplayWidth = dimensions.width;
             DisplayHeight = dimensions.height;

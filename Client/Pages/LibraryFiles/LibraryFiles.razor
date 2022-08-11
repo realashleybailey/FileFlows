@@ -24,7 +24,9 @@
 }
 
 <FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
-           TableIdentifier=@TableIdentifier DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
+           TableIdentifier=@TableIdentifier DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth"
+           ShowPager=@true TotalItems=@TotalItems OnPageChange=@PageChange OnPageSizeChange=@PageSizeChange
+           >
     <ToolBar>
         <FlowTableButton TItem="LibaryFileListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
         @if (Skybox?.SelectedItem?.Value == FileStatus.Duplicate)
@@ -170,56 +172,6 @@
         </FlowTableColumn>
     </Columns>
 </FlowTable>
-<div class="pager">
-    <div class="page-size">
-        <select class="page-size" @onchange=@PageSizeChange>
-            @foreach (int size in new[] { 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000, 5000 })
-            {
-                <option selected=@(PageSize == size)>@size</option>
-            }
-        </select>
-    </div>
-    @if (TotalItems > PageSize)
-    {
-        <ul>
-            @{
-                int maxPages = App.Instance.IsMobile ? 7 : 15;
-                int start = PageIndex - (maxPages / 2);
-                if (start < 0)
-                    start = 0;
-                int end = Math.Min(PageCount, start + maxPages);
-                if (end < PageCount - 1)
-                    --end;
-                if (end == PageCount)
-                    start = end - maxPages;
-                if (start < 0)
-                    start = 0;
-                if (start > 0)
-                {
-                    if (PageIndex == start)
-                        --end;
-                    else
-                        ++start;
-                }
-            }
-            @if (start > 0)
-            {
-                <li @onclick=@(() => PageChange(0))>1</li>
-                <li class="spacer">...</li>
-            }
-            @for (int i = start; i < end; i++)
-            {
-                int page = i;
-                <li class="@(page == PageIndex ? "current-page" : "")" @onclick=@(() => PageChange(page))>@(page + 1)</li>
-            }
-            @if (end < PageCount - 1)
-            {
-                <li class="spacer">...</li>
-                <li @onclick=@(() => PageChange(PageCount - 1))>@(PageCount)</li>
-            }
-        </ul>
-    }
-</div>
 </Body>
 
 </PageView>

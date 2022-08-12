@@ -74,9 +74,15 @@ public partial class Settings : ComponentBase
         lblCheckNow = Translater.Instant("Pages.Settings.Labels.CheckNow");
         lblTestingDatabase = Translater.Instant("Pages.Settings.Messages.Database.TestingDatabase");
         Blocker.Show("Loading Settings");
-
-        RequiredValidator.Add(new Required());
-        await Refresh();
+        try
+        {
+            RequiredValidator.Add(new Required());
+            await Refresh();
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
     }
 
     private async Task Refresh(bool blocker = true)

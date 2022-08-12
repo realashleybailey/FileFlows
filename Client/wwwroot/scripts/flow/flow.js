@@ -39,8 +39,8 @@ window.ffFlow = {
         ffFlow.parts = parts;
         ffFlow.elements = elements;
         ffFlow.infobox = null;
-
-
+        
+        
         ffFlow.csharp.invokeMethodAsync("Translate", `Labels.Delete`, null).then(result => {
             ffFlow.lblDelete = result;
         });
@@ -73,6 +73,8 @@ window.ffFlow = {
         container.addEventListener("click", (e) => { ffFlow.unSelect() }, false);
         container.addEventListener("dragover", (e) => { ffFlow.drop(e, false) }, false);
         container.addEventListener("drop", (e) => { ffFlow.drop(e, true) }, false);
+
+        container.addEventListener("contextmenu", (e) => { ffFlow.contextMenu(e); return false; }, false);
 
 
         document.removeEventListener('copy', ffFlow.CopyEventListener);
@@ -108,7 +110,20 @@ window.ffFlow = {
     redrawLines: function () {
         ffFlow.FlowLines.redrawLines();
     },
-
+    
+    contextMenu: function(event, part){
+        if(part){
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            event.preventDefault();
+        }                
+        ffFlow.csharp.invokeMethodAsync("OpenContextMenu", {
+            x: event.clientX,
+            y: event.clientY,
+            parts: this.SelectedParts
+        });
+        return false;
+    },
 
     ioInitConnections: function (connections) {
         ffFlow.reset();
@@ -428,31 +443,31 @@ window.ffFlow = {
                 return; // flowparts/canvas does not have focus, do not listen to this event
         }
         
-        console.log('got copy command');
         if (ffFlow.SelectedParts.length) {
             let json = JSON.stringify(ffFlow.SelectedParts);
-            console.log('json', json);
             e.clipboardData.setData('text/plain', json);
+            
         }
-        e.preventDefault();
+        e?.preventDefault();
     },
 
-    async PasteEventListener(e) {
+    async PasteEventListener(e, json) {
         let eleFlowParts = document.getElementById('flow-parts');
         if(!eleFlowParts)
             return; // not on flow page, dont consume paste
 
-        let active = document.activeElement;
-        if(active) {
-            let flowParts = active.closest('.flow-parts');
-            if (!flowParts)
-                return; // flowparts/canvas does not have focus, do not listen to this event
+        if(!json) {
+            let active = document.activeElement;
+            if (active) {
+                let flowParts = active.closest('.flow-parts');
+                if (!flowParts)
+                    return; // flowparts/canvas does not have focus, do not listen to this event
+            }
+            json = (e?.clipboardData || window.clipboardData)?.getData('text');
         }
-        
-        let json = (e.clipboardData || window.clipboardData).getData('text');
         if(!json)
             return;
-        e.preventDefault();
+        e?.preventDefault();
         let parts = [];
         try {
             parts = JSON.parse(json);
@@ -469,6 +484,29 @@ window.ffFlow = {
             if(p.Name)
                 p.Name = "Copy of " + p.Name;
             ffFlow.History.perform(new FlowActionAddNode(p));
+        }
+    },
+    
+    
+    contextMenu_Edit: function(part){
+        if(!part)
+            return;
+        ffFlow.setInfo(part.Name, 'Node');
+        ffFlowPart.editFlowPart(part.uid);
+    },
+
+    contextMenu_Copy: function(parts) {
+        let json = JSON.stringify(parts);
+        navigator.clipboard.writeText(json);
+    },
+    contextMenu_Paste: function() {
+        navigator.clipboard.readText().then(json => {
+            ffFlow.PasteEventListener(null, json);            
+        });
+    },
+    contextMenu_Delete: function(parts) {
+        for(let part of parts || []) {
+            ffFlowPart.deleteFlowPart(part.uid);
         }
     }
 }

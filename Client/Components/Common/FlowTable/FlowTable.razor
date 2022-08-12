@@ -1,34 +1,74 @@
 ﻿@namespace FileFlows.Client.Components.Common
+@inherits FlowTableBase
 @typeparam TItem
 
 @{
     string style = string.IsNullOrEmpty(MinWidth) ? "" : $"min-width:{MinWidth};";
 }
-
 <div class="flowtable">
     <div class="flow-table-inner" style="@style">
 
-    <CascadingValue Value="this">
-        @Columns
+        <CascadingValue Value="this">
+            @Columns
 
-        <div class="flowtable-toolbar">
+            <div class="flowtable-toolbar">
         
-            <div class="flowtable-toolbar-buttons">
-                @ToolBar
+                <div class="flowtable-toolbar-buttons">
+                    @ToolBar
+                </div>
+                <div class="flowtable-toolbar-filter">
+                    <input @ref="eleFilter" type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" placeholder="@lblFilter" autocomplete="off" />
+                    <i class="fas fa-search"></i>
+                </div>
             </div>
-            <div class="flowtable-toolbar-reset-layout">
-                <button class="flowtable-button" @onclick=@ResetLayout>
-                    <span class="icon fas fa-table"></span>
-                    Reset Layout
-                </button>
-            </div>
-            <div class="flowtable-toolbar-filter">
-                <input @ref="eleFilter" type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" placeholder="@lblFilter" autocomplete="off" />
-                <i class="fas fa-search"></i>
-            </div>
-        </div>
-    </CascadingValue>
-
+        </CascadingValue>
+        
+        <ContextMenu Id=@ContextMenuUid @ref="ContextMenu">
+            @{
+                bool addedResetLayout = false;
+                bool lastWasSeparator = false;
+            }
+            @foreach (var btn in this.Buttons)
+            {
+                if (btn == null)
+                {
+                    if (lastWasSeparator)
+                        continue;
+                    
+                    lastWasSeparator = true;
+                    <BlazorContextMenu.Seperator />
+                }
+                else if (btn.Enabled)
+                {
+                    if (btn is FlowTableHelpButton && addedResetLayout == false)
+                    {
+                        addedResetLayout = true;
+                        if (lastWasSeparator == false)
+                        {
+                            <BlazorContextMenu.Seperator />
+                        }
+                        <Item OnClick="@ResetLayout">
+                            <i class="icon fas fa-table"></i>
+                            @lblResetLayout
+                        </Item>
+                        
+                    }
+                    lastWasSeparator = false;
+                    <Item OnClick="@(() => ContextButton(btn))">
+                        <i class="@btn.Icon"></i>
+                        @btn.Label
+                    </Item>
+                }
+            }
+            @if (addedResetLayout == false)
+            {
+                <Item OnClick="@ResetLayout">
+                    <i class="icon fas fa-table"></i>
+                    @lblResetLayout
+                </Item>
+            }
+        </ContextMenu>
+        
     <style> 
         @foreach(var col in this.ColumnList)
         {
@@ -80,37 +120,37 @@
                 }
             </div>
         </div>
-        <div class="flowtable-body">
+        <ContextMenuTrigger MenuId=@ContextMenuUid CssClass="flowtable-body">
             @if (DisplayData?.Any() == true)
             {
-                <Virtualize Items="@DisplayData" Context="item" ItemSize="25"  OverscanCount="4">
-                    @{
-                        bool selected = Selection != SelectionMode.None && SelectedItems?.Contains(item.Key) == true;
-                    }
-                    <div class="flowtable-row @(selected ? "selected" : "")" @ondblclick="() => OnDoubleClick(item.Key)" @onclick="(e) => OnClick(e, item.Key)">
-                        @if(Selection!= SelectionMode.None)
-                        {
-                            <span class="flowtable-select" style="width:2rem;min-width:2rem;max-width:2rem">
-                                <input type="checkbox" @onchange="(e) => CheckItem(e, item.Key)" checked="@(SelectedItems?.Contains(item.Key) == true)"
-                                       @onclick:stopPropagation
-                                />                        
-                            </span>
+                    <Virtualize Items="@DisplayData" Context="item" ItemSize="25"  OverscanCount="4">
+                        @{
+                            bool selected = Selection != SelectionMode.None && SelectedItems?.Contains(item.Key) == true;
                         }
-                        @foreach (var col in ColumnList)
-                        {
-                            string hashcode = "col-" + col.GetHashCode();
-                            <span class="@col.ClassName @hashcode @(col.Pre ? "pre-text" : "") @(col.Hidden ? "hidden": "")" style="@col.Style">
-                                @col.Cell(item.Key)
-                            </span>
-                        }
-                    </div>                        
-                </Virtualize>
+                        <div class="flowtable-row @(selected ? "selected" : "")" @ondblclick="() => OnDoubleClick(item.Key)" @onclick="(e) => OnClick(e, item.Key)">
+                            @if(Selection!= SelectionMode.None)
+                            {
+                                <span class="flowtable-select" style="width:2rem;min-width:2rem;max-width:2rem">
+                                    <input type="checkbox" @onchange="(e) => CheckItem(e, item.Key)" checked="@(SelectedItems?.Contains(item.Key) == true)"
+                                           @onclick:stopPropagation
+                                    />                        
+                                </span>
+                            }
+                            @foreach (var col in ColumnList)
+                            {
+                                string hashcode = "col-" + col.GetHashCode();
+                                <span class="@col.ClassName @hashcode @(col.Pre ? "pre-text" : "") @(col.Hidden ? "hidden": "")" style="@col.Style">
+                                    @col.Cell(item.Key)
+                                </span>
+                            }
+                        </div>                        
+                    </Virtualize>
             }
             else
             {
                 <div class="no-data">No data</div>
             }
-        </div>
+        </ContextMenuTrigger>
         @if (ShowPager && TotalItems > Math.Min(250, App.PageSize))
         {
             <CascadingValue Value="this" IsFixed="true">

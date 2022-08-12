@@ -27,48 +27,136 @@
     </Head>
 
     <Body>
-        <div class="flow-container @(App.Instance.NavMenuCollapsed ? "has-collapsed-menu" : "")">
-            <div class="flow-elements">
-                <div class="flow-elements-filter">
-                    <input @ref="eleFilter" type="text" @bind-value="txtFilter" @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" @onkeydown="FilterKeyDown" />
-                    <i class="fas fa-search"></i>
-                </div>
-                <ul id="flow-elements-available">
-                    @if (Filtered != null)
+    <div class="flow-container @(App.Instance.NavMenuCollapsed ? "has-collapsed-menu" : "")">
+        <div class="flow-elements">
+            <div class="flow-elements-filter">
+                <input @ref="eleFilter" type="text" @bind-value="txtFilter" @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" @onkeydown="FilterKeyDown" />
+                <i class="fas fa-search"></i>
+            </div>
+            <ul id="flow-elements-available">
+                @if (Filtered != null)
+                {
+                    @foreach (var grp in Filtered.GroupBy(x => x.Group))
                     {
-                        @foreach (var grp in Filtered.GroupBy(x => x.Group))
+                        <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
+                        foreach (var ele in grp.OrderBy(x => x.Type == FlowElementType.Script ? x.Name : string.Empty).ThenBy(x => x.Type).ThenBy(x => x.DisplayName.Substring(x.DisplayName.IndexOf(":") + 1)))
                         {
-                            <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
-                            foreach (var ele in grp.OrderBy(x => x.Type == FlowElementType.Script ? x.Name : string.Empty).ThenBy(x => x.Type).ThenBy(x => x.DisplayName.Substring(x.DisplayName.IndexOf(":") + 1)))
-                            {
-                                <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "")" ondragstart="ffFlow.Mouse.dragElementStart(event)">
-                                    <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
-                                    @((ele.Type == FlowElementType.Script) ? ele.Name : ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1))
+                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "")" ondragstart="ffFlow.Mouse.dragElementStart(event)">
+                                <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
+                                @((ele.Type == FlowElementType.Script) ? ele.Name : ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1))
                                     
-                                   @{
-                                       string ribbonTT = "";
-                                       if (ele.Obsolete)
-                                       {
-                                           ribbonTT = ele.ObsoleteMessage?.EmptyAsNull() ?? lblObsoleteMessage;
-                                       }
-                                   } 
+                                @{
+                                    string ribbonTT = "";
+                                    if (ele.Obsolete)
+                                    {
+                                        ribbonTT = ele.ObsoleteMessage?.EmptyAsNull() ?? lblObsoleteMessage;
+                                    }
+                                } 
                                     
-                                    <div class="ribbon" title="@ribbonTT">
-                                      <div class="ribbon-content">
-                                      </div>
+                                <div class="ribbon" title="@ribbonTT">
+                                    <div class="ribbon-content">
                                     </div>
-                                </li>
-                            }
+                                </div>
+                            </li>
                         }
                     }
-                </ul>
-            </div>
-            <div class="flow-parts" id="flow-parts">
-                <canvas width="8000" height="4000" tabindex="1"></canvas>
-            </div>
-            <div id="flow-zoomer">
-                <FlowSlider Min="50" Max="100" Prefix="Zoom:" Suffix="%" @bind-Value="@Zoom" />
-            </div>
+                }
+            </ul>
         </div>
+        <div class="flow-parts" id="flow-parts">
+            <canvas width="8000" height="4000" tabindex="1" oncontextmenu="return false"></canvas>
+        </div>
+        <div id="flow-zoomer">
+            <FlowSlider Min="50" Max="100" Prefix="Zoom:" Suffix="%" @bind-Value="@Zoom" />
+        </div>
+    </div>
     </Body>
 </PageView>
+
+
+<ContextMenu Id="FlowContextMenu-Single">
+    <Item OnClick="EditItem">
+        <i class="fas fa-edit"></i>
+        @lblEdit
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="Copy">
+        <i class="fas fa-copy"></i>
+        @lblCopy
+    </Item>
+    <Item OnClick="Paste">
+        <i class="fas fa-paste"></i>
+        @lblPaste
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="Redo">
+        <i class="fas fa-redo"></i>
+        @lblRedo
+    </Item>
+    <Item OnClick="Undo">
+        <i class="fas fa-undo"></i>
+        @lblUndo
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="DeleteItems">
+        <i class="fas fa-trash"></i>
+        @lblDelete
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="OpenHelp">
+        <i class="fas fa-question-circle"></i>
+        @lblHelp
+    </Item>
+</ContextMenu>
+
+<ContextMenu Id="FlowContextMenu-Multiple">
+    <Item OnClick="Copy">
+        <i class="fas fa-copy"></i>
+        @lblCopy
+    </Item>
+    <Item OnClick="Paste">
+        <i class="fas fa-paste"></i>
+        @lblPaste
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="Redo">
+        <i class="fas fa-redo"></i>
+        @lblRedo
+    </Item>
+    <Item OnClick="Undo">
+        <i class="fas fa-undo"></i>
+        @lblUndo
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="DeleteItems">
+        <i class="fas fa-trash"></i>
+        @lblDelete
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="OpenHelp">
+        <i class="fas fa-question-circle"></i>
+        @lblHelp
+    </Item>
+</ContextMenu>
+
+
+<ContextMenu Id="FlowContextMenu-Basic">
+    <Item OnClick="Paste">
+        <i class="fas fa-paste"></i>
+        @lblPaste
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="Redo">
+        <i class="fas fa-redo"></i>
+        @lblRedo
+    </Item>
+    <Item OnClick="Undo">
+        <i class="fas fa-undo"></i>
+        @lblUndo
+    </Item>
+    <BlazorContextMenu.Seperator/>
+    <Item OnClick="OpenHelp">
+        <i class="fas fa-question-circle"></i>
+        @lblHelp
+    </Item>
+</ContextMenu>

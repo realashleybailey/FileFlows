@@ -13,7 +13,6 @@ class ffFlowHistory {
         if(this.redoActions.length === 0)
             return; // nothing to redo
         let action = this.redoActions.splice(this.redoActions.length - 1, 1)[0];
-        console.log('redo', action.constructor.name);
         this.history.push(action);
         action.perform();
     }
@@ -23,7 +22,6 @@ class ffFlowHistory {
             return;
         }
         let action = this.history.pop();
-        console.log('undo', action.constructor.name);
         this.redoActions.push(action);
         action.undo();
     }    

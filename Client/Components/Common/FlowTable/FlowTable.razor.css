@@ -112,11 +112,15 @@
   background: rgba(var(--input-background-rgb), 0.3);
 }
 
-.flowtable-body {
+::deep .flowtable-body {
   height: calc(100% - 2.4rem);
   overflow-y: scroll;
   border-left: solid 1px var(--input-background);
   border-bottom: solid 1px var(--input-background);
+}
+::deep .flowtable-body::-webkit-scrollbar-track {
+  border-right: solid 1px var(--input-background);
+  border-left: solid 1px var(--input-background);
 }
 
 .flowtable-data {
@@ -129,11 +133,6 @@
   font-size: 0.9rem;
   display: flex;
   flex-direction: column;
-}
-
-.flowtable-body::-webkit-scrollbar-track {
-  border-right: solid 1px var(--input-background);
-  border-left: solid 1px var(--input-background);
 }
 
 .hidden {

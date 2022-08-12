@@ -13,14 +13,46 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using BlazorContextMenu;
 
 namespace FileFlows.Client.Components.Common;
 
-public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropertyChanged
+public abstract class FlowTableBase: ComponentBase
+{
+    protected List<FlowTableButton> Buttons = new();
+    public delegate void SelectionChangedEvent(List<object> items);
+    public event SelectionChangedEvent SelectionChanged;
+    
+    internal void AddButton(FlowTableButton button)
+    {
+        if (Buttons.Contains(button) == false)
+            Buttons.Add(button);
+    }
+
+    internal void AddButtonSeperator()
+    {
+        Logger.Instance.ILog("Adding button separator");
+        Buttons.Add(null);
+    }
+    protected void NotifySelectionChanged(List<object> selectedItems)
+    {
+        if (SelectionChanged != null)
+            SelectionChanged(new (selectedItems)); // we want a clone of the list, not one they can modify 
+    }
+
+}
+
+public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropertyChanged
 {
     private readonly string Uid = Guid.NewGuid().ToString();
+    private readonly string ContextMenuUid = "ctxMenu-" + Guid.NewGuid();
     private Dictionary<TItem, string> DataDictionary;
     private List<TItem> _Data;
+    private string lblResetLayout;
+
+    private ContextMenu ContextMenu;
+
+    [Inject] private IBlazorContextMenuService ContextMenuService { get; set; }
 
     /// <summary>
     /// Gets or sets if the pager should be shown
@@ -28,6 +60,7 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropert
     [Parameter] public bool ShowPager { get; set; }
 
     private int _TotalItems;
+
 
     /// <summary>
     /// Gets or sets the total items, needed for the pager to know how many pages to show
@@ -180,12 +213,9 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropert
     [Inject] IHotKeysService HotKeyService { get; set; }
 
     List<FlowTableColumn<TItem>> ColumnList = new ();
-    List<FlowTableButton<TItem>> Buttons = new();
 
     private TItem LastSelected;
 
-    public delegate void SelectionChangedEvent(List<TItem> items);
-    public event SelectionChangedEvent SelectionChanged;
 
     private string lblFilter;
 
@@ -197,6 +227,7 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropert
     {
         FlowTableHotkey = Guid.NewGuid().ToString();
         lblFilter = Translater.Instant("Labels.FilterPlaceholder");
+        lblResetLayout = Translater.Instant("Labels.ResetLayout");
         HotKeyService.RegisterHotkey(FlowTableHotkey, "/", callback: () =>
         {
             Task.Run(async () =>
@@ -237,11 +268,6 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropert
     {
         if (ColumnList.Contains(col) == false)
             ColumnList.Add(col);
-    }
-    internal void AddButton(FlowTableButton<TItem> button)
-    {
-        if (Buttons.Contains(button) == false)
-            Buttons.Add(button);
     }
 
 
@@ -407,8 +433,7 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropert
 
     private void NotifySelectionChanged()
     {
-        if (SelectionChanged != null)
-            SelectionChanged(new (SelectedItems)); // we want a clone of the list, not one they can modify 
+        NotifySelectionChanged(SelectedItems.Cast<object>().ToList());
     }
 
     private async Task FilterKeyDown(KeyboardEventArgs args)
@@ -444,6 +469,11 @@ public partial class FlowTable<TItem>: ComponentBase,IDisposable, INotifyPropert
         field = value;
         OnPropertyChanged(propertyName);
         return true;
+    }
+
+    private async Task ContextButton(FlowTableButton btn)
+    {
+        _ = btn.OnClick();
     }
 }
 public enum SelectionMode

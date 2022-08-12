@@ -76,6 +76,11 @@ window.ffFlowPart = {
                     console.log('divInput mouse down ' + i, part);
                     ffFlowLines.ioDown(event, true);
                 });
+                divInput.addEventListener("contextmenu", function (event) {
+                    event.preventDefault();
+                    return false;
+                });
+
                 divInputs.appendChild(divInput);
             }
         }
@@ -97,6 +102,7 @@ window.ffFlowPart = {
 
         let divDraggable = document.createElement('div');
         divDraggable.classList.add('draggable');
+        divDraggable.addEventListener("contextmenu", (e) => { ffFlow.contextMenu(e, part); return false; }, false);
 
         div.appendChild(divDraggable);
 
@@ -140,7 +146,10 @@ window.ffFlowPart = {
                 event.preventDefault();
             }
         });
-        
+        div.addEventListener("contextmenu", function (event) {
+            event.preventDefault();
+            return false;
+        });
         if(allEvents){
             for(let output of div.querySelectorAll('.output div')){
                 ffFlowPart.attachOutputNodeEvents(output);
@@ -149,7 +158,7 @@ window.ffFlowPart = {
     },
     
     attachOutputNodeEvents: function(divOutput) {
-        divOutput.addEventListener("click", function (event) {
+        divOutput.addEventListener("click", function (event) {            
             event.stopImmediatePropagation();
             event.preventDefault();
         });
@@ -157,7 +166,7 @@ window.ffFlowPart = {
             event.stopImmediatePropagation();
             event.preventDefault();
             ffFlow.FlowLines.ioDown(event, false);
-        });  
+        });
     },
 
     setPartName: function (part) {

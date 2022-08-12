@@ -18,9 +18,9 @@
 <FlowTable @ref="Table" Data="@Data" TItem="LibraryFile" Selection="SelectionMode.Multiple" TableIdentifier="LibraryFilesSearch"
            DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth">
     <ToolBar>                    
-        <FlowTableButton TItem="LibraryFile" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
-        <FlowTableButton TItem="LibraryFile" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
-        <FlowTableHelpButton TItem="LibraryFile" HelpUrl="library-files" />
+        <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
+        <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+        <FlowTableHelpButton  HelpUrl="library-files" />
     </ToolBar>
 
     <Columns>

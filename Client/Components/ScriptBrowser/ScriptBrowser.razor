@@ -15,8 +15,8 @@
                 <div class="browser-content">
                     <FlowTable @ref="Table" TItem="RepositoryObject" Selection="SelectionMode.Multiple" DoubleClick="@View" TableIdentifier="ScriptBrowser">
                         <ToolBar>                    
-                            <FlowTableButton TItem="RepositoryObject" Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
-                            <FlowTableButton TItem="RepositoryObject" Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                
+                            <FlowTableButton Clicked=ViewAction SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View" />                                
+                            <FlowTableButton Clicked=Download SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Download" />                                
                         </ToolBar>
 
                         <Columns>

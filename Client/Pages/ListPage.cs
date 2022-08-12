@@ -1,3 +1,4 @@
+using System.Threading;
 using FileFlows.Client.Components;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
@@ -63,6 +64,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         _needsRendering = false;
     }
 
+    private SemaphoreSlim fetching = new(1);
 
     public virtual async Task Load(U selectedUid)
     {
@@ -70,6 +72,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         await this.WaitForRender();
         try
         {
+            await fetching.WaitAsync();
             var result = await FetchData();
             if (result.Success)
             {
@@ -93,6 +96,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         }
         finally
         {
+            fetching.Release();
             HasData = this.Data?.Any() == true;
             this.Loaded = true;
             Blocker.Hide();

@@ -14,17 +14,17 @@
         <FlowTable @ref="Table" Data="@Data" TItem="Library" Selection="SelectionMode.Multiple"
             DoubleClick="@OnDoubleClick" TableIdentifier="Libraries">
             <ToolBar>            
-                <FlowTableButton TItem="Library" Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
-                <FlowTableButton TItem="Library" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-                <FlowTableButton TItem="Library" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+                <FlowTableButton Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
+                <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
+                <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
                 <FlowTableButtonSeparator />            
-                <FlowTableButton TItem="Library" Clicked=Rescan SelectedOneOrMore=true Icon="fas fa-search-plus" Label="Labels.Rescan" />
+                <FlowTableButton Clicked=Rescan SelectedOneOrMore=true Icon="fas fa-search-plus" Label="Labels.Rescan" />
                 @if (App.Instance.FileFlowsSystem.Licensed)
                 {
-                    <FlowTableButton TItem="Library" Clicked=Revisions SelectedOne="true" Icon="fas fa-history" Label="Labels.Revisions" />
+                    <FlowTableButton Clicked=Revisions SelectedOne="true" Icon="fas fa-history" Label="Labels.Revisions" />
                 }
                 <FlowTableButtonSeparator />
-                <FlowTableHelpButton TItem="Library" HelpUrl="libraries" />
+                <FlowTableHelpButton  HelpUrl="libraries" />
             </ToolBar>
 
             <Columns>

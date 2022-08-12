@@ -6,6 +6,8 @@ namespace FileFlows.Client.Components
     public partial class Blocker : ComponentBase
     {
 
+        private int Count = 0;
+
         public bool Visible { get; set; }
 
         public string Message { get; set; } = "";
@@ -16,6 +18,9 @@ namespace FileFlows.Client.Components
             Message ??= "";
             message ??= "";
 
+
+            if (++Count < 1)
+                Count = 1;
             if (Translater.NeedsTranslating(message))
                 message = Translater.Instant(message);
 
@@ -29,6 +34,9 @@ namespace FileFlows.Client.Components
 
         public void Hide()
         {
+            if (--Count > 0)
+                return;
+            
             if (this.Visible == false)
                 return;
             this.Message = "";

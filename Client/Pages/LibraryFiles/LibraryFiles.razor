@@ -28,38 +28,38 @@
            ShowPager=@true TotalItems=@TotalItems OnPageChange=@PageChange OnPageSizeChange=@PageSizeChange
            >
     <ToolBar>
-        <FlowTableButton TItem="LibaryFileListModel" Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
+        <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
         @if (Skybox?.SelectedItem?.Value == FileStatus.Duplicate)
         {
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
+            <FlowTableButton Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
         }
         @if (SelectedStatus == FileStatus.Processing)
         {
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
+            <FlowTableButton Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
         }
         else
         {
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Remove" />
+            <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Remove" />
         }
 
         @if (SelectedStatus == FileStatus.Unprocessed)
         {
             <FlowTableButtonSeparator />    
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=Rescan Icon="fas fa-search-plus" Label="Labels.Rescan" />
+            <FlowTableButton Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
+            <FlowTableButton Clicked=Rescan Icon="fas fa-search-plus" Label="Labels.Rescan" />
         }
         else if (SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
         {
             <FlowTableButtonSeparator />    
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />
+            <FlowTableButton Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />
         }
         else if (SelectedStatus == FileStatus.OnHold)
         {
             <FlowTableButtonSeparator />    
-            <FlowTableButton TItem="LibaryFileListModel" Clicked=Unhold SelectedOneOrMore="true" Icon="fas fa-running" Label="Pages.LibraryFiles.Buttons.Unhold" />
+            <FlowTableButton Clicked=Unhold SelectedOneOrMore="true" Icon="fas fa-running" Label="Pages.LibraryFiles.Buttons.Unhold" />
         }
         <FlowTableButtonSeparator />    
-        <FlowTableHelpButton TItem="LibaryFileListModel" HelpUrl="library-files" />
+        <FlowTableHelpButton  HelpUrl="library-files" />
     </ToolBar>
 
     <Columns>

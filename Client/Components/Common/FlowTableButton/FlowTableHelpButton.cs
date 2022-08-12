@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FileFlows.Client.Components.Common
 {
-    public class FlowTableHelpButton<TItem> : FlowTableButton<TItem>
+    public class FlowTableHelpButton : FlowTableButton
     {
         [Inject] IJSRuntime jsRuntime { get; set; }
 
@@ -20,7 +20,7 @@ namespace FileFlows.Client.Components.Common
             this._Label = Translater.Instant("Labels.Help");
         }
 
-        protected override async Task OnClick()
+        public override async Task OnClick()
         {
             string url = this.HelpUrl;            
             if (string.IsNullOrEmpty(HelpUrl))

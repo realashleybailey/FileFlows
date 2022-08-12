@@ -126,11 +126,15 @@
     background: rgba(var(--input-background-rgb), 0.3);
 }
 
-.flowtable-body {
+::deep .flowtable-body {
     height: calc(100% - 2.4rem);
     overflow-y: scroll;
     border-left: solid 1px $borderColor;
     border-bottom: solid 1px $borderColor;
+    &::-webkit-scrollbar-track {
+        border-right: solid 1px $borderColor;
+        border-left: solid 1px $borderColor;
+    }
 }
 
 .flowtable-data {
@@ -145,10 +149,6 @@
     flex-direction: column;
 }
 
-.flowtable-body::-webkit-scrollbar-track {
-    border-right: solid 1px $borderColor;
-    border-left: solid 1px $borderColor;
-}
 
 .hidden {
     display:none;

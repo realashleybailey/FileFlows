@@ -20,28 +20,28 @@
         <ToolBar>
             @if (SelectedType == ScriptType.Shared)
             {
-                <FlowTableButton TItem="Script" Clicked=Edit SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View"/>
+                <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.View"/>
             }
             else
             {
-                <FlowTableButton TItem="Script" Clicked=Add Icon="fas fa-plus" Label="Labels.Add"/>
-                <FlowTableButton TItem="Script" Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit"/>
-                <FlowTableButton TItem="Script" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete"/>
+                <FlowTableButton Clicked=Add Icon="fas fa-plus" Label="Labels.Add"/>
+                <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit"/>
+                <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete"/>
                 @if (App.Instance.IsMobile == false)
                 {
                     <FlowTableButtonSeparator/>
-                    <FlowTableButton TItem="Script" Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />
-                    <FlowTableButton TItem="Script" Clicked=Browser Icon="fas fa-code-branch" Label="Pages.Scripts.Buttons.ScriptBrowser"/>
+                    <FlowTableButton Clicked=Update SelectedOneOrMore="true" Icon="fas fa-cloud-download-alt" Label="Labels.Update" />
+                    <FlowTableButton Clicked=Browser Icon="fas fa-code-branch" Label="Pages.Scripts.Buttons.ScriptBrowser"/>
                     <FlowTableButtonSeparator/>
-                    <FlowTableButton TItem="Script" Clicked=Import Icon="fas fa-file-import" Label="Labels.Import"/>
-                    <FlowTableButton TItem="Script" Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export"/>
-                    <FlowTableButton TItem="Script" Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
+                    <FlowTableButton Clicked=Import Icon="fas fa-file-import" Label="Labels.Import"/>
+                    <FlowTableButton Clicked=Export SelectedOne="true" Icon="fas fa-file-export" Label="Labels.Export"/>
+                    <FlowTableButton Clicked=Duplicate SelectedOne="true" Icon="fas fa-clone" Label="Labels.Duplicate"/>
                     <FlowTableButtonSeparator/>
-                    <FlowTableButton TItem="Script" Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy"/>
+                    <FlowTableButton Clicked=UsedBy SelectedOne="true" Icon="fas fa-info-circle" Label="Labels.UsedBy"/>
                 }
             }
             <FlowTableButtonSeparator/>
-            <FlowTableHelpButton TItem="Script" HelpUrl="scripts"/>
+            <FlowTableHelpButton  HelpUrl="scripts"/>
         </ToolBar>
 
         <Columns>

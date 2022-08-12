@@ -15,9 +15,9 @@
         
         <FlowTable @ref="Table" Data="@Data" TItem="RevisionedObject" Selection="SelectionMode.Multiple" DoubleClick="@OnDoubleClick" TableIdentifier="Revisions">
             <ToolBar>            
-                <FlowTableButton TItem="RevisionedObject" Clicked=Revisions SelectedOne="true" Icon="fas fa-history" Label="Labels.Revisions" />
+                <FlowTableButton Clicked=Revisions SelectedOne="true" Icon="fas fa-history" Label="Labels.Revisions" />
                 <FlowTableButtonSeparator />                    
-                <FlowTableHelpButton TItem="RevisionedObject" HelpUrl="revisions" />
+                <FlowTableHelpButton  HelpUrl="revisions" />
             </ToolBar>
             
             <Columns>

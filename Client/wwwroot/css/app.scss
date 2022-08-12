@@ -881,3 +881,34 @@ input[type=file]{
 .editor.PagesScripts .fields {
     overflow:hidden !important;
 }
+
+.blazor-context-menu {
+    color:var(--color) !important;
+    background:var(--base) !important;
+    margin:0 !important;
+    padding:0 !important;
+    font-size:0.9rem;
+    > ul {
+        padding: 0 !important;
+    }
+}
+.blazor-context-menu__seperator, .blazor-context-menu__seperator hr {
+    padding:0;
+    margin:0;
+}
+.context-menu {
+    color:var(--color);
+    background:var(--base);
+    .context-menu-item {
+        min-width:11rem;
+        padding:0.25rem 0.5rem 0.25rem 0.25rem;
+        &:hover {
+            background-color:var(--accent);
+        }
+    }
+    i {
+        width:1.75rem;
+        margin-right:0.25rem;
+        text-align: center;
+    }
+}

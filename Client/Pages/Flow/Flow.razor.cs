@@ -10,6 +10,7 @@ using FileFlows.Client.Components.Dialogs;
 using System.Text.Json;
 using FileFlows.Plugin;
 using System.Text.RegularExpressions;
+using BlazorContextMenu;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 
@@ -20,13 +21,14 @@ public partial class Flow : ComponentBase, IDisposable
     [CascadingParameter] public Editor Editor { get; set; }
     [Parameter] public System.Guid Uid { get; set; }
     [Inject] INavigationService NavigationService { get; set; }
+    [Inject] IBlazorContextMenuService ContextMenuService { get; set; }
     [CascadingParameter] Blocker Blocker { get; set; }
     [Inject] IHotKeysService HotKeyService { get; set; }
     private ffElement[] Available { get; set; }
     private ffElement[] Filtered { get; set; }
     private List<ffPart> Parts { get; set; } = new List<ffPart>();
 
-    private string lblObsoleteMessage;
+    private string lblObsoleteMessage, lblEdit, lblHelp, lblDelete, lblCopy, lblPaste, lblRedo, lblUndo;
 
     private int _Zoom = 100;
     private int Zoom
@@ -93,6 +95,13 @@ public partial class Flow : ComponentBase, IDisposable
         lblClose = Translater.Instant("Labels.Close");
         lblSaving = Translater.Instant("Labels.Saving");
         lblFilter = Translater.Instant("Labels.FilterPlaceholder");
+        lblEdit = Translater.Instant("Labels.Edit");
+        lblCopy = Translater.Instant("Labels.Copy");
+        lblPaste = Translater.Instant("Labels.Paste");
+        lblRedo = Translater.Instant("Labels.Redo");
+        lblUndo = Translater.Instant("Labels.Undo");
+        lblDelete = Translater.Instant("Labels.Delete");
+        lblHelp = Translater.Instant("Labels.Help");
         lblObsoleteMessage = Translater.Instant("Labels.ObsoleteConfirm.Message");
 
 
@@ -118,15 +127,9 @@ public partial class Flow : ComponentBase, IDisposable
                 await eleFilter.FocusAsync();
             });
         });
-        
-        HotKeyService.RegisterHotkey("FlowUndo", "Z", ctrl: true, shift:false, callback: () =>
-        {
-            _ = jsRuntime.InvokeVoidAsync("ffFlow.History.undo");
-        });
-        HotKeyService.RegisterHotkey("FlowUndo", "Z", ctrl: true, shift: true, callback: () =>
-        {
-            _ = jsRuntime.InvokeVoidAsync("ffFlow.History.redo");
-        });
+
+        HotKeyService.RegisterHotkey("FlowUndo", "Z", ctrl: true, shift: false, callback: () => Undo());
+        HotKeyService.RegisterHotkey("FlowUndo", "Z", ctrl: true, shift: true, callback: () => Redo());
         _ = Init();
     }
 
@@ -367,6 +370,16 @@ public partial class Flow : ComponentBase, IDisposable
 #else
         return await HttpHelper.Post<Dictionary<string, object>>(url, parts);
 #endif
+    }
+
+
+    private List<FlowPart> SelectedParts;
+    [JSInvokable]
+    public async Task OpenContextMenu(OpenContextMenuArgs args)
+    {
+        SelectedParts = args.Parts ?? new();
+        await ContextMenuService.ShowMenu(SelectedParts.Count == 1 ? "FlowContextMenu-Single" :
+            SelectedParts.Count > 1 ? "FlowContextMenu-Multiple" : "FlowContextMenu-Basic", args.X, args.Y);
     }
 
     private async Task FilterKeyDown(KeyboardEventArgs e)
@@ -661,6 +674,25 @@ public partial class Flow : ComponentBase, IDisposable
         return templates.OrderBy(x => x.Name).ToList();
     }
 
+    private async Task EditItem()
+    {
+        var item = this.SelectedParts?.FirstOrDefault();
+        if (item == null)
+            return;
+        await jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Edit", item);
+    }
+
+    private void Copy() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Copy", SelectedParts);
+    private void Paste() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Paste");
+    private void Undo() => jsRuntime.InvokeVoidAsync("ffFlow.History.undo");
+    private void Redo() => jsRuntime.InvokeVoidAsync("ffFlow.History.redo");
+    private void DeleteItems() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Delete", SelectedParts);
+    
+    private async Task OpenHelp()
+    {
+        await jsRuntime.InvokeVoidAsync("open", "https://docs.fileflows.com/flow-editor", "_blank");
+    }
+
     private class CodeTemplate
     {
         public string Name { get; init; }
@@ -668,4 +700,23 @@ public partial class Flow : ComponentBase, IDisposable
         public int Outputs { get; init; }
     }
 
-}
+    /// <summary>
+    /// Arguments passed from JavaScript when opening the context menu
+    /// </summary>
+    public class OpenContextMenuArgs
+    {
+        /// <summary>
+        /// Gets the X coordinate of the mouse
+        /// </summary>
+        public int X { get; init; }
+        /// <summary>
+        /// Gets the Y coordinate of the mouse
+        /// </summary>
+        public int Y { get; init; }
+        /// <summary>
+        /// Gets the selected parts
+        /// </summary>
+        public List<FlowPart> Parts { get; init; }
+    }
+
+} 

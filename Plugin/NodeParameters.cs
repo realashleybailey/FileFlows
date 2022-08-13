@@ -382,6 +382,11 @@ public class NodeParameters
             return;
         }
 
+        if (dontDelete == false)
+        {
+            dontDelete = this.WorkingFile.ToLowerInvariant().StartsWith(TempPath.ToLowerInvariant()) == false;
+        }
+
         if (isDirectory == false && this.WorkingFile != this.FileName)
         {
             string fileToDelete = this.WorkingFile;
@@ -394,6 +399,7 @@ public class NodeParameters
                     try
                     {
                         File.Delete(fileToDelete);
+                        Logger.ILog("Deleting old working file: " + fileToDelete);
                     }
                     catch (Exception ex)
                     {

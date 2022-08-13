@@ -61,7 +61,7 @@ public class RepositoryController : Controller
     /// <param name="model">A list of script to download</param>
     /// <returns>an awaited task</returns>
     [HttpPost("download")]
-    public async Task Download([FromBody] DownloadModel model)
+    public async Task Download([FromBody] RepositoryDownloadModel model)
     {
         if (model == null || model.Scripts?.Any() != true)
             return; // nothing to delete
@@ -110,7 +110,7 @@ public class RepositoryController : Controller
     /// <summary>
     /// Download model
     /// </summary>
-    public class DownloadModel
+    public class RepositoryDownloadModel
     {
         /// <summary>
         /// A list of plugin packages to download

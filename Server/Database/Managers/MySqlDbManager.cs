@@ -151,7 +151,7 @@ public class MySqlDbManager: DbManager
             new []{"js_Enabled", "ADD COLUMN js_Enabled boolean GENERATED ALWAYS AS (convert(json_extract(Data,'$.Enabled'), signed)) VIRTUAL"},
             new []{"js_Priority", "ADD COLUMN js_Priority int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.Priority')), signed)) VIRTUAL"},
             new []{"js_ProcessingOrder", "ADD COLUMN js_ProcessingOrder int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.ProcessingOrder')), signed)) VIRTUAL"},
-            new []{"js_Schedule", "ADD COLUMN js_Schedule varchar(36) COLLATE utf8_unicode_ci GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL"}
+            new []{"js_Schedule", "ADD COLUMN js_Schedule varchar(672) COLLATE utf8_unicode_ci GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL"}
         };
 
         string sql = "";

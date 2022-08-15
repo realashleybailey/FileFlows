@@ -1,6 +1,8 @@
 DROP PROCEDURE IF EXISTS SearchLibraryFiles;
 
-CREATE PROCEDURE SearchLibraryFiles(LibraryName varchar(100) COLLATE utf8_unicode_ci, SearchText varchar(100) COLLATE utf8_unicode_ci,  FromDate Date, ToDate Date, MaxRows int)
+CREATE PROCEDURE SearchLibraryFiles(LibraryName varchar(100) charset utf8 COLLATE utf8_unicode_ci, 
+SearchText varchar(100) charset utf8 COLLATE utf8_unicode_ci,  
+FromDate Date, ToDate Date, MaxRows int)
 BEGIN
 
     select Uid, Name, Type, DateCreated, DateModified, Data

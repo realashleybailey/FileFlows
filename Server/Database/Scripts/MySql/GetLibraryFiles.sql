@@ -1,6 +1,6 @@
 DROP PROCEDURE IF EXISTS GetLibraryFiles;
 
-CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem int, MaxItems int, NodeUid varchar(36) COLLATE utf8_unicode_ci, Overview bit)
+CREATE PROCEDURE GetLibraryFiles(FileStatus int, IntervalIndex int, StartItem int, MaxItems int, NodeUid varchar(36) charset utf8 COLLATE utf8_unicode_ci, Overview bit)
 BEGIN
 
 
@@ -14,7 +14,7 @@ BEGIN
     select Uid, Name, js_ProcessingOrder as ProcessingOrder,
            js_Enabled as Enabled,
            js_Priority as Priority,
-           ifnull(cast(JSON_EXTRACT(Data, '$.HoldMinutes') as INT), 0) as HoldMinutes,
+           ifnull(cast(JSON_EXTRACT(Data, '$.HoldMinutes') as SIGNED), 0) as HoldMinutes,
            case when substring(js_Schedule, IntervalIndex, 1) <> '0' then 0 else 1 end as Unscheduled
     from DbObject where Type = 'FileFlows.Shared.Models.Library';
 

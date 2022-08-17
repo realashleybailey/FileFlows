@@ -47,7 +47,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         this.StateHasChanged();
     }
 
-    public override string FetchUrl => $"{ApiUrl}/list-all?status={Skybox?.SelectedItem?.Value}&page={PageIndex}&pageSize={App.PageSize}";
+    public override string FetchUrl => $"{ApiUrl}/list-all?status={SelectedStatus}&page={PageIndex}&pageSize={App.PageSize}";
 
     private string NameMinWidth = "20ch";
 
@@ -69,14 +69,13 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
     protected async override Task OnInitializedAsync()
     {
-        base.OnInitialized();
         this.SelectedStatus = FileFlows.Shared.Models.FileStatus.Unprocessed;
         lblMoveToTop = Translater.Instant("Pages.LibraryFiles.Buttons.MoveToTop");
         lblLibraryFiles = Translater.Instant("Pages.LibraryFiles.Title");
         lblFileFlowsServer = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
         Title = lblLibraryFiles + ": " + Translater.Instant("Enums.FileStatus." + FileStatus.Unprocessed);
         this.lblSearch = Translater.Instant("Labels.Search");
-
+        base.OnInitialized(true);
     }
 
     private Task<RequestResult<List<LibraryStatus>>> GetStatus() => HttpHelper.Get<List<LibraryStatus>>(ApiUrl + "/status");

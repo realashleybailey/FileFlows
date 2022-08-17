@@ -31,7 +31,9 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         }
     }
 
-    protected override void OnInitialized()
+    protected virtual void OnInitialized() => OnInitialized(true);
+
+    protected void OnInitialized(bool load)
     {
         lblAdd = Translater.Instant("Labels.Add");
         lblEdit = Translater.Instant("Labels.Edit");
@@ -39,7 +41,8 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         lblDeleting = Translater.Instant("Labels.Deleting");
         lblRefresh = Translater.Instant("Labels.Refresh");
 
-        _ = Load(default);
+        if(load)
+            _ = Load(default);
     }
 
     public virtual async Task Refresh() => await Load(default);

@@ -273,6 +273,7 @@ public class ScriptController : Controller
                 System.Text.Json.JsonSerializer.Serialize(x)));
         };
         executor.Variables = args.Variables ?? new Dictionary<string, object>();
+        executor.AdditionalArguments.Add("Flow", new NodeParameters(null, Logger.Instance, false, null));
         if (executor.Execute() as bool? == false)
         {
             if(error.Contains("MISSING VARIABLE:") == false) // missing variables we don't care about

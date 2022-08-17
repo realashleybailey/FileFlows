@@ -31,7 +31,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
         }
     }
 
-    protected virtual void OnInitialized() => OnInitialized(true);
+    protected override void OnInitialized() => OnInitialized(true);
 
     protected void OnInitialized(bool load)
     {

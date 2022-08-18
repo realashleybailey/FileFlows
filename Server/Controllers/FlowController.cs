@@ -461,7 +461,7 @@ public class FlowController : ControllerStore<Flow>
                 {
                     ScriptArgumentType.Bool => FormInputType.Switch,
                     ScriptArgumentType.Int => FormInputType.Int,
-                    ScriptArgumentType.String => FormInputType.Text,
+                    ScriptArgumentType.String => FormInputType.TextVariable,
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 ef.Name = x.Name;

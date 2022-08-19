@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ public class WorkerController : Controller
     private readonly static Dictionary<Guid, FlowExecutorInfo> Executors = new();
     private readonly Queue<Guid> CompletedExecutors = new Queue<Guid>(50);
 
+    private static CacheStore LibraryFileCacheStore = new();
     private IHubContext<FlowHub> Context;
 
     public WorkerController(IHubContext<FlowHub> context)
@@ -93,9 +95,23 @@ public class WorkerController : Controller
             CompletedExecutors.Append(info.Uid);
             if (Executors.ContainsKey(info.Uid))
                 Executors.Remove(info.Uid);
-            else
+            else if (string.IsNullOrEmpty(info.LibraryFile?.Name) == false)
             {
-                Logger.Instance?.DLog("Could not remove as not in list of Executors: " + info.Uid + ", file: " + info.LibraryFile.Name);
+                var fileExecutor = Executors.Where(x => 
+                    x.Value.LibraryFile.Name == info.LibraryFile.Name)
+                    .Select(x => x.Key).FirstOrDefault();
+                if (fileExecutor != null)
+                {
+                    Executors.Remove(fileExecutor);
+                }
+                else
+                {
+                    Logger.Instance?.DLog("Could not remove as not in list of Executors [1]: " + info.Uid + ", file: " + info.LibraryFile.Name);
+                }
+            }
+            else
+            {   
+                Logger.Instance?.DLog("Could not remove as not in list of Executors [2]: " + info.Uid + ", file: " + info.LibraryFile.Name);
             }
         }
 
@@ -153,8 +169,7 @@ public class WorkerController : Controller
         }
     }
 
-    private static CacheStore LibraryFileCacheStore = new();
-
+    
     /// <summary>
     /// Update work, tells the server about updated work on a flow runner
     /// </summary>

@@ -531,7 +531,7 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (existing == null)
             throw new Exception("Not found");
 
-        if (existing.Status != file.Status)
+        if (existing.Status != file.Status && (existing.Status == FileStatus.Processed && file.Status == FileStatus.Processing) == false)
         {
             Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}");
             existing.Status = file.Status;

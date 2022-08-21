@@ -531,7 +531,13 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         if (existing == null)
             throw new Exception("Not found");
 
-        if (existing.Status != file.Status && (existing.Status == FileStatus.Processed && file.Status == FileStatus.Processing) == false)
+        if (existing.Status == FileStatus.Processed && file.Status == FileStatus.Processing)
+        {
+            // already finished and reported finished in the Worker controller.  So ignore this out of date update
+            return existing;
+        }
+
+        if (existing.Status != file.Status)
         {
             Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}");
             existing.Status = file.Status;

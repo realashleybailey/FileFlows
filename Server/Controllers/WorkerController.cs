@@ -126,7 +126,6 @@ public class WorkerController : Controller
                 if(info.LibraryFile.FinalSize > 0)
                     libfile.FinalSize = info.LibraryFile.FinalSize;
 
-
                 if (info.WorkingFile == libfile.Name)
                 {
                     var file = new FileInfo(info.WorkingFile);

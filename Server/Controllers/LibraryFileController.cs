@@ -222,10 +222,10 @@ public class LibraryFileController : ControllerStore<LibraryFile>
         return result;
     }
 
-    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status, IEnumerable<Library> libaries)
+    private IEnumerable<LibaryFileListModel> ConvertToListModel(IEnumerable<LibraryFile> files, FileStatus status, IEnumerable<Library> libraries)
     {
         files = files.ToList();
-        var dictLibraries = libaries.ToDictionary(x => x.Uid, x => x);
+        var dictLibraries = libraries.ToDictionary(x => x.Uid, x => x);
         return files.Select(x =>
         {
             var item = new LibaryFileListModel

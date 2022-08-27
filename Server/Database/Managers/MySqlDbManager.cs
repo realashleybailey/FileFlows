@@ -16,31 +16,6 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class MySqlDbManager: DbManager
 {
-    protected readonly string CreateMySqlDbScript =
-        @$"CREATE TABLE {nameof(DbObject)}(
-            Uid             VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
-            Name            VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
-            Type            VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
-            DateCreated     datetime           default           now(),
-            DateModified    datetime           default           now(),
-            Data            MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
-        );
-
-        CREATE TABLE {nameof(DbLogMessage)}(
-            ClientUid       VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL,
-            LogDate         datetime           default           now(),
-            Type            int                NOT NULL,            
-            Message         TEXT               COLLATE utf8_unicode_ci      NOT NULL
-        );
-
-        CREATE TABLE {nameof(DbStatistic)}(
-            LogDate         datetime           default           now(),
-            Name            varchar(100)       COLLATE utf8_unicode_ci      NOT NULL,
-            Type            int                NOT NULL,            
-            StringValue     TEXT               COLLATE utf8_unicode_ci      NOT NULL,            
-            NumberValue     double             NOT NULL
-        );
-";
     internal readonly string CreateDbRevisionedObjectTableScript = @$"
         CREATE TABLE {nameof(RevisionedObject)}(
             Uid             VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
@@ -117,8 +92,9 @@ public class MySqlDbManager: DbManager
         // createDbSql = createDbSql.Replace("NOT NULL", "COLLATE utf8_unicode_ci  NOT NULL");
         // createDbSql = createDbSql.Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
-        db.Execute(CreateMySqlDbScript);
-        db.Execute(CreateDbRevisionedObjectTableScript);
+        string sqlTables = GetSqlScript("MySql", "Tables.sql", clean: true);
+        Logger.Instance.ILog("SQL Tables:\n" + sqlTables);
+        db.Execute(sqlTables);
 
         db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Type ON {nameof(DbObject)}(Type)");
         db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");

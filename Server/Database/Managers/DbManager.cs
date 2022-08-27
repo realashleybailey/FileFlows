@@ -21,6 +21,8 @@ public abstract class DbManager
     
     protected string ConnectionString { get; init; }
     private static ObjectPool<PooledConnection> DbConnectionPool;
+    
+    public abstract LibraryFiles.ILibraryFileManager LibraryFileManager { get; }
 
     protected enum DbCreateResult
     {
@@ -259,16 +261,25 @@ public abstract class DbManager
     /// <returns>a list of objects</returns>
     public virtual async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
     {
+        if (typeof(T) == typeof(LibraryFile))
+            return (IEnumerable<T>) await SelectLibraryFiles();
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
-            DateTime start = DateTime.Now;
             dbObjects = await db.Db.FetchAsync<DbObject>("where Type=@0", typeof(T).FullName);
         }
 
         return ConvertFromDbObject<T>(dbObjects);
     }
-    
+
+    private async Task<IEnumerable<LibraryFile>> SelectLibraryFiles()
+    {
+        using (var db = await GetDb())
+        {
+            return await db.Db.FetchAsync<LibraryFile>("select * from DbLibraryFiles");
+        }
+    }
+
     /// <summary>
     /// Select a list of objects
     /// </summary>
@@ -833,8 +844,9 @@ public abstract class DbManager
     /// </summary>
     /// <param name="dbType">The type of database this script is for</param>
     /// <param name="script">The script name</param>
+    /// <param name="clean">if set to true, empty lines and comments will be removed</param>
     /// <returns>the sql script</returns>
-    public static string GetSqlScript(string dbType, string script)
+    public static string GetSqlScript(string dbType, string script, bool clean = false)
     {
         try
         {
@@ -843,7 +855,18 @@ public abstract class DbManager
 
             using Stream? stream = assembly.GetManifestResourceStream(resourceName);
             using StreamReader reader = new StreamReader(stream);
-            return reader.ReadToEnd();
+            string resource = reader.ReadToEnd();
+
+            if (clean)
+            {
+                var lines = resource.Replace("\r\n", "\n")
+                    .Split('\n')
+                    .Where(x => string.IsNullOrWhiteSpace(x) == false)
+                    .Where(x => x.Trim().StartsWith("--") == false);
+                resource = string.Join("\n", lines);
+            }
+            
+            return resource;
         }
         catch (Exception ex) 
         {

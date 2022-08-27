@@ -221,7 +221,13 @@ public class Program
                 if (migrated)
                     AppSettings.Instance.DatabaseConnection = AppSettings.Instance.DatabaseMigrateConnection;
                 else
+                {
                     Logger.Instance.ELog("Database migration failed, reverting to previous database settings");
+                    #if(DEBUG)
+                    throw new Exception("Migration failed");
+                    #endif
+                }
+
                 AppSettings.Instance.DatabaseMigrateConnection = null;
                 AppSettings.Instance.RecreateDatabase = false;
                 AppSettings.Instance.Save();

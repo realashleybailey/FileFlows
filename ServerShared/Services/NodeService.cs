@@ -131,6 +131,7 @@ public class NodeService : Service, INodeService
             if(result.Data == null)
             {
                 // node does not exist
+                Logger.Instance.ILog("Node does not exist: " + address);
                 return null;
             }
             result.Data.SignalrUrl = ServiceBaseUrl + "/" + result.Data.SignalrUrl;

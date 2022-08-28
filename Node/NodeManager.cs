@@ -76,6 +76,11 @@ public class NodeManager
                 try
                 {
                     var settings = nodeService.GetByAddress(AppSettings.Instance.HostName).Result;
+                    if (settings == null)
+                    {
+                        Logger.Instance.ELog("Failed getting settings for node: " + AppSettings.Instance.HostName);
+                        return false;
+                    }
 
                     AppSettings.Instance.Enabled = settings.Enabled;
                     AppSettings.Instance.Runners = settings.FlowRunners;

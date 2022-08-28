@@ -1,4 +1,5 @@
 using FileFlows.Server.Controllers;
+using FileFlows.Server.Services;
 using FileFlows.ServerShared.Workers;
 
 namespace FileFlows.Server.Workers;
@@ -20,7 +21,7 @@ public class LibraryFileLogPruner:Worker
     /// </summary>
     protected override void Execute()
     {
-        var libFiles = new LibraryFileController().GetDataList().Result.Select(x => x.Uid.ToString()).ToList();
+        var libFiles = new LibraryFileService().GetUids().Result.Select(x => x.ToString()).ToList();
         var files = new DirectoryInfo(DirectoryHelper.LibraryFilesLoggingDirectory).GetFiles();
         foreach (var file in files)
         {

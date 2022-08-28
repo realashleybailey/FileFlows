@@ -27,11 +27,11 @@ public interface ILibraryFileService
     Task<LibraryFile> Get(Guid uid);
 
     /// <summary>
-    /// Deletes a library file
+    /// Deletes library files
     /// </summary>
-    /// <param name="uid">The UID of the library file</param>
+    /// <param name="uids">a list of UIDs to delete</param>
     /// <returns>a completed task</returns>
-    Task Delete(Guid uid);
+    Task Delete(params Guid[] uids);
 
     /// <summary>
     /// Updates a library file
@@ -80,15 +80,15 @@ public class LibraryFileService : Service, ILibraryFileService
     }
 
     /// <summary>
-    /// Deletes a library file
+    /// Deletes library files
     /// </summary>
-    /// <param name="uid">The UID of the library file</param>
+    /// <param name="uids">The UIDs to delete</param>
     /// <returns>a completed task</returns>
-    public async Task Delete(Guid uid)
+    public async Task Delete(params Guid[] uid)
     {
         try
         {
-            var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel<Guid> { Uids = new[] { uid } });                
+            var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel<Guid> { Uids = uid });                
         }
         catch (Exception)
         {

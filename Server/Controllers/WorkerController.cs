@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using FileFlows.Shared.Models;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Hubs;
+using FileFlows.Server.Services;
 using FileFlows.Shared.Helpers;
 
 namespace FileFlows.Server.Controllers;
@@ -265,7 +266,7 @@ public class WorkerController : Controller
             foreach (var item in toRemove)
                 Executors.Remove(item.Key);
         }
-        await new LibraryFileController().ResetProcessingStatus(nodeUid);
+        await new LibraryFileService().ResetProcessingStatus(nodeUid);
     }
 
     /// <summary>

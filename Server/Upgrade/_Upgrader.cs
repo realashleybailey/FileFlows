@@ -54,6 +54,8 @@ public class Upgrader
                 new Upgrade_0_9_2().Run(settings);
             if (currentVersion < new Version(0, 9, 4)) // 0.9.4 because 1.0.0 was originally 0.9.4 
                 new Upgrade_1_0_0().Run(settings);
+            if (currentVersion < new Version(1, 0, 2))  
+                new Upgrade_1_0_2().Run(settings);
         }
         
         // save the settings

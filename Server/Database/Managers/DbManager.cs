@@ -22,8 +22,6 @@ public abstract class DbManager
     protected string ConnectionString { get; init; }
     private static ObjectPool<PooledConnection> DbConnectionPool;
     
-    public abstract LibraryFiles.ILibraryFileManager LibraryFileManager { get; }
-
     protected enum DbCreateResult
     {
         Failed = 0,
@@ -261,8 +259,6 @@ public abstract class DbManager
     /// <returns>a list of objects</returns>
     public virtual async Task<IEnumerable<T>> Select<T>() where T : FileFlowObject, new()
     {
-        if (typeof(T) == typeof(LibraryFile))
-            return (IEnumerable<T>) await SelectLibraryFiles();
         List<DbObject> dbObjects;
         using (var db = await GetDb())
         {
@@ -276,7 +272,7 @@ public abstract class DbManager
     {
         using (var db = await GetDb())
         {
-            return await db.Db.FetchAsync<LibraryFile>("select * from DbLibraryFiles");
+            return await db.Db.FetchAsync<LibraryFile>("select * from LibraryFiles");
         }
     }
 
@@ -287,12 +283,42 @@ public abstract class DbManager
     /// <param name="sql">the sql command</param>
     /// <param name="args">the sql arguments</param>
     /// <returns>a list of objects</returns>
-    internal async Task<IEnumerable<T>> Fetch<T>(string sql, params object[] args)
+    internal async Task<IEnumerable<T>> Fetch<T>(string sql, object[] args = null)
+    {
+        List<T> dbObjects;
+        using (var db = await GetDb())
+            dbObjects = await db.Db.FetchAsync<T>(sql, args);
+        return dbObjects;
+    }
+
+    /// <summary>
+    /// Select a list of objects
+    /// </summary>
+    /// <typeparam name="T">the type of objects to select</typeparam>
+    /// <param name="sql">the sql command</param>
+    /// <param name="args">the sql arguments</param>
+    /// <param name="skip">the amount of rows to skip</param>
+    /// <param name="rows">the number of rows to take</param>
+    /// <returns>a list of objects</returns>
+    internal async Task<IEnumerable<T>> Fetch<T>(string sql, object[] args, int skip, int rows)
     {
         List<T> dbObjects;
         using (var db = await GetDb())
         {
-            DateTime start = DateTime.Now;
+            if (skip > 0 && rows > 0)
+            {
+                if (UseMemoryCache)
+                {
+                    // sqlite
+                    sql += $" limit {rows} offset {skip}";
+                }
+                else
+                {
+                    // mysql
+                    sql += $" limit {skip}, {rows}";
+
+                }
+            }
             dbObjects = await db.Db.FetchAsync<T>(sql, args);
         }
         return dbObjects;
@@ -858,14 +884,7 @@ public abstract class DbManager
             string resource = reader.ReadToEnd();
 
             if (clean)
-            {
-                var lines = resource.Replace("\r\n", "\n")
-                    .Split('\n')
-                    .Where(x => string.IsNullOrWhiteSpace(x) == false)
-                    .Where(x => x.Trim().StartsWith("--") == false);
-                resource = string.Join("\n", lines);
-            }
-            
+                return SqlHelper.CleanSql(resource);
             return resource;
         }
         catch (Exception ex) 

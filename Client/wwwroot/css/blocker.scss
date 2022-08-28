@@ -31,7 +31,7 @@
         /* we're using two half linear-gradient which is masked by the radial-gradient */
         background: linear-gradient(to top, rgba(var(--accent-rgb), 1), rgba(var(--accent-rgb), 0.5)) 100% 0/50% 100% no-repeat,
                     linear-gradient(rgba(var(--accent-rgb), 0.5) 50%, transparent 95%) 0 0/50% 100% no-repeat;
-        animation: spin 1s linear infinite;
+      animation: spin 1s linear infinite;
 
     }
     .blocker-message {

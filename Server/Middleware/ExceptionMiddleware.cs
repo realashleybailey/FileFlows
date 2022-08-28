@@ -30,7 +30,7 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            Logger.Instance.ELog("ExceptionMiddleware: " + ex.Message +
+            Logger.Instance.ELog("ExceptionMiddleware: " + ex.Message + Environment.NewLine +
                                  $"REQUEST [{context.Request?.Method}] [{context.Response?.StatusCode}]: {context.Request?.Path.Value}" +
                                  Environment.NewLine + ex.StackTrace);
             context.Response.ContentType = "text/plain";

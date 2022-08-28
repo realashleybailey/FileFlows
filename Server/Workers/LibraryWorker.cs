@@ -3,6 +3,7 @@ using Esprima.Ast;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
+using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 
@@ -106,11 +107,6 @@ public class LibraryWorker : Worker
     {
         // special case can use dbhelper directly
         // this is called at the start up of FileFlows
-        var processing = DbHelper.Select<LibraryFile>().Result.Where(x => x.Status == FileStatus.Processing);
-        foreach (var p in processing)
-        {
-            p.Status = FileStatus.Unprocessed;
-            DbHelper.Update(p).Wait();
-        }
+        new Server.Services.LibraryFileService().ResetProcessingStatus().Wait();
     }
 }

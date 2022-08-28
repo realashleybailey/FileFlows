@@ -1,3 +1,6 @@
+using System.Xml.XPath;
+using NPoco;
+
 namespace FileFlows.Shared.Models;
 
 using FileFlows.Plugin;
@@ -7,6 +10,7 @@ using System.Collections.Generic;
 /// <summary>
 /// A library file is a file that FileFlows will process
 /// </summary>
+[TableName(nameof(LibraryFile))]
 public class LibraryFile : FileFlowObject
 {
     /// <summary>
@@ -23,23 +27,81 @@ public class LibraryFile : FileFlowObject
     /// <summary>
     /// Gets or sets the flow that executed this file
     /// </summary>
-    public ObjectReference Flow { get; set; }
+    [Ignore]
+    public ObjectReference Flow 
+    {
+        get
+        {
+            if (FlowUid == null)
+                return new ObjectReference() { };
+            return new ObjectReference()
+            {
+                Uid = FlowUid.Value, Name = FlowName, Type = typeof(Flow).FullName
+            };
+        }
+        set
+        {
+            FlowUid = value?.Uid;
+            FlowName = value?.Name;
+        }
+    }
 
-    /// <summary>
-    /// Gets or sets a list of nodes that were executed against this library file
-    /// </summary>
-    public List<ExecutedNode> ExecutedNodes { get; set; }
+    public Guid? FlowUid { get; set; }
+
+    public string FlowName { get; set; }
 
     /// <summary>
     /// Gets or sets the library this library files belongs to
     /// </summary>
-    public ObjectReference Library { get; set; }
+    [Ignore]
+    public ObjectReference Library 
+    {
+        get
+        {
+            if (LibraryUid == null)
+                return new ObjectReference() { };
+            return new ObjectReference()
+            {
+                Uid = LibraryUid.Value, Name = LibraryName, Type = typeof(Library).FullName
+            };
+        }
+        set
+        {
+            LibraryUid = value?.Uid;
+            LibraryName = value?.Name;
+        }
+    }
+
+    public Guid? LibraryUid { get; set; }
+
+    public string LibraryName { get; set; }
     
     /// <summary>
     /// Gets or sets an object reference to an existing
     /// library file that this file is a duplicate of
     /// </summary>
-    public ObjectReference Duplicate { get; set; }
+    [Ignore]
+    public ObjectReference Duplicate
+    {
+        get
+        {
+            if (DuplicateUid == null)
+                return new ObjectReference() { };
+            return new ObjectReference()
+            {
+                Uid = DuplicateUid.Value, Name = DuplicateName, Type = typeof(LibraryFile).FullName
+            };
+        }
+        set
+        {
+            DuplicateUid = value?.Uid;
+            DuplicateName = value?.Name;
+        }
+    }
+
+    public Guid? DuplicateUid { get; set; }
+
+    public string DuplicateName { get; set; }
 
     /// <summary>
     /// Gets or sets the size of the original library file
@@ -55,11 +117,32 @@ public class LibraryFile : FileFlowObject
     /// Gets or sets the fingerprint of the file
     /// </summary>
     public string Fingerprint { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the node tha this processing/has processed the file
     /// </summary>
-    public ObjectReference Node { get; set; }
+    [Ignore]
+    public ObjectReference Node
+    {
+        get
+        {
+            if (NodeUid == null)
+                return new ObjectReference() { };
+            return new ObjectReference()
+            {
+                Uid = NodeUid.Value, Name = NodeName, Type = typeof(ProcessingNode).FullName
+            };
+        }
+        set
+        {
+            NodeUid = value?.Uid;
+            NodeName = value?.Name;
+        }
+    }
+
+    public Guid? NodeUid { get; set; }
+
+    public string NodeName { get; set; }
 
     /// <summary>
     /// Gets or sets the UID of the worker that is executing this library file
@@ -89,6 +172,7 @@ public class LibraryFile : FileFlowObject
     /// <summary>
     /// Gets or sets the order of the file when the file should be processed
     /// </summary>
+    [Column("ProcessingOrder")]
     public int Order { get; set; }
 
     /// <summary>
@@ -99,6 +183,7 @@ public class LibraryFile : FileFlowObject
     /// <summary>
     /// Gets the total processing time of the library file
     /// </summary>
+    [Ignore]
     public TimeSpan ProcessingTime
     {
         get
@@ -122,15 +207,23 @@ public class LibraryFile : FileFlowObject
     /// Gets or sets when the file was written to
     /// </summary>
     public DateTime LastWriteTime { get; set; }
+
+    /// <summary>
+    /// Gets or sets a list of nodes that were executed against this library file
+    /// </summary>
+    [SerializedColumn]
+    public List<ExecutedNode> ExecutedNodes { get; set; }
     
     /// <summary>
     /// Gets or sets the original metadata for a file
     /// </summary>
+    [SerializedColumn]
     public Dictionary<string, object> OriginalMetadata { get; set; }
     
     /// <summary>
     /// Gets or sets the final metadata for the file
     /// </summary>
+    [SerializedColumn]
     public Dictionary<string, object> FinalMetadata { get; set; }
 
 }

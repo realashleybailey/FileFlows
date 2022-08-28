@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
+using FileFlows.ServerShared.Services;
 
 namespace FileFlows.Server.Workers;
 
@@ -247,18 +248,10 @@ public class WatchedLibrary:IDisposable
     
     private (bool known, string? fingerprint, ObjectReference? duplicate) IsKnownFileInMemory(string fullpath, FileSystemInfo fsInfo)
     {
-        var libFiles = new LibraryFileController().GetData().Result;
-        var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
-        var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
-        var knownFingerprints = libFiles.Where(x => string.IsNullOrEmpty(x.Value.Fingerprint) == false)
-                                    .DistinctBy(x => x.Value.Fingerprint)
-                                    .ToDictionary(x => x.Value.Fingerprint.ToLower(), x => new ObjectReference { Name = x.Value.Name, Uid = x.Key, Type = x.Value.GetType().FullName });
-
-        
-        if (knownFiles.ContainsKey(fullpath.ToLower()))
+        var service = new Server.Services.LibraryFileService();
+        var knownFile = service.GetFileIfKnown(fullpath).Result;
+        if (knownFile != null)
         {
-            var knownFileUid = knownFiles[fullpath.ToLower()];
-            var knownFile = libFiles[knownFileUid];
             if(Library.ReprocessRecreatedFiles == false || fsInfo.CreationTime <= knownFile.CreationTime)
             {
                 LogQueueMessage($"{Library.Name} skipping known file '{fullpath}'");
@@ -269,39 +262,32 @@ public class WatchedLibrary:IDisposable
             knownFile.CreationTime = fsInfo.CreationTime;
             knownFile.LastWriteTime = fsInfo.LastWriteTime;
             knownFile.Status = FileStatus.Unprocessed;
-            knownFile.Fingerprint = GetFingerprint().Fingerprint;
+            knownFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
             new LibraryFileController().Update(knownFile).Wait();
             // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
             return (true, null, null);
         }
-        if (knownOutputFiles.ContainsKey(fullpath.ToLower()))
-        {
-            LogQueueMessage($"{Library.Name} skipping known output file '{fullpath}'");
-            return (true, null, null);
-        }
 
-        var fingerprint = GetFingerprint();
-        return (false, fingerprint.Fingerprint, fingerprint.Duplicate);
-
-        (string Fingerprint, ObjectReference? Duplicate) GetFingerprint()
+        string fingerprint = null;
+        if (Library.UseFingerprinting)
         {
-            string fingerprint = string.Empty;
-            ObjectReference? duplicate = null;
-            if (Library.UseFingerprinting)
+            fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
+            if (string.IsNullOrEmpty(fingerprint))
             {
-                fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
-                if (string.IsNullOrEmpty(fingerprint) == false)
-                {   
-                    if (knownFingerprints.ContainsKey(fingerprint) && knownFingerprints[fingerprint]?.Name?.ToLower() != fullpath.ToLower())
+                knownFile = service.GetFileByFingerprint(fingerprint).Result;
+                if (knownFile != null)
+                {
+                    return (false, fingerprint, new ObjectReference()
                     {
-                        duplicate = knownFingerprints[fingerprint];
-                    }
+                        Name = knownFile.Name,
+                        Type = typeof(LibraryFile).FullName,
+                        Uid = knownFile.Uid
+                    });
                 }
             }
-
-            return (fingerprint, duplicate);
-
         }
+
+        return (false, fingerprint, new ObjectReference());
     }
 
     private async Task<(bool known, string fingerprint, ObjectReference? duplicate)> IsKnownFileInDb(string fullPath, FileSystemInfo fsInfo)
@@ -594,11 +580,10 @@ public class WatchedLibrary:IDisposable
                     }
                 }
             }
-            else 
+            else
             {
-                var libFiles = new LibraryFileController().GetData().Result;
-                var knownFiles = libFiles.DistinctBy(x => x.Value.Name.ToLower()).ToDictionary(x => x.Value.Name.ToLower(), x => x.Key);
-                var knownOutputFiles = libFiles.Where(x => string.IsNullOrEmpty(x.Value.OutputPath) == false).DistinctBy(x => x.Value.OutputPath.ToLower()).ToDictionary(x => x.Value.OutputPath.ToLower(), x => x.Key);
+                var service = new Server.Services.LibraryFileService();
+                var knownFiles = service.GetKnownLibraryFilesWithCreationTimes().Result;
 
                 var files = GetFiles(new DirectoryInfo(Library.Path));
                 var settings = new SettingsController().Get().Result;
@@ -607,12 +592,11 @@ public class WatchedLibrary:IDisposable
                     if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
                         continue;
                 
-                    if (knownFiles.ContainsKey(file.FullName.ToLower()))
+                    if (knownFiles.ContainsKey(file.FullName.ToLowerInvariant()))
                     {
-                        var knownFileUid = knownFiles[file.FullName.ToLower()];
-                        var knownFile = libFiles[knownFileUid];
+                        var knownFile = knownFiles[file.FullName.ToLower()];
                         if (Library.ReprocessRecreatedFiles == false ||
-                            file.CreationTime <= knownFile.CreationTime)
+                            file.CreationTime <= knownFile)
                         {
                             continue; // known file that hasn't changed, skip it
                         }

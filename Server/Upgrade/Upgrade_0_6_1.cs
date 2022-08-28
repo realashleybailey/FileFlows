@@ -36,7 +36,5 @@ public class Upgrade_0_6_1
                 DbHelper.Update(lf).Wait();
             }
         }
-        var controller = new LibraryFileController();
-        controller.ClearData();
     }
 }

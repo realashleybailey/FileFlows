@@ -37,7 +37,7 @@ CREATE TABLE RevisionedObject
     RevisionData    MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
 );
 
-CREATE TABLE DbLibraryFile
+CREATE TABLE LibraryFile
 (
     -- common fields from DbObject
     Uid                 VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
@@ -46,6 +46,7 @@ CREATE TABLE DbLibraryFile
     DateModified        datetime           default           now(),
     
     -- properties
+    RelativePath        VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
     Status              int                NOT NULL,
     ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
@@ -65,10 +66,14 @@ CREATE TABLE DbLibraryFile
     
     -- references
     LibraryUid          varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    LibraryName         VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL,
     FlowUid             varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
-    WorkerUid           varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    FlowName            VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL,
     DuplicateUid        varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    DuplicateName       VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
     NodeUid             varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    NodeName            VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL,
+    WorkerUid           varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
 
     -- output
     OutputPath          VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
@@ -79,3 +84,6 @@ CREATE TABLE DbLibraryFile
     FinalMetadata       TEXT               COLLATE utf8_unicode_ci      NOT NULL,
     ExecutedNodes       TEXT               COLLATE utf8_unicode_ci      NOT NULL
 );
+
+CREATE INDEX idx_LibraryFile_Status ON LibraryFile(Status);
+CREATE INDEX idx_LibraryFile_DateModified ON LibraryFile(DateModified);

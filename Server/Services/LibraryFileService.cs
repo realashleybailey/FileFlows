@@ -99,7 +99,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         var node = await new NodeController().Get(nodeUid);
         var nodeLibraries = node.Libraries?.Select(x => x.Uid)?.ToList() ?? new List<Guid>();
-        var libraries = await new LibraryController().GetAll();
+        var libraries = (await new LibraryController().GetAll()).ToArray();
         int quarter = TimeHelper.GetCurrentQuarter();
         var canProcess = libraries.Where(x =>
         {
@@ -112,27 +112,55 @@ public partial class LibraryFileService : ILibraryFileService
             if (node.AllLibraries == ProcessingLibraries.Only)
                 return nodeLibraries.Contains(x.Uid);
             return nodeLibraries.Contains(x.Uid) == false;
-        });
-        if (canProcess?.Any() != true)
+        }).ToArray();
+        if (canProcess.Any() != true)
             return null;
 
         string libraryUids = string.Join(",", canProcess.Select(x => "'" + x.Uid + "'"));
-
+        
         await GetNextSemaphore.WaitAsync();
         try
         {
-            string sql = $"select * from LibraryFiles where Status = 0 and HoldUntil <= now() " +
-                         $" and LibraryUid in ({libraryUids}) " + UNPROCESSED_ORDER_BY;
+            string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= now() " +
+                         $" and LibraryUid in ({libraryUids}) order by " + UNPROCESSED_ORDER_BY;
 
             
-            var libFile = await Database_Get<LibraryFile>(sql);
-            if (libFile != null)
-                await Database_Execute("update LibraryFile set NodeUid = @0 and NodeName = @1 and WorkerUid = @2 " +
-                           " and Status = @3 and ProcessingStarted = now() where Uid = @4",
-                    nodeUid, nodeName, workerUid, (int)FileStatus.Processing, libFile.Uid);
+            var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
+            if (libFile == null)
+                return null;
+            
+            // check the library this file belongs, we may have to grab a different file from this library
+            var library = libraries.FirstOrDefault(x => x.Uid == libFile.LibraryUid);
+            if (libFile.Order < 1 && library != null && library.ProcessingOrder != ProcessingOrder.AsFound)
+            {
+                // need to change the order up
+                bool orderGood = true;
+                sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= now() " +
+                      $" and LibraryUid = '{library.Uid}' order by ";
+                if (library.ProcessingOrder == ProcessingOrder.Random)
+                    sql += DbHelper.UseMemoryCache ? " random()" : "rand()"; // sqlite uses random, mysql uses rand
+                else if (library.ProcessingOrder == ProcessingOrder.LargestFirst)
+                    sql += " OriginalSize desc ";
+                else if (library.ProcessingOrder == ProcessingOrder.SmallestFirst)
+                    sql += " OriginalSize ";
+                else if (library.ProcessingOrder == ProcessingOrder.NewestFirst)
+                    sql += " LibraryFile.DateCreated desc ";
+                else
+                    orderGood = false;
+
+                if (orderGood)
+                {
+                    libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
+                    if (libFile == null)
+                        return null;
+                }
+            }
+
+            await Database_Execute("update LibraryFile set NodeUid = @0 , NodeName = @1 , WorkerUid = @2 " +
+                       " , Status = @3 , ProcessingStarted = now() where Uid = @4",
+                nodeUid, nodeName, workerUid, (int)FileStatus.Processing, libFile.Uid);
             
             return libFile;
-
         }
         finally
         {
@@ -306,7 +334,9 @@ public partial class LibraryFileService : ILibraryFileService
             if (status == FileStatus.OnHold)
                 return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified desc", skip, rows));
 
-            sql = SqlHelper.Skip(sql + " " + UNPROCESSED_ORDER_BY, skip, rows);
+            sql = sql.Replace("select * from LibraryFile", "select LibraryFile.* from LibraryFile  " + LIBRARY_JOIN);
+
+            sql = SqlHelper.Skip(sql + " order by " + UNPROCESSED_ORDER_BY, skip, rows);
             return await Database_Fetch<LibraryFile>(sql);
         }
         catch (Exception ex)

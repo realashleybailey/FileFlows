@@ -1,5 +1,6 @@
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Services;
 
@@ -14,7 +15,11 @@ public partial class LibraryFileService
     private static SemaphoreSlim GetNextSemaphore = new (1);
 
     private const string UNPROCESSED_ORDER_BY =
-        "order by case when ProcessingOrder > 0 then ProcessingOrder else 1000000 end, DateModified desc";
+        " case when ProcessingOrder > 0 then ProcessingOrder " +
+        " else 1000000 end, JSON_EXTRACT(obj.Data, '$.Priority') desc, LibraryFile.DateModified desc";
+
+    private const string LIBRARY_JOIN =
+        " inner join DbObject obj on Type = 'FileFlows.Shared.Models.Library' and LibraryUid = obj.Uid ";
 
     private async Task<FlowDbConnection> GetDbWithMappings()
     {
@@ -57,6 +62,17 @@ public partial class LibraryFileService
         }
         Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + sql);
     }
+    private async Task<T> Database_ExecuteScalar<T>(string sql, params object[] args)
+    {
+        T result;
+        DateTime dt = DateTime.Now;
+        using (var db = await GetDbWithMappings())
+        {
+            result = await db.Db.ExecuteScalarAsync<T>(sql, args);
+        }
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + sql);
+        return result;
+    }
 
     private async Task Database_Update(object o)
     {
@@ -87,6 +103,4 @@ public partial class LibraryFileService
         }
         Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to insert objects");
     }
-
-    
 }

@@ -39,4 +39,20 @@ public class SqlHelper
         // mysql
         return sql + $" limit {skip}, {rows}";
     }
+    /// <summary>
+    /// Adds a skip to a sql command
+    /// </summary>
+    /// <param name="sql">the sql command</param>
+    /// <param name="limit">the number of rows to fetch</param>
+    /// <returns>the updated SQL</returns>
+    public static string Limit(string sql, int limit)
+    {
+        if (DbHelper.UseMemoryCache)
+        {
+            // sqlite
+            return sql + $" limit {limit} ";
+        }
+        // mysql
+        return sql + $" limit 0, {limit}";
+    }
 }

@@ -487,7 +487,7 @@ public partial class LibraryFileService : ILibraryFileService
     /// <returns>the shrinkage groups</returns>
     public async Task<List<ShrinkageData>> GetShrinkageGroups()
      => (await Database_Fetch<ShrinkageData>(
-            $"select LibraryName, sum(OriginalSize) as OriginalSize, sum(FinalSize) as FinalSize, Count(Uid) as Items " +
+            $"select LibraryName as Library, sum(OriginalSize) as OriginalSize, sum(FinalSize) as FinalSize, Count(Uid) as Items " +
             $" from LibraryFile where Status = {(int)FileStatus.Processed}" +
             $" group by LibraryName;")).OrderByDescending(x => x.Items).ToList();
 

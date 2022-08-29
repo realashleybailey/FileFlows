@@ -540,8 +540,8 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     [HttpGet("shrinkage-groups")]
     public async Task<Dictionary<string, ShrinkageData>> ShrinkageGroups()
     {
-        var libraries = (await new LibraryFileService().GetShrinkageGroups()).ToDictionary(x => x.Library, x => x);
-        //var libraries = DbHelper.UseMemoryCache ? await ShrinkageGroupsInMemory() : await ShrinkageGroupsDb();
+        var data = await new LibraryFileService().GetShrinkageGroups();
+        var libraries = data.ToDictionary(x => x.Library, x => x);
         ShrinkageData total = new ShrinkageData();
         foreach (var lib in libraries)
         {

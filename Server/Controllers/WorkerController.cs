@@ -101,7 +101,7 @@ public class WorkerController : Controller
                 var fileExecutor = Executors.Where(x => 
                     x.Value.LibraryFile.Name == info.LibraryFile.Name)
                     .Select(x => x.Key).FirstOrDefault();
-                if (fileExecutor != null)
+                if (Executors.ContainsKey(fileExecutor)) // could be Guid.Empty if default
                 {
                     Executors.Remove(fileExecutor);
                 }

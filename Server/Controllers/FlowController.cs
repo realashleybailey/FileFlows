@@ -8,6 +8,7 @@ using FileFlows.Plugin;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using FileFlows.ScriptExecution;
+using FileFlows.Server.Services;
 using Logger = FileFlows.Shared.Logger;
 
 namespace FileFlows.Server.Controllers;
@@ -581,7 +582,7 @@ public class FlowController : ControllerStore<Flow>
         await base.Update(flow);
 
         // update any object references
-        await new LibraryFileController().UpdateFlowName(flow.Uid, flow.Name);
+        await new LibraryFileService().UpdateFlowName(flow.Uid, flow.Name);
         var libraries = new LibraryController().UpdateFlowName(flow.Uid, flow.Name);
     }
 

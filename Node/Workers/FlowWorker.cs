@@ -161,7 +161,7 @@ public class FlowWorker : Worker
         }
         
         var libFileService = LibraryFileService.Load();
-        var libFileResult = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty, Uid).Result;
+        var libFileResult = libFileService.GetNext(node?.Name ?? string.Empty, node?.Uid ?? Guid.Empty,node?.Version ?? string.Empty, Uid).Result;
         if (libFileResult?.Status != NextLibraryFileStatus.Success)
         {
             Logger.Instance.ILog("No file found to process, status from server: " + (libFileResult?.Status.ToString() ?? "UNKNOWN"));

@@ -15,9 +15,10 @@ public interface ILibraryFileService
     /// </summary>
     /// <param name="nodeName">The name of the node requesting a library file</param>
     /// <param name="nodeUid">The UID of the node</param>
+    /// <param name="nodeVersion">the version of the node</param>
     /// <param name="workerUid">The UID of the worker on the node</param>
     /// <returns>If found, the next library file to process, otherwise null</returns>
-    Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, Guid workerUid);
+    Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, string nodeVersion, Guid workerUid);
 
     /// <summary>
     /// Gets a library file by its UID
@@ -142,9 +143,10 @@ public class LibraryFileService : Service, ILibraryFileService
     /// </summary>
     /// <param name="nodeName">The name of the node requesting a library file</param>
     /// <param name="nodeUid">The UID of the node</param>
+    /// <param name="nodeVersion">the version of the node</param>
     /// <param name="workerUid">The UID of the worker on the node</param>
     /// <returns>If found, the next library file to process, otherwise null</returns>
-    public async Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, Guid workerUid)
+    public async Task<NextLibraryFileResult> GetNext(string nodeName, Guid nodeUid, string nodeVersion, Guid workerUid)
     {
         // can throw exception if nothing to process
         try

@@ -199,6 +199,11 @@ public class LibraryFile : FileFlowObject
     }
     
     /// <summary>
+    /// Gets or sets the data to hold this file for
+    /// </summary>
+    public DateTime HoldUntil { get; set; }
+    
+    /// <summary>
     /// Gets or sets when the file was created
     /// </summary>
     public DateTime CreationTime { get; set; }

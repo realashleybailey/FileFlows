@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using System.Text.RegularExpressions;
+using FileFlows.ServerShared.Services;
 
 namespace FileFlows.Server.Controllers;
 
@@ -124,7 +125,7 @@ public class LibraryController : ControllerStore<Library>
         await DeleteAll(model);
         if (deleteLibraryFiles)
         {
-            await new LibraryFileController().DeleteFromLibraries(model.Uids);
+            await new Server.Services.LibraryFileService().DeleteFromLibraries(model.Uids);
         }
 
         await UpdateHasLibraries();

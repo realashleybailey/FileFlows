@@ -7,6 +7,9 @@ CREATE TABLE DbObject
     DateModified    datetime           default           now(),
     Data            MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
 );
+ALTER TABLE DbObject ADD INDEX (Type);
+ALTER TABLE DbObject ADD INDEX (Name);
+ALTER TABLE DbObject ADD FULLTEXT NameIndex(Name);
 
 CREATE TABLE DbLogMessage
 (
@@ -15,6 +18,8 @@ CREATE TABLE DbLogMessage
     Type            int                NOT NULL,
     Message         TEXT               COLLATE utf8_unicode_ci      NOT NULL
 );
+ALTER TABLE DbLogMessage ADD INDEX (ClientUid);
+ALTER TABLE DbLogMessage ADD INDEX (LogDate);
 
 CREATE TABLE DbStatistic
 (
@@ -61,6 +66,7 @@ CREATE TABLE LibraryFile
     -- dates 
     CreationTime        datetime           default           now(),
     LastWriteTime       datetime           default           now(),
+    HoldUntil           datetime           default           '1970-01-01 00:00:01',
     ProcessingStarted   datetime           default           now()      NOT NULL,
     ProcessingEnded     datetime           default           now()      NOT NULL,
     
@@ -85,5 +91,7 @@ CREATE TABLE LibraryFile
     ExecutedNodes       TEXT               COLLATE utf8_unicode_ci      NOT NULL
 );
 
-CREATE INDEX idx_LibraryFile_Status ON LibraryFile(Status);
-CREATE INDEX idx_LibraryFile_DateModified ON LibraryFile(DateModified);
+ALTER TABLE LibraryFile ADD INDEX (Status);
+ALTER TABLE LibraryFile ADD INDEX (DateModified);
+-- index to make library file status/skybox faster
+ALTER TABLE LibraryFile ADD INDEX (Status, HoldUntil, LibraryUid);

@@ -96,11 +96,12 @@ public class MySqlDbManager: DbManager
         Logger.Instance.ILog("SQL Tables:\n" + sqlTables);
         db.Execute(sqlTables);
 
-        db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Type ON {nameof(DbObject)}(Type)");
-        db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");
-        db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);");
-        db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);");
-        db.Execute($"ALTER TABLE {nameof(DbObject)} ADD FULLTEXT NameIndex(Name);");
+        // moved to Tables.sql
+        // db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Type ON {nameof(DbObject)}(Type)");
+        // db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");
+        // db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);");
+        // db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);");
+        // db.Execute($"ALTER TABLE {nameof(DbObject)} ADD FULLTEXT NameIndex(Name);");
         return true;
     }
 

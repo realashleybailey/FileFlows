@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
 using FileFlows.ServerShared.Services;
+using MySqlConnector;
 
 namespace FileFlows.Server.Workers;
 
@@ -210,6 +211,7 @@ public class WatchedLibrary:IDisposable
                 CreationTime = fsInfo.CreationTime,
                 LastWriteTime = fsInfo.LastWriteTime,
                 Duplicate = duplicate,
+                HoldUntil = Library.HoldMinutes > 0 ? DateTime.Now.AddMinutes(Library.HoldMinutes) : DateTime.MinValue,
                 Library = new ObjectReference
                 {
                     Name = Library.Name,
@@ -268,7 +270,7 @@ public class WatchedLibrary:IDisposable
             return (true, null, null);
         }
 
-        string fingerprint = null;
+        string? fingerprint = null;
         if (Library.UseFingerprinting)
         {
             fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);

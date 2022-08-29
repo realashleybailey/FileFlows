@@ -911,23 +911,6 @@ public abstract class DbManager
     }
 
     /// <summary>
-    /// Gets the library file status  
-    /// </summary>
-    /// <returns>the library file status counts</returns>
-    public abstract Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview();
-
-    /// <summary>
-    /// Gets the library file with the corresponding status
-    /// </summary>
-    /// <param name="status">the library file status</param>
-    /// <param name="start">the row to start at</param>
-    /// <param name="max">the maximum items to return</param>
-    /// <param name="quarter">the current quarter</param>
-    /// <param name="nodeUid">optional UID of node to limit results for</param>
-    /// <returns>an enumerable of library files</returns>
-    public abstract Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max, int quarter, Guid? nodeUid);
-
-    /// <summary>
     /// Performance a search for library files
     /// </summary>
     /// <param name="filter">the search filter</param>
@@ -947,12 +930,6 @@ public abstract class DbManager
     /// <returns>heatmap data</returns>
     public virtual Task<List<Dictionary<int, int>>> GetHourProcessingTotals() =>
         throw new NotImplementedException();
-
-    /// <summary>
-    /// Gets the shrinkage group data
-    /// </summary>
-    /// <returns>the shrinkage group data</returns>
-    public abstract Task<IEnumerable<ShrinkageData>> GetShrinkageGroups();
 
     /// <summary>
     /// Logs a message to the database

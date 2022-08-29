@@ -13,36 +13,6 @@ public class SqliteDbManager : DbManager
 {
     private readonly string DbFilename;
     
-    protected readonly string CreateDbObjectTableScript =
-        @$"CREATE TABLE {nameof(DbObject)}(
-            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
-            Name            VARCHAR(1024)      NOT NULL,
-            Type            VARCHAR(255)       NOT NULL,
-            DateCreated     datetime           default           current_timestamp,
-            DateModified    datetime           default           current_timestamp,
-            Data            TEXT               NOT NULL
-        );";
-
-    internal readonly string CreateDbStatisticTableScript = @$"
-        CREATE TABLE {nameof(DbStatistic)}(
-            LogDate         datetime,
-            Name            varchar(100)       NOT NULL,
-            Type            int                NOT NULL,            
-            StringValue     TEXT               NOT NULL,            
-            NumberValue     REAL               NOT NULL
-        );
-";
-    internal readonly string CreateDbRevisionedObjectTableScript = @$"
-        CREATE TABLE {nameof(RevisionedObject)}(
-            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
-            RevisionUid     VARCHAR(36)        NOT NULL,
-            RevisionName    VARCHAR(1024)      NOT NULL,
-            RevisionType    VARCHAR(255)       NOT NULL,
-            RevisionDate    datetime           default           current_timestamp,
-            RevisionCreated datetime           default           current_timestamp,
-            RevisionData    TEXT               NOT NULL
-        );
-";
     
     /// <summary>
     /// Constructs a new Sqlite Database Manager
@@ -153,25 +123,32 @@ public class SqliteDbManager : DbManager
         con.Open();
         try
         {
-            foreach (var tbl in new[]
-                     {
-                         (nameof(DbObject), CreateDbObjectTableScript),
-                         (nameof(DbStatistic), CreateDbStatisticTableScript),
-                         (nameof(RevisionedObject), CreateDbRevisionedObjectTableScript),
-                     })
-            {
-                string sqlExists = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tbl.Item1}'";
-                using DbCommand cmdExists = Globals.IsArm
-                    ? new Microsoft.Data.Sqlite.SqliteCommand(sqlExists, (Microsoft.Data.Sqlite.SqliteConnection)con)
-                    : new System.Data.SQLite.SQLiteCommand(sqlExists, (System.Data.SQLite.SQLiteConnection)con);
-                if (cmdExists.ExecuteScalar() != null)
-                    continue;
-
-                using DbCommand cmd = Globals.IsArm
-                    ? new Microsoft.Data.Sqlite.SqliteCommand(tbl.Item2, (Microsoft.Data.Sqlite.SqliteConnection)con) 
-                    : new System.Data.SQLite.SQLiteCommand(tbl.Item2, (System.Data.SQLite.SQLiteConnection)con);
-                cmd.ExecuteNonQuery();
-            }
+            string sqlTables = GetSqlScript("Sqlite", "Tables.sql", clean: true);
+            
+            using DbCommand cmd = Globals.IsArm
+                ? new Microsoft.Data.Sqlite.SqliteCommand(sqlTables, (Microsoft.Data.Sqlite.SqliteConnection)con) 
+                : new System.Data.SQLite.SQLiteCommand(sqlTables, (System.Data.SQLite.SQLiteConnection)con);
+            cmd.ExecuteNonQuery();
+            
+            // foreach (var tbl in new[]
+            //          {
+            //              (nameof(DbObject), CreateDbObjectTableScript),
+            //              (nameof(DbStatistic), CreateDbStatisticTableScript),
+            //              (nameof(RevisionedObject), CreateDbRevisionedObjectTableScript),
+            //          })
+            // {
+            //     string sqlExists = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tbl.Item1}'";
+            //     using DbCommand cmdExists = Globals.IsArm
+            //         ? new Microsoft.Data.Sqlite.SqliteCommand(sqlExists, (Microsoft.Data.Sqlite.SqliteConnection)con)
+            //         : new System.Data.SQLite.SQLiteCommand(sqlExists, (System.Data.SQLite.SQLiteConnection)con);
+            //     if (cmdExists.ExecuteScalar() != null)
+            //         continue;
+            //
+            //     using DbCommand cmd = Globals.IsArm
+            //         ? new Microsoft.Data.Sqlite.SqliteCommand(tbl.Item2, (Microsoft.Data.Sqlite.SqliteConnection)con) 
+            //         : new System.Data.SQLite.SQLiteCommand(tbl.Item2, (System.Data.SQLite.SQLiteConnection)con);
+            //     cmd.ExecuteNonQuery();
+            // }
 
             return true;
         }
@@ -179,16 +156,6 @@ public class SqliteDbManager : DbManager
         {
             con.Close();
         }
-    }
-
-    public override Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int max, int start, int quarter, Guid? nodeUid)
-    {
-        throw new NotImplementedException();
     }
 
     public override Task<Flow> GetFailureFlow(Guid libraryUid)
@@ -201,12 +168,6 @@ public class SqliteDbManager : DbManager
     /// </summary>
     /// <returns>the processing time for each library file</returns>
     public override Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
-    {
-        throw new NotImplementedException();
-    }
-
-
-    public override Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
     {
         throw new NotImplementedException();
     }

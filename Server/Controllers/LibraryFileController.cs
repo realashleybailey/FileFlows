@@ -556,7 +556,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
             while (libraries.Count > 4)
             {
                 List<string> toRemove = new();
-                var sd = libraries.OrderBy(x => x.Value.Items).First();
+                var sd = libraries.MinBy(x => x.Value.Items);
                 other.Items += sd.Value.Items;
                 other.FinalSize += sd.Value.FinalSize;
                 other.OriginalSize += sd.Value.OriginalSize;

@@ -198,25 +198,6 @@ public class DbHelper
     public static Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint) =>
         Manager.FindKnownLibraryByFingerprint(fingerprint);
 
-
-    /// <summary>
-    /// Gets the library file status  
-    /// </summary>
-    /// <returns>the overview of the library files</returns>
-    public static Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview() => Manager.GetLibraryFileOverview();
-
-    /// <summary>
-    /// Gets the library file with the corresponding status
-    /// </summary>
-    /// <param name="status">the library file status</param>
-    /// <param name="start">the row to start at</param>
-    /// <param name="max">the maximum items to return</param>
-    /// <param name="nodeUid">optional UID of node to limit results for</param>
-    /// <returns>an enumerable of library files</returns>
-    public static Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start = 0, int max = 0, Guid? nodeUid = null) => 
-        Manager.GetLibraryFiles(status, start, max, TimeHelper.GetCurrentQuarter(), nodeUid);
-
-
     /// <summary>
     /// Performance a search for library files
     /// </summary>
@@ -235,16 +216,7 @@ public class DbHelper
     /// </summary>
     /// <returns>heatmap data</returns>
     public static Task<List<Dictionary<int, int>>> GetHourProcessingTotals() => Manager.GetHourProcessingTotals();
-    /// <summary>
-    /// Gets the shrinkage group data
-    /// </summary>
-    /// <returns>the shrinkage group data</returns>
-    public static async Task<Dictionary<string, ShrinkageData>> GetShrinkageGroups()
-    {
-        var data = await Manager.GetShrinkageGroups();
-        return data.OrderByDescending(x => x.OriginalSize).ToDictionary(x => x.Library, x => x);
-    }
-
+    
     /// <summary>
     /// Logs a message to the database
     /// </summary>

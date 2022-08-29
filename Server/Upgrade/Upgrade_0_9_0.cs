@@ -11,6 +11,16 @@ namespace FileFlows.Server.Upgrade;
 /// </summary>
 public class Upgrade_0_9_0
 {
+
+    internal readonly string SqliteCreateDbStatisticTableScript = @$"
+        CREATE TABLE {nameof(DbStatistic)}(
+            LogDate         datetime,
+            Name            varchar(100)       NOT NULL,
+            Type            int                NOT NULL,            
+            StringValue     TEXT               NOT NULL,            
+            NumberValue     REAL               NOT NULL
+        );";
+
     /// <summary>
     /// Runs the update
     /// </summary>
@@ -63,7 +73,7 @@ public class Upgrade_0_9_0
     private void AddStatisticsTable()
     {
         if(DbHelper.GetDbManager() is SqliteDbManager sqlite)
-            sqlite.Execute(sqlite.CreateDbStatisticTableScript, new object[]{}).Wait();
+            sqlite.Execute(SqliteCreateDbStatisticTableScript, new object[]{}).Wait();
     }
 
     private void ExportScripts()

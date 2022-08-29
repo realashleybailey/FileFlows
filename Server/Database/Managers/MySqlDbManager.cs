@@ -68,9 +68,6 @@ public class MySqlDbManager: DbManager
 
     protected override void CreateStoredProcedures()
     {
-        Logger.Instance.ILog("Adding virtual columns");
-        AddVirtualColumns().Wait();
-        
         Logger.Instance.ILog("Creating Stored Procedures");
         using var db = new NPoco.Database(ConnectionString + ";Allow User Variables=True", null, MySqlConnector.MySqlConnectorFactory.Instance);
         
@@ -88,131 +85,14 @@ public class MySqlDbManager: DbManager
     {
         Logger.Instance.ILog("Creating Database Structure");
         
-        // string createDbSql = CreateDbScript.Replace("current_timestamp", "now()");
-        // createDbSql = createDbSql.Replace("NOT NULL", "COLLATE utf8_unicode_ci  NOT NULL");
-        // createDbSql = createDbSql.Replace("TEXT", "MEDIUMTEXT"); // statistics is too big for TEXT...
         using var db = new NPoco.Database(ConnectionString, null, MySqlConnector.MySqlConnectorFactory.Instance);
         string sqlTables = GetSqlScript("MySql", "Tables.sql", clean: true);
         Logger.Instance.ILog("SQL Tables:\n" + sqlTables);
         db.Execute(sqlTables);
-
-        // moved to Tables.sql
-        // db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Type ON {nameof(DbObject)}(Type)");
-        // db.Execute($"CREATE INDEX idx_{nameof(DbObject)}_Name ON {nameof(DbObject)}(Name)");
-        // db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_Client ON {nameof(DbLogMessage)}(ClientUid);");
-        // db.Execute($"CREATE INDEX idx_{nameof(DbLogMessage)}_LogDate ON {nameof(DbLogMessage)}(LogDate);");
-        // db.Execute($"ALTER TABLE {nameof(DbObject)} ADD FULLTEXT NameIndex(Name);");
+        
         return true;
     }
 
-
-    /// <summary>
-    /// Adds virtual columns to database to improve performance
-    /// </summary>
-    public async Task AddVirtualColumns()
-    {
-        string dbName = GetDatabaseName(ConnectionString);
-        List<string> existingColumns;
-        using (var db = await GetDb())
-        {
-            existingColumns = db.Db.Fetch<string>($"SELECT COLUMN_NAME FROM information_schema.COLUMNS where TABLE_NAME = '{nameof(DbObject)}' and TABLE_SCHEMA = '{dbName}';");
-        }
-
-        var columns = new []{
-            new []{"js_Status", "ADD COLUMN js_Status int GENERATED ALWAYS AS (json_extract(Data,'$.Status')) VIRTUAL"},
-            new []{"js_Order", "ADD COLUMN js_Order int GENERATED ALWAYS AS (json_extract(Data,'$.Order')) VIRTUAL"},
-            new []{"js_OriginalSize", "ADD COLUMN js_OriginalSize bigint GENERATED ALWAYS AS (convert(json_extract(Data,'$.OriginalSize'), signed)) VIRTUAL"},
-            new []{"js_ProcessingStarted", "ADD COLUMN js_ProcessingStarted datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingStarted')), 1, 23), datetime)) VIRTUAL"},
-            new []{"js_ProcessingEnded", "ADD COLUMN js_ProcessingEnded datetime GENERATED ALWAYS AS (convert(substring(JSON_UNQUOTE(JSON_EXTRACT(Data, '$.ProcessingEnded')), 1, 23), datetime)) VIRTUAL"},
-            new []{"js_LibraryUid", "ADD COLUMN js_LibraryUid varchar(36) COLLATE utf8_unicode_ci GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Library.Uid'))) VIRTUAL"},
-            new []{"js_Enabled", "ADD COLUMN js_Enabled boolean GENERATED ALWAYS AS (convert(json_extract(Data,'$.Enabled'), signed)) VIRTUAL"},
-            new []{"js_Priority", "ADD COLUMN js_Priority int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.Priority')), signed)) VIRTUAL"},
-            new []{"js_ProcessingOrder", "ADD COLUMN js_ProcessingOrder int GENERATED ALWAYS AS (convert(JSON_UNQUOTE(json_extract(Data,'$.ProcessingOrder')), signed)) VIRTUAL"},
-            new []{"js_Schedule", "ADD COLUMN js_Schedule varchar(672) COLLATE utf8_unicode_ci GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(Data,'$.Schedule'))) VIRTUAL"}
-        };
-
-        string sql = "";
-        foreach (var column in columns)
-        {
-            string colName = column[0];
-            if (existingColumns.Contains(colName))
-                continue;
-            sql += column[1] + ",\n";
-        }
-
-        if (string.IsNullOrEmpty(sql))
-        {
-            Logger.Instance.ILog("Virtual columns already found in database");
-            return;
-        }
-
-        sql = sql[..^2]; // remove last ,\n
-        
-        Logger.Instance.ILog("Adding virtual columns to database");
-
-        sql = "ALTER TABLE DbObject \n" + sql + ";";
-        using (var db = await GetDb())
-        {
-            db.Db.Execute(sql);
-        }
-    }
-    
-    /// <summary>
-    /// Gets the library file status  
-    /// </summary>
-    /// <returns>the library file status counts</returns>
-    public override async Task<IEnumerable<LibraryStatus>> GetLibraryFileOverview()
-    {
-        int quarter = TimeHelper.GetCurrentQuarter();
-        List<LibraryStatus> results;
-        using (var db = await GetDb())
-        {
-            string sql = $"call GetLibraryFiles(0, {quarter}, 0, 0, null, 1)";
-            results = (await db.Db.FetchAsync<LibraryStatus>(sql)).ToList();
-        }
-
-        return results;
-    }
-
-    /// <summary>
-    /// Gets the library file with the corresponding status
-    /// </summary>
-    /// <param name="status">the library file status</param>
-    /// <param name="start">the row to start at</param>
-    /// <param name="max">the maximum items to return</param>
-    /// <param name="quarter">the current quarter</param>
-    /// <param name="nodeUid">optional UID of node to limit results for</param>
-    /// <returns>an enumerable of library files</returns>
-    public override async Task<IEnumerable<LibraryFile>> GetLibraryFiles(FileStatus status, int start, int max,
-        int quarter, Guid? nodeUid)
-    {
-        List<DbObject> dbObjects;
-        using (var db = await GetDb())
-        {
-            db.Db.OneTimeCommandTimeout = 120;
-            try
-            {
-                dbObjects = await db.Db.FetchAsync<DbObject>("call GetLibraryFiles(@0, @1, @2, @3, @4, 0)",
-                    (int)status,
-                    quarter, start, max, nodeUid);
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.ELog("Error getting files from mysql: " + ex.Message);
-                throw;
-            }
-        }
-
-        try
-        {
-            return ConvertFromDbObject<LibraryFile>(dbObjects);
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.ELog("Error getting files from mysql: " + ex.Message);
-            throw;
-        }
-    }
 
     /// <summary>
     /// Performance a search for library files
@@ -234,23 +114,6 @@ public class MySqlDbManager: DbManager
 
         return ConvertFromDbObject<LibraryFile>(dbObjects);
         
-    }
-    /// <summary>
-    /// Deletes all the library files from the specified libraries
-    /// </summary>
-    /// <param name="libraryUids">the UIDs of the libraries</param>
-    /// <returns>the task to await</returns>
-    public override async Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids)
-    {
-        string sql = "";
-        foreach (var uid in libraryUids ?? new Guid[] { })
-            sql += $"delete from {nameof(DbObject)} where js_LibraryUid = '{uid}';\n";
-        if (sql == "")
-            return;
-        using (var db = await GetDb())
-        {
-            await db.Db.ExecuteAsync(sql);
-        }
     }
 
 
@@ -307,20 +170,6 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         }
 
         return days;
-    }
-
-    /// <summary>
-    /// Gets the shrinkage group data
-    /// </summary>
-    /// <returns>the shrinkage group data</returns>
-    public override async Task<IEnumerable<ShrinkageData>> GetShrinkageGroups()
-    {
-        List<ShrinkageData> results;
-        using (var db = await GetDb())
-        {
-            results = await db.Db.FetchAsync<ShrinkageData>("call GetShrinkageData()");
-        }
-        return results;
     }
 
     private readonly List<string> LogMessages = new();

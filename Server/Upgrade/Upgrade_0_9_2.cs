@@ -12,6 +12,28 @@ namespace FileFlows.Server.Upgrade;
 /// </summary>
 public class Upgrade_0_9_2
 {
+    internal readonly string MySqlCreateDbRevisionedObjectTableScript = @$"
+        CREATE TABLE {nameof(RevisionedObject)}(
+            Uid             VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
+            RevisionUid     VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL,
+            RevisionName    VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
+            RevisionType    VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
+            RevisionDate    datetime           default           now(),
+            RevisionCreated datetime           default           now(),
+            RevisionData    MEDIUMTEXT         COLLATE utf8_unicode_ci      NOT NULL
+        );";
+    internal readonly string SqliteCreateDbRevisionedObjectTableScript = @$"
+        CREATE TABLE {nameof(RevisionedObject)}(
+            Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
+            RevisionUid     VARCHAR(36)        NOT NULL,
+            RevisionName    VARCHAR(1024)      NOT NULL,
+            RevisionType    VARCHAR(255)       NOT NULL,
+            RevisionDate    datetime           default           current_timestamp,
+            RevisionCreated datetime           default           current_timestamp,
+            RevisionData    TEXT               NOT NULL
+        );
+";
+
     /// <summary>
     /// Runs the update
     /// </summary>
@@ -30,9 +52,9 @@ public class Upgrade_0_9_2
     private void AddRevisionedObjectTable()
     {
         if(DbHelper.GetDbManager() is MySqlDbManager mysql)
-            mysql.Execute(mysql.CreateDbRevisionedObjectTableScript, null).Wait();
+            mysql.Execute(MySqlCreateDbRevisionedObjectTableScript, null).Wait();
         else if(DbHelper.GetDbManager() is SqliteDbManager sqlite)
-            sqlite.Execute(sqlite.CreateDbRevisionedObjectTableScript, null).Wait();
+            sqlite.Execute(SqliteCreateDbRevisionedObjectTableScript, null).Wait();
     }
 
     private void AddRevisions()

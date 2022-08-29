@@ -25,6 +25,12 @@ public class Upgrade_1_0_2
     {
         Logger.Instance.ILog("Migrating Library Files Data");
         var manager = DbHelper.GetDbManager();
+
+        if (manager is MySqlDbManager)
+        {
+            DropVirtualColumns(manager);
+        }
+        
         CreateLibraryFilesTable(manager);
         
         var files = DbHelper.Select<LibraryFile>().Result.ToArray();
@@ -37,6 +43,23 @@ public class Upgrade_1_0_2
             {
                 db.Db.Insert(file);
             }
+        }
+    }
+
+    private void DropVirtualColumns(DbManager manager)
+    {
+        using (var db = manager.GetDb().Result)
+        {
+            db.Db.Execute("alter table DbObject drop column js_Status");
+            db.Db.Execute("alter table DbObject drop column js_Order");
+            db.Db.Execute("alter table DbObject drop column js_OriginalSize");
+            db.Db.Execute("alter table DbObject drop column js_ProcessingStarted");
+            db.Db.Execute("alter table DbObject drop column js_ProcessingEnded");
+            db.Db.Execute("alter table DbObject drop column js_LibraryUid");
+            db.Db.Execute("alter table DbObject drop column js_Enabled");
+            db.Db.Execute("alter table DbObject drop column js_Priority");
+            db.Db.Execute("alter table DbObject drop column js_ProcessingOrder");
+            db.Db.Execute("alter table DbObject drop column js_Schedule");
         }
     }
 

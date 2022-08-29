@@ -1,4 +1,5 @@
 ﻿using FileFlows.Server.Helpers;
+using FileFlows.ServerShared.Services;
 
 namespace FileFlows.Server.Controllers
 {
@@ -41,7 +42,7 @@ namespace FileFlows.Server.Controllers
             }
             else
             {
-                var lfOverview = await DbHelper.GetLibraryFileOverview();
+                var lfOverview = (await new Server.Services.LibraryFileService().GetStatus()).ToArray();
                 status.queue = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Unprocessed)?.Count ?? 0;
                 status.processed = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Processed)?.Count ?? 0;
             }

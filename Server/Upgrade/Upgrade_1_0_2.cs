@@ -27,6 +27,7 @@ public class Upgrade_1_0_2
         if (manager is MySqlDbManager)
         {
             DropVirtualColumns(manager);
+            DropOldStoredProcs(manager);
         }
         
         CreateLibraryFilesTable(manager);
@@ -43,6 +44,16 @@ public class Upgrade_1_0_2
             }
 
             db.Db.Execute("delete from DbObject where Type = @0", typeof(LibraryFile).FullName);
+        }
+    }
+
+    private void DropOldStoredProcs(DbManager manager)
+    {
+        using (var db = manager.GetDb().Result)
+        {
+            db.Db.Execute("DROP PROCEDURE IF EXISTS GetLibraryFiles");
+            db.Db.Execute("DROP PROCEDURE IF EXISTS GetShrinkageData");
+            db.Db.Execute("DROP PROCEDURE IF EXISTS SearchLibraryFiles");
         }
     }
 
@@ -69,55 +80,55 @@ public class Upgrade_1_0_2
 CREATE TABLE IF NOT EXISTS LibraryFile
 (
     -- common fields from DbObject
-    Uid                 VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY       DEFAULT(''),
-    Name                VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL          DEFAULT(''),
-    DateCreated         datetime           default           now(),
-    DateModified        datetime           default           now(),
+    Uid                 VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
+    Name                VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
+    DateCreated         datetime           default           now()      NOT NULL,
+    DateModified        datetime           default           now()      NOT NULL,
     
     -- properties
     RelativePath        VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
-    Status              int                NOT NULL       DEFAULT(0),
-    ProcessingOrder     int                NOT NULL       DEFAULT(0),
+    Status              int                NOT NULL,
+    ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
-    IsDirectory         boolean            not null       DEFAULT(false),
+    IsDirectory         boolean            not null,
     
     -- size
-    OriginalSize        bigint             NOT NULL       DEFAULT(0),
-    FinalSize           bigint             NOT NULL       DEFAULT(0),
+    OriginalSize        bigint             NOT NULL,
+    FinalSize           bigint             NOT NULL,
     
     -- dates 
-    CreationTime        datetime           default           now(),
-    LastWriteTime       datetime           default           now(),
-    HoldUntil           datetime           default           '1970-01-01 00:00:01',
+    CreationTime        datetime           default           now()      NOT NULL,
+    LastWriteTime       datetime           default           now()      NOT NULL,
+    HoldUntil           datetime           default           '1970-01-01 00:00:01'      NOT NULL,
     ProcessingStarted   datetime           default           now()      NOT NULL,
     ProcessingEnded     datetime           default           now()      NOT NULL,
     
     -- references
-    LibraryUid          varchar(36)        COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    LibraryName         VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    FlowUid             varchar(36)        COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    FlowName            VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    DuplicateUid        varchar(36)        COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    DuplicateName       VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    NodeUid             varchar(36)        COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    NodeName            VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    WorkerUid           varchar(36)        COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
+    LibraryUid          varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    LibraryName         VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL,
+    FlowUid             varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    FlowName            VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL,
+    DuplicateUid        varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    DuplicateName       VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
+    NodeUid             varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
+    NodeName            VARCHAR(100)       COLLATE utf8_unicode_ci      NOT NULL,
+    WorkerUid           varchar(36)        COLLATE utf8_unicode_ci      NOT NULL,
 
     -- output
-    OutputPath          VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    NoLongerExistsAfterProcessing          boolean                      not null           DEFAULT(false),
+    OutputPath          VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
+    NoLongerExistsAfterProcessing          boolean                      not null,
 
     -- json data
-    OriginalMetadata    TEXT               COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    FinalMetadata       TEXT               COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
-    ExecutedNodes       TEXT               COLLATE utf8_unicode_ci      NOT NULL           DEFAULT('')
+    OriginalMetadata    TEXT               COLLATE utf8_unicode_ci      NOT NULL,
+    FinalMetadata       TEXT               COLLATE utf8_unicode_ci      NOT NULL,
+    ExecutedNodes       TEXT               COLLATE utf8_unicode_ci      NOT NULL
 );");
 
         if (DbHelper.UseMemoryCache)
         {
             // sqlite
             sql = sql.Replace("COLLATE utf8_unicode_ci      ", string.Empty);
-            sql = sql.Replace("now()", "current_timestamp");
+            sql = sql.Replace("datetime           default           now()", string.Empty);
         }
         
         manager.Execute(sql, null).Wait();
@@ -126,9 +137,9 @@ CREATE TABLE IF NOT EXISTS LibraryFile
         if (DbHelper.UseMemoryCache)
         {
             // sqlite
-            manager.Execute("CREATE INDEX IF NOT EXISTS idx_Status ON LibraryFile (Status)", null).Wait();
-            manager.Execute("CREATE INDEX IF NOT EXISTS idx_DateModified ON LibraryFile (DateModified)", null).Wait();
-            manager.Execute("CREATE INDEX IF NOT EXISTS idx_StatusHoldLibrary ON LibraryFile (Status, HoldUntil, LibraryUid)", null).Wait();
+            manager.Execute("CREATE INDEX IF NOT EXISTS idx_LibraryFile_Status ON LibraryFile (Status)", null).Wait();
+            manager.Execute("CREATE INDEX IF NOT EXISTS idx_LibraryFile_DateModified ON LibraryFile (DateModified)", null).Wait();
+            manager.Execute("CREATE INDEX IF NOT EXISTS idx_LibraryFile_StatusHoldLibrary ON LibraryFile (Status, HoldUntil, LibraryUid)", null).Wait();
         }
         else
         {

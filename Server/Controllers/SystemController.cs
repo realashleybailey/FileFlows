@@ -213,8 +213,6 @@ public class SystemController:Controller
     [HttpGet("history-data/library-processing-time")]
     public async Task<object> GetLibraryProcessingTime()
     {
-        if (DbHelper.UseMemoryCache)
-            return new object[] { }; // not supported
         var data = (await new LibraryFileService().GetLibraryProcessingTimes()).ToArray();
         var dict = data.Select(x => new
         {
@@ -244,8 +242,6 @@ public class SystemController:Controller
     [HttpGet("history-data/processing-heatmap")]
     public async Task<object> GetProcessingHeatMap()
     {
-        if (DbHelper.UseMemoryCache)
-            return "Not supported by this installation";
         var data = await new LibraryFileService().GetHourProcessingTotals();
         var results = data.Select((x, index) => new
         {

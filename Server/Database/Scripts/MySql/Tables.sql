@@ -47,8 +47,8 @@ CREATE TABLE LibraryFile
     -- common fields from DbObject
     Uid                 VARCHAR(36)        COLLATE utf8_unicode_ci      NOT NULL          PRIMARY KEY,
     Name                VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
-    DateCreated         datetime           default           now(),
-    DateModified        datetime           default           now(),
+    DateCreated         datetime           default           now()      NOT NULL,
+    DateModified        datetime           default           now()      NOT NULL,
     
     -- properties
     RelativePath        VARCHAR(1024)      COLLATE utf8_unicode_ci      NOT NULL,
@@ -62,9 +62,9 @@ CREATE TABLE LibraryFile
     FinalSize           bigint             NOT NULL,
     
     -- dates 
-    CreationTime        datetime           default           now(),
-    LastWriteTime       datetime           default           now(),
-    HoldUntil           datetime           default           '1970-01-01 00:00:01',
+    CreationTime        datetime           default           now()      NOT NULL,
+    LastWriteTime       datetime           default           now()      NOT NULL,
+    HoldUntil           datetime           default           '1970-01-01 00:00:01'      NOT NULL,
     ProcessingStarted   datetime           default           now()      NOT NULL,
     ProcessingEnded     datetime           default           now()      NOT NULL,
     

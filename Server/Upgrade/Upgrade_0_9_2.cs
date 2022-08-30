@@ -28,8 +28,8 @@ public class Upgrade_0_9_2
             RevisionUid     VARCHAR(36)        NOT NULL,
             RevisionName    VARCHAR(1024)      NOT NULL,
             RevisionType    VARCHAR(255)       NOT NULL,
-            RevisionDate    datetime           default           current_timestamp,
-            RevisionCreated datetime           default           current_timestamp,
+            RevisionDate    datetime           default,
+            RevisionCreated datetime           default,
             RevisionData    TEXT               NOT NULL
         );
 ";

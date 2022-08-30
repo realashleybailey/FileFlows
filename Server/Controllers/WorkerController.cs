@@ -214,17 +214,26 @@ public class WorkerController : Controller
 
     private bool LibraryFileHasChanged(LibraryFile file)
     {
-        var cached = LibraryFileCacheStore.Get<LibraryFile>(file.Uid);
-        LibraryFileCacheStore.Store(file.Uid, file);
+        var cached = LibraryFileCacheStore.Get<LibraryFileRecord>(file.Uid);
+        LibraryFileCacheStore.Store(file.Uid, new LibraryFileRecord
+        {
+            Status = file.Status,
+            ExecutedNodes = file.ExecutedNodes?.Count ?? 0,
+            WorkerUid = file.WorkerUid,
+            NodeUid = file.NodeUid,
+            FinalSize = file.FinalSize,
+            ProcessingStarted = file.ProcessingStarted,
+            ProcessingEnded = file.ProcessingEnded
+        });
         if (cached == null)
             return true;
         if (file.Status != cached.Status)
             return true;
-        if (file.ExecutedNodes?.Count != cached.ExecutedNodes?.Count)
+        if (file.ExecutedNodes?.Count != cached.ExecutedNodes)
             return true;
         if(file.WorkerUid != cached.WorkerUid)
             return true;
-        if(file.Node?.Uid != cached.Node?.Uid)
+        if(file.Node?.Uid != cached.NodeUid)
             return true;
         if(file.FinalSize != cached.FinalSize)
             return true;
@@ -233,6 +242,17 @@ public class WorkerController : Controller
         if(file.ProcessingEnded != cached.ProcessingEnded)
             return true;
         return false;
+    }
+
+    class LibraryFileRecord
+    {
+        public FileStatus Status { get; set; }
+        public int ExecutedNodes { get; set; }
+        public Guid? WorkerUid { get; set; }
+        public Guid? NodeUid { get; set; }
+        public long FinalSize { get; set; }
+        public DateTime ProcessingStarted { get; set; }
+        public DateTime ProcessingEnded { get; set; }
     }
 
     /// <summary>

@@ -3,12 +3,13 @@ CREATE TABLE DbObject
     Uid             VARCHAR(36)        NOT NULL          PRIMARY KEY,
     Name            VARCHAR(1024)      NOT NULL,
     Type            VARCHAR(255)       NOT NULL,
-    DateCreated     datetime           default           current_timestamp,
-    DateModified    datetime           default           current_timestamp,
+    DateCreated     datetime           NOT NULL,
+    DateModified    datetime           NOT NULL,
     Data            TEXT               NOT NULL
 );
-ALTER TABLE DbObject ADD INDEX (Type);
-ALTER TABLE DbObject ADD INDEX (Name);
+
+CREATE INDEX IF NOT EXISTS idx_DbObject_Type ON DbObject (Type);
+CREATE INDEX IF NOT EXISTS idx_DbObject_Name ON DbObject (Name);
 
 CREATE TABLE DbStatistic
 (
@@ -26,8 +27,8 @@ CREATE TABLE RevisionedObject
     RevisionUid     VARCHAR(36)        NOT NULL,
     RevisionName    VARCHAR(1024)      NOT NULL,
     RevisionType    VARCHAR(255)       NOT NULL,
-    RevisionDate    datetime           default           current_timestamp,
-    RevisionCreated datetime           default           current_timestamp,
+    RevisionDate    datetime           NOT NULL,
+    RevisionCreated datetime           NOT NULL,
     RevisionData    TEXT               NOT NULL
 );
 
@@ -36,8 +37,8 @@ CREATE TABLE LibraryFile
     -- common fields from DbObject
     Uid                 VARCHAR(36)        NOT NULL          PRIMARY KEY,
     Name                VARCHAR(1024)      NOT NULL,
-    DateCreated         datetime           default           current_timestamp,
-    DateModified        datetime           default           current_timestamp,
+    DateCreated         datetime           NOT NULL,
+    DateModified        datetime           NOT NULL,
     
     -- properties
     RelativePath        VARCHAR(1024)      NOT NULL,
@@ -51,11 +52,11 @@ CREATE TABLE LibraryFile
     FinalSize           bigint             NOT NULL,
     
     -- dates 
-    CreationTime        datetime           default           current_timestamp,
-    LastWriteTime       datetime           default           current_timestamp,
+    CreationTime        datetime           NOT NULL,
+    LastWriteTime       datetime           NOT NULL,
     HoldUntil           datetime           default           '1970-01-01 00:00:01',
-    ProcessingStarted   datetime           default           current_timestamp      NOT NULL,
-    ProcessingEnded     datetime           default           current_timestamp      NOT NULL,
+    ProcessingStarted   datetime           NOT NULL,
+    ProcessingEnded     datetime           NOT NULL,
     
     -- references
     LibraryUid          varchar(36)        NOT NULL,
@@ -78,7 +79,7 @@ CREATE TABLE LibraryFile
     ExecutedNodes       TEXT               NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_Status ON LibraryFile (Status)
-CREATE INDEX IF NOT EXISTS idx_DateModified ON LibraryFile (DateModified)
+CREATE INDEX IF NOT EXISTS idx_LibraryFile_Status ON LibraryFile (Status);
+CREATE INDEX IF NOT EXISTS idx_LibraryFile_DateModified ON LibraryFile (DateModified);
 -- index to make library file status/skybox faster
-CREATE INDEX IF NOT EXISTS idx_StatusHoldLibrary ON LibraryFile (Status, HoldUntil, LibraryUid)
+CREATE INDEX IF NOT EXISTS idx_LibraryFile_StatusHoldLibrary ON LibraryFile (Status, HoldUntil, LibraryUid);

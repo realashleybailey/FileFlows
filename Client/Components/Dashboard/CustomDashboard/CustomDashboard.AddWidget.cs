@@ -176,8 +176,7 @@ public partial class CustomDashboard
             });
         }
 
-        if (App.Instance.FileFlowsSystem.ExternalDatabase &&
-            DoesntHaveWidget(FileFlows.Shared.Widgets.ProcessingTimes.WD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.ProcessingTimes.WD_UID))
         {
             fields.Add(new ElementField
             {
@@ -190,8 +189,7 @@ public partial class CustomDashboard
             });
         }
 
-        if (App.Instance.FileFlowsSystem.ExternalDatabase &&
-            DoesntHaveWidget(FileFlows.Shared.Widgets.LibraryProcessingTimes.WD_UID))
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.LibraryProcessingTimes.WD_UID))
         {
             fields.Add(new ElementField
             {

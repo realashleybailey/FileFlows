@@ -85,9 +85,12 @@ public class SqlHelper
         if (DbHelper.UseMemoryCache)
         {
             // sqlite
+            // sqlite is 0 based, 0 == sunday, mysql and ms sql server is 1 based
+            return $"(strftime('%w', {column}) + 1)" + (string.IsNullOrEmpty(asColumn) ? string.Empty : $" as {asColumn}");
         }
 
-        return $" DAYOFWEEK({column}) " + (string.IsNullOrEmpty(asColumn) ? string.Empty : $"as {asColumn} ");
+        // mysql dayofweek is 1 based, convert to 0 based
+        return $"DAYOFWEEK({column})" + (string.IsNullOrEmpty(asColumn) ? string.Empty : $" as {asColumn}");
     }
     /// <summary>
     /// Creates a hour sql select
@@ -100,9 +103,10 @@ public class SqlHelper
         if (DbHelper.UseMemoryCache)
         {
             // sqlite
+            return $"strftime('%H', {column})" + (string.IsNullOrEmpty(asColumn) ? string.Empty : $" as {asColumn}");
         }
 
-        return $" hour({column}) " + (string.IsNullOrEmpty(asColumn) ? string.Empty : $"as {asColumn} ");
+        return $"hour({column})" + (string.IsNullOrEmpty(asColumn) ? string.Empty : $" as {asColumn}");
     }
 
     /// <summary>
@@ -112,7 +116,18 @@ public class SqlHelper
     public static object Now()
     {
         if (DbHelper.UseMemoryCache)
-            return " current_timestamp ";
-        return " now() ";
+            return "datetime(current_timestamp, 'localtime')";
+        return "now()";
+    }
+
+    /// <summary>
+    /// Gets the variable for a random value
+    /// </summary>
+    /// <returns>the SQL variable for random</returns>
+    public static string Random()
+    { 
+        if(DbHelper.UseMemoryCache)
+            return "random()";
+        return "rand()";
     }
 }

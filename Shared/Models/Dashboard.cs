@@ -114,62 +114,40 @@ public class Dashboard: FileFlowObject
 
 
         // codecs and times row
-        if (usingExternalDatabase)
+        db.Widgets.Add(new()
         {
-            db.Widgets.Add(new()
-            {
-                Height = 2, Width = 6,
-                Y = rowIndex, X = 0,
-                WidgetDefinitionUid = Codecs.WD_UID
-            });
-            db.Widgets.Add(new()
-            {
-                Height = 2, Width = 6,
-                Y = rowIndex, X = 6,
-                WidgetDefinitionUid = ProcessingTimes.WD_UID
-            });
-        }
-        else
+            Height = 2, Width = 6,
+            Y = rowIndex, X = 0,
+            WidgetDefinitionUid = Codecs.WD_UID
+        });
+        db.Widgets.Add(new()
         {
-            db.Widgets.Add(new()
-            {
-                Height = 2, Width = 6,
-                Y = rowIndex, X = 0,
-                WidgetDefinitionUid = Codecs.WD_UID
-            });
-            db.Widgets.Add(new()
-            {
-                Height = 2, Width = 6,
-                Y = rowIndex, X = 6,
-                WidgetDefinitionUid = StorageSaved.WD_UID
-            });
-            
-        }
+            Height = 2, Width = 6,
+            Y = rowIndex, X = 6,
+            WidgetDefinitionUid = ProcessingTimes.WD_UID
+        });
 
         rowIndex += 2;
 
         // containers, resolution, processing times row
         db.Widgets.Add(new()
         {
-            Height = 2, Width = usingExternalDatabase ? 4 : 6,
+            Height = 2, Width = 4,
             Y = rowIndex, X = 0,
             WidgetDefinitionUid = VideoContainers.WD_UID
         });
         db.Widgets.Add(new()
         {
-            Height = 2, Width = usingExternalDatabase ? 4 : 6,
-            Y = rowIndex, X = usingExternalDatabase ? 4 : 6,
+            Height = 2, Width = 4,
+            Y = rowIndex, X = 4,
             WidgetDefinitionUid = VideoResolution.WD_UID
         });
-        if (usingExternalDatabase)
+        db.Widgets.Add(new()
         {
-            db.Widgets.Add(new()
-            {
-                Height = 2, Width = 4,
-                Y = rowIndex, X = 8,
-                WidgetDefinitionUid = StorageSaved.WD_UID
-            });
-        }
+            Height = 2, Width = 4,
+            Y = rowIndex, X = 8,
+            WidgetDefinitionUid = StorageSaved.WD_UID
+        });
 
         return db;
     }

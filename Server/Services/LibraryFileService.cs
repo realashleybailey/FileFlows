@@ -121,24 +121,24 @@ public partial class LibraryFileService : ILibraryFileService
         await GetNextSemaphore.WaitAsync();
         try
         {
-            string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= now() " +
+            string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
                          $" and LibraryUid in ({libraryUids}) order by " + UNPROCESSED_ORDER_BY;
 
-            
+
             var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
             if (libFile == null)
                 return null;
-            
+
             // check the library this file belongs, we may have to grab a different file from this library
             var library = libraries.FirstOrDefault(x => x.Uid == libFile.LibraryUid);
             if (libFile.Order < 1 && library != null && library.ProcessingOrder != ProcessingOrder.AsFound)
             {
                 // need to change the order up
                 bool orderGood = true;
-                sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= now() " +
+                sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
                       $" and LibraryUid = '{library.Uid}' order by ";
                 if (library.ProcessingOrder == ProcessingOrder.Random)
-                    sql += DbHelper.UseMemoryCache ? " random()" : "rand()"; // sqlite uses random, mysql uses rand
+                    sql += " " + SqlHelper.Random() + " ";
                 else if (library.ProcessingOrder == ProcessingOrder.LargestFirst)
                     sql += " OriginalSize desc ";
                 else if (library.ProcessingOrder == ProcessingOrder.SmallestFirst)
@@ -157,10 +157,15 @@ public partial class LibraryFileService : ILibraryFileService
             }
 
             await Database_Execute("update LibraryFile set NodeUid = @0 , NodeName = @1 , WorkerUid = @2 " +
-                       " , Status = @3 , ProcessingStarted = now() where Uid = @4",
-                nodeUid, nodeName, workerUid, (int)FileStatus.Processing, libFile.Uid);
-            
+                                   $" , Status = @3 , ProcessingStarted = @4 where Uid = @5",
+                nodeUid, nodeName, workerUid, (int)FileStatus.Processing, DateTime.Now, libFile.Uid);
+
             return libFile;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Failed getting next file for processing: " + ex.Message);
+            throw;
         }
         finally
         {
@@ -187,6 +192,10 @@ public partial class LibraryFileService : ILibraryFileService
         if(file.Uid == Guid.Empty)
             file.Uid = Guid.NewGuid();
         
+        if(file.DateCreated < new DateTime(2000, 1,1))
+            file.DateCreated = DateTime.Now;
+        if (file.DateModified < new DateTime(2000, 1, 1))
+            file.DateModified = DateTime.Now;
         await Database_Insert(file);
         return await Get(file.Uid);
     }
@@ -206,6 +215,10 @@ public partial class LibraryFileService : ILibraryFileService
                 continue;
             if(file.Uid == Guid.Empty)
                 file.Uid = Guid.NewGuid();
+            if(file.DateCreated < new DateTime(2000, 1,1))
+                file.DateCreated = DateTime.Now;
+            if (file.DateModified < new DateTime(2000, 1, 1))
+                file.DateModified = DateTime.Now;
         }
 
         await Database_AddMany(files);
@@ -218,14 +231,8 @@ public partial class LibraryFileService : ILibraryFileService
     /// <returns>The newly updated library file</returns>
     public async Task<LibraryFile> Update(LibraryFile file)
     {
+        file.DateModified = DateTime.Now;
         await Database_Update(file);
-
-        // lock (CachedData)
-        // {
-        //     if (CachedData?.ContainsKey(file.Uid) == true)
-        //         CachedData[file.Uid] = file;
-        // }
-        
         return file;
     }
 
@@ -264,7 +271,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         if (uids?.Any() != true)
             return;
-        string inStr = string.Join(",", uids.Select(x => $"'${x}'"));
+        string inStr = string.Join(",", uids.Select(x => $"'{x}'"));
         await Database_Execute($"delete from LibraryFile where Uid in ({inStr})", null);
     }
 
@@ -277,7 +284,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         if (libraryUids?.Any() != true)
             return;
-        string inStr = string.Join(",", libraryUids.Select(x => $"'${x}'"));
+        string inStr = string.Join(",", libraryUids.Select(x => $"'{x}'"));
         await Database_Execute($"delete from LibraryFile where LibraryUid in ({inStr})", null);
     }
 
@@ -340,7 +347,7 @@ public partial class LibraryFileService : ILibraryFileService
             {
                 if (string.IsNullOrEmpty(disabled))
                     return new List<LibraryFile>(); // no disabled libraries
-                return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified desc", skip, rows));
+                return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified", skip, rows));
             }
             
             // add out of schedule condition
@@ -352,13 +359,13 @@ public partial class LibraryFileService : ILibraryFileService
                 if (string.IsNullOrEmpty(outOfSchedule))
                     return new List<LibraryFile>(); // no out of schedule libraries
                 
-                return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified desc", skip, rows));
+                return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified", skip, rows));
             }
             
             // add on hold condition
-            sql += $" and HoldUntil {(status == FileStatus.Disabled ? ">" : "<=")} " + SqlHelper.Now();
+            sql += $" and HoldUntil {(status == FileStatus.OnHold ? ">" : "<=")} " + SqlHelper.Now();
             if (status == FileStatus.OnHold)
-                return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified desc", skip, rows));
+                return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by HoldUntil, DateModified", skip, rows));
 
             sql = sql.Replace("select * from LibraryFile", "select LibraryFile.* from LibraryFile  " + LIBRARY_JOIN);
 
@@ -544,8 +551,12 @@ public partial class LibraryFileService : ILibraryFileService
 
         if (string.IsNullOrWhiteSpace(filter.Path) == false)
         {
+            // mysql better search, need to redo this
+            // and match(Name) against (SearchText IN BOOLEAN MODE)
+            //wheres.Add($"( match(Name) against (@{paramIndex}) IN BOOLEAN MODE) or match(OutputPath) against (@{paramIndex}) IN BOOLEAN MODE))");
+            
             int paramIndex = parameters.Count;
-            parameters.Add("%" + filter.Path + "%");
+            parameters.Add("%" + filter.Path.Replace(" ", "%") + "%");
             wheres.Add($"( lower(Name) like lower(@{paramIndex}) or lower(OutputPath) like lower(@{paramIndex}))");
         }
         if (string.IsNullOrWhiteSpace(filter.LibraryName) == false)
@@ -603,7 +614,7 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
             var results = new Dictionary<int, int>();
             for (int j = 0; j < 24; j++)
             {
-                // mysql DAYOFWEEK, sun=1, mon=2, sat =7
+                // sun=1, mon=2, sat =7
                 // so we use x.day - 1 here to convert sun=0
                 int count = data.Where(x => (x.day - 1) == i && x.hour == j).Select(x => x.count).FirstOrDefault();
                 results.Add(j, count);

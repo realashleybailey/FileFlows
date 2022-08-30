@@ -2,6 +2,7 @@
 @using FileFlows.Shared.Models
 @using Microsoft.AspNetCore.Components
 @using FileFlows.Client.Helpers
+@using Humanizer
 @inherits ListPage<Guid, LibaryFileListModel>
 
 @page "/library-files"
@@ -132,12 +133,23 @@
                 }
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.OnHold) == false)" MobileWidth="5rem">
+        <FlowTableColumn TItem="LibaryFileListModel" Width="7rem" Hidden="((SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.Processing || SelectedStatus == FileStatus.OnHold) == false)" MobileWidth="5rem">
             <Header>
                 Time
             </Header>
             <Cell Context="item">
-                <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
+                @if (item.ProcessingTime == null)
+                {
+                    <span></span>
+                }
+                else if (SelectedStatus == FileStatus.OnHold)
+                {
+                    <span>@item.ProcessingTime.Value.Humanize()</span>
+                }
+                else
+                {
+                    <span>@String.Format(@"{0:hh\:mm\:ss}", item.ProcessingTime)</span>
+                }
             </Cell>
         </FlowTableColumn>
         <FlowTableColumn TItem="LibaryFileListModel" Width="6rem" Hidden="SelectedStatus != FileStatus.MissingLibrary" MobileWidth="10rem">

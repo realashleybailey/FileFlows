@@ -1,6 +1,9 @@
+using System.Reflection;
+using System.Text.RegularExpressions;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
+using NPoco;
 
 namespace FileFlows.Server.Services;
 
@@ -36,7 +39,7 @@ public partial class LibraryFileService
         {
             result = await db.Db.SingleOrDefaultAsync<T>(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to get: " + sql);
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to get: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
     }
     
@@ -48,7 +51,7 @@ public partial class LibraryFileService
         {
             results = await db.Db.FetchAsync<T>(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to fetch: " + sql);
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to fetch: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
 
         return results;
     }
@@ -60,7 +63,7 @@ public partial class LibraryFileService
         {
             await db.Db.ExecuteAsync(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + sql);
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
     }
     private async Task<T> Database_ExecuteScalar<T>(string sql, params object[] args)
     {
@@ -70,16 +73,22 @@ public partial class LibraryFileService
         {
             result = await db.Db.ExecuteScalarAsync<T>(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + sql);
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
     }
 
-    private async Task Database_Update(object o)
+    private static readonly string[] LibraryFileUpdateColums = typeof(LibraryFile).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x =>
+    {
+        return x.GetCustomAttribute<IgnoreAttribute>() == null;
+    }).Select(x => x.Name).ToArray();
+
+    private async Task Database_Update(LibraryFile o)
     {
         DateTime dt = DateTime.Now;
+        
         using (var db = await GetDbWithMappings())
         {
-            await db.Db.UpdateAsync(o);
+            await db.Db.UpdateAsync("LibraryFile", "Uid", o, o.Uid, LibraryFileUpdateColums);
         }
         Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to update object");
     }

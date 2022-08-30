@@ -35,9 +35,24 @@ class CustomDbMapper : DefaultMapper
     public override Func<object, object> GetToDbConverter(Type destType, MemberInfo sourceMemberInfo)
     {
         if (sourceMemberInfo.GetMemberInfoType() == typeof(Guid))
-            return (value) => value?.ToString() ?? string.Empty;
+            return (value) =>
+            {
+                if (value == null)
+                    return string.Empty;
+                if (value is Guid guid && guid == Guid.Empty)
+                    return string.Empty;
+                return value.ToString() ?? string.Empty;
+            };
         if (sourceMemberInfo.GetMemberInfoType() == typeof(Guid?))
-            return (value) => value?.ToString() ?? string.Empty;
+            return (value) =>
+            {
+                if (value == null)
+                    return string.Empty;
+                if (value is Guid guid && guid == Guid.Empty)
+                    return string.Empty;
+
+                return value.ToString();
+            };
         if (sourceMemberInfo.GetMemberInfoType() == typeof(string))
             return (value) => value?.ToString() ?? string.Empty;
         if (sourceMemberInfo.GetMemberInfoType() == typeof(Dictionary<string, object>))

@@ -282,7 +282,7 @@ public class WatchedLibrary:IDisposable
             }
         }
 
-        return (false, fingerprint, new ObjectReference());
+        return (false, fingerprint, null);
     }
 
     private bool CheckExists(string fullpath)

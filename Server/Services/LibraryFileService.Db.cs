@@ -47,11 +47,17 @@ public partial class LibraryFileService
     {
         List<T> results;
         DateTime dt = DateTime.Now;
-        using (var db = await GetDbWithMappings())
+        try
         {
-            results = await db.Db.FetchAsync<T>(sql, args);
+            using (var db = await GetDbWithMappings())
+            {
+                results = await db.Db.FetchAsync<T>(sql, args);
+            }
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to fetch: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        finally
+        {
+            Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to fetch: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        }
 
         return results;
     }

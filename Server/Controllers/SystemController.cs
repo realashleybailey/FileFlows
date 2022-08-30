@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using FileFlows.Node.Workers;
 using FileFlows.Server.Helpers;
+using FileFlows.Server.Services;
 using FileFlows.Server.Workers;
 using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Workers;
@@ -214,7 +215,7 @@ public class SystemController:Controller
     {
         if (DbHelper.UseMemoryCache)
             return new object[] { }; // not supported
-        var data = await DbHelper.GetLibraryProcessingTimes();
+        var data = (await new LibraryFileService().GetLibraryProcessingTimes()).ToArray();
         var dict = data.Select(x => new
         {
             x.Library,
@@ -245,7 +246,7 @@ public class SystemController:Controller
     {
         if (DbHelper.UseMemoryCache)
             return "Not supported by this installation";
-        var data = await DbHelper.GetHourProcessingTotals();
+        var data = await new LibraryFileService().GetHourProcessingTotals();
         var results = data.Select((x, index) => new
         {
             name = ((DayOfWeek)index).ToString()[..3],

@@ -93,85 +93,6 @@ public class MySqlDbManager: DbManager
         return true;
     }
 
-
-    /// <summary>
-    /// Performance a search for library files
-    /// </summary>
-    /// <param name="filter">the search filter</param>
-    /// <returns>a list of matching library files</returns>
-    public async override Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter)
-    {
-        if (filter.Limit <= 0 || filter.Limit > 10_000)
-            filter.Limit = 1000;
-        
-        
-        List<DbObject> dbObjects;
-        using (var db = await GetDb())
-        {
-            string sql = $"call SearchLibraryFiles(@0, @1, @2, @3, @4)";
-            dbObjects = (await db.Db.FetchAsync<DbObject>(sql, filter.LibraryName ?? string.Empty, filter.Path ?? string.Empty, filter.FromDate, filter.ToDate, filter.Limit)).ToList();
-        }
-
-        return ConvertFromDbObject<LibraryFile>(dbObjects);
-        
-    }
-
-
-    /// <summary>
-    /// Gets the processing time for each library file 
-    /// </summary>
-    /// <returns>the processing time for each library file</returns>
-    public override async Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
-    {
-        List<LibraryFileProcessingTime> result;
-        using (var db = await GetDb())
-        {
-            result = await db.Db.FetchAsync<LibraryFileProcessingTime>(@"SELECT 
-        JSON_UNQUOTE(JSON_EXTRACT(DATA, '$.Library.Name')) AS Library,
-        js_OriginalSize as OriginalSize,
-        timestampdiff(second, js_ProcessingStarted, js_ProcessingEnded) AS Seconds
-        from DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
-        AND js_Status = 1 AND js_ProcessingEnded > js_ProcessingStarted;");
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
-    /// </summary>
-    /// <returns>heatmap data</returns>
-    public override async Task<List<Dictionary<int, int>>> GetHourProcessingTotals()
-    {
-        List<(int day, int hour, int count)> data;
-        string sql = @"SELECT DAYOFWEEK(js_ProcessingStarted) AS day, HOUR(js_ProcessingStarted) as hour, COUNT(Uid) as count
- from DbObject where TYPE = 'FileFlows.Shared.Models.LibraryFile'
-AND js_Status = 1 AND js_ProcessingStarted IS not NULL
-GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
-
-        using (var db = await GetDb())
-        {
-            data = (await db.Db.FetchAsync<(int day, int hour, int count)>(sql));
-        }
-
-        var days = new List<Dictionary<int, int>>();
-        for (int i = 0; i < 7; i++)
-        {
-            var results = new Dictionary<int, int>();
-            for (int j = 0; j < 24; j++)
-            {
-                // mysql DAYOFWEEK, sun=1, mon=2, sat =7
-                // so we use x.day - 1 here to convert sun=0
-                int count = data.Where(x => (x.day - 1) == i && x.hour == j).Select(x => x.count).FirstOrDefault();
-                results.Add(j, count);
-            }
-
-            days.Add(results);
-        }
-
-        return days;
-    }
-
     private readonly List<string> LogMessages = new();
     
     /// <summary>
@@ -396,65 +317,24 @@ GROUP BY DAYOFWEEK(js_ProcessingStarted), HOUR(js_ProcessingStarted);";
         {
             if (NodeLastSeen.ContainsKey(uid))
             {
-                 if(NodeLastSeen[uid] > DateTime.Now.AddSeconds(-20))
-                     return; // so recent, don't record it
-                 NodeLastSeen[uid] = DateTime.Now;
+                if (NodeLastSeen[uid] > DateTime.Now.AddSeconds(-20))
+                    return; // so recent, don't record it
+                NodeLastSeen[uid] = DateTime.Now;
             }
             else
             {
                 NodeLastSeen.Add(uid, DateTime.Now);
             }
         }
-        
+
 
         string dt = DateTime.Now.ToString("o"); // same format as json
-        
+
         using (var db = await GetDb())
         {
-            string sql = $"update DbObject set Data = json_set(Data, '$.LastSeen', '{dt}') where Type = 'FileFlows.Shared.Models.ProcessingNode' and Uid = '{uid}'";
+            string sql =
+                $"update DbObject set Data = json_set(Data, '$.LastSeen', '{dt}') where Type = 'FileFlows.Shared.Models.ProcessingNode' and Uid = '{uid}'";
             await db.Db.ExecuteAsync(sql);
         }
-    }
-    
-    
-    
-    /// <summary>
-    /// Updates work on a library file
-    /// </summary>
-    /// <param name="libraryFile">The library file to update</param>
-    public override async Task UpdateWork(LibraryFile libraryFile)
-    {
-        if (libraryFile == null)
-            return;
-        
-        using (var db = await GetDb())
-        {
-            string sql = "update DbObject set Data = " +
-                         "json_set(Data" +
-                         $", '$.Status', {(int)libraryFile.Status}" +
-                         $", '$.FinalSize', {libraryFile.FinalSize}" +
-                         (libraryFile.Node == null ? "" : (
-                             $@", '$.Node', JSON_OBJECT('Uid', '{libraryFile.Node.Uid}', 'Name', '{MySqlHelper.EscapeString(libraryFile.Node.Name)}', 'Type', '{typeof(ProcessingNode).FullName}')"
-                         )) +
-                         $", '$.WorkerUid', '{libraryFile.WorkerUid}'" +
-                         $", '$.ExecutedNodes'," + 
-                             $"JSON_ARRAY(" +
-                                (libraryFile.ExecutedNodes?.Any() == true ? 
-                                    string.Join(",", libraryFile.ExecutedNodes.Select(x => 
-                                        "JSON_OBJECT(" +
-                                        $"'NodeName', '{MySqlHelper.EscapeString(x.NodeName)}', " +
-                                        $"'NodeUid', '{x.NodeUid}', " +
-                                        $"'ProcessingTime', '{x.ProcessingTime}', " +
-                                        $"'Output', {x.Output})")
-                                    ) 
-                                    : ""
-                                ) +
-                            ")" +
-                         $", '$.ProcessingStarted', '{libraryFile.ProcessingStarted.ToString("o")}'" +
-                         $", '$.ProcessingEnded', '{libraryFile.ProcessingEnded.ToString("o")}'" +
-                         $") where Type = 'FileFlows.Shared.Models.LibraryFile' and Uid = '{libraryFile.Uid}'";
-            await db.Db.ExecuteAsync(sql);
-        }
-        
     }
 }

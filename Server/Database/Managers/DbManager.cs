@@ -911,27 +911,6 @@ public abstract class DbManager
     }
 
     /// <summary>
-    /// Performance a search for library files
-    /// </summary>
-    /// <param name="filter">the search filter</param>
-    /// <returns>a list of matching library files</returns>
-    public abstract Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter);
-
-    /// <summary>
-    /// Gets the processing time for each library file 
-    /// </summary>
-    /// <returns>the processing time for each library file</returns>
-    public abstract Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes();
-
-
-    /// <summary>
-    /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
-    /// </summary>
-    /// <returns>heatmap data</returns>
-    public virtual Task<List<Dictionary<int, int>>> GetHourProcessingTotals() =>
-        throw new NotImplementedException();
-
-    /// <summary>
     /// Logs a message to the database
     /// </summary>
     /// <param name="clientUid">The UID of the client, use Guid.Empty for the server</param>
@@ -1084,13 +1063,4 @@ public abstract class DbManager
         }
     }
 #endif
-    
-    /// <summary>
-    /// Updates work on a library file
-    /// </summary>
-    /// <param name="libraryFile">The library file to update</param>
-    public virtual Task UpdateWork(LibraryFile libraryFile)
-    {
-        throw new NotImplementedException();
-    }
 }

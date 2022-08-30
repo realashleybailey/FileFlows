@@ -184,22 +184,7 @@ public class WorkerController : Controller
         {
             if (LibraryFileHasChanged(info.LibraryFile))
             {
-                if (DbHelper.UseMemoryCache == false)
-                    await DbHelper.UpdateWork(info.LibraryFile);
-                else
-                {
-                    var lfController = new LibraryFileController();
-                    var existing = lfController.GetCached(info.LibraryFile.Uid).Result;
-                    if (existing != null)
-                    {
-                        bool recentUpdate = existing.DateModified > DateTime.Now.AddSeconds(-10);
-                        if ((existing.Status == FileStatus.ProcessingFailed &&
-                             info.LibraryFile.Status == FileStatus.Processing && recentUpdate) == false)
-                        {
-                            existing = await lfController.Update(info.LibraryFile);
-                        }
-                    }
-                }
+                await new LibraryFileService().UpdateWork(info.LibraryFile);
             }
 
             if (info.LibraryFile.Status == FileStatus.ProcessingFailed || info.LibraryFile.Status == FileStatus.Processed)

@@ -163,14 +163,6 @@ public class SqliteDbManager : DbManager
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Gets the processing time for each library file 
-    /// </summary>
-    /// <returns>the processing time for each library file</returns>
-    public override Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
-    {
-        throw new NotImplementedException();
-    }
 
     #endregion
 
@@ -191,17 +183,6 @@ public class SqliteDbManager : DbManager
         File.Move(filename, dest, true);
     }
     
-    
-    /// <summary>
-    /// Performance a search for library files
-    /// </summary>
-    /// <param name="filter">the search filter</param>
-    /// <returns>a list of matching library files</returns>
-    public override Task<IEnumerable<LibraryFile>> SearchLibraryFiles(LibraryFileSearchModel filter)
-    {
-        var notImplemented = new LibraryFile[] { };
-        return Task.FromResult((IEnumerable<LibraryFile>)notImplemented);
-    }
 
     /// <summary>
     /// Gets statistics by name

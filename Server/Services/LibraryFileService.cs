@@ -230,6 +230,32 @@ public partial class LibraryFileService : ILibraryFileService
     }
 
     /// <summary>
+    /// Special case used by the flow runner to update a processing library file
+    /// </summary>
+    /// <param name="file">the processing library file</param>
+    public async Task UpdateWork(LibraryFile file)
+    {
+        if (file == null)
+            return;
+        
+        string sql = "update LibraryFile set " +
+                     $" Status = {((int)file.Status)}, " + 
+                     $" FinalSize = {file.FinalSize}, " +
+                     (file.Node == null ? "" : (
+                         $" NodeUid = '{file.NodeUid}', NodeName = '{file.NodeName.Replace("'", "''")}', "
+                     )) +
+                     $" WorkerUid = '{file.WorkerUid}', " +
+                     $" ProcessingStarted = '{file.ProcessingStarted.ToString("o")}', " +
+                     $" ProcessingEnded', '{file.ProcessingEnded.ToString("o")}', " +
+                     $" ExecutedNodes = @0, " +
+                     $" where Uid = '{file.Uid}'";
+        string executedJson = file.ExecutedNodes?.Any() != true
+            ? string.Empty
+            : JsonSerializer.Serialize(file.ExecutedNodes);
+        await Database_Execute(sql, executedJson);
+    }
+
+    /// <summary>
     /// Deletes library files
     /// </summary>
     /// <param name="uids">a list of UIDs to delete</param>
@@ -520,5 +546,61 @@ public partial class LibraryFileService : ILibraryFileService
         }
         string sql = SqlHelper.Skip("select * from LibraryFiles where " + string.Join(" and ", wheres), skip: 0, rows: 500);
         return await Database_Fetch<LibraryFile>(sql);
+    }
+    
+    
+    /// <summary>
+    /// Gets the processing time for each library file 
+    /// </summary>
+    /// <returns>the processing time for each library file</returns>
+    public async Task<IEnumerable<LibraryFileProcessingTime>> GetLibraryProcessingTimes()
+    {
+        string sql = @$"select 
+LibraryName as {nameof(LibraryFileProcessingTime.Library)},
+OriginalSize, " +
+SqlHelper.TimestampDiffSeconds("ProcessingStarted", "ProcessingEnded", nameof(LibraryFileProcessingTime.Seconds)) + 
+@" from LibraryFile 
+where Status = 1 and ProcessingEnded > ProcessingStarted;";
+
+        return await Database_Fetch<LibraryFileProcessingTime>(sql);
+    }
+
+    
+
+    /// <summary>
+    /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
+    /// </summary>
+    /// <returns>heatmap data</returns>
+    public async Task<List<Dictionary<int, int>>> GetHourProcessingTotals()
+    {
+        
+        string sql = @"select " +
+                     SqlHelper.DayOfWeek("ProcessingStarted","day") + ", " + 
+                     SqlHelper.Hour("ProcessingStarted","hour") + ", " +
+                     " count(Uid) as count " + 
+                     " from LibraryFile where Status = 1 AND ProcessingStarted > '2000-01-01 00:00:00' " +
+                     " group by " + SqlHelper.DayOfWeek("ProcessingStarted") + "," +
+                     SqlHelper.Hour("ProcessingStarted");
+
+        List<(int day, int hour, int count)>
+            data = (await Database_Fetch<(int day, int hour, int count)>(sql)).ToList();
+
+
+        var days = new List<Dictionary<int, int>>();
+        for (int i = 0; i < 7; i++)
+        {
+            var results = new Dictionary<int, int>();
+            for (int j = 0; j < 24; j++)
+            {
+                // mysql DAYOFWEEK, sun=1, mon=2, sat =7
+                // so we use x.day - 1 here to convert sun=0
+                int count = data.Where(x => (x.day - 1) == i && x.hour == j).Select(x => x.count).FirstOrDefault();
+                results.Add(j, count);
+            }
+
+            days.Add(results);
+        }
+
+        return days;
     }
 }

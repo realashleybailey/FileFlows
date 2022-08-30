@@ -183,23 +183,6 @@ public class DbHelper
     internal static Task<int> Execute(string sql = "", params object[] args) => Manager.Execute(sql, args);
     
     /// <summary>
-    /// Finds an existing library file in the database
-    /// </summary>
-    /// <param name="fullPath">the full path of the library file</param>
-    /// <returns>the result of the known file</returns>
-    public static Task<LibraryFile> FindKnownLibraryFile(string fullPath) =>
-        Manager.FindKnownLibraryFile(fullPath);
-
-    /// <summary>
-    /// Finds an existing library file in the database by a fingerprint
-    /// </summary>
-    /// <param name="fingerprint">the fingerprint of the file</param>
-    /// <returns>the result of the known file</returns>
-    public static Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint) =>
-        Manager.FindKnownLibraryByFingerprint(fingerprint);
-
-    
-    /// <summary>
     /// Logs a message to the database
     /// </summary>
     /// <param name="clientUid">The UID of the client, use Guid.Empty for the server</param>
@@ -235,15 +218,7 @@ public class DbHelper
     /// <returns>the object if found</returns>
     public static Task<T> GetByName<T>(string name) where T : FileFlowObject, new()
         => Manager.GetByName<T>(name);
-
-    /// <summary>
-    /// Deletes all the library files from the specified libraries
-    /// </summary>
-    /// <param name="libraryUids">the UIDs of the libraries</param>
-    /// <returns>the task to await</returns>
-    public static Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids) =>
-        Manager.DeleteLibraryFilesFromLibraries(libraryUids);
-    
+   
     
     /// <summary>
     /// Records a statistic
@@ -280,14 +255,6 @@ public class DbHelper
     /// <param name="uid">the UID of the node</param>
     public static Task UpdateNodeLastSeen(Guid uid) => Manager.UpdateNodeLastSeen(uid);
     
-#if (DEBUG)
-    /// <summary>
-    /// Clean the database and purge old data
-    /// </summary>
-    /// <returns>True if successful</returns>
-    public Task<bool> CleanDatabase() => Manager.CleanDatabase();
-#endif
-
     /// <summary>
     /// Restores defaults from the database if they have been removed
     /// </summary>

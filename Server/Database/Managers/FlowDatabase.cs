@@ -109,7 +109,7 @@ public class FlowDatabase:NPoco.Database
         if (time.TotalMilliseconds > 100)
             lg = LogType.Warning;
         
-        Logger.Log(lg, $"Executed  [{hashCode.ToString("00000000")}] [{time}]: " + sql);
+        Logger.Log(lg, $"Executed [{hashCode.ToString("00000000")}] [{time}]: " + sql);
     }
 
     private string GetCommandText(DbCommand cmd)

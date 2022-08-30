@@ -1,8 +1,6 @@
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
-using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Models;
-using NPoco;
 
 namespace FileFlows.Server.Upgrade;
 
@@ -43,6 +41,8 @@ public class Upgrade_1_0_2
             {
                 db.Db.Insert(file);
             }
+
+            db.Db.Execute("delete from DbObject where Type = @0", typeof(LibraryFile).FullName);
         }
     }
 
@@ -79,9 +79,7 @@ CREATE TABLE IF NOT EXISTS LibraryFile
     Status              int                NOT NULL       DEFAULT(0),
     ProcessingOrder     int                NOT NULL       DEFAULT(0),
     Fingerprint         VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
-    Enabled             boolean            not null       DEFAULT(true),
     IsDirectory         boolean            not null       DEFAULT(false),
-    Priority            int                not null       DEFAULT(0),
     
     -- size
     OriginalSize        bigint             NOT NULL       DEFAULT(0),
@@ -90,6 +88,7 @@ CREATE TABLE IF NOT EXISTS LibraryFile
     -- dates 
     CreationTime        datetime           default           now(),
     LastWriteTime       datetime           default           now(),
+    HoldUntil           datetime           default           '1970-01-01 00:00:01',
     ProcessingStarted   datetime           default           now()      NOT NULL,
     ProcessingEnded     datetime           default           now()      NOT NULL,
     
@@ -113,11 +112,31 @@ CREATE TABLE IF NOT EXISTS LibraryFile
     FinalMetadata       TEXT               COLLATE utf8_unicode_ci      NOT NULL           DEFAULT(''),
     ExecutedNodes       TEXT               COLLATE utf8_unicode_ci      NOT NULL           DEFAULT('')
 );");
-        manager.Execute(sql, null).Wait();
+
+        if (DbHelper.UseMemoryCache)
+        {
+            // sqlite
+            sql = sql.Replace("COLLATE utf8_unicode_ci      ", string.Empty);
+            sql = sql.Replace("now()", "current_timestamp");
+        }
         
-        // create indexes if dont exist
-        //CREATE INDEX idx_LibraryFile_Status ON LibraryFile(Status);
-        //CREATE INDEX idx_LibraryFile_DateModified ON LibraryFile(DateModified);
+        manager.Execute(sql, null).Wait();
+
+        // create indexes 
+        if (DbHelper.UseMemoryCache)
+        {
+            // sqlite
+            manager.Execute("CREATE INDEX IF NOT EXISTS idx_Status ON LibraryFile (Status)", null).Wait();
+            manager.Execute("CREATE INDEX IF NOT EXISTS idx_DateModified ON LibraryFile (DateModified)", null).Wait();
+            manager.Execute("CREATE INDEX IF NOT EXISTS idx_StatusHoldLibrary ON LibraryFile (Status, HoldUntil, LibraryUid)", null).Wait();
+        }
+        else
+        {
+            // mysql 
+            manager.Execute("ALTER TABLE LibraryFile ADD INDEX (Status)", null).Wait();
+            manager.Execute("ALTER TABLE LibraryFile ADD INDEX (DateModified)", null).Wait();
+            manager.Execute("ALTER TABLE LibraryFile ADD INDEX (Status, HoldUntil, LibraryUid)", null).Wait();
+        }
     }
 
 }

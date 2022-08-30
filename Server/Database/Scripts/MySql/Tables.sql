@@ -55,9 +55,7 @@ CREATE TABLE LibraryFile
     Status              int                NOT NULL,
     ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
-    Enabled             boolean            not null,
     IsDirectory         boolean            not null,
-    Priority            int                not null,
     
     -- size
     OriginalSize        bigint             NOT NULL,

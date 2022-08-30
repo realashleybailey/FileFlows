@@ -104,4 +104,15 @@ public class SqlHelper
 
         return $" hour({column}) " + (string.IsNullOrEmpty(asColumn) ? string.Empty : $"as {asColumn} ");
     }
+
+    /// <summary>
+    /// Gets the variable for "now" as in the current datetime
+    /// </summary>
+    /// <returns>the SQL variable for now</returns>
+    public static object Now()
+    {
+        if (DbHelper.UseMemoryCache)
+            return " current_timestamp ";
+        return " now() ";
+    }
 }

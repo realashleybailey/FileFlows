@@ -222,13 +222,13 @@ public class LibraryFile : FileFlowObject
     /// <summary>
     /// Gets or sets the original metadata for a file
     /// </summary>
-    [SerializedColumn]
+    [Column]
     public Dictionary<string, object> OriginalMetadata { get; set; }
     
     /// <summary>
     /// Gets or sets the final metadata for the file
     /// </summary>
-    [SerializedColumn]
+    [Column]
     public Dictionary<string, object> FinalMetadata { get; set; }
 
 }

@@ -356,7 +356,7 @@ public partial class LibraryFileService : ILibraryFileService
             }
             
             // add on hold condition
-            sql += $" and HoldUntil {(status == FileStatus.Disabled ? ">" : "<=")} now() ";
+            sql += $" and HoldUntil {(status == FileStatus.Disabled ? ">" : "<=")} " + SqlHelper.Now();
             if (status == FileStatus.OnHold)
                 return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by DateModified desc", skip, rows));
 
@@ -380,7 +380,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         if (uids?.Any() != true)
             return;
-        string inStr = string.Join(",", uids.Select(x => $"'${x}'"));
+        string inStr = string.Join(",", uids.Select(x => $"'{x}'"));
         await Database_Execute($"update LibraryFile set Status = 0 where Uid in ({inStr})");
     }
 
@@ -393,7 +393,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         if (uids?.Any() != true)
             return;
-        string inStr = string.Join(",", uids.Select(x => $"'${x}'"));
+        string inStr = string.Join(",", uids.Select(x => $"'{x}'"));
         await Database_Execute($"update LibraryFile set HoldUntil = '1970-01-01 00:00:01' where Uid in ({inStr})");
     }
     
@@ -416,7 +416,7 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="path">the path of the library file</param>
     /// <returns>the library file if it is known</returns>
     public async Task<LibraryFile> GetFileIfKnown(string path)
-        => await Database_Get<LibraryFile>("select * from LibraryFile where Name = @0 or OutputPath @0", path);
+        => await Database_Get<LibraryFile>("select * from LibraryFile where Name = @0 or OutputPath = @0", path);
 
     /// <summary>
     /// Gets a library file if it is known by its fingerprint
@@ -462,7 +462,7 @@ public partial class LibraryFileService : ILibraryFileService
             sql += $" when LibraryFile.Status = 0 and LibraryUid IN ({disabled}) then -2 " + "\n";
         if (string.IsNullOrEmpty(outOfSchedule) == false)
             sql += $" when LibraryFile.Status = 0 and LibraryUid IN ({outOfSchedule}) then -1 " + "\n";
-        sql += @"when HoldUntil > now() then -3
+        sql += $@"when HoldUntil > {SqlHelper.Now()} then -3
         else LibraryFile.Status
         end as FileStatus,
         count(Uid) as Count
@@ -534,18 +534,29 @@ public partial class LibraryFileService : ILibraryFileService
     {
         List<string> wheres = new();
         List<object> parameters = new List<object>();
-        parameters.Add(filter.FromDate);
-        parameters.Add(filter.ToDate);
-        wheres.Add("DateCreated > @0");
-        wheres.Add("DateCreated < @1");
+        if (filter.FromDate > new DateTime(2000, 1, 1) && filter.ToDate < DateTime.Now.AddYears(100))
+        {
+            parameters.Add(filter.FromDate);
+            parameters.Add(filter.ToDate);
+            wheres.Add("DateCreated > @0");
+            wheres.Add("DateCreated < @1");
+        }
+
         if (string.IsNullOrWhiteSpace(filter.Path) == false)
         {
             int paramIndex = parameters.Count;
-            parameters.Add(filter.Path);
-            wheres.Add($"( lower(Name) like '%' + lower(@{paramIndex}) + '%' or lower(OutputPath) like '%' + lower(@{paramIndex}) + '%')");
+            parameters.Add("%" + filter.Path + "%");
+            wheres.Add($"( lower(Name) like lower(@{paramIndex}) or lower(OutputPath) like lower(@{paramIndex}))");
         }
-        string sql = SqlHelper.Skip("select * from LibraryFiles where " + string.Join(" and ", wheres), skip: 0, rows: 500);
-        return await Database_Fetch<LibraryFile>(sql);
+        if (string.IsNullOrWhiteSpace(filter.LibraryName) == false)
+        {
+            int paramIndex = parameters.Count;
+            parameters.Add("%" + filter.LibraryName + "%");
+            wheres.Add($"lower(LibraryName) like lower(@{paramIndex})");
+        }
+        string sql = SqlHelper.Skip("select * from LibraryFile where " + string.Join(" and ", wheres), skip: 0, rows: filter.Limit > 0 ? filter.Limit : 100);
+        var results =  await Database_Fetch<LibraryFile>(sql, parameters);
+        return results;
     }
     
     

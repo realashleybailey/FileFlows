@@ -21,6 +21,14 @@ class CustomDbMapper : DefaultMapper
             return (value) => string.IsNullOrEmpty(value as string) ? null : Guid.Parse((string)value);
         if (destType == typeof(Guid) && sourceType == typeof(string))
             return (value) => string.IsNullOrEmpty(value as string) ? Guid.Empty : Guid.Parse((string)value);
+        if (destType == typeof(Dictionary<string, object>) && sourceType == typeof(string))
+            return (value) =>
+            {
+                if (string.IsNullOrEmpty(value as string))
+                    return new Dictionary<string, object>();
+                var result = JsonSerializer.Deserialize<Dictionary<string, object>>((string)value);
+                return result;
+            };
         return base.GetFromDbConverter(destType, sourceType);
     }
     
@@ -32,6 +40,13 @@ class CustomDbMapper : DefaultMapper
             return (value) => value?.ToString() ?? string.Empty;
         if (sourceMemberInfo.GetMemberInfoType() == typeof(string))
             return (value) => value?.ToString() ?? string.Empty;
+        if (sourceMemberInfo.GetMemberInfoType() == typeof(Dictionary<string, object>))
+            return (value) =>
+            {
+                if (value is Dictionary<string, object> dict == false || dict.Any() == false)
+                    return string.Empty;
+                return JsonSerializer.Serialize(dict);
+            };
         return base.GetToDbConverter(destType, sourceMemberInfo);
     }
 }

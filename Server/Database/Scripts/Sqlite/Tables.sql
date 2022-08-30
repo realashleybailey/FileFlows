@@ -36,28 +36,26 @@ CREATE TABLE LibraryFile
     -- common fields from DbObject
     Uid                 VARCHAR(36)        NOT NULL          PRIMARY KEY,
     Name                VARCHAR(1024)      NOT NULL,
-    DateCreated         datetime           default           now(),
-    DateModified        datetime           default           now(),
+    DateCreated         datetime           default           current_timestamp,
+    DateModified        datetime           default           current_timestamp,
     
     -- properties
     RelativePath        VARCHAR(1024)      NOT NULL,
     Status              int                NOT NULL,
     ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       NOT NULL,
-    Enabled             boolean            not null,
     IsDirectory         boolean            not null,
-    Priority            int                not null,
     
     -- size
     OriginalSize        bigint             NOT NULL,
     FinalSize           bigint             NOT NULL,
     
     -- dates 
-    CreationTime        datetime           default           now(),
-    LastWriteTime       datetime           default           now(),
+    CreationTime        datetime           default           current_timestamp,
+    LastWriteTime       datetime           default           current_timestamp,
     HoldUntil           datetime           default           '1970-01-01 00:00:01',
-    ProcessingStarted   datetime           default           now()      NOT NULL,
-    ProcessingEnded     datetime           default           now()      NOT NULL,
+    ProcessingStarted   datetime           default           current_timestamp      NOT NULL,
+    ProcessingEnded     datetime           default           current_timestamp      NOT NULL,
     
     -- references
     LibraryUid          varchar(36)        NOT NULL,
@@ -80,7 +78,7 @@ CREATE TABLE LibraryFile
     ExecutedNodes       TEXT               NOT NULL
 );
 
-ALTER TABLE LibraryFile ADD INDEX (Status);
-ALTER TABLE LibraryFile ADD INDEX (DateModified);
+CREATE INDEX IF NOT EXISTS idx_Status ON LibraryFile (Status)
+CREATE INDEX IF NOT EXISTS idx_DateModified ON LibraryFile (DateModified)
 -- index to make library file status/skybox faster
-ALTER TABLE LibraryFile ADD INDEX (Status, HoldUntil, LibraryUid);
+CREATE INDEX IF NOT EXISTS idx_StatusHoldLibrary ON LibraryFile (Status, HoldUntil, LibraryUid)

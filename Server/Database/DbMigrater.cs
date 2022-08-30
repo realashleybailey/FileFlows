@@ -1,5 +1,6 @@
 using System.Data.SQLite;
 using FileFlows.Server.Database.Managers;
+using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using Microsoft.Data.SqlClient;
 using DatabaseType = NPoco.DatabaseType;
@@ -35,6 +36,7 @@ public class DbMigrater
             using var dest = GetDatabase(destinationConnection);
 
             MigrateDbObjects(source, dest);
+            MigrateLibraryFiles(source, dest);
             MigrateDbStatistics(source, dest);
             MigrateRevisions(source, dest);
             MigrateDbLogs(source, dest);
@@ -171,6 +173,26 @@ public class DbMigrater
                     obj.LogDate,
                     (int)obj.Type,
                     obj.Message ?? string.Empty);
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
+    
+    private static void MigrateLibraryFiles(NPoco.Database source, NPoco.Database dest)
+    {
+        source.Mappers.Add(new CustomDbMapper());
+        var items = source.Fetch<LibraryFile>($"select * from LibraryFile")?.ToArray();
+        if (items?.Any() != true)
+            return;
+        dest.Mappers.Add(new CustomDbMapper());
+
+        foreach (var obj in items)
+        {
+            try
+            {
+                dest.Insert(obj);
             }
             catch (Exception)
             {

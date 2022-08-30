@@ -268,13 +268,6 @@ public abstract class DbManager
         return ConvertFromDbObject<T>(dbObjects);
     }
 
-    private async Task<IEnumerable<LibraryFile>> SelectLibraryFiles()
-    {
-        using (var db = await GetDb())
-        {
-            return await db.Db.FetchAsync<LibraryFile>("select * from LibraryFiles");
-        }
-    }
 
     /// <summary>
     /// Select a list of objects
@@ -818,53 +811,6 @@ public abstract class DbManager
         }
     }
 
-
-    /// <summary>
-    /// Finds an existing library file in the database
-    /// </summary>
-    /// <param name="fullPath">the full path of the library file</param>
-    /// <returns>the result of the known library file</returns>
-    public virtual  async Task<LibraryFile> FindKnownLibraryFile(string fullPath)
-    {
-        DbObject dbObject;
-        using (var db = await GetDb())
-        {
-            // first see if this file exists by its name
-            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>(
-                "where Type=@0 and name = @1", typeof(LibraryFile).FullName, fullPath);
-        }
-
-        if (string.IsNullOrEmpty(dbObject?.Data) == false)
-            return Convert<LibraryFile>(dbObject);
-
-        return new LibraryFile();
-    }
-
-    /// <summary>
-    /// Finds an existing library file in the database by a fingerprint
-    /// </summary>
-    /// <param name="fingerprint">the fingerprint of the file</param>
-    /// <returns>the result of the known file</returns>
-    public virtual async Task<LibraryFile> FindKnownLibraryByFingerprint(string fingerprint)
-    {
-        if (string.IsNullOrEmpty(fingerprint))
-            return new LibraryFile();
-
-        DbObject dbObject;
-        using (var db = await GetDb())
-        {
-            dbObject = await db.Db.FirstOrDefaultAsync<DbObject>(
-                $"where Type=@0 and {JsonExtractMethod}(Data, '$.Fingerprint') = @1", typeof(LibraryFile).FullName,
-                fingerprint ?? string.Empty);
-        }
-
-        if (string.IsNullOrEmpty(dbObject?.Data) == false)
-            return Convert<LibraryFile>(dbObject);
-
-        return new LibraryFile();
-    }
-
-
     /// <summary>
     /// Reads in a embedded SQL script
     /// </summary>
@@ -902,7 +848,7 @@ public abstract class DbManager
     protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
     {
         Dictionary<string, string> scripts = new();
-        foreach (string script in new[] { "GetLibraryFiles", "SearchLibraryFiles", "GetShrinkageData", "DeleteOldLogs" })
+        foreach (string script in new[] {  "DeleteOldLogs" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
             scripts.Add(script, sql);
@@ -961,13 +907,6 @@ public abstract class DbManager
     /// <returns>the failure flow</returns>
     public abstract Task<Flow> GetFailureFlow(Guid libraryUid);
     
-    /// <summary>
-    /// Deletes all the library files from the specified libraries
-    /// </summary>
-    /// <param name="libraryUids">the UIDs of the libraries</param>
-    /// <returns>the task to await</returns>
-    public virtual Task DeleteLibraryFilesFromLibraries(Guid[] libraryUids) => Task.CompletedTask;
-
     /// <summary>
     /// Records a statistic
     /// </summary>
@@ -1039,28 +978,4 @@ public abstract class DbManager
     {
         throw new NotImplementedException();
     }
-    
-#if (DEBUG)
-    /// <summary>
-    /// Clean the database and purge old data
-    /// </summary>
-    /// <returns>True if successful</returns>
-    public async Task<bool> CleanDatabase()
-    {
-        try
-        {
-            using (var db = await GetDb())
-            {
-                await db.Db.ExecuteAsync($"delete from {nameof(DbObject)} where Type = @0", typeof(LibraryFile).FullName);
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.ELog("Failed cleaning database: " + ex.Message);
-            return false;
-        }
-    }
-#endif
 }

@@ -63,8 +63,8 @@ public class Upgrade_1_0_2
         {
             string dbName = manager.GetDatabaseName();
             List<string>? existingColumns = string.IsNullOrEmpty(dbName) ? null : 
-                db.Db.Fetch<string>("SELECT 'COLUMN_NAME' FROM 'INFORMATION_SCHEMA'.'COLUMNS' " +
-                                    $"WHERE 'TABLE_SCHEMA'='{dbName}' AND 'TABLE_NAME'='DbObject';");
+                db.Db.Fetch<string>("SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` " +
+                                    $"WHERE `TABLE_SCHEMA`='{dbName}' AND `TABLE_NAME`='DbObject';");
             var toDelete = new []
             {
                 "js_Status",

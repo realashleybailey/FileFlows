@@ -24,9 +24,9 @@ public class Upgrade_1_0_2
         Logger.Instance.ILog("Migrating Library Files Data");
         var manager = DbHelper.GetDbManager();
 
-        if (manager is MySqlDbManager)
+        if (manager is MySqlDbManager mysql)
         {
-            DropVirtualColumns(manager);
+            DropVirtualColumns(mysql);
             DropOldStoredProcs(manager);
         }
         
@@ -57,20 +57,40 @@ public class Upgrade_1_0_2
         }
     }
 
-    private void DropVirtualColumns(DbManager manager)
+    private void DropVirtualColumns(MySqlDbManager manager)
     {
         using (var db = manager.GetDb().Result)
         {
-            db.Db.Execute("alter table DbObject drop column js_Status");
-            db.Db.Execute("alter table DbObject drop column js_Order");
-            db.Db.Execute("alter table DbObject drop column js_OriginalSize");
-            db.Db.Execute("alter table DbObject drop column js_ProcessingStarted");
-            db.Db.Execute("alter table DbObject drop column js_ProcessingEnded");
-            db.Db.Execute("alter table DbObject drop column js_LibraryUid");
-            db.Db.Execute("alter table DbObject drop column js_Enabled");
-            db.Db.Execute("alter table DbObject drop column js_Priority");
-            db.Db.Execute("alter table DbObject drop column js_ProcessingOrder");
-            db.Db.Execute("alter table DbObject drop column js_Schedule");
+            string dbName = manager.GetDatabaseName();
+            List<string>? existingColumns = string.IsNullOrEmpty(dbName) ? null : 
+                db.Db.Fetch<string>("SELECT 'COLUMN_NAME' FROM 'INFORMATION_SCHEMA'.'COLUMNS' " +
+                                    $"WHERE 'TABLE_SCHEMA'='{dbName}' AND 'TABLE_NAME'='DbObject';");
+            var toDelete = new []
+            {
+                "js_Status",
+                "js_Order",
+                "js_OriginalSize",
+                "js_ProcessingStarted",
+                "js_ProcessingEnded",
+                "js_LibraryUid",
+                "js_Enabled",
+                "js_Priority",
+                "js_ProcessingOrder",
+                "js_Schedule"
+            };
+            foreach (string col in toDelete)
+            {
+                if (existingColumns == null || existingColumns.Contains(col) == false)
+                {
+                    try
+                    {
+                        db.Db.Execute("alter table DbObject drop column " + col);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.ScriptExecution;
@@ -260,9 +261,18 @@ public class ScriptController : Controller
         executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
         executor.HttpClient = HttpHelper.Client;
         executor.Logger = new ScriptExecution.Logger();
-        executor.Logger.DLogAction = (_) => { };
-        executor.Logger.ILogAction = (_) => { };
-        executor.Logger.WLogAction = (_) => { };
+        string log = String.Empty;
+        var logFunction = (object[] args) =>
+        {
+            log += string.Join(", ", args.Select(x =>
+                x == null ? "null" :
+                x.GetType().IsPrimitive || x is string ? x.ToString() :
+                System.Text.Json.JsonSerializer.Serialize(x))) + "\n";
+        };
+        
+        executor.Logger.DLogAction = logFunction;
+        executor.Logger.ILogAction = logFunction;
+        executor.Logger.WLogAction = logFunction;
         string error = string.Empty;
         executor.Logger.ELogAction = (args) =>
         {

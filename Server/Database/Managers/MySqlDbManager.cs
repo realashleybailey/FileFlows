@@ -287,6 +287,16 @@ public class MySqlDbManager: DbManager
     }
 
     /// <summary>
+    /// Gets the database name from the connection string
+    /// </summary>
+    /// <returns>the database name</returns>
+    public string GetDatabaseName()
+    {
+        var builder = new MySqlConnector.MySqlConnectionStringBuilder(this.ConnectionString);
+        return builder["Database"].ToString();
+    }
+
+    /// <summary>
     /// Populates the database settings from a connection string
     /// </summary>
     /// <param name="settings">the settings to populate</param>

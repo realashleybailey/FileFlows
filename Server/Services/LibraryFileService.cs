@@ -157,7 +157,7 @@ public partial class LibraryFileService : ILibraryFileService
             }
 
             await Database_Execute("update LibraryFile set NodeUid = @0 , NodeName = @1 , WorkerUid = @2 " +
-                                   $" , Status = @3 , ProcessingStarted = @4 where Uid = @5",
+                                   $" , Status = @3 , ProcessingStarted = @4, OriginalMetadata = '', FinalMetadata = '', ExecutedNodes = '' where Uid = @5",
                 nodeUid, nodeName, workerUid, (int)FileStatus.Processing, DateTime.Now, libFile.Uid);
 
             return libFile;
@@ -412,7 +412,7 @@ public partial class LibraryFileService : ILibraryFileService
     internal async Task ResetProcessingStatus(Guid? nodeUid = null)
     {
         if(nodeUid != null)
-            await Database_Execute($"update LibraryFile set Status = 0 where Status = {(int)FileStatus.Processing} and NodeUid = '{nodeUid}");
+            await Database_Execute($"update LibraryFile set Status = 0 where Status = {(int)FileStatus.Processing} and NodeUid = '{nodeUid}'");
         else
             await Database_Execute($"update LibraryFile set Status = 0 where Status = {(int)FileStatus.Processing}");
     }

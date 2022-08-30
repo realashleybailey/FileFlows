@@ -374,7 +374,7 @@ public partial class LibraryFileService : ILibraryFileService
         }
         catch (Exception ex)
         {
-            Logger.Instance.ELog("Failed GetAll Files: " + ex.Message);
+            Logger.Instance.ELog("Failed GetAll Files: " + ex.Message + "\n" + ex.StackTrace);
             return new LibraryFile[] { };
         }
     }

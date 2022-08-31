@@ -263,8 +263,8 @@ public partial class LibraryFileService : ILibraryFileService
                      )) +
                      $" WorkerUid = '{file.WorkerUid}', " +
                      $" ProcessingStarted = '{file.ProcessingStarted.ToString("o")}', " +
-                     $" ProcessingEnded', '{file.ProcessingEnded.ToString("o")}', " +
-                     $" ExecutedNodes = @0, " +
+                     $" ProcessingEnded = '{file.ProcessingEnded.ToString("o")}', " +
+                     $" ExecutedNodes = @0 " +
                      $" where Uid = '{file.Uid}'";
         
         string executedJson = file.ExecutedNodes?.Any() != true

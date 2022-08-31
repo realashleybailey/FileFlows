@@ -1,6 +1,7 @@
 .input-widget {
   cursor: pointer;
   overflow: hidden;
+  height: 12rem;
 }
 
 .title {
@@ -20,9 +21,9 @@
 }
 
 .preview.BoxPlot {
-  transform: scale(1.5, 2.5);
+  transform: scale(1.5, 2);
   left: 1.5rem;
-  top: 1.5rem;
+  top: 0.5rem;
 }
 
 .preview.BellCurve {
@@ -32,13 +33,13 @@
 }
 
 .preview.HeatMap {
-  top: -1rem;
-  transform: scale(1.35);
+  top: -2.3rem;
+  transform: scale(1.35, 1);
 }
 
 .preview.PieChart {
-  transform: scale(1.65);
-  top: 2rem;
+  transform: scale(1.35);
+  top: 1rem;
   left: 2rem;
 }
 

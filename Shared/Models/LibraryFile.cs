@@ -216,7 +216,7 @@ public class LibraryFile : FileFlowObject
     /// <summary>
     /// Gets or sets a list of nodes that were executed against this library file
     /// </summary>
-    [SerializedColumn]
+    [Column]
     public List<ExecutedNode> ExecutedNodes { get; set; }
     
     /// <summary>

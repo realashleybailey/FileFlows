@@ -3,6 +3,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Services;
+using FileFlows.Shared.Json;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Services;
@@ -256,9 +257,10 @@ public partial class LibraryFileService : ILibraryFileService
                      $" ProcessingEnded', '{file.ProcessingEnded.ToString("o")}', " +
                      $" ExecutedNodes = @0, " +
                      $" where Uid = '{file.Uid}'";
+        
         string executedJson = file.ExecutedNodes?.Any() != true
             ? string.Empty
-            : JsonSerializer.Serialize(file.ExecutedNodes);
+            : JsonSerializer.Serialize(file.ExecutedNodes, CustomDbMapper.JsonOptions);
         await Database_Execute(sql, executedJson);
     }
 

@@ -1,4 +1,7 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
+using FileFlows.Shared.Json;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Helpers;
 
@@ -9,6 +12,14 @@ using NPoco;
 /// </summary>
 class CustomDbMapper : DefaultMapper
 {
+    public static readonly JsonSerializerOptions JsonOptions;
+
+    static CustomDbMapper()
+    {
+        JsonOptions = new JsonSerializerOptions();
+        JsonOptions.Converters.Add(new TimeSpanConverter());
+    }
+    
     /// <summary>
     /// Function to convert a database object type
     /// </summary>
@@ -24,10 +35,34 @@ class CustomDbMapper : DefaultMapper
         if (destType == typeof(Dictionary<string, object>) && sourceType == typeof(string))
             return (value) =>
             {
-                if (string.IsNullOrEmpty(value as string))
-                    return new Dictionary<string, object>();
-                var result = JsonSerializer.Deserialize<Dictionary<string, object>>((string)value);
-                return result;
+                try
+                {
+                    if (string.IsNullOrEmpty(value as string))
+                        return new Dictionary<string, object>();
+                    var result = JsonSerializer.Deserialize<Dictionary<string, object>>((string)value, JsonOptions);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            };
+        if (destType == typeof(List<ExecutedNode>) && sourceType == typeof(string))
+            return (value) =>
+            {
+                if(value is string strValue == false)
+                    return new List<ExecutedNode>(); 
+                try
+                {
+                    if (string.IsNullOrEmpty(strValue) || strValue == "null")
+                        return new List<ExecutedNode>();
+                    var result = JsonSerializer.Deserialize<List<ExecutedNode>>(strValue, JsonOptions);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             };
         return base.GetFromDbConverter(destType, sourceType);
     }
@@ -60,8 +95,19 @@ class CustomDbMapper : DefaultMapper
             {
                 if (value is Dictionary<string, object> dict == false || dict.Any() == false)
                     return string.Empty;
-                return JsonSerializer.Serialize(dict);
+                return JsonSerializer.Serialize(dict, JsonOptions);
             };
+        if (sourceMemberInfo.GetMemberInfoType() == typeof(List<ExecutedNode>))
+            return (value) =>
+            {
+                if (value is List<ExecutedNode> list == false || list.Any() == false)
+                    return string.Empty;
+                return JsonSerializer.Serialize(list, JsonOptions);
+            };
+        
+        
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new TimeSpanConverter());
         return base.GetToDbConverter(destType, sourceMemberInfo);
     }
 }

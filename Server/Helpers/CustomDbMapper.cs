@@ -44,7 +44,7 @@ class CustomDbMapper : DefaultMapper
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             };
         if (destType == typeof(List<ExecutedNode>) && sourceType == typeof(string))
@@ -61,7 +61,7 @@ class CustomDbMapper : DefaultMapper
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             };
         return base.GetFromDbConverter(destType, sourceType);

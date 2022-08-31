@@ -46,8 +46,14 @@ public class LibraryFile : FileFlowObject
         }
     }
 
+    /// <summary>
+    /// Gets or sets the UID of Flow that processed this file
+    /// </summary>
     public Guid? FlowUid { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Name of Flow that processed this file
+    /// </summary>
     public string FlowName { get; set; }
 
     /// <summary>
@@ -72,8 +78,14 @@ public class LibraryFile : FileFlowObject
         }
     }
 
+    /// <summary>
+    /// Gets or sets the UID of Library that owns this file
+    /// </summary>
     public Guid? LibraryUid { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Name of Library that owns this file
+    /// </summary>
     public string LibraryName { get; set; }
     
     /// <summary>
@@ -99,8 +111,14 @@ public class LibraryFile : FileFlowObject
         }
     }
 
+    /// <summary>
+    /// Gets or sets the UID of Library file that this is a duplicate of
+    /// </summary>
     public Guid? DuplicateUid { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Name of Library file that this is a duplicate of
+    /// </summary>
     public string DuplicateName { get; set; }
 
     /// <summary>
@@ -140,8 +158,14 @@ public class LibraryFile : FileFlowObject
         }
     }
 
+    /// <summary>
+    /// Gets or sets the UID of Node that processed this file
+    /// </summary>
     public Guid? NodeUid { get; set; }
 
+    /// <summary>
+    /// Gets or sets the Name of Node that processed this file
+    /// </summary>
     public string NodeName { get; set; }
 
     /// <summary>
@@ -216,7 +240,7 @@ public class LibraryFile : FileFlowObject
     /// <summary>
     /// Gets or sets a list of nodes that were executed against this library file
     /// </summary>
-    [Column]
+    [SerializedColumn]
     public List<ExecutedNode> ExecutedNodes { get; set; }
     
     /// <summary>

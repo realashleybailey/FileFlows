@@ -46,6 +46,8 @@ public class SystemStatisticsWorker:Worker
     private DirectorySize GetTempStorageSize()
     {
         var tempPath = processingNode?.TempPath;
+        if (string.IsNullOrEmpty(tempPath))
+            return new DirectorySize();
         return GetDirectorySize(tempPath);
     }
 

@@ -4,6 +4,7 @@ using FileFlows.Server.Controllers;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
 using Jint.Native.Symbol;
+using NPoco;
 
 namespace FileFlows.Server.Helpers;
 
@@ -19,6 +20,8 @@ public class DbHelper
     /// </summary>
     internal static Task<bool> Initialize()
     {
+        DatabaseFactory.ColumnSerializer = new JsonColumnSerializer();
+        
         string connstring = AppSettings.Instance.DatabaseConnection;
         if (string.IsNullOrWhiteSpace(connstring) == false)
         {

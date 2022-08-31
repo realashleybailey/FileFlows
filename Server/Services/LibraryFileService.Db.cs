@@ -102,11 +102,20 @@ public partial class LibraryFileService
     private async Task Database_Insert(object o)
     {
         DateTime dt = DateTime.Now;
-        using (var db = await GetDbWithMappings())
+        try
         {
-            await db.Db.InsertAsync(o);
+            using (var db = await GetDbWithMappings())
+            {
+                await db.Db.InsertAsync(o);
+            }
+            Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to insert object");
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to insert object");
+        catch (Exception ex)
+        {
+            Logger.Instance.ILog($"Failed insert object: " + ex.Message);
+            throw;
+        }
+
     }
 
     private async Task Database_AddMany(IEnumerable<object> o)

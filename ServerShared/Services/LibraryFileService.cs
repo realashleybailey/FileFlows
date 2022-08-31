@@ -85,11 +85,11 @@ public class LibraryFileService : Service, ILibraryFileService
     /// </summary>
     /// <param name="uids">The UIDs to delete</param>
     /// <returns>a completed task</returns>
-    public async Task Delete(params Guid[] uid)
+    public async Task Delete(params Guid[] uids)
     {
         try
         {
-            var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel<Guid> { Uids = uid });                
+            var result = await HttpHelper.Delete($"{ServiceBaseUrl}/api/library-file", new ReferenceModel<Guid> { Uids = uids });                
         }
         catch (Exception)
         {

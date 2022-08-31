@@ -197,6 +197,9 @@ public partial class LibraryFileService : ILibraryFileService
             file.DateCreated = DateTime.Now;
         if (file.DateModified < new DateTime(2000, 1, 1))
             file.DateModified = DateTime.Now;
+        file.ExecutedNodes ??= new ();
+        file.OriginalMetadata ??= new ();
+        file.FinalMetadata ??= new ();
         await Database_Insert(file);
         return await Get(file.Uid);
     }
@@ -220,6 +223,9 @@ public partial class LibraryFileService : ILibraryFileService
                 file.DateCreated = DateTime.Now;
             if (file.DateModified < new DateTime(2000, 1, 1))
                 file.DateModified = DateTime.Now;
+            file.ExecutedNodes ??= new ();
+            file.OriginalMetadata ??= new ();
+            file.FinalMetadata ??= new ();
         }
 
         await Database_AddMany(files);
@@ -233,6 +239,9 @@ public partial class LibraryFileService : ILibraryFileService
     public async Task<LibraryFile> Update(LibraryFile file)
     {
         file.DateModified = DateTime.Now;
+        file.ExecutedNodes ??= new ();
+        file.OriginalMetadata ??= new ();
+        file.FinalMetadata ??= new ();
         await Database_Update(file);
         return file;
     }

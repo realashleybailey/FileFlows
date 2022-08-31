@@ -262,15 +262,15 @@ public partial class LibraryFileService : ILibraryFileService
                          $" NodeUid = '{file.NodeUid}', NodeName = '{file.NodeName.Replace("'", "''")}', "
                      )) +
                      $" WorkerUid = '{file.WorkerUid}', " +
-                     $" ProcessingStarted = '{file.ProcessingStarted.ToString("o")}', " +
-                     $" ProcessingEnded = '{file.ProcessingEnded.ToString("o")}', " +
-                     $" ExecutedNodes = @0 " +
+                     $" ProcessingStarted = @0, " +
+                     $" ProcessingEnded = @1, " + 
+                     $" ExecutedNodes = @2 " +
                      $" where Uid = '{file.Uid}'";
         
         string executedJson = file.ExecutedNodes?.Any() != true
             ? string.Empty
             : JsonSerializer.Serialize(file.ExecutedNodes, CustomDbMapper.JsonOptions);
-        await Database_Execute(sql, executedJson);
+        await Database_Execute(sql, file.ProcessingStarted, file.ProcessingEnded, executedJson);
     }
 
     /// <summary>

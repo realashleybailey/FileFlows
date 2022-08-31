@@ -61,7 +61,8 @@ class CustomDbMapper : DefaultMapper
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    Logger.Instance.ELog("Error parsing ExecutedNodes: " + ex.Message + " , string value: " + strValue);
+                    return new List<ExecutedNode>();
                 }
             };
         return base.GetFromDbConverter(destType, sourceType);

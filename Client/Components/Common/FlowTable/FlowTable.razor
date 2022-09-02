@@ -132,8 +132,7 @@
                             {
                                 <span class="flowtable-select" style="width:2rem;min-width:2rem;max-width:2rem">
                                     <input type="checkbox" @onchange="(e) => CheckItem(e, item.Key)" checked="@(SelectedItems?.Contains(item.Key) == true)"
-                                           @onclick:stopPropagation
-                                    />                        
+                                           onclick="ff.stopSelectPropagation(event)" />                        
                                 </span>
                             }
                             @foreach (var col in ColumnList)

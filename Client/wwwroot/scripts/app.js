@@ -349,5 +349,12 @@ window.ff = {
                 createResizableColumn(col, resizer, cols[i + 1]);
             }
         }
+    },
+    stopSelectPropagation: function(event){
+        if(event.ctrlKey === false && event.shiftKey === false)
+        {
+            event.stopPropagation();
+            return false;
+        }
     }
 };

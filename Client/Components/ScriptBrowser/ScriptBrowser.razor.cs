@@ -73,7 +73,7 @@ public partial class ScriptBrowser: ComponentBase
                 this.Close();
                 return;
             }
-            this.Table.Data = result.Data;
+            this.Table.Data = result.Data.OrderBy(x => x.Name).ToList();
             this.Loading = false;
         }
         finally

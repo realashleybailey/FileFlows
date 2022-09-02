@@ -247,10 +247,13 @@ class FFChart {
         }, true, false);
     }
 
-    formatFileSize(size) {
+    formatFileSize(size, dps) {
         if (size === undefined) {
             return '';
         }
+
+        if(dps === undefined)
+            dps = 2;
         let neg = size < 0;
         size = Math.abs(size);
         let sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -261,7 +264,7 @@ class FFChart {
         }
         if(neg)
             size *= -1;
-        return size.toFixed(2) + ' ' + sizes[order];
+        return size.toFixed(dps) + ' ' + sizes[order];
     }
 
     async getData() {
@@ -458,7 +461,15 @@ export class BarChart extends FFChart
                 }
             },
             dataLabels: {
-                enabled: false
+                enabled: true,
+                formatter: (val, opt) => {
+                    let d = data.series[opt.seriesIndex].data[opt.dataPointIndex];
+                    // if(opt.seriesIndex !== 0)
+                    //     return '';
+                    let size = this.formatFileSize(d, 0);
+                    return size;
+                    return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+                },
             },
             colors: [
                 '#02647e',
@@ -1200,22 +1211,10 @@ export class LibraryFileTable extends FFChart
     formatShrinkage(original, final)
     {
         let diff = Math.abs(original - final);
-        return this.formatSize(diff) + (original < final ? " " + this.lblIncrease : " " + this.lblDecrease) +
-        "\n" + this.formatSize(final) + " / " + this.formatSize(original);
+        return this.formatFileSize(diff) + (original < final ? " " + this.lblIncrease : " " + this.lblDecrease) +
+        "\n" + this.formatFileSize(final) + " / " + this.formatFileSize(original);
     }
-    
-    formatSize(size) {
-        let sizes = ["B", "KB", "MB", "GB", "TB"];
-
-        let order = 0;
-        let num = size;
-        while (num >= 1000 && order < sizes.length - 1) {
-            order++;
-            num /= 1000;
-        }
-        return num.toFixed(2) + ' ' + sizes[order];
-    }
-    
+        
     getTimerInterval() {
         return document.hasFocus() ? 10000 : 20000;
     }

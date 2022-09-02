@@ -70,7 +70,7 @@ public class ServerUpdater : UpdaterWorker
 
     protected override bool CanUpdate()
     {
-        var workers = new WorkerController(null).GetAll();
+        var workers = new WorkerController(null).GetAll().Result;
         return workers?.Any() != true;
     }
 

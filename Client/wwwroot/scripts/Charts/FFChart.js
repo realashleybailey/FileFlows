@@ -268,8 +268,7 @@ class FFChart {
         if(this.disposed)
             return;
 
-        let response = await fetch(this.url);
-        let data = await response.json();
+        let data = await this.fetchData()
         data = this.fixData(data);
 
         if(this.hasData(data) === false){
@@ -277,6 +276,11 @@ class FFChart {
             return;
         }
         this.createChart(data);
+    }
+    
+    async fetchData(){
+        let response = await fetch(this.url);
+        return await response.json();
     }
     
     hasData(data) {
@@ -1355,11 +1359,20 @@ export class Processing extends FFChart
     existing;
     runners = {};
     infoTemplate;
+    isPaused;
 
     constructor(uid, args) {
         super(uid, args);
         this.recentlyFinished = args.flags === 1;
         this.infoTemplate = Handlebars.compile(this.infoTemplateHtml);
+    }
+
+    async fetchData(){
+        this.isPaused = false;
+        let response = await fetch(this.url);
+        if(response.headers.get('x-paused') === '1')
+            this.isPaused = true;
+        return await response.json();
     }
 
     async getData() {
@@ -1374,8 +1387,8 @@ export class Processing extends FFChart
     }
     
     createChart(data) {
-        let json = data ? JSON.stringify(data) : '';
-        if(json === this.existing)
+        let json = (data ? JSON.stringify(data) : '') + (':' + this.isPaused);
+        if(json === this.existing) 
             return;
         this.existing = json; // so we dont refresh if we don't have to
         let title = 'FileFlows - Dashboard';
@@ -1421,11 +1434,16 @@ export class Processing extends FFChart
 
         let icon = document.createElement('i');
         span.appendChild(icon);
-        icon.className = 'fas fa-times';
 
         let spanText = document.createElement('span');
         span.appendChild(spanText);
-        spanText.innerText = 'No files currently processing';
+        if(this.isPaused){
+            icon.className = 'fas fa-pause';
+            spanText.innerText = 'Processing is currently paused';            
+        }else {
+            icon.className = 'fas fa-times';
+            spanText.innerText = 'No files currently processing';
+        }
 
         chartDiv.appendChild(div);
     }

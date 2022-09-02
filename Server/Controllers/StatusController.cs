@@ -48,7 +48,7 @@ namespace FileFlows.Server.Controllers
             }
 
             var workerController = new WorkerController(null);
-            var executors = workerController.GetAll()?.ToList() ?? new List<FlowExecutorInfo>();
+            var executors = (await workerController.GetAll())?.ToList() ?? new List<FlowExecutorInfo>();
             status.processing = executors.Count;
             if (executors.Any())
             {

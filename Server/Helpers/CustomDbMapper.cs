@@ -35,17 +35,10 @@ class CustomDbMapper : DefaultMapper
         if (destType == typeof(Dictionary<string, object>) && sourceType == typeof(string))
             return (value) =>
             {
-                try
-                {
-                    if (string.IsNullOrEmpty(value as string))
-                        return new Dictionary<string, object>();
-                    var result = JsonSerializer.Deserialize<Dictionary<string, object>>((string)value, JsonOptions);
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+                if (string.IsNullOrEmpty(value as string))
+                    return new Dictionary<string, object>();
+                var result = JsonSerializer.Deserialize<Dictionary<string, object>>((string)value, JsonOptions);
+                return result;
             };
         if (destType == typeof(List<ExecutedNode>) && sourceType == typeof(string))
             return (value) =>

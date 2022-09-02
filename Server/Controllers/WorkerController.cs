@@ -279,8 +279,17 @@ public class WorkerController : Controller
     /// </summary>
     /// <returns>A list of all running flow executors</returns>
     [HttpGet]
-    public IEnumerable<FlowExecutorInfo> GetAll()
+    public async Task<IEnumerable<FlowExecutorInfo>> GetAll()
     {
+        if (HttpContext?.Response != null)
+        {
+            var settings = await new SettingsController().Get();
+            if (settings.IsPaused)
+            {
+                HttpContext.Response.Headers.TryAdd("x-paused", "1");
+            }
+        }
+
         // we don't want to return the logs here, too big
         var liveExecutors = Executors.Values.Where(x => x != null).ToList();
         var results = liveExecutors.Select(x => new FlowExecutorInfo

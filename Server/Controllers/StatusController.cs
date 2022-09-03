@@ -50,6 +50,7 @@ namespace FileFlows.Server.Controllers
                     {
                         name = exec.LibraryFile.Name,
                         step = exec.CurrentPartName,
+                        library = exec.LibraryFile.LibraryName,
                         relativePath = exec.LibraryFile.RelativePath,
                         stepPercent = exec.CurrentPartPercent,
                     });
@@ -110,6 +111,12 @@ namespace FileFlows.Server.Controllers
             /// the relative path to the library path
             /// </summary>
             public string relativePath { get; set; }
+            
+            /// <summary>
+            /// the library name
+            /// </summary>
+            public string library { get; set; }
+            
             /// <summary>
             /// the step currently processing
             /// </summary>

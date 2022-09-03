@@ -464,11 +464,7 @@ export class BarChart extends FFChart
                 enabled: true,
                 formatter: (val, opt) => {
                     let d = data.series[opt.seriesIndex].data[opt.dataPointIndex];
-                    // if(opt.seriesIndex !== 0)
-                    //     return '';
-                    let size = this.formatFileSize(d, 0);
-                    return size;
-                    return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+                    return this.formatFileSize(d, 0);
                 },
             },
             colors: [

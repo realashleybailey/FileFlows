@@ -34,24 +34,26 @@ namespace FileFlows.Server.Controllers
         public async Task<StatusModel> Get()
         {
             var status = new StatusModel();
-            if (DbHelper.UseMemoryCache)
-            {
-                var lfController = new LibraryFileController();
-                status.queue = (await lfController.GetAll(FileStatus.Unprocessed))?.Count() ?? 0;
-                status.processed = (await lfController.GetAll(FileStatus.Processed))?.Count() ?? 0;
-            }
-            else
-            {
-                var lfOverview = (await new Server.Services.LibraryFileService().GetStatus()).ToArray();
-                status.queue = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Unprocessed)?.Count ?? 0;
-                status.processed = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Processed)?.Count ?? 0;
-            }
-
+            var lfOverview = (await new Server.Services.LibraryFileService().GetStatus()).ToArray();
+            status.queue = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Unprocessed)?.Count ?? 0;
+            status.processed = lfOverview.FirstOrDefault(x => x.Status == FileStatus.Processed)?.Count ?? 0;
+            
             var workerController = new WorkerController(null);
             var executors = (await workerController.GetAll())?.ToList() ?? new List<FlowExecutorInfo>();
             status.processing = executors.Count;
+            
             if (executors.Any())
             {
+                foreach (var exec in executors)
+                {
+                    status.processingFiles.Add(new ()
+                    {
+                        name = exec.LibraryFile.Name,
+                        step = exec.CurrentPartName,
+                        relativePath = exec.LibraryFile.RelativePath,
+                        stepPercent = exec.CurrentPartPercent,
+                    });
+                }
                 var time = executors.OrderByDescending(x => x.ProcessingTime).First().ProcessingTime;
                 if (time.Hours > 0)
                     status.time = time.ToString(@"h\:mm\:ss");
@@ -87,6 +89,35 @@ namespace FileFlows.Server.Controllers
             /// Gets the processing time of the longest running item in the queue
             /// </summary>
             public string time { get; set; }
+
+            /// <summary>
+            /// Files currently processing
+            /// </summary>
+            public List<ProcessingFile> processingFiles { get; set; } = new List<ProcessingFile>();
+        }
+
+        /// <summary>
+        /// A processing file
+        /// </summary>
+        public class ProcessingFile
+        {
+            /// <summary>
+            /// the filename
+            /// </summary>
+            public string name { get; set; }
+
+            /// <summary>
+            /// the relative path to the library path
+            /// </summary>
+            public string relativePath { get; set; }
+            /// <summary>
+            /// the step currently processing
+            /// </summary>
+            public string step { get; set; }
+            /// <summary>
+            /// the percent the current step is at
+            /// </summary>
+            public float stepPercent { get; set; }
         }
     }
 }

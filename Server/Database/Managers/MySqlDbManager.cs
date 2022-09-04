@@ -203,7 +203,7 @@ public class MySqlDbManager: DbManager
                          "and JSON_EXTRACT(Data,'$.Default') = 1 " +
                          "and JSON_EXTRACT(Data,'$.Enabled') = 1 ";
                 
-            dbObject = await db.Db.SingleAsync<DbObject>(sql);
+            dbObject = await db.Db.SingleOrDefaultAsync<DbObject>(sql);
         }
 
         return ConvertFromDbObject<Flow>(dbObject);

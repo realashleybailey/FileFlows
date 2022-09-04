@@ -18,10 +18,10 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public abstract class DbManager
 {
-    
+
     protected string ConnectionString { get; init; }
     private static ObjectPool<PooledConnection> DbConnectionPool;
-    
+
     protected enum DbCreateResult
     {
         Failed = 0,
@@ -38,12 +38,12 @@ public abstract class DbManager
     /// Gets if this database uses TOP to limit queries, otherwise LIMIT will be used
     /// </summary>
     public virtual bool UseTop => false;
-    
+
     /// <summary>
     /// Method used by the manager to extract a json variable, mysql/mariadb use JSON_EXTRACT
     /// </summary>
     protected virtual string JsonExtractMethod => "JSON_EXTRACT";
-    
+
     /// <summary>
     /// Gets the database used by this configuration
     /// </summary>
@@ -52,13 +52,13 @@ public abstract class DbManager
     public static DbManager GetManager(string connectionString)
     {
         connectionString ??= SqliteDbManager.GetConnetionString(SqliteDbFile);
-        
+
         if (connectionString.Contains(".sqlite"))
             return new SqliteDbManager(connectionString);
 
-        if(connectionString.Contains(";Uid="))
+        if (connectionString.Contains(";Uid="))
             return new MySqlDbManager(connectionString);
-        
+
         //return new SqlServerDbManager(connectionString);
         throw new Exception("Unknown database: " + connectionString);
     }
@@ -98,7 +98,7 @@ public abstract class DbManager
     /// </summary>
     /// <returns>the number of open database connections</returns>
     public static int GetOpenDbConnections() => DbConnectionPool?.Count ?? 0;
-    
+
     /// <summary>
     /// Get an instance of the IDatabase
     /// </summary>
@@ -125,7 +125,7 @@ public abstract class DbManager
             CreateStoredProcedures();
             return true;
         }
-        
+
         if (CreateDatabaseStructure() == false)
             return false;
 
@@ -138,13 +138,14 @@ public abstract class DbManager
             if (File.Exists(SqliteDbFile))
             {
                 // migrate the data
-                bool migrated = DbMigrater.Migrate(SqliteDbManager.GetConnetionString(SqliteDbFile), this.ConnectionString);
+                bool migrated = DbMigrater.Migrate(SqliteDbManager.GetConnetionString(SqliteDbFile),
+                    this.ConnectionString);
 
                 if (migrated)
                 {
                     File.Move(SqliteDbFile, SqliteDbFile + ".migrated");
                 }
-                
+
                 // migrated, we dont need to insert initial data
                 return true;
             }
@@ -152,7 +153,7 @@ public abstract class DbManager
 
         if (insertInitialData == false)
             return true;
-        
+
         return await CreateInitialData();
     }
 
@@ -162,6 +163,7 @@ public abstract class DbManager
     /// <param name="recreate">if the database should be recreated if already exists</param>
     /// <returns>true if successfully created</returns>
     protected abstract DbCreateResult CreateDatabase(bool recreate);
+
     /// <summary>
     /// Creates the tables etc in the database
     /// </summary>
@@ -171,7 +173,9 @@ public abstract class DbManager
     /// <summary>
     /// Creates (or recreates) any stored procedures and functions used by this database
     /// </summary>
-    protected virtual void CreateStoredProcedures() { }
+    protected virtual void CreateStoredProcedures()
+    {
+    }
 
     /// <summary>
     /// Inserts the initial data into the database
@@ -181,11 +185,14 @@ public abstract class DbManager
     {
         using var flowDb = await GetDb();
         var db = flowDb.Db;
-        bool windows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+        bool windows =
+            System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform
+                .Windows);
         await AddOrUpdateObject(db, new Variable
         {
             Name = "ffmpeg",
-            Value = windows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
+            Value =
+                windows ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe") : "/usr/local/bin/ffmpeg",
             DateCreated = DateTime.Now,
             DateModified = DateTime.Now
         });
@@ -199,13 +206,14 @@ public abstract class DbManager
         });
 
         string tempPath;
-        if(DirectoryHelper.IsDocker)
+        if (DirectoryHelper.IsDocker)
             tempPath = "/temp";
-        else if(windows)
-            tempPath = @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FileFlows\\Temp");
+        else if (windows)
+            tempPath = @Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "FileFlows\\Temp");
         else
             tempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
-        
+
         if (Directory.Exists(tempPath) == false)
             Directory.CreateDirectory(tempPath);
 
@@ -225,18 +233,21 @@ public abstract class DbManager
     }
 
     #endregion
-    
-    
+
+
     #region helper methods
+
     /// <summary>
     /// Escapes a string so it is safe to be used in a sql command
     /// </summary>
     /// <param name="input">the string to escape</param>
     /// <returns>the escaped string</returns>
-    protected static string SqlEscape(string input) => input == null ? string.Empty : "'" + input.Replace("'", "''") + "'";
+    protected static string SqlEscape(string input) =>
+        input == null ? string.Empty : "'" + input.Replace("'", "''") + "'";
+
     #endregion
-    
-    
+
+
     /// <summary>
     /// Executes a sql command and returns a single value
     /// </summary>
@@ -312,8 +323,10 @@ public abstract class DbManager
 
                 }
             }
+
             dbObjects = await db.Db.FetchAsync<T>(sql, args);
         }
+
         return dbObjects;
     }
 
@@ -330,7 +343,7 @@ public abstract class DbManager
         Parallel.ForEach(list, (x, state, index) =>
         {
             var converted = Convert<T>(x);
-            if(converted != null)
+            if (converted != null)
                 results[index] = converted;
         });
         return results.Where(x => x != null);
@@ -342,9 +355,9 @@ public abstract class DbManager
     /// <param name="dbObject">the DbObject to convert</param>
     /// <typeparam name="T">The type to convert to</typeparam>
     /// <returns>A converted object</returns>
-    internal T ConvertFromDbObject<T>(DbObject dbObject)where T : FileFlowObject, new()
+    internal T ConvertFromDbObject<T>(DbObject dbObject) where T : FileFlowObject, new()
     {
-        if(dbObject == null)
+        if (dbObject == null)
             return default;
         return Convert<T>(dbObject);
     }
@@ -356,7 +369,8 @@ public abstract class DbManager
     /// <param name="arguments">the arguments for the select</param>
     /// <typeparam name="T">the type of object to select</typeparam>
     /// <returns>a list of objects</returns>
-    public virtual async Task<IEnumerable<T>> Select<T>(string where, params object[] arguments) where T : FileFlowObject, new()
+    public virtual async Task<IEnumerable<T>> Select<T>(string where, params object[] arguments)
+        where T : FileFlowObject, new()
     {
         List<DbObject> dbObjects;
         using (var db = await GetDb())
@@ -423,7 +437,7 @@ public abstract class DbManager
             sql = "select top 1 " + sql;
         else
             sql = "select " + sql + " limit 1";
-        
+
         string result;
         using (var db = await GetDb())
         {
@@ -463,9 +477,10 @@ public abstract class DbManager
         {
             dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Uid=@0", uid);
         }
+
         return dbObject;
     }
-    
+
     /// <summary>
     /// Selects a single instance
     /// </summary>
@@ -479,7 +494,7 @@ public abstract class DbManager
         {
             dbObject = await db.Db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, uid);
         }
-        
+
         if (string.IsNullOrEmpty(dbObject?.Data))
             return new T();
         return Convert<T>(dbObject);
@@ -504,7 +519,7 @@ public abstract class DbManager
             return new T();
         return Convert<T>(dbObject);
     }
-    
+
     /// <summary>
     /// Adds or updates an object in the database
     /// </summary>
@@ -524,11 +539,13 @@ public abstract class DbManager
 
         var type = obj.GetType();
         obj.Name = obj.Name?.EmptyAsNull() ?? type.Name;
-        var dbObject = obj.Uid == Guid.Empty ? null : db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid);
+        var dbObject = obj.Uid == Guid.Empty
+            ? null
+            : db.FirstOrDefault<DbObject>("where Type=@0 and Uid = @1", type.FullName, obj.Uid);
         if (dbObject == null)
         {
             changed = true;
-            if(obj.Uid == Guid.Empty)
+            if (obj.Uid == Guid.Empty)
                 obj.Uid = Guid.NewGuid();
             obj.DateCreated = DateTime.Now;
             obj.DateModified = obj.DateCreated;
@@ -554,27 +571,27 @@ public abstract class DbManager
                 changed = true;
             dbObject.Name = obj.Name;
             dbObject.DateModified = obj.DateModified;
-            if(obj.DateCreated  != dbObject.DateCreated && obj.DateCreated > new DateTime(2020,1,1))
+            if (obj.DateCreated != dbObject.DateCreated && obj.DateCreated > new DateTime(2020, 1, 1))
                 dbObject.DateCreated = obj.DateCreated; // OnHeld moving to process now can change this date
             dbObject.Data = json;
             await db.UpdateAsync(dbObject);
         }
 
         if (changed && (
-            dbObject.Type == typeof(Library).FullName ||
-            dbObject.Type == typeof(Flow).FullName ||
-            dbObject.Type == typeof(PluginSettingsModel).FullName ||
-            dbObject.Type == typeof(Dashboard).FullName
-        ))
+                dbObject.Type == typeof(Library).FullName ||
+                dbObject.Type == typeof(Flow).FullName ||
+                dbObject.Type == typeof(PluginSettingsModel).FullName ||
+                dbObject.Type == typeof(Dashboard).FullName
+            ))
             await RevisionController.SaveRevision(dbObject);
 
         if (UseMemoryCache == false)
-            return await Single<T>(dbObject.Uid);//return await Single<T>(Guid.Parse(dbObject.Uid));
-        
+            return await Single<T>(dbObject.Uid); //return await Single<T>(Guid.Parse(dbObject.Uid));
+
         return obj;
     }
 
-    
+
     /// <summary>
     /// Adds or updates a DbObject directly in the database
     /// Note: NO revision will be saved
@@ -588,6 +605,7 @@ public abstract class DbManager
             return;
         await db.Db.InsertAsync(dbObject);
     }
+
     /// <summary>
     /// Tests if the data has changed
     /// </summary>
@@ -631,7 +649,8 @@ public abstract class DbManager
     {
         using (var db = await GetDb())
         {
-            await db.Db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now, uid);
+            await db.Db.ExecuteAsync($"update {nameof(DbObject)} set DateModified = @0 where Uid = @1", DateTime.Now,
+                uid);
         }
     }
 
@@ -672,6 +691,7 @@ public abstract class DbManager
                                SqlEscape(json) +
                                ");");
             }
+
             if (sql.Length > 0)
             {
                 using (var db = await GetDb())
@@ -692,7 +712,7 @@ public abstract class DbManager
     public virtual async Task<T> Single<T>(string andWhere, params object[] args) where T : FileFlowObject, new()
     {
         args = new object[] { typeof(T).FullName }.Union(args).ToArray();
-        
+
         DbObject dbObject;
         using (var db = await GetDb())
         {
@@ -703,12 +723,12 @@ public abstract class DbManager
             return new T();
         return Convert<T>(dbObject);
     }
-    
+
     private T Convert<T>(DbObject dbObject) where T : FileFlowObject, new()
     {
         if (dbObject == null)
             return default;
-        
+
         var serializerOptions = new JsonSerializerOptions
         {
             Converters = { new BoolConverter(), new Shared.Json.ValidatorConverter(), new DataConverter() }
@@ -721,17 +741,18 @@ public abstract class DbManager
         foreach (var prop in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
             var dbencrypted = prop.GetCustomAttribute<EncryptedAttribute>();
-            if(dbencrypted != null)
+            if (dbencrypted != null)
             {
                 var value = prop.GetValue(result) as string;
                 if (string.IsNullOrEmpty(value) == false)
                 {
-                    string decrypted  = Decrypter.Decrypt(value);
-                    if(decrypted != value)
+                    string decrypted = Decrypter.Decrypt(value);
+                    if (decrypted != value)
                         prop.SetValue(result, decrypted);
                 }
             }
         }
+
         //result.Uid = Guid.Parse(dbObject.Uid);
         result.Uid = dbObject.Uid;
         result.Name = dbObject.Name;
@@ -739,7 +760,7 @@ public abstract class DbManager
         result.DateCreated = dbObject.DateCreated;
         return result;
     }
-    
+
     /// <summary>
     /// Updates an object
     /// </summary>
@@ -755,9 +776,10 @@ public abstract class DbManager
         {
             result = await AddOrUpdateObject(db.Db, obj);
         }
+
         return result;
     }
-    
+
     /// <summary>
     /// Delete items from a database
     /// </summary>
@@ -775,7 +797,7 @@ public abstract class DbManager
             await db.Db.ExecuteAsync($"delete from {nameof(DbObject)} where Type=@0 and Uid in ({strUids})", typeName);
         }
     }
-    
+
     /// <summary>
     /// Delete items from a database
     /// </summary>
@@ -784,7 +806,7 @@ public abstract class DbManager
     /// <typeparam name="T">the type to delete</typeparam>
     public virtual async Task Delete<T>(string andWhere = "", params object[] args)
     {
-        
+
         if (string.IsNullOrEmpty(andWhere) == false && andWhere.Trim().ToLower().StartsWith("and ") == false)
             andWhere = " and " + andWhere;
         args = new object[] { typeof(T).FullName }.Union(args ?? new object[] { }).ToArray();
@@ -794,7 +816,7 @@ public abstract class DbManager
             await db.Db.ExecuteAsync(sql, args);
         }
     }
-    
+
     /// <summary>
     /// Delete items from a database
     /// </summary>
@@ -833,10 +855,10 @@ public abstract class DbManager
                 return SqlHelper.CleanSql(resource);
             return resource;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             Logger.Instance.ELog($"Failed getting embedded SQL script '{dbType}.{script}': {ex.Message}");
-            return string.Empty; 
+            return string.Empty;
         }
     }
 
@@ -845,14 +867,15 @@ public abstract class DbManager
     /// </summary>
     /// <param name="dbType">the type of database</param>
     /// <returns>a list of stored procedures</returns>
-    protected static Dictionary<string,string> GetStoredProcedureScripts(string dbType)
+    protected static Dictionary<string, string> GetStoredProcedureScripts(string dbType)
     {
         Dictionary<string, string> scripts = new();
-        foreach (string script in new[] {  "DeleteOldLogs" })
+        foreach (string script in new[] { "DeleteOldLogs" })
         {
             string sql = GetSqlScript(dbType, script + ".sql");
             scripts.Add(script, sql);
         }
+
         return scripts;
     }
 
@@ -863,7 +886,7 @@ public abstract class DbManager
     /// <param name="type">the type of log message</param>
     /// <param name="message">the message to log</param>
     public virtual Task Log(Guid clientUid, LogType type, string message) => Task.CompletedTask;
-    
+
     /// <summary>
     /// Prune old logs from the database
     /// </summary>
@@ -877,7 +900,7 @@ public abstract class DbManager
     /// <returns>the messages found in the log</returns>
     public virtual Task<IEnumerable<DbLogMessage>> SearchLog(LogSearchModel filter) =>
         Task.FromResult((IEnumerable<DbLogMessage>)new DbLogMessage[] { });
-    
+
     /// <summary>
     /// Gets an item from the database by it's name
     /// </summary>
@@ -897,16 +920,16 @@ public abstract class DbManager
         if (string.IsNullOrEmpty(dbObject?.Data) == false)
             return Convert<T>(dbObject);
 
-        return new ();
+        return new();
     }
-    
+
     /// <summary>
     /// Gets the failure flow for a particular library
     /// </summary>
     /// <param name="libraryUid">the UID of the library</param>
     /// <returns>the failure flow</returns>
     public abstract Task<Flow> GetFailureFlow(Guid libraryUid);
-    
+
     /// <summary>
     /// Records a statistic
     /// </summary>
@@ -939,6 +962,7 @@ public abstract class DbManager
                 StringValue = statistic.Value.ToString()
             };
         }
+
         using (var db = await GetDb())
         {
             await db.Db.InsertAsync(stat);
@@ -951,8 +975,9 @@ public abstract class DbManager
     /// Gets statistics by name
     /// </summary>
     /// <returns>the matching statistics</returns>
-    public virtual Task<IEnumerable<Statistic>> GetStatisticsByName(string name) => Task.FromResult((IEnumerable<Statistic>)new Statistic[] { });
-    
+    public virtual Task<IEnumerable<Statistic>> GetStatisticsByName(string name) =>
+        Task.FromResult((IEnumerable<Statistic>)new Statistic[] { });
+
     /// <summary>
     /// Executes SQL against the database
     /// </summary>
@@ -966,9 +991,10 @@ public abstract class DbManager
         {
             result = await db.Db.ExecuteAsync(sql, args);
         }
+
         return result;
     }
-    
+
     /// <summary>
     /// Updates the last seen of a node
     /// </summary>

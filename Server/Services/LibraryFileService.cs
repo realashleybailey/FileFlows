@@ -320,15 +320,20 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="status">the status</param>
     /// <param name="skip">the amount to skip</param>
     /// <param name="rows">the number to fetch</param>
+    /// <param name="filter">[Optional] filter text</param>
     /// <returns>a list of matching library files</returns>
-    public async Task<IEnumerable<LibraryFile>> GetAll(FileStatus?status, int skip = 0, int rows = 0)
+    public async Task<IEnumerable<LibraryFile>> GetAll(FileStatus?status, int skip = 0, int rows = 0, string filter = null)
     {
         try
         {
+            bool hasFilter = string.IsNullOrWhiteSpace(filter) == false;
+            string filterWhere = hasFilter ? $"lower(name) like lower('%{filter.Replace("'", "''").Replace(" ", "%")}%')" : string.Empty;
             if(status == null)
             {
                 string sqlStatus =
-                    SqlHelper.Skip($"select * from LibraryFile order by DateModified desc",
+                    SqlHelper.Skip($"select * from LibraryFile " + 
+                                   (hasFilter ? $" where " + filterWhere : string.Empty) +
+                                   " order by DateModified desc",
                         skip, rows);
                 return await Database_Fetch<LibraryFile>(sqlStatus);
             }
@@ -340,7 +345,9 @@ public partial class LibraryFileService : ILibraryFileService
                     orderBy = "ProcessingEnded desc,";
 
                 string sqlStatus =
-                    SqlHelper.Skip($"select * from LibraryFile where Status = {(int)status} order by {orderBy}DateModified desc",
+                    SqlHelper.Skip($"select * from LibraryFile where Status = {(int)status} " +
+                                   (hasFilter ? " and " + filterWhere : string.Empty) +
+                                   $" order by {orderBy}DateModified desc",
                         skip, rows);
                 return await Database_Fetch<LibraryFile>(sqlStatus);
             }
@@ -353,6 +360,8 @@ public partial class LibraryFileService : ILibraryFileService
                 libraries.Where(x => x.Schedule?.Length != 672 || x.Schedule[quarter] == '0').Select(x => "'" + x.Uid + "'"));
 
             string sql = $"select * from LibraryFile where Status = {(int)FileStatus.Unprocessed}";
+            if (hasFilter)
+                sql += " and " + filterWhere;
             
             // add disabled condition
             if(string.IsNullOrEmpty(disabled) == false)

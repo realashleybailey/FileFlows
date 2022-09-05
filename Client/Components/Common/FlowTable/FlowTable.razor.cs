@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Timers;
 using BlazorContextMenu;
 
 namespace FileFlows.Client.Components.Common;
@@ -58,6 +59,16 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     /// Gets or sets if the pager should be shown
     /// </summary>
     [Parameter] public bool ShowPager { get; set; }
+
+    /// <summary>
+    /// Gets if the pager is visible
+    /// </summary>
+    public bool PagerVisible => ShowPager && TotalItems > Math.Min(250, App.PageSize);
+
+    /// <summary>
+    /// Gets or sets the callback for the filter
+    /// </summary>
+    [Parameter] public EventCallback<FilterEventArgs> OnFilter { get; set; }
 
     private int _TotalItems;
 
@@ -114,11 +125,12 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     /// </summary>
     /// <param name="value">the data to set</param>
     /// <param name="clearSelected">if the selected items should be cleared</param>
-    public void SetData(List<TItem> value, bool clearSelected = true)
+    /// <param name="filter">[Optional] text for the filter</param>
+    public void SetData(List<TItem> value, bool clearSelected = true, string filter = null)
     {
         if(value?.Any() != true)
             Logger.Instance.ILog("## SetData to nothing!");
-        this._FilterText = string.Empty;
+        this._FilterText = filter ?? string.Empty;
         this._Data = value ?? new();
         var jsonOptions = new System.Text.Json.JsonSerializerOptions()
         {   
@@ -129,7 +141,10 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
             string result = JsonSerializer.Serialize(x, jsonOptions);  
             return result.ToLowerExplicit();
         });
-        FilterData(clearSelected : clearSelected);
+        if(string.IsNullOrEmpty(filter)) // if we pass in filter, the data is already filtered
+            FilterData(clearSelected : clearSelected).Wait();
+        else
+            this.DisplayData = this.DataDictionary; // need to update the data
         
         // need to reselect the items here!
         var keys = this.SelectedItems.Select(x =>
@@ -181,14 +196,39 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     private string CurrentFilter = string.Empty;
 
     private string _FilterText = string.Empty;
+
+    private Timer filterTimer;
+    
     private string FilterText
     {
         get => _FilterText;
         set
         {
+            if (_FilterText?.EmptyAsNull() == value?.EmptyAsNull())
+                return;
             _FilterText = value ?? string.Empty;
-            FilterData();
+            // debounce the filter so if the user is still typing we only filter when they have finished
+            DisposeFilterTimer();
+            filterTimer = new(300);
+            filterTimer.Elapsed += FilterTimerOnElapsed;
+            filterTimer.Enabled = true;
+            filterTimer.Start();
         }
+    }
+
+    private async void FilterTimerOnElapsed(object sender, ElapsedEventArgs e)
+    {
+        DisposeFilterTimer();
+        await FilterData();
+    }
+
+    private void DisposeFilterTimer()
+    {
+        if (filterTimer == null)
+            return;
+        filterTimer.Elapsed -= FilterTimerOnElapsed;
+        filterTimer.Dispose();
+        filterTimer = null;
     }
 
     /// <summary>
@@ -326,7 +366,7 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
         }
     }
 
-    private void FilterData(bool clearSelected = true)
+    async Task FilterData(bool clearSelected = true)
     {
         if (clearSelected && this.SelectedItems.Any())
         {
@@ -334,6 +374,16 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
             this.NotifySelectionChanged();
         }
         string filter = this.FilterText.ToLowerExplicit();
+        var filterEvent = new FilterEventArgs
+        {
+            Text = filter,
+            FlowTable = this,
+            HasPager = this.PagerVisible
+        };
+        await this.OnFilter.InvokeAsync(filterEvent);
+        if (filterEvent.Handled)
+            return;
+        
         if (string.IsNullOrWhiteSpace(filter))
             this.DisplayData = this.DataDictionary;
         else if (filter.StartsWith(CurrentFilter))
@@ -348,6 +398,7 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
                                    .ToDictionary(x => x.Key, x => x.Value);
         }
         CurrentFilter = filter;
+        await InvokeAsync(this.StateHasChanged);
     }
 
     private async Task OnClick(MouseEventArgs e, TItem item)
@@ -481,4 +532,31 @@ public enum SelectionMode
     None,
     Single,
     Multiple
+}
+
+/// <summary>
+/// Arguments for filter event
+/// </summary>
+public class FilterEventArgs
+{
+    /// <summary>
+    /// Gets or sets if this event has been handled
+    /// </summary>
+    public bool Handled { get; set; }
+
+
+    /// <summary>
+    /// Gets the flow table
+    /// </summary>
+    public FlowTableBase FlowTable { get; init; }
+
+    /// <summary>
+    /// Gets if there is a pager
+    /// </summary>
+    public bool HasPager { get; init; }
+
+    /// <summary>
+    /// Gets the filter text
+    /// </summary>
+    public string Text { get; init; }
 }

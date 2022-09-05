@@ -69,6 +69,12 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
 
     private SemaphoreSlim fetching = new(1);
 
+    /// <summary>
+    /// Sets the table data, virtual so a filter can be set if needed
+    /// </summary>
+    /// <param name="data">the data to set</param>
+    protected virtual void SetTableData(List<T> data) => Table.SetData(data);
+
     public virtual async Task Load(U selectedUid)
     {
         Blocker.Show("Loading Data");
@@ -82,7 +88,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
                 this.Data = result.Data;
                 if (Table != null)
                 {
-                    Table.SetData(this.Data);
+                    SetTableData(this.Data);
                     var item = this.Data.Where(x => x.Uid.Equals(selectedUid)).FirstOrDefault();
                     if (item != null)
                     {

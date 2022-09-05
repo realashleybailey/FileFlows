@@ -8,6 +8,8 @@ namespace FileFlows.Client.Pages;
 
 public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 {
+    private string filter = string.Empty;
+    private FileStatus? filterStatus;
     public override string ApiUrl => "/api/library-file";
     [Inject] private INavigationService NavigationService { get; set; }
     [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
@@ -47,7 +49,8 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         this.StateHasChanged();
     }
 
-    public override string FetchUrl => $"{ApiUrl}/list-all?status={SelectedStatus}&page={PageIndex}&pageSize={App.PageSize}";
+    public override string FetchUrl => $"{ApiUrl}/list-all?status={SelectedStatus}&page={PageIndex}&pageSize={App.PageSize}" +
+                                       $"&filter={Uri.EscapeDataString(filterStatus == SelectedStatus ? filter ?? string.Empty : string.Empty)}";
 
     private string NameMinWidth = "20ch";
 
@@ -259,6 +262,37 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     {
         this.PageIndex = 0;
         await this.Refresh();
+    }
+
+    private async Task OnFilter(FilterEventArgs args)
+    {
+        if (this.filter?.EmptyAsNull() == args.Text?.EmptyAsNull())
+        {
+            this.filter = string.Empty;
+            this.filterStatus = null;
+            return;
+        }
+
+        if (args.HasPager == false)
+            return;
+        this.filterStatus = this.SelectedStatus;
+        // need to filter on the server side
+        args.Handled = true;
+        this.filter = args.Text;
+        await this.Refresh();
+        this.filter = args.Text; // ensures refresh didnt change the filter
+    }
+
+    /// <summary>
+    /// Sets the table data, virtual so a filter can be set if needed
+    /// </summary>
+    /// <param name="data">the data to set</param>
+    protected override void SetTableData(List<LibaryFileListModel> data)
+    {
+        if(string.IsNullOrWhiteSpace(this.filter) || SelectedStatus  != filterStatus)
+            Table.SetData(data);
+        else
+            Table.SetData(data, filter: this.filter); 
     }
 
     private async Task Rescan()

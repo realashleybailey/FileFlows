@@ -146,7 +146,7 @@
                     </Virtualize>
             }
         </ContextMenuTrigger>
-        @if (ShowPager && TotalItems > Math.Min(250, App.PageSize))
+        @if (PagerVisible)
         {
             <CascadingValue Value="this" IsFixed="true">
                 <FlowPager TItem="TItem" />

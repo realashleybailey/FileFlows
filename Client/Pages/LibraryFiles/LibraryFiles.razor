@@ -27,6 +27,7 @@
 <FlowTable @ref="Table" Data="@Data" TItem="LibaryFileListModel" Selection="SelectionMode.Multiple"
            TableIdentifier=@TableIdentifier DoubleClick="@OnDoubleClick" MinWidth="@NameMinWidth"
            ShowPager=@true TotalItems=@TotalItems OnPageChange=@PageChange OnPageSizeChange=@PageSizeChange
+           OnFilter="OnFilter"
            >
     <ToolBar>
         <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />

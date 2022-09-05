@@ -192,10 +192,17 @@ public class Program
                 }
                 #endif
 
+                FlowDbConnection.Initialize(true);
                 Logger.Instance.WLog("No longer licensed for external database, migrating to SQLite database.");
                 AppSettings.Instance.DatabaseMigrateConnection = SqliteDbManager.GetDefaultConnectionString();
             }
+            else
+            {
+                FlowDbConnection.Initialize(false);
+            }
         }
+        else
+            FlowDbConnection.Initialize(true); 
         
         if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
         {

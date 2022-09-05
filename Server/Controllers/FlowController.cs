@@ -20,6 +20,8 @@ public class FlowController : ControllerStore<Flow>
 {
     const int DEFAULT_XPOS = 450;
     const int DEFAULT_YPOS = 50;
+    
+    protected override bool AutoIncrementRevision => true; 
 
     private static bool? _HasFlows;
     /// <summary>
@@ -555,6 +557,8 @@ public class FlowController : ControllerStore<Flow>
         var result = await Update(model);
         if(nameChanged)
             _ = new ObjectReferenceUpdater().RunAsync();
+
+        IncrementConfigurationRevision();
         return result;
     }
 

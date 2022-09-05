@@ -335,8 +335,12 @@ public partial class LibraryFileService : ILibraryFileService
             if ((int)status > 0)
             {
                 // the status in the db is correct and not a computed status
+                string orderBy = "";
+                if (status is FileStatus.Processed or FileStatus.ProcessingFailed)
+                    orderBy = "ProcessingEnded desc,";
+
                 string sqlStatus =
-                    SqlHelper.Skip($"select * from LibraryFile where Status = {(int)status} order by DateModified desc",
+                    SqlHelper.Skip($"select * from LibraryFile where Status = {(int)status} order by {orderBy}DateModified desc",
                         skip, rows);
                 return await Database_Fetch<LibraryFile>(sqlStatus);
             }

@@ -217,6 +217,9 @@ public class PluginController : ControllerStore<PluginInfo>
 
             updated |= success;
         }
+        if(updated)
+            IncrementConfigurationRevision();
+        
         return updated;
     }
 
@@ -239,6 +242,7 @@ public class PluginController : ControllerStore<PluginInfo>
             PluginScanner.Delete(item.PackageName);
         }
 
+        IncrementConfigurationRevision();
     }
 
     /// <summary>
@@ -253,23 +257,29 @@ public class PluginController : ControllerStore<PluginInfo>
             return; // nothing to delete
 
         var pluginDownloader = new PluginDownloader(GetRepositories());
+        bool downloaded = false;
         foreach(var package in model.Packages)
         {
             try
             {
                 var dlResult = pluginDownloader.Download(package);
                 if (dlResult.Success)
+                {
                     PluginScanner.UpdatePlugin(package, dlResult.Data);
+                    downloaded = true;
+                }
             }
             catch (Exception ex)
             { 
                 Logger.Instance?.ELog($"Failed downloading plugin package: '{package}' => {ex.Message}");
             }
         }
+        if(downloaded)
+            IncrementConfigurationRevision();
     }
 
     /// <summary>
-    /// Download the plugin ffplugin file .  Only intended to be used by the FlowRunnner
+    /// Download the plugin ffplugin file.  Only intended to be used by the FlowRunner
     /// </summary>
     /// <param name="package">The plugin package name to download</param>
     /// <returns>A download stream of the ffplugin file</returns>
@@ -426,6 +436,8 @@ public class PluginController : ControllerStore<PluginInfo>
         obj.Name = "PluginSettings_" + packageName;
         obj.Json = json ?? String.Empty;
         await DbHelper.Update(obj);
+        
+        IncrementConfigurationRevision();
     }
 
     /// <summary>

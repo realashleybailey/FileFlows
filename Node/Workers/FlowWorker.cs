@@ -7,6 +7,7 @@ using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
+using Jint.Native.Json;
 
 namespace FileFlows.Node.Workers;
 
@@ -22,6 +23,11 @@ public class FlowWorker : Worker
     /// not match the UI of an executor in the UI
     /// </summary>
     public readonly Guid Uid = Guid.NewGuid();
+
+    /// <summary>
+    /// The current configuration
+    /// </summary>
+    internal static int CurrentConfigurationRevision { get; private set; } = -1;
 
     /// <summary>
     /// The instance of the flow worker 
@@ -70,7 +76,6 @@ public class FlowWorker : Worker
     /// </summary>
     public static bool HasActiveRunners => Instance?.ExecutingRunners?.Any() == true;
 
-
     /// <summary>
     /// Executes the flow worker and start a flow runner if required
     /// </summary>
@@ -78,7 +83,7 @@ public class FlowWorker : Worker
     {
         if (UpdaterWorker.UpdatePending)
             return;
-        
+
         if (IsEnabledCheck?.Invoke() == false)
             return;
         var nodeService = NodeService.Load();
@@ -105,6 +110,9 @@ public class FlowWorker : Worker
             Logger.Instance?.DLog($"Node not found");
             return;
         }
+
+        if (UpdateConfiguration().Result == false)
+            return;
 
         var settingsService = SettingsService.Load();
         var ffStatus = settingsService.GetFileFlowsStatus().Result;
@@ -187,6 +195,8 @@ public class FlowWorker : Worker
                     libFile.Uid.ToString(),
                     "--tempPath",
                     tempPath,
+                    "--cfgPath",
+                    GetConfigurationDirectory(),
                     "--baseUrl",
                     Service.ServiceBaseUrl,
                     isServer ? null : "--hostname",
@@ -196,7 +206,16 @@ public class FlowWorker : Worker
 #pragma warning restore CS8601 // Possible null reference assignment.
 
 #if (DEBUG)
-                FileFlows.FlowRunner.Program.Main(parameters);
+                try
+                {
+                    FileFlows.FlowRunner.Program.Main(parameters);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance?.ELog("Error executing runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    libFile.Status = FileStatus.ProcessingFailed;
+                    libFileService.Update(libFile);
+                }
 #else
                 using (Process process = new Process())
                 {
@@ -415,4 +434,117 @@ public class FlowWorker : Worker
         }
         return Dotnet;
     }
+
+    private string GetConfigurationDirectory(int? configVersion = null) =>
+        Path.Combine(DirectoryHelper.ConfigDirectory, (configVersion ?? CurrentConfigurationRevision).ToString());
+    
+    /// <summary>
+    /// Ensures the local configuration is current with the server
+    /// </summary>
+    /// <returns>an awaited task</returns>
+    private async Task<bool> UpdateConfiguration()
+    {
+        var service = new SettingsService();
+        int revision = await service.GetCurrentConfigurationRevision();
+        if (revision == -1)
+        {
+            Logger.Instance.ELog("Failed to get current configuration revision from server");
+            return false;
+        }
+
+        if (revision == CurrentConfigurationRevision)
+            return true;
+
+        var config = await service.GetCurrentConfiguration();
+        if (config == null)
+        {
+            Logger.Instance.ELog("Failed downloading latest configuration from server");
+            return false;
+        }
+
+        string dir = GetConfigurationDirectory(revision);
+        try
+        {
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, true);
+            
+            Directory.CreateDirectory(dir);
+            Directory.CreateDirectory(Path.Combine(dir, "Scripts"));
+            Directory.CreateDirectory(Path.Combine(dir, "Scripts", "Shared"));
+            Directory.CreateDirectory(Path.Combine(dir, "Scripts", "Flow"));
+            Directory.CreateDirectory(Path.Combine(dir, "Scripts", "System"));
+            Directory.CreateDirectory(Path.Combine(dir, "Plugins"));
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog($"Failed recreating configuration directory '{dir}': {ex.Message}");
+            return false;
+        }
+
+        foreach (var script in config.FlowScripts)
+            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "Flow", script.Name), script.Code);
+        foreach (var script in config.SystemScripts)
+            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "System", script.Name), script.Code);
+        foreach (var script in config.SharedScripts)
+            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "Shared", script.Name), script.Code);
+        
+
+        bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        bool is64bit = IntPtr.Size == 8;
+        foreach (var plugin in config.Plugins ?? new Dictionary<string, byte[]>())
+        {
+            var zip = Path.Combine(dir, plugin.Key + ".zip");
+            await System.IO.File.WriteAllBytesAsync(zip, plugin.Value);
+            string destDir = Path.Combine(dir, "Plugins", plugin.Key);
+            Directory.CreateDirectory(destDir);
+            System.IO.Compression.ZipFile.ExtractToDirectory(zip, destDir);
+            System.IO.File.Delete(zip);
+            
+            
+
+            // check if there are runtime specific files that need to be moved
+            foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
+            {
+                var runtimeDir = new DirectoryInfo(Path.Combine(destDir, "runtimes", rdir));
+                Logger.Instance?.ILog("Searching for runtime directory: " + runtimeDir.FullName);
+                if (runtimeDir.Exists)
+                {
+                    foreach (var rfile in runtimeDir.GetFiles("*.*", SearchOption.AllDirectories))
+                    {
+                        try
+                        {
+                            if (Regex.IsMatch(rfile.Name, @"\.(dll|so)$") == false)
+                                continue;
+
+                            Logger.Instance?.ILog("Trying to move file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
+                            rfile.MoveTo(Path.Combine(destDir, rfile.Name));
+                            Logger.Instance?.ILog("Moved file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Instance?.ILog("Failed to move file: " + ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+
+        string json = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            config.Revision,
+            config.Variables,
+            config.Libraries,
+            config.Flows,
+            config.FlowScripts,
+            config.SharedScripts,
+            config.SystemScripts
+        });
+        await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "config.json"), json);
+        CurrentConfigurationRevision = revision;
+
+        return true;
+
+    }
+
 }

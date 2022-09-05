@@ -110,7 +110,14 @@ public class NodeManager
             }
         };
         
-        WorkerManager.StartWorkers(flowWorker, updater, new LogFileCleaner(), new TempFileCleaner(AppSettings.Instance.HostName), new SystemStatisticsWorker());
+        WorkerManager.StartWorkers(
+            flowWorker, 
+            updater, 
+            new LogFileCleaner(),
+            new TempFileCleaner(AppSettings.Instance.HostName), 
+            new SystemStatisticsWorker(),
+            new ConfigCleaner()
+        );
     }
 
     

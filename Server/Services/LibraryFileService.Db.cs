@@ -66,11 +66,12 @@ public partial class LibraryFileService
     private async Task Database_Execute(string sql, params object[] args)
     {
         DateTime dt = DateTime.Now;
+        int effected;
         using (var db = await GetDbWithMappings())
         {
-            await db.Db.ExecuteAsync(sql, args);
+            effected = await db.Db.ExecuteAsync(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute [{effected}]: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
     }
     private async Task<T> Database_ExecuteScalar<T>(string sql, params object[] args)
     {

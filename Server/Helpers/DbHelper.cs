@@ -3,7 +3,6 @@ using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
-using Jint.Native.Symbol;
 using NPoco;
 
 namespace FileFlows.Server.Helpers;

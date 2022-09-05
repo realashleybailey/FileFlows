@@ -59,7 +59,7 @@ public class RevisionController:Controller
             return null;
         var manager = DbHelper.GetDbManager();
         using var db = await manager.GetDb();
-        var data = await db.Db.SingleAsync<RevisionedObject>("select * from RevisionedObject where RevisionUid = @0 and Uid = @1", uid, revisionUid);
+        var data = await db.Db.SingleOrDefaultAsync<RevisionedObject>("select * from RevisionedObject where RevisionUid = @0 and Uid = @1", uid, revisionUid);
         return data;
     }
 

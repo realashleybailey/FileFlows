@@ -1,11 +1,9 @@
-using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
-using FileFlows.Shared;
 using FileFlows.Shared.Attributes;
 using FileFlows.Shared.Models;
 using NPoco;
@@ -574,7 +572,7 @@ public abstract class DbManager
             if (obj.DateCreated != dbObject.DateCreated && obj.DateCreated > new DateTime(2020, 1, 1))
                 dbObject.DateCreated = obj.DateCreated; // OnHeld moving to process now can change this date
             dbObject.Data = json;
-            await db.UpdateAsync(dbObject);
+            await db.UpdateAsync(dbObject); 
         }
 
         if (changed && (
@@ -583,10 +581,20 @@ public abstract class DbManager
                 dbObject.Type == typeof(PluginSettingsModel).FullName ||
                 dbObject.Type == typeof(Dashboard).FullName
             ))
-            await RevisionController.SaveRevision(dbObject);
+        {
+            // can't await this, this would lock the database on Sqlite since we only allow a single connection
+            // to Sqlite at a time, and that connection is already being used
+            _ = RevisionController.SaveRevision(dbObject);
+        }
 
         if (UseMemoryCache == false)
-            return await Single<T>(dbObject.Uid); //return await Single<T>(Guid.Parse(dbObject.Uid));
+        {
+            dbObject = await db.FirstOrDefaultAsync<DbObject>("where Type=@0 and Uid=@1", typeof(T).FullName, dbObject.Uid);
+            
+            if (string.IsNullOrEmpty(dbObject?.Data))
+                return new T();
+            return Convert<T>(dbObject);
+        }
 
         return obj;
     }

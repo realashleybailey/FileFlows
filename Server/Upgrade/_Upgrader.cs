@@ -62,6 +62,8 @@ public class Upgrader
         if (settings.Version != Globals.Version.ToString())
         {
             settings.Version = Globals.Version.ToString();
+            // always increase the revision when the version changes
+            settings.Revision += 1;
             DbHelper.Update(settings).Wait();
         }
     }

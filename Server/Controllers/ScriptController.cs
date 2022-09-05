@@ -320,9 +320,19 @@ public class ScriptController : Controller
             script.Uid = script.Name;
         }
 
+        IncrementConfigurationRevision();
+
         return script;
     }
 
+    /// <summary>
+    /// Increments the revision of the configuration
+    /// </summary>
+    protected void IncrementConfigurationRevision()
+    {
+        var service = new SettingsService();
+        _ = service.RevisionIncrement();
+    }
     private async Task UpdateScriptReferences(string oldName, string newName)
     {
         var controller = new FlowController();
@@ -382,6 +392,7 @@ public class ScriptController : Controller
                 Logger.Instance.ELog($"Failed to delete script '{m}': {ex.Message}");
             }
         }
+        IncrementConfigurationRevision();
     }
 
     private bool DeleteScript(string script, ScriptType type)

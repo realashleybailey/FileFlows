@@ -1,3 +1,6 @@
+using FileFlows.Plugin;
+using FileFlows.ServerShared.Models;
+
 namespace FileFlows.Server.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -273,6 +276,47 @@ public class SettingsController : Controller
             return ServerUpdater.Instance.RunCheck();
         });
         await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Gets the current configuration revision
+    /// </summary>
+    /// <returns>the current revision</returns>
+    [HttpGet("current-config/revision")]
+    public int GetCurrentConfigRevision() => Instance.Revision;
+    
+    /// <summary>
+    /// Loads the current configuration
+    /// </summary>
+    /// <returns>the current configuration</returns>
+    [HttpGet("current-config")]
+    public async Task<ConfigurationRevision> GetCurrentConfig()
+    {
+        var cfg = new ConfigurationRevision();
+        cfg.Revision = Instance.Revision;
+        var scriptController = new ScriptController();
+        cfg.FlowScripts = (await scriptController.GetAllByType(ScriptType.Flow)).ToList();
+        cfg.SystemScripts = (await scriptController.GetAllByType(ScriptType.System)).ToList();
+        cfg.SharedScripts = (await scriptController.GetAllByType(ScriptType.Shared)).ToList();
+        cfg.Variables = (await new VariableController().GetAll()).ToDictionary(x => x.Name, x => x.Value);
+        cfg.Flows = (await new FlowController().GetAll()).ToList();
+        cfg.Libraries = (await new LibraryController().GetAll()).ToList();
+        string sqlPluginSettings = "select Name, " +
+                                   SqlHelper.JsonValue("Data", "Json") +
+                                   " from DbObject where Type = 'FileFlows.Server.Models.PluginSettingsModel'";
+        cfg.PluginSettings = (await DbHelper.GetDbManager()
+                .Fetch<(string Name, string Json)>(sqlPluginSettings))
+                .ToDictionary(x => x.Name, x => x.Json);
+
+        var plugins = new Dictionary<string, byte[]>();
+        foreach (var file in new DirectoryInfo(DirectoryHelper.PluginsDirectory).GetFiles("*.ffplugin"))
+        {
+            plugins.Add(file.Name, System.IO.File.ReadAllBytes(file.FullName));
+        }
+
+        cfg.Plugins = plugins;
+        
+        return cfg;
     }
 }
 

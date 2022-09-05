@@ -1,4 +1,7 @@
-﻿namespace FileFlows.Server.Services;
+﻿using FileFlows.Server.Helpers;
+using FileFlows.ServerShared.Models;
+
+namespace FileFlows.Server.Services;
 
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Services;
@@ -23,4 +26,30 @@ public class SettingsService : ISettingsService
     /// <returns>the file flows status</returns>
     public Task<FileFlowsStatus> GetFileFlowsStatus() =>
         Task.FromResult(new SettingsController().GetFileFlowsStatus());
+
+
+    /// <summary>
+    /// Gets the current configuration revision number
+    /// </summary>
+    /// <returns>the current configuration revision number</returns>
+    public Task<int> GetCurrentConfigurationRevision()
+        => Task.FromResult(new SettingsController().GetCurrentConfigRevision());
+
+    /// <summary>
+    /// Gets the current configuration revision
+    /// </summary>
+    /// <returns>the current configuration revision</returns>
+    public Task<ConfigurationRevision> GetCurrentConfiguration()
+        => new SettingsController().GetCurrentConfig();
+    
+    /// <summary>
+    /// Increments the revision
+    /// </summary>
+    public async Task RevisionIncrement()
+    {
+        var controller = new SettingsController();
+        var settings = await controller.Get();
+        settings.Revision += 1;
+        await DbHelper.Update(settings);
+    }
 }

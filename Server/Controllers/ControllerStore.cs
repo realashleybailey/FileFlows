@@ -163,18 +163,8 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
             if(await NameInUse(model.Uid, model.Name))
                 throw new Exception("ErrorMessages.NameInUse");
         }
-        Logger.Instance.ILog("Updating: " + model.GetType().FullName + " = " + model.Uid);
-        T updated = null;
-        try
-        {
-            updated = await DbHelper.Update(model);
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.ELog("Failed to update: " +ex.Message +"\n" + ex.StackTrace);
-        }
-
-        Logger.Instance.ILog("Updated: " + model.GetType().FullName + " = " + model.Uid);
+        
+        var updated = await DbHelper.Update(model);
         
         if (useCache == null)
             useCache = DbHelper.UseMemoryCache;

@@ -38,7 +38,6 @@ public class FlowDbConnection:IDisposable
     /// <returns>the database connection</returns>
     public static async Task<FlowDbConnection> Get(Func<NPoco.Database> instanceCreator)
     {
-        string stack = Environment.StackTrace;
         DateTime dt = DateTime.Now;
         await semaphore.WaitAsync();
         var timeWaited = DateTime.Now.Subtract(dt);
@@ -47,14 +46,12 @@ public class FlowDbConnection:IDisposable
             await FlowDatabase.Logger.Log(LogType.Info, "Time waited for connection: " + timeWaited);
         }
         var db = new FlowDbConnection();
-        Logger.Instance.DLog("Requesting database [" + db.GetHashCode() + "]: " + stack);
         db.Db = instanceCreator();
         return db;
     }
 
     public void Dispose()
     {
-        Logger.Instance.DLog("Releasing database [" + this.GetHashCode() + "]: " + Environment.StackTrace);
         if (Db != null)
         {
             Db.Dispose();

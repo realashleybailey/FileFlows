@@ -22,7 +22,7 @@ public partial class LibraryFileService
         " else 1000000 end, JSON_EXTRACT(obj.Data, '$.Priority') desc, LibraryFile.DateModified desc";
 
     private const string LIBRARY_JOIN =
-        " inner join DbObject obj on Type = 'FileFlows.Shared.Models.Library' and LibraryUid = obj.Uid ";
+        " left join DbObject obj on Type = 'FileFlows.Shared.Models.Library' and LibraryUid = obj.Uid ";
 
     
     private async Task<FlowDbConnection> GetDbWithMappings()

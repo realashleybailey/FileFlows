@@ -532,7 +532,7 @@ public class NodeParameters
             if (destFileInfo.Exists)
                 currentSize = destFileInfo.Length;
 
-            if (PartPercentageUpdate != null)
+            if (PartPercentageUpdate != null && fileSize > 0)
                 PartPercentageUpdate(currentSize / fileSize * 100);
             Thread.Sleep(50);
         }
@@ -652,7 +652,7 @@ public class NodeParameters
             if (destFileInfo.Exists)
                 currentSize = destFileInfo.Length;
 
-            if (PartPercentageUpdate != null)
+            if (PartPercentageUpdate != null && fileSize > 0)
                 PartPercentageUpdate(currentSize / fileSize * 100);
             Thread.Sleep(50);
         }

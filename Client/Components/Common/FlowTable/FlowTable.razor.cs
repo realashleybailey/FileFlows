@@ -251,6 +251,11 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     /// </summary>
     [Inject] IJSRuntime jsRuntime{ get; set; }
     [Inject] IHotKeysService HotKeyService { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the pager
+    /// </summary>
+    public FlowPager<TItem> Pager { get; set; }
 
     List<FlowTableColumn<TItem>> ColumnList = new ();
 
@@ -378,12 +383,18 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
         {
             Text = filter,
             FlowTable = this,
+            PageIndex = this.Pager?.PageIndex ?? -1,
+            PageSize = App.PageSize,
             HasPager = this.PagerVisible
         };
         await this.OnFilter.InvokeAsync(filterEvent);
         if (filterEvent.Handled)
+        {
+            if (filterEvent.PageIndex != -1 && filterEvent.PageIndex != this.Pager.PageIndex)
+                this.Pager.PageIndex = filterEvent.PageIndex;
             return;
-        
+        }
+
         if (string.IsNullOrWhiteSpace(filter))
             this.DisplayData = this.DataDictionary;
         else if (filter.StartsWith(CurrentFilter))
@@ -544,6 +555,10 @@ public class FilterEventArgs
     /// </summary>
     public bool Handled { get; set; }
 
+    /// <summary>
+    /// Gets or sets the page index
+    /// </summary>
+    public int PageIndex { get; set; }
 
     /// <summary>
     /// Gets the flow table
@@ -554,6 +569,11 @@ public class FilterEventArgs
     /// Gets if there is a pager
     /// </summary>
     public bool HasPager { get; init; }
+
+    /// <summary>
+    /// Gets or sets the number of items per page
+    /// </summary>
+    public int PageSize { get; init; }
 
     /// <summary>
     /// Gets the filter text

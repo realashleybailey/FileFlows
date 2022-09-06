@@ -20,4 +20,9 @@ public class RequestResult<T>
     /// Gets or sets the parsed response object 
     /// </summary>
     public T Data { get; set; }
+    
+    /// <summary>
+    /// Gets or sets any custom headers returned
+    /// </summary>
+    public Dictionary<string, string> Headers { get; set; }
 }

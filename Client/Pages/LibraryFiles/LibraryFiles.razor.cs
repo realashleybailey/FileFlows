@@ -13,7 +13,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     public override string ApiUrl => "/api/library-file";
     [Inject] private INavigationService NavigationService { get; set; }
     [Inject] private Blazored.LocalStorage.ILocalStorageService LocalStorage { get; set; }
-
+    
     [Inject] private IJSRuntime jsRuntime { get; set; }
 
     private FlowSkyBox<FileStatus> Skybox;
@@ -61,7 +61,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         else
             this.NameMinWidth = this.Data?.Any() == true ? Math.Min(120, Math.Max(20, this.Data.Max(x => (x.Name?.Length) ?? 0))) + "ch" : "20ch";
         Logger.Instance.ILog("PostLoad: " + this.Data.Count);
-        CheckPager();
         await jsRuntime.InvokeVoidAsync("ff.scrollTableToTop");
     }
 
@@ -142,7 +141,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
 
         Skybox.SetItems(sbItems, SelectedStatus);
         this.Count = sbItems.Where(x => x.Value == SelectedStatus).Select(x => x.Count).FirstOrDefault();
-        CheckPager();
         this.StateHasChanged();
     }
 
@@ -230,6 +228,18 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         }
 
         RefreshStatus(request.Data?.Status?.ToList() ?? new List<LibraryStatus>());
+
+        if (request.Headers.ContainsKey("x-total-items") &&
+            int.TryParse(request.Headers["x-total-items"], out int totalItems))
+        {
+            Logger.Instance.ILog("### Total items from header: " + totalItems);
+            this.TotalItems = totalItems;
+        }
+        else
+        {
+            var status = Skybox.SelectedItem;
+            this.TotalItems = status?.Count ?? 0;
+        }
         
         var result = new RequestResult<List<LibaryFileListModel>>
         {
@@ -239,17 +249,6 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         };
         Logger.Instance.ILog("FetchData: " + result.Data.Count);
         return result;
-    }
-
-    /// <summary>
-    /// Checks if the pager should be visible on the amount of data
-    /// </summary>
-    private void CheckPager()
-    {
-        var status = Skybox.SelectedItem;
-        this.TotalItems = status?.Count ?? 0;
-        Logger.Instance.ILog("TotalItems: " + TotalItems);
-        this.StateHasChanged();
     }
 
     private async Task PageChange(int index)
@@ -273,11 +272,14 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             return;
         }
 
-        if (args.HasPager == false)
+        int totalItems = Skybox.SelectedItem.Count;
+        if (totalItems <= args.PageSize)
             return;
         this.filterStatus = this.SelectedStatus;
         // need to filter on the server side
         args.Handled = true;
+        args.PageIndex = 0;
+        this.PageIndex = 0;
         this.filter = args.Text;
         await this.Refresh();
         this.filter = args.Text; // ensures refresh didnt change the filter

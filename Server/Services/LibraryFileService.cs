@@ -404,6 +404,73 @@ public partial class LibraryFileService : ILibraryFileService
     }
 
     /// <summary>
+    /// Gets the total items matching the filter
+    /// </summary>
+    /// <param name="status">the status</param>
+    /// <param name="filter">the filter</param>
+    /// <returns>the total number of items matching</returns>
+    public async Task<int> GetTotalMatchingItems(FileStatus status, string filter)
+    {
+        try
+        {
+            string filterWhere = $"lower(name) like lower('%{filter.Replace("'", "''").Replace(" ", "%")}%')" ;
+            if(status == null)
+            {
+                return await Database_ExecuteScalar<int>("select count(Uid) from LibraryFile where " + filterWhere);
+            }
+            if ((int)status > 0)
+            {
+                return await Database_ExecuteScalar<int>($"select count(Uid) from LibraryFile where Status = {(int)status} and {filterWhere}");
+            }
+            
+            var libraries = await new LibraryController().GetAll();
+            var disabled = string.Join(", ",
+                libraries.Where(x => x.Enabled == false).Select(x => "'" + x.Uid + "'"));
+            int quarter = TimeHelper.GetCurrentQuarter();
+            var outOfSchedule = string.Join(", ",
+                libraries.Where(x => x.Schedule?.Length != 672 || x.Schedule[quarter] == '0').Select(x => "'" + x.Uid + "'"));
+
+            string sql = $"select count(LibraryFile.Uid) from LibraryFile where Status = {(int)FileStatus.Unprocessed} and " + filterWhere;
+            
+            // add disabled condition
+            if(string.IsNullOrEmpty(disabled) == false)
+                sql += $" and LibraryUid {(status == FileStatus.Disabled ? "" : "not")} in ({disabled})";
+            
+            if (status == FileStatus.Disabled)
+            {
+                if (string.IsNullOrEmpty(disabled))
+                    return 0;
+                return await Database_ExecuteScalar<int>(sql);
+            }
+            
+            // add out of schedule condition
+            if(string.IsNullOrEmpty(outOfSchedule) == false)
+                sql += $" and LibraryUid {(status == FileStatus.OutOfSchedule ? "" : "not")} in ({outOfSchedule})";
+            
+            if (status == FileStatus.OutOfSchedule)
+            {
+                if (string.IsNullOrEmpty(outOfSchedule))
+                    return 0; // no out of schedule libraries
+                
+                return await Database_ExecuteScalar<int>(sql);
+            }
+            
+            // add on hold condition
+            sql += $" and HoldUntil {(status == FileStatus.OnHold ? ">" : "<=")} " + SqlHelper.Now();
+            if (status == FileStatus.OnHold)
+                return await Database_ExecuteScalar<int>(sql);
+
+            sql = sql.Replace(" from LibraryFile", " from LibraryFile  " + LIBRARY_JOIN);
+            return await Database_ExecuteScalar<int>(sql);
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Failed GetTotalMatchingItems Files: " + ex.Message + "\n" + ex.StackTrace);
+            return 0;
+        }
+    }
+
+    /// <summary>
     /// Reset processing for the files
     /// </summary>
     /// <param name="uids">a list of UIDs to reprocess</param>

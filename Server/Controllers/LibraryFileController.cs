@@ -49,6 +49,12 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         var taskStatus = service.GetStatus();
         var taskLibraries = DbHelper.Select<Library>();
         var taskFiles = service.GetAll(status, page * pageSize, pageSize, filter);
+        if (string.IsNullOrWhiteSpace(filter) == false)
+        {
+            // need to get total number of items matching filter aswell
+            int total = await service.GetTotalMatchingItems(status, filter);
+            HttpContext?.Response?.Headers?.TryAdd("x-total-items", total.ToString());
+        }
         await Task.WhenAll(taskStatus, taskLibraries, taskFiles);
         return new()
         {

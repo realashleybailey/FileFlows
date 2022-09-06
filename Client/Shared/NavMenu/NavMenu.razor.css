@@ -109,6 +109,12 @@
 .version-info {
   display: none;
 }
+.version-info a {
+  color: rgba(var(--color-rgb), 0.4) !important;
+}
+.version-info a:hover {
+  color: var(--accent);
+}
 
 @media (min-width: 850px) {
   .navbar-toggler {

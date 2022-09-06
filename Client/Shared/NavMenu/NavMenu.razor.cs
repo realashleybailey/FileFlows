@@ -31,7 +31,7 @@ public partial class NavMenu : IDisposable
 
     protected override void OnInitialized()
     {
-        lblVersion = Translater.Instant("Labels.VersionNumber", new { version = Globals.Version });
+        lblVersion = Translater.Instant("Labels.Version");
         lblHelp = Translater.Instant("Labels.Help");
         lblForum = Translater.Instant("Labels.Forum");
         lblDiscord = Translater.Instant("Labels.Discord");

@@ -209,7 +209,7 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
             _FilterText = value ?? string.Empty;
             // debounce the filter so if the user is still typing we only filter when they have finished
             DisposeFilterTimer();
-            filterTimer = new(300);
+            filterTimer = new(500);
             filterTimer.Elapsed += FilterTimerOnElapsed;
             filterTimer.Enabled = true;
             filterTimer.Start();

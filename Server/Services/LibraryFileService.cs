@@ -122,8 +122,14 @@ public partial class LibraryFileService : ILibraryFileService
         await GetNextSemaphore.WaitAsync();
         try
         {
+            var executing = WorkerController.ExecutingLibraryFiles();
+            var execAndWhere = executing?.Any() != true
+                ? string.Empty
+                : (" and Uid not in (" + string.Join(",", executing.Select(x => x.ToString())) + ") ");
+            
             string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
-                         $" and LibraryUid in ({libraryUids}) order by " + UNPROCESSED_ORDER_BY;
+                         $" and LibraryUid in ({libraryUids}) " + execAndWhere +
+                         " order by " + UNPROCESSED_ORDER_BY;
 
 
             var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
@@ -137,6 +143,7 @@ public partial class LibraryFileService : ILibraryFileService
                 // need to change the order up
                 bool orderGood = true;
                 sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
+                      execAndWhere +
                       $" and LibraryUid = '{library.Uid}' order by ";
                 if (library.ProcessingOrder == ProcessingOrder.Random)
                     sql += " " + SqlHelper.Random() + " ";

@@ -516,4 +516,12 @@ public class WorkerController : Controller
             }
         }
     }
+
+    /// <summary>
+    /// Get UIDs of executing library files
+    /// </summary>
+    /// <returns>UIDs of executing library files</returns>
+    internal static Guid[] ExecutingLibraryFiles()
+        => Executors?.Select(x => x.Value?.LibraryFile?.Uid)?.Where(x => x != null)?.Select(x => x.Value)?.ToArray() ??
+           new Guid[] { };
 }

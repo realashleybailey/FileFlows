@@ -301,7 +301,22 @@ public class FlowWorker : Worker
     private bool PreExecuteScriptTest(ProcessingNode node)
     {
         var scriptService  = ScriptService.Load();
-        string code = scriptService.GetCode(node.PreExecuteScript).Result;
+        string jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "System", node.PreExecuteScript + ".js");
+        if (File.Exists(jsFile) == false)
+        {
+            jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "Flow", node.PreExecuteScript + ".js");
+            if (File.Exists(jsFile) == false)
+            {
+                jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "Shared", node.PreExecuteScript + ".js");
+                if (File.Exists(jsFile) == false)
+                {
+                    Logger.Instance.ELog("Failed to locate pre-execute script: " + node.PreExecuteScript);
+                    return false;
+                }
+            }
+        }
+
+        string code = System.IO.File.ReadAllText(jsFile);
         if (string.IsNullOrWhiteSpace(code))
         {
             Logger.Instance.ELog("Failed to load pre-execute script code");
@@ -482,11 +497,11 @@ public class FlowWorker : Worker
         }
 
         foreach (var script in config.FlowScripts)
-            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "Flow", script.Name), script.Code);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "Flow", script.Name + ".js"), script.Code);
         foreach (var script in config.SystemScripts)
-            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "System", script.Name), script.Code);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "System", script.Name + ".js"), script.Code);
         foreach (var script in config.SharedScripts)
-            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "Shared", script.Name), script.Code);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "Scripts", "Shared", script.Name + ".js"), script.Code);
         
 
         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

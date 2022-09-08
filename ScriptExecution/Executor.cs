@@ -136,14 +136,6 @@ public class Executor
 
             var processExecutor = this.ProcessExecutor ?? new BasicProcessExecutor(Logger);
 
-            var sb = new StringBuilder();
-            var log = new
-            {
-                ILog = new LogDelegate(Logger.ILog),
-                DLog = new LogDelegate(Logger.DLog),
-                WLog = new LogDelegate(Logger.WLog),
-                ELog = new LogDelegate(Logger.ELog),
-            };
             var engine = new Engine(options =>
             {
                 options.AllowClr();
@@ -189,10 +181,18 @@ public class Executor
             {
                 if(result != null)
                 {
-                    int num = (int)result.AsNumber();
-
-                    Logger.ILog("Script result: " + num);
-                    return num;
+                    try
+                    {
+                        int num = (int)result.AsNumber();
+                        Logger.ILog("Script result: " + num);
+                        return num;
+                    }
+                    catch (Exception)
+                    {
+                        bool bResult = (bool)result.AsBoolean();
+                        Logger.ILog("Script result: " + bResult);
+                        return bResult;
+                    }
                 }
             }
             catch(Exception) { }
@@ -201,6 +201,10 @@ public class Executor
         }
         catch(JavaScriptException ex)
         {
+            if (ex.Message == "true")
+                return true;
+            if (int.TryParse(ex.Message, out int code))
+                return code;
             // print out the code block for debugging
             int lineNumber = 0;
             var lines = Code.Split('\n');

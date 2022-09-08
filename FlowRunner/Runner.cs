@@ -27,7 +27,7 @@ public class Runner
     private CancellationTokenSource CancellationToken = new CancellationTokenSource();
     private bool Canceled = false;
     private string WorkingDir;
-    private string ScriptDir, ScriptSharedDir, ScriptFlowDir;
+    //private string ScriptDir, ScriptSharedDir, ScriptFlowDir;
 
     /// <summary>
     /// Creates an instance of a Runner
@@ -281,7 +281,7 @@ public class Runner
         nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
         nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()
         {
-            SharedDirectory = ScriptSharedDir,
+            SharedDirectory = Path.Combine(Info.ConfigDirectory, "Scripts", "Shared"),
             FileFlowsUrl = Service.ServiceBaseUrl
         };
         foreach (var variable in Info.Config.Variables)
@@ -715,7 +715,7 @@ public class Runner
     {
         if (scriptName.EndsWith(".js") == false)
             scriptName += ".js";
-        var file = new FileInfo(Path.Combine(ScriptFlowDir, scriptName));
+        var file = new FileInfo(Path.Combine(Info.ConfigDirectory, "Scripts", "Flow", scriptName));
         if (file.Exists == false)
             return string.Empty;
         return File.ReadAllText(file.FullName);

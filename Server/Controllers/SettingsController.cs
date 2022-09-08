@@ -306,7 +306,8 @@ public class SettingsController : Controller
                                    " from DbObject where Type = 'FileFlows.Server.Models.PluginSettingsModel'";
         cfg.PluginSettings = (await DbHelper.GetDbManager()
                 .Fetch<(string Name, string Json)>(sqlPluginSettings))
-                .ToDictionary(x => x.Name, x => x.Json);
+                .DistinctBy(x => x.Name.Replace("PluginSettings_", string.Empty))
+                .ToDictionary(x => x.Name.Replace("PluginSettings_", string.Empty), x => x.Json);
 
         var plugins = new Dictionary<string, byte[]>();
         foreach (var file in new DirectoryInfo(DirectoryHelper.PluginsDirectory).GetFiles("*.ffplugin"))

@@ -550,6 +550,7 @@ public class FlowWorker : Worker
             config.Revision,
             config.Variables,
             config.Libraries,
+            config.PluginSettings,
             config.Flows,
             config.FlowScripts,
             config.SharedScripts,

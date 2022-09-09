@@ -3,6 +3,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Services;
+using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Json;
 using FileFlows.Shared.Models;
 
@@ -34,7 +35,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         _ = new NodeController().UpdateLastSeen(nodeUid);
         
-        if (Workers.ServerUpdater.UpdatePending)
+        if (UpdaterWorker.UpdatePending)
             return NextFileResult (NextLibraryFileStatus.UpdatePending); // if an update is pending, stop providing new files to process
 
         var settings = await new SettingsController().Get();

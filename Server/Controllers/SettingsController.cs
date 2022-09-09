@@ -301,14 +301,7 @@ public class SettingsController : Controller
         cfg.Variables = (await new VariableController().GetAll()).ToDictionary(x => x.Name, x => x.Value);
         cfg.Flows = (await new FlowController().GetAll()).ToList();
         cfg.Libraries = (await new LibraryController().GetAll()).ToList();
-        string sqlPluginSettings = "select Name, " +
-                                   SqlHelper.JsonValue("Data", "Json") +
-                                   " from DbObject where Type = 'FileFlows.Server.Models.PluginSettingsModel'";
-        cfg.PluginSettings = (await DbHelper.GetDbManager()
-                .Fetch<(string Name, string Json)>(sqlPluginSettings))
-                .DistinctBy(x => x.Name.Replace("PluginSettings_", string.Empty))
-                .ToDictionary(x => x.Name.Replace("PluginSettings_", string.Empty), x => x.Json);
-
+        cfg.PluginSettings = await new PluginController().GetAllPluginSettings();
         var plugins = new Dictionary<string, byte[]>();
         foreach (var file in new DirectoryInfo(DirectoryHelper.PluginsDirectory).GetFiles("*.ffplugin"))
         {

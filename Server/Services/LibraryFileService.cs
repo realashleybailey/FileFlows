@@ -529,7 +529,7 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="fingerprint">the fingerprint of the library file</param>
     /// <returns>the library file if it is known</returns>
     public async Task<LibraryFile> GetFileByFingerprint(string fingerprint)
-        => await Database_Get<LibraryFile>("select * from LibraryFile where fingerprint = @0", fingerprint);
+        => await Database_Get<LibraryFile>(SqlHelper.Limit("select * from LibraryFile where fingerprint = @0", 1), fingerprint);
 
     /// <summary>
     /// Gets a list of all filenames and the file creation times

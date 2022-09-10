@@ -38,7 +38,15 @@ public partial class LibraryFileService
         DateTime dt = DateTime.Now;
         using (var db = await GetDbWithMappings())
         {
-            result = await db.Db.SingleOrDefaultAsync<T>(sql, args);
+            try
+            {
+                result = await db.Db.SingleOrDefaultAsync<T>(sql, args);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog(("Failed getting SQL: " + sql));
+                return default;
+            }
         }
         Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to get: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;

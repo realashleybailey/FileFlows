@@ -126,7 +126,7 @@ public partial class LibraryFileService : ILibraryFileService
             var executing = WorkerController.ExecutingLibraryFiles();
             var execAndWhere = executing?.Any() != true
                 ? string.Empty
-                : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => x.ToString())) + ") ");
+                : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => "'" + x + "'")) + ") ");
             
             string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
                          $" and LibraryUid in ({libraryUids}) " + execAndWhere +

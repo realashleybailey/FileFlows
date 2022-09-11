@@ -106,13 +106,18 @@ public partial class CustomDashboard : IDisposable
         var result = await HttpHelper.Get<List<LibraryFile>>("/api/library-file/recently-finished");
         if (!result.Success || result.Data?.Any() != true)
             return new List<object>();
-        return result.Data.Select(x => (object)new
+        return result.Data.Select(x =>
         {
-            x.Uid,
-            x.RelativePath,
-            When = x.ProcessingEnded.ToUniversalTime().Humanize(),
-            x.OriginalSize,
-            x.FinalSize,
+            var utc = x.ProcessingEnded.ToUniversalTime();
+            var end = new DateTime(utc.Year, utc.Month, utc.Day, utc.Hour, utc.Minute, utc.Second);
+            return (object)new
+            {
+                x.Uid,
+                x.RelativePath,
+                When = end.Humanize(),
+                x.OriginalSize,
+                x.FinalSize,
+            };
         }).ToList();
     }
     

@@ -29,10 +29,10 @@
                 @Globals.lblName
             </Header>
             <Cell Context="item">
-                <span>@item.Name</span>
+                <span>@item.RelativePath</span>
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibraryFile" Width="10rem">
+        <FlowTableColumn TItem="LibraryFile" Width="10rem" MobileWidth="7rem">
             <Header>
                 Status
             </Header>
@@ -40,7 +40,7 @@
                 <span>@item.Status</span>
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0">
+        <FlowTableColumn TItem="LibraryFile" Width="12rem" MobileWidth="0" Hidden="App.Instance.IsMobile">
             <Header>
                 Library
             </Header>

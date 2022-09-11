@@ -75,7 +75,24 @@
             string hashcode = ".col-" + col.GetHashCode();
             <text>
             @hashcode { 
-                @if(string.IsNullOrEmpty(col.Width) == false)
+                @if (App.Instance.IsMobile && string.IsNullOrEmpty(col.MobileWidth) == false)
+                {
+                    if (col.MobileWidth == "0")
+                    {
+                        <text>
+                        display:none;
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                        min-width:@col.MobileWidth;
+                        max-width:@col.MobileWidth;
+                        width:@col.MobileWidth;
+                        </text>
+                    }
+                }
+                else if(string.IsNullOrEmpty(col.Width) == false)
                 {
                     <text>
                         min-width:@col.Width;

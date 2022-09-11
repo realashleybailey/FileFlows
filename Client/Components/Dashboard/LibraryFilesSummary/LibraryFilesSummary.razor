@@ -1,4 +1,5 @@
-﻿@namespace FileFlows.Client.Components.Dashboard
+﻿@using Humanizer
+@namespace FileFlows.Client.Components.Dashboard
 
 @if(Data != null && Data.Count > 0)
 {
@@ -21,7 +22,7 @@
                         <th>Name</th>
                         @if (Completed)
                         {
-                            <th style="width:6rem">Time</th>
+                            <th style="width:9rem">When</th>
                             <th style="width:6rem">Size</th>
                         }
                     </tr>
@@ -41,7 +42,7 @@
                                     width = 100;
                                 string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
 
-                                <td><a href="#" @onclick:preventDefault @onclick="() => ShowFileInfo(item)">@item.ProcessingTime.ToString(@"hh\:mm\:ss")</a></td>
+                                <td><a href="#" @onclick:preventDefault @onclick="() => ShowFileInfo(item)">@item.ProcessingEnded.Humanize()</a></td>
                                 <td>                                        
                                     @if (fs > 0)
                                     {

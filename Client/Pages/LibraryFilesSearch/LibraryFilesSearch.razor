@@ -56,6 +56,18 @@
 </PageView>
 
 <SearchPane @ref=SearchPane Searched=@Search Closed=@Closed InitialVisibleState="true">
+    <div class="search-field input search-path">
+        <div class="label">Path</div>
+        <div class="value">
+            <input id="lfs-path" type="text" @bind="SearchModel.Path">
+        </div>
+    </div>
+    <div class="search-field input">
+        <div class="label">Library Name</div>
+        <div class="value">
+            <input type="text" @bind="SearchModel.LibraryName">
+        </div>
+    </div>
     <div class="search-field input">
         <div class="label">Date</div>
         <div class="value">
@@ -80,18 +92,6 @@
                         </div>
                     </PickerTemplate>
             </DateRangePicker>
-        </div>
-    </div>
-    <div class="search-field input">
-        <div class="label">Path</div>
-        <div class="value">
-            <input id="lfs-path" type="text" @bind="SearchModel.Path">
-        </div>
-    </div>
-    <div class="search-field input">
-        <div class="label">Library Name</div>
-        <div class="value">
-            <input type="text" @bind="SearchModel.LibraryName">
         </div>
     </div>
     <div class="search-field input">

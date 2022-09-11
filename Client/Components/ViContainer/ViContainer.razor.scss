@@ -89,12 +89,18 @@
     flex-direction: row;
     justify-content: space-around;
 
-    ::deep button {
-        flex-grow: 1;
-        flex-basis: 0;
-        margin: auto;
-        + button {
-            margin-left:1rem;
+    ::deep
+    {
+        a.btn, button {
+            flex-grow: 1;
+            flex-basis: 0;
+            margin: auto;
+            span {
+                margin:auto;
+            }
+            + button {
+                margin-left: 1rem;
+            }
         }
     }
 }

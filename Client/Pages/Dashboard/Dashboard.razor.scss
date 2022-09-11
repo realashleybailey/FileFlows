@@ -21,7 +21,14 @@
 .mobile-pause-resume{
     text-align: center;
     margin-bottom: 1rem;
+    position: fixed;
+    top: 0.75rem;
+    z-index: 1000000;
+    right: 4.5rem;
     ::deep button {
-        width: min(14rem, 90%) !important;
+        border-color: var(--border-color);
+        &:focus, &:active, &:hover {
+            border-color: var(--accent);            
+        }
     }
 }

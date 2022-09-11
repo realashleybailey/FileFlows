@@ -86,6 +86,12 @@
             if (result.Success)
             {
                 Data = result.Data ?? new();
+                // this fixes an issue with the date being considered UTC even though its local
+                foreach (var d in Data)
+                {
+                    var utc = d.ProcessingEnded.ToUniversalTime();
+                    d.ProcessingEnded = new DateTime(utc.Year, utc.Month, utc.Day, utc.Hour, utc.Minute, utc.Second);
+                }
             }
             else if (Data == null)
                 Data = new ();

@@ -228,6 +228,24 @@ input[type=file]{
     top: 0;
     bottom: 0;
     width: 18rem;
+    @media (max-width: 849.99px) 
+    {
+        width:unset;
+        right:0;
+        bottom:unset;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        &:not(:focus-within) {
+            height: 4rem;
+            overflow: hidden;
+            .search-path input {
+                position: absolute;
+                top: 0.7rem;
+                left: 9rem;
+                width: calc(100% - 12rem);
+            }
+        }
+    }
     z-index: 2;
     background: var(--base-darker);
     padding: 0 1rem;
@@ -266,6 +284,14 @@ input[type=file]{
     }
     .search-submit {
         text-align: right;
+    }
+    @media (max-width: 849.99px){
+        .search-submit {
+            text-align:center;
+            .btn {
+                width:min(50%, 18rem);
+            }
+        }
     }
 
     .close {

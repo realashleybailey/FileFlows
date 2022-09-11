@@ -152,5 +152,8 @@
     display: none !important;
   }
 }
+.dashboard-wrapper {
+  margin-bottom: 3rem;
+}
 
 /*# sourceMappingURL=BasicDashboard.razor.css.map */

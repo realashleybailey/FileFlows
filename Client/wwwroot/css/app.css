@@ -667,6 +667,25 @@ hr {
   display: unset;
   z-index: 10000;
 }
+@media (max-width: 849.99px) {
+  .search-pane {
+    width: unset;
+    right: 0;
+    bottom: unset;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .search-pane:not(:focus-within) {
+    height: 4rem;
+    overflow: hidden;
+  }
+  .search-pane:not(:focus-within) .search-path input {
+    position: absolute;
+    top: 0.7rem;
+    left: 9rem;
+    width: calc(100% - 12rem);
+  }
+}
 .search-pane .search-head {
   font-size: 1.25rem;
   padding: 0.75rem 0 0.5rem;
@@ -697,6 +716,14 @@ hr {
 }
 .search-pane .search-submit {
   text-align: right;
+}
+@media (max-width: 849.99px) {
+  .search-pane .search-submit {
+    text-align: center;
+  }
+  .search-pane .search-submit .btn {
+    width: min(50%, 18rem);
+  }
 }
 .search-pane .close {
   position: absolute;

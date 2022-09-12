@@ -606,6 +606,7 @@ button .fas, button .far {
 
 .update-available {
   color: var(--color);
+  z-index: 1000000;
 }
 
 .flow-template-description {

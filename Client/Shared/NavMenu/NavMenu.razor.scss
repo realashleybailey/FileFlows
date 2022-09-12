@@ -177,7 +177,7 @@
             display:grid;
             flex-direction:unset !important;
             grid-gap: 0.5rem;
-            margin:1rem 2rem 2rem;
+            margin:1rem;
         }
         li {
             display:block;
@@ -204,6 +204,12 @@
                     background:none !important;
                 }
             }
+        }
+        .version-info {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin: 3rem 0;
         }
     }
 }
@@ -242,6 +248,19 @@
     margin: 0;
     position: absolute;
     right: 0.5rem;
+    @media (max-width:849.99px) {
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: row;
+        place-content: center;
+        position: absolute;
+        bottom: -1rem;
+        left: 0;
+        right: 0;
+        .bubble {
+            margin: 0 !important;
+        }
+    }
 
     .bubble {
         border: solid 1px var(--bubble-color);
@@ -270,13 +289,13 @@
             min-width: 1.5rem;
         }
         &.d-000 {
-            min-width: 1.9rem;
+            min-width: 2.1rem;
         }
         &.d-0000 {
-            min-width: 2.2rem;
+            min-width: 2.7rem;
         }
         &.d-00000 {
-            min-width: 2.5rem;
+            min-width: 3rem;
         }
         + .bubble {
             margin-left:0.25rem;

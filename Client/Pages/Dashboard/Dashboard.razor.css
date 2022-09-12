@@ -26,6 +26,26 @@
   z-index: 1000000;
   right: 4.5rem;
 }
+@media screen and (max-width: 385px) {
+  .mobile-pause-resume ::deep .fa-play:before {
+    content: "\f04c";
+  }
+  .mobile-pause-resume ::deep .fa-pause:before {
+    content: "\f04b";
+  }
+  .mobile-pause-resume ::deep i {
+    width: 100%;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+  }
+  .mobile-pause-resume ::deep button {
+    width: 2.5rem !important;
+  }
+  .mobile-pause-resume ::deep .btn-pause-label {
+    display: none;
+  }
+}
 .mobile-pause-resume ::deep button {
   border-color: var(--border-color);
 }

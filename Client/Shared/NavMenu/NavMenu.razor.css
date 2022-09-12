@@ -180,7 +180,7 @@
     display: grid;
     flex-direction: unset !important;
     grid-gap: 0.5rem;
-    margin: 1rem 2rem 2rem;
+    margin: 1rem;
   }
   .nav-menu-container:not(.collapsed) li {
     display: block;
@@ -207,6 +207,12 @@
   }
   .nav-menu-container:not(.collapsed) li a:hover, .nav-menu-container:not(.collapsed) li a:focus {
     background: none !important;
+  }
+  .nav-menu-container:not(.collapsed) .version-info {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 3rem 0;
   }
 }
 @media screen and (max-height: 610px) {
@@ -242,6 +248,21 @@
   position: absolute;
   right: 0.5rem;
 }
+@media (max-width: 849.99px) {
+  .bubbles {
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row;
+    place-content: center;
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    right: 0;
+  }
+  .bubbles .bubble {
+    margin: 0 !important;
+  }
+}
 .bubbles .bubble {
   border: solid 1px var(--bubble-color);
   border-radius: 1rem;
@@ -267,13 +288,13 @@
   min-width: 1.5rem;
 }
 .bubbles .bubble.d-000 {
-  min-width: 1.9rem;
+  min-width: 2.1rem;
 }
 .bubbles .bubble.d-0000 {
-  min-width: 2.2rem;
+  min-width: 2.7rem;
 }
 .bubbles .bubble.d-00000 {
-  min-width: 2.5rem;
+  min-width: 3rem;
 }
 .bubbles .bubble + .bubble {
   margin-left: 0.25rem;

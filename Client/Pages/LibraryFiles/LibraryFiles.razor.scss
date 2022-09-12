@@ -16,3 +16,8 @@
         border-color: var(--border-color);
     }    
 }
+@media (max-width:310px){
+    .btn-search {
+        width: unset;
+    }
+}

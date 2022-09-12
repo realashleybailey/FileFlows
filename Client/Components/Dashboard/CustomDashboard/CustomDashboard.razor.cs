@@ -108,13 +108,12 @@ public partial class CustomDashboard : IDisposable
             return new List<object>();
         return result.Data.Select(x =>
         {
-            var utc = x.ProcessingEnded.ToUniversalTime();
-            var end = new DateTime(utc.Year, utc.Month, utc.Day, utc.Hour, utc.Minute, utc.Second);
+            string when = x.ProcessingEnded.Humanize(false, DateTime.Now);
             return (object)new
             {
                 x.Uid,
                 x.RelativePath,
-                When = end.Humanize(),
+                When = when,
                 x.OriginalSize,
                 x.FinalSize,
             };

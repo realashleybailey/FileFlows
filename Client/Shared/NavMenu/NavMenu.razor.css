@@ -79,6 +79,11 @@
   text-align: center;
   font-size: 1.5rem;
 }
+@media screen and (max-width: 849.99px) {
+  .support-links {
+    display: none;
+  }
+}
 .support-links a {
   color: rgba(var(--color-rgb), 0.4) !important;
   padding: 0 0.25rem;
@@ -87,10 +92,11 @@
   color: var(--accent) !important;
 }
 
-.nav-item.discord, .nav-item.forum {
-  display: none;
+@media screen and (min-width: 850px) {
+  .nav-item.discord, .nav-item.forum {
+    display: none;
+  }
 }
-
 .page.collapsed .support-links {
   display: none;
 }
@@ -149,7 +155,58 @@
   }
 
   .nav-menu-group {
-    display: none;
+    grid-column-start: 1;
+    grid-column-end: -1;
+    height: 2rem;
+  }
+  .nav-menu-group:not(:first-of-type) {
+    margin-top: 1.5rem !important;
+  }
+  .nav-menu-group .text-label {
+    margin-left: 1rem;
+  }
+
+  .nav-menu-container:not(.collapsed) {
+    position: fixed;
+    top: 2.6rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+    background: var(--base);
+  }
+  .nav-menu-container:not(.collapsed) ul {
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    display: grid;
+    flex-direction: unset !important;
+    grid-gap: 0.5rem;
+    margin: 1rem 2rem 2rem;
+  }
+  .nav-menu-container:not(.collapsed) li {
+    display: block;
+    padding: 0 !important;
+    margin: 0;
+  }
+  .nav-menu-container:not(.collapsed) li .icon {
+    font-size: 3rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .nav-menu-container:not(.collapsed) li a {
+    height: 6rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 0;
+    border: none;
+    place-content: center;
+  }
+  .nav-menu-container:not(.collapsed) li a.active {
+    color: var(--accent) !important;
+    background: unset;
+  }
+  .nav-menu-container:not(.collapsed) li a:hover, .nav-menu-container:not(.collapsed) li a:focus {
+    background: none !important;
   }
 }
 @media screen and (max-height: 610px) {

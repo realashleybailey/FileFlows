@@ -173,6 +173,10 @@
   .nav-menu-group {
     display: none;
   }
+
+  .nav-menu-container {
+    margin-top: 1rem;
+  }
 }
 .bubbles {
   list-style: none;

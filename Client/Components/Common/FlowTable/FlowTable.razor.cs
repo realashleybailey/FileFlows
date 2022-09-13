@@ -262,7 +262,7 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     private TItem LastSelected;
 
 
-    private string lblFilter;
+    private string lblFilterPlaceholder, lblFilter;
 
     public IEnumerable<TItem> GetSelected() => new List<TItem>(this.SelectedItems); // clone the list, dont give them the actual one
 
@@ -271,7 +271,8 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     protected override void OnInitialized()
     {
         FlowTableHotkey = Guid.NewGuid().ToString();
-        lblFilter = Translater.Instant("Labels.FilterPlaceholder");
+        lblFilterPlaceholder = Translater.Instant("Labels.FilterPlaceholder");
+        lblFilter = Translater.Instant("Labels.Filter");
         lblResetLayout = Translater.Instant("Labels.ResetLayout");
         HotKeyService.RegisterHotkey(FlowTableHotkey, "/", callback: () =>
         {

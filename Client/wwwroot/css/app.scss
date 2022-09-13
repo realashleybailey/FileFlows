@@ -165,6 +165,7 @@ button {
         color: var(--accent);
     }
 }
+
 .update-available {
     color:var(--color);
     z-index:1000000;
@@ -937,5 +938,28 @@ input[type=file]{
         width:1.75rem;
         margin-right:0.25rem;
         text-align: center;
+    }
+}
+
+
+@media (max-width: 849.99px) {
+    .vi-container  {
+        .bottom-buttons {
+            position: fixed;
+            top: 0.75rem;
+            right: 2.5rem;
+            z-index:2;
+            button {
+                width:6rem;
+                + button {
+                    margin-left: 0.3rem !important;
+                }
+                &:not(:focus),
+                &:not(:active),
+                &:not(:hover){
+                    border-color:var(--border-color);
+                }
+            }
+        }
     }
 }

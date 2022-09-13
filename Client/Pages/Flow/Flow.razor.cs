@@ -67,6 +67,8 @@ public partial class Flow : ComponentBase, IDisposable
 
     private bool IsDirty = false;
 
+    private bool ElementsVisible = false;
+
     private string _txtFilter = string.Empty;
     private string lblFilter;
 
@@ -565,6 +567,11 @@ public partial class Flow : ComponentBase, IDisposable
         {
             return null;
         }
+    }
+    
+    private void ShowElementsOnClick()
+    {
+        ElementsVisible = !ElementsVisible;
     }
 
     private async Task<bool> FunctionSaveCallback(ExpandoObject model)

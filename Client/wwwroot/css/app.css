@@ -133,6 +133,7 @@ button:not(.flowtable-button):not(.navbar-toggler), a.btn, .btn-select {
   border: solid 1px var(--accent);
   background-color: transparent;
   color: var(--color);
+  overflow: hidden;
 }
 button:not(.flowtable-button):not(.navbar-toggler):hover:not(:disabled), button:not(.flowtable-button):not(.navbar-toggler):active:not(:disabled), a.btn:hover:not(:disabled), a.btn:active:not(:disabled), .btn-select:hover:not(:disabled), .btn-select:active:not(:disabled) {
   background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
@@ -1310,6 +1311,24 @@ hr {
   width: 1.75rem;
   margin-right: 0.25rem;
   text-align: center;
+}
+
+@media (max-width: 849.99px) {
+  .vi-container .bottom-buttons {
+    position: fixed;
+    top: 0.75rem;
+    right: 2.5rem;
+    z-index: 2;
+  }
+  .vi-container .bottom-buttons button {
+    width: 6rem;
+  }
+  .vi-container .bottom-buttons button + button {
+    margin-left: 0.3rem !important;
+  }
+  .vi-container .bottom-buttons button:not(:focus), .vi-container .bottom-buttons button:not(:active), .vi-container .bottom-buttons button:not(:hover) {
+    border-color: var(--border-color);
+  }
 }
 
 /*# sourceMappingURL=app.css.map */

@@ -13,6 +13,7 @@
     border: solid 1px var(--accent);
     background-color: transparent;
     color: var(--color);
+    overflow: hidden;
 
     &:hover:not(:disabled), &:active:not(:disabled) {
         background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;

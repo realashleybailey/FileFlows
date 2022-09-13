@@ -1318,7 +1318,7 @@ hr {
     position: fixed;
     top: 0.75rem;
     right: 2.5rem;
-    z-index: 2;
+    z-index: 3;
   }
   .vi-container .bottom-buttons button {
     width: 6rem;

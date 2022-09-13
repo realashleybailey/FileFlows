@@ -60,9 +60,20 @@ window.ffFlow = {
             container = c;
         }
         container.addEventListener("keydown", (e) => ffFlow.onKeyDown(e), false);
-        container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
-        container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
-        container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
+        // container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
+        // container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
+        // container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
+
+        var mc = new Hammer.Manager(container);
+        var pinch = new Hammer.Pinch();
+        mc.add([pinch]);
+        mc.on("pinchin", (ev) => {
+            ffFlow.zoom(Math.min(100, ffFlow.Zoom + 1));            
+        });
+        mc.on("pinchout", (ev) => {
+            ffFlow.zoom(Math.max(50, ffFlow.Zoom - 1));
+        });
+        
 
         container.addEventListener("mousedown", (e) => ffFlow.Mouse.dragStart(e), false);
         container.addEventListener("mouseup", (e) => ffFlow.Mouse.dragEnd(e), false);

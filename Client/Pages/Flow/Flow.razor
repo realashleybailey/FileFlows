@@ -37,7 +37,7 @@
     <div class="flow-container @(App.Instance.NavMenuCollapsed ? "has-collapsed-menu" : "") @(App.Instance.IsMobile ? (ElementsVisible ? "elements-visible" : "elements-hidden") : "")">
         @if (App.Instance.IsMobile)
         {
-            <i class="show-elements fas fa-sitemap" @onclick="ShowElementsOnClick"></i>
+            <i id="show-elements" class="show-elements fas fa-sitemap" @onclick="ShowElementsOnClick"></i>
         }
         <div class="flow-elements">
             <div class="flow-elements-filter">

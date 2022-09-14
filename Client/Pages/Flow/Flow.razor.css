@@ -21,9 +21,7 @@
 
 @media screen and (max-width: 849.99px) {
   #flow-zoomer {
-    border-bottom-right-radius: 0 !important;
-    border-bottom-left-radius: 1rem;
-    left: unset !important;
+    display: none;
   }
 
   .flow-name {

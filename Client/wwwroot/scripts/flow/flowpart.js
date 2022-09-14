@@ -52,6 +52,11 @@ window.ffFlowPart = {
                 div.classList.add('Script');
         }
 
+        var mc = new Hammer.Manager(div);
+        mc.add( new Hammer.Tap({ event: 'doubletap', taps: 2 }) );
+        mc.on("doubletap", (ev) => {
+            ffFlowPart.editFlowPart(part.uid, false);
+        });
         div.classList.add('size-' + Math.max(part.inputs, part.outputs));
 
         div.setAttribute('tabIndex', -1);

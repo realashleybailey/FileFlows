@@ -67,11 +67,21 @@ window.ffFlow = {
         var mc = new Hammer.Manager(container);
         var pinch = new Hammer.Pinch();
         mc.add([pinch]);
+        mc.get('press').set({
+            time: 1000,
+            pointers: 2,
+            threshold: 10
+        });
         mc.on("pinchin", (ev) => {
             ffFlow.zoom(Math.min(100, ffFlow.Zoom + 1));            
         });
         mc.on("pinchout", (ev) => {
             ffFlow.zoom(Math.max(50, ffFlow.Zoom - 1));
+        });
+        mc.on('press', (ev) => {
+            let eleShowElements = document.getElementById('show-elements');
+            if(eleShowElements)
+                eleShowElements.click();
         });
         
 

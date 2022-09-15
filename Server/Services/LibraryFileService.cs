@@ -724,4 +724,13 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
 
         return days;
     }
+    
+    
+    /// <summary>
+    /// Updates the original size of a file
+    /// </summary>
+    /// <param name="uid">The UID of the file</param>
+    /// <param name="size">the size of the file in bytes</param>
+    public Task UpdateOriginalSize(Guid uid, long size) 
+        => Database_Execute($"update LibraryFile set OriginalSize = {size} where Uid = '{uid}'");
 }

@@ -61,6 +61,8 @@ public class WorkerController : Controller
         if (info.LibraryFile != null)
         {
             var lf = info.LibraryFile;
+            if (lf.OriginalSize > 0)
+                _ = new LibraryFileService().UpdateOriginalSize(lf.Uid, lf.OriginalSize);
             _ = Task.Run(async () =>
             {
                 var library = await new LibraryController().Get(lf.Uid);

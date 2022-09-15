@@ -123,7 +123,19 @@ public class MySqlDbManager: DbManager
         {
             using (var db = await GetDb())
             {
-                await db.Db.ExecuteAsync(sql);
+                try
+                {
+                    await db.Db.ExecuteAsync(sql);
+                }
+                catch (Exception ex)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        // move this out of here
+                        await Task.Delay(2);
+                        Logger.Instance.ELog("Error insert log: " + ex.Message + "\n" + sql);
+                    });
+                }
             }
         }
         // using (var db = await GetDb())

@@ -59,10 +59,6 @@ window.ffFlow = {
             }
             container = c;
         }
-        container.addEventListener("keydown", (e) => ffFlow.onKeyDown(e), false);
-        // container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
-        // container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
-        // container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
         
         var mc = new Hammer.Manager(container);
         var pinch = new Hammer.Pinch();
@@ -79,11 +75,19 @@ window.ffFlow = {
             ffFlow.zoom(Math.max(50, ffFlow.Zoom - 1));
         });
         mc.on('press', (ev) => {
+            ev.preventDefault();
             let eleShowElements = document.getElementById('show-elements');
             if(eleShowElements)
                 eleShowElements.click();
-        });        
+        });
+        mc.on('touch', (ev) => {
+            ev.preventDefault();
+        })
 
+        container.addEventListener("keydown", (e) => ffFlow.onKeyDown(e), false);
+        // container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
+        // container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
+        // container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
         container.addEventListener("mousedown", (e) => ffFlow.Mouse.dragStart(e), false);
         container.addEventListener("mouseup", (e) => ffFlow.Mouse.dragEnd(e), false);
         container.addEventListener("mousemove", (e) => ffFlow.Mouse.drag(e), false);

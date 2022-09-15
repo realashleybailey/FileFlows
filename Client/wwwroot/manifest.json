@@ -1,9 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "FileFlows",
+  "short_name": "FileFlows",
   "display": "standalone",
   "start_url": "/",
   "theme_color": "#ff0090",
   "background_color": "#111214",
+  "description":"A file processing application",
   "icons": [
     {
       "src": "/favicon.svg",

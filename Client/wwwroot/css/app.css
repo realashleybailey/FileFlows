@@ -1329,6 +1329,11 @@ hr {
   .vi-container .bottom-buttons button:not(:focus), .vi-container .bottom-buttons button:not(:active), .vi-container .bottom-buttons button:not(:hover) {
     border-color: var(--border-color);
   }
+
+  .editor-wrapper .vi-container .bottom-buttons {
+    right: 0.5rem;
+    padding-right: 0;
+  }
 }
 
 /*# sourceMappingURL=app.css.map */

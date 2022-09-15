@@ -16,20 +16,29 @@
     </HeadLeft>
 
     <Head>
-        @if (App.Instance.IsMobile)
+        @if (ElementsVisible == false || App.Instance.IsMobile == false)
         {
-            <input class="flow-name" type="text" @bind-value="@Name" autocomplete="off" placeholder="@lblName"/>
+            if (App.Instance.IsMobile)
+            {
+                <input class="flow-name" type="text" @bind-value="@Name" autocomplete="off" placeholder="@lblName"/>
+            }
+            <button class="save-button" @onclick="() => Save()">
+                @if (IsSaving)
+                {
+                    @lblSaving
+                }
+                else
+                {
+                    @lblSave
+                }
+            </button>
+        }else if (App.Instance.IsMobile)
+        {
+            <button class="add-button" disabled="@string.IsNullOrEmpty(SelectedElement)" @onclick="() => AddSelectedElement()">
+                @lblAdd
+            </button>
+            
         }
-        <button class="save-button" @onclick="() => Save()">
-            @if (IsSaving)
-            {
-                @lblSaving
-            }
-            else
-            {
-                @lblSave
-            }
-        </button>
         <button @onclick="() => Close()">@lblClose</button>
     </Head>
 
@@ -52,7 +61,8 @@
                         <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
                         foreach (var ele in grp.OrderBy(x => x.Type == FlowElementType.Script ? x.Name : string.Empty).ThenBy(x => x.Type).ThenBy(x => x.DisplayName.Substring(x.DisplayName.IndexOf(":") + 1)))
                         {
-                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "")" ondragstart="ffFlow.Mouse.dragElementStart(event)">
+                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "") @(App.Instance.IsMobile && SelectedElement == ele.Uid ? "selected" : "") " 
+                                ondragstart="ffFlow.Mouse.dragElementStart(event)" @onclick="() => SelectPart(ele.Uid)">
                                 <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
                                 @((ele.Type == FlowElementType.Script) ? ele.Name : ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1))
 
@@ -90,6 +100,10 @@
         <i class="fas fa-edit"></i>
         @lblEdit
     </Item>
+    <Item OnClick="Add">
+        <i class="fas fa-plus"></i>
+        @lblAdd
+    </Item>
     <BlazorContextMenu.Seperator/>
     <Item OnClick="Copy">
         <i class="fas fa-copy"></i>
@@ -121,6 +135,11 @@
 </ContextMenu>
 
 <ContextMenu Id="FlowContextMenu-Multiple">
+    <Item OnClick="Add">
+        <i class="fas fa-plus"></i>
+        @lblAdd
+    </Item>
+    <BlazorContextMenu.Seperator/>
     <Item OnClick="Copy">
         <i class="fas fa-copy"></i>
         @lblCopy
@@ -152,6 +171,11 @@
 
 
 <ContextMenu Id="FlowContextMenu-Basic">
+    <Item OnClick="Add">
+        <i class="fas fa-plus"></i>
+        @lblAdd
+    </Item>
+    <BlazorContextMenu.Seperator/>
     <Item OnClick="Paste">
         <i class="fas fa-paste"></i>
         @lblPaste

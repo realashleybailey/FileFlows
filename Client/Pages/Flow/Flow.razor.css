@@ -119,6 +119,13 @@ canvas {
   padding: 0;
   overflow-y: auto;
 }
+.flow-elements .flow-element.selected {
+  border-color: var(--accent) !important;
+  background: rgba(var(--accent-rgb), 0.3) !important;
+}
+.flow-elements .flow-element.selected .icon-wrapper {
+  border-color: var(--accent) !important;
+}
 
 .flow-parts {
   background: var(--darkest);

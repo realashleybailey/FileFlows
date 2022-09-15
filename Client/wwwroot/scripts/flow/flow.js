@@ -63,15 +63,15 @@ window.ffFlow = {
         // container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
         // container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
         // container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
-
+        
         var mc = new Hammer.Manager(container);
         var pinch = new Hammer.Pinch();
-        mc.add([pinch]);
-        mc.get('press').set({
+        var press = new Hammer.Press({
             time: 1000,
             pointers: 2,
             threshold: 10
         });
+        mc.add([pinch, press]);
         mc.on("pinchin", (ev) => {
             ffFlow.zoom(Math.min(100, ffFlow.Zoom + 1));            
         });
@@ -82,8 +82,7 @@ window.ffFlow = {
             let eleShowElements = document.getElementById('show-elements');
             if(eleShowElements)
                 eleShowElements.click();
-        });
-        
+        });        
 
         container.addEventListener("mousedown", (e) => ffFlow.Mouse.dragStart(e), false);
         container.addEventListener("mouseup", (e) => ffFlow.Mouse.dragEnd(e), false);
@@ -187,7 +186,10 @@ window.ffFlow = {
         }
         if (!uid)
             uid = ffFlow.Mouse.draggingElementUid;
-
+        ffFlow.addElementActual(uid, xPos, yPos);
+    },
+    
+    addElementActual: function (uid, xPos, yPos) {
 
         ffFlow.csharp.invokeMethodAsync("AddElement", uid).then(result => {
             if(!result)
@@ -215,7 +217,6 @@ window.ffFlow = {
                 part.Outputs = part.model?.outputs;
 
             ffFlow.History.perform(new FlowActionAddNode(part));
-            
 
             if (element.noEditorOnAdd === true)
                 return;
@@ -224,7 +225,7 @@ window.ffFlow = {
             {
                 ffFlowPart.editFlowPart(part.uid, true);
             }
-        });
+        }); 
     },
 
     translateCoord: function (value, lines) {
@@ -529,5 +530,11 @@ window.ffFlow = {
         for(let part of parts || []) {
             ffFlowPart.deleteFlowPart(part.uid);
         }
+    },
+    contextMenu_Add: function() {
+        let ele = document.getElementById('show-elements')
+        if(ele)
+            ele.click();
+        bottom-buttons
     }
 }

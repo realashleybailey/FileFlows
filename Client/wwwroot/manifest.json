@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
   "name": "FileFlows",
   "short_name": "FileFlows",
   "display": "standalone",
@@ -17,6 +16,28 @@
       "src": "/icon.png",
       "type": "image/png",
       "sizes": "128x128"
+    }
+  ],
+  "shortcuts":[
+    {
+      "name":"Dashboard",
+      "url":"./"
+    },
+    {
+      "name":"Files",
+      "url":"./library-files"
+    },
+    {
+      "name":"Flows",
+      "url":"./flows"
+    },
+    {
+      "name":"Libraries",
+      "url":"./libraries"
+    },
+    {
+      "name":"Nodes",
+      "url":"./nodes"
     }
   ]
 }

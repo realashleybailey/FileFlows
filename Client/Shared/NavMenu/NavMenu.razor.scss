@@ -171,6 +171,7 @@
         right: 0;
         bottom: 0;
         overflow: auto;
+        margin:0 !important;
         background: var(--base);
         ul {
             grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));

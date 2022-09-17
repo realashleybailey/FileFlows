@@ -479,6 +479,18 @@ a, .btn-link {
   color: var(--accent) !important;
 }
 
+.loading-version {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 5rem;
+  text-align: center;
+  z-index: 1000;
+  font-weight: bold;
+  color: var(--color);
+  opacity: 0.7;
+}
+
 .btn-primary {
   color: var(--color);
   background-color: var(--primary);
@@ -1333,6 +1345,11 @@ hr {
   .editor-wrapper .vi-container .bottom-buttons {
     right: 0.5rem;
     padding-right: 0;
+  }
+}
+@media (max-width: 849.99px) {
+  .page .vi-container {
+    z-index: 1;
   }
 }
 

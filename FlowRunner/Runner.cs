@@ -277,8 +277,8 @@ public class Runner
     private void RunActual(IFlowRunnerCommunicator communicator)
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
-        nodeParameters.PathMapper = (string path) => Node.Map(path);
-        nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
+        nodeParameters.PathMapper = (path) => Node.Map(path);
+        nodeParameters.PathUnMapper = (path) => Node.UnMap(path);
         nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()
         {
             SharedDirectory = Path.Combine(Info.ConfigDirectory, "Scripts", "Shared"),
@@ -309,18 +309,21 @@ public class Runner
         DownloadScripts();
 
         nodeParameters.Result = NodeResult.Success;
-        nodeParameters.GetToolPathActual = (string name) =>
+        nodeParameters.GetToolPathActual = (name) =>
         {
-            return Info.Config.Variables.Where(x => x.Key.ToLowerInvariant() == name.ToLowerInvariant())
+            var variable = Info.Config.Variables.Where(x => x.Key.ToLowerInvariant() == name.ToLowerInvariant())
                 .Select(x => x.Value).FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(variable))
+                return variable;
+            return Node.Map(variable);
         };
-        nodeParameters.GetPluginSettingsJson = (string pluginSettingsType) =>
+        nodeParameters.GetPluginSettingsJson = (pluginSettingsType) =>
         {
             string? json = null;
             Info.Config.PluginSettings?.TryGetValue(pluginSettingsType, out json);
             return json;
         };
-        nodeParameters.StatisticRecorder = (string name, object value) =>
+        nodeParameters.StatisticRecorder = (name, value) =>
         {
             var statService = StatisticService.Load();
             statService.Record(name, value);
@@ -357,7 +360,7 @@ public class Runner
         };
 
         // find the first node
-        var part = flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
+        var part = flow.Parts.FirstOrDefault(x => x.Inputs == 0);
         if (part == null)
         {
             nodeParameters.Logger!.ELog("Failed to find Input node");
@@ -367,7 +370,7 @@ public class Runner
         int step = 0;
         StepChanged(step, part.Name);
 
-        // need to clear this incase the file is being reprocessed
+        // need to clear this in case the file is being reprocessed
         if(failure == false)
             Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
 

@@ -263,27 +263,34 @@ public class DbHelper
     public static void RestoreDefaults()
     {
         var manager = GetDbManager();
-        using var db = manager.GetDb().Result;
-        var variables  = db.Db.Fetch<string>(
-            "select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'");
+        List<string> variables;
 
-        var ffmpeg = variables.FirstOrDefault(x => x.ToLowerInvariant() == "ffmpeg");
-        if (ffmpeg == null)
+        using (var db = manager.GetDb().Result)
         {
-            // doesnt exist, insert it
-            manager.Update(new Variable()
+            variables = db.Db.Fetch<string>(
+                "select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'");
+
+
+            var ffmpeg = variables.FirstOrDefault(x => x.ToLowerInvariant() == "ffmpeg");
+            if (ffmpeg == null)
             {
-                Name = "ffmpeg",
-                Value = Globals.IsWindows
-                    ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
-                    : "/usr/local/bin/ffmpeg"
-            }).Wait();
+                // doesnt exist, insert it
+                manager.Update(new Variable()
+                {
+                    Name = "ffmpeg",
+                    Value = Globals.IsWindows
+                        ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
+                        : "/usr/local/bin/ffmpeg"
+                }).Wait();
+            }
+            else if (ffmpeg != "ffmpeg")
+            {
+                // not lower case
+                db.Db.Execute(
+                    "update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
+            }
         }
-        else if (ffmpeg != "ffmpeg")
-        {
-            // not lower case
-            db.Db.Execute("update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
-        }
+
         string programFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");
         
         foreach (var variable in new[]

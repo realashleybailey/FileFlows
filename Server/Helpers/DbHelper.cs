@@ -269,13 +269,20 @@ public class DbHelper
         if (ffmpeg == null)
         {
             // doesnt exist, insert it
-            manager.Update(new Variable()
+            try
             {
-                Name = "ffmpeg",
-                Value = Globals.IsWindows
-                    ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
-                    : "/usr/local/bin/ffmpeg"
-            }).Wait();
+                manager.Update(new Variable()
+                {
+                    Name = "ffmpeg",
+                    Value = Globals.IsWindows
+                        ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
+                        : "/usr/local/bin/ffmpeg"
+                }).Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Error inserting ffmpeg: " + ex.Message);
+            }
         }
         else if (ffmpeg != "ffmpeg")
         {
@@ -296,11 +303,18 @@ public class DbHelper
             if (variables.Contains(variable.Item1))
                 continue;
             // doesnt exist, insert it
-            manager.Update(new Variable()
+            try
             {
-                Name = variable.Item1,
-                Value = variable.Item2
-            }).Wait();
+                manager.Update(new Variable()
+                {
+                    Name = variable.Item1,
+                    Value = variable.Item2
+                }).Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog($"Error inserting '{variable.Item1}: " + ex.Message);
+            }
         }
     }
 }

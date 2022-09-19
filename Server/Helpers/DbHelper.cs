@@ -263,32 +263,24 @@ public class DbHelper
     public static void RestoreDefaults()
     {
         var manager = GetDbManager();
-        List<string> variables;
+        var variables = manager.Fetch<string>("select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'").Result.ToList();
 
-        using (var db = manager.GetDb().Result)
+        var ffmpeg = variables.FirstOrDefault(x => x.ToLowerInvariant() == "ffmpeg");
+        if (ffmpeg == null)
         {
-            variables = db.Db.Fetch<string>(
-                "select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'");
-
-
-            var ffmpeg = variables.FirstOrDefault(x => x.ToLowerInvariant() == "ffmpeg");
-            if (ffmpeg == null)
+            // doesnt exist, insert it
+            manager.Update(new Variable()
             {
-                // doesnt exist, insert it
-                manager.Update(new Variable()
-                {
-                    Name = "ffmpeg",
-                    Value = Globals.IsWindows
-                        ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
-                        : "/usr/local/bin/ffmpeg"
-                }).Wait();
-            }
-            else if (ffmpeg != "ffmpeg")
-            {
-                // not lower case
-                db.Db.Execute(
-                    "update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
-            }
+                Name = "ffmpeg",
+                Value = Globals.IsWindows
+                    ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
+                    : "/usr/local/bin/ffmpeg"
+            }).Wait();
+        }
+        else if (ffmpeg != "ffmpeg")
+        {
+            // not lower case
+            manager.Execute("update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'", null).Wait();
         }
 
         string programFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");

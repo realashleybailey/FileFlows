@@ -58,14 +58,16 @@ public class Upgrader
             if (currentVersion < new Version(1, 0, 2))  
                 new Upgrade_1_0_2().Run(settings);
         }
-        
+
         // save the settings
         if (settings.Version != Globals.Version.ToString())
         {
+            Logger.Instance.ILog("Saving version to database");
             settings.Version = Globals.Version.ToString();
             // always increase the revision when the version changes
             settings.Revision += 1;
             DbHelper.Update(settings).Wait();
         }
+        Logger.Instance.ILog("Finished checking upgrade scripts");
     }
 }

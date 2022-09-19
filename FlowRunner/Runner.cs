@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using FileFlows.Server;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 using Microsoft.Extensions.Logging;
 using NPoco;
@@ -277,6 +278,11 @@ public class Runner
     private void RunActual(IFlowRunnerCommunicator communicator)
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
+        nodeParameters.IsDocker = Globals.IsDocker;
+        nodeParameters.IsWindows = Globals.IsWindows;
+        nodeParameters.IsLinux = Globals.IsLinux;
+        nodeParameters.IsMac = Globals.IsMac;
+        nodeParameters.IsArm = Globals.IsArm;
         nodeParameters.PathMapper = (path) => Node.Map(path);
         nodeParameters.PathUnMapper = (path) => Node.UnMap(path);
         nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()

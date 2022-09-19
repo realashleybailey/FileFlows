@@ -113,6 +113,31 @@ public class NodeParameters
     public string LibraryPath { get; set; }
 
     /// <summary>
+    /// Gets or sets if this node is running inside a docker container
+    /// </summary>
+    public bool IsDocker { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this node is running on windows
+    /// </summary>
+    public bool IsWindows { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this node is running on linux
+    /// </summary>
+    public bool IsLinux { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this node is running on a mac
+    /// </summary>
+    public bool IsMac { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this node is running on a ARM base platform
+    /// </summary>
+    public bool IsArm { get; set; }
+
+    /// <summary>
     /// Gets or sets the temporary path for this node
     /// </summary>
     public string TempPath { get; set; }

@@ -143,6 +143,17 @@ public class NodeParameters
     public string TempPath { get; set; }
 
     /// <summary>
+    /// Gets or sets the short temporary path name
+    /// eg. Runner-42f99fc9-158e-408d-9133-de91a56a6ac8
+    /// </summary>
+    public string TempPathName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the runners UID
+    /// </summary>
+    public Guid RunnerUid { get; set; }
+
+    /// <summary>
     /// Gets or sets the action that handles updating a percentage change for a flow part
     /// </summary>
     public Action<float>? PartPercentageUpdate { get; set; }

@@ -302,8 +302,10 @@ public class Runner
 
         List<Guid> runFlows = new List<Guid>();
         runFlows.Add(Flow.Uid);
-        
+
+        nodeParameters.RunnerUid = Info.Uid;
         nodeParameters.TempPath = WorkingDir;
+        nodeParameters.TempPathName = new DirectoryInfo(WorkingDir).Name;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
         Shared.Helpers.HttpHelper.Logger = nodeParameters.Logger;

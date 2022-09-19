@@ -27,6 +27,12 @@ public class NodeParameters
     /// </summary>
     public string WorkingFile { get; private set; }
 
+    /// <summary>
+    /// Gets the working file shortname
+    /// </summary>
+    public string WorkingFileName => string.IsNullOrWhiteSpace(WorkingFile) ? string.Empty : 
+        IsDirectory ? new DirectoryInfo(this.WorkingFile).Name : new FileInfo(this.WorkingFile).Name;
+
     private long _WorkingFileSize { get; set; }
     /// <summary>
     /// Gets the last actual record file size that is greater than zero

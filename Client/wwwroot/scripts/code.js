@@ -47,6 +47,8 @@ window.ffCode = {
             "NewGuid: function ():string," +
             "Execute: function(args:{command:string, arguments: string, argumentList:string[], timeout:number, workingDirectory:string}):{completed:bool, exitCode:number, output:string, standardOutput:string, starndardError:string}," +
             "TempPath:string," +
+            "TempPathName:string," + 
+            "RunnerUid:string," + 
             "WorkingFile:string," +
             "WorkingFileSize:number," +
             "RelativeFile:string," +

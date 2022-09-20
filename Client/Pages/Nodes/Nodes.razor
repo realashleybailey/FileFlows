@@ -25,7 +25,7 @@
             </ToolBar>
 
             <Columns>
-                <FlowTableColumn TItem="ProcessingNode">
+                <FlowTableColumn TItem="ProcessingNode" MinWidth="14rem">
                     <Header>
                         @Globals.lblName
                     </Header>
@@ -45,15 +45,7 @@
                         <span>@item.Name</span>
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="ProcessingNode" Width="8rem" MobileWidth="0">
-                    <Header>
-                        @lblVersion
-                    </Header>
-                    <Cell Context="item">
-                        <span>@item.Version</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="ProcessingNode" MobileWidth="0">
+                <FlowTableColumn TItem="ProcessingNode" MobileWidth="0" Width="14rem">
                     <Header>
                         @lblAddress
                     </Header>
@@ -67,6 +59,14 @@
                         }
                     </Cell>
                 </FlowTableColumn>
+                <FlowTableColumn TItem="ProcessingNode" Width="8rem" MobileWidth="0">
+                    <Header>
+                        @lblVersion
+                    </Header>
+                    <Cell Context="item">
+                        <span>@item.Version</span>
+                    </Cell>
+                </FlowTableColumn>
                 <FlowTableColumn TItem="ProcessingNode" Width="12rem" MobileWidth="0">
                     <Header>
                     </Header>
@@ -77,7 +77,7 @@
                         }
                     </Cell>
                 </FlowTableColumn>
-                <FlowTableColumn TItem="ProcessingNode" Width="8rem" MobileWidth="0">
+                <FlowTableColumn TItem="ProcessingNode" Width="7rem" MobileWidth="0">
                     <Header>
                         @lblRunners
                     </Header>

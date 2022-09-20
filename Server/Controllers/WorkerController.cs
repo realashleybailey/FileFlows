@@ -181,10 +181,12 @@ public class WorkerController : Controller
     {
         _ = new NodeController().UpdateLastSeen(info.NodeUid);
         
-        
         if (info.LibraryFile != null)
         {
-            if (LibraryFileHasChanged(info.LibraryFile))
+            if(info.LibraryFile.Status != FileStatus.Processing)
+                Logger.Instance.DLog($"Updating non-processing library file [{info.LibraryFile.Status}]: {info.LibraryFile.Name}");
+            
+            if (await LibraryFileHasChanged(info.LibraryFile))
             {
                 await new LibraryFileService().UpdateWork(info.LibraryFile);
             }
@@ -214,7 +216,7 @@ public class WorkerController : Controller
         }
     }
 
-    private bool LibraryFileHasChanged(LibraryFile file)
+    private async Task<bool> LibraryFileHasChanged(LibraryFile file)
     {
         var cached = LibraryFileCacheStore.Get<LibraryFileRecord>(file.Uid);
         LibraryFileCacheStore.Store(file.Uid, new LibraryFileRecord
@@ -228,6 +230,9 @@ public class WorkerController : Controller
             ProcessingEnded = file.ProcessingEnded
         });
         if (cached == null)
+            return true;
+        var dbStatus = await new LibraryFileService().GetFileStatus(file.Uid);
+        if (dbStatus != file.Status)
             return true;
         if (file.Status != cached.Status)
             return true;

@@ -582,6 +582,16 @@ public partial class LibraryFileService : ILibraryFileService
     }
 
     /// <summary>
+    /// Gets the current status of a file
+    /// </summary>
+    /// <param name="uid">The UID of the file</param>
+    /// <returns>the current status of the rfile</returns>
+    public async Task<FileStatus> GetFileStatus(Guid uid)
+    {
+        return (FileStatus)await Database_ExecuteScalar<int>($"select Status from LibraryFile where Uid = '{uid}'");
+    }
+
+    /// <summary>
     /// Moves the passed in UIDs to the top of the processing order
     /// </summary>
     /// <param name="uids">the UIDs to move</param>

@@ -162,9 +162,10 @@ public class NodeParameters
     {
         get
         {
-            if (IsDocker == false)
-                return TempPath;
+            // if (IsDocker == false)
+            //     return TempPath;
             var host = Environment.GetEnvironmentVariable("TempPathHost");
+            Logger.ILog("TempPathHost: " + (host ?? "null"));
             return host?.EmptyAsNull() ?? this.TempPath;
         }
     }

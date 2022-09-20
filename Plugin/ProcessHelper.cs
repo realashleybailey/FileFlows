@@ -296,6 +296,7 @@ public class ProcessHelper
         return result;
     }
 
+    private string ProcessLastOutputLine;
 
     /// <summary>
     /// Called when a process received standard data in its output
@@ -312,9 +313,13 @@ public class ProcessHelper
         else
         {
             Args?.OnStandardOutput(e.Data);
-            if(Args?.Silent != true)
-                Logger?.ILog(e.Data);
-            outputBuilder.AppendLine(e.Data);
+            if (ProcessLastOutputLine != e.Data)
+            {
+                if (Args?.Silent != true)
+                    Logger?.ILog(e.Data);
+                outputBuilder.AppendLine(e.Data);
+            }
+            ProcessLastOutputLine = e.Data;
         }
     }
 
@@ -333,9 +338,13 @@ public class ProcessHelper
         else
         {
             Args?.OnErrorOutput(e.Data);
-            if (Args?.Silent != true)
-                Logger?.ILog(e.Data);
-            outputBuilder.AppendLine(e.Data);
+            if (ProcessLastOutputLine != e.Data)
+            {
+                if (Args?.Silent != true)
+                    Logger?.ILog(e.Data);
+                outputBuilder.AppendLine(e.Data);
+            }
+            ProcessLastOutputLine = e.Data;
         }
     }
 

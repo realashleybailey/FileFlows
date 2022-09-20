@@ -1,4 +1,5 @@
 ﻿using FileFlows.Shared;
+using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace FileFlows.FlowRunner;
@@ -128,11 +129,12 @@ public class FlowRunnerCommunicator : IFlowRunnerCommunicator
     /// Sends a hello to the server saying this runner is still executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    public async Task<bool> Hello(Guid runnerUid)
+    /// <param name="info">The flow execution info</param>
+    public async Task<bool> Hello(Guid runnerUid, FlowExecutorInfo info)
     {
         try
         {
-            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, LibraryFileUid);
+            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, info);
             if(helloResult == false)
                 Logger.Instance.WLog("Received a false from the hello request to the server");
             return helloResult;

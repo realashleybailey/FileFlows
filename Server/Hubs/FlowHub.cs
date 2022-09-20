@@ -1,5 +1,6 @@
 ﻿using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
+using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FileFlows.Server.Hubs;
@@ -30,11 +31,11 @@ public class FlowHub : Hub
     /// Receives a hello from the flow runner, indicating its still alive and executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    /// <param name="libraryFileUid">the UID of the library file</param>
+    /// <param name="info">the flow execution info</param>
     /// <returns>if the hello was successful or not</returns>
-    public Task<bool> Hello(Guid runnerUid, Guid libraryFileUid)
+    public Task<bool> Hello(Guid runnerUid, FlowExecutorInfo info)
     {
-        var result = new WorkerController(null).Hello(runnerUid, libraryFileUid);
+        var result = new WorkerController(null).Hello(runnerUid, info);
         return Task.FromResult(result);
     }
 }

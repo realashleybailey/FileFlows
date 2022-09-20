@@ -94,7 +94,7 @@ public class Runner
                 {
                     if (finished == false)
                     {
-                        bool success = await communicator.Hello(Program.Uid);
+                        bool success = await communicator.Hello(Program.Uid, this.Info);
                         if (success == false)
                         {
                             Communicator_OnCancel();

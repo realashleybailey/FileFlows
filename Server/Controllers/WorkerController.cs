@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using System.Security.Cryptography.Xml;
 using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
 using Microsoft.AspNetCore.Mvc;
@@ -485,8 +486,8 @@ public class WorkerController : Controller
     /// Receives a hello from the flow runner, indicating its still alive and executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    /// <param name="libraryFileUid">the UID of the library file</param>
-    internal bool Hello(Guid runnerUid, Guid libraryFileUid)
+    /// <param name="info">the flow execution info</param>
+    internal bool Hello(Guid runnerUid, FlowExecutorInfo info)
     {
         lock (Executors)
         {
@@ -495,8 +496,12 @@ public class WorkerController : Controller
                 Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
                 foreach (var executor in Executors.Values)
                     Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
-                return false; // unknown executor
+                
+                // unknown executor, the server may have restarted
+                if(Executors.TryAdd(runnerUid, info) == false)
+                    return false; 
             }
+
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;
             return true;

@@ -31,10 +31,11 @@ public class FlowHub : Hub
     /// Receives a hello from the flow runner, indicating its still alive and executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    /// <param name="info">the flow execution info</param>
+    /// <param name="infoJson">the flow execution info serialized</param>
     /// <returns>if the hello was successful or not</returns>
-    public Task<bool> Hello(Guid runnerUid, FlowExecutorInfo info)
+    public Task<bool> Hello(Guid runnerUid, string infoJson)
     {
+        FlowExecutorInfo? info = string.IsNullOrEmpty(infoJson) ? null : JsonSerializer.Deserialize<FlowExecutorInfo>(infoJson);
         var result = new WorkerController(null).Hello(runnerUid, info);
         return Task.FromResult(result);
     }

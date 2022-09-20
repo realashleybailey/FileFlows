@@ -134,7 +134,7 @@ public class FlowRunnerCommunicator : IFlowRunnerCommunicator
     {
         try
         {
-            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, info);
+            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, JsonSerializer.Serialize(info));
             if(helloResult == false)
                 Logger.Instance.WLog("Received a false from the hello request to the server");
             return helloResult;

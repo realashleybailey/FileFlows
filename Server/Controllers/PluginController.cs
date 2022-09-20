@@ -405,7 +405,7 @@ public class PluginController : ControllerStore<PluginInfo>
         }
         catch (Exception ex)
         {
-            Logger.Instance.WLog("Failed to encrypting passwords in plugin settings: " + ex.Message);
+            Logger.Instance.WLog("Failed to decrypt passwords in plugin settings: " + ex.Message + Environment.NewLine + json);
         }
 
         return json;

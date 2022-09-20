@@ -240,7 +240,10 @@ public class PluginController : ControllerStore<PluginInfo>
         foreach(var item in deleting)
         {
             PluginScanner.Delete(item.PackageName);
+            // delete the plugin settings
+            await DbHelper.Execute( $"delete from DbObject where Type = '{typeof(PluginSettingsModel).FullName}' and Name = 'PluginSettings_{item.PackageName}'");
         }
+
 
         IncrementConfigurationRevision();
     }

@@ -838,7 +838,15 @@ public class NodeParameters
         string json = GetPluginSettingsJson(name);
         if (string.IsNullOrEmpty(json))
             return default;
-        return JsonSerializer.Deserialize<T>(json);
+        try
+        {
+            return JsonSerializer.Deserialize<T>(json);
+        }
+        catch (Exception ex)
+        {
+            Logger.ELog("Failed deserializing plugin settings: " + ex.Message + Environment.NewLine + json);
+            throw new Exception("Failed deserializing plugin settings: " + ex.Message);
+        }
     }
 
     /// <summary>

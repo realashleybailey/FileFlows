@@ -374,34 +374,36 @@ public class PluginController : ControllerStore<PluginInfo>
             if (string.IsNullOrEmpty(plugin?.Name))
                 return json;
             
-                bool updated = false;
+            bool updated = false;
 
-                IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json) as IDictionary<string, object> ?? new Dictionary<string, object>();
-                foreach (var key in dict.Keys.ToArray())
+            json = json.Replace("\u0022", "\"");
+
+            IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json) as IDictionary<string, object> ?? new Dictionary<string, object>();
+            foreach (var key in dict.Keys.ToArray())
+            {
+                if (plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
                 {
-                    if (plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
+                    // its a password, decrypt 
+                    string text = string.Empty;
+                    if (dict[key] is JsonElement je)
                     {
-                        // its a password, decrypt 
-                        string text = string.Empty;
-                        if (dict[key] is JsonElement je)
-                        {
-                            text = je.GetString() ?? String.Empty;
-                        }
-                        else if (dict[key] is string str)
-                        {
-                            text = str;
-                        }
-
-                        if (string.IsNullOrEmpty(text))
-                            continue;
-
-                        dict[key] = Helpers.Decrypter.Decrypt(text);
-                        updated = true;
+                        text = je.GetString() ?? String.Empty;
                     }
+                    else if (dict[key] is string str)
+                    {
+                        text = str;
+                    }
+
+                    if (string.IsNullOrEmpty(text))
+                        continue;
+
+                    dict[key] = Helpers.Decrypter.Decrypt(text);
+                    updated = true;
                 }
-                if (updated)
-                    return JsonSerializer.Serialize(dict);
-                return json;
+            }
+            if (updated)
+                return JsonSerializer.Serialize(dict);
+            return json;
         }
         catch (Exception ex)
         {

@@ -792,6 +792,21 @@ public class NodeParameters
     }
 
     /// <summary>
+    /// Copies a file into the temporary directory if it is not already in the temporary directory
+    /// </summary>
+    /// <param name="filename">[Optional] the filename to copy, if not set the working file will be set</param>
+    /// <returns>the new filename</returns>
+    public string CopyToTemp(string filename = null)
+    {
+        filename ??= WorkingFile;
+        if (filename.StartsWith(TempPath))
+            return filename;
+        string dest = Path.Combine(TempPath, new FileInfo(filename).Name);
+        System.IO.File.Copy(filename, dest);
+        return dest;
+    }
+
+    /// <summary>
     /// Creates a directory if it does not already exist
     /// </summary>
     /// <param name="directory">the directory path</param>

@@ -71,9 +71,10 @@
 }
 .flowtable {
   position: relative !important;
-  height: 100%;
   max-width: 100%;
   width: 100%;
+  flex-grow: 1;
+  overflow: auto;
 }
 
 .flow-table-inner {

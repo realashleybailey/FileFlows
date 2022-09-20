@@ -985,5 +985,11 @@ input[type=file]{
 @media (max-width:849.99px) {
     .page .vi-container {
         z-index:1;
+        .content {
+            height: calc(100vh - 4rem);
+        }
+    }    
+    .pager {
+        text-align: left !important;
     }
 }

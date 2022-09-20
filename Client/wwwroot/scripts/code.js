@@ -49,7 +49,8 @@ window.ffCode = {
             "Execute: function(args:{command:string, arguments: string, argumentList:string[], timeout:number, workingDirectory:string}):{completed:bool, exitCode:number, output:string, standardOutput:string, starndardError:string}," +
             "FileName: string," + 
             "TempPath:string," +            
-            "TempPathName:string," + 
+            "TempPathName:string," +
+            "TempPathHost:string," + 
             "RunnerUid:string," + 
             "WorkingFile:string," +
             "WorkingFileName:string, " +

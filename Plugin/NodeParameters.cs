@@ -155,6 +155,21 @@ public class NodeParameters
     public string TempPathName { get; set; }
 
     /// <summary>
+    /// Gets the temp path on the host if running on docker from the environmental variable "TempPathHost"
+    /// If not running on docker just returns TempPath
+    /// </summary>
+    public string TempPathHost
+    {
+        get
+        {
+            if (IsDocker == false)
+                return TempPath;
+            var host = Environment.GetEnvironmentVariable("TempPathHost");
+            return host?.EmptyAsNull() ?? this.TempPath;
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the runners UID
     /// </summary>
     public Guid RunnerUid { get; set; }

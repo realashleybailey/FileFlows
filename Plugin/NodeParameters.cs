@@ -162,11 +162,11 @@ public class NodeParameters
     {
         get
         {
-            // if (IsDocker == false)
-            //     return TempPath;
             var host = Environment.GetEnvironmentVariable("TempPathHost");
-            Logger.ILog("TempPathHost: " + (host ?? "null"));
-            return host?.EmptyAsNull() ?? this.TempPath;
+            if (string.IsNullOrEmpty(host))
+                return TempPath;
+            // need to append runner subpath
+            return Path.Combine(host, "Runner-" + RunnerUid);
         }
     }
 

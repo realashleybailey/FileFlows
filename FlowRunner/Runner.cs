@@ -94,9 +94,10 @@ public class Runner
                 {
                     if (finished == false)
                     {
-                        bool success = await communicator.Hello(Program.Uid, this.Info);
+                        bool success = await communicator.Hello(Program.Uid, this.Info, nodeParameters);
                         if (success == false)
                         {
+                            nodeParameters?.Logger?.WLog("Hello failed, cancelling flow");
                             Communicator_OnCancel();
                             return;
                         }

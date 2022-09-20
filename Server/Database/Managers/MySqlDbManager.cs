@@ -93,7 +93,7 @@ public class MySqlDbManager: DbManager
         return true;
     }
 
-    private readonly List<string> LogMessages = new();
+    private readonly List<(Guid ClientUid, LogType Type, string Message, DateTime Date)> LogMessages = new();
     
     /// <summary>
     /// Logs a message to the database
@@ -104,37 +104,32 @@ public class MySqlDbManager: DbManager
     public override async Task Log(Guid clientUid, LogType type, string message)
     {
         // by bucketing this it greatly improves speed
-        string? sql = null;
+        List<(Guid ClientUid, LogType Type, string Message, DateTime Date)> toInsert = new();
         lock (LogMessages)
         {
-            message = MySqlHelper.EscapeString(message);
-            LogMessages.Add(
-                $"('{clientUid}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}', {(int)type}, '{message}')");
-
+            LogMessages.Add((clientUid, type, message, DateTime.Now));
             if (LogMessages.Count > 20)
             {
-                sql =
-                    $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.LogDate)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) values "
-                    + string.Join("," + Environment.NewLine, LogMessages);
+                toInsert = LogMessages.ToList();
                 LogMessages.Clear();
             }
         }
-        if(sql != null)
+        if(toInsert?.Any() == true)
         {
             using (var db = await GetDb())
             {
                 try
                 {
-                    await db.Db.ExecuteAsync(sql);
-                }
-                catch (Exception ex)
-                {
-                    _ = Task.Run(async () =>
+                    foreach (var msg in toInsert)
                     {
-                        // move this out of here
-                        await Task.Delay(2);
-                        Logger.Instance.ELog("Error insert log: " + ex.Message + "\n" + sql);
-                    });
+                        await db.Db.ExecuteAsync(
+                            $"insert into {nameof(DbLogMessage)} ({nameof(DbLogMessage.ClientUid)}, {nameof(DbLogMessage.LogDate)}, {nameof(DbLogMessage.Type)}, {nameof(DbLogMessage.Message)}) values " +
+                            $"(@0, @1, @2, @3)",
+                            msg.ClientUid, msg.Date, (int)msg.Type, msg.Message);
+                    }
+                }
+                catch (Exception)
+                {
                 }
             }
         }

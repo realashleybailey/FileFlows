@@ -798,6 +798,8 @@ public class NodeParameters
     /// <returns>the new filename</returns>
     public string CopyToTemp(string filename = null)
     {
+        if (Fake) return filename?.EmptyAsNull() ?? "/mnt/temp/fakefile.mkv";
+            
         filename ??= WorkingFile;
         if (filename.StartsWith(TempPath))
             return filename;

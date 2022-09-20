@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Plugin;
+﻿using System.Text.RegularExpressions;
+
+namespace FileFlows.Plugin;
 
 using System;
 using System.Diagnostics;
@@ -312,14 +314,16 @@ public class ProcessHelper
         }
         else
         {
-            Args?.OnStandardOutput(e.Data);
-            if (ProcessLastOutputLine != e.Data)
+            // remove ansi codes
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty);
+            Args?.OnStandardOutput(line);
+            if (ProcessLastOutputLine != line)
             {
                 if (Args?.Silent != true)
-                    Logger?.ILog(e.Data);
-                outputBuilder.AppendLine(e.Data);
+                    Logger?.ILog(line);
+                outputBuilder.AppendLine(line);
             }
-            ProcessLastOutputLine = e.Data;
+            ProcessLastOutputLine = line;
         }
     }
 
@@ -337,14 +341,16 @@ public class ProcessHelper
         }
         else
         {
-            Args?.OnErrorOutput(e.Data);
-            if (ProcessLastOutputLine != e.Data)
+            // remove ansi codes
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty);
+            Args?.OnErrorOutput(line);
+            if (ProcessLastOutputLine != line)
             {
                 if (Args?.Silent != true)
-                    Logger?.ILog(e.Data);
-                outputBuilder.AppendLine(e.Data);
+                    Logger?.ILog(line);
+                outputBuilder.AppendLine(line);
             }
-            ProcessLastOutputLine = e.Data;
+            ProcessLastOutputLine = line;
         }
     }
 

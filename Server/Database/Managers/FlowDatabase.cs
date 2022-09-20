@@ -84,7 +84,7 @@ public class FlowDatabase:NPoco.Database
         var time = DateTime.Now.Subtract(started);
         string sql = GetCommandText(cmd);
         if (sql.Contains("LogMessage"))
-            sql = "LOGMESSAGE";
+            return; // dont log these sql = "LOGMESSAGE";
         else if (sql.Contains("call GetLibraryFiles(1,") && sql.Contains(", 0, 10, \"\", 0)"))
             sql = "DASHBOARD: RECENTLY FINISHED";
         else if (sql.Contains("call GetLibraryFiles(0,") && sql.Contains(", 0, 10, \"\", 0)"))

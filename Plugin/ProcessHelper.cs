@@ -315,7 +315,7 @@ public class ProcessHelper
         else
         {
             // remove ansi codes
-            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace('', ' ');
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace("[" + '', string.Empty);
             Args?.OnStandardOutput(line);
             if (ProcessLastOutputLine != line)
             {
@@ -342,7 +342,7 @@ public class ProcessHelper
         else
         {
             // remove ansi codes
-            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace('', ' ');
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace("[" + '', string.Empty);
             Args?.OnErrorOutput(line);
             if (ProcessLastOutputLine != line)
             {

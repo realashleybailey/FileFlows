@@ -373,6 +373,15 @@ public class NodeParameters
                         { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
                         { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" }
                     });
+
+                    if (string.IsNullOrEmpty(this.LibraryPath) == false &&
+                        fiOriginal.FullName.StartsWith(this.LibraryPath))
+                    {
+                        UpdateVariables(new Dictionary<string, object>
+                        {
+                            { "file.Orig.RelativeName", fiOriginal.FullName.Substring(LibraryPath.Length + 1) }
+                        });
+                    }
                 }
             }
         }

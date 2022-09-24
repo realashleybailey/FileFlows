@@ -2,6 +2,7 @@ using System.Text.Json;
 using FileFlows.Client.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using NPoco;
 
 namespace FileFlows.Client.Components.Inputs;
 
@@ -31,6 +32,7 @@ public interface IInput
 
 public abstract class Input<T> : ComponentBase, IInput, IDisposable
 {
+    [CascadingParameter] protected InputRegister InputRegister { get; set; }
     [CascadingParameter] protected Editor Editor { get; set; }
 
     [Inject] protected IJSRuntime jsRuntime { get; set; }
@@ -199,7 +201,8 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Editor.RegisterInput(this);
+        Logger.Instance.ILog("InputRegister: " + (InputRegister?.GetTheType()?.Name ?? "null"));
+        InputRegister.RegisterInput(this);
         this.Visible = true;
 
         if (this.Field != null)

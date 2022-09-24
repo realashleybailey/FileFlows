@@ -21,11 +21,11 @@ using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Components;
 
-public partial class Editor : ComponentBase, IDisposable
+public partial class Editor : InputRegister, IDisposable
 {
     [Inject] IJSRuntime jsRuntime { get; set; }
 
-    private readonly  List<ActionButton> AdditionalButtons = new();
+    private readonly List<ActionButton> AdditionalButtons = new();
 
     public bool Visible { get; set; }
 
@@ -73,7 +73,6 @@ public partial class Editor : ComponentBase, IDisposable
 
     public string EditorDescription { get; set; }
 
-    protected readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
     protected bool FocusFirst = false;
     private bool _needsRendering = false;
@@ -145,24 +144,6 @@ public partial class Editor : ComponentBase, IDisposable
             dictionary.Add(property.Name, property.GetValue(model));
         return expando;
     }
-
-
-    internal void RegisterInput<T>(Input<T> input)
-    {
-        if (this.RegisteredInputs.Contains(input) == false)
-            this.RegisteredInputs.Add(input);
-    }
-
-    // internal void RemoveRegisteredInputs(params string[] except)
-    // {
-    //     var listExcept = except?.ToList() ?? new();
-    //     this.RegisteredInputs.RemoveAll(x => listExcept.Contains(x.Field?.Name ?? string.Empty) == false);
-    // }
-
-    // internal Inputs.IInput GetRegisteredInput(string name)
-    // {
-    //     return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
-    // }
 
     /// <summary>
     /// Opens an editor
@@ -318,6 +299,7 @@ public partial class Editor : ComponentBase, IDisposable
             if (input.Disabled || input.Visible == false)
                 continue; // don't validate hidden or disabled inputs
             bool iValid = await input.Validate();
+            Logger.Instance.ILog("Validating: " + input.Label  + " = " + iValid);
             if (iValid == false)
             {
                 Logger.Instance.DLog("Invalid input:" + input.Label);

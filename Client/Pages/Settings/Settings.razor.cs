@@ -12,7 +12,7 @@ using FileFlows.Shared.Validators;
 using Microsoft.JSInterop;
 using FileFlows.Plugin;
 
-public partial class Settings : ComponentBase
+public partial class Settings : InputRegister
 {
     [CascadingParameter] Blocker Blocker { get; set; }
     [Inject] IJSRuntime jsRuntime { get; set; }
@@ -31,7 +31,10 @@ public partial class Settings : ComponentBase
     
     private ProcessingNode InternalProcessingNode { get; set; }
 
-    readonly List<Validator> RequiredValidator = new ();
+    private readonly List<Validator> RequiredValidator = new()
+    {
+        new Required()
+    };
 
     private readonly List<ListOption> DbTypes = new()
     {
@@ -76,7 +79,6 @@ public partial class Settings : ComponentBase
         Blocker.Show("Loading Settings");
         try
         {
-            RequiredValidator.Add(new Required());
             await Refresh();
         }
         finally
@@ -124,6 +126,11 @@ public partial class Settings : ComponentBase
         this.IsSaving = true;
         try
         {
+
+            bool valid = await this.Validate();
+            if (valid == false)
+                return;
+            
             await HttpHelper.Put<string>("/api/settings/ui-settings", this.Model);
 
             if (this.InternalProcessingNode != null)

@@ -50,36 +50,7 @@
                 <Body>
                 <CascadingValue IsFixed="true" Value="this">
                     <div class="fields">
-                        @if (string.IsNullOrEmpty(EditorDescription) == false)
-                        {
-                            <div class="description">@EditorDescription</div>
-                        }
-                        @if (Fields?.Any() == true)
-                        {
-                            <FlowPanel Fields=@Fields OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
-
-                            @if (AdditionalFields != null)
-                            {
-                                @AdditionalFields
-                            }
-                            
-                            @if (Fields.Count > 4)
-                            {
-                                <div class="empty"></div>
-                            }
-                        }
-                        @if (Tabs?.Any() == true)
-                        {
-                            <FlowTabs>
-                                @foreach (var tab in Tabs)
-                                {
-                                    <FlowTab Title=@tab.Key>
-                                        <FlowPanel Fields=@tab.Value OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
-
-                                    </FlowTab>
-                                }
-                            </FlowTabs>
-                        }
+                        @FieldsFragment
                     </div>
                 </CascadingValue>
                 </Body>

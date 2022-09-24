@@ -93,8 +93,21 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
     //[Parameter] // dont not make this a parameter, it sets it to false unexpectedly
     public bool Visible { get; set; }
 
+    private ElementField _Field;
+
     [Parameter]
-    public ElementField Field { get; set; }
+    public ElementField Field
+    {
+        get => _Field;
+        set
+        {
+            if (_Field == value)
+                return;
+            if (_Field != null && value != null)
+                return;  // field is already set and wired up, if we change the instance it will break the conditions.  this should be changing its blazor doing the changing
+            _Field = value;
+        }
+    }
 
     [Parameter]
     public string Help { get => _Help; set { if (string.IsNullOrEmpty(value) == false) _Help = value; } }
@@ -274,6 +287,7 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
 
     public virtual async Task<bool> Validate()
     {
+        Logger.Instance.ILog("BATMAN Validating " + this.Label);
         if (Disposed) return false;
         if (this.Validators?.Any() != true)
             return true;
@@ -283,6 +297,7 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
         bool isValid = string.IsNullOrEmpty(ErrorMessage);
         foreach (var val in this.Validators)
         {
+            Logger.Instance.ILog("BATMAN Validating " + this.Label + " ,  " + val.GetType().Name);
             var validResult = await val.Validate(this.Value);
             if (validResult.Valid == false)
             {

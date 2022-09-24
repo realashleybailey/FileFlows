@@ -15,6 +15,7 @@ using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using FileFlows.Client.Components.Common;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.JSInterop;
 
@@ -36,6 +37,8 @@ public partial class Editor : ComponentBase, IDisposable
     private bool UpdateResizer; // when set to true, the afterrender method will reinitailize the resizer in javascript
     
     protected bool Maximised { get; set; }
+
+    private RenderFragment FieldsFragment;
 
     /// <summary>
     /// Get the name of the type this editor is editing
@@ -150,16 +153,16 @@ public partial class Editor : ComponentBase, IDisposable
             this.RegisteredInputs.Add(input);
     }
 
-    internal void RemoveRegisteredInputs(params string[] except)
-    {
-        var listExcept = except?.ToList() ?? new();
-        this.RegisteredInputs.RemoveAll(x => listExcept.Contains(x.Field?.Name ?? string.Empty) == false);
-    }
+    // internal void RemoveRegisteredInputs(params string[] except)
+    // {
+    //     var listExcept = except?.ToList() ?? new();
+    //     this.RegisteredInputs.RemoveAll(x => listExcept.Contains(x.Field?.Name ?? string.Empty) == false);
+    // }
 
-    internal Inputs.IInput GetRegisteredInput(string name)
-    {
-        return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
-    }
+    // internal Inputs.IInput GetRegisteredInput(string name)
+    // {
+    //     return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
+    // }
 
     /// <summary>
     /// Opens an editor
@@ -212,10 +215,66 @@ public partial class Editor : ComponentBase, IDisposable
         }
 
         this.EditorDescription = Translater.Instant(args.TypeName + ".Description");
+        
+        BuildFieldsRenderFragment();
+        
         OpenTask = new TaskCompletionSource<ExpandoObject>();
         this.FocusFirst = true;
         this.StateHasChanged();
         return OpenTask.Task;
+    }
+
+    private void BuildFieldsRenderFragment()
+    {
+        FieldsFragment = (builder) => { };
+        this.WaitForRender();
+        FieldsFragment = (builder) =>
+        {
+            int count = -1;
+            if (string.IsNullOrEmpty(EditorDescription) == false)
+            {
+                builder.OpenElement(++count, "div");
+                builder.AddAttribute(++count, "class", "description");
+                builder.AddContent(++count, EditorDescription);
+                builder.CloseElement();
+            }
+
+            if (Fields?.Any() == true)
+            {
+                builder.OpenComponent<FlowPanel>(++count);
+                builder.AddAttribute(++count,  nameof(FlowPanel.Fields), Fields);
+                builder.AddAttribute(++count, nameof(FlowPanel.OnSubmit), EventCallback.Factory.Create(this, OnSubmit));
+                builder.AddAttribute(++count, nameof(FlowPanel.OnClose), EventCallback.Factory.Create(this, OnClose));
+                builder.CloseComponent();
+                if (AdditionalFields != null)
+                {
+                    builder.AddContent(++count, AdditionalFields);
+                }
+                if (Fields.Count > 4)
+                {
+                    builder.OpenElement(++count, "div");
+                    builder.AddAttribute(++count, "class", "empty");
+                    builder.CloseElement();
+                }
+            }
+
+            if (Tabs?.Any() == true)
+            {
+                builder.OpenComponent<FlowTabs>(++count);
+                foreach (var tab in Tabs)
+                {
+                    builder.OpenComponent<FlowTab>(++count);
+                    builder.AddAttribute(++count, nameof(FlowTab.Title), tab.Key);
+                    builder.OpenComponent<FlowPanel>(++count);
+                    builder.AddAttribute(++count, nameof(FlowPanel.Fields), tab.Value);
+                    builder.AddAttribute(++count, nameof(FlowPanel.OnSubmit), EventCallback.Factory.Create(this, OnSubmit));
+                    builder.AddAttribute(++count, nameof(FlowPanel.OnClose), EventCallback.Factory.Create(this, OnClose));
+                    builder.CloseComponent();
+                    builder.CloseComponent();
+                }
+                builder.CloseComponent();
+            }
+        };
     }
 
     protected async Task WaitForRender()
@@ -252,10 +311,12 @@ public partial class Editor : ComponentBase, IDisposable
             Logger.Instance.ILog("Cannot save, readonly");
             return;
         }
-
+        
         bool valid = true;
         foreach (var input in RegisteredInputs)
         {
+            if (input.Disabled || input.Visible == false)
+                continue; // don't validate hidden or disabled inputs
             bool iValid = await input.Validate();
             if (iValid == false)
             {

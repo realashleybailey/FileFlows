@@ -287,7 +287,6 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
 
     public virtual async Task<bool> Validate()
     {
-        Logger.Instance.ILog("BATMAN Validating " + this.Label);
         if (Disposed) return false;
         if (this.Validators?.Any() != true)
             return true;
@@ -297,7 +296,6 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
         bool isValid = string.IsNullOrEmpty(ErrorMessage);
         foreach (var val in this.Validators)
         {
-            Logger.Instance.ILog("BATMAN Validating " + this.Label + " ,  " + val.GetType().Name);
             var validResult = await val.Validate(this.Value);
             if (validResult.Valid == false)
             {

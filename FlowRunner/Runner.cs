@@ -382,8 +382,8 @@ public class Runner
         // need to clear this in case the file is being reprocessed
         if(failure == false)
             Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
-
-        while (count++ < 50)
+       
+        while (count++ < Math.Max(25, Info.Config.MaxNodes))
         {
             if (CancellationToken.IsCancellationRequested || Canceled)
             {

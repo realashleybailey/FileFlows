@@ -115,6 +115,8 @@ public class Program
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.bat"));
             if(File.Exists(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.sh")))
                 File.Delete(Path.Combine(DirectoryHelper.BaseDirectory, "node-upgrade.sh"));
+
+            CleanOldConfigurations();
             
             #if(DEBUG)
             showUi = true;
@@ -216,6 +218,17 @@ public class Program
         Exiting = true;
         MainWindow.Instance?.ForceQuit();
         Environment.Exit(exitCode);
+    }
+
+    static void CleanOldConfigurations()
+    {
+        var configDir = new DirectoryInfo(DirectoryHelper.ConfigDirectory);
+        if (configDir.Exists == false)
+            return;
+        foreach (var subdir in configDir.GetDirectories())
+        {
+            subdir.Delete(recursive: true);
+        }
     }
     
 }

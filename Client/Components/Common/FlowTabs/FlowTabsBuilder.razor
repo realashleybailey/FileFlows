@@ -1,0 +1,10 @@
+@namespace FileFlows.Client.Components.Common
+
+<FlowTabs @ref="FlowTabs">
+    @foreach (var tab in Tabs)
+    {
+        <FlowTab Title=@tab.Key>
+            <FlowPanel Fields=@tab.Value OnSubmit=@OnSubmit OnClose=@OnClose></FlowPanel>
+        </FlowTab>
+    }
+</FlowTabs>

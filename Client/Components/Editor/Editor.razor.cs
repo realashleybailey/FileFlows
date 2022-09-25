@@ -241,18 +241,10 @@ public partial class Editor : InputRegister, IDisposable
 
             if (Tabs?.Any() == true)
             {
-                builder.OpenComponent<FlowTabs>(++count);
-                foreach (var tab in Tabs)
-                {
-                    builder.OpenComponent<FlowTab>(++count);
-                    builder.AddAttribute(++count, nameof(FlowTab.Title), tab.Key);
-                    builder.OpenComponent<FlowPanel>(++count);
-                    builder.AddAttribute(++count, nameof(FlowPanel.Fields), tab.Value);
-                    builder.AddAttribute(++count, nameof(FlowPanel.OnSubmit), EventCallback.Factory.Create(this, OnSubmit));
-                    builder.AddAttribute(++count, nameof(FlowPanel.OnClose), EventCallback.Factory.Create(this, OnClose));
-                    builder.CloseComponent();
-                    builder.CloseComponent();
-                }
+                builder.OpenComponent<FlowTabsBuilder>(++count);
+                builder.AddAttribute(++count, nameof(FlowTabsBuilder.Tabs), Tabs);
+                builder.AddAttribute(++count, nameof(FlowTabsBuilder.OnSubmit), EventCallback.Factory.Create(this, OnSubmit));
+                builder.AddAttribute(++count, nameof(FlowTabsBuilder.OnClose), EventCallback.Factory.Create(this, OnClose));
                 builder.CloseComponent();
             }
         };

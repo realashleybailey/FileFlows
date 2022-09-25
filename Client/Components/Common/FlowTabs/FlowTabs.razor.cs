@@ -9,7 +9,7 @@
         public RenderFragment ChildContent { get; set; }
         public FlowTab ActiveTab { get; internal set; }
 
-        List<FlowTab> Tabs = new List<FlowTab>();
+        private List<FlowTab> Tabs = new();
 
         internal void AddTab(FlowTab tab)
         {
@@ -35,9 +35,17 @@
 
         protected override Task OnParametersSetAsync()
         {
-            if(ActiveTab == null)
-                ActiveTab = Tabs.FirstOrDefault(x => x.Visible);
+            SelectFirstTab();
             return Task.CompletedTask;
+        }
+
+        public void SelectFirstTab()
+        {
+            if (ActiveTab == null)
+            {
+                ActiveTab = Tabs.FirstOrDefault(x => x.Visible);
+                this.StateHasChanged();
+            }
         }
 
     }

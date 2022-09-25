@@ -14,6 +14,11 @@ public class ConfigurationRevision
     public int Revision { get; set; }
 
     /// <summary>
+    /// Gets or sets the maximum nodes that can be executed
+    /// </summary>
+    public int MaxNodes { get; set; }
+
+    /// <summary>
     /// Gets or sets the system variables
     /// </summary>
     public Dictionary<string, string> Variables { get; set; }

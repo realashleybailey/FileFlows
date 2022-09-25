@@ -285,19 +285,7 @@ public partial class Editor : InputRegister, IDisposable
             return;
         }
         
-        bool valid = true;
-        foreach (var input in RegisteredInputs)
-        {
-            if (input.Disabled || input.Visible == false)
-                continue; // don't validate hidden or disabled inputs
-            bool iValid = await input.Validate();
-            Logger.Instance.ILog("Validating: " + input.Label  + " = " + iValid);
-            if (iValid == false)
-            {
-                Logger.Instance.DLog("Invalid input:" + input.Label);
-                valid = false;
-            }
-        }
+        bool valid = await this.Validate();
         if (valid == false)
             return;
 

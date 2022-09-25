@@ -306,6 +306,7 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
                 this.StateHasChanged();
                 if (isValid)
                     ValidStateChanged?.Invoke(this, false);
+                Logger.Instance.DLog($"Invalid '{this.Label}' validator: " + val.GetType().FullName);
                 return false;
             }
         }

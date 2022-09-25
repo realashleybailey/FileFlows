@@ -931,7 +931,7 @@ public class NodeParameters
         }
 
         var variable = GetToolPathActual(variableName);
-        if (string.IsNullOrEmpty(variableName))
+        if (string.IsNullOrEmpty(variable))
         {
             Logger.WLog("Variable not found: " + variableName);
             return false;
@@ -950,7 +950,7 @@ public class NodeParameters
                     string rgxCompare = line[1..lastIndex];
                     string opt = line.Substring(lastIndex + 1);
                     var options = RegexOptions.None;
-                    if (opt.IndexOf("i", StringComparison.Ordinal) > 0)
+                    if (opt.IndexOf("i", StringComparison.Ordinal) >= 0)
                         options |= RegexOptions.IgnoreCase;
                     var rgx = new Regex(rgxCompare, options);
                     if (rgx.IsMatch(input))

@@ -126,7 +126,7 @@ public partial class Editor : InputRegister, IDisposable
             jsRuntime.InvokeVoidAsync("ff.resizableEditor", this.Uid);
         if (FocusFirst)
         {
-            foreach (var input in RegisteredInputs)
+            foreach (var input in RegisteredInputs.Values)
             {
                 if (input.Focus())
                     break;
@@ -374,9 +374,7 @@ public partial class Editor : InputRegister, IDisposable
     /// <typeparam name="T">the type of field</typeparam>
     /// <returns>the input if found</returns>
     internal T FindInput<T>(string name)
-    {
-        return (T)this.RegisteredInputs.FirstOrDefault(x => x.Field?.Name == name && x is T);
-    }
+        => (T)this.RegisteredInputs.Values.FirstOrDefault(x => x.Field?.Name == name && x is T);
     
     /// <summary>
     /// Updates a value

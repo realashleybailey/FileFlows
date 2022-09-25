@@ -13,6 +13,11 @@ using FileFlows.Plugin;
 public class ElementField
 {
     /// <summary>
+    /// A unique identifier for this field
+    /// </summary>
+    public readonly Guid Uid = Guid.NewGuid(); 
+    
+    /// <summary>
     /// Gets or sets the order of which to display this filed
     /// </summary>
     public int Order { get; set; }

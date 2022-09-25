@@ -5,13 +5,15 @@ namespace FileFlows.Client.Components;
 
 public abstract class InputRegister:ComponentBase
 {
-    protected readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
+    protected readonly Dictionary<Guid, Inputs.IInput> RegisteredInputs = new();
 
 
-    internal void RegisterInput<T>(Input<T> input)
+    internal void RegisterInput<T>(Guid uid, Input<T> input)
     {
-        if (this.RegisteredInputs.Contains(input) == false)
-            this.RegisteredInputs.Add(input);
+        if (this.RegisteredInputs.ContainsKey(uid) == false)
+            this.RegisteredInputs.Add(uid, input);
+        else
+            this.RegisteredInputs[uid] = input;
     }
 
     // internal void RemoveRegisteredInputs(params string[] except)
@@ -32,12 +34,12 @@ public abstract class InputRegister:ComponentBase
     protected async Task<bool> Validate()
     {
         bool valid = true;
-        foreach (var input in RegisteredInputs)
+        foreach (var ri in RegisteredInputs)
         {
+            var input = ri.Value;
             if (input.Disabled || input.Visible == false)
                 continue; // don't validate hidden or disabled inputs
             bool iValid = await input.Validate();
-            Logger.Instance.ILog("Validating: " + input.Label  + " = " + iValid);
             if (iValid == false)
             {
                 Logger.Instance.DLog("Invalid input: " + input.Label);

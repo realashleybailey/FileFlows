@@ -215,7 +215,8 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
     {
         base.OnInitialized();
         Logger.Instance.ILog("InputRegister: " + (InputRegister?.GetTheType()?.Name ?? "null"));
-        InputRegister.RegisterInput(this);
+        if(this.Field != null)
+            InputRegister.RegisterInput(this.Field.Uid, this);
         this.Visible = true;
 
         if (this.Field != null)
@@ -303,7 +304,7 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
 
     public virtual async Task<bool> Validate()
     {
-        if (Disposed) return false;
+        if (Disposed) return true;
         if (this.Validators?.Any() != true)
             return true;
         if (this.Visible == false)

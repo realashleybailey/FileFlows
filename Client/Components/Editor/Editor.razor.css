@@ -5,4 +5,8 @@
   overflow: auto;
 }
 
+.full-width ::deep textarea, .full-width ::deep input[type=text], .full-width ::deep input[type=number] {
+  max-width: unset;
+}
+
 /*# sourceMappingURL=Editor.razor.css.map */

@@ -5,3 +5,12 @@
     overflow: auto;
   }
 }
+
+.full-width {
+  ::deep
+  {
+    textarea, input[type=text], input[type=number] {
+      max-width: unset;
+    }
+  }
+}

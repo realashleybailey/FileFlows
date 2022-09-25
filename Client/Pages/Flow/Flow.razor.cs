@@ -477,6 +477,7 @@ public partial class Flow : ComponentBase, IDisposable
         }
 
         List<ListOption> flowOptions = null;
+        List<ListOption> variableOptions = null;
 
         foreach (var field in fields)
         {
@@ -533,6 +534,32 @@ public partial class Flow : ComponentBase, IDisposable
                                 field.Parameters["Options"] = flowOptions;
                             else
                                 field.Parameters.Add("Options", flowOptions);
+                        }
+                        else if (optp == "VARIABLE_LIST")
+                        {
+                            if (variableOptions == null)
+                            {
+                                variableOptions = new List<ListOption>();
+                                var variableResult = await HttpHelper.Get<Variable[]>($"/api/variable");
+                                if (variableResult.Success)
+                                {
+                                    variableOptions = variableResult.Data?.OrderBy(x => x.Name)?.Select(x => new ListOption
+                                    {
+                                        Label = x.Name,
+                                        Value = new ObjectReference
+                                        {
+                                            Name = x.Name,
+                                            Uid = x.Uid,
+                                            Type = x.GetType().FullName
+                                        }
+                                    })?.ToList() ?? new List<ListOption>();
+                                }
+
+                            }
+                            if (field.Parameters.ContainsKey("Options"))
+                                field.Parameters["Options"] = variableOptions;
+                            else
+                                field.Parameters.Add("Options", variableOptions);
                         }
                     }
                 }

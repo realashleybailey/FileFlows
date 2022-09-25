@@ -136,6 +136,19 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the text to show as the placeholder
+    /// </summary>
+    /// <returns>the text to show as the placeholder</returns>
+    protected string GetPlaceholder()
+    {
+        if (string.IsNullOrEmpty(this.Placeholder) == false)
+            return this.Placeholder;
+        if (this.HideLabel || this.Field?.HideLabel == true)
+            return this.Label;
+        return string.Empty;
+    }
+
     protected T _Value;
     private bool _ValueUpdating = false;
     [Parameter]

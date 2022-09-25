@@ -36,6 +36,11 @@ public partial class Editor : InputRegister, IDisposable
     private string Uid = Guid.NewGuid().ToString();
     private bool UpdateResizer; // when set to true, the afterrender method will reinitailize the resizer in javascript
     
+    /// <summary>
+    /// Gets or sets if inputs should be full width and not use a maximum width
+    /// </summary>
+    public bool FullWidth { get; set; }
+    
     protected bool Maximised { get; set; }
 
     private RenderFragment FieldsFragment;
@@ -161,6 +166,7 @@ public partial class Editor : InputRegister, IDisposable
             this.CleanModelJson = ModelToJsonForCompare(expandoModel);
         this.TypeName = args.TypeName;
         this.Maximised = false;
+        this.FullWidth = args.FullWidth;
         this.Uid = Guid.NewGuid().ToString();
         this.UpdateResizer = true;
         this.AdditionalButtons.Clear();
@@ -634,6 +640,12 @@ public class EditorOpenArgs
     /// Gets or sets if the editor is a large editor and takes up more width
     /// </summary>
     public bool Large  { get; set; }
+
+    /// <summary>
+    /// Gets or sets if inputs should be full width and not use a maximum width
+    /// </summary>
+    public bool FullWidth { get; set; }
+
     /// <summary>
     /// Gets or sets the label to show on the save button
     /// </summary>

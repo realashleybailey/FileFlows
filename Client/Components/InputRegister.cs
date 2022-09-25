@@ -40,7 +40,7 @@ public abstract class InputRegister:ComponentBase
             Logger.Instance.ILog("Validating: " + input.Label  + " = " + iValid);
             if (iValid == false)
             {
-                Logger.Instance.DLog("Invalid input:" + input.Label);
+                Logger.Instance.DLog("Invalid input: " + input.Label);
                 valid = false;
             }
         }

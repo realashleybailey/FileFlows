@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FileFlows.Plugin.Models;
 
 namespace FileFlows.Plugin;
@@ -913,6 +914,56 @@ public class NodeParameters
         if(this.Variables?.ContainsKey(name) == true)
             return this.Variables[name];
         return null;
+    }
+
+    /// <summary>
+    /// Tests if a input string matches a variable
+    /// </summary>
+    /// <param name="variableName">The name of the variable</param>
+    /// <param name="input">the input string</param>
+    /// <returns>true if matches, otherwise false</returns>
+    public bool MatchesVariable(string variableName, string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            Logger.ILog("Input not set, does not match anything");
+            return false;
+        }
+
+        var variable = GetToolPathActual(variableName);
+        if (string.IsNullOrEmpty(variableName))
+        {
+            Logger.WLog("Variable not found: " + variableName);
+            return false;
+        }
+
+        foreach (var line in variable.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (string.Equals(line, input, StringComparison.InvariantCultureIgnoreCase))
+                return true;
+            int lastIndex = line.LastIndexOf("/", StringComparison.Ordinal);
+            if (line.StartsWith("/") && lastIndex > 0)
+            {
+                // try a regex
+                try
+                {
+                    string rgxCompare = line[1..lastIndex];
+                    string opt = line.Substring(lastIndex + 1);
+                    var options = RegexOptions.None;
+                    if (opt.IndexOf("i", StringComparison.Ordinal) > 0)
+                        options |= RegexOptions.IgnoreCase;
+                    var rgx = new Regex(rgxCompare, options);
+                    if (rgx.IsMatch(input))
+                        return true;
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

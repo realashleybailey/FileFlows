@@ -47,7 +47,17 @@ public class ElementField
     /// Note: this is used by the Script which the user defines the description for
     /// </summary>
     public string Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this field should flex-grow to fill the remaining content
+    /// </summary>
+    public bool FlexGrow { get; set; }
     
+    /// <summary>
+    /// Gets or sets if this should hide the label
+    /// </summary>
+    public bool HideLabel { get; set; }
+
     /// <summary>
     /// Gets or sets the input type of this field
     /// </summary>

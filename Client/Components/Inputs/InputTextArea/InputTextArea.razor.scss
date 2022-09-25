@@ -9,3 +9,10 @@ textarea {
         filter: opacity(0.5);
     }
 }
+
+.flex-grow {
+    height:100%;
+    textarea {
+        height:calc(100% - 0.35rem);
+    }   
+}

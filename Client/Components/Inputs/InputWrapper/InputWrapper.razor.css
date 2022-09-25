@@ -1,4 +1,4 @@
-﻿.help-text {
+.help-text {
   font-size: 0.8rem;
   font-style: italic;
   color: var(--color-darkest);
@@ -19,6 +19,9 @@
 .row {
   display: flex;
   flex-direction: row;
+}
+.row.flex-grow {
+  flex-grow: 1;
 }
 
 .input-label {
@@ -52,3 +55,5 @@
     margin: unset;
   }
 }
+
+/*# sourceMappingURL=InputWrapper.razor.css.map */

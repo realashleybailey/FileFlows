@@ -1,1 +1,1 @@
-﻿textarea{width:100%;line-height:1.5;font-size:1rem;padding:.1875rem .625rem;max-width:40rem;}textarea:read-only{filter:opacity(.5);}
+textarea{width:100%;line-height:1.5;font-size:1rem;padding:.1875rem .625rem;max-width:40rem}textarea:read-only{filter:opacity(.5)}.flex-grow{height:100%}.flex-grow textarea{height:calc(100% - .35rem)}

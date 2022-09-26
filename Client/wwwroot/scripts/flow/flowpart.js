@@ -227,8 +227,8 @@ window.ffFlowPart = {
 
             if (result.outputs >= 0) {
                 part.outputs = result.outputs;
-                // have to update any connections incase they are no long available
-                ffFlowPart.updateOutputNodes(part.uid);
+                // have to update any connections in case they are no long available
+                ffFlowPart.updateOutputNodes(part.uid, part);
                 ffFlow.redrawLines();
             }
             ffFlow.initOutputHints(part);
@@ -269,8 +269,6 @@ window.ffFlowPart = {
         if (part.outputs > 0) {
             if (!divOutputs) {
                 divOutputs = document.createElement('div');
-                divOutputs.classList.add('outputs');
-                divOutputs.classList.add('outputs-' + Math.max(part.outputs, 1));
                 div.appendChild(divOutputs);
             }
             else {
@@ -278,6 +276,7 @@ window.ffFlowPart = {
                     divOutputs.removeChild(divOutputs.firstChild);
                 }
             }
+            divOutputs.className = 'outputs outputs-' + Math.max(part.outputs, 1);
             for (let i = 1; i <= part.outputs; i++) {
                 let divOutput = document.createElement('div');
                 let divOutputInner = document.createElement('div');

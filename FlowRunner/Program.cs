@@ -42,11 +42,15 @@ namespace FileFlows.FlowRunner
                 if (string.IsNullOrEmpty(cfgPath) || Directory.Exists(cfgPath) == false)
                     throw new Exception("Configuration Path doesnt exist: " + cfgPath);
 
+                string cfgKey = GetArgument(args, "--cfgKey");
+                if (string.IsNullOrEmpty(cfgKey))
+                    throw new Exception("Configuration Key not set");
+
                 string cfgFile = Path.Combine(cfgPath, "config.json");
                 if(File.Exists(cfgFile) == false)
                     throw new Exception("Configuration file doesnt exist: " + cfgFile);
 
-                string cfgJson = File.ReadAllText(cfgFile);
+                string cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
                 var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationRevision>(cfgJson);
 
                 string baseUrl = GetArgument(args, "--baseUrl");

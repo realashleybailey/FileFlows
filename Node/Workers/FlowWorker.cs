@@ -24,6 +24,8 @@ public class FlowWorker : Worker
     /// </summary>
     public readonly Guid Uid = Guid.NewGuid();
 
+    private static readonly string ConfigKey = Guid.NewGuid().ToString();
+
     /// <summary>
     /// The current configuration
     /// </summary>
@@ -197,6 +199,8 @@ public class FlowWorker : Worker
                     tempPath,
                     "--cfgPath",
                     GetConfigurationDirectory(),
+                    "--cfgKey",
+                    ConfigKey,
                     "--baseUrl",
                     Service.ServiceBaseUrl,
                     isServer ? null : "--hostname",
@@ -548,6 +552,7 @@ public class FlowWorker : Worker
         string json = System.Text.Json.JsonSerializer.Serialize(new
         {
             config.Revision,
+            config.MaxNodes,
             config.Variables,
             config.Libraries,
             config.PluginSettings,
@@ -556,7 +561,8 @@ public class FlowWorker : Worker
             config.SharedScripts,
             config.SystemScripts
         });
-        await System.IO.File.WriteAllTextAsync(Path.Combine(dir, "config.json"), json);
+        
+        Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
         CurrentConfigurationRevision = revision;
 
         return true;

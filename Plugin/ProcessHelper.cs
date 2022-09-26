@@ -1,4 +1,6 @@
-﻿namespace FileFlows.Plugin;
+﻿using System.Text.RegularExpressions;
+
+namespace FileFlows.Plugin;
 
 using System;
 using System.Diagnostics;
@@ -296,6 +298,7 @@ public class ProcessHelper
         return result;
     }
 
+    private string ProcessLastOutputLine;
 
     /// <summary>
     /// Called when a process received standard data in its output
@@ -311,10 +314,16 @@ public class ProcessHelper
         }
         else
         {
-            Args?.OnStandardOutput(e.Data);
-            if(Args?.Silent != true)
-                Logger?.ILog(e.Data);
-            outputBuilder.AppendLine(e.Data);
+            // remove ansi codes
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace("[" + '', string.Empty);
+            Args?.OnStandardOutput(line);
+            if (ProcessLastOutputLine != line)
+            {
+                if (Args?.Silent != true)
+                    Logger?.ILog(line);
+                outputBuilder.AppendLine(line);
+            }
+            ProcessLastOutputLine = line;
         }
     }
 
@@ -332,10 +341,16 @@ public class ProcessHelper
         }
         else
         {
-            Args?.OnErrorOutput(e.Data);
-            if (Args?.Silent != true)
-                Logger?.ILog(e.Data);
-            outputBuilder.AppendLine(e.Data);
+            // remove ansi codes
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace("[" + '', string.Empty);
+            Args?.OnErrorOutput(line);
+            if (ProcessLastOutputLine != line)
+            {
+                if (Args?.Silent != true)
+                    Logger?.ILog(line);
+                outputBuilder.AppendLine(line);
+            }
+            ProcessLastOutputLine = line;
         }
     }
 

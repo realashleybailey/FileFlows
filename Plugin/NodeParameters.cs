@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FileFlows.Plugin.Models;
 
 namespace FileFlows.Plugin;
@@ -153,6 +154,22 @@ public class NodeParameters
     /// eg. Runner-42f99fc9-158e-408d-9133-de91a56a6ac8
     /// </summary>
     public string TempPathName { get; set; }
+
+    /// <summary>
+    /// Gets the temp path on the host if running on docker from the environmental variable "TempPathHost"
+    /// If not running on docker just returns TempPath
+    /// </summary>
+    public string TempPathHost
+    {
+        get
+        {
+            var host = Environment.GetEnvironmentVariable("TempPathHost");
+            if (string.IsNullOrEmpty(host))
+                return TempPath;
+            // need to append runner subpath
+            return Path.Combine(host, "Runner-" + RunnerUid);
+        }
+    }
 
     /// <summary>
     /// Gets or sets the runners UID
@@ -357,6 +374,15 @@ public class NodeParameters
                         { "folder.Orig.Name", fiOriginal.Directory?.Name ?? "" },
                         { "folder.Orig.FullName", fiOriginal.DirectoryName ?? "" }
                     });
+
+                    if (string.IsNullOrEmpty(this.LibraryPath) == false &&
+                        fiOriginal.FullName.StartsWith(this.LibraryPath))
+                    {
+                        UpdateVariables(new Dictionary<string, object>
+                        {
+                            { "file.Orig.RelativeName", fiOriginal.FullName.Substring(LibraryPath.Length + 1) }
+                        });
+                    }
                 }
             }
         }
@@ -744,7 +770,7 @@ public class NodeParameters
     /// Replaces variables in a given string
     /// </summary>
     /// <param name="input">the input string</param>
-    /// <param name="stripMissing">if missing variables shouild be removed</param>
+    /// <param name="stripMissing">if missing variables should be removed</param>
     /// <param name="cleanSpecialCharacters">if special characters (eg directory path separator) should be replaced</param>
     /// <returns>the string with the variables replaced</returns>
     public string ReplaceVariables(string input, bool stripMissing = false, bool cleanSpecialCharacters = false) => VariablesHelper.ReplaceVariables(input, Variables, stripMissing, cleanSpecialCharacters);
@@ -789,6 +815,23 @@ public class NodeParameters
         // put the drive letter back if it was replaced iwth a ' - '
         destDir = System.Text.RegularExpressions.Regex.Replace(destDir, @"^([a-z]) \- ", "$1:", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         return new FileInfo(Path.Combine(destDir, destName));
+    }
+
+    /// <summary>
+    /// Copies a file into the temporary directory if it is not already in the temporary directory
+    /// </summary>
+    /// <param name="filename">[Optional] the filename to copy, if not set the working file will be set</param>
+    /// <returns>the new filename</returns>
+    public string CopyToTemp(string filename = null)
+    {
+        if (Fake) return filename?.EmptyAsNull() ?? "/mnt/temp/fakefile.mkv";
+            
+        filename ??= WorkingFile;
+        if (filename.StartsWith(TempPath))
+            return filename;
+        string dest = Path.Combine(TempPath, new FileInfo(filename).Name);
+        System.IO.File.Copy(filename, dest);
+        return dest;
     }
 
     /// <summary>
@@ -871,6 +914,56 @@ public class NodeParameters
         if(this.Variables?.ContainsKey(name) == true)
             return this.Variables[name];
         return null;
+    }
+
+    /// <summary>
+    /// Tests if a input string matches a variable
+    /// </summary>
+    /// <param name="variableName">The name of the variable</param>
+    /// <param name="input">the input string</param>
+    /// <returns>true if matches, otherwise false</returns>
+    public bool MatchesVariable(string variableName, string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            Logger.ILog("Input not set, does not match anything");
+            return false;
+        }
+
+        var variable = GetToolPathActual(variableName);
+        if (string.IsNullOrEmpty(variable))
+        {
+            Logger.WLog("Variable not found: " + variableName);
+            return false;
+        }
+
+        foreach (var line in variable.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (string.Equals(line, input, StringComparison.InvariantCultureIgnoreCase))
+                return true;
+            int lastIndex = line.LastIndexOf("/", StringComparison.Ordinal);
+            if (line.StartsWith("/") && lastIndex > 0)
+            {
+                // try a regex
+                try
+                {
+                    string rgxCompare = line[1..lastIndex];
+                    string opt = line.Substring(lastIndex + 1);
+                    var options = RegexOptions.None;
+                    if (opt.IndexOf("i", StringComparison.Ordinal) >= 0)
+                        options |= RegexOptions.IgnoreCase;
+                    var rgx = new Regex(rgxCompare, options);
+                    if (rgx.IsMatch(input))
+                        return true;
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

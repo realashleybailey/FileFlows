@@ -45,14 +45,23 @@ window.ffCode = {
             "SetWorkingFile: function (filename: string, dontDelete: bool), " +
             "SetParameter: function (key:string, value:any)," +
             "NewGuid: function ():string," +
+            "CopyToTemp: function(filename:string):string, " + 
             "Execute: function(args:{command:string, arguments: string, argumentList:string[], timeout:number, workingDirectory:string}):{completed:bool, exitCode:number, output:string, standardOutput:string, starndardError:string}," +
-            "TempPath:string," +
-            "TempPathName:string," + 
+            "FileName: string," + 
+            "TempPath:string," +            
+            "TempPathName:string," +
+            "TempPathHost:string," + 
             "RunnerUid:string," + 
             "WorkingFile:string," +
+            "WorkingFileName:string, " +
             "WorkingFileSize:number," +
             "RelativeFile:string," +
-            "IsDirectory:bool" +
+            "IsDirectory:bool," +
+            "IsDocker:bool," +
+            "IsWindows:bool," +
+            "IsLinux:bool," +
+            "IsMac:bool," +
+            "IsArm:bool," +
             "LibraryPath:string," +
             "}",
             "javascript"

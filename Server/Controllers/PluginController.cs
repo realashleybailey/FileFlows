@@ -376,7 +376,9 @@ public class PluginController : ControllerStore<PluginInfo>
             
             bool updated = false;
 
-            json = json.Replace("\u0022", "\"");
+            json = json.Replace("\\u0022", "\"");
+            if (json.StartsWith("\"") && json.EndsWith("\""))
+                json = json[1..^1];
 
             IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json) as IDictionary<string, object> ?? new Dictionary<string, object>();
             foreach (var key in dict.Keys.ToArray())

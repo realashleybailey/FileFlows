@@ -1,4 +1,4 @@
-﻿textarea {
+textarea {
   width: 100%;
   line-height: 1.5;
   font-size: 1rem;
@@ -8,3 +8,12 @@
 textarea:read-only {
   filter: opacity(0.5);
 }
+
+.flex-grow {
+  height: 100%;
+}
+.flex-grow textarea {
+  height: calc(100% - 0.35rem);
+}
+
+/*# sourceMappingURL=InputTextArea.razor.css.map */

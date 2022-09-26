@@ -302,6 +302,7 @@ public class SettingsController : Controller
         cfg.Flows = (await new FlowController().GetAll()).ToList();
         cfg.Libraries = (await new LibraryController().GetAll()).ToList();
         cfg.PluginSettings = await new PluginController().GetAllPluginSettings();
+        cfg.MaxNodes = LicenseHelper.IsLicensed() ? 250 : 30;
         var plugins = new Dictionary<string, byte[]>();
         foreach (var file in new DirectoryInfo(DirectoryHelper.PluginsDirectory).GetFiles("*.ffplugin"))
         {

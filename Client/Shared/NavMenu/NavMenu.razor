@@ -1,14 +1,20 @@
 ﻿@namespace FileFlows.Client.Shared
 
-<PageTitle>FileFlows - @Active.Title</PageTitle>
+@if (Active != null)
+{
+    <PageTitle>FileFlows - @Active.Title</PageTitle>
+}
 
 <div class="top-row navbar navbar-dark">
     <a class="navbar-brand" target="_blank" href="https://fileflows.com/" rel="noreferrer">
         
     </a>
     <span class="page-title">
-        <span class="icon @Active?.Icon"></span>
-        @Active.Title
+        @if (Active != null)
+        {
+            <span class="icon @Active?.Icon"></span>
+            @Active.Title
+        }
     </span>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="fas fa-bars"></span>

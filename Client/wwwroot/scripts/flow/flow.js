@@ -422,10 +422,13 @@ window.ffFlow = {
         }
         if(part.flowElementUid.startsWith('Script:'))
         {
-            let labels = element.outputLabels || element.OutputLabels;
             part.OutputLabels = {};
-            for(let i=0;i<labels.length;i++) {
-                part.OutputLabels[i+1] = `Output ${i + 1}: ${labels[i]}`;
+            for(let i=0; i<element.outputLabels.length;i++)
+            {
+                part.OutputLabels[(i + 1)] = 'Output ' + (i + 1) + ': ' + element.outputLabels[i];
+                let outputNode = document.getElementById(part.uid + '-output-' + (i + 1));
+                if (outputNode)
+                    outputNode.setAttribute('title', part.OutputLabels[(i + 1)]);                 
             }
         }
         else 

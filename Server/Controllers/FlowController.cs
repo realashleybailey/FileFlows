@@ -629,6 +629,7 @@ public class FlowController : ControllerStore<Flow>
                 windows ? @"C:\Folder\temp\randomfile.ext" : "/media/temp/randomfile.ext");
             variables.Add("file.Orig.Extension", ".mkv");
             variables.Add("file.Orig.FileName", "OriginalFile.ext");
+            variables.Add("file.Orig.RelativeName", "files/filename.ext");
             variables.Add("file.Orig.FileNameNoExtension", "OriginalFile");
             variables.Add("file.Orig.FullName",
                 windows ? @"C:\Folder\files\filename.ext" : "/media/files/filename.ext");

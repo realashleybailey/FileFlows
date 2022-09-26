@@ -169,7 +169,7 @@ public abstract class ListPage<U, T> : ComponentBase where T : IUniqueObject<U>
 #endif
     }
 
-    protected virtual string DeleteMessage => "Labels.DeleteLibraryFiles";
+    protected virtual string DeleteMessage => "Labels.DeleteItems";
     
     protected virtual string DeleteUrl => ApiUrl;
 

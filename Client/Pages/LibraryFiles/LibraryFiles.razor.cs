@@ -38,6 +38,8 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     private string Title;
     private string lblLibraryFiles, lblFileFlowsServer;
     private int TotalItems;
+
+    protected override string DeleteMessage => "Labels.DeleteLibraryFiles";
     
     private async Task SetSelected(FlowSkyBoxItem<FileStatus> status)
     {

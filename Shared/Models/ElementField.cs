@@ -283,7 +283,25 @@ public class Condition
     /// <returns>true if the condition is matches</returns>
     public virtual bool Matches(object value)
     {
-        bool matches = Helpers.ObjectHelper.ObjectsAreSame(value, this.Value);
+        bool matches = false;
+        string strValue = this.Value?.ToString() ?? string.Empty;
+        if (strValue.Length > 1 && strValue.StartsWith("/") && strValue.EndsWith("/"))
+        {
+            // special case, regex
+            try
+            {
+                matches = new Regex(strValue[1..^1]).IsMatch(value.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ILog("matches error: " + ex.Message);
+            }
+        }
+        else
+        {
+            matches = Helpers.ObjectHelper.ObjectsAreSame(value, this.Value);
+        }
+
         if (IsNot)
             matches = !matches;
         return matches;

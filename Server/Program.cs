@@ -123,12 +123,19 @@ public class Program
                     WebServer.Start(args);
                 });
 
+                DateTime dt = DateTime.Now;
                 try
                 {
                     var appBuilder = BuildAvaloniaApp();
                     appBuilder.StartWithClassicDesktopLifetime(args);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    if(DateTime.Now.Subtract(dt) < new TimeSpan(0,0,2))
+                        Console.WriteLine("Failed to launch GUI: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    else
+                        Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                }
             }
 
             _ = WebServer.Stop();

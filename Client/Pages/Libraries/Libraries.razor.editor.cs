@@ -157,7 +157,7 @@ public partial class Libraries : ListPage<Guid, Library>
             }
         });
         
-        if(App.Instance.FileFlowsSystem.ExternalDatabase)
+        if(App.Instance.FileFlowsSystem.Licensed)
         {
             fields.Add(new ElementField
             {

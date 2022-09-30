@@ -1,4 +1,5 @@
 using FileFlows.Plugin;
+using FileFlows.Server.Helpers;
 
 namespace FileFlows.Server.Database.Managers;
 
@@ -7,16 +8,27 @@ namespace FileFlows.Server.Database.Managers;
 /// </summary>
 public class FlowDbConnection:IDisposable
 {
-    private const int MAX_CONNECTIONS = 30;
-    private static SemaphoreSlim semaphore = new SemaphoreSlim(MAX_CONNECTIONS, MAX_CONNECTIONS);
+    private static int MAX_CONNECTIONS = 30;
+    private static SemaphoreSlim semaphore;
+    private static bool Initialized = false;
 
     /// <summary>
     /// Gets the database instance
     /// </summary>
     public NPoco.Database Db { get; private set; }
 
-    private FlowDbConnection()
+    /// <summary>
+    /// Initializes the FlowDbConnection and the maximum open SQL connections
+    /// </summary>
+    /// <param name="sqlite">if the database is SQLite</param>
+    internal static void Initialize(bool sqlite)
     {
+        if (Initialized)
+            return;
+        MAX_CONNECTIONS = sqlite ? 1 : 30;
+        semaphore = new SemaphoreSlim(MAX_CONNECTIONS, MAX_CONNECTIONS);
+        Logger.Instance.ILog("Maximum concurrent database connections: " + MAX_CONNECTIONS);
+        Initialized = true;
     }
 
     /// <summary>
@@ -51,6 +63,12 @@ public class FlowDbConnection:IDisposable
             Db = null;
         }
 
-        semaphore.Release();
+        try
+        {
+            semaphore.Release();
+        }
+        catch (Exception)
+        {
+        }
     }
 }

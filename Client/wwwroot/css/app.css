@@ -133,6 +133,7 @@ button:not(.flowtable-button):not(.navbar-toggler), a.btn, .btn-select {
   border: solid 1px var(--accent);
   background-color: transparent;
   color: var(--color);
+  overflow: hidden;
 }
 button:not(.flowtable-button):not(.navbar-toggler):hover:not(:disabled), button:not(.flowtable-button):not(.navbar-toggler):active:not(:disabled), a.btn:hover:not(:disabled), a.btn:active:not(:disabled), .btn-select:hover:not(:disabled), .btn-select:active:not(:disabled) {
   background-image: linear-gradient(rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
@@ -478,6 +479,18 @@ a, .btn-link {
   color: var(--accent) !important;
 }
 
+.loading-version {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 5rem;
+  text-align: center;
+  z-index: 1000;
+  font-weight: bold;
+  color: var(--color);
+  opacity: 0.7;
+}
+
 .btn-primary {
   color: var(--color);
   background-color: var(--primary);
@@ -606,6 +619,7 @@ button .fas, button .far {
 
 .update-available {
   color: var(--color);
+  z-index: 1000000;
 }
 
 .flow-template-description {
@@ -667,6 +681,25 @@ hr {
   display: unset;
   z-index: 10000;
 }
+@media (max-width: 849.99px) {
+  .search-pane {
+    width: unset;
+    right: 0;
+    bottom: unset;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .search-pane:not(:focus-within) {
+    height: 4rem;
+    overflow: hidden;
+  }
+  .search-pane:not(:focus-within) .search-path input {
+    position: absolute;
+    top: 0.7rem;
+    left: 9rem;
+    width: calc(100% - 12rem);
+  }
+}
 .search-pane .search-head {
   font-size: 1.25rem;
   padding: 0.75rem 0 0.5rem;
@@ -697,6 +730,14 @@ hr {
 }
 .search-pane .search-submit {
   text-align: right;
+}
+@media (max-width: 849.99px) {
+  .search-pane .search-submit {
+    text-align: center;
+  }
+  .search-pane .search-submit .btn {
+    width: min(50%, 18rem);
+  }
 }
 .search-pane .close {
   position: absolute;
@@ -1282,6 +1323,41 @@ hr {
   width: 1.75rem;
   margin-right: 0.25rem;
   text-align: center;
+}
+
+@media (max-width: 849.99px) {
+  .vi-container .bottom-buttons {
+    position: fixed;
+    top: 0.75rem;
+    right: 2.5rem;
+    z-index: 3;
+  }
+  .vi-container .bottom-buttons button {
+    width: 6rem;
+  }
+  .vi-container .bottom-buttons button + button {
+    margin-left: 0.3rem !important;
+  }
+  .vi-container .bottom-buttons button:not(:focus), .vi-container .bottom-buttons button:not(:active), .vi-container .bottom-buttons button:not(:hover) {
+    border-color: var(--border-color);
+  }
+
+  .editor-wrapper .vi-container .bottom-buttons {
+    right: 0.5rem;
+    padding-right: 0;
+  }
+}
+@media (max-width: 849.99px) {
+  .page .vi-container {
+    z-index: 1;
+  }
+  .page .vi-container .content {
+    height: calc(100vh - 4rem);
+  }
+
+  .pager {
+    text-align: left !important;
+  }
 }
 
 /*# sourceMappingURL=app.css.map */

@@ -10,6 +10,8 @@ namespace FileFlows.Server.Controllers;
 [Route("/api/variable")]
 public class VariableController : ControllerStore<Variable>
 {
+    protected override bool AutoIncrementRevision => true;
+    
     /// <summary>
     /// Get all variables configured in the system
     /// </summary>

@@ -13,6 +13,16 @@ public class FlowExecutorInfo
     public Guid Uid { get; set; }
     
     /// <summary>
+    /// Gets or sets the directory where the configuration is saved
+    /// </summary>
+    public string ConfigDirectory { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the configuration
+    /// </summary>
+    public ConfigurationRevision Config { get; set; }
+    
+    /// <summary>
     /// Gets or sets the UID of the node execution this flow
     /// </summary>
     public Guid NodeUid { get; set; }

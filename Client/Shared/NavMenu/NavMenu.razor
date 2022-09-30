@@ -1,14 +1,20 @@
 ﻿@namespace FileFlows.Client.Shared
 
-<PageTitle>FileFlows - @Active.Title</PageTitle>
+@if (Active != null)
+{
+    <PageTitle>FileFlows - @Active.Title</PageTitle>
+}
 
 <div class="top-row navbar navbar-dark">
     <a class="navbar-brand" target="_blank" href="https://fileflows.com/" rel="noreferrer">
         
     </a>
     <span class="page-title">
-        <span class="icon @Active?.Icon"></span>
-        @Active.Title
+        @if (Active != null)
+        {
+            <span class="icon @Active?.Icon"></span>
+            @Active.Title
+        }
     </span>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="fas fa-bars"></span>
@@ -35,7 +41,7 @@
                 <li class="nav-item @(item.Url.Replace("/", ""))">
                     <a class="nav-link @(Active == item  ? "active": "")" href="@item.Url" @onclick:preventDefault @onclick:stopPropagation
                                                                                            @onclick="() => Click(item)">
-                        <span class="@item.Icon" aria-hidden="true"></span>
+                        <span class="icon @item.Icon" aria-hidden="true"></span>
                         <span class="text-label">@item.Title</span>
                         @if (item.Url == "library-files" && (Processing > 0 || Failed > 0 || Unprocessed > 0))
                         {
@@ -64,17 +70,17 @@
         }
         <li class="nav-item help">
             <a class="nav-link" href="https://docs.fileflows.com/" target="_blank" rel="noreferrer">
-                <span class="far fa-question-circle" aria-hidden="true"></span> <span class="text-label">@lblHelp</span>
+                <span class="icon far fa-question-circle" aria-hidden="true"></span> <span class="text-label">@lblHelp</span>
             </a>
         </li>
         <li class="nav-item forum">
             <a class="nav-link" href="https://forum.fileflows.com/" target="_blank" rel="noreferrer">
-                <span class="fas fa-comments" aria-hidden="true"></span> <span class="text-label">@lblForum</span>
+                <span class="icon fas fa-comments" aria-hidden="true"></span> <span class="text-label">@lblForum</span>
             </a>
         </li>
         <li class="nav-item discord">
             <a class="nav-link" href="https://fileflows.com/discord" target="_blank" rel="noreferrer">
-                <span class="fab fa-discord" aria-hidden="true"></span> <span class="text-label">@lblDiscord</span>
+                <span class="icon fab fa-discord" aria-hidden="true"></span> <span class="text-label">@lblDiscord</span>
             </a>
         </li>
     </ul>
@@ -85,6 +91,6 @@
     </div> 
 
     <div class="version-info">
-        @lblVersion
+        @lblVersion: <a href="http://docs.fileflows.com/versions" rel="noreferrer" target="_blank">@Globals.Version</a>
     </div>
 </div>

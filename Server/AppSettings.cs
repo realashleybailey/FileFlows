@@ -102,14 +102,25 @@ internal class AppSettings
             
             return settings;
         }
-        
+
+        AppSettings result = null;
         try
         {
             string json = File.ReadAllText(file);
             var settings = JsonSerializer.Deserialize<AppSettings>(json);
-            return settings ?? new ();
+            result = settings ?? new ();
         }
         catch (Exception) { }
-        return new();
+
+        result ??= new();
+
+
+        if (string.IsNullOrWhiteSpace(result.EncryptionKey))
+        {
+            result.EncryptionKey = Guid.NewGuid().ToString();
+            result.Save();
+        }
+
+        return result;
     }
 }

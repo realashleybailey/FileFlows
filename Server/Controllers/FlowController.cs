@@ -20,6 +20,8 @@ public class FlowController : ControllerStore<Flow>
 {
     const int DEFAULT_XPOS = 450;
     const int DEFAULT_YPOS = 50;
+    
+    protected override bool AutoIncrementRevision => true; 
 
     private static bool? _HasFlows;
     /// <summary>
@@ -555,6 +557,8 @@ public class FlowController : ControllerStore<Flow>
         var result = await Update(model);
         if(nameChanged)
             _ = new ObjectReferenceUpdater().RunAsync();
+
+        IncrementConfigurationRevision();
         return result;
     }
 
@@ -625,6 +629,7 @@ public class FlowController : ControllerStore<Flow>
                 windows ? @"C:\Folder\temp\randomfile.ext" : "/media/temp/randomfile.ext");
             variables.Add("file.Orig.Extension", ".mkv");
             variables.Add("file.Orig.FileName", "OriginalFile.ext");
+            variables.Add("file.Orig.RelativeName", "files/filename.ext");
             variables.Add("file.Orig.FileNameNoExtension", "OriginalFile");
             variables.Add("file.Orig.FullName",
                 windows ? @"C:\Folder\files\filename.ext" : "/media/files/filename.ext");

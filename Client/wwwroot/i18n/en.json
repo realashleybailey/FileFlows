@@ -2,6 +2,7 @@
   "ProductName": "FileFlows",
   "Labels": {
     "VersionNumber": "Version: {version}",
+    "Version":"Version",
     "Save": "Save",
     "Saving": "Saving",
     "Execute": "Execute",

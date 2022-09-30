@@ -32,8 +32,9 @@ public class Upgrade_0_9_0
         ExportScripts();
         UpdateScriptReferences();
         
+        // can no longer do this due to Library Files are in their own database which isn't known in 0.9.0
         // update object references
-        new ObjectReferenceUpdater().Run();
+        // new ObjectReferenceUpdater().Run();
     }
 
     private void UpdateScriptReferences()
@@ -72,8 +73,18 @@ public class Upgrade_0_9_0
     /// </summary>
     private void AddStatisticsTable()
     {
-        if(DbHelper.GetDbManager() is SqliteDbManager sqlite)
-            sqlite.Execute(SqliteCreateDbStatisticTableScript, new object[]{}).Wait();
+        if (DbHelper.GetDbManager() is SqliteDbManager sqlite)
+        {
+            try
+            {
+                sqlite.Execute($"drop table {nameof(DbStatistic)}",new object[] { }).Wait();
+                sqlite.Execute(SqliteCreateDbStatisticTableScript, new object[] { }).Wait();
+            }
+            catch (Exception)
+            {
+                // FF-337.   easiest to just catch this error and ignore it.
+            }
+        }
     }
 
     private void ExportScripts()

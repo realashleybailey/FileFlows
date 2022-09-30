@@ -28,7 +28,8 @@ public partial class Flow : ComponentBase, IDisposable
     private ffElement[] Filtered { get; set; }
     private List<ffPart> Parts { get; set; } = new List<ffPart>();
 
-    private string lblObsoleteMessage, lblEdit, lblHelp, lblDelete, lblCopy, lblPaste, lblRedo, lblUndo;
+    private string lblObsoleteMessage, lblEdit, lblHelp, lblDelete, lblCopy, lblPaste, lblRedo, lblUndo, lblAdd;
+    private string SelectedElement;
 
     private int _Zoom = 100;
     private int Zoom
@@ -67,6 +68,8 @@ public partial class Flow : ComponentBase, IDisposable
 
     private bool IsDirty = false;
 
+    private bool ElementsVisible = false;
+
     private string _txtFilter = string.Empty;
     private string lblFilter;
 
@@ -95,6 +98,7 @@ public partial class Flow : ComponentBase, IDisposable
         lblClose = Translater.Instant("Labels.Close");
         lblSaving = Translater.Instant("Labels.Saving");
         lblFilter = Translater.Instant("Labels.FilterPlaceholder");
+        lblAdd = Translater.Instant("Labels.Add");
         lblEdit = Translater.Instant("Labels.Edit");
         lblCopy = Translater.Instant("Labels.Copy");
         lblPaste = Translater.Instant("Labels.Paste");
@@ -138,6 +142,12 @@ public partial class Flow : ComponentBase, IDisposable
     {
         HotKeyService.DeregisterHotkey("FlowFilter");
         NavigationService.UnRegisterNavigationCallback(NavigationCheck);
+    }
+
+    private void SelectPart(string uid)
+    {
+        if (App.Instance.IsMobile)
+            SelectedElement = uid;
     }
 
     private async Task Init()
@@ -209,9 +219,13 @@ public partial class Flow : ComponentBase, IDisposable
 
     async Task Close()
     {
+        if (App.Instance.IsMobile && ElementsVisible)
+        {
+            ElementsVisible = false;
+            return;
+        }
         await NavigationService.NavigateTo("flows");
     }
-
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -463,6 +477,7 @@ public partial class Flow : ComponentBase, IDisposable
         }
 
         List<ListOption> flowOptions = null;
+        List<ListOption> variableOptions = null;
 
         foreach (var field in fields)
         {
@@ -520,6 +535,32 @@ public partial class Flow : ComponentBase, IDisposable
                             else
                                 field.Parameters.Add("Options", flowOptions);
                         }
+                        else if (optp == "VARIABLE_LIST")
+                        {
+                            if (variableOptions == null)
+                            {
+                                variableOptions = new List<ListOption>();
+                                var variableResult = await HttpHelper.Get<Variable[]>($"/api/variable");
+                                if (variableResult.Success)
+                                {
+                                    variableOptions = variableResult.Data?.OrderBy(x => x.Name)?.Select(x => new ListOption
+                                    {
+                                        Label = x.Name,
+                                        Value = new ObjectReference
+                                        {
+                                            Name = x.Name,
+                                            Uid = x.Uid,
+                                            Type = x.GetType().FullName
+                                        }
+                                    })?.ToList() ?? new List<ListOption>();
+                                }
+
+                            }
+                            if (field.Parameters.ContainsKey("Options"))
+                                field.Parameters["Options"] = variableOptions;
+                            else
+                                field.Parameters.Add("Options", variableOptions);
+                        }
                     }
                 }
             }
@@ -565,6 +606,13 @@ public partial class Flow : ComponentBase, IDisposable
         {
             return null;
         }
+    }
+    
+    private void ShowElementsOnClick()
+    {
+        ElementsVisible = !ElementsVisible;
+        if (ElementsVisible)
+            SelectedElement = null; // clear the selected item
     }
 
     private async Task<bool> FunctionSaveCallback(ExpandoObject model)
@@ -684,9 +732,16 @@ public partial class Flow : ComponentBase, IDisposable
 
     private void Copy() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Copy", SelectedParts);
     private void Paste() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Paste");
+    private void Add() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Add");
     private void Undo() => jsRuntime.InvokeVoidAsync("ffFlow.History.undo");
     private void Redo() => jsRuntime.InvokeVoidAsync("ffFlow.History.redo");
     private void DeleteItems() => jsRuntime.InvokeVoidAsync("ffFlow.contextMenu_Delete", SelectedParts);
+
+    private void AddSelectedElement()
+    {
+        jsRuntime.InvokeVoidAsync("ffFlow.addElementActual", new object[] { this.SelectedElement, 100, 100});
+        this.ElementsVisible = false;
+    } 
     
     private async Task OpenHelp()
     {

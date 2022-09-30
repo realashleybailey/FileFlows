@@ -98,6 +98,29 @@ public partial class CustomDashboard : IDisposable
     }
     
     /// <summary>
+    /// Gets recently finished library files
+    /// </summary>
+    [JSInvokable]
+    public async Task<List<object>> FetchRecentlyFinished()
+    {
+        var result = await HttpHelper.Get<List<LibraryFile>>("/api/library-file/recently-finished");
+        if (!result.Success || result.Data?.Any() != true)
+            return new List<object>();
+        return result.Data.Select(x =>
+        {
+            string when = x.ProcessingEnded.Humanize(false, DateTime.Now);
+            return (object)new
+            {
+                x.Uid,
+                x.RelativePath,
+                When = when,
+                x.OriginalSize,
+                x.FinalSize,
+            };
+        }).ToList();
+    }
+    
+    /// <summary>
     /// Opens a log for a executing library file
     /// </summary>
     /// <param name="libraryFileUid">The UID of the library file</param>

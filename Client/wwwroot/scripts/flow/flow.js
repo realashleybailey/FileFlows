@@ -59,11 +59,35 @@ window.ffFlow = {
             }
             container = c;
         }
-        container.addEventListener("keydown", (e) => ffFlow.onKeyDown(e), false);
-        container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
-        container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
-        container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
+        
+        var mc = new Hammer.Manager(container);
+        var pinch = new Hammer.Pinch();
+        var press = new Hammer.Press({
+            time: 1000,
+            pointers: 2,
+            threshold: 10
+        });
+        mc.add([pinch, press]);
+        mc.on("pinchin", (ev) => {
+            ffFlow.zoom(Math.min(100, ffFlow.Zoom + 1));            
+        });
+        mc.on("pinchout", (ev) => {
+            ffFlow.zoom(Math.max(50, ffFlow.Zoom - 1));
+        });
+        mc.on('press', (ev) => {
+            ev.preventDefault();
+            let eleShowElements = document.getElementById('show-elements');
+            if(eleShowElements)
+                eleShowElements.click();
+        });
+        mc.on('touch', (ev) => {
+            ev.preventDefault();
+        })
 
+        container.addEventListener("keydown", (e) => ffFlow.onKeyDown(e), false);
+        // container.addEventListener("touchstart", (e) => ffFlow.Mouse.dragStart(e), false);
+        // container.addEventListener("touchend", (e) => ffFlow.Mouse.dragEnd(e), false);
+        // container.addEventListener("touchmove", (e) => ffFlow.Mouse.drag(e), false);
         container.addEventListener("mousedown", (e) => ffFlow.Mouse.dragStart(e), false);
         container.addEventListener("mouseup", (e) => ffFlow.Mouse.dragEnd(e), false);
         container.addEventListener("mousemove", (e) => ffFlow.Mouse.drag(e), false);
@@ -166,7 +190,10 @@ window.ffFlow = {
         }
         if (!uid)
             uid = ffFlow.Mouse.draggingElementUid;
-
+        ffFlow.addElementActual(uid, xPos, yPos);
+    },
+    
+    addElementActual: function (uid, xPos, yPos) {
 
         ffFlow.csharp.invokeMethodAsync("AddElement", uid).then(result => {
             if(!result)
@@ -194,7 +221,6 @@ window.ffFlow = {
                 part.Outputs = part.model?.outputs;
 
             ffFlow.History.perform(new FlowActionAddNode(part));
-            
 
             if (element.noEditorOnAdd === true)
                 return;
@@ -203,7 +229,7 @@ window.ffFlow = {
             {
                 ffFlowPart.editFlowPart(part.uid, true);
             }
-        });
+        }); 
     },
 
     translateCoord: function (value, lines) {
@@ -396,10 +422,13 @@ window.ffFlow = {
         }
         if(part.flowElementUid.startsWith('Script:'))
         {
-            let labels = element.outputLabels || element.OutputLabels;
             part.OutputLabels = {};
-            for(let i=0;i<labels.length;i++) {
-                part.OutputLabels[i+1] = `Output ${i + 1}: ${labels[i]}`;
+            for(let i=0; i<element.outputLabels.length;i++)
+            {
+                part.OutputLabels[(i + 1)] = 'Output ' + (i + 1) + ': ' + element.outputLabels[i];
+                let outputNode = document.getElementById(part.uid + '-output-' + (i + 1));
+                if (outputNode)
+                    outputNode.setAttribute('title', part.OutputLabels[(i + 1)]);                 
             }
         }
         else 
@@ -508,5 +537,11 @@ window.ffFlow = {
         for(let part of parts || []) {
             ffFlowPart.deleteFlowPart(part.uid);
         }
+    },
+    contextMenu_Add: function() {
+        let ele = document.getElementById('show-elements')
+        if(ele)
+            ele.click();
+        bottom-buttons
     }
 }

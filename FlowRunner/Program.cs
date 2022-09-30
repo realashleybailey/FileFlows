@@ -4,9 +4,12 @@ using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using System;
 using System.Collections.Generic;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Azure;
+using FileFlows.ServerShared.Models;
 
 namespace FileFlows.FlowRunner
 {
@@ -34,6 +37,21 @@ namespace FileFlows.FlowRunner
                 string tempPath = GetArgument(args, "--tempPath");
                 if (string.IsNullOrEmpty(tempPath) || Directory.Exists(tempPath) == false)
                     throw new Exception("Temp path doesnt exist: " + tempPath);
+                
+                string cfgPath = GetArgument(args, "--cfgPath");
+                if (string.IsNullOrEmpty(cfgPath) || Directory.Exists(cfgPath) == false)
+                    throw new Exception("Configuration Path doesnt exist: " + cfgPath);
+
+                string cfgKey = GetArgument(args, "--cfgKey");
+                if (string.IsNullOrEmpty(cfgKey))
+                    throw new Exception("Configuration Key not set");
+
+                string cfgFile = Path.Combine(cfgPath, "config.json");
+                if(File.Exists(cfgFile) == false)
+                    throw new Exception("Configuration file doesnt exist: " + cfgFile);
+
+                string cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
+                var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationRevision>(cfgJson);
 
                 string baseUrl = GetArgument(args, "--baseUrl");
                 if (string.IsNullOrEmpty(baseUrl))
@@ -50,7 +68,17 @@ namespace FileFlows.FlowRunner
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
                 Shared.Helpers.HttpHelper.Client = new HttpClient();
-                Execute(server, tempPath, libfileUid, workingDir, hostname);
+                Execute(new()
+                {
+                    IsServer = server,
+                    Config = config,
+                    ConfigDirectory = cfgPath,
+                    TempDirectory = tempPath,
+                    LibraryFileUid = libfileUid,
+                    WorkingDirectory = workingDir,
+                    Hostname = hostname
+                });
+
             }
             catch (Exception ex)
             {
@@ -81,13 +109,13 @@ namespace FileFlows.FlowRunner
         }
 
 
-        static void Execute(bool isServer, string tempPath, Guid libfileUid, string workingDir, string hostname)
+        static void Execute(ExecuteArgs args)
         {
             ProcessingNode node;
             var nodeService = NodeService.Load();
             try
             {
-                string address = isServer ? "INTERNAL_NODE" : hostname;
+                string address = args.IsServer ? "INTERNAL_NODE" : args.Hostname;
                 LogInfo("Address: "+ address);
                 var nodeTask = nodeService.GetByAddress(address);
                 LogInfo("Waiting on node task");
@@ -107,7 +135,7 @@ namespace FileFlows.FlowRunner
             FlowRunnerCommunicator.SignalrUrl = node.SignalrUrl;
 
             var libFileService = LibraryFileService.Load();
-            var libFile = libFileService.Get(libfileUid).Result;
+            var libFile = libFileService.Get(args.LibraryFileUid).Result;
             if (libFile == null)
             {
                 LogInfo("Library file not found, must have been deleted from the library files.  Nothing to process");
@@ -117,21 +145,19 @@ namespace FileFlows.FlowRunner
             string workingFile = node.Map(libFile.Name);
 
             var libfileService = LibraryFileService.Load();
-            var libService = LibraryService.Load();
-            var lib = libService.Get(libFile.Library.Uid).Result;
+            var lib = args.Config.Libraries.FirstOrDefault(x => x.Uid == libFile.Library.Uid);
             if (lib == null)
             {
-                LogInfo("Library was null, deleting library file");
+                LogInfo("Library was not found, deleting library file");
                 libfileService.Delete(libFile.Uid).Wait();
                 return;
             }
 
-            var flowService = FlowService.Load();
             FileSystemInfo file = lib.Folders ? new DirectoryInfo(workingFile) : new FileInfo(workingFile);
             bool fileExists = file.Exists; // set to variable so we can set this to false in debugging easily
             if (fileExists == false)
             {
-                if(isServer == false)
+                if(args.IsServer == false)
                 {
                     // check if the library file exists on the server, if it does its a mapping issue
                     bool exists = libfileService.ExistsOnServer(libFile.Uid).Result;
@@ -149,7 +175,7 @@ namespace FileFlows.FlowRunner
                 return;
             }
 
-            var flow = flowService.Get(lib.Flow?.Uid ?? Guid.Empty).Result;
+            var flow = args.Config.Flows.FirstOrDefault(x => x.Uid == (lib.Flow?.Uid ?? Guid.Empty));
             if (flow == null || flow.Uid == Guid.Empty)
             {
                 LogInfo("Flow not found, cannot process file: " + file.FullName);
@@ -158,6 +184,8 @@ namespace FileFlows.FlowRunner
                 return;
             }
 
+            libFile.Status = FileStatus.Processing;
+            
             // update the library file to reference the updated flow (if changed)
             if (libFile.Flow?.Name != flow.Name || libFile.Flow?.Uid != flow.Uid)
             {
@@ -176,6 +204,8 @@ namespace FileFlows.FlowRunner
             var info = new FlowExecutorInfo
             {
                 Uid = Program.Uid,
+                Config = args.Config,
+                ConfigDirectory = args.ConfigDirectory,
                 LibraryFile = libFile,
                 Log = String.Empty,
                 NodeUid = node.Uid,
@@ -193,10 +223,11 @@ namespace FileFlows.FlowRunner
                 Fingerprint = lib.UseFingerprinting,
                 InitialSize = lib.Folders ? GetDirectorySize(workingFile) : new FileInfo(workingFile).Length
             };
+            info.LibraryFile.OriginalSize = info.InitialSize;
+            LogInfo("Initial Size: " + info.InitialSize);
+            
 
-            LogInfo("Initial Size: " + info.InitialSize);  
-
-            var runner = new Runner(info, flow, node, workingDir);
+            var runner = new Runner(info, flow, node, args.WorkingDirectory);
             runner.Run();
         }
 

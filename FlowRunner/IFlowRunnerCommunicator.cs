@@ -1,4 +1,6 @@
-﻿using FileFlows.Shared;
+﻿using FileFlows.Plugin;
+using FileFlows.Shared;
+using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace FileFlows.FlowRunner;
@@ -128,18 +130,37 @@ public class FlowRunnerCommunicator : IFlowRunnerCommunicator
     /// Sends a hello to the server saying this runner is still executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    public async Task<bool> Hello(Guid runnerUid)
+    /// <param name="info">The flow execution info</param>
+    public async Task<bool> Hello(Guid runnerUid, FlowExecutorInfo info, NodeParameters args)
     {
         try
         {
-            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, LibraryFileUid);
+            bool helloResult = await connection.InvokeAsync<bool>("Hello", runnerUid, JsonSerializer.Serialize(new
+            {
+                info.Library,
+                info.Uid,
+                info.CurrentPart,
+                info.InitialSize,
+                info.IsDirectory,
+                info.LastUpdate,
+                info.LibraryFile,
+                info.LibraryPath,
+                info.NodeName,
+                info.NodeUid,
+                info.RelativeFile,
+                info.StartedAt,
+                info.TotalParts,
+                info.WorkingFile,
+                info.CurrentPartName,
+                info.CurrentPartPercent
+            }));
             if(helloResult == false)
-                Logger.Instance.WLog("Received a false from the hello request to the server");
+                args?.Logger?.WLog("Received a false from the hello request to the server");
             return helloResult;
         }
         catch(Exception ex)
         {
-            Logger.Instance.ELog("Failed to send hello to server: " + ex.Message);
+            args?.Logger?.ELog("Failed to send hello to server: " + ex.Message);
             return false;
         }
     }

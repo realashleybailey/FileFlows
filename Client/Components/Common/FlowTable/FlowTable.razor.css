@@ -8,7 +8,6 @@
 }
 .flowtable-toolbar .flowtable-toolbar-buttons {
   flex-grow: 1;
-  white-space: nowrap;
   overflow: hidden;
 }
 .flowtable-toolbar ::deep .flow-table-button-separator {
@@ -23,6 +22,14 @@
 .flowtable-toolbar .flowtable-toolbar-filter {
   width: 16rem;
   position: relative;
+}
+@media (max-width: 849.99px) {
+  .flowtable-toolbar .flowtable-toolbar-filter {
+    width: 5rem;
+  }
+  .flowtable-toolbar .flowtable-toolbar-filter:focus-within {
+    width: 18rem;
+  }
 }
 .flowtable-toolbar .flowtable-toolbar-filter input {
   background-color: transparent !important;
@@ -64,14 +71,17 @@
 }
 .flowtable {
   position: relative !important;
-  height: 100%;
   max-width: 100%;
   width: 100%;
+  flex-grow: 1;
+  overflow: auto;
 }
 
 .flow-table-inner {
   height: 100%;
   position: relative !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .flowtable-row {
@@ -124,12 +134,9 @@
 }
 
 .flowtable-data {
-  position: absolute;
   overflow: hidden;
   top: 1.75rem;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-grow: 1;
   font-size: 0.9rem;
   display: flex;
   flex-direction: column;
@@ -143,7 +150,6 @@
 @media screen and (max-width: 578px) {
   .flowtable-toolbar {
     display: unset;
-    height: 5rem;
   }
 
   .flowtable-toolbar-filter {

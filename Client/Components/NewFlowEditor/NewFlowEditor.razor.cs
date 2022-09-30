@@ -250,9 +250,12 @@ public partial class NewFlowEditor : Editor
 
     private void DisposeCurrentTemplate()
     {
-        for(int i=RegisteredInputs.Count -1;i >= 0;i--)
+        var keys = RegisteredInputs.Keys.ToArray();
+        for(int i=keys.Length -1;i >= 0;i--)
         {
-            var input = RegisteredInputs[i];
+            var key = keys[i];
+            var input = RegisteredInputs[key];
+            
             if (input == null)
                 continue;
             if (input?.Field?.Name == "Name")
@@ -260,7 +263,7 @@ public partial class NewFlowEditor : Editor
             if (input?.Field?.Name == "Template")
                 continue;
             input.Dispose();
-            this.RegisteredInputs.Remove(input);
+            this.RegisteredInputs.Remove(key);
         }
         Fields?.Clear();
         TemplateFields?.Clear();
@@ -298,10 +301,13 @@ public partial class NewFlowEditor : Editor
                 // special case, removing this node and wiring up a different output
                 var parts = value.ToString().Split(':');
                 var outputNode = flow.Parts.FirstOrDefault(x => x.Uid.ToString() == parts[1]);
+                int outputIndex = int.Parse(parts[2]);
+                // remove any existing output connections
+                outputNode.OutputConnections.RemoveAll(x => x.Output == outputIndex);
                 outputNode.OutputConnections.Add(new ()
                 {
                     Input = 1,
-                    Output = int.Parse(parts[2]),
+                    Output = outputIndex,
                     InputNode = Guid.Parse(parts[3])
                 });
                 flow.Parts.Remove(part);

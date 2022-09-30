@@ -171,6 +171,9 @@ public class DirectoryHelper
         if (Directory.Exists(DatabaseDirectory) == false)
             Directory.CreateDirectory(DatabaseDirectory);
         
+        ConfigDirectory = Path.Combine(IsDocker == false ? dir : Path.Combine(dir, "Data"), "Config");
+        if (Directory.Exists(ConfigDirectory) == false)
+            Directory.CreateDirectory(ConfigDirectory);
     }
 
     /// <summary>
@@ -187,6 +190,11 @@ public class DirectoryHelper
     /// Gets the data directory
     /// </summary>
     public static string DataDirectory { get; private set; }
+    
+    /// <summary>
+    /// Gets the directory containing the cached configurations
+    /// </summary>
+    public static string ConfigDirectory { get; private set; }
     
     /// <summary>
     /// Gets the directory the database is saved in
@@ -357,5 +365,45 @@ public class DirectoryHelper
             }
         } 
         catch { }
+    }
+    
+    /// <summary>
+    /// Copies a directory and all its contents
+    /// </summary>
+    /// <param name="sourceDir">the source directory</param>
+    /// <param name="destinationDir">the destination directory</param>
+    /// <param name="recursive">if all subdirectories should be copied</param>
+    /// <exception cref="DirectoryNotFoundException">throw in the source directory does not exist</exception>
+    public static void CopyDirectory(string sourceDir, string destinationDir, bool recursive = true)
+    {
+        // Get information about the source directory
+        var dir = new DirectoryInfo(sourceDir);
+
+        // Check if the source directory exists
+        if (!dir.Exists)
+            throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
+
+        // Cache directories before we start copying
+        DirectoryInfo[] dirs = dir.GetDirectories();
+
+        // Create the destination directory
+        Directory.CreateDirectory(destinationDir);
+
+        // Get the files in the source directory and copy to the destination directory
+        foreach (FileInfo file in dir.GetFiles())
+        {
+            string targetFilePath = Path.Combine(destinationDir, file.Name);
+            file.CopyTo(targetFilePath);
+        }
+
+        // If recursive and copying subdirectories, recursively call this method
+        if (recursive)
+        {
+            foreach (DirectoryInfo subDir in dirs)
+            {
+                string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                CopyDirectory(subDir.FullName, newDestinationDir, true);
+            }
+        }
     }
 }

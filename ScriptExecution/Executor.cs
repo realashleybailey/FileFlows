@@ -94,17 +94,29 @@ public class Executor
                 // so Variables.file?.Orig.Name, will be replaced to Variables["file.Orig.Name"] 
                 // since its just a dictionary key value 
                 string keyRegex = @"Variables(\?)?\." + k.Replace(".", @"(\?)?\.");
-                
-                object? value = Variables[k];
-                if (value is JsonElement jElement)
-                {
-                    if (jElement.ValueKind == JsonValueKind.String)
-                        value = jElement.GetString();
-                    if (jElement.ValueKind == JsonValueKind.Number)
-                        value = jElement.GetInt64();
-                }
 
-                tcode = Regex.Replace(tcode, keyRegex, "Variables['" + k + "']");
+                string replacement = "Variables['" + k + "']";
+                if (k.StartsWith("file.") || k.StartsWith("folder."))
+                {
+                    // FF-301: special case, these are readonly, need to make these easier to use
+                    if (Regex.IsMatch(k, @"\.(Create|Modified)$"))
+                        continue; // dates
+                    if (Regex.IsMatch(k, @"\.(Year|Day|Month|Size)$"))
+                        replacement = "Number(" + replacement + ")";
+                    else
+                        replacement += ".toString()";
+                }
+                
+                // object? value = Variables[k];
+                // if (value is JsonElement jElement)
+                // {
+                //     if (jElement.ValueKind == JsonValueKind.String)
+                //         value = jElement.GetString();
+                //     if (jElement.ValueKind == JsonValueKind.Number)
+                //         value = jElement.GetInt64();
+                // }
+
+                tcode = Regex.Replace(tcode, keyRegex, replacement);
             }
 
             tcode = tcode.Replace("Flow.Execute(", "Execute(");
@@ -124,14 +136,6 @@ public class Executor
 
             var processExecutor = this.ProcessExecutor ?? new BasicProcessExecutor(Logger);
 
-            var sb = new StringBuilder();
-            var log = new
-            {
-                ILog = new LogDelegate(Logger.ILog),
-                DLog = new LogDelegate(Logger.DLog),
-                WLog = new LogDelegate(Logger.WLog),
-                ELog = new LogDelegate(Logger.ELog),
-            };
             var engine = new Engine(options =>
             {
                 options.AllowClr();
@@ -177,10 +181,18 @@ public class Executor
             {
                 if(result != null)
                 {
-                    int num = (int)result.AsNumber();
-
-                    Logger.ILog("Script result: " + num);
-                    return num;
+                    try
+                    {
+                        int num = (int)result.AsNumber();
+                        Logger.ILog("Script result: " + num);
+                        return num;
+                    }
+                    catch (Exception)
+                    {
+                        bool bResult = (bool)result.AsBoolean();
+                        Logger.ILog("Script result: " + bResult);
+                        return bResult;
+                    }
                 }
             }
             catch(Exception) { }
@@ -189,6 +201,10 @@ public class Executor
         }
         catch(JavaScriptException ex)
         {
+            if (ex.Message == "true")
+                return true;
+            if (int.TryParse(ex.Message, out int code))
+                return code;
             // print out the code block for debugging
             int lineNumber = 0;
             var lines = Code.Split('\n');

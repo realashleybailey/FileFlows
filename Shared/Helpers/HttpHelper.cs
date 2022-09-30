@@ -1,5 +1,6 @@
 using System.Collections;
 using System.IO;
+using NPoco.Expressions;
 
 namespace FileFlows.Shared.Helpers;
 
@@ -207,8 +208,8 @@ public class HttpHelper
             {
                 var bytes = await response.Content.ReadAsByteArrayAsync();
                 if (response.IsSuccessStatusCode)
-                    return new RequestResult<T> { Success = true, Data = (T)(object)bytes };
-                return new RequestResult<T> { Success = false };
+                    return new RequestResult<T> { Success = true, Data = (T)(object)bytes, Headers = GetHeaders(response)};
+                return new RequestResult<T> { Success = false, Headers = GetHeaders(response) };
             }
 
             // if (TryGetHeader(response, "x-files-remaining", out int filesRemaining))
@@ -239,7 +240,7 @@ public class HttpHelper
 #pragma warning disable CS8600
                 T result = string.IsNullOrEmpty(body) ? default(T) : typeof(T) == typeof(string) ? (T)(object)body : JsonSerializer.Deserialize<T>(body, options);
 #pragma warning restore CS8600
-                return new RequestResult<T> { Success = true, Body = body, Data = result };
+                return new RequestResult<T> { Success = true, Body = body, Data = result, Headers = GetHeaders(response) };
             }
             else
             {
@@ -252,12 +253,19 @@ public class HttpHelper
                 }
                 if(noLog == false)
                     Log("Error Body: " + body);
-                return new RequestResult<T> { Success = false, Body = body, Data = default(T) };
+                return new RequestResult<T> { Success = false, Body = body, Data = default(T), Headers = GetHeaders(response) };
             }
         }
         catch (Exception)
         {
             throw;
+        }
+        
+        Dictionary<string, string> GetHeaders(HttpResponseMessage response)
+        {
+            return response.Headers.Where(x => x.Key.StartsWith("x-"))
+                .DistinctBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Value.FirstOrDefault());
         }
     }
 

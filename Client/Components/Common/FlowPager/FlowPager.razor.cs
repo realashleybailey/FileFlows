@@ -14,7 +14,10 @@ public partial class FlowPager<TItem>
     /// </summary>
     private int TotalItems => Table.TotalItems;
 
-    private int PageIndex;
+    /// <summary>
+    /// Gets or sets the current page index
+    /// </summary>
+    public int PageIndex { get; set; }
     private int PageCount 
     {
         get
@@ -45,6 +48,7 @@ public partial class FlowPager<TItem>
     protected override void OnInitialized()
     {
         Table.PropertyChanged += TableOnPropertyChanged;
+        Table.Pager = this;
     }
 
     private void TableOnPropertyChanged(object sender, PropertyChangedEventArgs e)

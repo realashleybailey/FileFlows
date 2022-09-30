@@ -38,6 +38,19 @@ a, .btn-link {
     color: var(--accent) !important;
 }
 
+.loading-version {
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:5rem;
+    text-align: center;
+    z-index: 1000;
+    font-weight: bold;
+    color: var(--color);
+    opacity: 0.7;
+}
+
+
 .btn-primary {
     color: var(--color);
     background-color: var(--primary);
@@ -165,8 +178,10 @@ button {
         color: var(--accent);
     }
 }
+
 .update-available {
     color:var(--color);
+    z-index:1000000;
 }
 .flow-template-description {
     white-space: pre-wrap;
@@ -228,6 +243,24 @@ input[type=file]{
     top: 0;
     bottom: 0;
     width: 18rem;
+    @media (max-width: 849.99px) 
+    {
+        width:unset;
+        right:0;
+        bottom:unset;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        &:not(:focus-within) {
+            height: 4rem;
+            overflow: hidden;
+            .search-path input {
+                position: absolute;
+                top: 0.7rem;
+                left: 9rem;
+                width: calc(100% - 12rem);
+            }
+        }
+    }
     z-index: 2;
     background: var(--base-darker);
     padding: 0 1rem;
@@ -266,6 +299,14 @@ input[type=file]{
     }
     .search-submit {
         text-align: right;
+    }
+    @media (max-width: 849.99px){
+        .search-submit {
+            text-align:center;
+            .btn {
+                width:min(50%, 18rem);
+            }
+        }
     }
 
     .close {
@@ -910,5 +951,45 @@ input[type=file]{
         width:1.75rem;
         margin-right:0.25rem;
         text-align: center;
+    }
+}
+
+
+@media (max-width: 849.99px) {
+    .vi-container  {
+        .bottom-buttons {
+            position: fixed;
+            top: 0.75rem;
+            right: 2.5rem;
+            z-index:3;
+            button {
+                width:6rem;
+                + button {
+                    margin-left: 0.3rem !important;
+                }
+                &:not(:focus),
+                &:not(:active),
+                &:not(:hover){
+                    border-color:var(--border-color);
+                }
+            }
+        }
+    }
+    .editor-wrapper .vi-container .bottom-buttons
+    {
+        right: 0.5rem;
+        padding-right: 0;
+    }
+}
+
+@media (max-width:849.99px) {
+    .page .vi-container {
+        z-index:1;
+        .content {
+            height: calc(100vh - 4rem);
+        }
+    }    
+    .pager {
+        text-align: left !important;
     }
 }

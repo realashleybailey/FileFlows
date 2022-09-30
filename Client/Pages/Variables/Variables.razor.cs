@@ -31,19 +31,26 @@ namespace FileFlows.Client.Pages
             {
                 InputType = FileFlows.Plugin.FormInputType.Text,
                 Name = nameof(variable.Name),
+                HideLabel = true,
                 Validators = new List<FileFlows.Shared.Validators.Validator> {
                     new FileFlows.Shared.Validators.Required()
-                }
+                },
+                
             });
             fields.Add(new ElementField
             {
-                InputType = FileFlows.Plugin.FormInputType.Text,
+                InputType = FileFlows.Plugin.FormInputType.TextArea,
+                FlexGrow = true,
+                HideLabel = true,
                 Name = nameof(variable.Value),
                 Validators = new List<FileFlows.Shared.Validators.Validator> {
                     new FileFlows.Shared.Validators.Required()
                 }
             });
-            var result = await Editor.Open(new () { TypeName = "Pages.Variable", Title = "Pages.Variable.Title", Fields = fields, Model = variable, SaveCallback = Save});
+            var result = await Editor.Open(new () { TypeName = "Pages.Variable", Title = "Pages.Variable.Title", 
+                Fields = fields, Model = variable, SaveCallback = Save,
+                FullWidth = true
+            });
 #endif
             return false;
         }

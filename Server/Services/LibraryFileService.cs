@@ -3,6 +3,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Models;
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Services;
+using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Json;
 using FileFlows.Shared.Models;
 
@@ -34,7 +35,7 @@ public partial class LibraryFileService : ILibraryFileService
     {
         _ = new NodeController().UpdateLastSeen(nodeUid);
         
-        if (Workers.ServerUpdater.UpdatePending)
+        if (UpdaterWorker.UpdatePending)
             return NextFileResult (NextLibraryFileStatus.UpdatePending); // if an update is pending, stop providing new files to process
 
         var settings = await new SettingsController().Get();
@@ -122,8 +123,14 @@ public partial class LibraryFileService : ILibraryFileService
         await GetNextSemaphore.WaitAsync();
         try
         {
+            var executing = WorkerController.ExecutingLibraryFiles();
+            var execAndWhere = executing?.Any() != true
+                ? string.Empty
+                : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => "'" + x + "'")) + ") ");
+            
             string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
-                         $" and LibraryUid in ({libraryUids}) order by " + UNPROCESSED_ORDER_BY;
+                         $" and LibraryUid in ({libraryUids}) " + execAndWhere +
+                         " order by " + UNPROCESSED_ORDER_BY;
 
 
             var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
@@ -137,6 +144,7 @@ public partial class LibraryFileService : ILibraryFileService
                 // need to change the order up
                 bool orderGood = true;
                 sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
+                      execAndWhere +
                       $" and LibraryUid = '{library.Uid}' order by ";
                 if (library.ProcessingOrder == ProcessingOrder.Random)
                     sql += " " + SqlHelper.Random() + " ";
@@ -320,23 +328,34 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="status">the status</param>
     /// <param name="skip">the amount to skip</param>
     /// <param name="rows">the number to fetch</param>
+    /// <param name="filter">[Optional] filter text</param>
     /// <returns>a list of matching library files</returns>
-    public async Task<IEnumerable<LibraryFile>> GetAll(FileStatus?status, int skip = 0, int rows = 0)
+    public async Task<IEnumerable<LibraryFile>> GetAll(FileStatus?status, int skip = 0, int rows = 0, string filter = null)
     {
         try
         {
+            bool hasFilter = string.IsNullOrWhiteSpace(filter) == false;
+            string filterWhere = hasFilter ? $"lower(name) like lower('%{filter.Replace("'", "''").Replace(" ", "%")}%')" : string.Empty;
             if(status == null)
             {
                 string sqlStatus =
-                    SqlHelper.Skip($"select * from LibraryFile order by DateModified desc",
+                    SqlHelper.Skip($"select * from LibraryFile " + 
+                                   (hasFilter ? $" where " + filterWhere : string.Empty) +
+                                   " order by DateModified desc",
                         skip, rows);
                 return await Database_Fetch<LibraryFile>(sqlStatus);
             }
             if ((int)status > 0)
             {
                 // the status in the db is correct and not a computed status
+                string orderBy = "";
+                if (status is FileStatus.Processed or FileStatus.ProcessingFailed)
+                    orderBy = "ProcessingEnded desc,";
+
                 string sqlStatus =
-                    SqlHelper.Skip($"select * from LibraryFile where Status = {(int)status} order by DateModified desc",
+                    SqlHelper.Skip($"select * from LibraryFile where Status = {(int)status} " +
+                                   (hasFilter ? " and " + filterWhere : string.Empty) +
+                                   $" order by {orderBy}DateModified desc",
                         skip, rows);
                 return await Database_Fetch<LibraryFile>(sqlStatus);
             }
@@ -349,6 +368,8 @@ public partial class LibraryFileService : ILibraryFileService
                 libraries.Where(x => x.Schedule?.Length != 672 || x.Schedule[quarter] == '0').Select(x => "'" + x.Uid + "'"));
 
             string sql = $"select * from LibraryFile where Status = {(int)FileStatus.Unprocessed}";
+            if (hasFilter)
+                sql += " and " + filterWhere;
             
             // add disabled condition
             if(string.IsNullOrEmpty(disabled) == false)
@@ -387,6 +408,73 @@ public partial class LibraryFileService : ILibraryFileService
         {
             Logger.Instance.ELog("Failed GetAll Files: " + ex.Message + "\n" + ex.StackTrace);
             return new LibraryFile[] { };
+        }
+    }
+
+    /// <summary>
+    /// Gets the total items matching the filter
+    /// </summary>
+    /// <param name="status">the status</param>
+    /// <param name="filter">the filter</param>
+    /// <returns>the total number of items matching</returns>
+    public async Task<int> GetTotalMatchingItems(FileStatus status, string filter)
+    {
+        try
+        {
+            string filterWhere = $"lower(name) like lower('%{filter.Replace("'", "''").Replace(" ", "%")}%')" ;
+            if(status == null)
+            {
+                return await Database_ExecuteScalar<int>("select count(Uid) from LibraryFile where " + filterWhere);
+            }
+            if ((int)status > 0)
+            {
+                return await Database_ExecuteScalar<int>($"select count(Uid) from LibraryFile where Status = {(int)status} and {filterWhere}");
+            }
+            
+            var libraries = await new LibraryController().GetAll();
+            var disabled = string.Join(", ",
+                libraries.Where(x => x.Enabled == false).Select(x => "'" + x.Uid + "'"));
+            int quarter = TimeHelper.GetCurrentQuarter();
+            var outOfSchedule = string.Join(", ",
+                libraries.Where(x => x.Schedule?.Length != 672 || x.Schedule[quarter] == '0').Select(x => "'" + x.Uid + "'"));
+
+            string sql = $"select count(LibraryFile.Uid) from LibraryFile where Status = {(int)FileStatus.Unprocessed} and " + filterWhere;
+            
+            // add disabled condition
+            if(string.IsNullOrEmpty(disabled) == false)
+                sql += $" and LibraryUid {(status == FileStatus.Disabled ? "" : "not")} in ({disabled})";
+            
+            if (status == FileStatus.Disabled)
+            {
+                if (string.IsNullOrEmpty(disabled))
+                    return 0;
+                return await Database_ExecuteScalar<int>(sql);
+            }
+            
+            // add out of schedule condition
+            if(string.IsNullOrEmpty(outOfSchedule) == false)
+                sql += $" and LibraryUid {(status == FileStatus.OutOfSchedule ? "" : "not")} in ({outOfSchedule})";
+            
+            if (status == FileStatus.OutOfSchedule)
+            {
+                if (string.IsNullOrEmpty(outOfSchedule))
+                    return 0; // no out of schedule libraries
+                
+                return await Database_ExecuteScalar<int>(sql);
+            }
+            
+            // add on hold condition
+            sql += $" and HoldUntil {(status == FileStatus.OnHold ? ">" : "<=")} " + SqlHelper.Now();
+            if (status == FileStatus.OnHold)
+                return await Database_ExecuteScalar<int>(sql);
+
+            sql = sql.Replace(" from LibraryFile", " from LibraryFile  " + LIBRARY_JOIN);
+            return await Database_ExecuteScalar<int>(sql);
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Failed GetTotalMatchingItems Files: " + ex.Message + "\n" + ex.StackTrace);
+            return 0;
         }
     }
 
@@ -442,7 +530,7 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="fingerprint">the fingerprint of the library file</param>
     /// <returns>the library file if it is known</returns>
     public async Task<LibraryFile> GetFileByFingerprint(string fingerprint)
-        => await Database_Get<LibraryFile>("select * from LibraryFile where fingerprint = @0", fingerprint);
+        => await Database_Get<LibraryFile>(SqlHelper.Limit("select * from LibraryFile where fingerprint = @0", 1), fingerprint);
 
     /// <summary>
     /// Gets a list of all filenames and the file creation times
@@ -491,6 +579,16 @@ public partial class LibraryFileService : ILibraryFileService
         foreach (var status in statuses)
             status.Name = Regex.Replace(status.Status.ToString(), "([A-Z])", " $1").Trim();
         return statuses;
+    }
+
+    /// <summary>
+    /// Gets the current status of a file
+    /// </summary>
+    /// <param name="uid">The UID of the file</param>
+    /// <returns>the current status of the rfile</returns>
+    public async Task<FileStatus> GetFileStatus(Guid uid)
+    {
+        return (FileStatus)await Database_ExecuteScalar<int>($"select Status from LibraryFile where Uid = '{uid}'");
     }
 
     /// <summary>
@@ -636,4 +734,13 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
 
         return days;
     }
+    
+    
+    /// <summary>
+    /// Updates the original size of a file
+    /// </summary>
+    /// <param name="uid">The UID of the file</param>
+    /// <param name="size">the size of the file in bytes</param>
+    public Task UpdateOriginalSize(Guid uid, long size) 
+        => Database_Execute($"update LibraryFile set OriginalSize = {size} where Uid = '{uid}'");
 }

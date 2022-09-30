@@ -123,12 +123,19 @@ public class Program
                     WebServer.Start(args);
                 });
 
+                DateTime dt = DateTime.Now;
                 try
                 {
                     var appBuilder = BuildAvaloniaApp();
                     appBuilder.StartWithClassicDesktopLifetime(args);
                 }
-                catch (Exception) { }
+                catch (Exception ex)
+                {
+                    if(DateTime.Now.Subtract(dt) < new TimeSpan(0,0,2))
+                        Console.WriteLine("Failed to launch GUI: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                    else
+                        Console.WriteLine("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+                }
             }
 
             _ = WebServer.Stop();
@@ -192,10 +199,17 @@ public class Program
                 }
                 #endif
 
+                FlowDbConnection.Initialize(true);
                 Logger.Instance.WLog("No longer licensed for external database, migrating to SQLite database.");
                 AppSettings.Instance.DatabaseMigrateConnection = SqliteDbManager.GetDefaultConnectionString();
             }
+            else
+            {
+                FlowDbConnection.Initialize(false);
+            }
         }
+        else
+            FlowDbConnection.Initialize(true); 
         
         if (string.IsNullOrEmpty(AppSettings.Instance.DatabaseMigrateConnection) == false)
         {

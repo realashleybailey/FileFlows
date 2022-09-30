@@ -130,4 +130,16 @@ public class SqlHelper
             return "random()";
         return "rand()";
     }
+
+    /// <summary>
+    /// Creates a select parameter for a JSON value
+    /// </summary>
+    /// <param name="column">the column to extract from eg "Data"</param>
+    /// <param name="jsonProperty">the json property eg "MyValue"</param>
+    /// <param name="asColumn">the name of the result</param>
+    /// <returns>the json select eg "JSON_EXTRACT('$.Data.MyValue')</returns>
+    public static string JsonValue(string column, string jsonProperty, string asColumn = null)
+    {
+        return $"JSON_EXTRACT({column}, '$.{jsonProperty}')" + (string.IsNullOrEmpty(asColumn) ? string.Empty : $" as {asColumn}");
+    }
 }

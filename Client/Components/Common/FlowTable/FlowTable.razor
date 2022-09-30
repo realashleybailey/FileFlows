@@ -17,7 +17,7 @@
                     @ToolBar
                 </div>
                 <div class="flowtable-toolbar-filter">
-                    <input @ref="eleFilter" type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" placeholder="@lblFilter" autocomplete="off" />
+                    <input @ref="eleFilter" type="text" @bind-value="FilterText" @bind-value:event="oninput" @onkeydown="FilterKeyDown" placeholder="@(App.Instance.IsMobile ? lblFilter : lblFilterPlaceholder)" autocomplete="off" />
                     <i class="fas fa-search"></i>
                 </div>
             </div>
@@ -75,7 +75,24 @@
             string hashcode = ".col-" + col.GetHashCode();
             <text>
             @hashcode { 
-                @if(string.IsNullOrEmpty(col.Width) == false)
+                @if (App.Instance.IsMobile && string.IsNullOrEmpty(col.MobileWidth) == false)
+                {
+                    if (col.MobileWidth == "0")
+                    {
+                        <text>
+                        display:none;
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                        min-width:@col.MobileWidth;
+                        max-width:@col.MobileWidth;
+                        width:@col.MobileWidth;
+                        </text>
+                    }
+                }
+                else if(string.IsNullOrEmpty(col.Width) == false)
                 {
                     <text>
                         min-width:@col.Width;
@@ -146,7 +163,7 @@
                     </Virtualize>
             }
         </ContextMenuTrigger>
-        @if (ShowPager && TotalItems > Math.Min(250, App.PageSize))
+        @if (PagerVisible)
         {
             <CascadingValue Value="this" IsFixed="true">
                 <FlowPager TItem="TItem" />

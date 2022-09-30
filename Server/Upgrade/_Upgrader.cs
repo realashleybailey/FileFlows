@@ -10,6 +10,7 @@ public class Upgrader
     public void Run(Settings settings)
     {
         var currentVersion = string.IsNullOrWhiteSpace(settings.Version) ? new Version() : Version.Parse(settings.Version);
+        Logger.Instance.ILog("Current version: " + currentVersion);
         // check if current version is even set, and only then do we run the upgrades
         // so on a clean install these do not run
         if (currentVersion > new Version(0, 4, 0))
@@ -57,12 +58,16 @@ public class Upgrader
             if (currentVersion < new Version(1, 0, 2))  
                 new Upgrade_1_0_2().Run(settings);
         }
-        
+
         // save the settings
         if (settings.Version != Globals.Version.ToString())
         {
+            Logger.Instance.ILog("Saving version to database");
             settings.Version = Globals.Version.ToString();
+            // always increase the revision when the version changes
+            settings.Revision += 1;
             DbHelper.Update(settings).Wait();
         }
+        Logger.Instance.ILog("Finished checking upgrade scripts");
     }
 }

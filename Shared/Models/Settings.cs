@@ -41,6 +41,11 @@ public class Settings : FileFlowObject
     public bool LogQueueMessages { get; set; }
 
     /// <summary>
+    /// Gets or sets the revision of the configuration
+    /// </summary>
+    public int Revision { get; set; }
+
+    /// <summary>
     /// Gets or sets if this is running on Windows
     /// </summary>
     public bool IsWindows { get; set; }

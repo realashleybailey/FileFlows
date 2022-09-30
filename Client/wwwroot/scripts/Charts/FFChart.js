@@ -213,6 +213,7 @@ class FFChart {
     chart;
     chartBottomPad = 18;
     csharp;
+    args;
 
 
     constructor(uid, args, dontGetData) {
@@ -464,11 +465,7 @@ export class BarChart extends FFChart
                 enabled: true,
                 formatter: (val, opt) => {
                     let d = data.series[opt.seriesIndex].data[opt.dataPointIndex];
-                    // if(opt.seriesIndex !== 0)
-                    //     return '';
-                    let size = this.formatFileSize(d, 0);
-                    return size;
-                    return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+                    return this.formatFileSize(d, 0);
                 },
             },
             colors: [
@@ -1205,6 +1202,7 @@ export class LibraryFileTable extends FFChart
     
     constructor(uid, args) {
         super(uid, args);
+        console.log('args!', args);
         this.recentlyFinished = args.flags === 1;
     }
     
@@ -1213,6 +1211,28 @@ export class LibraryFileTable extends FFChart
         let diff = Math.abs(original - final);
         return this.formatFileSize(diff) + (original < final ? " " + this.lblIncrease : " " + this.lblDecrease) +
         "\n" + this.formatFileSize(final) + " / " + this.formatFileSize(original);
+    }
+    
+    async fetchData(){
+        if(this.url.endsWith('recently-finished') !== true)
+            return await super.fetchData();
+        else {
+            let data = await this.csharp.invokeMethodAsync("FetchRecentlyFinished");
+            for(var d of data){
+                d.When = d.when;
+                delete d.when;
+                d.RelativePath = d.relativePath;
+                delete d.relativePath;
+                d.Uid = d.uid;
+                delete d.uid;
+                d.FinalSize = d.finalSize;
+                delete d.finalSize;
+                d.OriginalSize = d.originalSize;
+                delete d.originalSize;
+            }
+            console.log('data', data);
+            return data;
+        }
     }
         
     getTimerInterval() {
@@ -1271,15 +1291,16 @@ export class LibraryFileTable extends FFChart
         let theadTr = document.createElement('tr');
         thead.appendChild(theadTr);
 
-        let columns = this.recentlyFinished ? ['Name', 'Time', 'Size'] : ['Name']
+        let columns = this.recentlyFinished ? ['Name', 'When', 'Size'] : ['Name']
 
         for(let title of columns){
             let th = document.createElement('th');
             th.innerText = title;
             if(title !== 'Name') {
-                th.style.width = '6rem';
-                th.style.minWidth = '6rem';
-                th.style.maxWidth = '6rem';
+                let width = title !== 'Size' ? '9rem' : '6rem';
+                th.style.width = width;
+                th.style.minWidth = width;
+                th.style.maxWidth = width;
             }
             th.className = title.toLowerCase();
             theadTr.appendChild(th);                
@@ -1308,19 +1329,16 @@ export class LibraryFileTable extends FFChart
                 width = 100;
             let toolTip = this.formatShrinkage(os, fs);
 
-            let tdTime = document.createElement('td');
-            tdTime.style.width = '6rem';
-            tdTime.style.minWidth = '6rem';
-            tdTime.style.maxWidth = '6rem';
-            tr.appendChild(tdTime);
+            let tdWhen = document.createElement('td');
+            tdWhen.style.width = '9rem';
+            tdWhen.style.minWidth = '9rem';
+            tdWhen.style.maxWidth = '9rem';
+            tr.appendChild(tdWhen);
             
-            let aTime = document.createElement('a');
-            tdTime.appendChild(aTime);
-            let time = item.ProcessingTime || '';
-            if(time.indexOf('.') > 0)
-                time = time.substring(0, time.indexOf('.'));
-            aTime.innerText = time;
-            aTime.addEventListener('click', (event) => {
+            let aWhen = document.createElement('a');
+            tdWhen.appendChild(aWhen);
+            aWhen.innerText = item.When;
+            aWhen.addEventListener('click', (event) => {
                event.preventDefault();
                this.csharp.invokeMethodAsync("OpenFileViewer", item.Uid);
             });

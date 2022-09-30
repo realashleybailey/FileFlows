@@ -1,0 +1,43 @@
+{
+  "name": "FileFlows",
+  "short_name": "FileFlows",
+  "display": "standalone",
+  "start_url": "/",
+  "theme_color": "#ff0090",
+  "background_color": "#111214",
+  "description":"A file processing application",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    }
+  ],
+  "shortcuts":[
+    {
+      "name":"Dashboard",
+      "url":"./"
+    },
+    {
+      "name":"Files",
+      "url":"./library-files"
+    },
+    {
+      "name":"Flows",
+      "url":"./flows"
+    },
+    {
+      "name":"Libraries",
+      "url":"./libraries"
+    },
+    {
+      "name":"Nodes",
+      "url":"./nodes"
+    }
+  ]
+}

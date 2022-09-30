@@ -3,7 +3,6 @@ using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Shared.Models;
-using Jint.Native.Symbol;
 using NPoco;
 
 namespace FileFlows.Server.Helpers;
@@ -264,27 +263,33 @@ public class DbHelper
     public static void RestoreDefaults()
     {
         var manager = GetDbManager();
-        using var db = manager.GetDb().Result;
-        var variables  = db.Db.Fetch<string>(
-            "select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'");
+        var variables = manager.Fetch<string>("select name from DbObject where Type = 'FileFlows.Shared.Models.Variable'").Result.ToList();
 
         var ffmpeg = variables.FirstOrDefault(x => x.ToLowerInvariant() == "ffmpeg");
         if (ffmpeg == null)
         {
             // doesnt exist, insert it
-            manager.Update(new Variable()
+            try
             {
-                Name = "ffmpeg",
-                Value = Globals.IsWindows
-                    ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
-                    : "/usr/local/bin/ffmpeg"
-            }).Wait();
+                manager.Update(new Variable()
+                {
+                    Name = "ffmpeg",
+                    Value = Globals.IsWindows
+                        ? Path.Combine(DirectoryHelper.BaseDirectory, @"Tools\ffmpeg.exe")
+                        : "/usr/local/bin/ffmpeg"
+                }).Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Error inserting ffmpeg: " + ex.Message);
+            }
         }
         else if (ffmpeg != "ffmpeg")
         {
             // not lower case
-            db.Db.Execute("update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'");
+            manager.Execute("update DbObject set Name = 'ffmpeg' where Name like 'ffmpeg' and Type = 'FileFlows.Shared.Models.Variable'", null).Wait();
         }
+
         string programFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");
         
         foreach (var variable in new[]
@@ -298,11 +303,18 @@ public class DbHelper
             if (variables.Contains(variable.Item1))
                 continue;
             // doesnt exist, insert it
-            manager.Update(new Variable()
+            try
             {
-                Name = variable.Item1,
-                Value = variable.Item2
-            }).Wait();
+                manager.Update(new Variable()
+                {
+                    Name = variable.Item1,
+                    Value = variable.Item2
+                }).Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog($"Error inserting '{variable.Item1}: " + ex.Message);
+            }
         }
     }
 }

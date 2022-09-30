@@ -2,7 +2,7 @@
 @inherits Input<string>
 
 <InputWrapper Input="@this">
-    <div>
-        <textarea id=@Uid @bind-value="Value" @bind-value:event="oninput" placeholder="@Placeholder" rows="8"  @onkeydown="OnKeyDown" readonly="@(ReadOnly ? "readonly" : null)"></textarea>
+    <div class="@(Field?.FlexGrow == true ? "flex-grow" :"")">
+        <textarea id=@Uid @bind-value="Value" @bind-value:event="oninput" placeholder="@GetPlaceholder()" rows="8"  @onkeydown="OnKeyDown" readonly="@(ReadOnly ? "readonly" : null)"></textarea>
     </div>
 </InputWrapper>

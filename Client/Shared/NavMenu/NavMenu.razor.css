@@ -79,6 +79,11 @@
   text-align: center;
   font-size: 1.5rem;
 }
+@media screen and (max-width: 849.99px) {
+  .support-links {
+    display: none;
+  }
+}
 .support-links a {
   color: rgba(var(--color-rgb), 0.4) !important;
   padding: 0 0.25rem;
@@ -87,10 +92,11 @@
   color: var(--accent) !important;
 }
 
-.nav-item.discord, .nav-item.forum {
-  display: none;
+@media screen and (min-width: 850px) {
+  .nav-item.discord, .nav-item.forum {
+    display: none;
+  }
 }
-
 .page.collapsed .support-links {
   display: none;
 }
@@ -108,6 +114,12 @@
 
 .version-info {
   display: none;
+}
+.version-info a {
+  color: rgba(var(--color-rgb), 0.4) !important;
+}
+.version-info a:hover {
+  color: var(--accent);
 }
 
 @media (min-width: 850px) {
@@ -143,7 +155,65 @@
   }
 
   .nav-menu-group {
-    display: none;
+    grid-column-start: 1;
+    grid-column-end: -1;
+    height: 2rem;
+  }
+  .nav-menu-group:not(:first-of-type) {
+    margin-top: 1.5rem !important;
+  }
+  .nav-menu-group .text-label {
+    margin-left: 1rem;
+  }
+
+  .nav-menu-container:not(.collapsed) {
+    position: fixed;
+    top: 3.7rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+    margin: 0 !important;
+    background: var(--base);
+  }
+  .nav-menu-container:not(.collapsed) ul {
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    display: grid;
+    flex-direction: unset !important;
+    grid-gap: 0.5rem;
+    margin: 1rem;
+  }
+  .nav-menu-container:not(.collapsed) li {
+    display: block;
+    padding: 0 !important;
+    margin: 0;
+  }
+  .nav-menu-container:not(.collapsed) li .icon {
+    font-size: 3rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .nav-menu-container:not(.collapsed) li a {
+    height: 6rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 0;
+    border: none;
+    place-content: center;
+  }
+  .nav-menu-container:not(.collapsed) li a.active {
+    color: var(--accent) !important;
+    background: unset;
+  }
+  .nav-menu-container:not(.collapsed) li a:hover, .nav-menu-container:not(.collapsed) li a:focus {
+    background: none !important;
+  }
+  .nav-menu-container:not(.collapsed) .version-info {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 3rem 0;
   }
 }
 @media screen and (max-height: 610px) {
@@ -167,6 +237,10 @@
   .nav-menu-group {
     display: none;
   }
+
+  .nav-menu-container {
+    margin-top: 1rem;
+  }
 }
 .bubbles {
   list-style: none;
@@ -174,6 +248,21 @@
   margin: 0;
   position: absolute;
   right: 0.5rem;
+}
+@media (max-width: 849.99px) {
+  .bubbles {
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row;
+    place-content: center;
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    right: 0;
+  }
+  .bubbles .bubble {
+    margin: 0 !important;
+  }
 }
 .bubbles .bubble {
   border: solid 1px var(--bubble-color);
@@ -200,13 +289,13 @@
   min-width: 1.5rem;
 }
 .bubbles .bubble.d-000 {
-  min-width: 1.9rem;
+  min-width: 2.1rem;
 }
 .bubbles .bubble.d-0000 {
-  min-width: 2.2rem;
+  min-width: 2.7rem;
 }
 .bubbles .bubble.d-00000 {
-  min-width: 2.5rem;
+  min-width: 3rem;
 }
 .bubbles .bubble + .bubble {
   margin-left: 0.25rem;

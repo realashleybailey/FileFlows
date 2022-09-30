@@ -264,7 +264,7 @@ public class WatchedLibrary:IDisposable
         }
 
         string? fingerprint = null;
-        if (Library.UseFingerprinting)
+        if (Library.UseFingerprinting && Library.Folders == false)
         {
             fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
             if (string.IsNullOrEmpty(fingerprint))

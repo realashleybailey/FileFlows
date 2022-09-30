@@ -148,6 +148,7 @@ public class WebServer
             new LogFileCleaner(),
             new DbLogPruner(),
             new FlowWorker(string.Empty, isServer: true),
+            new ConfigCleaner(),
             new PluginUpdaterWorker(),
             new LibraryFileLogPruner(),
             new LogConverter(),

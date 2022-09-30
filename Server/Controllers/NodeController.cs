@@ -15,6 +15,8 @@ using FileFlows.ServerShared.Models;
 [Route("/api/node")]
 public class NodeController : ControllerStore<ProcessingNode>
 {
+    protected override bool AutoIncrementRevision => true;
+    
     /// <summary>
     /// Gets a list of all processing nodes in the system
     /// </summary>

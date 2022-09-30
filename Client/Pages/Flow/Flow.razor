@@ -9,28 +9,48 @@
 
 <PageView FullWidth=@true title="@Title">
     <HeadLeft>
-        <input class="flow-name" type="text" @bind-value="@Name" autocomplete="off" placeholder="@lblName" />
+        @if (App.Instance.IsMobile == false)
+        {
+            <input class="flow-name" type="text" @bind-value="@Name" autocomplete="off" placeholder="@lblName"/>
+        }
     </HeadLeft>
 
     <Head>
-        <button class="save-button" @onclick="() => Save()">
-            @if(IsSaving)
+        @if (ElementsVisible == false || App.Instance.IsMobile == false)
+        {
+            if (App.Instance.IsMobile)
             {
-                @lblSaving
+                <input class="flow-name" type="text" @bind-value="@Name" autocomplete="off" placeholder="@lblName"/>
             }
-            else
-            {
-                @lblSave
-            }
-        </button>
+            <button class="save-button" @onclick="() => Save()">
+                @if (IsSaving)
+                {
+                    @lblSaving
+                }
+                else
+                {
+                    @lblSave
+                }
+            </button>
+        }else if (App.Instance.IsMobile)
+        {
+            <button class="add-button" disabled="@string.IsNullOrEmpty(SelectedElement)" @onclick="() => AddSelectedElement()">
+                @lblAdd
+            </button>
+            
+        }
         <button @onclick="() => Close()">@lblClose</button>
     </Head>
 
     <Body>
-    <div class="flow-container @(App.Instance.NavMenuCollapsed ? "has-collapsed-menu" : "")">
+    <div class="flow-container @(App.Instance.NavMenuCollapsed ? "has-collapsed-menu" : "") @(App.Instance.IsMobile ? (ElementsVisible ? "elements-visible" : "elements-hidden") : "")">
+        @if (App.Instance.IsMobile)
+        {
+            <i id="show-elements" class="show-elements fas fa-sitemap" @onclick="ShowElementsOnClick"></i>
+        }
         <div class="flow-elements">
             <div class="flow-elements-filter">
-                <input @ref="eleFilter" type="text" @bind-value="txtFilter" @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" @onkeydown="FilterKeyDown" />
+                <input @ref="eleFilter" type="text" @bind-value="txtFilter" @bind-value:event="oninput" autocomplete="off" placeholder="@lblFilter" @onkeydown="FilterKeyDown"/>
                 <i class="fas fa-search"></i>
             </div>
             <ul id="flow-elements-available">
@@ -41,18 +61,19 @@
                         <li class="group">@Helpers.FlowHelper.FormatLabel(grp.Key)</li>
                         foreach (var ele in grp.OrderBy(x => x.Type == FlowElementType.Script ? x.Name : string.Empty).ThenBy(x => x.Type).ThenBy(x => x.DisplayName.Substring(x.DisplayName.IndexOf(":") + 1)))
                         {
-                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "")" ondragstart="ffFlow.Mouse.dragElementStart(event)">
+                            <li id="@ele.Uid" draggable="true" class="flow-element draggable @ele.Type @(ele.Obsolete ? "obsolete" : "") @(App.Instance.IsMobile && SelectedElement == ele.Uid ? "selected" : "") " 
+                                ondragstart="ffFlow.Mouse.dragElementStart(event)" @onclick="() => SelectPart(ele.Uid)">
                                 <div class="icon-wrapper"><span class="icon @ele.Icon"></span></div>
                                 @((ele.Type == FlowElementType.Script) ? ele.Name : ele.DisplayName.Substring(ele.DisplayName.IndexOf(":") + 1))
-                                    
+
                                 @{
                                     string ribbonTT = "";
                                     if (ele.Obsolete)
                                     {
                                         ribbonTT = ele.ObsoleteMessage?.EmptyAsNull() ?? lblObsoleteMessage;
                                     }
-                                } 
-                                    
+                                }
+
                                 <div class="ribbon" title="@ribbonTT">
                                     <div class="ribbon-content">
                                     </div>
@@ -67,7 +88,7 @@
             <canvas width="8000" height="4000" tabindex="1" oncontextmenu="return false"></canvas>
         </div>
         <div id="flow-zoomer">
-            <FlowSlider Min="50" Max="100" Prefix="Zoom:" Suffix="%" @bind-Value="@Zoom" />
+            <FlowSlider Min="50" Max="100" Prefix="Zoom:" Suffix="%" @bind-Value="@Zoom"/>
         </div>
     </div>
     </Body>
@@ -78,6 +99,10 @@
     <Item OnClick="EditItem">
         <i class="fas fa-edit"></i>
         @lblEdit
+    </Item>
+    <Item OnClick="Add">
+        <i class="fas fa-plus"></i>
+        @lblAdd
     </Item>
     <BlazorContextMenu.Seperator/>
     <Item OnClick="Copy">
@@ -110,6 +135,11 @@
 </ContextMenu>
 
 <ContextMenu Id="FlowContextMenu-Multiple">
+    <Item OnClick="Add">
+        <i class="fas fa-plus"></i>
+        @lblAdd
+    </Item>
+    <BlazorContextMenu.Seperator/>
     <Item OnClick="Copy">
         <i class="fas fa-copy"></i>
         @lblCopy
@@ -141,6 +171,11 @@
 
 
 <ContextMenu Id="FlowContextMenu-Basic">
+    <Item OnClick="Add">
+        <i class="fas fa-plus"></i>
+        @lblAdd
+    </Item>
+    <BlazorContextMenu.Seperator/>
     <Item OnClick="Paste">
         <i class="fas fa-paste"></i>
         @lblPaste

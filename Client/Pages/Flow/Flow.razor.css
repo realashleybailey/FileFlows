@@ -19,6 +19,67 @@
   outline: unset !important;
 }
 
+@media screen and (max-width: 849.99px) {
+  #flow-zoomer {
+    display: none;
+  }
+
+  .flow-name {
+    background: var(--base) !important;
+    left: 0rem;
+    position: fixed;
+    right: 16.5rem;
+    top: 0;
+    padding-top: 1rem;
+  }
+
+  .elements-hidden .flow-elements {
+    display: none;
+  }
+
+  .elements-visible .flow-elements {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 3.5rem;
+    width: unset;
+    max-width: unset;
+    background: var(--base);
+    z-index: 3;
+  }
+  .elements-visible .flow-elements .flow-elements-filter {
+    margin: 0;
+  }
+  .elements-visible .flow-elements input {
+    margin-left: 3rem;
+    width: calc(100% - 4rem) !important;
+  }
+  .elements-visible .flow-elements .fa-search {
+    right: 1.5rem !important;
+  }
+  .elements-visible .show-elements {
+    border: none;
+    top: 3.5rem;
+    left: 0.25rem;
+    z-index: 4;
+  }
+  .elements-visible .show-elements:before {
+    content: "\f00d";
+  }
+
+  .show-elements {
+    position: fixed;
+    top: 4rem;
+    left: -0.5rem;
+    border: solid 1px var(--border-color);
+    padding: 1rem;
+    border-left: none;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    z-index: 2;
+  }
+}
 canvas {
   position: absolute;
   top: 0;
@@ -57,6 +118,13 @@ canvas {
   margin: 0;
   padding: 0;
   overflow-y: auto;
+}
+.flow-elements .flow-element.selected {
+  border-color: var(--accent) !important;
+  background: rgba(var(--accent-rgb), 0.3) !important;
+}
+.flow-elements .flow-element.selected .icon-wrapper {
+  border-color: var(--accent) !important;
 }
 
 .flow-parts {

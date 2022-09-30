@@ -217,6 +217,9 @@ public class PluginController : ControllerStore<PluginInfo>
 
             updated |= success;
         }
+        if(updated)
+            IncrementConfigurationRevision();
+        
         return updated;
     }
 
@@ -237,8 +240,12 @@ public class PluginController : ControllerStore<PluginInfo>
         foreach(var item in deleting)
         {
             PluginScanner.Delete(item.PackageName);
+            // delete the plugin settings
+            await DbHelper.Execute( $"delete from DbObject where Type = '{typeof(PluginSettingsModel).FullName}' and Name = 'PluginSettings_{item.PackageName}'");
         }
 
+
+        IncrementConfigurationRevision();
     }
 
     /// <summary>
@@ -253,23 +260,29 @@ public class PluginController : ControllerStore<PluginInfo>
             return; // nothing to delete
 
         var pluginDownloader = new PluginDownloader(GetRepositories());
+        bool downloaded = false;
         foreach(var package in model.Packages)
         {
             try
             {
                 var dlResult = pluginDownloader.Download(package);
                 if (dlResult.Success)
+                {
                     PluginScanner.UpdatePlugin(package, dlResult.Data);
+                    downloaded = true;
+                }
             }
             catch (Exception ex)
             { 
                 Logger.Instance?.ELog($"Failed downloading plugin package: '{package}' => {ex.Message}");
             }
         }
+        if(downloaded)
+            IncrementConfigurationRevision();
     }
 
     /// <summary>
-    /// Download the plugin ffplugin file .  Only intended to be used by the FlowRunnner
+    /// Download the plugin ffplugin file.  Only intended to be used by the FlowRunner
     /// </summary>
     /// <param name="package">The plugin package name to download</param>
     /// <returns>A download stream of the ffplugin file</returns>
@@ -319,53 +332,87 @@ public class PluginController : ControllerStore<PluginInfo>
     public async Task<string> GetPluginSettings([FromRoute]string packageName)
     {
         var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
-
-        // need to decode any passwords
-        if (string.IsNullOrEmpty(obj.Json) == false) 
-        {
-            try
-            {
-                var plugin = await GetByPackageName(packageName);
-                if (string.IsNullOrEmpty(plugin?.Name) == false)
-                {
-                    bool updated = false;
-
-                    IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(obj.Json) as IDictionary<string, object> ?? new Dictionary<string, object>();
-                    foreach (var key in dict.Keys.ToArray())
-                    {
-                        if(plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
-                        {
-                            // its a password, decrypt 
-                            string text = String.Empty;
-                            if (dict[key] is JsonElement je)
-                            {
-                                text = je.GetString() ?? String.Empty;
-                            }
-                            else if(dict[key] is string str)  
-                            {
-                                text = str;
-                            }
-
-                            if (string.IsNullOrEmpty(text))
-                                continue;
-
-                            dict[key] = Helpers.Decrypter.Decrypt(text);
-                            updated = true;
-                        }
-                    }
-                    if(updated)
-                        obj.Json = JsonSerializer.Serialize(dict);
-                }
-            } 
-            catch (Exception ex)
-            {
-                Logger.Instance.WLog("Failed to decrypting passwords in plugin settings: " + ex.Message);
-            }
-        }
-
         if (obj == null)
             return string.Empty;
+
+        // need to decode any passwords
+        if (string.IsNullOrEmpty(obj.Json) == false)
+            obj.Json = await DecryptPluginJson(packageName, obj.Json);
+
         return obj.Json ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Gets all plugin settings with and the plugin settings
+    /// </summary>
+    /// <returns>all plugin settings with and the plugin settings</returns>
+    internal async Task<Dictionary<string, string>> GetAllPluginSettings()
+    {
+        string sqlPluginSettings = "select Name, " +
+                                   SqlHelper.JsonValue("Data", "Json") +
+                                   " from DbObject where Type = 'FileFlows.Server.Models.PluginSettingsModel'";
+        var plugins = (await DbHelper.GetDbManager()
+                .Fetch<(string Name, string Json)>(sqlPluginSettings))
+            .DistinctBy(x => x.Name.Replace("PluginSettings_", string.Empty))
+            .ToDictionary(x => x.Name.Replace("PluginSettings_", string.Empty), x => x.Json);
+        foreach (var plg in plugins)
+        {
+            if (string.IsNullOrEmpty(plg.Value))
+                continue;
+            plugins[plg.Key] = await DecryptPluginJson(plg.Key, plg.Value);
+        }
+
+        return plugins;
+    }
+
+    private async Task<string> DecryptPluginJson(string packageName, string json)
+    {
+        
+        try
+        {
+            var plugin = await GetByPackageName(packageName);
+            if (string.IsNullOrEmpty(plugin?.Name))
+                return json;
+            
+            bool updated = false;
+
+            json = json.Replace("\\u0022", "\"");
+            if (json.StartsWith("\"") && json.EndsWith("\""))
+                json = json[1..^1];
+
+            IDictionary<string, object> dict = JsonSerializer.Deserialize<ExpandoObject>(json) as IDictionary<string, object> ?? new Dictionary<string, object>();
+            foreach (var key in dict.Keys.ToArray())
+            {
+                if (plugin.Settings.Any(x => x.Name == key && x.InputType == Plugin.FormInputType.Password))
+                {
+                    // its a password, decrypt 
+                    string text = string.Empty;
+                    if (dict[key] is JsonElement je)
+                    {
+                        text = je.GetString() ?? String.Empty;
+                    }
+                    else if (dict[key] is string str)
+                    {
+                        text = str;
+                    }
+
+                    if (string.IsNullOrEmpty(text))
+                        continue;
+
+                    dict[key] = Helpers.Decrypter.Decrypt(text);
+                    updated = true;
+                }
+            }
+            if (updated)
+                return JsonSerializer.Serialize(dict);
+            return json;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.WLog("Failed to decrypt passwords in plugin settings: " + ex.Message + Environment.NewLine + json);
+        }
+
+        return json;
     }
 
     /// <summary>
@@ -426,6 +473,8 @@ public class PluginController : ControllerStore<PluginInfo>
         obj.Name = "PluginSettings_" + packageName;
         obj.Json = json ?? String.Empty;
         await DbHelper.Update(obj);
+        
+        IncrementConfigurationRevision();
     }
 
     /// <summary>

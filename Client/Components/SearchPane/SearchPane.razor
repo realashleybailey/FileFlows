@@ -10,6 +10,13 @@
     </div>
 
     <div class="search-submit">
-        <button class="btn">@lblSearch</button>
+        @if (App.Instance.IsMobile)
+        {
+            <button class="btn" onclick="blur()">@lblSearch</button>
+        }
+        else
+        {
+            <button class="btn">@lblSearch</button>
+        }
     </div>
 </form>

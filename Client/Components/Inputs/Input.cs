@@ -2,6 +2,7 @@ using System.Text.Json;
 using FileFlows.Client.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using NPoco;
 
 namespace FileFlows.Client.Components.Inputs;
 
@@ -31,6 +32,7 @@ public interface IInput
 
 public abstract class Input<T> : ComponentBase, IInput, IDisposable
 {
+    [CascadingParameter] protected InputRegister InputRegister { get; set; }
     [CascadingParameter] protected Editor Editor { get; set; }
 
     [Inject] protected IJSRuntime jsRuntime { get; set; }
@@ -93,8 +95,21 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
     //[Parameter] // dont not make this a parameter, it sets it to false unexpectedly
     public bool Visible { get; set; }
 
+    private ElementField _Field;
+
     [Parameter]
-    public ElementField Field { get; set; }
+    public ElementField Field
+    {
+        get => _Field;
+        set
+        {
+            if (_Field == value)
+                return;
+            if (_Field != null && value != null)
+                return;  // field is already set and wired up, if we change the instance it will break the conditions.  this should be changing its blazor doing the changing
+            _Field = value;
+        }
+    }
 
     [Parameter]
     public string Help { get => _Help; set { if (string.IsNullOrEmpty(value) == false) _Help = value; } }
@@ -119,6 +134,19 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
         {
             _ErrorMessage = value;
         }
+    }
+
+    /// <summary>
+    /// Gets the text to show as the placeholder
+    /// </summary>
+    /// <returns>the text to show as the placeholder</returns>
+    protected string GetPlaceholder()
+    {
+        if (string.IsNullOrEmpty(this.Placeholder) == false)
+            return this.Placeholder;
+        if (this.HideLabel || this.Field?.HideLabel == true)
+            return this.Label;
+        return string.Empty;
     }
 
     protected T _Value;
@@ -186,7 +214,9 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Editor.RegisterInput(this);
+        Logger.Instance.ILog("InputRegister: " + (InputRegister?.GetTheType()?.Name ?? "null"));
+        if(this.Field != null)
+            InputRegister.RegisterInput(this.Field.Uid, this);
         this.Visible = true;
 
         if (this.Field != null)
@@ -274,7 +304,7 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
 
     public virtual async Task<bool> Validate()
     {
-        if (Disposed) return false;
+        if (Disposed) return true;
         if (this.Validators?.Any() != true)
             return true;
         if (this.Visible == false)
@@ -290,6 +320,7 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
                 this.StateHasChanged();
                 if (isValid)
                     ValidStateChanged?.Invoke(this, false);
+                Logger.Instance.DLog($"Invalid '{this.Label}' validator: " + val.GetType().FullName);
                 return false;
             }
         }

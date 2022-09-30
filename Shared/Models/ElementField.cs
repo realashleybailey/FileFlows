@@ -13,6 +13,11 @@ using FileFlows.Plugin;
 public class ElementField
 {
     /// <summary>
+    /// A unique identifier for this field
+    /// </summary>
+    public readonly Guid Uid = Guid.NewGuid(); 
+    
+    /// <summary>
     /// Gets or sets the order of which to display this filed
     /// </summary>
     public int Order { get; set; }
@@ -47,7 +52,17 @@ public class ElementField
     /// Note: this is used by the Script which the user defines the description for
     /// </summary>
     public string Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets if this field should flex-grow to fill the remaining content
+    /// </summary>
+    public bool FlexGrow { get; set; }
     
+    /// <summary>
+    /// Gets or sets if this should hide the label
+    /// </summary>
+    public bool HideLabel { get; set; }
+
     /// <summary>
     /// Gets or sets the input type of this field
     /// </summary>
@@ -268,7 +283,25 @@ public class Condition
     /// <returns>true if the condition is matches</returns>
     public virtual bool Matches(object value)
     {
-        bool matches = Helpers.ObjectHelper.ObjectsAreSame(value, this.Value);
+        bool matches = false;
+        string strValue = this.Value?.ToString() ?? string.Empty;
+        if (strValue.Length > 1 && strValue.StartsWith("/") && strValue.EndsWith("/"))
+        {
+            // special case, regex
+            try
+            {
+                matches = new Regex(strValue[1..^1]).IsMatch(value.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ILog("matches error: " + ex.Message);
+            }
+        }
+        else
+        {
+            matches = Helpers.ObjectHelper.ObjectsAreSame(value, this.Value);
+        }
+
         if (IsNot)
             matches = !matches;
         return matches;

@@ -1,6 +1,10 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using FileFlows.Server;
+using FileFlows.ServerShared;
+using FileFlows.ServerShared.Helpers;
 using Microsoft.Extensions.Logging;
+using NPoco;
 
 namespace FileFlows.FlowRunner;
 
@@ -24,7 +28,7 @@ public class Runner
     private CancellationTokenSource CancellationToken = new CancellationTokenSource();
     private bool Canceled = false;
     private string WorkingDir;
-    private string ScriptDir, ScriptSharedDir, ScriptFlowDir;
+    //private string ScriptDir, ScriptSharedDir, ScriptFlowDir;
 
     /// <summary>
     /// Creates an instance of a Runner
@@ -90,9 +94,10 @@ public class Runner
                 {
                     if (finished == false)
                     {
-                        bool success = await communicator.Hello(Program.Uid);
+                        bool success = await communicator.Hello(Program.Uid, this.Info, nodeParameters);
                         if (success == false)
                         {
+                            nodeParameters?.Logger?.WLog("Hello failed, cancelling flow");
                             Communicator_OnCancel();
                             return;
                         }
@@ -274,18 +279,22 @@ public class Runner
     private void RunActual(IFlowRunnerCommunicator communicator)
     {
         nodeParameters = new NodeParameters(Node.Map(Info.LibraryFile.Name), new FlowLogger(communicator), Info.IsDirectory, Info.LibraryPath);
-        nodeParameters.PathMapper = (string path) => Node.Map(path);
-        nodeParameters.PathUnMapper = (string path) => Node.UnMap(path);
+        nodeParameters.IsDocker = Globals.IsDocker;
+        nodeParameters.IsWindows = Globals.IsWindows;
+        nodeParameters.IsLinux = Globals.IsLinux;
+        nodeParameters.IsMac = Globals.IsMac;
+        nodeParameters.IsArm = Globals.IsArm;
+        nodeParameters.PathMapper = (path) => Node.Map(path);
+        nodeParameters.PathUnMapper = (path) => Node.UnMap(path);
         nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()
         {
-            SharedDirectory = ScriptSharedDir,
+            SharedDirectory = Path.Combine(Info.ConfigDirectory, "Scripts", "Shared"),
             FileFlowsUrl = Service.ServiceBaseUrl
         };
-        var systemVariables = new VariableService().GetAll().Result?.ToArray() ?? new Variable []{ };
-        foreach (var variable in systemVariables)
+        foreach (var variable in Info.Config.Variables)
         {
-            if (nodeParameters.Variables.ContainsKey(variable.Name) == false)
-                nodeParameters.Variables.Add(variable.Name, variable.Value);
+            if (nodeParameters.Variables.ContainsKey(variable.Key) == false)
+                nodeParameters.Variables.Add(variable.Key, variable.Value);
         }
 
         FileHelper.DontChangeOwner = Node.DontChangeOwner;
@@ -295,8 +304,9 @@ public class Runner
         List<Guid> runFlows = new List<Guid>();
         runFlows.Add(Flow.Uid);
 
-        Info.LibraryFile.OriginalSize = nodeParameters.IsDirectory ? nodeParameters.GetDirectorySize(nodeParameters.WorkingFile) : new FileInfo(nodeParameters.WorkingFile).Length;
+        nodeParameters.RunnerUid = Info.Uid;
         nodeParameters.TempPath = WorkingDir;
+        nodeParameters.TempPathName = new DirectoryInfo(WorkingDir).Name;
         nodeParameters.RelativeFile = Info.LibraryFile.RelativePath;
         nodeParameters.PartPercentageUpdate = UpdatePartPercentage;
         Shared.Helpers.HttpHelper.Logger = nodeParameters.Logger;
@@ -308,30 +318,33 @@ public class Runner
         DownloadScripts();
 
         nodeParameters.Result = NodeResult.Success;
-        nodeParameters.GetToolPathActual = (string name) =>
+        nodeParameters.GetToolPathActual = (name) =>
         {
-            var nodeService = NodeService.Load();
-            return Node.Map(nodeService.GetVariable(name).Result);
+            var variable = Info.Config.Variables.Where(x => x.Key.ToLowerInvariant() == name.ToLowerInvariant())
+                .Select(x => x.Value).FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(variable))
+                return variable;
+            return Node.Map(variable);
         };
-        nodeParameters.GetPluginSettingsJson = (string pluginSettingsType) =>
+        nodeParameters.GetPluginSettingsJson = (pluginSettingsType) =>
         {
-            var pluginService = PluginService.Load();
-            return pluginService.GetSettingsJson(pluginSettingsType).Result;
+            string? json = null;
+            Info.Config.PluginSettings?.TryGetValue(pluginSettingsType, out json);
+            return json;
         };
-        nodeParameters.StatisticRecorder = (string name, object value) =>
+        nodeParameters.StatisticRecorder = (name, value) =>
         {
             var statService = StatisticService.Load();
             statService.Record(name, value);
         };
 
-        var pluginLoader = PluginService.Load();
-        var status = ExecuteFlow(Flow, pluginLoader, runFlows);
+        var status = ExecuteFlow(Flow, runFlows);
         SetStatus(status);
         if(status == FileStatus.ProcessingFailed && Canceled == false)
         {
             // try run FailureFlow
-            var fs = new FlowService();
-            var failureFlow = fs.GetFailureFlow(Info.Library.Uid).Result;
+            var failureFlow =
+                Info.Config.Flows?.FirstOrDefault(x => x.Type == FlowType.Failure && x.Default && x.Enabled);
             if (failureFlow != null)
             {
                 nodeParameters.UpdateVariables(new Dictionary<string, object>
@@ -339,12 +352,12 @@ public class Runner
                     { "FailedNode", CurrentNode?.Name },
                     { "FlowName", Flow.Name }
                 });
-                ExecuteFlow(failureFlow, pluginLoader, runFlows, failure: true);
+                ExecuteFlow(failureFlow, runFlows, failure: true);
             }
         }
     }
 
-    private FileStatus ExecuteFlow(Flow flow, IPluginService pluginLoader, List<Guid> runFlows, bool failure = false)
+    private FileStatus ExecuteFlow(Flow flow, List<Guid> runFlows, bool failure = false)
     { 
         int count = 0;
         ObjectReference? gotoFlow = null;
@@ -356,7 +369,7 @@ public class Runner
         };
 
         // find the first node
-        var part = flow.Parts.Where(x => x.Inputs == 0).FirstOrDefault();
+        var part = flow.Parts.FirstOrDefault(x => x.Inputs == 0);
         if (part == null)
         {
             nodeParameters.Logger!.ELog("Failed to find Input node");
@@ -366,11 +379,11 @@ public class Runner
         int step = 0;
         StepChanged(step, part.Name);
 
-        // need to clear this incase the file is being reprocessed
+        // need to clear this in case the file is being reprocessed
         if(failure == false)
             Info.LibraryFile.ExecutedNodes = new List<ExecutedNode>();
-
-        while (count++ < 50)
+       
+        while (count++ < Math.Max(25, Info.Config.MaxNodes))
         {
             if (CancellationToken.IsCancellationRequested || Canceled)
             {
@@ -424,8 +437,7 @@ public class Runner
 
                 if (gotoFlow != null)
                 {
-                    var fs = new FlowService();
-                    var newFlow = fs.Get(gotoFlow.Uid).Result;
+                    var newFlow = Info.Config.Flows.FirstOrDefault(x => x.Uid == gotoFlow.Uid);
                     if (newFlow == null)
                     {
                         nodeParameters.Logger?.ELog("Unable goto flow with UID:" + gotoFlow.Uid + " (" + gotoFlow.Name + ")");
@@ -503,124 +515,137 @@ public class Runner
 
     private void DownloadScripts()
     {
-        var service = ScriptService.Load();
-        DateTime start = DateTime.Now;
+        //var service = ScriptService.Load();
+        //DateTime start = DateTime.Now;
         if (Directory.Exists(nodeParameters.TempPath) == false)
             Directory.CreateDirectory(nodeParameters.TempPath);
-
-        ScriptDir = Path.Combine(nodeParameters.TempPath, "Scripts");
-        if (Directory.Exists(ScriptDir) == false)
-            Directory.CreateDirectory(ScriptDir);
         
-        ScriptSharedDir = Path.Combine(ScriptDir, "Shared");
-        if (Directory.Exists(ScriptSharedDir) == false)
-            Directory.CreateDirectory(ScriptSharedDir);
-        
-        ScriptFlowDir = Path.Combine(ScriptDir, "Flow");
-        if (Directory.Exists(ScriptFlowDir) == false)
-            Directory.CreateDirectory(ScriptFlowDir);
+        DirectoryHelper.CopyDirectory(
+            Path.Combine(Info.ConfigDirectory, "Scripts"),
+            Path.Combine(nodeParameters.TempPath, "Scripts"));
 
-        var allScripts = service.GetScripts().Result?.ToArray() ?? new Script[] { };
-        var shared = allScripts.Where(x => x.Type == ScriptType.Shared);
-        foreach (var script in shared)
-        {
-            File.WriteAllText(Path.Combine(ScriptSharedDir, script.Name + ".js"), script.Code);
-        }
-
-        var flowScripts = allScripts.Where(x => x.Type == ScriptType.Flow);
-        foreach (var script in flowScripts)
-        {
-            File.WriteAllText(Path.Combine(ScriptFlowDir, script.Name + ".js"), script.Code);
-        }
+        // ScriptDir = Path.Combine(nodeParameters.TempPath, "Scripts");
+        // if (Directory.Exists(ScriptDir) == false)
+        //     Directory.CreateDirectory(ScriptDir);
         
-        TimeSpan timeTaken = DateTime.Now - start;
-        nodeParameters.Logger?.ILog("Time taken to download scripts: " + timeTaken.ToString());
+        
+        // ScriptSharedDir = Path.Combine(ScriptDir, "Shared");
+        // if (Directory.Exists(ScriptSharedDir) == false)
+        //     Directory.CreateDirectory(ScriptSharedDir);
+        //
+        // ScriptFlowDir = Path.Combine(ScriptDir, "Flow");
+        // if (Directory.Exists(ScriptFlowDir) == false)
+        //     Directory.CreateDirectory(ScriptFlowDir);
+
+        // var allScripts = service.GetScripts().Result?.ToArray() ?? new Script[] { };
+        // var shared = allScripts.Where(x => x.Type == ScriptType.Shared);
+        // foreach (var script in shared)
+        // {
+        //     File.WriteAllText(Path.Combine(ScriptSharedDir, script.Name + ".js"), script.Code);
+        // }
+        //
+        // var flowScripts = allScripts.Where(x => x.Type == ScriptType.Flow);
+        // foreach (var script in flowScripts)
+        // {
+        //     File.WriteAllText(Path.Combine(ScriptFlowDir, script.Name + ".js"), script.Code);
+        // }
+        //
+        // TimeSpan timeTaken = DateTime.Now - start;
+        // nodeParameters.Logger?.ILog("Time taken to download scripts: " + timeTaken.ToString());
     }
     
     private void DownloadPlugins()
     {
-        var service = PluginService.Load();
-        var plugins = service.GetAll().Result;
-        DateTime start = DateTime.Now;
-        List<Task<bool>> tasks = new List<Task<bool>>();
-        foreach (var plugin in plugins)
+        var dir = Path.Combine(Info.ConfigDirectory, "Plugins");
+        if (Directory.Exists(dir) == false)
+            return;
+        foreach (var sub in new DirectoryInfo(dir).GetDirectories())
         {
-            tasks.Add(DownloadPlugin(service, plugin));
+            string dest = Path.Combine(nodeParameters.TempPath, sub.Name);
+            ServerShared.Helpers.DirectoryHelper.CopyDirectory(sub.FullName, dest);
         }
-
-        Task.WaitAll(tasks.ToArray());
-        TimeSpan timeTaken = DateTime.Now - start;
-        nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());
+        // var service = PluginService.Load();
+        // var plugins = service.GetAll().Result;
+        // DateTime start = DateTime.Now;
+        // List<Task<bool>> tasks = new List<Task<bool>>();
+        // foreach (var plugin in plugins)
+        // {
+        //     tasks.Add(DownloadPlugin(service, plugin));
+        // }
+        //
+        // Task.WaitAll(tasks.ToArray());
+        // TimeSpan timeTaken = DateTime.Now - start;
+        // nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());
     }
 
 
-    private async Task<bool> DownloadPlugin(IPluginService service, PluginInfo plugin)
-    {
-        try
-        {
-            bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-            bool is64bit = IntPtr.Size == 8;
-
-            DateTime dtDownload = DateTime.Now;
-            nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
-            if (Directory.Exists(nodeParameters.TempPath) == false)
-                Directory.CreateDirectory(nodeParameters.TempPath);
-            string file = Path.Combine(nodeParameters.TempPath, $"{plugin.PackageName}.ffplugin");
-            var data = await service.Download(plugin);
-            if (data == null || data.Length == 0)
-            {
-                nodeParameters.Logger?.ELog("Failed to download plugin: " + plugin.PackageName);
-                return false;
-            }
-
-            string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
-
-            FileHelper.CreateDirectoryIfNotExists(nodeParameters.Logger, destDir);
-
-            FileHelper.SaveFile(nodeParameters.Logger, file, data);
-            
-            nodeParameters.Logger?.ILog($"Time taken to download plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtDownload)));
-
-            DateTime dtExtract = DateTime.Now;
-            FileHelper.ExtractFile(nodeParameters.Logger, file, destDir);
-            File.Delete(file);
-
-            // check if there are runtime specific files that need to be moved
-            foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
-            {
-                var runtimeDir = new DirectoryInfo(Path.Combine(destDir, "runtimes", rdir));
-                nodeParameters.Logger?.ILog("Searching for runtime directory: " + runtimeDir.FullName);
-                if (runtimeDir.Exists)
-                {
-                    foreach (var rfile in runtimeDir.GetFiles("*.*", SearchOption.AllDirectories))
-                    {
-                        try
-                        {
-                            if (Regex.IsMatch(rfile.Name, @"\.(dll|so)$") == false)
-                                continue;
-
-                            nodeParameters.Logger?.ILog("Trying to move file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
-                            rfile.MoveTo(Path.Combine(destDir, rfile.Name));
-                            nodeParameters.Logger?.ILog("Moved file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
-                        }
-                        catch (Exception ex)
-                        {
-                            nodeParameters.Logger?.ILog("Failed to move file: " + ex.Message);
-                        }
-                    }
-                }
-            }
-            nodeParameters.Logger?.ILog($"Time taken to extract plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtExtract)));
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            nodeParameters.Logger.ILog($"Failed downloading pugin '{plugin.Name}': " + ex.Message);
-            return false;
-        }
-    }
+    // private async Task<bool> DownloadPlugin(IPluginService service, PluginInfo plugin)
+    // {
+    //     try
+    //     {
+    //         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    //         bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    //         bool is64bit = IntPtr.Size == 8;
+    //
+    //         DateTime dtDownload = DateTime.Now;
+    //         nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
+    //         if (Directory.Exists(nodeParameters.TempPath) == false)
+    //             Directory.CreateDirectory(nodeParameters.TempPath);
+    //         string file = Path.Combine(nodeParameters.TempPath, $"{plugin.PackageName}.ffplugin");
+    //         var data = await service.Download(plugin);
+    //         if (data == null || data.Length == 0)
+    //         {
+    //             nodeParameters.Logger?.ELog("Failed to download plugin: " + plugin.PackageName);
+    //             return false;
+    //         }
+    //
+    //         string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
+    //
+    //         FileHelper.CreateDirectoryIfNotExists(nodeParameters.Logger, destDir);
+    //
+    //         FileHelper.SaveFile(nodeParameters.Logger, file, data);
+    //         
+    //         nodeParameters.Logger?.ILog($"Time taken to download plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtDownload)));
+    //
+    //         DateTime dtExtract = DateTime.Now;
+    //         FileHelper.ExtractFile(nodeParameters.Logger, file, destDir);
+    //         File.Delete(file);
+    //
+    //         // check if there are runtime specific files that need to be moved
+    //         foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
+    //         {
+    //             var runtimeDir = new DirectoryInfo(Path.Combine(destDir, "runtimes", rdir));
+    //             nodeParameters.Logger?.ILog("Searching for runtime directory: " + runtimeDir.FullName);
+    //             if (runtimeDir.Exists)
+    //             {
+    //                 foreach (var rfile in runtimeDir.GetFiles("*.*", SearchOption.AllDirectories))
+    //                 {
+    //                     try
+    //                     {
+    //                         if (Regex.IsMatch(rfile.Name, @"\.(dll|so)$") == false)
+    //                             continue;
+    //
+    //                         nodeParameters.Logger?.ILog("Trying to move file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
+    //                         rfile.MoveTo(Path.Combine(destDir, rfile.Name));
+    //                         nodeParameters.Logger?.ILog("Moved file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
+    //                     }
+    //                     catch (Exception ex)
+    //                     {
+    //                         nodeParameters.Logger?.ILog("Failed to move file: " + ex.Message);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         nodeParameters.Logger?.ILog($"Time taken to extract plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtExtract)));
+    //
+    //         return true;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         nodeParameters.Logger.ILog($"Failed downloading pugin '{plugin.Name}': " + ex.Message);
+    //         return false;
+    //     }
+    // }
 
     private Type? GetNodeType(string fullName)
     {
@@ -702,7 +727,7 @@ public class Runner
     {
         if (scriptName.EndsWith(".js") == false)
             scriptName += ".js";
-        var file = new FileInfo(Path.Combine(ScriptFlowDir, scriptName));
+        var file = new FileInfo(Path.Combine(Info.ConfigDirectory, "Scripts", "Flow", scriptName));
         if (file.Exists == false)
             return string.Empty;
         return File.ReadAllText(file.FullName);

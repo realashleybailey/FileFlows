@@ -40,14 +40,21 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     /// <param name="status">The status to list</param>
     /// <param name="page">The page to get</param>
     /// <param name="pageSize">The number of items to fetch</param>
+    /// <param name="filter">[Optional] filter text</param>
     /// <returns>a slimmed down list of files with only needed information</returns>
     [HttpGet("list-all")]
-    public async Task<LibraryFileDatalistModel> ListAll([FromQuery] FileStatus status, [FromQuery] int page = 0, [FromQuery] int pageSize = 0)
+    public async Task<LibraryFileDatalistModel> ListAll([FromQuery] FileStatus status, [FromQuery] int page = 0, [FromQuery] int pageSize = 0, [FromQuery] string filter = null)
     {
         var service = new LibraryFileService();
         var taskStatus = service.GetStatus();
         var taskLibraries = DbHelper.Select<Library>();
-        var taskFiles = service.GetAll(status, page * pageSize, pageSize);
+        var taskFiles = service.GetAll(status, page * pageSize, pageSize, filter);
+        if (string.IsNullOrWhiteSpace(filter) == false)
+        {
+            // need to get total number of items matching filter aswell
+            int total = await service.GetTotalMatchingItems(status, filter);
+            HttpContext?.Response?.Headers?.TryAdd("x-total-items", total.ToString());
+        }
         await Task.WhenAll(taskStatus, taskLibraries, taskFiles);
         return new()
         {

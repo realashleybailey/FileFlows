@@ -96,7 +96,7 @@ public partial class BasicDashboard
     /// <summary>
     /// Gets if this is the active dashboard
     /// </summary>
-    public bool IsActive => Dashboard.ActiveDashboardUid == Guid.Empty;
+    public bool IsActive => Dashboard.ActiveDashboardUid == Guid.Empty || App.Instance.IsMobile;
 
     public void Dispose()
     {

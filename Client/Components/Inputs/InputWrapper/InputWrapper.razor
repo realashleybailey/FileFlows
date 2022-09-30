@@ -9,13 +9,16 @@
     bool invalid = string.IsNullOrEmpty(Input?.ErrorMessage) == false;
 
 }
-<div class="row @(NoSpacing ? "mt-0" : "") @(invalid ? "error" : "") @(Input?.HideLabel == true ? "hide-label": "") @(Input?.Disabled == true ? "disabled" : "")">
-    <div class="input-label">
-        @if (string.IsNullOrEmpty(Input?.Label) == false)
-        {
-            <label>@Input.Label</label>
-        }
-    </div>
+<div class="row @(NoSpacing ? "mt-0" : "") @(invalid ? "error" : "") @(Input?.Field?.FlexGrow == true ? "flex-grow" : "") @(Input?.HideLabel == true ? "hide-label" : "") @(Input?.Disabled == true ? "disabled" : "")">
+    @if (Input?.HideLabel != true && Input?.Field?.HideLabel != true)
+    {
+        <div class="input-label">
+            @if (string.IsNullOrEmpty(Input?.Label) == false)
+            {
+                <label>@Input.Label</label>
+            }
+        </div>
+    }
 
     <div class="input-value">
         @ChildContent

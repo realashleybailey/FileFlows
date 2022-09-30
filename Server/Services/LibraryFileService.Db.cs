@@ -22,8 +22,9 @@ public partial class LibraryFileService
         " else 1000000 end, JSON_EXTRACT(obj.Data, '$.Priority') desc, LibraryFile.DateModified desc";
 
     private const string LIBRARY_JOIN =
-        " inner join DbObject obj on Type = 'FileFlows.Shared.Models.Library' and LibraryUid = obj.Uid ";
+        " left join DbObject obj on obj.Type = 'FileFlows.Shared.Models.Library' and LibraryFile.LibraryUid = obj.Uid ";
 
+    
     private async Task<FlowDbConnection> GetDbWithMappings()
     {
         var db = await DbHelper.GetDbManager().GetDb();
@@ -37,7 +38,15 @@ public partial class LibraryFileService
         DateTime dt = DateTime.Now;
         using (var db = await GetDbWithMappings())
         {
-            result = await db.Db.SingleOrDefaultAsync<T>(sql, args);
+            try
+            {
+                result = await db.Db.SingleOrDefaultAsync<T>(sql, args);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog(("Failed getting SQL: " + sql));
+                return default;
+            }
         }
         Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to get: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
@@ -65,11 +74,12 @@ public partial class LibraryFileService
     private async Task Database_Execute(string sql, params object[] args)
     {
         DateTime dt = DateTime.Now;
+        int effected;
         using (var db = await GetDbWithMappings())
         {
-            await db.Db.ExecuteAsync(sql, args);
+            effected = await db.Db.ExecuteAsync(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute [{effected}]: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
     }
     private async Task<T> Database_ExecuteScalar<T>(string sql, params object[] args)
     {

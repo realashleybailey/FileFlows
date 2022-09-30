@@ -15,16 +15,17 @@ using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using FileFlows.Client.Components.Common;
 using FileFlows.Client.Components.Dialogs;
 using Microsoft.JSInterop;
 
 namespace FileFlows.Client.Components;
 
-public partial class Editor : ComponentBase, IDisposable
+public partial class Editor : InputRegister, IDisposable
 {
     [Inject] IJSRuntime jsRuntime { get; set; }
 
-    private readonly  List<ActionButton> AdditionalButtons = new();
+    private readonly List<ActionButton> AdditionalButtons = new();
 
     public bool Visible { get; set; }
 
@@ -35,7 +36,14 @@ public partial class Editor : ComponentBase, IDisposable
     private string Uid = Guid.NewGuid().ToString();
     private bool UpdateResizer; // when set to true, the afterrender method will reinitailize the resizer in javascript
     
+    /// <summary>
+    /// Gets or sets if inputs should be full width and not use a maximum width
+    /// </summary>
+    public bool FullWidth { get; set; }
+    
     protected bool Maximised { get; set; }
+
+    private RenderFragment FieldsFragment;
 
     /// <summary>
     /// Get the name of the type this editor is editing
@@ -70,7 +78,6 @@ public partial class Editor : ComponentBase, IDisposable
 
     public string EditorDescription { get; set; }
 
-    protected readonly List<Inputs.IInput> RegisteredInputs = new List<Inputs.IInput>();
 
     protected bool FocusFirst = false;
     private bool _needsRendering = false;
@@ -119,7 +126,7 @@ public partial class Editor : ComponentBase, IDisposable
             jsRuntime.InvokeVoidAsync("ff.resizableEditor", this.Uid);
         if (FocusFirst)
         {
-            foreach (var input in RegisteredInputs)
+            foreach (var input in RegisteredInputs.Values)
             {
                 if (input.Focus())
                     break;
@@ -143,24 +150,6 @@ public partial class Editor : ComponentBase, IDisposable
         return expando;
     }
 
-
-    internal void RegisterInput<T>(Input<T> input)
-    {
-        if (this.RegisteredInputs.Contains(input) == false)
-            this.RegisteredInputs.Add(input);
-    }
-
-    internal void RemoveRegisteredInputs(params string[] except)
-    {
-        var listExcept = except?.ToList() ?? new();
-        this.RegisteredInputs.RemoveAll(x => listExcept.Contains(x.Field?.Name ?? string.Empty) == false);
-    }
-
-    internal Inputs.IInput GetRegisteredInput(string name)
-    {
-        return this.RegisteredInputs.Where(x => x.Field.Name == name).FirstOrDefault();
-    }
-
     /// <summary>
     /// Opens an editor
     /// </summary>
@@ -177,6 +166,7 @@ public partial class Editor : ComponentBase, IDisposable
             this.CleanModelJson = ModelToJsonForCompare(expandoModel);
         this.TypeName = args.TypeName;
         this.Maximised = false;
+        this.FullWidth = args.FullWidth;
         this.Uid = Guid.NewGuid().ToString();
         this.UpdateResizer = true;
         this.AdditionalButtons.Clear();
@@ -212,10 +202,58 @@ public partial class Editor : ComponentBase, IDisposable
         }
 
         this.EditorDescription = Translater.Instant(args.TypeName + ".Description");
+        
+        BuildFieldsRenderFragment();
+        
         OpenTask = new TaskCompletionSource<ExpandoObject>();
         this.FocusFirst = true;
         this.StateHasChanged();
         return OpenTask.Task;
+    }
+
+    private void BuildFieldsRenderFragment()
+    {
+        FieldsFragment = (builder) => { };
+        this.WaitForRender();
+        FieldsFragment = (builder) =>
+        {
+            int count = -1;
+            if (string.IsNullOrEmpty(EditorDescription) == false)
+            {
+                builder.OpenElement(++count, "div");
+                builder.AddAttribute(++count, "class", "description");
+                builder.AddContent(++count, EditorDescription);
+                builder.CloseElement();
+            }
+
+            if (Fields?.Any() == true)
+            {
+                builder.OpenComponent<FlowPanel>(++count);
+                builder.AddAttribute(++count,  nameof(FlowPanel.Fields), Fields);
+                builder.AddAttribute(++count, nameof(FlowPanel.OnSubmit), EventCallback.Factory.Create(this, OnSubmit));
+                builder.AddAttribute(++count, nameof(FlowPanel.OnClose), EventCallback.Factory.Create(this, OnClose));
+                builder.CloseComponent();
+                if (AdditionalFields != null)
+                {
+                    builder.AddContent(++count, AdditionalFields);
+                }
+                if (Fields.Count > 4)
+                {
+                    builder.OpenElement(++count, "div");
+                    builder.AddAttribute(++count, "class", "empty");
+                    builder.CloseElement();
+                }
+            }
+
+            if (Tabs?.Any() == true)
+            {
+                builder.OpenComponent<FlowTabsBuilder>(++count);
+                builder.AddAttribute(++count, nameof(FlowTabsBuilder.Tabs), Tabs);
+                builder.AddAttribute(++count, nameof(FlowTabsBuilder.OnSubmit), EventCallback.Factory.Create(this, OnSubmit));
+                builder.AddAttribute(++count, nameof(FlowTabsBuilder.OnClose), EventCallback.Factory.Create(this, OnClose));
+                builder.CloseComponent();
+            }
+        };
     }
 
     protected async Task WaitForRender()
@@ -252,17 +290,8 @@ public partial class Editor : ComponentBase, IDisposable
             Logger.Instance.ILog("Cannot save, readonly");
             return;
         }
-
-        bool valid = true;
-        foreach (var input in RegisteredInputs)
-        {
-            bool iValid = await input.Validate();
-            if (iValid == false)
-            {
-                Logger.Instance.DLog("Invalid input:" + input.Label);
-                valid = false;
-            }
-        }
+        
+        bool valid = await this.Validate();
         if (valid == false)
             return;
 
@@ -345,9 +374,7 @@ public partial class Editor : ComponentBase, IDisposable
     /// <typeparam name="T">the type of field</typeparam>
     /// <returns>the input if found</returns>
     internal T FindInput<T>(string name)
-    {
-        return (T)this.RegisteredInputs.FirstOrDefault(x => x.Field?.Name == name && x is T);
-    }
+        => (T)this.RegisteredInputs.Values.FirstOrDefault(x => x.Field?.Name == name && x is T);
     
     /// <summary>
     /// Updates a value
@@ -611,6 +638,12 @@ public class EditorOpenArgs
     /// Gets or sets if the editor is a large editor and takes up more width
     /// </summary>
     public bool Large  { get; set; }
+
+    /// <summary>
+    /// Gets or sets if inputs should be full width and not use a maximum width
+    /// </summary>
+    public bool FullWidth { get; set; }
+
     /// <summary>
     /// Gets or sets the label to show on the save button
     /// </summary>

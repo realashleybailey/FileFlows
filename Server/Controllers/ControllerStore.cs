@@ -1,4 +1,5 @@
 ﻿using FileFlows.Server.Helpers;
+using FileFlows.Server.Services;
 using FileFlows.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -14,6 +15,11 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
 {
     protected static Dictionary<Guid, T> _Data;
     protected static SemaphoreSlim _mutex = new SemaphoreSlim(1);
+
+    /// <summary>
+    /// Gets if add/updates/deletes for this controller should automatically update the configuration revision
+    /// </summary>
+    protected virtual bool AutoIncrementRevision => false; 
     
     protected async Task<IEnumerable<string>> GetNames(Guid? uid = null)
     {
@@ -146,15 +152,18 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         }
 
         await DbHelper.Delete(uids);
+        if(AutoIncrementRevision)
+            IncrementConfigurationRevision();
     }
 
-    internal async Task<T> Update(T model, bool checkDuplicateName = false, bool? useCache = null)
+    internal async Task<T> Update(T model, bool checkDuplicateName = false, bool? useCache = null, bool? dontIncremetnConfigRevision = null)
     {
         if (checkDuplicateName)
         {
             if(await NameInUse(model.Uid, model.Name))
                 throw new Exception("ErrorMessages.NameInUse");
         }
+        
         var updated = await DbHelper.Update(model);
         
         if (useCache == null)
@@ -176,6 +185,8 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
                 _mutex.Release();
             }
         }
+        if(AutoIncrementRevision && dontIncremetnConfigRevision != true)
+            IncrementConfigurationRevision();
         return updated;
     }
     
@@ -229,5 +240,14 @@ public abstract class ControllerStore<T>:Controller where T : FileFlowObject, ne
         {
             _mutex.Release();
         }
+    }
+
+    /// <summary>
+    /// Increments the revision of the configuration
+    /// </summary>
+    protected void IncrementConfigurationRevision()
+    {
+        var service = new SettingsService();
+        _ = service.RevisionIncrement();
     }
 }

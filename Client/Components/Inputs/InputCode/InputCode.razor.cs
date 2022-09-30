@@ -65,7 +65,11 @@ public partial class InputCode : Input<string>, IDisposable
     [JSInvokable]
     public async Task SaveCode()
     {
-        this.OnSubmit.InvokeAsync();
+        // first update the code
+        this.Updating = true;
+        this.Value = await CodeEditor.GetValue();
+        this.Updating = false;
+        await this.OnSubmit.InvokeAsync();
     }
 
     private Task Editor_Closed()

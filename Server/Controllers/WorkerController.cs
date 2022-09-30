@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using System.Security.Cryptography.Xml;
 using FileFlows.Plugin;
 using FileFlows.Server.Database.Managers;
 using Microsoft.AspNetCore.Mvc;
@@ -61,6 +62,8 @@ public class WorkerController : Controller
         if (info.LibraryFile != null)
         {
             var lf = info.LibraryFile;
+            if (lf.OriginalSize > 0)
+                _ = new LibraryFileService().UpdateOriginalSize(lf.Uid, lf.OriginalSize);
             _ = Task.Run(async () =>
             {
                 var library = await new LibraryController().Get(lf.Uid);
@@ -179,10 +182,12 @@ public class WorkerController : Controller
     {
         _ = new NodeController().UpdateLastSeen(info.NodeUid);
         
-        
         if (info.LibraryFile != null)
         {
-            if (LibraryFileHasChanged(info.LibraryFile))
+            if(info.LibraryFile.Status != FileStatus.Processing)
+                Logger.Instance.DLog($"Updating non-processing library file [{info.LibraryFile.Status}]: {info.LibraryFile.Name}");
+            
+            if (await LibraryFileHasChanged(info.LibraryFile))
             {
                 await new LibraryFileService().UpdateWork(info.LibraryFile);
             }
@@ -212,7 +217,7 @@ public class WorkerController : Controller
         }
     }
 
-    private bool LibraryFileHasChanged(LibraryFile file)
+    private async Task<bool> LibraryFileHasChanged(LibraryFile file)
     {
         var cached = LibraryFileCacheStore.Get<LibraryFileRecord>(file.Uid);
         LibraryFileCacheStore.Store(file.Uid, new LibraryFileRecord
@@ -226,6 +231,9 @@ public class WorkerController : Controller
             ProcessingEnded = file.ProcessingEnded
         });
         if (cached == null)
+            return true;
+        var dbStatus = await new LibraryFileService().GetFileStatus(file.Uid);
+        if (dbStatus != file.Status)
             return true;
         if (file.Status != cached.Status)
             return true;
@@ -478,8 +486,8 @@ public class WorkerController : Controller
     /// Receives a hello from the flow runner, indicating its still alive and executing
     /// </summary>
     /// <param name="runnerUid">the UID of the flow runner</param>
-    /// <param name="libraryFileUid">the UID of the library file</param>
-    internal bool Hello(Guid runnerUid, Guid libraryFileUid)
+    /// <param name="info">the flow execution info</param>
+    internal bool Hello(Guid runnerUid, FlowExecutorInfo info)
     {
         lock (Executors)
         {
@@ -488,8 +496,12 @@ public class WorkerController : Controller
                 Logger.Instance?.WLog("Unable to find executor from helloer: " + runnerUid);
                 foreach (var executor in Executors.Values)
                     Logger.Instance?.WLog("Executor: " + executor.Uid + " = " + executor.LibraryFile.Name);
-                return false; // unknown executor
+                
+                // unknown executor, the server may have restarted
+                if(Executors.TryAdd(runnerUid, info) == false)
+                    return false; 
             }
+
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;
             return true;
@@ -516,4 +528,12 @@ public class WorkerController : Controller
             }
         }
     }
+
+    /// <summary>
+    /// Get UIDs of executing library files
+    /// </summary>
+    /// <returns>UIDs of executing library files</returns>
+    internal static Guid[] ExecutingLibraryFiles()
+        => Executors?.Select(x => x.Value?.LibraryFile?.Uid)?.Where(x => x != null)?.Select(x => x.Value)?.ToArray() ??
+           new Guid[] { };
 }

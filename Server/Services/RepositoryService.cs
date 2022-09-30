@@ -26,10 +26,18 @@ class RepositoryService
     internal async Task<FileFlowsRepository> GetRepository()
     {
         string url = BASE_URL + "repo.json?ts=" + DateTime.UtcNow.ToFileTimeUtc();
-        var srResult = await HttpHelper.Get<FileFlowsRepository>(url);
-        if (srResult.Success == false)
-            throw new Exception(srResult.Body);
-        return srResult.Data;
+        try
+        {
+            var srResult = await HttpHelper.Get<FileFlowsRepository>(url);
+            if (srResult.Success == false)
+                throw new Exception(srResult.Body);
+            return srResult.Data;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Error getting repository: " + ex.Message);
+            throw;
+        }
     }
 
     /// <summary>

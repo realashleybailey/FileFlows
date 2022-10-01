@@ -343,7 +343,8 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
 
         if (existing.Status != file.Status)
         {
-            Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}");
+            var t = new System.Diagnostics.StackTrace(true);
+            Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}" + Environment.NewLine + t.ToString());
             existing.Status = file.Status;
         }
 

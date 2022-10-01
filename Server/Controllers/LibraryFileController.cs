@@ -343,8 +343,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
 
         if (existing.Status != file.Status)
         {
-            var t = new System.Diagnostics.StackTrace(true);
-            Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}" + Environment.NewLine + t.ToString());
+            Logger.Instance?.ILog($"Setting library file status to: {file.Status} - {file.Name}");
             existing.Status = file.Status;
         }
 
@@ -363,6 +362,12 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         existing.ProcessingEnded = file.ProcessingEnded;
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;
+        existing.CreationTime = file.CreationTime;
+        existing.LastWriteTime = file.LastWriteTime;
+        existing.HoldUntil = file.HoldUntil;
+        existing.Order = file.Order;
+        existing.Fingerprint = file.Fingerprint;
+        existing.OriginalSize = file.OriginalSize;
         existing.ExecutedNodes = file.ExecutedNodes ?? new List<ExecutedNode>();
         if (file.OriginalMetadata?.Any() == true)
             existing.OriginalMetadata = file.OriginalMetadata;

@@ -221,7 +221,16 @@ public class WatchedLibrary:IDisposable
                 Order = -1
             };
 
-            var result = new LibraryFileController().Add(lf).Result;
+            LibraryFile result;
+            if (knownFile != null)
+            {
+                // update the known file, we can't add it again
+                result = new LibraryFileController().Update(lf).Result;
+            }
+            else
+            {
+                result = new LibraryFileController().Add(lf).Result;
+            }
 
             if (result != null && result.Uid != Guid.Empty)
             {
@@ -253,7 +262,7 @@ public class WatchedLibrary:IDisposable
                 // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
                 return (true, null, null);
             }
-            Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file");
+            Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file '{fsInfo.CreationTime}' vs '{knownFile.CreationTime}'");
             knownFile.CreationTime = fsInfo.CreationTime;
             knownFile.LastWriteTime = fsInfo.LastWriteTime;
             knownFile.Status = FileStatus.Unprocessed;

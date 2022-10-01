@@ -6,57 +6,57 @@
 
 @page "/"
 
-<PageView ClassName="fix-width">
+@if (App.Instance.IsMobile && (int)ConfiguredStatus >= 3)
+{
+    <div class="mobile-pause-resume">
+        <PauseResume />   
+    </div>
+}
+<CascadingValue Value="this" IsFixed="true">
+    <PageView ClassName="fix-width">
 
-    <Head>
-        @if (App.Instance.FileFlowsSystem.Licensed && App.Instance.IsMobile == false)
-        {
-            if (ActiveDashboardUid != Guid.Empty && ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
+        <Head>
+            @if (App.Instance.FileFlowsSystem.Licensed && App.Instance.IsMobile == false)
             {
-                <button class="btn" @onclick=@AddWidget>@lblAddWidget</button>
-            }
-            
-            <div class="dashboard-selector">
-                <select @bind="ActiveDashboardUid">
-                    @if (Dashboards?.Any() == true)
-                    {
-                        @foreach (var dashboard in Dashboards.OrderBy(x => x.Label))
+                if (ActiveDashboardUid != Guid.Empty && ActiveDashboardUid != FileFlows.Shared.Models.Dashboard.DefaultDashboardUid)
+                {
+                    <button class="btn" @onclick=@AddWidget>@lblAddWidget</button>
+                }
+                
+                <div class="dashboard-selector">
+                    <select @bind="ActiveDashboardUid">
+                        @if (Dashboards?.Any() == true)
                         {
-                            <option value=@dashboard.Value>@dashboard.Label</option>
+                            @foreach (var dashboard in Dashboards.OrderBy(x => x.Label))
+                            {
+                                <option value=@dashboard.Value>@dashboard.Label</option>
+                            }
                         }
-                    }
-                </select>
-                <button @onclick=@AddDashboard><i class="fas fa-plus"></i></button>
-                <button disabled=@(DashboardDeletable == false) @onclick=@DeleteDashboard><i class="fas fa-trash"></i></button>
-            </div>
-        }
-        @if (App.Instance.IsMobile == false)
-        {
-            <PauseResume />   
-        }
-    </Head>
-
-    <Body>
-
-    <CascadingValue Value="this" IsFixed="true">
-        @if ((int)ConfiguredStatus < 3)
-        {
-            <InitialConfigWelcome />
-        }
-        else if (App.Instance.IsMobile == false && App.Instance.FileFlowsSystem.Licensed && ActiveDashboardUid != Guid.Empty)
-        {
-            <CustomDashboard ActiveDashboardUid=@ActiveDashboardUid />
-        }
-        else if(ActiveDashboardSet || App.Instance.IsMobile)
-        {
-            @if (App.Instance.IsMobile)
-            {
-                <div class="mobile-pause-resume">
-                    <PauseResume />   
+                    </select>
+                    <button @onclick=@AddDashboard><i class="fas fa-plus"></i></button>
+                    <button disabled=@(DashboardDeletable == false) @onclick=@DeleteDashboard><i class="fas fa-trash"></i></button>
                 </div>
             }
-            <BasicDashboard />
-        }
-    </CascadingValue>
-    </Body>
-</PageView>
+            @if (App.Instance.IsMobile == false)
+            {
+                <PauseResume />   
+            }
+        </Head>
+
+        <Body>
+
+            @if ((int)ConfiguredStatus < 3)
+            {
+                <InitialConfigWelcome />
+            }
+            else if (App.Instance.IsMobile == false && App.Instance.FileFlowsSystem.Licensed && ActiveDashboardUid != Guid.Empty)
+            {
+                <CustomDashboard ActiveDashboardUid=@ActiveDashboardUid />
+            }
+            else if(ActiveDashboardSet || App.Instance.IsMobile)
+            {
+                <BasicDashboard />
+            }
+        </Body>
+    </PageView>
+</CascadingValue>

@@ -211,6 +211,12 @@ public partial class Editor : InputRegister, IDisposable
         return OpenTask.Task;
     }
 
+    /// <summary>
+    /// Gets the total number of buttons
+    /// </summary>
+    private int NumberOfButtons =>
+        (AdditionalButtons?.Count ?? 0) + (ReadOnly ? 1 : 2) + (string.IsNullOrEmpty(HelpUrl) ? 0 : 1) + (ShowDownload ? 1 : 0); 
+
     private void BuildFieldsRenderFragment()
     {
         FieldsFragment = (builder) => { };

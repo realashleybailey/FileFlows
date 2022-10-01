@@ -27,11 +27,16 @@ public class Upgrade_1_0_5
         if (manager is MySqlDbManager mysql)
         {
             // delete any duplicates
-            manager.Execute(@"DELETE c1 FROM LibraryFile c1
-        INNER JOIN LibraryFile c2 
-        WHERE
-        c1.DateCreated > c2.DateCreated AND 
-        c1.Name = c2.Name", null).Wait();
+            manager.Execute(@"
+DELETE FROM LibraryFile
+WHERE Uid NOT IN(
+    SELECT Uid FROM (
+        SELECT DISTINCT Uid, Name FROM LibraryFile
+        GROUP BY Name
+        ORDER BY DateCreated 
+    ) as tmp
+)
+".Trim(), null).Wait();
             mysql.Execute("ALTER TABLE LibraryFile ADD UNIQUE (`Name`)", null).Wait();
         }
         else

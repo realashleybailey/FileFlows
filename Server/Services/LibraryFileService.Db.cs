@@ -40,11 +40,11 @@ public partial class LibraryFileService
         {
             try
             {
-                result = await db.Db.SingleOrDefaultAsync<T>(sql, args);
+                result = await db.Db.FirstOrDefaultAsync<T>(sql, args);
             }
             catch (Exception ex)
             {
-                Logger.Instance.ELog(("Failed getting SQL: " + sql));
+                Logger.Instance.ELog("Failed getting SQL: " + sql + ", error: " + ex.Message);
                 return default;
             }
         }

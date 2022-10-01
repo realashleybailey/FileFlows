@@ -36,7 +36,7 @@ CREATE TABLE LibraryFile
 (
     -- common fields from DbObject
     Uid                 VARCHAR(36)        NOT NULL          PRIMARY KEY,
-    Name                VARCHAR(1024)      NOT NULL,
+    Name                VARCHAR(1024)      NOT NULL          UNIQUE,
     DateCreated         datetime           NOT NULL,
     DateModified        datetime           NOT NULL,
     

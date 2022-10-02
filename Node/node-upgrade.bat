@@ -1,6 +1,6 @@
 @echo off
 
-IF %1=="UPDATE" GOTO RunUpdate
+IF "%1"=="UPDATE" GOTO RunUpdate
 copy node-upgrade.bat ..\
 cd ..
 start node-upgrade.bat "UPDATE" %1 & exit
@@ -18,8 +18,16 @@ rmdir /q /s FlowRunner
 
 echo.
 echo Copying Node update files
-move NodeUpdate/FlowRunner FlowRunner
-move NodeUpdate/Node Node
+if exist NodeUpdate/FlowRunner/FlowRunner (
+    move NodeUpdate/FlowRunner/FlowRunner FlowRunner
+) else (
+    move NodeUpdate/FlowRunner FlowRunner
+)
+if exist NodeUpdate/Node/Node (
+    move NodeUpdate/Node/Node Node
+) else ( 
+    move NodeUpdate/Node Node
+)
 rmdir /q /s NodeUpdate
 
 echo.

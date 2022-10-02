@@ -140,7 +140,7 @@ public class WebServer
         ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{Port}";
 
 
-        LibraryWorker.ResetProcessing();
+        LibraryWorker.ResetProcessing(internalOnly: true);
         WorkerManager.StartWorkers(
             new LicenseValidatorWorker(),
             new SystemMonitor(),

@@ -313,6 +313,15 @@ public class Runner
 
         nodeParameters.Logger!.ILog("File: " + nodeParameters.FileName);
         nodeParameters.Logger!.ILog("Executing Flow: " + Flow.Name);
+        nodeParameters.Logger!.ILog("Version: " + Globals.Version);
+        if(Globals.IsDocker)
+            nodeParameters.Logger!.ILog("Platform: Docker" + (Globals.IsArm ? " (ARM)" : string.Empty));
+        else if(Globals.IsLinux)
+            nodeParameters.Logger!.ILog("Platform: Linux" + (Globals.IsArm ? " (ARM)" : string.Empty));
+        else if(Globals.IsWindows)
+            nodeParameters.Logger!.ILog("Platform: Windows" + (Globals.IsArm ? " (ARM)" : string.Empty));
+        else if(Globals.IsMac)
+            nodeParameters.Logger!.ILog("Platform: Mac" + (Globals.IsArm ? " (ARM)" : string.Empty));
 
         DownloadPlugins();
         DownloadScripts();

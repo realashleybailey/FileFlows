@@ -1389,5 +1389,8 @@ hr {
     word-break: break-word;
   }
 }
+.content:has(> .flowtable) {
+  display: flex;
+}
 
 /*# sourceMappingURL=app.css.map */

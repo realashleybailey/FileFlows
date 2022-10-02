@@ -222,7 +222,7 @@ public class WatchedLibrary:IDisposable
             };
 
             LibraryFile result;
-            if (knownFile != null)
+            if (knownFile)
             {
                 // update the known file, we can't add it again
                 result = new LibraryFileController().Update(lf).Result;

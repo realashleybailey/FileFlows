@@ -374,7 +374,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         if (file.FinalMetadata?.Any() == true)
             existing.FinalMetadata = file.FinalMetadata;
         
-        var updated = await new LibraryFileService().Update(file);
+        var updated = await new LibraryFileService().Update(existing);
         
         // if(DbHelper.UseMemoryCache == false)
         //     CacheStore.Store(updated.Uid, updated);

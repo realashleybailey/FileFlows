@@ -513,6 +513,17 @@ public class WorkerController : Controller
 
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;
+
+            if (info.LibraryFile != null)
+            {
+                var service = new LibraryFileService();
+                var current = service.GetFileStatus(info.LibraryFile.Uid).Result;
+                if (current == FileStatus.Unprocessed)
+                {
+                    // can happen if server was restarted
+                    service.UpdateWork(info.LibraryFile).Wait();
+                }
+            }
             return true;
         }
     }

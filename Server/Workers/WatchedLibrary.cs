@@ -256,7 +256,8 @@ public class WatchedLibrary:IDisposable
         var knownFile = service.GetFileIfKnown(fullpath).Result;
         if (knownFile != null)
         {
-            if(Library.ReprocessRecreatedFiles == false || fsInfo.CreationTime <= knownFile.CreationTime)
+            if(Library.ReprocessRecreatedFiles == false || 
+               Math.Abs(fsInfo.CreationTime.Subtract(knownFile.CreationTime).TotalSeconds) < 5)
             {
                 LogQueueMessage($"{Library.Name} skipping known file '{fullpath}'");
                 // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it

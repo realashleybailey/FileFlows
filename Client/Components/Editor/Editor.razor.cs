@@ -63,6 +63,11 @@ public partial class Editor : InputRegister, IDisposable
 
     public delegate Task<bool> SaveDelegate(ExpandoObject model);
     protected SaveDelegate SaveCallback;
+    
+    /// <summary>
+    /// Gets if the editor has loaded and past the initial render
+    /// </summary>
+    public bool Loaded { get;private set; }
 
     protected bool ShowDownload { get; set; }
     /// <summary>
@@ -122,6 +127,8 @@ public partial class Editor : InputRegister, IDisposable
 
     protected override void OnAfterRender(bool firstRender)
     {
+        Loaded = true;
+
         if(UpdateResizer)
             jsRuntime.InvokeVoidAsync("ff.resizableEditor", this.Uid);
         if (FocusFirst)
@@ -157,6 +164,7 @@ public partial class Editor : InputRegister, IDisposable
     /// <returns>the updated model from the edit</returns>
     internal Task<ExpandoObject> Open(EditorOpenArgs args)
     {
+        this.Loaded = false;
         this.RegisteredInputs.Clear();
         var expandoModel = ConvertToExando(args.Model);
         this.Model = expandoModel;
@@ -210,6 +218,12 @@ public partial class Editor : InputRegister, IDisposable
         this.StateHasChanged();
         return OpenTask.Task;
     }
+
+    /// <summary>
+    /// Gets the total number of buttons
+    /// </summary>
+    private int NumberOfButtons =>
+        (AdditionalButtons?.Count ?? 0) + (ReadOnly ? 1 : 2) + (string.IsNullOrEmpty(HelpUrl) ? 0 : 1) + (ShowDownload ? 1 : 0); 
 
     private void BuildFieldsRenderFragment()
     {

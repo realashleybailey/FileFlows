@@ -1,6 +1,7 @@
 using System.Text.Json;
 using FileFlows.Client.Helpers;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using NPoco;
 
@@ -170,10 +171,12 @@ public abstract class Input<T> : ComponentBase, IInput, IDisposable
                 bool areEqual = System.Text.Json.JsonSerializer.Serialize(_Value) ==
                                 System.Text.Json.JsonSerializer.Serialize(value);
                 if (areEqual ==
-                    false) // for lists/arrays if they havent really changed, empty to empty, dont clear validation
+                    false) // for lists/arrays if they haven't really changed, empty to empty, dont clear validation
                     ErrorMessage = ""; // clear the error
 
                 _Value = value;
+                if (Editor?.Loaded != true)
+                    return;
                 ValueUpdated();
                 ValueChanged.InvokeAsync(value);
                 Field?.InvokeValueChanged(this.Editor, value);

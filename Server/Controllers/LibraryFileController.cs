@@ -362,6 +362,12 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         existing.ProcessingEnded = file.ProcessingEnded;
         existing.ProcessingStarted = file.ProcessingStarted;
         existing.WorkerUid = file.WorkerUid;
+        existing.CreationTime = file.CreationTime;
+        existing.LastWriteTime = file.LastWriteTime;
+        existing.HoldUntil = file.HoldUntil;
+        existing.Order = file.Order;
+        existing.Fingerprint = file.Fingerprint;
+        existing.OriginalSize = file.OriginalSize;
         existing.ExecutedNodes = file.ExecutedNodes ?? new List<ExecutedNode>();
         if (file.OriginalMetadata?.Any() == true)
             existing.OriginalMetadata = file.OriginalMetadata;

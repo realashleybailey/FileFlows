@@ -103,10 +103,19 @@ public class LibraryWorker : Worker
     /// <summary>
     /// Resets processing of all library files that are currently marked as Processing to Unprocessed
     /// </summary>
-    internal static void ResetProcessing()
+    /// <param name="internalOnly">If only the internal processing node should be reset</param>
+    internal static void ResetProcessing(bool internalOnly = true)
     {
-        // special case can use dbhelper directly
-        // this is called at the start up of FileFlows
-        new Server.Services.LibraryFileService().ResetProcessingStatus().Wait();
+        var service = new Server.Services.LibraryFileService();
+        if (internalOnly)
+        {
+            service.ResetProcessingStatus(Globals.InternalNodeUid).Wait();
+        }
+        else
+        {
+            // special case can use dbhelper directly
+            // this is called at the start up of FileFlows
+            service.ResetProcessingStatus().Wait();
+        }
     }
 }

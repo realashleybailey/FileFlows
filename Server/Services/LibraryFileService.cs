@@ -743,4 +743,17 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
     /// <param name="size">the size of the file in bytes</param>
     public Task UpdateOriginalSize(Guid uid, long size) 
         => Database_Execute($"update LibraryFile set OriginalSize = {size} where Uid = '{uid}'");
+
+
+
+    /// <summary>
+    /// Aborts a file by setting its status to failed
+    /// Only used to abort files that were processing on startup
+    /// </summary>
+    /// <param name="uid">The UID of the file</param>
+    public async Task Abort(Guid uid)
+    {
+        Logger.Instance.ILog("Aborting file: " + uid);
+        await Database_Execute($"update LibraryFile set Status = {((int)FileStatus.ProcessingFailed)} where Uid = '{uid}'");
+    }
 }

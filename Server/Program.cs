@@ -5,6 +5,7 @@ using FileFlows.Plugin;
 using FileFlows.Server.Database;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
+using FileFlows.Server.Services;
 using FileFlows.Server.Ui;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
@@ -106,7 +107,7 @@ public class Program
 
             if (PrepareDatabase() == false)
                 return;
-
+            
             if (Docker || noGui)
             {
                 Console.WriteLine("Starting FileFlows Server...");

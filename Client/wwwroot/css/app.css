@@ -1358,6 +1358,36 @@ hr {
   .pager {
     text-align: left !important;
   }
+
+  .PagesLibraryFile.editor.buttons-0 .top-row, .PagesDashboard.editor.buttons-0 .top-row {
+    max-width: calc(100vw - 1rem);
+  }
+  .PagesLibraryFile.editor.buttons-1 .top-row, .PagesDashboard.editor.buttons-1 .top-row {
+    max-width: calc(100vw - 7rem);
+  }
+  .PagesLibraryFile.editor.buttons-2 .top-row, .PagesDashboard.editor.buttons-2 .top-row {
+    max-width: calc(100vw - 13rem);
+  }
+  .PagesLibraryFile.editor.buttons-3 .top-row, .PagesDashboard.editor.buttons-3 .top-row {
+    max-width: calc(100vw - 19rem);
+  }
+  .PagesLibraryFile.editor .top-row .title, .PagesDashboard.editor .top-row .title {
+    display: unset;
+    margin-top: 0.5rem;
+  }
+  .PagesLibraryFile.editor .top-row .title i, .PagesDashboard.editor .top-row .title i {
+    top: 0 !important;
+  }
+  .PagesLibraryFile.editor .row.mt-0 + .row.mt-0, .PagesDashboard.editor .row.mt-0 + .row.mt-0 {
+    margin-top: 1rem !important;
+  }
+  .PagesLibraryFile.editor .input-label label, .PagesDashboard.editor .input-label label {
+    margin-bottom: 0 !important;
+  }
+  .PagesLibraryFile.editor .input-value span, .PagesDashboard.editor .input-value span {
+    margin: 0;
+    word-break: break-word;
+  }
 }
 
 /*# sourceMappingURL=app.css.map */

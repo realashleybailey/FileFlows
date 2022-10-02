@@ -1,7 +1,3 @@
-using System.Net.Sockets;
-using System.Security.Cryptography.Xml;
-using FileFlows.Plugin;
-using FileFlows.Server.Database.Managers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using FileFlows.Shared.Models;
@@ -181,15 +177,28 @@ public class WorkerController : Controller
     public async Task UpdateWork([FromBody] FlowExecutorInfo info)
     {
         _ = new NodeController().UpdateLastSeen(info.NodeUid);
+
         
         if (info.LibraryFile != null)
         {
-            if(info.LibraryFile.Status != FileStatus.Processing)
-                Logger.Instance.DLog($"Updating non-processing library file [{info.LibraryFile.Status}]: {info.LibraryFile.Name}");
+            var libfileService = new LibraryFileService();
+            var dbStatus = libfileService.GetFileStatus(info.Library.Uid).Result;
+
             
-            if (await LibraryFileHasChanged(info.LibraryFile))
+            if (info.LibraryFile.Status != FileStatus.Processing)
             {
-                await new LibraryFileService().UpdateWork(info.LibraryFile);
+                Logger.Instance.DLog(
+                    $"Updating non-processing library file [{info.LibraryFile.Status}]: {info.LibraryFile.Name}");
+            }
+
+            if (dbStatus == FileStatus.Unprocessed)
+            {
+                // this can happen if the server is restarted but the node is still processing, update the status
+                await libfileService.Update(info.LibraryFile);
+            }
+            else if (await LibraryFileHasChanged(info.LibraryFile))
+            {
+                await libfileService.UpdateWork(info.LibraryFile);
             }
 
             if (info.LibraryFile.Status == FileStatus.ProcessingFailed || info.LibraryFile.Status == FileStatus.Processed)
@@ -507,6 +516,14 @@ public class WorkerController : Controller
             return true;
         }
     }
+
+    /// <summary>
+    /// Gets if a library file is executing
+    /// </summary>
+    /// <param name="uid">The UID of the library file</param>
+    /// <returns>true if running, otherwise false</returns>
+    internal bool IsLibraryFileRunning(Guid uid)
+        => Executors?.Any(x => x.Value.LibraryFile?.Uid == uid) == true;
 
     /// <summary>
     /// Aborts any runners that have stopped communicating

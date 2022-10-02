@@ -992,4 +992,38 @@ input[type=file]{
     .pager {
         text-align: left !important;
     }
+    .PagesLibraryFile.editor, .PagesDashboard.editor {
+        &.buttons-0 .top-row{
+            max-width:calc(100vw - 1rem);
+        }
+        &.buttons-1 .top-row{
+            max-width:calc(100vw - 7rem);            
+        }
+        &.buttons-2 .top-row{
+            max-width:calc(100vw - 13rem);
+        }
+        &.buttons-3 .top-row{
+            max-width:calc(100vw - 19rem);
+        }
+        .top-row {
+            .title {
+                i {
+                    top: 0 !important;
+                }
+                display:unset;
+                margin-top: 0.5rem;
+            }
+        }
+        .row.mt-0 + .row.mt-0 {
+            margin-top:1rem !important;
+        }
+
+        .input-label label {
+            margin-bottom:0 !important;
+        }
+        .input-value span {
+            margin:0;
+            word-break: break-word;
+        }
+    }
 }

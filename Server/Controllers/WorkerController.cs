@@ -518,6 +518,14 @@ public class WorkerController : Controller
     }
 
     /// <summary>
+    /// Gets if a library file is executing
+    /// </summary>
+    /// <param name="uid">The UID of the library file</param>
+    /// <returns>true if running, otherwise false</returns>
+    internal bool IsLibraryFileRunning(Guid uid)
+        => Executors?.Any(x => x.Value.LibraryFile?.Uid == uid) == true;
+
+    /// <summary>
     /// Aborts any runners that have stopped communicating
     /// </summary>
     internal void AbortDisconnectedRunners()

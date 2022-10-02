@@ -576,7 +576,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
                 libraries.Remove(sd.Key);
             }
 
-            libraries.Add("###OTHER###", other);
+            libraries.Add("Other", other);
         }
         
         if (libraries.ContainsKey("###TOTAL###") ==

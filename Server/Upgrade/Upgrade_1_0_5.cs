@@ -26,7 +26,7 @@ public class Upgrade_1_0_5
     /// <param name="settings">the settings</param>
     public void Run2ndUpgrade(Settings settings)
     {
-        Logger.Instance.ILog("Upgrade running, running 1.0.5.2050 upgrade script");
+        Logger.Instance.ILog("Upgrade running, running 1.0.5.2060 upgrade script");
         FixOutputPaths(settings);
     }
 

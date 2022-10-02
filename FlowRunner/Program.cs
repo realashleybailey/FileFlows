@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Azure;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Models;
 
 namespace FileFlows.FlowRunner
@@ -62,6 +63,8 @@ namespace FileFlows.FlowRunner
                 string hostname = GetArgument(args, "--hostname");
                 if(string.IsNullOrWhiteSpace(hostname))
                     hostname = Environment.MachineName;
+
+                Globals.IsDocker = args.Contains("--docker");
 
                 string workingDir = Path.Combine(tempPath, "Runner-" + uid);
                 Directory.CreateDirectory(workingDir);

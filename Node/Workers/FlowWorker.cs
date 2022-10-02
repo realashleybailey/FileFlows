@@ -203,6 +203,7 @@ public class FlowWorker : Worker
                     ConfigKey,
                     "--baseUrl",
                     Service.ServiceBaseUrl,
+                    Globals.IsDocker ? "--docker" : null,
                     isServer ? null : "--hostname",
                     isServer ? null : Hostname,
                     isServer ? "--server" : "--notserver"

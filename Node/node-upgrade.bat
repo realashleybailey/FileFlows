@@ -1,12 +1,13 @@
 @echo off
 
-IF "%1"=="UPDATE" GOTO RunUpdate
-copy node-upgrade.bat ..\
-cd ..
-start node-upgrade.bat "UPDATE" %1 & exit
+IF "%1" == "UPDATE" GOTO RunUpdate
+echo Launching from Subdirectory %1
+copy node-upgrade.bat ..\node-upgrade.bat
+start node-upgrade.bat UPDATE %1 -wo "%~dp0%..\" & pause & exit
 GOTO Done
 
 :RunUpdate
+echo Running Update
 timeout /t 3
 echo Stopping FileFlows Node if running
 taskkill /PID %2

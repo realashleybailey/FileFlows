@@ -33,9 +33,7 @@ rmdir /q /s NodeUpdate
 
 echo.
 echo Starting FileFlows Node
-cd Node 
-start dotnet FileFlows.Node.dll
-cd .. 
+start dotnet FileFlows.Node.dll --wo "%~dp0%Node"
 
 if exist node-upgrade.bat goto Done
 del node-upgrade.bat & exit

@@ -3,7 +3,7 @@
 IF "%1" == "UPDATE" GOTO RunUpdate
 echo Launching from Subdirectory %1
 copy node-upgrade.bat ..\node-upgrade.bat
-start node-upgrade.bat UPDATE %1 -wo "%~dp0%..\" & pause & exit
+start node-upgrade.bat UPDATE %1 -wo "%~dp0%..\" & exit
 GOTO Done
 
 :RunUpdate

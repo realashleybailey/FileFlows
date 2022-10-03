@@ -6,6 +6,7 @@ IF "%1" == "UPDATE" GOTO RunUpdate
     start /D "..\" node-upgrade.bat UPDATE %1 & exit
 GOTO Done
 
+
 :RunUpdate
 
     echo Running Update

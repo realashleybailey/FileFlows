@@ -4,7 +4,7 @@ IF "%1" == "UPDATE" GOTO RunUpdate
 (
     echo Launching from Subdirectory %1
     copy node-upgrade.bat ..\node-upgrade.bat
-    start node-upgrade.bat UPDATE %1 -wo "%~dp0%..\" & exit
+    start /D "%~dp0%..\" node-upgrade.bat UPDATE %1 & exit
 ) > "..\preupdate.log"
 GOTO Done
 
@@ -13,12 +13,12 @@ GOTO Done
     echo Running Update
     timeout /t 3
     echo Stopping FileFlows Node if running
-    taskkill /PID %2
+    taskkill /PID %2 2>NUL
     
     echo.
     echo Removing previous version
-    rmdir /q /s Node
-    rmdir /q /s FlowRunner
+    rmdir /q /s "%~dp0%Node"
+    rmdir /q /s "%~dp0%FlowRunner"
     
     echo.
     echo Copying Node update files
@@ -32,11 +32,11 @@ GOTO Done
     ) else ( 
         move NodeUpdate/Node Node
     )
-    rmdir /q /s NodeUpdate
+    rmdir /q /s "%~dp0%NodeUpdate"
     
     echo.
     echo Starting FileFlows Node
-    start dotnet FileFlows.Node.dll --wo "%~dp0%Node"
+    start /D "%~dp0%Node" dotnet FileFlows.Node.dll
     
     if exist node-upgrade.bat goto Done
     del node-upgrade.bat & exit

@@ -1,15 +1,13 @@
 @echo off
 
 IF "%1" == "UPDATE" GOTO RunUpdate
-(
     echo Launching from Subdirectory %1
     copy node-upgrade.bat ..\node-upgrade.bat
-    start /D "%~dp0%..\" node-upgrade.bat UPDATE %1 & exit
-) > "..\preupdate.log"
+    start /D "..\" node-upgrade.bat UPDATE %1 & exit
 GOTO Done
 
 :RunUpdate
-(
+
     echo Running Update
     timeout /t 3
     echo Stopping FileFlows Node if running
@@ -40,7 +38,6 @@ GOTO Done
     
     if exist node-upgrade.bat goto Done
     del node-upgrade.bat & exit
-) > "update.log"
 
 :Done
 exit

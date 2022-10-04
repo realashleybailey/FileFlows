@@ -315,7 +315,7 @@ public class ProcessHelper
         else
         {
             // remove ansi codes
-            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace("[" + '', string.Empty);
+            string line = new Regex(@".[3[\d]m").Replace(e.Data, string.Empty).Replace("[" + '', string.Empty).Replace(''.ToString(), string.Empty);
             Args?.OnStandardOutput(line);
             if (ProcessLastOutputLine != line)
             {

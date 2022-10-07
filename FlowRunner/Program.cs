@@ -50,8 +50,9 @@ namespace FileFlows.FlowRunner
                     throw new Exception("Configuration file doesnt exist: " + cfgFile);
 
 
+                bool noEnrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
                 string cfgJson;
-                if (Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1")
+                if (noEnrypt)
                 {
                     LogInfo("No Encryption for Node configuration");
                     cfgJson = System.IO.File.ReadAllText(cfgFile);

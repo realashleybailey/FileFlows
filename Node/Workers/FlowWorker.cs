@@ -563,8 +563,9 @@ public class FlowWorker : Worker
             config.SystemScripts
         });
         
-        if(Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1")
-            await File.WriteAllTextAsync(json,Path.Combine(dir, "config.json"));
+        bool noEnrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
+        if(noEnrypt)
+            await File.WriteAllTextAsync(Path.Combine(dir, "config.json"), json);
         else
             Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
         CurrentConfigurationRevision = revision;

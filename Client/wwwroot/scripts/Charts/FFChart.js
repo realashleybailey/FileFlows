@@ -97,6 +97,8 @@ function intDashboardActual(uid, csharp, isReadOnly) {
         disableResize: isReadOnly,
         disableDrag: isReadOnly
     });
+    if(!grid)
+        return;
     window.ffGrid = grid;
 
     grid.on('resizestop', (e, el) => {

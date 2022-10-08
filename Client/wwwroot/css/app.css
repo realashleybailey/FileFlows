@@ -825,13 +825,13 @@ hr {
 }
 
 @media screen and (min-width: 850px) {
-  .dashboard {
+  .dashboard:not(.nav-item) {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(36rem, 1fr));
     grid-gap: 1rem;
     grid-auto-rows: 1fr;
   }
-  .dashboard > div {
+  .dashboard:not(.nav-item) > div {
     margin: unset;
   }
 }

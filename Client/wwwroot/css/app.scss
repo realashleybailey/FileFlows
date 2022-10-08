@@ -398,7 +398,7 @@ input[type=file]{
 }
 
 @media screen and (min-width: 850px) {
-    .dashboard {
+    .dashboard:not(.nav-item) {
         > div {
             margin: unset;
         }

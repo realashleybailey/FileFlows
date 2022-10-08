@@ -24,7 +24,7 @@ public class FlowWorker : Worker
     /// </summary>
     public readonly Guid Uid = Guid.NewGuid();
 
-    private static readonly string ConfigKey = Guid.NewGuid().ToString();
+    private static readonly string ConfigKey = Environment.GetEnvironmentVariable("FF_ENCRYPT")?.EmptyAsNull() ?? Guid.NewGuid().ToString();
 
     /// <summary>
     /// The current configuration
@@ -563,7 +563,11 @@ public class FlowWorker : Worker
             config.SystemScripts
         });
         
-        Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
+        bool noEnrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
+        if(noEnrypt)
+            await File.WriteAllTextAsync(Path.Combine(dir, "config.json"), json);
+        else
+            Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
         CurrentConfigurationRevision = revision;
 
         return true;

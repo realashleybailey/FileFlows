@@ -3,6 +3,7 @@ using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO.Enumeration;
 using System.Linq;
@@ -11,6 +12,7 @@ using System.Net.Http;
 using Azure;
 using FileFlows.ServerShared;
 using FileFlows.ServerShared.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.FlowRunner
 {
@@ -43,15 +45,34 @@ namespace FileFlows.FlowRunner
                 if (string.IsNullOrEmpty(cfgPath) || Directory.Exists(cfgPath) == false)
                     throw new Exception("Configuration Path doesnt exist: " + cfgPath);
 
-                string cfgKey = GetArgument(args, "--cfgKey");
-                if (string.IsNullOrEmpty(cfgKey))
-                    throw new Exception("Configuration Key not set");
-
                 string cfgFile = Path.Combine(cfgPath, "config.json");
                 if(File.Exists(cfgFile) == false)
                     throw new Exception("Configuration file doesnt exist: " + cfgFile);
 
-                string cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
+
+                bool noEnrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
+                string cfgJson;
+                if (noEnrypt)
+                {
+                    LogInfo("No Encryption for Node configuration");
+                    cfgJson = System.IO.File.ReadAllText(cfgFile);
+                }
+                else if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FF_ENCRYPT")) == false)
+                {
+                    string cfgKey = Environment.GetEnvironmentVariable("FF_ENCRYPT");
+                    LogInfo("Using environmental configuration encryption key: " + cfgKey);
+                    cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
+                }
+                else
+                {
+                    string cfgKey = GetArgument(args, "--cfgKey");
+                    if (string.IsNullOrEmpty(cfgKey))
+                        throw new Exception("Configuration Key not set");
+                    LogInfo("Using configuration encryption key: " + cfgKey);
+                    cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
+                }
+
+
                 var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationRevision>(cfgJson);
 
                 string baseUrl = GetArgument(args, "--baseUrl");

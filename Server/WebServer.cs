@@ -28,13 +28,11 @@ public class WebServer
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        string protocol = Environment.GetEnvironmentVariable("HTTPS") == "1" ? "https" : "http";
+        string protocol = "https";
         Port = 5000;
 #if (DEBUG)
         Port = 6868;
 #endif
-        if (int.TryParse(Environment.GetEnvironmentVariable("Port"), out int port))
-            Port = port;
         
         var url = args?.Where(x => x?.StartsWith("--urls=") == true)?.FirstOrDefault();
         if(string.IsNullOrEmpty(url) == false)
@@ -45,6 +43,10 @@ public class WebServer
             if (url.StartsWith("https"))
                 protocol = "https";
         }
+        if (int.TryParse(Environment.GetEnvironmentVariable("Port"), out int port) && port is > 0 and <= 65535)
+            Port = port;
+        if (Environment.GetEnvironmentVariable("HTTPS") == "1")
+            protocol = "https";
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();

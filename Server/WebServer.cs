@@ -28,11 +28,14 @@ public class WebServer
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        string protocol = "http";
+        string protocol = Environment.GetEnvironmentVariable("HTTPS") == "1" ? "https" : "http";
         Port = 5000;
 #if (DEBUG)
         Port = 6868;
 #endif
+        if (int.TryParse(Environment.GetEnvironmentVariable("Port"), out int port))
+            Port = port;
+        
         var url = args?.Where(x => x?.StartsWith("--urls=") == true)?.FirstOrDefault();
         if(string.IsNullOrEmpty(url) == false)
         {

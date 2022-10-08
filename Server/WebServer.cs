@@ -3,10 +3,12 @@ using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using FileFlows.Server.Middleware;
 using FileFlows.ServerShared.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -72,6 +74,26 @@ public class WebServer
                     c.IncludeXmlComments(filePath);
             }
         });
+
+        if (File.Exists("/https/certificate.crt"))
+        {
+            Console.WriteLine("Using certificate: /https/certificate.crt");
+            builder.WebHost.ConfigureKestrel((context, options) =>
+            {
+                var cert = File.ReadAllText("/https/certificate.crt");
+                var key = File.ReadAllText("/https/privatekey.key");
+                var x509 = X509Certificate2.CreateFromPem(cert, key);
+                X509Certificate2 miCertificado2 = new X509Certificate2(x509.Export(X509ContentType.Pkcs12));
+
+                x509.Dispose();
+
+                options.ListenAnyIP(5001, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                    listenOptions.UseHttps(miCertificado2);
+                });
+            });
+        }
 
         app = builder.Build();
 

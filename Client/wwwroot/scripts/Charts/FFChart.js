@@ -10,7 +10,8 @@ export function initDashboard(uid, Widgets, csharp, isReadOnly){
         dashboard = document.createElement('div');
         dashboard.className = 'dashboard grid-stack';
         let container = document.querySelector('.dashboard-wrapper');
-        container.appendChild(dashboard);        
+        if(!container)
+            container.appendChild(dashboard);
     }
     else {
         dashboard.classList.remove('readonly');

@@ -226,6 +226,8 @@ class FFChart {
         this.seriesName = args.title;
 
         this.ele = document.getElementById(uid);
+        if(!this.ele)
+            return;
         this.ele.classList.add('chart-' + args.type);
         this.ele.addEventListener('dashboardElementResized', (event) => this.dashboardElementResized(event));
     

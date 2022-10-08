@@ -75,25 +75,26 @@ public class WebServer
             }
         });
 
-        // if (File.Exists("/https/certificate.crt"))
-        // {
-        //     Console.WriteLine("Using certificate: /https/certificate.crt");
-        //     builder.WebHost.ConfigureKestrel((context, options) =>
-        //     {
-        //         var cert = File.ReadAllText("/https/certificate.crt");
-        //         var key = File.ReadAllText("/https/privatekey.key");
-        //         var x509 = X509Certificate2.CreateFromPem(cert, key);
-        //         X509Certificate2 miCertificado2 = new X509Certificate2(x509.Export(X509ContentType.Pkcs12));
-        //
-        //         x509.Dispose();
-        //
-        //         options.ListenAnyIP(5001, listenOptions =>
-        //         {
-        //             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-        //             listenOptions.UseHttps(miCertificado2);
-        //         });
-        //     });
-        // }
+        if (File.Exists("/https/certificate.crt"))
+        {
+            Console.WriteLine("Using certificate: /https/certificate.crt");
+            Logger.Instance.ILog("Using certificate: /https/certificate.crt");
+            builder.WebHost.ConfigureKestrel((context, options) =>
+            {
+                var cert = File.ReadAllText("/https/certificate.crt");
+                var key = File.ReadAllText("/https/privatekey.key");
+                var x509 = X509Certificate2.CreateFromPem(cert, key);
+                X509Certificate2 miCertificado2 = new X509Certificate2(x509.Export(X509ContentType.Pkcs12));
+
+                x509.Dispose();
+
+                options.ListenAnyIP(5001, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                    listenOptions.UseHttps(miCertificado2);
+                });
+            });
+        }
 
         app = builder.Build();
 

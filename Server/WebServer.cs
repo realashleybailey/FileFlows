@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using FileFlows.Server.Middleware;
 using FileFlows.ServerShared.Workers;
+using FileFlows.Shared.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;

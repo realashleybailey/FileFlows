@@ -101,7 +101,18 @@ public class Program
             }
             
             // create new client, this can be used by upgrade scripts, so do this before preparing database
-            Shared.Helpers.HttpHelper.Client = new HttpClient();
+            var handler = new HttpClientHandler();
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback = 
+                (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    if (httpRequestMessage.RequestUri.ToString()
+                        .StartsWith(ServerShared.Services.Service.ServiceBaseUrl))
+                        return true;
+                    return cert.Verify();
+                };
+            Shared.Helpers.HttpHelper.Client = new HttpClient(handler);
+
 
             CheckLicense();
 

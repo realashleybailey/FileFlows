@@ -10,7 +10,7 @@ export function initDashboard(uid, Widgets, csharp, isReadOnly){
         dashboard = document.createElement('div');
         dashboard.className = 'dashboard grid-stack';
         let container = document.querySelector('.dashboard-wrapper');
-        if(!container)
+        if(container)
             container.appendChild(dashboard);
     }
     else {

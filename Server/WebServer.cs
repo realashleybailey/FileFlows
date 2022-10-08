@@ -28,6 +28,7 @@ public class WebServer
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        string protocol = "http";
         Port = 5000;
 #if (DEBUG)
         Port = 6868;
@@ -38,6 +39,8 @@ public class WebServer
             var portMatch = Regex.Match(url, @"(?<=(:))[\d]+");
             if (portMatch.Success)
                 Port = int.Parse(portMatch.Value);
+            if (url.StartsWith("https"))
+                protocol = "https";
         }
 
         // Add services to the container.
@@ -168,7 +171,7 @@ public class WebServer
         // this will run the asp.net app and wait until it is killed
         Console.WriteLine("Running FileFlows Server");
 
-        app.Run($"http://0.0.0.0:{Port}/");                
+        app.Run($"{protocol}://0.0.0.0:{Port}/");                
         
         Console.WriteLine("Finished running FileFlows Server");
 

@@ -33,7 +33,7 @@ public class Program
             CommandLineOptions.PrintHelp();
             return;
         }
-        Shared.Helpers.HttpHelper.Client = new HttpClient();
+        Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
         ServicePointManager.DefaultConnectionLimit = 50;
 
         var options = CommandLineOptions.Parse(args);

@@ -91,7 +91,7 @@ namespace FileFlows.FlowRunner
                 Directory.CreateDirectory(workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
-                Shared.Helpers.HttpHelper.Client = new HttpClient();
+                Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
                 Execute(new()
                 {
                     IsServer = server,

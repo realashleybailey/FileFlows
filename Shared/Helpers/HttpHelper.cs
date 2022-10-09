@@ -309,4 +309,23 @@ public class HttpHelper
         string json = o.ToJson();
         return new StringContent(json, Encoding.UTF8, "application/json");
     }
+
+    public static HttpClient GetDefaultHttpHelper(string serviceBaseUrl)
+    {
+        if (Environment.GetEnvironmentVariable("HTTPS") != "1")
+            return new HttpClient();
+        var handler = new HttpClientHandler();
+        handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+        handler.ServerCertificateCustomValidationCallback = 
+            (httpRequestMessage, cert, cetChain, policyErrors) =>
+            {
+                if (string.IsNullOrEmpty(serviceBaseUrl))
+                    return true;
+                if (httpRequestMessage.RequestUri.ToString()
+                    .StartsWith(serviceBaseUrl))
+                    return true;
+                return cert.Verify();
+            };
+        return new HttpClient(handler);
+    }
 }

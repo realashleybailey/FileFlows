@@ -33,17 +33,7 @@ public class Program
             CommandLineOptions.PrintHelp();
             return;
         }
-        var handler = new HttpClientHandler();
-        handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-        handler.ServerCertificateCustomValidationCallback = 
-            (httpRequestMessage, cert, cetChain, policyErrors) =>
-            {
-                if (httpRequestMessage.RequestUri.ToString()
-                    .StartsWith(ServerShared.Services.Service.ServiceBaseUrl))
-                    return true;
-                return cert.Verify();
-            };
-        Shared.Helpers.HttpHelper.Client = new HttpClient(handler);
+        Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
         ServicePointManager.DefaultConnectionLimit = 50;
 
         var options = CommandLineOptions.Parse(args);

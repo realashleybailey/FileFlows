@@ -170,6 +170,8 @@ public class WebServer
         Helpers.TranslaterHelper.InitTranslater();
 
         ServerShared.Services.Service.ServiceBaseUrl = $"{protocol}://localhost:{Port}";
+        // update the client with the proper ServiceBaseUrl
+        Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
 
 
         LibraryWorker.ResetProcessing(internalOnly: true);

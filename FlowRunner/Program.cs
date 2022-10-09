@@ -91,17 +91,7 @@ namespace FileFlows.FlowRunner
                 Directory.CreateDirectory(workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
-                var handler = new HttpClientHandler();
-                handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-                handler.ServerCertificateCustomValidationCallback = 
-                    (httpRequestMessage, cert, cetChain, policyErrors) =>
-                    {
-                        if (httpRequestMessage.RequestUri.ToString()
-                            .StartsWith(ServerShared.Services.Service.ServiceBaseUrl))
-                            return true;
-                        return cert.Verify();
-                    };
-                Shared.Helpers.HttpHelper.Client = new HttpClient(handler);
+                Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
                 Execute(new()
                 {
                     IsServer = server,

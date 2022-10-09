@@ -587,7 +587,7 @@
     "Tasks": {
       "Title": "Tasks",
       "Messages": {
-        "NoScripts":"No scripts found to create a task for"
+        "NoScripts":"No scripts found to create a task for."
       }
     },
     "FileFlowsTask":{

@@ -31,7 +31,7 @@ public class WebServer
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        string protocol = "https";
+        string protocol = "http";
         Port = 5000;
 #if (DEBUG)
         Port = 6868;

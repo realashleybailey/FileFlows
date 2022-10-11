@@ -140,7 +140,15 @@ public class Runner
         }
         finally
         {
-            Finish().Wait();
+            try
+            {
+                Finish().Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed 'Finishing' runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+
             systemHelper.Stop();
         }
     }
@@ -160,9 +168,9 @@ public class Runner
         if (nodeParameters?.Logger is FlowLogger fl)
             Info.Log = fl.ToString();
 
-        if(nodeParameters.OriginalMetadata != null)
+        if(nodeParameters?.OriginalMetadata != null)
             Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;
-        if (nodeParameters.Metadata != null)
+        if (nodeParameters?.Metadata != null)
             Info.LibraryFile.FinalMetadata = nodeParameters.Metadata;
 
         await Complete();

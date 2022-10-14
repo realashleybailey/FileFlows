@@ -422,6 +422,21 @@ public partial class NewFlowEditor : Editor
             }
         } while (count != flow.Parts.Count); // loop over as we may have removed a connection that now makes other nodes disconnected/redundant
 
+        // remove any missing connections
+        var partUids = flow.Parts.Select(x => x.Uid).ToList();
+        foreach (var part in flow.Parts)
+        {
+            if (part.OutputConnections?.Any() != true)
+                continue;
+            for(int i=part.OutputConnections.Count - 1;i>=0;i--)
+            {
+                if (partUids.Contains(part.OutputConnections[i].InputNode) == false)
+                {
+                    part.OutputConnections.RemoveAt(i);
+                }
+            }
+        }
+
         Logger.Instance.ILog("Flow", flow);
 
         if (CurrentTemplate.Save)

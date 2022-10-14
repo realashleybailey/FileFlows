@@ -25,6 +25,7 @@ namespace FileFlows.FlowRunner
 
         public static void Main(string[] args)
         {
+            LogInfo("Flow Runner Version: " + Globals.Version);
             int exitCode = 0;
             ServicePointManager.DefaultConnectionLimit = 50;
             try

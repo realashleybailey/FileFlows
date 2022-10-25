@@ -1,4 +1,4 @@
-﻿.flow-schedule {
+.flow-schedule {
   user-select: none;
   max-width: 60rem;
 }
@@ -15,6 +15,12 @@ table {
 
 thead {
   text-align: center;
+}
+
+tbody tr {
+  height: 1.65rem;
+  max-height: 1.65rem;
+  overflow: hidden;
 }
 
 .filled {
@@ -63,12 +69,10 @@ thead {
     display: flex;
     flex-direction: row;
   }
-
   .spacer {
     width: 1rem;
     display: unset;
   }
-
   .schedule-pm {
     margin-top: unset;
   }
@@ -76,3 +80,5 @@ thead {
     display: none;
   }
 }
+
+/*# sourceMappingURL=FlowSchedule.razor.css.map */

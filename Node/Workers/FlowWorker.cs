@@ -563,11 +563,18 @@ public class FlowWorker : Worker
             config.SystemScripts
         });
         
-        bool noEnrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
-        if(noEnrypt)
+        bool noEncrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
+        if (noEncrypt)
+        {
+            Logger.Instance?.DLog("FF_NO_ENCRYPT found saving configuration as plain text");
             await File.WriteAllTextAsync(Path.Combine(dir, "config.json"), json);
+        }
         else
+        {
+            Logger.Instance?.DLog("Saving encrypted configuration");
             Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
+        }
+
         CurrentConfigurationRevision = revision;
 
         return true;

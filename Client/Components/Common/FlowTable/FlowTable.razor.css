@@ -127,6 +127,7 @@
   overflow-y: scroll;
   border-left: solid 1px var(--input-background);
   border-bottom: solid 1px var(--input-background);
+  border-right: solid 1px var(--input-background);
 }
 ::deep .flowtable-body::-webkit-scrollbar-track {
   border-right: solid 1px var(--input-background);
@@ -151,12 +152,10 @@
   .flowtable-toolbar {
     display: unset;
   }
-
   .flowtable-toolbar-filter {
     width: 100% !important;
     max-width: calc(100vw - 2.5rem);
   }
-
   .flowtable-data {
     top: 3.5rem;
   }

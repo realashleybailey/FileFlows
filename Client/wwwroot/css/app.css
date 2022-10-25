@@ -184,7 +184,6 @@ a.btn {
     box-shadow: 0 3px 10px rgba(var(--color-rgb), 0.1);
     background: rgba(var(--base-rgb), 0.9);
   }
-
   .flow-modal-footer {
     text-align: right;
   }
@@ -202,18 +201,15 @@ a.btn {
     right: 0;
     background: var(--base);
   }
-
   .flow-modal-inner {
     height: 100%;
     display: flex;
     flex-direction: column;
   }
-
   .flow-modal-body {
     flex-grow: 1;
     position: relative;
   }
-
   .flow-modal-footer {
     display: flex;
     flex-direction: row;
@@ -246,7 +242,6 @@ a.btn {
     left: 6px !important;
     z-index: 10;
   }
-
   .pointer-add {
     position: fixed;
     top: 5rem;
@@ -366,7 +361,6 @@ a.btn {
   .html-log .line .line-prefix {
     display: none;
   }
-
   .vi-container.fullwidth > .content > .log.html-log {
     position: absolute;
     left: 0;
@@ -424,8 +418,7 @@ a.btn {
   margin-bottom: 1rem;
 }
 .editor-wrapper .fields .row {
-  margin: 1px 0 0;
-  /* 1px top for input outline border to be visible */
+  margin: 1px 0 0; /* 1px top for input outline border to be visible */
 }
 .editor-wrapper .fields .row + .row, .editor-wrapper .fields .row + .input-text-variables, .editor-wrapper .fields .input-text-variables + .row {
   margin-top: 1rem;
@@ -750,8 +743,7 @@ hr {
 }
 .search-pane .close:after {
   display: inline-block;
-  content: "×";
-  /* This will render the 'X' */
+  content: "×"; /* This will render the 'X' */
   color: white;
 }
 .search-pane .input .value.range {
@@ -1081,7 +1073,6 @@ hr {
   .page.collapsed .nav-item:hover .not-configured-pointer {
     display: none !important;
   }
-
   .not-configured-pointer {
     position: absolute;
     right: -9px;
@@ -1105,7 +1096,6 @@ hr {
     border-bottom: 14px solid transparent;
     border-right: 10px solid var(--accent);
   }
-
   @keyframes bounce {
     0% {
       transform: translateX(0);
@@ -1341,7 +1331,6 @@ hr {
   .vi-container .bottom-buttons button:not(:focus), .vi-container .bottom-buttons button:not(:active), .vi-container .bottom-buttons button:not(:hover) {
     border-color: var(--border-color);
   }
-
   .editor-wrapper .vi-container .bottom-buttons {
     right: 0.5rem;
     padding-right: 0;
@@ -1354,11 +1343,9 @@ hr {
   .page .vi-container .content {
     height: calc(100vh - 4rem);
   }
-
   .pager {
     text-align: left !important;
   }
-
   .PagesLibraryFile.editor.buttons-0 .top-row, .PagesDashboard.editor.buttons-0 .top-row {
     max-width: calc(100vw - 1rem);
   }
@@ -1390,6 +1377,10 @@ hr {
   }
 }
 .content:has(> .flowtable) {
+  display: flex;
+}
+
+.flex {
   display: flex;
 }
 

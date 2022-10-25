@@ -140,6 +140,7 @@
     overflow-y: scroll;
     border-left: solid 1px $borderColor;
     border-bottom: solid 1px $borderColor;
+    border-right: solid 1px $borderColor;
     &::-webkit-scrollbar-track {
         border-right: solid 1px $borderColor;
         border-left: solid 1px $borderColor;

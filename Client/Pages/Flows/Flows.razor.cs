@@ -90,20 +90,14 @@ public partial class Flows : ListPage<Guid, FlowListModel>
 
     private async Task Export()
     {
-        var items = Table.GetSelected();
-        if (items?.Any() != true)
+        var items = Table.GetSelected()?.ToList() ?? new (); 
+        if (items.Any() != true)
             return;
-        var last = items.Last();
-        foreach (var item in items)
-        {
-            string url = $"/api/flow/export/{item.Uid}";
+        string url = $"/api/flow/export?{string.Join("&", items.Select(x => "uid=" + x.Uid))}";
 #if (DEBUG)
-            url = "http://localhost:6868" + url;
+        url = "http://localhost:6868" + url;
 #endif
-            await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, item.Name + ".json" });
-            if(item != last)
-                await Task.Delay(1000); // need to actually allow the browser to download the additional flows
-        }
+        await jsRuntime.InvokeVoidAsync("ff.downloadFile", new object[] { url, items.Count() == 1 ? items[0].Name + ".json" : "Flows.zip" });
     }
 
     private async Task Import()

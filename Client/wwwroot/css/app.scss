@@ -32,7 +32,7 @@ html, body {
 
 * {
     scrollbar-color: rgba(var(--accent-rgb), 0.5) var(--base);
-    scrollbar-width: thin;
+    scrollbar-width: auto;
 }
 a, .btn-link {
     color: var(--accent) !important;

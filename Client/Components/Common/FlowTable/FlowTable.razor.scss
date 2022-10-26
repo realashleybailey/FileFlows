@@ -96,13 +96,22 @@
     flex-direction:column;
 }
 
+@supports (-moz-appearance:none) 
+{
+    ::deep .flowtable-row {
+        /** scrollbar on firefox */
+        padding-right: 0.75rem;
+    }
+}
+
+
+
 .flowtable-row {
     border: solid 1px $borderColor;
     display: flex;
     flex-direction: row;
     user-select: none;
     width: 100%;
-
     &:not(.flowtable-header-row) {
         border-top: none;
         border-right: none;

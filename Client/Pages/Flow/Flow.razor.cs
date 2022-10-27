@@ -245,6 +245,17 @@ public partial class Flow : ComponentBase, IDisposable
         this.Parts = this.Model.Parts;
         foreach (var p in this.Parts)
         {
+            // FF-347: sane limits to flow positions
+            if (p.xPos < 10)
+                p.xPos = 50;
+            else if (p.xPos > 2400)
+                p.xPos = 2300;
+            
+            if (p.yPos < 10)
+                p.yPos = 50;
+            else if (p.yPos > 1780)
+                p.yPos = 1750;
+            
             if (string.IsNullOrEmpty(p.Name) == false || string.IsNullOrEmpty(p?.FlowElementUid))
                 continue;
             string type = p.FlowElementUid.Substring(p.FlowElementUid.LastIndexOf(".") + 1);

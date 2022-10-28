@@ -510,16 +510,16 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     public async Task<object> ShrinkageBarChart()
     {
         var groups = await ShrinkageGroups();
-        #if(DEBUG)
-        groups = new Dictionary<string, ShrinkageData>()
-        {
-            { "Movies", new() { FinalSize = 10_000_000_000, OriginalSize = 25_000_000_000 } },
-            { "TV", new() { FinalSize = 45_000_000_000, OriginalSize = 75_000_000_000 } },
-            { "Other", new() { FinalSize = 45_000_000_000, OriginalSize = 40_000_000_000 } },
-            { "Other2", new() { FinalSize = 15_000_000_000, OriginalSize = 20_000_000_000 } },
-            { "Other3", new() { FinalSize = 27_000_000_000, OriginalSize = 30_000_000_000 } },
-        };
-        #endif
+        // #if(DEBUG)
+        // groups = new Dictionary<string, ShrinkageData>()
+        // {
+        //     { "Movies", new() { FinalSize = 10_000_000_000, OriginalSize = 25_000_000_000 } },
+        //     { "TV", new() { FinalSize = 45_000_000_000, OriginalSize = 75_000_000_000 } },
+        //     { "Other", new() { FinalSize = 45_000_000_000, OriginalSize = 40_000_000_000 } },
+        //     { "Other2", new() { FinalSize = 15_000_000_000, OriginalSize = 20_000_000_000 } },
+        //     { "Other3", new() { FinalSize = 27_000_000_000, OriginalSize = 30_000_000_000 } },
+        // };
+        // #endif
         return new
         {
             series = new object[]
@@ -543,6 +543,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
                 }).ToArray() }
             },
             labels = groups.Select(x => x.Key.Replace("###TOTAL###", "Total")).ToArray(),
+            items = groups.Select(x => x.Value.Items).ToArray()
         };
     }
 

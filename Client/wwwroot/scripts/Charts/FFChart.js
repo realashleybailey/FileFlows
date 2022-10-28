@@ -455,8 +455,12 @@ export class BarChart extends FFChart
             },
             tooltip: {
                 y: {
-                    formatter: (value) => {
-                        return this.formatFileSize(value);
+                    formatter: (val, opt) => {
+                        let r = this.formatFileSize(val);
+                        if(opt.seriesIndex === 0 && data.items?.length > opt.dataPointIndex) {
+                            r += ` (${data.items[opt.dataPointIndex]} items)`;
+                        }
+                        return r;
                     }
                 }
             },
@@ -470,7 +474,7 @@ export class BarChart extends FFChart
                 enabled: true,
                 formatter: (val, opt) => {
                     let d = data.series[opt.seriesIndex].data[opt.dataPointIndex];
-                    return this.formatFileSize(d, 0);
+                    return this.formatFileSize(d, 0);                    
                 },
             },
             colors: [

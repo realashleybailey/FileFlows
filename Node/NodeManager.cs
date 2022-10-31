@@ -153,7 +153,7 @@ public class NodeManager
             AppSettings.Instance.Enabled = AppSettings.EnvironmentalEnabled.Value;
 
         if (string.IsNullOrEmpty(AppSettings.Instance.TempPath))
-            AppSettings.Instance.TempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+            AppSettings.Instance.TempPath = Globals.IsDocker ? "/temp" : Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
 
         var settings = AppSettings.Instance;
         var nodeService = new NodeService();

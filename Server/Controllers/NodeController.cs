@@ -226,6 +226,7 @@ public class NodeController : ControllerStore<ProcessingNode>
             Address = address,
             Enabled = isSystem, // default to disabled so they have to configure it first
             FlowRunners = 1,
+            AllLibraries = ProcessingLibraries.All,
             Schedule = new string('1', 672),
             Mappings = isSystem  ? null : variables.Select(x => new
                 KeyValuePair<string, string>(x.Value, "")

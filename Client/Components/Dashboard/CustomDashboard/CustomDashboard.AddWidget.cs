@@ -264,6 +264,19 @@ public partial class CustomDashboard
             });
         }
 
+        if (DoesntHaveWidget(FileFlows.Shared.Widgets.NvidiaSmi.WD_UID))
+        {
+            fields.Add(new ElementField
+            {
+                InputType = FormInputType.Widget,
+                Name = nameof(FileFlows.Shared.Widgets.NvidiaSmi),
+                Parameters = new Dictionary<string, object>
+                {
+                    { nameof(InputWidget.Type), WidgetType.LibraryFileTable }
+                }
+            });
+        }
+        
         var result = await Editor.Open(new()
         {
             TypeName = "Pages.Widget", Title = "Pages.Widget.Title", Fields = fields, SaveLabel = "Labels.Add",
@@ -339,6 +352,9 @@ public partial class CustomDashboard
                                 break;
                             case nameof(ImageFormats):
                                 newWidgets.Add(CreateNewWidgetModel(ImageFormats.WD_UID, 4, 2));
+                                break;
+                            case nameof(NvidiaSmi):
+                                newWidgets.Add(CreateNewWidgetModel(NvidiaSmi.WD_UID, 4, 2));
                                 break;
                         }
                     }

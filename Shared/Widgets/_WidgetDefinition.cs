@@ -52,6 +52,8 @@ public abstract class WidgetDefinition
             return new OpenDatabaseConnections();
         if (uid == StorageSaved.WD_UID)
             return new StorageSaved();
+        if (uid == NvidiaSmi.WD_UID)
+            return new NvidiaSmi();
         throw new Exception("Unknown widget: " + uid);
     }
     

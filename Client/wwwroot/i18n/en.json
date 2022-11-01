@@ -388,7 +388,8 @@
         "OpenDatabaseConnections": "Open Database Connections",
         "ComicFormats": "Comic Formats",
         "ComicPages": "Comic Pages",
-        "ImageFormats": "Image Formats"
+        "ImageFormats": "Image Formats",
+        "NvidiaSmi": "NVIDIA SMI"
       }
     },
     "ProcessingNode": {

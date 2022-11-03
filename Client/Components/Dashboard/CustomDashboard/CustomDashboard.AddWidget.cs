@@ -272,7 +272,7 @@ public partial class CustomDashboard
                 Name = nameof(FileFlows.Shared.Widgets.NvidiaSmi),
                 Parameters = new Dictionary<string, object>
                 {
-                    { nameof(InputWidget.Type), WidgetType.LibraryFileTable }
+                    { nameof(InputWidget.Type), WidgetType.Nvidia }
                 }
             });
         }

@@ -202,6 +202,8 @@ function newChart(type, uid, args){
         window.FlowCharts[uid] = new BarChart(uid, args);
     else if(type == 'BellCurve' || type === 107)
         window.FlowCharts[uid] = new BellCurve(uid, args);
+    else if(type == 'Nvidia' || type === 121)
+        window.FlowCharts[uid] = new NvidiaChart(uid, args);
     else 
         console.log('unknown type: ' + type);
     
@@ -1676,3 +1678,116 @@ export class Processing extends FFChart
         }
     }
 }
+
+
+export class NvidiaChart extends FFChart
+{
+    recentlyFinished;
+    timer;
+    existing;
+    hasNoData;
+
+    constructor(uid, args) {
+        super(uid, args);
+        console.log('args!', args);
+        this.recentlyFinished = args.flags === 1;
+    }
+
+    getTimerInterval() {
+        return document.hasFocus() ? 10000 : 20000;
+    }
+
+    async getData() {
+        if(this.disposed)
+            return;
+        super.getData();
+
+        this.timer = setTimeout(() => this.getData(), this.getTimerInterval());
+    }
+
+    createChart(data) {
+        let json = data ? JSON.stringify(data) : '';
+        if(json === this.existing)
+            return;
+        this.existing = json; // so we dont refresh if we don't have to
+        if(data?.length)
+            this.createTableData(data);
+        else
+            this.createNoData();
+    }
+
+    createNoData(data){
+        let chartDiv = document.getElementById(this.chartUid);
+        if(chartDiv == null)
+            return;
+        chartDiv.textContent = '';
+
+        let div = document.createElement('div');
+        div.className = 'no-data';
+
+        let span = document.createElement('span');
+        div.appendChild(span);
+
+        let icon = document.createElement('i');
+        span.appendChild(icon);
+        icon.className = 'fas fa-times';
+
+        let spanText = document.createElement('span');
+        span.appendChild(spanText);
+        spanText.innerText = this.recentlyFinished ? 'No files recently finished' : 'No upcoming files';
+
+        chartDiv.appendChild(div);
+
+    }
+
+    createTableData(data)
+    {
+        let chartDiv = document.getElementById(this.chartUid);
+        chartDiv.textContent = '';
+        let tbody;
+        
+        const addRow = (label, value) => {
+            let tr = document.createElement("tr");
+            tbody.appendChild(tr);
+            let tdLabel = document.createElement("td");
+            tdLabel.className = 'label';
+            tdLabel.style.width = '10rem';
+            tdLabel.innerText = label;
+            tr.appendChild(tdLabel);
+
+            if(value === 'COLSPAN') {
+                tdLabel.colSpan = 2;
+                tdLabel.style.fontWeight = 600;
+                tdLabel.style.textTransform = 'uppercase';
+                return;
+            }
+            let tdValue = document.createElement("td");
+            tdValue.className = 'label';
+            tdValue.style.textAlign = 'right';
+            tdValue.innerText = value;
+            tr.appendChild(tdValue);
+        };
+        let count = 0;
+        for(let gpu of data) {
+            let table = document.createElement('table');
+            table.style.height = 'unset';
+            table.style.width = 'calc(100% - 1rem)';
+            tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+            if(count > 0) {
+                table.style.borderTop = 'solid 2px var(--border-color)';
+                table.style.marginTop = '1rem';
+            }
+            
+            console.log('gpu', gpu);
+            addRow(gpu.Name, 'COLSPAN');
+            addRow('Temperature', gpu.GpuTemperature + ' °C');
+            addRow('Memory', Math.round((gpu.MemoryUsedMib / gpu.MemoryTotalMib) * 100) + ' %');
+            addRow('Fan Speed', gpu.FanSpeedPercent  + ' %');
+            chartDiv.appendChild(table);
+            ++count;
+        }
+        
+    }
+}
+

@@ -35,7 +35,7 @@ public class NvidiaSmi:WidgetDefinition
     /// <summary>
     /// Gets the type of Widget
     /// </summary>
-    public override WidgetType Type => WidgetType.LibraryFileTable;
+    public override WidgetType Type => WidgetType.Nvidia;
 
     /// <summary>
     /// Gets any flags 

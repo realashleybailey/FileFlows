@@ -124,5 +124,9 @@ public enum WidgetType
     /// <summary>
     /// Bell curve
     /// </summary>
-    BellCurve = 107
+    BellCurve = 107,
+    /// <summary>
+    /// Nvidia Chart
+    /// </summary>
+    Nvidia = 121
 }

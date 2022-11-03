@@ -60,6 +60,19 @@ public class NvidiaSmi
                     gpu.UtilizationMemoryPercent = ParsePercent(agpu.utilization[0].memory_util);
                 }
 
+                if (agpu?.processes?.Any() == true)
+                {
+                    gpu.Processes = new();
+                    foreach (var p in agpu.processes)
+                    {
+                        gpu.Processes.Add(new ()
+                        {
+                            Memory = ParseMib(p.used_memory),
+                            ProcessName = p.process_name
+                        });
+                    }
+                }
+
                 gpus.Add(gpu);
             }
 
@@ -76,6 +89,16 @@ public class NvidiaSmi
             return 0;
         if (Regex.IsMatch(value, @"[\d]+ %"))
             return int.Parse(Regex.Match(value, @"[\d]+").Value);
+        return 0;
+    }
+
+    private int ParseMib(string value)
+    {
+        var rgx = Regex.Match(value, @"[\d]+");
+        if (rgx.Success == false)
+            return 0;
+        if (int.TryParse(rgx.Value, out int mib))
+            return mib;
         return 0;
     }
 
@@ -333,7 +356,7 @@ public class NvidiaGpu
     /// <summary>
     /// Gets or sets the processes running on the GPU
     /// </summary>
-    public NvidiaGpuProcess[] Processes { get; set; }
+    public List<NvidiaGpuProcess> Processes { get; set; }
 }
 
 /// <summary>

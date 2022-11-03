@@ -225,8 +225,10 @@ public class Program
         var configDir = new DirectoryInfo(DirectoryHelper.ConfigDirectory);
         if (configDir.Exists == false)
             return;
+        Logger.Instance.ILog("Deleting old configurations");
         foreach (var subdir in configDir.GetDirectories())
         {
+            Logger.Instance.ILog("Deleting configuration: " + subdir.Name);
             subdir.Delete(recursive: true);
         }
     }

@@ -26,6 +26,12 @@ public class FlowWorker : Worker
 
     private static readonly string ConfigKey = Environment.GetEnvironmentVariable("FF_ENCRYPT")?.EmptyAsNull() ?? Guid.NewGuid().ToString();
 
+    #if(DEBUG)
+    private static readonly bool ConfigNoEncrypt = true;
+    #else
+    private static readonly bool ConfigNoEncrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
+    #endif
+
     /// <summary>
     /// The current configuration
     /// </summary>
@@ -200,7 +206,7 @@ public class FlowWorker : Worker
                     "--cfgPath",
                     GetConfigurationDirectory(),
                     "--cfgKey",
-                    ConfigKey,
+                    ConfigNoEncrypt ? "NO_ENCRYPT" : ConfigKey,
                     "--baseUrl",
                     Service.ServiceBaseUrl,
                     Globals.IsDocker ? "--docker" : null,
@@ -457,6 +463,17 @@ public class FlowWorker : Worker
 
     private string GetConfigurationDirectory(int? configVersion = null) =>
         Path.Combine(DirectoryHelper.ConfigDirectory, (configVersion ?? CurrentConfigurationRevision).ToString());
+
+    private bool GetCurrentConfigEncrypted()
+    {
+        string cfgFile = Path.Combine(GetConfigurationDirectory(), "config.json");
+        if (File.Exists(cfgFile) == false)
+            return false;
+        string content = File.ReadAllText(cfgFile);
+        if (string.IsNullOrWhiteSpace(content))
+            return false;
+        return content.Contains("Revision") == false;
+    }
     
     /// <summary>
     /// Ensures the local configuration is current with the server
@@ -471,6 +488,7 @@ public class FlowWorker : Worker
             Logger.Instance.ELog("Failed to get current configuration revision from server");
             return false;
         }
+
 
         if (revision == CurrentConfigurationRevision)
             return true;
@@ -515,14 +533,12 @@ public class FlowWorker : Worker
         foreach (var plugin in config.Plugins ?? new Dictionary<string, byte[]>())
         {
             var zip = Path.Combine(dir, plugin.Key + ".zip");
-            await System.IO.File.WriteAllBytesAsync(zip, plugin.Value);
+            await File.WriteAllBytesAsync(zip, plugin.Value);
             string destDir = Path.Combine(dir, "Plugins", plugin.Key);
             Directory.CreateDirectory(destDir);
             System.IO.Compression.ZipFile.ExtractToDirectory(zip, destDir);
-            System.IO.File.Delete(zip);
+            File.Delete(zip);
             
-            
-
             // check if there are runtime specific files that need to be moved
             foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
             {
@@ -562,17 +578,17 @@ public class FlowWorker : Worker
             config.SharedScripts,
             config.SystemScripts
         });
-        
-        bool noEncrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
-        if (noEncrypt)
+
+        string cfgFile = Path.Combine(dir, "config.json");
+        if (ConfigNoEncrypt)
         {
-            Logger.Instance?.DLog("FF_NO_ENCRYPT found saving configuration as plain text");
-            await File.WriteAllTextAsync(Path.Combine(dir, "config.json"), json);
+            Logger.Instance?.DLog("Configuration set to no encryption, saving as plain text");
+            await File.WriteAllTextAsync(cfgFile, json);
         }
         else
         {
             Logger.Instance?.DLog("Saving encrypted configuration");
-            Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
+            Utils.ConfigEncrypter.Save(json, ConfigKey, cfgFile);
         }
 
         CurrentConfigurationRevision = revision;

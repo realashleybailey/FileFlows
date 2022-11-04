@@ -356,6 +356,25 @@ public class FlowWorker : Worker
             return false;
         }
 
+        if (result.ReturnValue?.ToString()?.ToLowerInvariant() == "restart")
+        {
+            if (Globals.IsDocker == false)
+            {
+                Logger.Instance.WLog("Requested restart but not running inside docker");
+                return false;
+            }
+
+            if (HasActiveRunners)
+            {
+                Logger.Instance.WLog("Requested restart, but there are executing runners");
+                return false;
+            }
+            
+            Logger.Instance.ILog("Restarting...");
+            Environment.Exit(0);
+            return false;
+        }
+        
         if (result.ReturnValue as bool? == false)
         {
             Logger.Instance.ELog("Output from pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);

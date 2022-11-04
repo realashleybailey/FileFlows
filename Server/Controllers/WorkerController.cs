@@ -122,7 +122,7 @@ public class WorkerController : Controller
             if (libfile != null)
             {
                 info.LibraryFile.OutputPath = info.LibraryFile.OutputPath?.EmptyAsNull() ?? libfile.OutputPath;
-                Logger.Instance.ILog($"Recording final size for '{info.LibraryFile.FinalSize}' for '{info.LibraryFile.Name}'");
+                Logger.Instance.ILog($"Recording final size for '{info.LibraryFile.FinalSize}' for '{info.LibraryFile.Name}' status: {info.LibraryFile.Status}");
                 if(info.LibraryFile.FinalSize > 0)
                     libfile.FinalSize = info.LibraryFile.FinalSize;
 
@@ -513,6 +513,17 @@ public class WorkerController : Controller
 
             if(executorInfo != null)
                 executorInfo.LastUpdate = DateTime.Now;
+
+            if (info.LibraryFile != null)
+            {
+                var service = new LibraryFileService();
+                var current = service.GetFileStatus(info.LibraryFile.Uid).Result;
+                if (current == FileStatus.Unprocessed)
+                {
+                    // can happen if server was restarted
+                    service.UpdateWork(info.LibraryFile).Wait();
+                }
+            }
             return true;
         }
     }

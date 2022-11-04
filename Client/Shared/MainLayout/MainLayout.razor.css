@@ -10,7 +10,7 @@
 
 .sidebar {
   background-color: rgba(var(--base-rgb), 0.15);
-  border: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
   z-index: 3;
 }
 
@@ -18,19 +18,16 @@
   .page {
     flex-direction: row;
   }
-
   .sidebar {
     width: 250px;
     height: 100vh;
     position: sticky;
     top: 0;
   }
-
   .main {
     position: relative;
     max-width: calc(100% - 250px);
   }
-
   .collapsed .main {
     max-width: calc(100% - 3.5rem);
   }
@@ -59,11 +56,9 @@
   .expand-collapse:hover {
     color: var(--color);
   }
-
   .collapsed .expand-collapse {
     left: calc(3.5rem + 2px);
   }
-
   .sidebar.collapsed {
     width: 3.75rem !important;
   }

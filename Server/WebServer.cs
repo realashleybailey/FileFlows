@@ -3,10 +3,13 @@ using FileFlows.Server.Workers;
 using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using FileFlows.Server.Middleware;
 using FileFlows.ServerShared.Workers;
+using FileFlows.Shared.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -28,17 +31,25 @@ public class WebServer
         var builder = WebApplication.CreateBuilder(args);
 
         bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        string protocol = "http";
         Port = 5000;
 #if (DEBUG)
         Port = 6868;
 #endif
+        
         var url = args?.Where(x => x?.StartsWith("--urls=") == true)?.FirstOrDefault();
         if(string.IsNullOrEmpty(url) == false)
         {
             var portMatch = Regex.Match(url, @"(?<=(:))[\d]+");
             if (portMatch.Success)
                 Port = int.Parse(portMatch.Value);
+            if (url.StartsWith("https"))
+                protocol = "https";
         }
+        if (int.TryParse(Environment.GetEnvironmentVariable("Port"), out int port) && port is > 0 and <= 65535)
+            Port = port;
+        if (Environment.GetEnvironmentVariable("HTTPS") == "1")
+            protocol = "https";
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
@@ -64,6 +75,27 @@ public class WebServer
                     c.IncludeXmlComments(filePath);
             }
         });
+
+        // if (File.Exists("/https/certificate.crt"))
+        // {
+        //     Console.WriteLine("Using certificate: /https/certificate.crt");
+        //     Logger.Instance.ILog("Using certificate: /https/certificate.crt");
+        //     builder.WebHost.ConfigureKestrel((context, options) =>
+        //     {
+        //         var cert = File.ReadAllText("/https/certificate.crt");
+        //         var key = File.ReadAllText("/https/privatekey.key");
+        //         var x509 = X509Certificate2.CreateFromPem(cert, key);
+        //         X509Certificate2 miCertificado2 = new X509Certificate2(x509.Export(X509ContentType.Pkcs12));
+        //
+        //         x509.Dispose();
+        //
+        //         options.ListenAnyIP(5001, listenOptions =>
+        //         {
+        //             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+        //             listenOptions.UseHttps(miCertificado2);
+        //         });
+        //     });
+        // }
 
         app = builder.Build();
 
@@ -137,7 +169,9 @@ public class WebServer
 
         Helpers.TranslaterHelper.InitTranslater();
 
-        ServerShared.Services.Service.ServiceBaseUrl = $"http://localhost:{Port}";
+        ServerShared.Services.Service.ServiceBaseUrl = $"{protocol}://localhost:{Port}";
+        // update the client with the proper ServiceBaseUrl
+        Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
 
 
         LibraryWorker.ResetProcessing(internalOnly: true);
@@ -168,7 +202,7 @@ public class WebServer
         // this will run the asp.net app and wait until it is killed
         Console.WriteLine("Running FileFlows Server");
 
-        app.Run($"http://0.0.0.0:{Port}/");                
+        app.Run($"{protocol}://0.0.0.0:{Port}/");                
         
         Console.WriteLine("Finished running FileFlows Server");
 

@@ -120,6 +120,7 @@ public class ProcessingNode: FileFlowObject
         }
         return path;
     }
+    
     /// <summary>
     /// Unmaps a path for this node
     /// </summary>
@@ -140,6 +141,16 @@ public class ProcessingNode: FileFlowObject
                 path = Regex.Replace(path, "^" + Regex.Escape(mapping.Value.Replace("/", "\\")), mapping.Key, RegexOptions.IgnoreCase);
             }
         }
+
+        int forwardIndex = path.IndexOf("/");
+        int backIndex = path.IndexOf("\\");
+        if (forwardIndex >= 0 && backIndex >= 0)
+        {
+            // we have both slashes, need to use the first one
+            (string correct, string incorrect) = backIndex < forwardIndex ? ("\\", "/") : ("/", "\\");
+            path = path.Replace(incorrect, correct);
+        }
+
         return path;
     }
 }

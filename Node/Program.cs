@@ -33,7 +33,7 @@ public class Program
             CommandLineOptions.PrintHelp();
             return;
         }
-        Shared.Helpers.HttpHelper.Client = new HttpClient();
+        Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
         ServicePointManager.DefaultConnectionLimit = 50;
 
         var options = CommandLineOptions.Parse(args);
@@ -225,8 +225,10 @@ public class Program
         var configDir = new DirectoryInfo(DirectoryHelper.ConfigDirectory);
         if (configDir.Exists == false)
             return;
+        Logger.Instance.ILog("Deleting old configurations");
         foreach (var subdir in configDir.GetDirectories())
         {
+            Logger.Instance.ILog("Deleting configuration: " + subdir.Name);
             subdir.Delete(recursive: true);
         }
     }

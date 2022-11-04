@@ -59,7 +59,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
 
         if (scriptResponse.Data?.Any() != true)
         {
-            Toast.ShowError("Pages.Tasks.Message.NoScripts");
+            Toast.ShowError("Pages.Tasks.Messages.NoScripts");
             return false;
         }
 

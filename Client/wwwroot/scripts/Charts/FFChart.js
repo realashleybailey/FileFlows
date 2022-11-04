@@ -10,7 +10,8 @@ export function initDashboard(uid, Widgets, csharp, isReadOnly){
         dashboard = document.createElement('div');
         dashboard.className = 'dashboard grid-stack';
         let container = document.querySelector('.dashboard-wrapper');
-        container.appendChild(dashboard);        
+        if(container)
+            container.appendChild(dashboard);
     }
     else {
         dashboard.classList.remove('readonly');
@@ -96,6 +97,8 @@ function intDashboardActual(uid, csharp, isReadOnly) {
         disableResize: isReadOnly,
         disableDrag: isReadOnly
     });
+    if(!grid)
+        return;
     window.ffGrid = grid;
 
     grid.on('resizestop', (e, el) => {
@@ -199,6 +202,8 @@ function newChart(type, uid, args){
         window.FlowCharts[uid] = new BarChart(uid, args);
     else if(type == 'BellCurve' || type === 107)
         window.FlowCharts[uid] = new BellCurve(uid, args);
+    else if(type == 'Nvidia' || type === 121)
+        window.FlowCharts[uid] = new NvidiaChart(uid, args);
     else 
         console.log('unknown type: ' + type);
     
@@ -225,6 +230,8 @@ class FFChart {
         this.seriesName = args.title;
 
         this.ele = document.getElementById(uid);
+        if(!this.ele)
+            return;
         this.ele.classList.add('chart-' + args.type);
         this.ele.addEventListener('dashboardElementResized', (event) => this.dashboardElementResized(event));
     
@@ -450,8 +457,12 @@ export class BarChart extends FFChart
             },
             tooltip: {
                 y: {
-                    formatter: (value) => {
-                        return this.formatFileSize(value);
+                    formatter: (val, opt) => {
+                        let r = this.formatFileSize(val);
+                        if(opt.seriesIndex === 0 && data.items?.length > opt.dataPointIndex) {
+                            r += ` (${data.items[opt.dataPointIndex]} items)`;
+                        }
+                        return r;
                     }
                 }
             },
@@ -465,7 +476,7 @@ export class BarChart extends FFChart
                 enabled: true,
                 formatter: (val, opt) => {
                     let d = data.series[opt.seriesIndex].data[opt.dataPointIndex];
-                    return this.formatFileSize(d, 0);
+                    return this.formatFileSize(d, 0);                    
                 },
             },
             colors: [
@@ -1667,3 +1678,126 @@ export class Processing extends FFChart
         }
     }
 }
+
+
+export class NvidiaChart extends FFChart
+{
+    recentlyFinished;
+    timer;
+    existing;
+    hasNoData;
+
+    constructor(uid, args) {
+        super(uid, args);
+        console.log('args!', args);
+        this.recentlyFinished = args.flags === 1;
+    }
+
+    getTimerInterval() {
+        return document.hasFocus() ? 10000 : 20000;
+    }
+
+    async getData() {
+        if(this.disposed)
+            return;
+        super.getData();
+
+        this.timer = setTimeout(() => this.getData(), this.getTimerInterval());
+    }
+
+    createChart(data) {
+        let json = data ? JSON.stringify(data) : '';
+        if(json === this.existing)
+            return;
+        this.existing = json; // so we dont refresh if we don't have to
+        if(data?.length)
+            this.createTableData(data);
+        else
+            this.createNoData();
+    }
+
+    createNoData(data){
+        let chartDiv = document.getElementById(this.chartUid);
+        if(chartDiv == null)
+            return;
+        chartDiv.textContent = '';
+
+        let div = document.createElement('div');
+        div.className = 'no-data';
+
+        let span = document.createElement('span');
+        div.appendChild(span);
+
+        let icon = document.createElement('i');
+        span.appendChild(icon);
+        icon.className = 'fas fa-times';
+
+        let spanText = document.createElement('span');
+        span.appendChild(spanText);
+        spanText.innerText = this.recentlyFinished ? 'No files recently finished' : 'No upcoming files';
+
+        chartDiv.appendChild(div);
+
+    }
+
+    createTableData(data)
+    {
+        let chartDiv = document.getElementById(this.chartUid);
+        chartDiv.textContent = '';
+        let tbody;
+        
+        const addRow = (label, value, icon) => {
+            let tr = document.createElement("tr");
+            tbody.appendChild(tr);
+            let tdLabel = document.createElement("td");
+            tdLabel.className = 'label';
+            tdLabel.style.width = '10rem';
+            if(icon){
+                tdLabel.innerHTML = `<i class="${icon}" style="width: 1.5rem;text-align: center;"></i> ${label}`;
+            }else {
+                tdLabel.innerText = label;
+            }
+            tr.appendChild(tdLabel);
+
+            if(value === 'COLSPAN') {
+                tdLabel.colSpan = 2;
+                tdLabel.style.fontWeight = 600;
+                tdLabel.style.textTransform = 'uppercase';
+                return;
+            }
+            let tdValue = document.createElement("td");
+            tdValue.className = 'label';
+            tdValue.style.textAlign = 'right';
+            tdValue.innerText = value;
+            tr.appendChild(tdValue);
+        };
+        let count = 0;
+        for(let gpu of data) {
+            let table = document.createElement('table');
+            table.style.height = 'unset';
+            table.style.width = 'calc(100% - 1rem)';
+            tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+            table.style.margin = '0 0.25rem';
+            if(count > 0) {
+                table.style.borderTop = 'solid 2px var(--border-color)';
+                table.style.marginTop = '1rem';
+            }
+            
+            console.log('gpu', gpu);
+            addRow(gpu.Name, 'COLSPAN');
+            addRow('Temperature', gpu.GpuTemperature + ' °C',  
+                gpu.GpuTemperature < 40 ? 'fas fa-thermometer-quarter' : 
+                gpu.GpuTemperature < 75 ? 'fas fa-thermometer-half' : 
+                'fas fa-thermometer-full'
+            );
+            addRow('Memory', Math.round((gpu.MemoryUsedMib / gpu.MemoryTotalMib) * 100) + ' %', 'fas fa-memory');
+            addRow('Fan Speed', gpu.FanSpeedPercent  + ' %', 'fas fa-fan');
+            addRow('Processes', (gpu.Processes?.length?.toString() || '0'), 'fas fa-running');
+            chartDiv.appendChild(table);
+            ++count;
+        }
+        
+    }
+}
+

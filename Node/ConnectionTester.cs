@@ -1,55 +1,52 @@
 ﻿using FileFlows.ServerShared.Models;
 using FileFlows.ServerShared.Services;
-using FileFlows.Shared.Helpers;
-using System.Text.RegularExpressions;
 
-namespace FileFlows.Node
+namespace FileFlows.Node;
+
+public class ConnectionTester
 {
-    public class ConnectionTester
+    public static (bool, string) SaveConnection(string url, string tempPath, int runners, bool enabled, List<RegisterModelMapping> mappings)
     {
-        public static (bool, string) SaveConnection(string url, string tempPath, int runners, bool enabled, List<RegisterModelMapping> mappings)
+        if (string.IsNullOrWhiteSpace(url))
+            return (false, string.Empty);
+
+        string address = url.ToLower().Replace("http://", "").Replace("https://", "");
+        int givenPort = 5151;
+        var portMatch = Regex.Match(address, @"(?<=(:))[\d]+");
+        if(portMatch != null && portMatch.Success)
         {
-            if (string.IsNullOrWhiteSpace(url))
-                return (false, string.Empty);
+            int.TryParse(portMatch.Value, out givenPort);
+        }
+        if (address.IndexOf(":") > 0)
+            address = address.Substring(0, address.IndexOf(":"));
 
-            string address = url.ToLower().Replace("http://", "").Replace("https://", "");
-            int givenPort = 5151;
-            var portMatch = Regex.Match(address, @"(?<=(:))[\d]+");
-            if(portMatch != null && portMatch.Success)
+        if (address.IndexOf("/") > 0)
+            address = address.Substring(0, address.IndexOf("/"));
+
+        // try the common set of ports protocols
+        foreach (int port in new[] { givenPort, 5151, 5000, 80 }.Distinct())
+        {
+            if (port < 0 || port > 65535)
+                continue;
+
+            foreach (string protocol in new[] { "https", "http" })
             {
-                int.TryParse(portMatch.Value, out givenPort);
-            }
-            if (address.IndexOf(":") > 0)
-                address = address.Substring(0, address.IndexOf(":"));
-
-            if (address.IndexOf("/") > 0)
-                address = address.Substring(0, address.IndexOf("/"));
-
-            // try the common set of ports protocols
-            foreach (int port in new[] { givenPort, 5151, 5000, 80 }.Distinct())
-            {
-                if (port < 0 || port > 65535)
-                    continue;
-
-                foreach (string protocol in new[] { "https", "http" })
+                try
                 {
-                    try
-                    {
-                        var nodeService = new NodeService();
-                        string actualUrl = protocol + "://" + address + ":" + port + "/";
-                        var result = nodeService.Register(actualUrl, Environment.MachineName, tempPath, runners, enabled, mappings).Result;
-                        if (result == null)
-                            return (false, "Failed to register");
-                        return (true, actualUrl);
+                    var nodeService = new NodeService();
+                    string actualUrl = protocol + "://" + address + ":" + port + "/";
+                    var result = nodeService.Register(actualUrl, Environment.MachineName, tempPath, runners, enabled, mappings).Result;
+                    if (result == null)
+                        return (false, "Failed to register");
+                    return (true, actualUrl);
 
-                    }
-                    catch (Exception)
-                    {
-                    }
+                }
+                catch (Exception)
+                {
                 }
             }
-
-            return (false, "Failed to register");
         }
+
+        return (false, "Failed to register");
     }
 }

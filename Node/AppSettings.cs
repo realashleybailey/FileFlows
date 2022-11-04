@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using FileFlows.ServerShared;
 using FileFlows.ServerShared.Helpers;
 using FileFlows.ServerShared.Models;
 
@@ -143,7 +144,7 @@ public class AppSettings
         if (File.Exists(file) == false)
         {
             AppSettings settings = new();
-            settings.TempPath = Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
+            settings.TempPath = Globals.IsDocker ? "/temp" :  Path.Combine(DirectoryHelper.BaseDirectory, "Temp");
             settings.Save();
             return settings;
         }

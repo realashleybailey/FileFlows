@@ -1,4 +1,5 @@
 @namespace FileFlows.Client.Components.Inputs
+@using Humanizer
 @inherits Input<Dictionary<string, object>>
 
 @if (Value?.Any() == true)
@@ -21,9 +22,9 @@
                 }
                 @foreach (var item in md.Values)
                 {
-                    <tr>
-                        <td>@item.Key</td>
-                        <td>@item.Value</td>
+                    <tr class="md-@item.Key.Dehumanize()">
+                        <td class="label">@item.Key</td>
+                        <td class="value">@item.Value</td>
                     </tr>
                 }
             }

@@ -20,6 +20,16 @@ public class Upgrade_1_0_5
         RemoveDuplicateFiles();
     }
 
+    /// <summary>
+    /// Runs the update
+    /// </summary>
+    /// <param name="settings">the settings</param>
+    public void Run2ndUpgrade(Settings settings)
+    {
+        Logger.Instance.ILog("Upgrade running, running 1.0.5.2060 upgrade script");
+        FixOutputPaths(settings);
+    }
+
     private void RemoveDuplicateFiles()
     {
         var manager = DbHelper.GetDbManager();
@@ -46,5 +56,19 @@ WHERE Uid NOT IN(
             manager.Execute(@"DELETE FROM LibraryFile WHERE rowid NOT IN (SELECT min(rowid) FROM LibraryFile GROUP BY Name)", null).Wait();
             manager.Execute("CREATE UNIQUE INDEX LibraryFileUniqueName ON LibraryFile(Name)", null).Wait();
         }
+    }
+
+    private void FixOutputPaths(Settings settings)
+    {
+        var manager = DbHelper.GetDbManager();
+
+        string forward = "\\";
+        if (manager is MySqlDbManager mysql)
+            forward = "\\\\";
+            
+        if (Globals.IsWindows)
+            DbHelper.Execute($"update LibraryFile set OutputPath = replace(OutputPath, '/', '{forward}')");
+        else
+            DbHelper.Execute($"update LibraryFile set OutputPath = replace(OutputPath, '{forward}', '/')");
     }
 }

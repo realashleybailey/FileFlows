@@ -24,7 +24,13 @@ public class FlowWorker : Worker
     /// </summary>
     public readonly Guid Uid = Guid.NewGuid();
 
-    private static readonly string ConfigKey = Guid.NewGuid().ToString();
+    private static readonly string ConfigKey = Environment.GetEnvironmentVariable("FF_ENCRYPT")?.EmptyAsNull() ?? Guid.NewGuid().ToString();
+
+    #if(DEBUG)
+    private static readonly bool ConfigNoEncrypt = true;
+    #else
+    private static readonly bool ConfigNoEncrypt = Environment.GetEnvironmentVariable("FF_NO_ENCRYPT") == "1";
+    #endif
 
     /// <summary>
     /// The current configuration
@@ -200,7 +206,7 @@ public class FlowWorker : Worker
                     "--cfgPath",
                     GetConfigurationDirectory(),
                     "--cfgKey",
-                    ConfigKey,
+                    ConfigNoEncrypt ? "NO_ENCRYPT" : ConfigKey,
                     "--baseUrl",
                     Service.ServiceBaseUrl,
                     Globals.IsDocker ? "--docker" : null,
@@ -306,13 +312,15 @@ public class FlowWorker : Worker
     private bool PreExecuteScriptTest(ProcessingNode node)
     {
         var scriptService  = ScriptService.Load();
-        string jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "System", node.PreExecuteScript + ".js");
+        string scriptDir = Path.Combine(GetConfigurationDirectory(), "Scripts");
+        string sharedDir = Path.Combine(scriptDir, "Shared");
+        string jsFile = Path.Combine(scriptDir, "System", node.PreExecuteScript + ".js");
         if (File.Exists(jsFile) == false)
         {
             jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "Flow", node.PreExecuteScript + ".js");
             if (File.Exists(jsFile) == false)
             {
-                jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "Shared", node.PreExecuteScript + ".js");
+                jsFile = Path.Combine(sharedDir, node.PreExecuteScript + ".js");
                 if (File.Exists(jsFile) == false)
                 {
                     Logger.Instance.ELog("Failed to locate pre-execute script: " + node.PreExecuteScript);
@@ -321,7 +329,8 @@ public class FlowWorker : Worker
             }
         }
 
-        string code = System.IO.File.ReadAllText(jsFile);
+        Logger.Instance.ILog("Loading Pre-Execute Script: " + jsFile);
+        string code = File.ReadAllText(jsFile);
         if (string.IsNullOrWhiteSpace(code))
         {
             Logger.Instance.ELog("Failed to load pre-execute script code");
@@ -331,22 +340,47 @@ public class FlowWorker : Worker
         var variableService = new VariableService();
         var variables = variableService.GetAll().Result?.ToDictionary(x => x.Name, x => (object)x.Value) ?? new ();
         if (variables.ContainsKey("FileFlows.Url"))
-            variables["FileFlows.Url"] = ServerShared.Services.Service.ServiceBaseUrl;
+            variables["FileFlows.Url"] = Service.ServiceBaseUrl;
         else
-            variables.Add("FileFlows.Url", ServerShared.Services.Service.ServiceBaseUrl);
-        var result = ScriptExecutor.Execute(code, variables);
+            variables.Add("FileFlows.Url", Service.ServiceBaseUrl);
+        var result = ScriptExecutor.Execute(code, variables, sharedDirectory: sharedDir);
         if (result.Success == false)
         {
             Logger.Instance.ELog("Pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
             return false;
         }
 
+        if (result.ReturnValue?.ToString()?.ToLowerInvariant() == "exit")
+        {
+            Logger.Instance.ILog("Exiting");
+            return false;
+        }
+
+        if (result.ReturnValue?.ToString()?.ToLowerInvariant() == "restart")
+        {
+            if (Globals.IsDocker == false)
+            {
+                Logger.Instance.WLog("Requested restart but not running inside docker");
+                return false;
+            }
+
+            if (HasActiveRunners)
+            {
+                Logger.Instance.WLog("Requested restart, but there are executing runners");
+                return false;
+            }
+            
+            Logger.Instance.ILog("Restarting...");
+            Environment.Exit(0);
+            return false;
+        }
+        
         if (result.ReturnValue as bool? == false)
         {
             Logger.Instance.ELog("Output from pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
             return false;
         }
-        Logger.Instance.ILog("Pre-execute scrip passed: \n"+ result.Log);
+        Logger.Instance.ILog("Pre-execute script passed: \n"+ result.Log);
         return true;
     }
 
@@ -457,6 +491,17 @@ public class FlowWorker : Worker
 
     private string GetConfigurationDirectory(int? configVersion = null) =>
         Path.Combine(DirectoryHelper.ConfigDirectory, (configVersion ?? CurrentConfigurationRevision).ToString());
+
+    private bool GetCurrentConfigEncrypted()
+    {
+        string cfgFile = Path.Combine(GetConfigurationDirectory(), "config.json");
+        if (File.Exists(cfgFile) == false)
+            return false;
+        string content = File.ReadAllText(cfgFile);
+        if (string.IsNullOrWhiteSpace(content))
+            return false;
+        return content.Contains("Revision") == false;
+    }
     
     /// <summary>
     /// Ensures the local configuration is current with the server
@@ -471,6 +516,7 @@ public class FlowWorker : Worker
             Logger.Instance.ELog("Failed to get current configuration revision from server");
             return false;
         }
+
 
         if (revision == CurrentConfigurationRevision)
             return true;
@@ -515,14 +561,12 @@ public class FlowWorker : Worker
         foreach (var plugin in config.Plugins ?? new Dictionary<string, byte[]>())
         {
             var zip = Path.Combine(dir, plugin.Key + ".zip");
-            await System.IO.File.WriteAllBytesAsync(zip, plugin.Value);
+            await File.WriteAllBytesAsync(zip, plugin.Value);
             string destDir = Path.Combine(dir, "Plugins", plugin.Key);
             Directory.CreateDirectory(destDir);
             System.IO.Compression.ZipFile.ExtractToDirectory(zip, destDir);
-            System.IO.File.Delete(zip);
+            File.Delete(zip);
             
-            
-
             // check if there are runtime specific files that need to be moved
             foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
             {
@@ -562,8 +606,19 @@ public class FlowWorker : Worker
             config.SharedScripts,
             config.SystemScripts
         });
-        
-        Utils.ConfigEncrypter.Save(json, ConfigKey, Path.Combine(dir, "config.json"));
+
+        string cfgFile = Path.Combine(dir, "config.json");
+        if (ConfigNoEncrypt)
+        {
+            Logger.Instance?.DLog("Configuration set to no encryption, saving as plain text");
+            await File.WriteAllTextAsync(cfgFile, json);
+        }
+        else
+        {
+            Logger.Instance?.DLog("Saving encrypted configuration");
+            Utils.ConfigEncrypter.Save(json, ConfigKey, cfgFile);
+        }
+
         CurrentConfigurationRevision = revision;
 
         return true;

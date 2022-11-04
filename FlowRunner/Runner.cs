@@ -88,6 +88,7 @@ public class Runner
             var communicator = FlowRunnerCommunicator.Load(Info.LibraryFile.Uid);
             communicator.OnCancel += Communicator_OnCancel;
             bool finished = false;
+            DateTime lastSuccessHello = DateTime.Now;
             var task = Task.Run(async () =>
             {
                 while (finished == false)
@@ -97,11 +98,20 @@ public class Runner
                         bool success = await communicator.Hello(Program.Uid, this.Info, nodeParameters);
                         if (success == false)
                         {
-                            nodeParameters?.Logger?.WLog("Hello failed, cancelling flow");
-                            Communicator_OnCancel();
-                            return;
+                            if (lastSuccessHello < DateTime.Now.AddMinutes(-2))
+                            {
+                                nodeParameters?.Logger?.ELog("Hello failed, cancelling flow");
+                                Communicator_OnCancel();
+                                return;
+                            }
+                            nodeParameters?.Logger?.WLog("Hello failed, if continues the flow will be canceled");
+                        }
+                        else
+                        {
+                            lastSuccessHello = DateTime.Now;
                         }
                     }
+
                     await Task.Delay(5_000);
                 }
             });
@@ -130,7 +140,15 @@ public class Runner
         }
         finally
         {
-            Finish().Wait();
+            try
+            {
+                Finish().Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.ELog("Failed 'Finishing' runner: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            }
+
             systemHelper.Stop();
         }
     }
@@ -150,9 +168,9 @@ public class Runner
         if (nodeParameters?.Logger is FlowLogger fl)
             Info.Log = fl.ToString();
 
-        if(nodeParameters.OriginalMetadata != null)
+        if(nodeParameters?.OriginalMetadata != null)
             Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;
-        if (nodeParameters.Metadata != null)
+        if (nodeParameters?.Metadata != null)
             Info.LibraryFile.FinalMetadata = nodeParameters.Metadata;
 
         await Complete();

@@ -96,12 +96,13 @@ public class ScriptExecutor:IScriptExecutor
     /// </summary>
     /// <param name="code">the code to execute</param>
     /// <param name="variables">any variables to be passed to the executor</param>
+    /// <param name="sharedDirectory">[Optional] the shared script directory to look in</param>
     /// <returns>the result of the execution</returns>
-    public static RunScriptResult Execute(string code, Dictionary<string, object> variables)
+    public static RunScriptResult Execute(string code, Dictionary<string, object> variables, string sharedDirectory = null)
     {
         Executor executor = new Executor();
         executor.Code = code;
-        executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
+        executor.SharedDirectory = sharedDirectory?.EmptyAsNull() ?? DirectoryHelper.ScriptsDirectoryShared;
         executor.HttpClient = HttpHelper.Client;
         executor.Logger = new ScriptExecution.Logger();
         StringBuilder sbLog = new();
@@ -115,7 +116,7 @@ public class ScriptExecutor:IScriptExecutor
             object returnValue = executor.Execute();
             return new RunScriptResult()
             {
-                Log = sbLog.ToString(),
+                Log = FixLog(sbLog),
                 Success = true,
                 ReturnValue = returnValue
             };
@@ -124,11 +125,15 @@ public class ScriptExecutor:IScriptExecutor
         {
             return new RunScriptResult()
             {
-                Log = sbLog.ToString(),
+                Log = FixLog(sbLog),
                 Success = false,
                 ReturnValue = ex.Message
             };
         }
+
+        string FixLog(StringBuilder sb)
+            => sb.ToString()
+                .Replace("\\n", "\n").Trim();
     }
     
         

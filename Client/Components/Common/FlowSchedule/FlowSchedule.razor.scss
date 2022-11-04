@@ -15,6 +15,11 @@ table {
 thead {
     text-align:center;
 }
+tbody tr {  
+    height: 1.65rem;
+    max-height: 1.65rem;
+    overflow: hidden;
+}
 .filled {
     background: rgba(var(--accent-rgb), 0.5);
 }

@@ -222,7 +222,7 @@ public class WatchedLibrary:IDisposable
             };
 
             LibraryFile result;
-            if (knownFile != null)
+            if (knownFile)
             {
                 // update the known file, we can't add it again
                 result = new LibraryFileController().Update(lf).Result;
@@ -256,7 +256,8 @@ public class WatchedLibrary:IDisposable
         var knownFile = service.GetFileIfKnown(fullpath).Result;
         if (knownFile != null)
         {
-            if(Library.ReprocessRecreatedFiles == false || fsInfo.CreationTime <= knownFile.CreationTime)
+            if(Library.ReprocessRecreatedFiles == false || 
+               Math.Abs(fsInfo.CreationTime.Subtract(knownFile.CreationTime).TotalSeconds) < 5)
             {
                 LogQueueMessage($"{Library.Name} skipping known file '{fullpath}'");
                 // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
@@ -276,7 +277,7 @@ public class WatchedLibrary:IDisposable
         if (Library.UseFingerprinting && Library.Folders == false)
         {
             fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
-            if (string.IsNullOrEmpty(fingerprint))
+            if (string.IsNullOrEmpty(fingerprint) == false)
             {
                 knownFile = service.GetFileByFingerprint(fingerprint).Result;
                 if (knownFile != null)

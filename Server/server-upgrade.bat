@@ -1,6 +1,6 @@
 @echo off
 
-IF %1=="UPDATE" GOTO RunUpdate
+IF "%1"=="UPDATE" GOTO RunUpdate
 copy server-upgrade.bat ..\
 cd ..
 start server-upgrade.bat "UPDATE" %1 & exit

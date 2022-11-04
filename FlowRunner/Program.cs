@@ -3,6 +3,7 @@ using FileFlows.ServerShared.Services;
 using FileFlows.Shared.Helpers;
 using FileFlows.Shared.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO.Enumeration;
 using System.Linq;
@@ -11,6 +12,7 @@ using System.Net.Http;
 using Azure;
 using FileFlows.ServerShared;
 using FileFlows.ServerShared.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FileFlows.FlowRunner
 {
@@ -23,6 +25,7 @@ namespace FileFlows.FlowRunner
 
         public static void Main(string[] args)
         {
+            LogInfo("Flow Runner Version: " + Globals.Version);
             int exitCode = 0;
             ServicePointManager.DefaultConnectionLimit = 50;
             try
@@ -43,16 +46,29 @@ namespace FileFlows.FlowRunner
                 if (string.IsNullOrEmpty(cfgPath) || Directory.Exists(cfgPath) == false)
                     throw new Exception("Configuration Path doesnt exist: " + cfgPath);
 
-                string cfgKey = GetArgument(args, "--cfgKey");
-                if (string.IsNullOrEmpty(cfgKey))
-                    throw new Exception("Configuration Key not set");
-
                 string cfgFile = Path.Combine(cfgPath, "config.json");
                 if(File.Exists(cfgFile) == false)
                     throw new Exception("Configuration file doesnt exist: " + cfgFile);
 
-                string cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
-                var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationRevision>(cfgJson);
+
+                string cfgKey = GetArgument(args, "--cfgKey");
+                if (string.IsNullOrEmpty(cfgKey))
+                    throw new Exception("Configuration Key not set");
+                bool noEnrypt = cfgKey == "NO_ENCRYPT";
+                string cfgJson;
+                if (noEnrypt)
+                {
+                    LogInfo("No Encryption for Node configuration");
+                    cfgJson = File.ReadAllText(cfgFile);
+                }
+                else
+                {
+                    LogInfo("Using configuration encryption key: " + cfgKey);
+                    cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
+                }
+
+
+                var config = JsonSerializer.Deserialize<ConfigurationRevision>(cfgJson);
 
                 string baseUrl = GetArgument(args, "--baseUrl");
                 if (string.IsNullOrEmpty(baseUrl))
@@ -70,7 +86,7 @@ namespace FileFlows.FlowRunner
                 Directory.CreateDirectory(workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
-                Shared.Helpers.HttpHelper.Client = new HttpClient();
+                Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
                 Execute(new()
                 {
                     IsServer = server,

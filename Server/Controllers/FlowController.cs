@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using FileFlows.Shared.Models;
 using FileFlows.Server.Helpers;
 using System.Dynamic;
+using System.IO.Compression;
 using FileFlows.Plugin;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -147,22 +148,48 @@ public class FlowController : ControllerStore<Flow>
     }
 
     /// <summary>
-    /// Exports a specific flow
+    /// Exports a flows
     /// </summary>
-    /// <param name="uid">The Flow UID</param>
-    /// <returns>A download response of the flow</returns>
-    [HttpGet("export/{uid}")]
-    public async Task<IActionResult> Export([FromRoute] Guid uid)
+    /// <param name="uids">The Flow UIDs</param>
+    /// <returns>A download response of the flow(s)</returns>
+    [HttpGet("export")]
+    public async Task<IActionResult> Export([FromQuery(Name = "uid")] Guid[] uids)
     {
-        var flow = await GetByUid(uid);
-        if (flow == null)
+        var flows = uids.Select(async x => await GetByUid(x))
+                                    .Select(x => x.Result)
+                                    .Where(x => x != null).ToList();
+        if (flows.Any() == false)
             return NotFound();
-        string json = JsonSerializer.Serialize(flow, new JsonSerializerOptions
+        if (flows.Count() == 1)
         {
-            WriteIndented = true
-        });
-        byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(json);
-        return File(data, "application/octet-stream", flow.Name + ".json");
+            var flow = flows[0];
+            string json = JsonSerializer.Serialize(flow, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
+            return File(data, "application/octet-stream", flow.Name + ".json");
+        }
+        
+        // multiple, send a zip
+        using var ms = new MemoryStream();
+        using var zip = new ZipArchive(ms, ZipArchiveMode.Create, true);
+        foreach (var flow in flows)
+        {
+            var json = JsonSerializer.Serialize(flow, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            var fe = zip.CreateEntry(flow.Name + ".json");
+
+            await using var entryStream = fe.Open();
+            await using var streamWriter = new StreamWriter(entryStream);
+            await streamWriter.WriteAsync(json);
+        }
+        zip.Dispose();
+
+        ms.Seek(0, SeekOrigin.Begin);
+        return File(ms.ToArray(), "application/octet-stream", "Flows.zip");
     }
 
     /// <summary>

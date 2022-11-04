@@ -101,7 +101,7 @@ public partial class NavMenu : IDisposable
             {
                 new("Pages.Plugins.Title", "fas fa-puzzle-piece", "plugins"),
                 new("Pages.Scripts.Title", "fas fa-scroll", "scripts"),
-                new("Pages.Variables.Title", "fas fa-at", "tools"),
+                new("Pages.Variables.Title", "fas fa-at", "variables"),
             }
         });
         MenuItems.Add(new NavMenuGroup

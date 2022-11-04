@@ -1778,6 +1778,7 @@ export class NvidiaChart extends FFChart
             table.style.width = 'calc(100% - 1rem)';
             tbody = document.createElement('tbody');
             table.appendChild(tbody);
+            table.style.margin = '0 0.25rem';
             if(count > 0) {
                 table.style.borderTop = 'solid 2px var(--border-color)';
                 table.style.marginTop = '1rem';
@@ -1792,6 +1793,7 @@ export class NvidiaChart extends FFChart
             );
             addRow('Memory', Math.round((gpu.MemoryUsedMib / gpu.MemoryTotalMib) * 100) + ' %', 'fas fa-memory');
             addRow('Fan Speed', gpu.FanSpeedPercent  + ' %', 'fas fa-fan');
+            addRow('Processes', (gpu.Processes?.length?.toString() || '0'), 'fas fa-running');
             chartDiv.appendChild(table);
             ++count;
         }

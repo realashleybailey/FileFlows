@@ -116,7 +116,7 @@ public class ScriptExecutor:IScriptExecutor
             object returnValue = executor.Execute();
             return new RunScriptResult()
             {
-                Log = sbLog.ToString(),
+                Log = FixLog(sbLog),
                 Success = true,
                 ReturnValue = returnValue
             };
@@ -125,11 +125,15 @@ public class ScriptExecutor:IScriptExecutor
         {
             return new RunScriptResult()
             {
-                Log = sbLog.ToString(),
+                Log = FixLog(sbLog),
                 Success = false,
                 ReturnValue = ex.Message
             };
         }
+
+        string FixLog(StringBuilder sb)
+            => sb.ToString()
+                .Replace("\\n", "\n").Trim();
     }
     
         

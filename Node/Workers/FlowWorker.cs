@@ -361,7 +361,7 @@ public class FlowWorker : Worker
             Logger.Instance.ELog("Output from pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
             return false;
         }
-        Logger.Instance.ILog("Pre-execute scrip passed: \n"+ result.Log);
+        Logger.Instance.ILog("Pre-execute script passed: \n"+ result.Log);
         return true;
     }
 

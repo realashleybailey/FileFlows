@@ -354,7 +354,7 @@ public partial class CustomDashboard
                                 newWidgets.Add(CreateNewWidgetModel(ImageFormats.WD_UID, 4, 2));
                                 break;
                             case nameof(NvidiaSmi):
-                                newWidgets.Add(CreateNewWidgetModel(NvidiaSmi.WD_UID, 4, 2));
+                                newWidgets.Add(CreateNewWidgetModel(NvidiaSmi.WD_UID, 3, 1));
                                 break;
                         }
                     }

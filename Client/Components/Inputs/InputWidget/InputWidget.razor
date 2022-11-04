@@ -27,7 +27,6 @@
                 <PreviewHeatMap />
                 break;
             case WidgetType.LibraryFileTable:
-            case WidgetType.Nvidia:
                 <PreviewLibraryFileTable />
                 break;
             case WidgetType.PieChart:
@@ -41,6 +40,9 @@
                 break;
             case WidgetType.TreeMap:
                 <PreviewTreeMap />
+                break;
+            case WidgetType.Nvidia:
+                <PreviewNvidiaSmi />
                 break;
         }
         

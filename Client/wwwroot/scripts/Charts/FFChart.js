@@ -1746,13 +1746,17 @@ export class NvidiaChart extends FFChart
         chartDiv.textContent = '';
         let tbody;
         
-        const addRow = (label, value) => {
+        const addRow = (label, value, icon) => {
             let tr = document.createElement("tr");
             tbody.appendChild(tr);
             let tdLabel = document.createElement("td");
             tdLabel.className = 'label';
             tdLabel.style.width = '10rem';
-            tdLabel.innerText = label;
+            if(icon){
+                tdLabel.innerHTML = `<i class="${icon}" style="width: 1.5rem;text-align: center;"></i> ${label}`;
+            }else {
+                tdLabel.innerText = label;
+            }
             tr.appendChild(tdLabel);
 
             if(value === 'COLSPAN') {
@@ -1781,9 +1785,13 @@ export class NvidiaChart extends FFChart
             
             console.log('gpu', gpu);
             addRow(gpu.Name, 'COLSPAN');
-            addRow('Temperature', gpu.GpuTemperature + ' °C');
-            addRow('Memory', Math.round((gpu.MemoryUsedMib / gpu.MemoryTotalMib) * 100) + ' %');
-            addRow('Fan Speed', gpu.FanSpeedPercent  + ' %');
+            addRow('Temperature', gpu.GpuTemperature + ' °C',  
+                gpu.GpuTemperature < 40 ? 'fas fa-thermometer-quarter' : 
+                gpu.GpuTemperature < 75 ? 'fas fa-thermometer-half' : 
+                'fas fa-thermometer-full'
+            );
+            addRow('Memory', Math.round((gpu.MemoryUsedMib / gpu.MemoryTotalMib) * 100) + ' %', 'fas fa-memory');
+            addRow('Fan Speed', gpu.FanSpeedPercent  + ' %', 'fas fa-fan');
             chartDiv.appendChild(table);
             ++count;
         }

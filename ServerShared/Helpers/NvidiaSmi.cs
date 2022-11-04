@@ -178,7 +178,7 @@ public class NvidiaSmi
                         <average_latency>0</average_latency>
                 </fbc_stats>
                 <temperature>
-                        <gpu_temp>53 C</gpu_temp>
+                        <gpu_temp>33 C</gpu_temp>
                         <gpu_temp_max_threshold>103 C</gpu_temp_max_threshold>
                         <gpu_temp_slow_threshold>100 C</gpu_temp_slow_threshold>
                         <gpu_temp_max_gpu_threshold>N/A</gpu_temp_max_gpu_threshold>
@@ -261,7 +261,7 @@ public class NvidiaSmi
                         <average_latency>0</average_latency>
                 </fbc_stats>
                 <temperature>
-                        <gpu_temp>53 C</gpu_temp>
+                        <gpu_temp>83 C</gpu_temp>
                         <gpu_temp_max_threshold>103 C</gpu_temp_max_threshold>
                         <gpu_temp_slow_threshold>100 C</gpu_temp_slow_threshold>
                         <gpu_temp_max_gpu_threshold>N/A</gpu_temp_max_gpu_threshold>

@@ -312,13 +312,15 @@ public class FlowWorker : Worker
     private bool PreExecuteScriptTest(ProcessingNode node)
     {
         var scriptService  = ScriptService.Load();
-        string jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "System", node.PreExecuteScript + ".js");
+        string scriptDir = Path.Combine(GetConfigurationDirectory(), "Scripts");
+        string sharedDir = Path.Combine(scriptDir, "Shared");
+        string jsFile = Path.Combine(scriptDir, "System", node.PreExecuteScript + ".js");
         if (File.Exists(jsFile) == false)
         {
             jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "Flow", node.PreExecuteScript + ".js");
             if (File.Exists(jsFile) == false)
             {
-                jsFile = Path.Combine(GetConfigurationDirectory(), "Scripts", "Shared", node.PreExecuteScript + ".js");
+                jsFile = Path.Combine(sharedDir, node.PreExecuteScript + ".js");
                 if (File.Exists(jsFile) == false)
                 {
                     Logger.Instance.ELog("Failed to locate pre-execute script: " + node.PreExecuteScript);
@@ -327,7 +329,8 @@ public class FlowWorker : Worker
             }
         }
 
-        string code = System.IO.File.ReadAllText(jsFile);
+        Logger.Instance.ILog("Loading Pre-Execute Script: " + jsFile);
+        string code = File.ReadAllText(jsFile);
         if (string.IsNullOrWhiteSpace(code))
         {
             Logger.Instance.ELog("Failed to load pre-execute script code");
@@ -337,13 +340,19 @@ public class FlowWorker : Worker
         var variableService = new VariableService();
         var variables = variableService.GetAll().Result?.ToDictionary(x => x.Name, x => (object)x.Value) ?? new ();
         if (variables.ContainsKey("FileFlows.Url"))
-            variables["FileFlows.Url"] = ServerShared.Services.Service.ServiceBaseUrl;
+            variables["FileFlows.Url"] = Service.ServiceBaseUrl;
         else
-            variables.Add("FileFlows.Url", ServerShared.Services.Service.ServiceBaseUrl);
-        var result = ScriptExecutor.Execute(code, variables);
+            variables.Add("FileFlows.Url", Service.ServiceBaseUrl);
+        var result = ScriptExecutor.Execute(code, variables, sharedDirectory: sharedDir);
         if (result.Success == false)
         {
             Logger.Instance.ELog("Pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
+            return false;
+        }
+
+        if (result.ReturnValue?.ToString()?.ToLowerInvariant() == "exit")
+        {
+            Logger.Instance.ILog("Exiting");
             return false;
         }
 

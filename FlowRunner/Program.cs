@@ -67,7 +67,6 @@ namespace FileFlows.FlowRunner
                     cfgJson = ConfigDecrypter.DecryptConfig(cfgFile, cfgKey);
                 }
 
-
                 var config = JsonSerializer.Deserialize<ConfigurationRevision>(cfgJson);
 
                 string baseUrl = GetArgument(args, "--baseUrl");
@@ -81,12 +80,15 @@ namespace FileFlows.FlowRunner
                     hostname = Environment.MachineName;
 
                 Globals.IsDocker = args.Contains("--docker");
+                LogInfo("Docker: " + Globals.IsDocker);
 
                 string workingDir = Path.Combine(tempPath, "Runner-" + uid);
+                LogInfo("Working Directory: " + workingDir);
                 Directory.CreateDirectory(workingDir);
+                LogInfo("Created Directory: " + workingDir);
 
                 var libfileUid = Guid.Parse(GetArgument(args, "--libfile"));
-                Shared.Helpers.HttpHelper.Client = Shared.Helpers.HttpHelper.GetDefaultHttpHelper(ServerShared.Services.Service.ServiceBaseUrl);
+                HttpHelper.Client = HttpHelper.GetDefaultHttpHelper(Service.ServiceBaseUrl);
                 Execute(new()
                 {
                     IsServer = server,

@@ -304,7 +304,7 @@ public class Runner
         nodeParameters.IsArm = Globals.IsArm;
         nodeParameters.PathMapper = (path) => Node.Map(path);
         nodeParameters.PathUnMapper = (path) => Node.UnMap(path);
-        nodeParameters.ScriptExecutor = new FileFlows.ServerShared.ScriptExecutor()
+        nodeParameters.ScriptExecutor = new ScriptExecutor()
         {
             SharedDirectory = Path.Combine(Info.ConfigDirectory, "Scripts", "Shared"),
             FileFlowsUrl = Service.ServiceBaseUrl

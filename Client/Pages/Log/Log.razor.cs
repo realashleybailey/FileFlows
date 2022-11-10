@@ -138,7 +138,8 @@ public partial class Log : ComponentBase
             var response = await HttpHelper.Post<string>("/api/log/search", SearchModel);
             if (response.Success)
             {
-                this.LogText = response.Data;
+                this.LogText = response.Data.Replace("\\u0022", "\"")
+                    .Replace("\\u0027", "'");
                 this.scrollToBottom = nearBottom;
                 this.StateHasChanged();
             }
@@ -148,7 +149,8 @@ public partial class Log : ComponentBase
             var response = await HttpHelper.Get<string>("/api/log?logLevel=" + LogLevel);
             if (response.Success)
             {
-                this.LogText = response.Data;
+                this.LogText = response.Data.Replace("\\u0022", "\"")
+                    .Replace("\\u0027", "'");;
                 this.scrollToBottom = nearBottom;
                 this.StateHasChanged();
             }

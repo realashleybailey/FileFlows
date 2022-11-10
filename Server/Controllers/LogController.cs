@@ -27,6 +27,8 @@ public class LogController : Controller
         {
             string log = logger.GetTail(1000, logLevel);
             string html = LogToHtml.Convert(log);
+            html = html.Replace("\\u0022", "\"")
+                       .Replace("\\u0027", "'");
             return html;
         }
         return string.Empty;
@@ -37,7 +39,7 @@ public class LogController : Controller
     /// </summary>
     /// <returns>the available log sources</returns>
     [HttpGet("log-sources")]
-    public async Task<List<ListOption>>  GetLogSources()
+    public async Task<List<ListOption>> GetLogSources()
     {
         List<ListOption> sources = new();
         sources.Add(new() { Value = "", Label = "Server" });

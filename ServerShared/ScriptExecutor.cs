@@ -133,6 +133,8 @@ public class ScriptExecutor:IScriptExecutor
 
         string FixLog(StringBuilder sb)
             => sb.ToString()
+                .Replace("\u0022", "\"")
+                .Replace("\u0027", "'")
                 .Replace("\\n", "\n").Trim();
     }
     

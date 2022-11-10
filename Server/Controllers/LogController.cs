@@ -27,12 +27,14 @@ public class LogController : Controller
         {
             string log = logger.GetTail(1000, logLevel);
             string html = LogToHtml.Convert(log);
-            html = html.Replace("\\u0022", "\"")
-                       .Replace("\\u0027", "'");
-            return html;
+            return FixLog(html);
         }
         return string.Empty;
     }
+    
+    private string FixLog(string log)
+    => log.Replace("\\u0022", "\"")
+            .Replace("\\u0027", "'");
 
     /// <summary>
     /// Get the available log sources
@@ -90,7 +92,7 @@ public class LogController : Controller
             return x.LogDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + " [" + prefix + "] -> " + x.Message;
         }));
         string html = LogToHtml.Convert(log);
-        return html;
+        return FixLog(html);
     }
 
     /// <summary>

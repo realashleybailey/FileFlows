@@ -132,6 +132,11 @@
       "Sat": "Sat",
       "Sun": "Sun"
     },
+    "DetectionPeriod": {
+      "None": "None",
+      "NewerThan": "Newer Than",
+      "OlderThan": "Older Than"
+    },
     "FileStatus": {
       "OnHold":"On Hold",
       "Disabled": "Disabled",
@@ -268,6 +273,10 @@
     },
     "Library": {
       "Title": "Library",
+      "Labels": {
+        "CreationTime": "Creation Time",
+        "LastWriteTime": "Last Write Time"
+      },
       "Fields": {
         "Template": "Template",
         "Name": "Name",
@@ -308,7 +317,11 @@
         "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue.",
         "HoldMinutes":"Hold Minutes",
         "HoldMinutes-Suffix":"minutes",
-        "HoldMinutes-Help":"Optionally hold any files found in this library for this amount of minutes before processing them.  Each file will be held for this amount of time."
+        "HoldMinutes-Help":"Optionally hold any files found in this library for this amount of minutes before processing them.  Each file will be held for this amount of time.",
+        "DetectionPeriod": "Detection Period",
+        "DetectionDescription": "Here you can configure a library to only detect files that are older or newer than a given period.\n\nThis allows you to only include files that are older than 1 week for example, or files newer than 3 days etc.\n\nSet to 'None' to not limit files based on date.",
+        "DetectionMinutes": "",
+        "DetectionLastWriteTime": "Detection Property"
       }
     },
     "LibraryFile": {

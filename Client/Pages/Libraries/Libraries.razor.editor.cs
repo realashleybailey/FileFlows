@@ -1,16 +1,7 @@
-﻿namespace FileFlows.Client.Pages;
-
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
-using FileFlows.Client.Components;
-using FileFlows.Shared.Helpers;
-using FileFlows.Shared;
-using FileFlows.Shared.Models;
-using FileFlows.Plugin;
-using System;
+﻿using FileFlows.Plugin;
 using FileFlows.Client.Components.Inputs;
+
+namespace FileFlows.Client.Pages;
 
 public partial class Libraries : ListPage<Guid, Library>
 {
@@ -33,6 +24,7 @@ public partial class Libraries : ListPage<Guid, Library>
         var tabGeneral = await TabGeneral(library, flowOptions);
         tabs.Add("General", tabGeneral);
         tabs.Add("Schedule", TabSchedule(library));
+        tabs.Add("Detection", TabDetection(library));
         tabs.Add("Advanced", TabAdvanced(library));
         var result = await Editor.Open(new()
         {
@@ -185,6 +177,7 @@ public partial class Libraries : ListPage<Guid, Library>
             InputType = FormInputType.Switch,
             Name = nameof(library.Enabled)
         });
+        
         return fields;
     }
 
@@ -300,6 +293,57 @@ public partial class Libraries : ListPage<Guid, Library>
                 new EmptyCondition(fieldScan, library.Scan)
             }
         });
+        return fields;
+    }
+
+    private List<ElementField> TabDetection(Library library)
+    {
+        List<ElementField> fields = new List<ElementField>();
+        fields.Add(new ()
+        {
+            InputType = FormInputType.Label,
+            Name = "DetectionDescription"
+        });
+        var efPeriod = new ElementField
+        {
+            InputType = FormInputType.Select,
+            Name = nameof(library.DetectionPeriod),
+            Parameters = new Dictionary<string, object>{
+                { "AllowClear", false },
+                { "Options", new List<ListOption> {
+                    new () { Value = DetectionPeriod.None, Label = $"Enums.{nameof(DetectionPeriod)}.{nameof(DetectionPeriod.None)}" },
+                    new () { Value = DetectionPeriod.NewerThan, Label = $"Enums.{nameof(DetectionPeriod)}.{nameof(DetectionPeriod.NewerThan)}" },
+                    new () { Value = DetectionPeriod.OlderThan, Label = $"Enums.{nameof(DetectionPeriod)}.{nameof(DetectionPeriod.OlderThan)}" }
+                } }
+            }
+        };
+        fields.Add(efPeriod);
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Period,
+            Name = nameof(library.DetectionMinutes),
+            Conditions = new List<Condition>
+            {
+                new Condition(efPeriod, library.DetectionPeriod, value: DetectionPeriod.None, isNot: true)                    
+            }
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Select,
+            Name = nameof(library.DetectionLastWriteTime),
+            Parameters = new Dictionary<string, object>{
+                { "AllowClear", false },
+                { "Options", new List<ListOption> {
+                    new () { Value = false, Label = $"Pages.{nameof(Library)}.Labels.CreationTime" },
+                    new () { Value = true, Label = $"Pages.{nameof(Library)}.Labels.LastWriteTime" },
+                } }
+            },
+            Conditions = new List<Condition>
+            {
+                new Condition(efPeriod, library.DetectionPeriod, value: DetectionPeriod.None, isNot: true)                    
+            }
+        });
+        
         return fields;
     }
 }

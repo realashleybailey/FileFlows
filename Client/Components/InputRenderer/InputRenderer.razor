@@ -67,6 +67,13 @@
     Validators=@field.Validators Placeholder="@field.Placeholder" Min="@min" Max="@max" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose Help=@field.HelpText />
             }
             break;
+        case FormInputType.Period:
+        {
+            var value = GetValue<int>(field.Name);
+            <InputPeriod Field=@field Label="@label" Value="@value" ReadOnly=@readOnly ValueChanged="@(x => UpdateValue(field, x))"
+                         Validators=@field.Validators Placeholder="@field.Placeholder" HideLabel=@hideLabel OnSubmit=@OnSubmit OnClose=@OnClose Help=@field.HelpText />
+        }
+            break;
         case FormInputType.Float:
         {
             var value = GetValue<float>(field.Name);

@@ -23,6 +23,21 @@ public class Library : FileFlowObject
     public string Filter { get; set; }
 
     /// <summary>
+    /// Gets or sets the detection period
+    /// </summary>
+    public DetectionPeriod DetectionPeriod { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the detection minutes value
+    /// </summary>
+    public int DetectionMinutes { get; set; }
+
+    /// <summary>
+    /// Gets or sets if the last write time should be used in the detection
+    /// </summary>
+    public bool DetectionLastWriteTime { get; set; }
+
+    /// <summary>
     /// Gets or sets filter to determine if a file should be excluded
     /// </summary>
     public string ExclusionFilter { get; set; }
@@ -175,4 +190,23 @@ public enum ProcessingOrder
     /// Newest files first
     /// </summary>
     NewestFirst = 4,
+}
+
+/// <summary>
+/// Period when to detect files
+/// </summary>
+public enum DetectionPeriod 
+{
+    /// <summary>
+    /// Any file
+    /// </summary>
+    None,
+    /// <summary>
+    /// Files older than the specified time
+    /// </summary>
+    OlderThan = 1,
+    /// <summary>
+    /// Files newer than the specified time
+    /// </summary>
+    NewerThan = 2
 }

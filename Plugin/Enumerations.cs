@@ -40,7 +40,8 @@ public enum FormInputType
     ExecutedNodes = 22,
     Table = 23,
     Widget = 24,
-    Metadata = 25
+    Metadata = 25,
+    Period = 26
 }
 
 

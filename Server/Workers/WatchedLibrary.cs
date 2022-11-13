@@ -121,6 +121,12 @@ public class WatchedLibrary:IDisposable
                 return;
             }
 
+            if (InDetectionPeriod(fullpath) == false)
+            {
+                Logger.Instance.DLog($"{Library.Name} file is not in detection period: {fullpath}");
+                return;
+            }
+
 
             if (this.Library.ExcludeHidden)
             {
@@ -248,6 +254,35 @@ public class WatchedLibrary:IDisposable
         {
             Logger.Instance.ELog("Error in queue: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
+    }
+
+    private bool InDetectionPeriod(string fullpath)
+    {
+        if (Library.DetectionPeriod == DetectionPeriod.None)
+            return true;
+
+        DateTime dt;
+        if (Library.Folders)
+        {
+            var dir =  new DirectoryInfo(fullpath);
+            if (dir.Exists == false)
+                return false;
+            dt = Library.DetectionLastWriteTime ? dir.LastWriteTime : dir.CreationTime;
+        }
+        else
+        {
+            var file = new FileInfo(fullpath);
+            if (file.Exists == false)
+                return false;
+            dt = Library.DetectionLastWriteTime ? file.LastWriteTime : file.CreationTime;
+        }
+
+        // eg 60minutes old
+        double minutes = DateTime.Now.Subtract(dt).TotalMinutes;
+        if (Library.DetectionPeriod == DetectionPeriod.NewerThan)
+            return minutes < Library.DetectionMinutes; // 60mins < 2 hours
+        // older than
+        return minutes > Library.DetectionMinutes; // 60mins > 3 days
     }
 
     private (bool known, string? fingerprint, ObjectReference? duplicate) IsKnownFile(string fullpath, FileSystemInfo fsInfo)

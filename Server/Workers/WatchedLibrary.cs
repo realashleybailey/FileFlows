@@ -74,7 +74,6 @@ public class WatchedLibrary:IDisposable
     {
         try
         {
-            Logger.Instance.ILog("Processing Timer Queue: " + this.Library.Name);
             ProcessQueuedItem();
         }
         catch (Exception)

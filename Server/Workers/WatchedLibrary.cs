@@ -120,13 +120,6 @@ public class WatchedLibrary:IDisposable
                 return;
             }
 
-            if (InDetectionPeriod(fullpath) == false)
-            {
-                Logger.Instance.DLog($"{Library.Name} file is not in detection period: {fullpath}");
-                return;
-            }
-
-
             if (this.Library.ExcludeHidden)
             {
                 if (FileIsHidden(fullpath))
@@ -715,6 +708,12 @@ public class WatchedLibrary:IDisposable
     /// <param name="fullPath">the item to add</param>
     private void QueueItem(string fullPath)
     {
+        if (InDetectionPeriod(fullPath) == false)
+        {
+            Logger.Instance.DLog($"{Library.Name} file is not in detection period: {fullPath}");
+            return;
+        }
+        
         lock (QueuedFiles)
         {
             QueuedFiles.Enqueue(fullPath);

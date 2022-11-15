@@ -248,33 +248,34 @@ public class WatchedLibrary:IDisposable
         }
     }
 
-    private bool InDetectionPeriod(string fullpath)
+    private bool MatchesDetection(string fullpath)
     {
-        if (Library.DetectionPeriod == DetectionPeriod.None)
+        FileSystemInfo info = this.Library.Folders ? new DirectoryInfo(fullpath) : new FileInfo(fullpath);
+        long size = this.Library.Folders ? Helpers.FileHelper.GetDirectorySize(fullpath) : ((FileInfo)info).Length;
+        
+        if(MatchesValue((int)DateTime.Now.Subtract(info.CreationTime).TotalMinutes, Library.DetectFileCreation, Library.DetectFileCreationLower, Library.DetectFileCreationUpper) == false)
+            return false;
+
+        if(MatchesValue((int)DateTime.Now.Subtract(info.LastWriteTime).TotalMinutes, Library.DetectFileLastWritten, Library.DetectFileLastWrittenLower, Library.DetectFileLastWrittenUpper) == false)
+            return false;
+        
+        if(MatchesValue(size, Library.DetectFileLastWritten, Library.DetectFileSizeLower, Library.DetectFileSizeUpper) == false)
+            return false;
+        
+        return true;
+    }
+    
+    private bool MatchesValue(long value, MatchRange range, long low, long high)
+    {
+        if (range == MatchRange.Any)
             return true;
-
-        DateTime dt;
-        if (Library.Folders)
-        {
-            var dir =  new DirectoryInfo(fullpath);
-            if (dir.Exists == false)
-                return false;
-            dt = Library.DetectionLastWriteTime ? dir.LastWriteTime : dir.CreationTime;
-        }
-        else
-        {
-            var file = new FileInfo(fullpath);
-            if (file.Exists == false)
-                return false;
-            dt = Library.DetectionLastWriteTime ? file.LastWriteTime : file.CreationTime;
-        }
-
-        // eg 60minutes old
-        double minutes = DateTime.Now.Subtract(dt).TotalMinutes;
-        if (Library.DetectionPeriod == DetectionPeriod.NewerThan)
-            return minutes < Library.DetectionMinutes; // 60mins < 2 hours
-        // older than
-        return minutes > Library.DetectionMinutes; // 60mins > 3 days
+        
+        if (range == MatchRange.GreaterThan)
+            return value > low;
+        if (range == MatchRange.LessThan)
+            return value < low;
+        bool between = value >= low && value <= high;
+        return range == MatchRange.Between ? between : !between;
     }
 
     private (bool known, string? fingerprint, ObjectReference? duplicate) IsKnownFile(string fullpath, FileSystemInfo fsInfo)
@@ -708,7 +709,7 @@ public class WatchedLibrary:IDisposable
     /// <param name="fullPath">the item to add</param>
     private void QueueItem(string fullPath)
     {
-        if (InDetectionPeriod(fullPath) == false)
+        if (MatchesDetection(fullPath) == false)
         {
             Logger.Instance.DLog($"{Library.Name} file is not in detection period: {fullPath}");
             return;

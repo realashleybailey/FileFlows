@@ -41,7 +41,8 @@ public enum FormInputType
     Table = 23,
     Widget = 24,
     Metadata = 25,
-    Period = 26
+    Period = 26,
+    FileSize = 27
 }
 
 

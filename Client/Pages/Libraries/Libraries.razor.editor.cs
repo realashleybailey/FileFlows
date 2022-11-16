@@ -26,6 +26,7 @@ public partial class Libraries : ListPage<Guid, Library>
         tabs.Add("General", tabGeneral);
         tabs.Add("Schedule", TabSchedule(library));
         tabs.Add("Detection", TabDetection(library));
+        tabs.Add("Scan", TabScan(library));
         tabs.Add("Advanced", TabAdvanced(library));
         var result = await Editor.Open(new()
         {
@@ -260,40 +261,6 @@ public partial class Libraries : ListPage<Guid, Library>
                 new Condition(efFolders, library.Folders, value: true)                    
             }
         });
-        var fieldScan = new ElementField
-        {
-            InputType = FormInputType.Switch,
-            Name = nameof(library.Scan)
-        };
-        fields.Add(fieldScan);
-        fields.Add(new ElementField
-        {
-            InputType = FormInputType.Int,
-            Parameters = new Dictionary<string, object>
-            {
-                { "Min", 10 },
-                { "Max", 24 * 60 * 60 }
-            },
-            Name = nameof(library.ScanInterval),
-            DisabledConditions = new List<Condition>
-            {
-                new EmptyCondition(fieldScan, library.Scan)
-            }
-        });
-        fields.Add(new ElementField
-        {
-            InputType = FormInputType.Int,
-            Parameters = new Dictionary<string, object>
-            {
-                { "Min", 0 },
-                { "Max", 300 }
-            },
-            Name = nameof(library.FileSizeDetectionInterval),
-            DisabledConditions = new List<Condition>
-            {
-                new EmptyCondition(fieldScan, library.Scan)
-            }
-        });
         return fields;
     }
 
@@ -352,6 +319,76 @@ public partial class Libraries : ListPage<Guid, Library>
             if(prop.Item3)
                 fields.Add(ElementField.Separator());
         }
+
+        return fields;
+    }
+    
+    
+    private List<ElementField> TabScan(Library library)
+    {
+        List<ElementField> fields = new List<ElementField>();
+        
+        var fieldScan = new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.Scan)
+        };
+        fields.Add(fieldScan);
+        
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Int,
+            Parameters = new Dictionary<string, object>
+            {
+                { "Min", 10 },
+                { "Max", 24 * 60 * 60 }
+            },
+            Name = nameof(library.ScanInterval),
+            Conditions = new List<Condition>
+            {
+                new (fieldScan, library.Scan, value: true)
+            }
+        });
+        var efFullScanEnabled = new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.FullScanDisabled),
+            Conditions = new List<Condition>
+            {
+                new(fieldScan, library.Scan, value: false)
+            }
+        };
+        fields.Add(efFullScanEnabled);
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Period,
+            Name = nameof(library.FullScanIntervalMinutes),
+            Conditions = new List<Condition>
+            {
+                new (fieldScan, library.Scan, value: false),
+            },
+            DisabledConditions =new List<Condition>
+            {
+                new (efFullScanEnabled, library.FullScanDisabled, value: false),
+            }, 
+        });
+        if (library.FullScanIntervalMinutes < 1)
+            library.FullScanIntervalMinutes = 60;
+        
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Int,
+            Parameters = new Dictionary<string, object>
+            {
+                { "Min", 0 },
+                { "Max", 300 }
+            },
+            Name = nameof(library.FileSizeDetectionInterval),
+            Conditions = new List<Condition>
+            {
+                new (fieldScan, library.Scan, value: true)
+            }
+        });
 
         return fields;
     }

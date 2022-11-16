@@ -69,7 +69,7 @@ public class LibraryWorker : Worker
     protected override void Execute()
     {
         var libController = new LibraryController();
-        var libraries = libController.GetAll().Result;
+        var libraries = libController.GetAll().Result.ToArray();
         bool scannedLibraries = libraries.Any(x => x.Scan);
         if (scannedLibraries)
         {
@@ -90,7 +90,7 @@ public class LibraryWorker : Worker
         bool scannedAny = false;
         foreach(var libwatcher in WatchedLibraries.Values)
         {
-            var library = libraries.Where(x => libwatcher.Library.Uid == x.Uid).FirstOrDefault();
+            var library = libraries.FirstOrDefault(x => libwatcher.Library.Uid == x.Uid);
             if (library != null)
                 libwatcher.UpdateLibrary(library);
             //scannedAny |= libwatcher.Scan();

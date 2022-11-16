@@ -24,7 +24,7 @@ public partial class InputPeriod : Input<int>
 
         if (Value > 0)
         {
-            foreach (int p in new [] { 10080, 1440, 1})
+            foreach (int p in new [] { 10080, 1440, 60, 1})
             {
                 if (Value % p == 0)
                 {
@@ -52,8 +52,9 @@ public partial class InputPeriod : Input<int>
         int max = Period switch
         {
             1 => 100_000,
-            1440 => 10000,
-            _ => 1000
+            60 => 10_000,
+            1440 => 10_000,
+            _ => 1_000
         };
         if (value > max)
             value = max;

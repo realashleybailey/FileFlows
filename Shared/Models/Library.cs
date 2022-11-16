@@ -139,6 +139,16 @@ public class Library : FileFlowObject
     /// Gets or sets the number of seconds to scan files
     /// </summary>
     public int ScanInterval { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if the full scan is disabled
+    /// </summary>
+    public bool FullScanDisabled { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of minutes when to run a full scan to scan files
+    /// </summary>
+    public int FullScanIntervalMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets the number of seconds to wait before checking for file size changes when scanning the library

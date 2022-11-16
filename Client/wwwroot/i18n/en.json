@@ -329,7 +329,11 @@
         "DetectFileLastWrittenUpper": "",
         "DetectFileSize": "File Size",
         "DetectFileSizeLower": "",
-        "DetectFileSizeUpper": ""
+        "DetectFileSizeUpper": "",
+        "FullScanDisabled": "Disable Full Scan",
+        "FullScanDisabled-Help": "The full scan''s intended purpose is to catch any files that may be missed by the file system watch events.",
+        "FullScanIntervalMinutes": "Full Scan Interval",
+        "FullScanIntervalMinutes-Help": "The interval when a full scan of this library should take place"
       }
     },
     "LibraryFile": {

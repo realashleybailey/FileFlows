@@ -531,14 +531,12 @@ public class WatchedLibrary:IDisposable
                 return;
             }
 
+            int fullScanMinutes = Library.FullScanIntervalMinutes < 1 ? 60 : Library.FullScanIntervalMinutes;
             if (fullScan == false && Library.FullScanDisabled != true)
             {
                 // do a full scan when configured just in case anything has been missed
-                int fullScanMinutes = Library.FullScanIntervalMinutes < 1 ? 60 : Library.FullScanIntervalMinutes;
                 
                 fullScan = Library.LastScanned < DateTime.Now.AddMinutes(-fullScanMinutes);
-                if(fullScan)
-                    Logger.Instance.ILog($"Doing a full scan of: {Library.Name} (interval: {fullScanMinutes})");
             }
 
             if (fullScan == false && Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
@@ -560,6 +558,9 @@ public class WatchedLibrary:IDisposable
                 return;
             }
 
+            if(fullScan)
+                Logger.Instance.ILog($"Doing a full scan of: {Library.Name} (interval: {fullScanMinutes})");
+            
             Logger.Instance.DLog($"Scan started on '{Library.Name}': {Library.Path}");
             
             

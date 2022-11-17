@@ -24,7 +24,7 @@ public partial class InputFileSize : Input<int>
 
         if (Value > 0)
         {
-            foreach (int p in new [] { 10080, 1440, 1})
+            foreach (int p in new [] { 1000000000, 1000000, 1000, 1})
             {
                 if (Value % p == 0)
                 {
@@ -51,8 +51,9 @@ public partial class InputFileSize : Input<int>
         
         int max = Unit switch
         {
-            1 => 100_000,
-            1440 => 10000,
+            1 => 1_000_000,
+            1_000 => 100_000,
+            1_000_000 => 10_000,
             _ => 1000
         };
         if (value > max)

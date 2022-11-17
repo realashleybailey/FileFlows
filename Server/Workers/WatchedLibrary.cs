@@ -259,7 +259,7 @@ public class WatchedLibrary:IDisposable
         if(MatchesValue((int)DateTime.Now.Subtract(info.LastWriteTime).TotalMinutes, Library.DetectFileLastWritten, Library.DetectFileLastWrittenLower, Library.DetectFileLastWrittenUpper) == false)
             return false;
         
-        if(MatchesValue(size, Library.DetectFileLastWritten, Library.DetectFileSizeLower, Library.DetectFileSizeUpper) == false)
+        if(MatchesValue(size, Library.DetectFileSize, Library.DetectFileSizeLower, Library.DetectFileSizeUpper) == false)
             return false;
         
         return true;

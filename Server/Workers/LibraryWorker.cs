@@ -84,22 +84,31 @@ public class LibraryWorker : Worker
             libwatcher.UpdateLibrary(library);
             if (library.Enabled == false)
                 continue;
-            if (libwatcher.ScanComplete)
+            if (libwatcher.ScanComplete == false)
             {
                 // hasn't been scanned yet, we scan when the app starts or library is first added
             }
             else if (library.Scan == false)
             {
                 if (library.FullScanDisabled)
+                {
+                    Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' full scan disabled");
                     continue;
-                
+                }
+
                 // need to check full scan interval
                 if (library.LastScannedAgo.TotalMinutes < library.FullScanIntervalMinutes)
+                {
+                    Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' was scanned recently {library.LastScannedAgo} (full scan interval {library.FullScanIntervalMinutes} minutes)");
                     continue;
+                }
             }
             else if (library.LastScannedAgo.TotalSeconds < library.ScanInterval)
+            {
+                Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' was scanned recently {library.LastScannedAgo} ({(new TimeSpan(library.ScanInterval * TimeSpan.TicksPerSecond))}");
                 continue;
-            
+            }
+
             libwatcher.Scan();
         }
     }

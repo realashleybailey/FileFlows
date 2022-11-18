@@ -527,7 +527,7 @@ public class WatchedLibrary:IDisposable
 
             if (TimeHelper.InSchedule(Library.Schedule) == false)
             {
-                Logger.Instance?.ILog($"Library '{Library.Name}' outside of schedule, scanning skipped.");
+                Logger.Instance?.ILog($"WatchedLibrary: Library '{Library.Name}' outside of schedule, scanning skipped.");
                 return;
             }
 
@@ -537,7 +537,7 @@ public class WatchedLibrary:IDisposable
                 return;
             }
             
-            Logger.Instance.DLog($"Scan started on '{Library.Name}': {Library.Path}");
+            Logger.Instance.DLog($"WatchedLibrary: Scan started on '{Library.Name}': {Library.Path}");
             
             int count = 0;
             if (Library.Folders)
@@ -580,14 +580,14 @@ public class WatchedLibrary:IDisposable
 
                     if (QueueContains(file.FullName) == false)
                     {
-                        LogQueueMessage($"{Library.Name} queueing file for scan: {file.FullName}", settings);
+                        LogQueueMessage($"WatchedLibrary: {Library.Name} queueing file for scan: {file.FullName}", settings);
                         QueueItem(file.FullName);
                         ++count;
                     }
                 }
             }
 
-            LogQueueMessage($"Files queued for '{Library.Name}': {count} / {QueueCount()}");
+            LogQueueMessage($"WatchedLibrary: Files queued for '{Library.Name}': {count} / {QueueCount()}");
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
         }
         catch(Exception ex)
@@ -595,7 +595,7 @@ public class WatchedLibrary:IDisposable
             while(ex.InnerException != null)
                 ex = ex.InnerException;
 
-            Logger.Instance.ELog("Failed scanning for files: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            Logger.Instance.ELog("WatchedLibrary: Failed scanning for files: " + ex.Message + Environment.NewLine + ex.StackTrace);
             return;
         }
         finally

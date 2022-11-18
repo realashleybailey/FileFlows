@@ -22,7 +22,7 @@ public class LibraryWorker : Worker
     /// <summary>
     /// Creates a new instance of the library worker
     /// </summary>
-    public LibraryWorker() : base(ScheduleType.Second, 10)
+    public LibraryWorker() : base(ScheduleType.Minute, 1)
     {
         Trigger();
         Instance = this;
@@ -71,19 +71,7 @@ public class LibraryWorker : Worker
     {
         var libController = new LibraryController();
         var libraries = libController.GetAll().Result.ToArray();
-        bool scannedLibraries = libraries.Any(x => x.Scan);
-        if (scannedLibraries)
-        {
-            this.Interval = 30;
-            this.Schedule = ScheduleType.Second;
-        }
-        else
-        {
-            this.Interval = 5;
-            this.Schedule = ScheduleType.Minute;
-        }
         var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();            
-
 
         Watch(libraries.Where(x => WatchedLibraries.ContainsKey(x.Uid + ":" + x.Path) == false).ToArray());
         Unwatch(WatchedLibraries.Keys.Where(x => libraryUids.Contains(x) == false).ToArray());

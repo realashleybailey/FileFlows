@@ -45,7 +45,7 @@ public class ScriptNode:Node
         //string entryPoint = $"Script({epParams});";
         string entryPoint = $"var scriptResult = Script({epParams});\nexport const result = scriptResult;";
 
-        var execArgs = new FileFlows.Plugin.Models.ScriptExecutionArgs
+        var execArgs = new Plugin.Models.ScriptExecutionArgs
         {
             Args = args,
             ScriptType = ScriptType.Flow,

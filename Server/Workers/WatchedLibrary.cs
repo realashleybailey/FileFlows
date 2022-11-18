@@ -506,10 +506,10 @@ public class WatchedLibrary:IDisposable
             SetupWatcher(); 
         }
 
-        if (library.Enabled && library.LastScanned < new DateTime(2020, 1, 1))
+        if (library.Enabled && library.LastScanned < new DateTime(2020, 1, 1) && Directory.Exists(library.Path))
         {
             ScanComplete = false; // this could happen if they click "Rescan" on the library page, this will force a full new scan
-            Logger.Instance?.ILog($"WatchedLibrary: Library '{library.Name}' marked for full scan");
+            Logger.Instance?.ILog($"WatchedLibrary: Library '{library.Name}' marked for re-scan");
         }
     }
 

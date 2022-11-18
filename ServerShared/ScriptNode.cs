@@ -1,4 +1,6 @@
+using System.Text.Json;
 using FileFlows.ScriptExecution;
+using Logger = FileFlows.Shared.Logger;
 
 namespace FileFlows.Server;
 
@@ -60,6 +62,20 @@ public class ScriptNode:Node
             foreach (var p in script.Parameters) 
             {
                 var value = dictModel?.ContainsKey(p.Name) == true ? dictModel[p.Name] : null;
+                if (value is JsonElement je && je.ValueKind == JsonValueKind.String)
+                {
+                    string str = je.GetString();
+                    if (string.IsNullOrWhiteSpace(str) == false)
+                    {
+                        Logger.Instance.ILog("Parameter is string replacing variables: " + str);
+                        string replaced = args.ReplaceVariables(str);
+                        if (replaced != str)
+                        {
+                            Logger.Instance.ILog("Variables replaced: " + replaced);
+                            value = replaced;
+                        }
+                    }
+                }
                 execArgs.AdditionalArguments.Add(p.Name, value);
             }
         }

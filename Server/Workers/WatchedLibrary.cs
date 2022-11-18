@@ -563,6 +563,9 @@ public class WatchedLibrary:IDisposable
                 {
                     if (IsMatch(file.FullName) == false || file.FullName.EndsWith("_"))
                         continue;
+
+                    if (MatchesDetection(file.FullName) == false)
+                        continue;
                 
                     if (knownFiles.ContainsKey(file.FullName.ToLowerInvariant()))
                     {
@@ -694,7 +697,7 @@ public class WatchedLibrary:IDisposable
     {
         if (MatchesDetection(fullPath) == false)
         {
-            Logger.Instance.DLog($"{Library.Name} file is not in detection period: {fullPath}");
+            Logger.Instance.DLog($"{Library.Name} file failed file detection: {fullPath}");
             return;
         }
         

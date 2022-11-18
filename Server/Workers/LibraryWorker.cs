@@ -88,7 +88,6 @@ public class LibraryWorker : Worker
         Watch(libraries.Where(x => WatchedLibraries.ContainsKey(x.Uid + ":" + x.Path) == false).ToArray());
         Unwatch(WatchedLibraries.Keys.Where(x => libraryUids.Contains(x) == false).ToArray());
 
-        bool scannedAny = false;
         foreach(var libwatcher in WatchedLibraries.Values)
         {
             var library = libraries.FirstOrDefault(x => libwatcher.Library.Uid == x.Uid);
@@ -97,7 +96,11 @@ public class LibraryWorker : Worker
             libwatcher.UpdateLibrary(library);
             if (library.Enabled == false)
                 continue;
-            if (library.Scan == false)
+            if (libwatcher.ScanComplete)
+            {
+                // hasn't been scanned yet, we scan when the app starts or library is first added
+            }
+            else if (library.Scan == false)
             {
                 if (library.FullScanDisabled)
                     continue;
@@ -109,11 +112,8 @@ public class LibraryWorker : Worker
             else if (library.LastScannedAgo.TotalSeconds < library.ScanInterval)
                 continue;
             
-            //scannedAny |= libwatcher.Scan();
             libwatcher.Scan();
         }
-        if(scannedAny)
-            Logger.Instance.DLog("Finished scanning libraries");
     }
 
     /// <summary>

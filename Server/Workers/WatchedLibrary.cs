@@ -19,7 +19,7 @@ public class WatchedLibrary:IDisposable
     private FileSystemWatcher Watcher;
     public Library Library { get;private set; } 
 
-    private bool ScanComplete = false;
+    public bool ScanComplete { get;private set; } = false;
     private bool UseScanner = false;
     private bool Disposed = false;
 
@@ -513,7 +513,7 @@ public class WatchedLibrary:IDisposable
         }
     }
 
-    public void Scan(bool fullScan = false)
+    public void Scan()
     {
         if (ScanMutex.WaitOne(1) == false)
             return;
@@ -531,37 +531,13 @@ public class WatchedLibrary:IDisposable
                 return;
             }
 
-            int fullScanMinutes = Library.FullScanIntervalMinutes < 1 ? 60 : Library.FullScanIntervalMinutes;
-            if (fullScan == false && Library.FullScanDisabled != true)
-            {
-                // do a full scan when configured just in case anything has been missed
-                fullScan = Library.LastScanned < DateTime.Now.AddMinutes(-fullScanMinutes);
-            }
-
-            if (fullScan == false && Library.LastScanned > DateTime.Now.AddSeconds(-Library.ScanInterval))
-            {
-                if(Library.Scan) // only log this if set to scan mode
-                    Logger.Instance?.ILog($"Library '{Library.Name}' need to wait until '{(Library.LastScanned.AddSeconds(Library.ScanInterval))}' before scanning again");
-                return;
-            }
-
-            if (UseScanner == false && ScanComplete && fullScan == false)
-            {
-                Logger.Instance?.ILog($"Library '{Library.Name}' has full scan, using FileWatcherEvents now to watch for new files");
-                return; // we can use the filesystem watchers for any more files
-            }
-
             if (string.IsNullOrEmpty(Library.Path) || Directory.Exists(Library.Path) == false)
             {
                 Logger.Instance?.WLog($"WatchedLibrary: Library '{Library.Name}' path not found: {Library.Path}");
                 return;
             }
-
-            if(fullScan)
-                Logger.Instance.ILog($"Doing a full scan of: {Library.Name} (interval: {fullScanMinutes})");
             
             Logger.Instance.DLog($"Scan started on '{Library.Name}': {Library.Path}");
-            
             
             int count = 0;
             if (Library.Folders)

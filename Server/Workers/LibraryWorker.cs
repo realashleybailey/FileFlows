@@ -6,6 +6,7 @@ using FileFlows.Server.Helpers;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace FileFlows.Server.Workers;
 
@@ -78,8 +79,8 @@ public class LibraryWorker : Worker
         }
         else
         {
-            this.Interval = 1;
-            this.Schedule = ScheduleType.Hourly;
+            this.Interval = 5;
+            this.Schedule = ScheduleType.Minute;
         }
         var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();            
 
@@ -91,8 +92,23 @@ public class LibraryWorker : Worker
         foreach(var libwatcher in WatchedLibraries.Values)
         {
             var library = libraries.FirstOrDefault(x => libwatcher.Library.Uid == x.Uid);
-            if (library != null)
-                libwatcher.UpdateLibrary(library);
+            if (library == null)
+                continue;
+            libwatcher.UpdateLibrary(library);
+            if (library.Enabled == false)
+                continue;
+            if (library.Scan == false)
+            {
+                if (library.FullScanDisabled)
+                    continue;
+                
+                // need to check full scan interval
+                if (library.LastScannedAgo.TotalMinutes < library.FullScanIntervalMinutes)
+                    continue;
+            }
+            else if (library.LastScannedAgo.TotalSeconds < library.ScanInterval)
+                continue;
+            
             //scannedAny |= libwatcher.Scan();
             libwatcher.Scan();
         }

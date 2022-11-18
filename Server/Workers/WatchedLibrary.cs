@@ -535,7 +535,6 @@ public class WatchedLibrary:IDisposable
             if (fullScan == false && Library.FullScanDisabled != true)
             {
                 // do a full scan when configured just in case anything has been missed
-                
                 fullScan = Library.LastScanned < DateTime.Now.AddMinutes(-fullScanMinutes);
             }
 

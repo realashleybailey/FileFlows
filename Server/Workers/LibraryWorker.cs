@@ -1,12 +1,6 @@
-using System.Text.RegularExpressions;
-using Esprima.Ast;
-using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
-using FileFlows.Server.Helpers;
-using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace FileFlows.Server.Workers;
 
@@ -108,6 +102,8 @@ public class LibraryWorker : Worker
                 Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' was scanned recently {library.LastScannedAgo} ({(new TimeSpan(library.ScanInterval * TimeSpan.TicksPerSecond))}");
                 continue;
             }
+
+            Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' calling scan");
 
             libwatcher.Scan();
         }

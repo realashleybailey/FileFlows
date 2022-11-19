@@ -9,9 +9,13 @@ namespace FileFlows.Server.Workers;
 /// </summary>
 public class LibraryWorker : Worker
 {
-    private static LibraryWorker Instance;
     
     private Dictionary<string, WatchedLibrary> WatchedLibraries = new ();
+
+    /// <summary>
+    /// Gets the instance of the library worker
+    /// </summary>
+    private static LibraryWorker Instance;
 
     /// <summary>
     /// Creates a new instance of the library worker
@@ -25,20 +29,26 @@ public class LibraryWorker : Worker
     public override void Start()
     {
         base.Start();
+        UpdateLibraries();
     }
 
     public override void Stop()
     {
         base.Stop();
     }
+    
+    private DateTime LibrariesLastUpdated = DateTime.MinValue;
 
     /// <summary>
     /// Triggers a scan now
     /// </summary>
-    public static void ScanNow()
-    {
-        Instance?.Trigger();
-    }
+    public static void ScanNow() => Instance?.Trigger();
+
+    /// <summary>
+    /// Updates the libraries being watched
+    /// </summary>
+    public static void UpdateLibraries() => Instance?.UpdateLibrariesInstance();
+    
 
     private void Watch(params Library[] libraries)
     {
@@ -61,8 +71,12 @@ public class LibraryWorker : Worker
         }
     }
 
-    protected override void Execute()
+    /// <summary>
+    /// Updates the libraries being watched
+    /// </summary>
+    private void UpdateLibrariesInstance()
     {
+        Logger.Instance.DLog("LibraryWorker: Updating Libraries");
         var libController = new LibraryController();
         var libraries = libController.GetAll().Result.ToArray();
         var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();            
@@ -70,14 +84,25 @@ public class LibraryWorker : Worker
         Watch(libraries.Where(x => WatchedLibraries.ContainsKey(x.Uid + ":" + x.Path) == false).ToArray());
         Unwatch(WatchedLibraries.Keys.Where(x => libraryUids.Contains(x) == false).ToArray());
 
-        foreach(var libwatcher in WatchedLibraries.Values)
-        {
+        foreach (var libwatcher in WatchedLibraries.Values)
+        {   
             var library = libraries.FirstOrDefault(x => libwatcher.Library.Uid == x.Uid);
             if (library == null)
                 continue;
             libwatcher.UpdateLibrary(library);
-            if (library.Enabled == false)
-                continue;
+        }
+     
+        LibrariesLastUpdated = DateTime.Now;
+    }
+
+    protected override void Execute()
+    {
+        if(LibrariesLastUpdated < DateTime.Now.AddHours(-1))
+            UpdateLibrariesInstance();
+
+        foreach(var libwatcher in WatchedLibraries.Values)
+        {
+            var library = libwatcher.Library;
             if (libwatcher.ScanComplete == false)
             {
                 // hasn't been scanned yet, we scan when the app starts or library is first added
@@ -103,7 +128,10 @@ public class LibraryWorker : Worker
                 continue;
             }
 
-            Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' calling scan");
+            Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' calling scan " +
+                                 $"(Scan complete: {libwatcher.ScanComplete}) " +
+                                 $"(last scanned: {library.LastScannedAgo}) " +
+                                 $"(Full Scan interval: {library.FullScanIntervalMinutes}");
 
             libwatcher.Scan();
         }

@@ -90,6 +90,9 @@ public class LibraryController : ControllerStore<Library>
         
         if (newLib && result != null)
             await Rescan(new() { Uids = new[] { result.Uid } });
+        
+        LibraryWorker.UpdateLibraries();
+        
         return result;
     }
 
@@ -110,6 +113,7 @@ public class LibraryController : ControllerStore<Library>
             library.Enabled = enable;
             return await Update(library);
         }
+            LibraryWorker.UpdateLibraries();
         return library;
     }
 
@@ -131,6 +135,7 @@ public class LibraryController : ControllerStore<Library>
         }
 
         await UpdateHasLibraries();
+        LibraryWorker.UpdateLibraries();
     }
 
     /// <summary>
@@ -153,6 +158,7 @@ public class LibraryController : ControllerStore<Library>
         _ = Task.Run(async () =>
         {
             await Task.Delay(1);
+            LibraryWorker.UpdateLibraries();
             LibraryWorker.ScanNow();
         });
     }

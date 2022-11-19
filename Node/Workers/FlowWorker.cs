@@ -349,6 +349,8 @@ public class FlowWorker : Worker
             Logger.Instance.ELog("Pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
             return false;
         }
+        Logger.Instance.ILog("Pre-Execute script returned: " + result.ReturnValue == null ? "" : System.Text.Json.JsonSerializer.Serialize(result.ReturnValue));
+        
 
         if (result.ReturnValue?.ToString()?.ToLowerInvariant() == "exit")
         {
@@ -371,6 +373,7 @@ public class FlowWorker : Worker
             }
             
             Logger.Instance.ILog("Restarting...");
+            Thread.Sleep(5_000);
             Environment.Exit(0);
             return false;
         }
@@ -380,7 +383,7 @@ public class FlowWorker : Worker
             Logger.Instance.ELog("Output from pre-execute script failed: " + result.ReturnValue + "\n" + result.Log);
             return false;
         }
-        Logger.Instance.ILog("Pre-execute script passed: \n"+ result.Log);
+        Logger.Instance.ILog("Pre-execute script passed: \n"+ result.Log.Replace("\\n", "\n"));
         return true;
     }
 

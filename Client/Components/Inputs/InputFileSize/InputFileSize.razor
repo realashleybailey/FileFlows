@@ -1,0 +1,19 @@
+@namespace FileFlows.Client.Components.Inputs
+@inherits Input<int>
+
+<InputWrapper Input="@this">
+    <div class="input-filesize-wrapper">
+        <div class="filesize-number">
+            <input id=@Uid type="number" value="@Number" disabled=@(Disabled || ReadOnly ? string.Empty : null) 
+                @onchange="ChangeValue" placeholder="@Placeholder" min="1" max="100000" @onkeydown="OnKeyDown" />
+        </div>
+        <div class="filesize-unit">
+            <select @onchange="UnitSelectionChanged">
+                <option selected=@(Unit == 1) value="1">Bytes</option>
+                <option selected=@(Unit == 1000) value="1000">Kilobytes</option>
+                <option selected=@(Unit == 1000000) value="1000000">Megabytes</option>
+                <option selected=@(Unit == 1000000000) value="1000000000">Gigabytes</option>
+            </select>
+        </div>
+    </div>
+</InputWrapper>

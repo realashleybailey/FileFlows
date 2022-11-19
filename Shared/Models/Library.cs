@@ -23,6 +23,44 @@ public class Library : FileFlowObject
     public string Filter { get; set; }
 
     /// <summary>
+    /// Gets or sets the match range for the file creation date
+    /// </summary>
+    public MatchRange DetectFileCreation { get; set; }
+    /// <summary>
+    /// Gets or sets the match range for the file last written date
+    /// </summary>
+    public MatchRange DetectFileLastWritten { get; set; }
+    /// <summary>
+    /// Gets or sets the match range for the file size
+    /// </summary>
+    public MatchRange DetectFileSize { get; set; }
+
+    /// <summary>
+    /// Gets or sets the lower value for file creation date
+    /// </summary>
+    public int DetectFileCreationLower { get; set; }
+    /// <summary>
+    /// Gets or sets the upper value for file creation date
+    /// </summary>
+    public int DetectFileCreationUpper { get; set; }
+    /// <summary>
+    /// Gets or sets the lower value for file creation last written
+    /// </summary>
+    public long DetectFileLastWrittenLower { get; set; }
+    /// <summary>
+    /// Gets or sets the upper value for file creation last written
+    /// </summary>
+    public int DetectFileLastWrittenUpper { get; set; }
+    /// <summary>
+    /// Gets or sets the lower value for file size
+    /// </summary>
+    public long DetectFileSizeLower { get; set; }
+    /// <summary>
+    /// Gets or sets the upper value for file size
+    /// </summary>
+    public long DetectFileSizeUpper { get; set; }
+
+    /// <summary>
     /// Gets or sets filter to determine if a file should be excluded
     /// </summary>
     public string ExclusionFilter { get; set; }
@@ -101,6 +139,16 @@ public class Library : FileFlowObject
     /// Gets or sets the number of seconds to scan files
     /// </summary>
     public int ScanInterval { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if the full scan is disabled
+    /// </summary>
+    public bool FullScanDisabled { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of minutes when to run a full scan to scan files
+    /// </summary>
+    public int FullScanIntervalMinutes { get; set; }
 
     /// <summary>
     /// Gets or sets the number of seconds to wait before checking for file size changes when scanning the library
@@ -121,58 +169,4 @@ public class Library : FileFlowObject
     /// Gets or sets the number of minutes to hold processing for this file
     /// </summary>
     public int HoldMinutes { get; set; }
-}
-
-/// <summary>
-/// Processing priority, used to prioritize library files for processing
-/// </summary>
-public enum ProcessingPriority
-{
-    /// <summary>
-    /// Lowest priority
-    /// </summary>
-    Lowest = -10,
-    /// <summary>
-    /// Low priority
-    /// </summary>
-    Low = -5,
-    /// <summary>
-    /// Normal priority
-    /// </summary>
-    Normal = 0,
-    /// <summary>
-    /// High priority
-    /// </summary>
-    High = 5,
-    /// <summary>
-    /// Highest priority
-    /// </summary>
-    Highest = 10
-}
-
-/// <summary>
-/// Processing order for a library
-/// </summary>
-public enum ProcessingOrder
-{
-    /// <summary>
-    /// Default order, as they are found
-    /// </summary>
-    AsFound = 0,
-    /// <summary>
-    /// Randomly
-    /// </summary>
-    Random = 1,
-    /// <summary>
-    /// Smallest files first
-    /// </summary>
-    SmallestFirst = 2,
-    /// <summary>
-    /// Largest files first
-    /// </summary>
-    LargestFirst = 3,
-    /// <summary>
-    /// Newest files first
-    /// </summary>
-    NewestFirst = 4,
 }

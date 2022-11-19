@@ -1,9 +1,4 @@
-using System.Text.RegularExpressions;
-using Esprima.Ast;
-using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
-using FileFlows.Server.Helpers;
-using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
 using FileFlows.Shared.Models;
 
@@ -14,14 +9,18 @@ namespace FileFlows.Server.Workers;
 /// </summary>
 public class LibraryWorker : Worker
 {
-    private static LibraryWorker Instance;
     
     private Dictionary<string, WatchedLibrary> WatchedLibraries = new ();
 
     /// <summary>
+    /// Gets the instance of the library worker
+    /// </summary>
+    private static LibraryWorker Instance;
+
+    /// <summary>
     /// Creates a new instance of the library worker
     /// </summary>
-    public LibraryWorker() : base(ScheduleType.Second, 10)
+    public LibraryWorker() : base(ScheduleType.Minute, 1)
     {
         Trigger();
         Instance = this;
@@ -30,20 +29,26 @@ public class LibraryWorker : Worker
     public override void Start()
     {
         base.Start();
+        UpdateLibraries();
     }
 
     public override void Stop()
     {
         base.Stop();
     }
+    
+    private DateTime LibrariesLastUpdated = DateTime.MinValue;
 
     /// <summary>
     /// Triggers a scan now
     /// </summary>
-    public static void ScanNow()
-    {
-        Instance?.Trigger();
-    }
+    public static void ScanNow() => Instance?.Trigger();
+
+    /// <summary>
+    /// Updates the libraries being watched
+    /// </summary>
+    public static void UpdateLibraries() => Instance?.UpdateLibrariesInstance();
+    
 
     private void Watch(params Library[] libraries)
     {
@@ -66,38 +71,72 @@ public class LibraryWorker : Worker
         }
     }
 
-    protected override void Execute()
+    /// <summary>
+    /// Updates the libraries being watched
+    /// </summary>
+    private void UpdateLibrariesInstance()
     {
+        Logger.Instance.DLog("LibraryWorker: Updating Libraries");
         var libController = new LibraryController();
-        var libraries = libController.GetAll().Result;
-        bool scannedLibraries = libraries.Any(x => x.Scan);
-        if (scannedLibraries)
-        {
-            this.Interval = 30;
-            this.Schedule = ScheduleType.Second;
-        }
-        else
-        {
-            this.Interval = 1;
-            this.Schedule = ScheduleType.Hourly;
-        }
+        var libraries = libController.GetAll().Result.ToArray();
         var libraryUids = libraries.Select(x => x.Uid + ":" + x.Path).ToList();            
-
 
         Watch(libraries.Where(x => WatchedLibraries.ContainsKey(x.Uid + ":" + x.Path) == false).ToArray());
         Unwatch(WatchedLibraries.Keys.Where(x => libraryUids.Contains(x) == false).ToArray());
 
-        bool scannedAny = false;
+        foreach (var libwatcher in WatchedLibraries.Values)
+        {   
+            var library = libraries.FirstOrDefault(x => libwatcher.Library.Uid == x.Uid);
+            if (library == null)
+                continue;
+            libwatcher.UpdateLibrary(library);
+        }
+     
+        LibrariesLastUpdated = DateTime.Now;
+    }
+
+    protected override void Execute()
+    {
+        if(LibrariesLastUpdated < DateTime.Now.AddHours(-1))
+            UpdateLibrariesInstance();
+
         foreach(var libwatcher in WatchedLibraries.Values)
         {
-            var library = libraries.Where(x => libwatcher.Library.Uid == x.Uid).FirstOrDefault();
-            if (library != null)
-                libwatcher.UpdateLibrary(library);
-            //scannedAny |= libwatcher.Scan();
+            var library = libwatcher.Library;
+            if (library.FullScanIntervalMinutes == 0)
+                library.FullScanIntervalMinutes = 60;
+            if (libwatcher.ScanComplete == false)
+            {
+                // hasn't been scanned yet, we scan when the app starts or library is first added
+            }
+            else if (library.Scan == false)
+            {
+                if (library.FullScanDisabled)
+                {
+                    Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' full scan disabled");
+                    continue;
+                }
+
+                // need to check full scan interval
+                if (library.LastScannedAgo.TotalMinutes < library.FullScanIntervalMinutes)
+                {
+                    Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' was scanned recently {library.LastScannedAgo} (full scan interval {library.FullScanIntervalMinutes} minutes)");
+                    continue;
+                }
+            }
+            else if (library.LastScannedAgo.TotalSeconds < library.ScanInterval)
+            {
+                Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' was scanned recently {library.LastScannedAgo} ({(new TimeSpan(library.ScanInterval * TimeSpan.TicksPerSecond))}");
+                continue;
+            }
+
+            Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' calling scan " +
+                                 $"(Scan complete: {libwatcher.ScanComplete}) " +
+                                 $"(last scanned: {library.LastScannedAgo}) " +
+                                 $"(Full Scan interval: {library.FullScanIntervalMinutes})");
+
             libwatcher.Scan();
         }
-        if(scannedAny)
-            Logger.Instance.DLog("Finished scanning libraries");
     }
 
     /// <summary>

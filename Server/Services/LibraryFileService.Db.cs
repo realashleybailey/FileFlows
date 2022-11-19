@@ -12,8 +12,6 @@ namespace FileFlows.Server.Services;
 /// </summary>
 public partial class LibraryFileService
 {   
-    
-    //private static Dictionary<Guid, LibraryFile> CachedData;
 
     private static SemaphoreSlim GetNextSemaphore = new (1);
 
@@ -24,7 +22,17 @@ public partial class LibraryFileService
     private const string LIBRARY_JOIN =
         " left join DbObject obj on obj.Type = 'FileFlows.Shared.Models.Library' and LibraryFile.LibraryUid = obj.Uid ";
 
-    
+    private void Database_Log(DateTime start, string message)
+    {
+        var time = DateTime.Now.Subtract(start);
+        if (time > new TimeSpan(0, 0, 10))
+            Logger.Instance.ELog($"Took '{time}' to " + message);
+        else if (time > new TimeSpan(0, 0, 3))
+            Logger.Instance.WLog($"Took '{time}' to " + message);
+        else if (time > new TimeSpan(0, 0, 1))
+            Logger.Instance.DLog($"Took '{time}' to " + message);
+    }
+
     private async Task<FlowDbConnection> GetDbWithMappings()
     {
         var db = await DbHelper.GetDbManager().GetDb();
@@ -48,7 +56,7 @@ public partial class LibraryFileService
                 return default;
             }
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to get: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        Database_Log(dt, "get: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
     }
     
@@ -65,7 +73,7 @@ public partial class LibraryFileService
         }
         finally
         {
-            Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to fetch: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+            Database_Log(dt,"fetch: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         }
 
         return results;
@@ -79,7 +87,7 @@ public partial class LibraryFileService
         {
             effected = await db.Db.ExecuteAsync(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute [{effected}]: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        Logger.Instance.DLog($"Took '{(DateTime.Now - dt)}' to execute [{effected}]: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
     }
     private async Task<T> Database_ExecuteScalar<T>(string sql, params object[] args)
     {
@@ -89,7 +97,7 @@ public partial class LibraryFileService
         {
             result = await db.Db.ExecuteScalarAsync<T>(sql, args);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
+        Database_Log(dt, "execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
     }
 
@@ -106,7 +114,7 @@ public partial class LibraryFileService
         {
             await db.Db.UpdateAsync("LibraryFile", "Uid", o, o.Uid, LibraryFileUpdateColums);
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to update object");
+        Database_Log(dt,"update object");
     }
 
     private async Task Database_Insert(object o)
@@ -118,11 +126,12 @@ public partial class LibraryFileService
             {
                 await db.Db.InsertAsync(o);
             }
-            Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to insert object");
+            
+            Database_Log(dt,"insert object");
         }
         catch (Exception ex)
         {
-            Logger.Instance.ILog($"Failed insert object: " + ex.Message);
+            Logger.Instance.ELog($"Failed insert object: " + ex.Message);
             throw;
         }
 
@@ -135,6 +144,6 @@ public partial class LibraryFileService
         {
             await db.Db.InsertBulkAsync(o.Where(x => x != null));
         }
-        Logger.Instance.ILog($"Took '{(DateTime.Now - dt)}' to insert objects");
+        Database_Log(dt,"insert objects");
     }
 }

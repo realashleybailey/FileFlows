@@ -145,6 +145,13 @@
       "MappingIssue": "Mapping Issue",
       "MissingLibrary": "Missing Library"
     },
+    "MatchRange": {
+      "Any": "Any",
+      "GreaterThan": "Greater Than",
+      "LessThan": "Less Than",
+      "Between": "Between",
+      "NotBetween": "Not Between"
+    },
     "ProcessingOrder":{
       "AsFound": "As Found (Default)",
       "LargestFirst":"Largest First",
@@ -268,6 +275,10 @@
     },
     "Library": {
       "Title": "Library",
+      "Labels": {
+        "CreationTime": "Creation Time",
+        "LastWriteTime": "Last Write Time"
+      },
       "Fields": {
         "Template": "Template",
         "Name": "Name",
@@ -308,7 +319,21 @@
         "SkipFileAccessTests-Help": "When enabled, the library will not test if it can read or write to the file before adding it to the Files queue.",
         "HoldMinutes":"Hold Minutes",
         "HoldMinutes-Suffix":"minutes",
-        "HoldMinutes-Help":"Optionally hold any files found in this library for this amount of minutes before processing them.  Each file will be held for this amount of time."
+        "HoldMinutes-Help":"Optionally hold any files found in this library for this amount of minutes before processing them.  Each file will be held for this amount of time.",
+        "DetectionDescription": "Here you can configure a library to only detect files that match the given patterns.\n\nFor example, this allows you to only include files that are\n\t- Files that were created less than 7 days ago\n\t- Files that were last written to between 3 and 7 days ago\n\t- File size is greater than 1 gigabyte",
+        "DetectFileCreation": "File Creation",
+        "DetectFileCreationLower": "",
+        "DetectFileCreationUpper": "",
+        "DetectFileLastWritten": "File Last Written",
+        "DetectFileLastWrittenLower": "",
+        "DetectFileLastWrittenUpper": "",
+        "DetectFileSize": "File Size",
+        "DetectFileSizeLower": "",
+        "DetectFileSizeUpper": "",
+        "FullScanDisabled": "Disable Full Scan",
+        "FullScanDisabled-Help": "The full scan''s intended purpose is to catch any files that may be missed by the file system watch events.",
+        "FullScanIntervalMinutes": "Full Scan Interval",
+        "FullScanIntervalMinutes-Help": "The interval when a full scan of this library should take place"
       }
     },
     "LibraryFile": {

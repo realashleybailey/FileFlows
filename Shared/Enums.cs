@@ -103,3 +103,85 @@ public enum TaskType
     FileFlowsServerUpdating = 101
 
 }
+
+/// <summary>
+/// Match
+/// </summary>
+public enum MatchRange 
+{
+    /// <summary>
+    /// Any 
+    /// </summary>
+    Any = 0,
+    /// <summary>
+    /// Greater than value specified
+    /// </summary>
+    GreaterThan = 1,
+    /// <summary>
+    /// Less than value specified
+    /// </summary>
+    LessThan = 2,
+    /// <summary>
+    /// Between values specified
+    /// </summary>
+    Between = 3,
+    /// <summary>
+    /// Not between values specified
+    /// </summary>
+    NotBetween = 4
+}
+
+
+/// <summary>
+/// Processing priority, used to prioritize library files for processing
+/// </summary>
+public enum ProcessingPriority
+{
+    /// <summary>
+    /// Lowest priority
+    /// </summary>
+    Lowest = -10,
+    /// <summary>
+    /// Low priority
+    /// </summary>
+    Low = -5,
+    /// <summary>
+    /// Normal priority
+    /// </summary>
+    Normal = 0,
+    /// <summary>
+    /// High priority
+    /// </summary>
+    High = 5,
+    /// <summary>
+    /// Highest priority
+    /// </summary>
+    Highest = 10
+}
+
+/// <summary>
+/// Processing order for a library
+/// </summary>
+public enum ProcessingOrder
+{
+    /// <summary>
+    /// Default order, as they are found
+    /// </summary>
+    AsFound = 0,
+    /// <summary>
+    /// Randomly
+    /// </summary>
+    Random = 1,
+    /// <summary>
+    /// Smallest files first
+    /// </summary>
+    SmallestFirst = 2,
+    /// <summary>
+    /// Largest files first
+    /// </summary>
+    LargestFirst = 3,
+    /// <summary>
+    /// Newest files first
+    /// </summary>
+    NewestFirst = 4,
+}

@@ -30,7 +30,9 @@ public class LogToHtml
                 colorized.Append(HtmlEncode(ex.Message));
             }
         }
-        string result = colorized.ToString();
+        string result = colorized.ToString()
+            .Replace("\\u0022", "\"")
+            .Replace("\\u0027", "'");
         return result;
     }
 

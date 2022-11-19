@@ -42,7 +42,7 @@ public class ScriptExecutor:IScriptExecutor
 
         var args = execArgs.Args;
         
-        FileFlows.ScriptExecution.Executor executor = new();
+        Executor executor = new();
         executor.Logger = new ScriptExecution.Logger();
         executor.Logger.ELogAction = (largs) => args.Logger.ELog(largs);
         executor.Logger.WLogAction = (largs) => args.Logger.WLog(largs);
@@ -75,7 +75,7 @@ public class ScriptExecutor:IScriptExecutor
             executor.AdditionalArguments["Flow"] = args;
         else
             executor.AdditionalArguments.Add("Flow", args);
-        executor.SharedDirectory = DirectoryHelper.ScriptsDirectoryShared;
+        executor.SharedDirectory = SharedDirectory;
         try
         {
             object result = executor.Execute();

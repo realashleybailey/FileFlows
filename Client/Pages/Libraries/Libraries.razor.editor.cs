@@ -1,16 +1,8 @@
-﻿namespace FileFlows.Client.Pages;
-
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
-using FileFlows.Client.Components;
-using FileFlows.Shared.Helpers;
-using FileFlows.Shared;
-using FileFlows.Shared.Models;
-using FileFlows.Plugin;
-using System;
+﻿using FileFlows.Plugin;
 using FileFlows.Client.Components.Inputs;
+using FileFlows.Client.Components.Inputs.InputWidgetPreviews;
+
+namespace FileFlows.Client.Pages;
 
 public partial class Libraries : ListPage<Guid, Library>
 {
@@ -33,6 +25,8 @@ public partial class Libraries : ListPage<Guid, Library>
         var tabGeneral = await TabGeneral(library, flowOptions);
         tabs.Add("General", tabGeneral);
         tabs.Add("Schedule", TabSchedule(library));
+        tabs.Add("Detection", TabDetection(library));
+        tabs.Add("Scan", TabScan(library));
         tabs.Add("Advanced", TabAdvanced(library));
         var result = await Editor.Open(new()
         {
@@ -185,6 +179,7 @@ public partial class Libraries : ListPage<Guid, Library>
             InputType = FormInputType.Switch,
             Name = nameof(library.Enabled)
         });
+        
         return fields;
     }
 
@@ -266,12 +261,80 @@ public partial class Libraries : ListPage<Guid, Library>
                 new Condition(efFolders, library.Folders, value: true)                    
             }
         });
+        return fields;
+    }
+
+    private List<ElementField> TabDetection(Library library)
+    {
+        List<ElementField> fields = new List<ElementField>();
+        fields.Add(new ()
+        {
+            InputType = FormInputType.Label,
+            Name = "DetectionDescription"
+        });
+        var matchParameters = new Dictionary<string, object>
+        {
+            { "AllowClear", false },
+            { "Options", new List<ListOption> {
+                new () { Value = (int)MatchRange.Any, Label = $"Enums.{nameof(MatchRange)}.{nameof(MatchRange.Any)}" },
+                new () { Value = MatchRange.GreaterThan, Label = $"Enums.{nameof(MatchRange)}.{nameof(MatchRange.GreaterThan)}" },
+                new () { Value = MatchRange.LessThan, Label = $"Enums.{nameof(MatchRange)}.{nameof(MatchRange.LessThan)}" },
+                new () { Value = MatchRange.Between, Label = $"Enums.{nameof(MatchRange)}.{nameof(MatchRange.Between)}" },
+                new () { Value = MatchRange.NotBetween, Label = $"Enums.{nameof(MatchRange)}.{nameof(MatchRange.NotBetween)}" }
+            } }
+        };
+        foreach (var prop in new[]
+                 {
+                     (nameof(Library.DetectFileCreation), "date", true),
+                     (nameof(library.DetectFileLastWritten), "date", true),
+                     (nameof(library.DetectFileSize), "size", false)
+                 })
+        {
+            var efDetection = new ElementField
+            {
+                InputType = FormInputType.Select,
+                Name = prop.Item1,
+                Parameters = matchParameters
+            };
+            fields.Add(efDetection);
+            fields.Add(new ElementField
+            {
+                InputType = prop.Item2 == "date" ? FormInputType.Period : FormInputType.FileSize,
+                Name = prop.Item1 + "Lower",
+                Conditions = new List<Condition>
+                {
+                    new (efDetection, prop.Item1, value: (int)MatchRange.Any, isNot: true)
+                }
+            });
+            fields.Add(new ElementField
+            {
+                InputType = prop.Item2 == "date" ? FormInputType.Period : FormInputType.FileSize,
+                Name = prop.Item1 + "Upper",
+                Conditions = new List<Condition>
+                {
+                    new AnyCondition(efDetection, prop.Item1, new [] { MatchRange.Between, MatchRange.NotBetween})
+                }
+            });
+            
+            if(prop.Item3)
+                fields.Add(ElementField.Separator());
+        }
+
+        return fields;
+    }
+    
+    
+    private List<ElementField> TabScan(Library library)
+    {
+        List<ElementField> fields = new List<ElementField>();
+        
         var fieldScan = new ElementField
         {
             InputType = FormInputType.Switch,
             Name = nameof(library.Scan)
         };
         fields.Add(fieldScan);
+        
         fields.Add(new ElementField
         {
             InputType = FormInputType.Int,
@@ -281,11 +344,37 @@ public partial class Libraries : ListPage<Guid, Library>
                 { "Max", 24 * 60 * 60 }
             },
             Name = nameof(library.ScanInterval),
-            DisabledConditions = new List<Condition>
+            Conditions = new List<Condition>
             {
-                new EmptyCondition(fieldScan, library.Scan)
+                new (fieldScan, library.Scan, value: true)
             }
         });
+        var efFullScanEnabled = new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.FullScanDisabled),
+            Conditions = new List<Condition>
+            {
+                new(fieldScan, library.Scan, value: false)
+            }
+        };
+        fields.Add(efFullScanEnabled);
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Period,
+            Name = nameof(library.FullScanIntervalMinutes),
+            Conditions = new List<Condition>
+            {
+                new (fieldScan, library.Scan, value: false),
+            },
+            DisabledConditions =new List<Condition>
+            {
+                new (efFullScanEnabled, library.FullScanDisabled, value: false),
+            }, 
+        });
+        if (library.FullScanIntervalMinutes < 1)
+            library.FullScanIntervalMinutes = 60;
+        
         fields.Add(new ElementField
         {
             InputType = FormInputType.Int,
@@ -295,11 +384,12 @@ public partial class Libraries : ListPage<Guid, Library>
                 { "Max", 300 }
             },
             Name = nameof(library.FileSizeDetectionInterval),
-            DisabledConditions = new List<Condition>
+            Conditions = new List<Condition>
             {
-                new EmptyCondition(fieldScan, library.Scan)
+                new (fieldScan, library.Scan, value: true)
             }
         });
+
         return fields;
     }
 }

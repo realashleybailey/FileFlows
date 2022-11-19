@@ -103,6 +103,8 @@ public class LibraryWorker : Worker
         foreach(var libwatcher in WatchedLibraries.Values)
         {
             var library = libwatcher.Library;
+            if (library.FullScanIntervalMinutes == 0)
+                library.FullScanIntervalMinutes = 60;
             if (libwatcher.ScanComplete == false)
             {
                 // hasn't been scanned yet, we scan when the app starts or library is first added
@@ -131,7 +133,7 @@ public class LibraryWorker : Worker
             Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' calling scan " +
                                  $"(Scan complete: {libwatcher.ScanComplete}) " +
                                  $"(last scanned: {library.LastScannedAgo}) " +
-                                 $"(Full Scan interval: {library.FullScanIntervalMinutes}");
+                                 $"(Full Scan interval: {library.FullScanIntervalMinutes})");
 
             libwatcher.Scan();
         }

@@ -5,7 +5,7 @@
 
 FileFlows is a application that lets you configure a "Flow" that can be processed on a file.
 
-More information available on [fileflows.com](https://fileflows.com)
+More information available on [fileflows.com](https://fileflows.com) and documentation can be found at [docs.fileflows.com](https://docs.fileflows.com)
 
 [![Download](https://custom-icon-badges.herokuapp.com/badge/-Download-blue?style=for-the-badge&logo=download&logoColor=white "Download")](https://fileflows.com/downloads)
 

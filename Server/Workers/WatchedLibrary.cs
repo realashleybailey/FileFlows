@@ -589,6 +589,8 @@ public class WatchedLibrary:IDisposable
 
             LogQueueMessage($"WatchedLibrary: Files queued for '{Library.Name}': {count} / {QueueCount()}");
             ScanComplete = true;
+            
+            Library.LastScanned = DateTime.Now;
             new LibraryController().UpdateLastScanned(Library.Uid).Wait();
         }
         catch(Exception ex)

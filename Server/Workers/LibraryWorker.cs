@@ -132,6 +132,7 @@ public class LibraryWorker : Worker
 
             Logger.Instance.DLog($"LibraryWorker: Library '{library.Name}' calling scan " +
                                  $"(Scan complete: {libwatcher.ScanComplete}) " +
+                                 $"(Library Scan: {library.Scan} " +
                                  $"(last scanned: {library.LastScannedAgo}) " +
                                  $"(Full Scan interval: {library.FullScanIntervalMinutes})");
 

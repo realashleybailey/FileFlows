@@ -54,7 +54,10 @@ public class LibraryWorker : Worker
     {
         foreach(var lib in libraries)
         {
-            WatchedLibraries.Add(lib.Uid + ":" + lib.Path, new WatchedLibrary(lib));
+            string key = lib.Uid + ":" + lib.Path;
+            if (WatchedLibraries.ContainsKey(key))
+                continue;
+            WatchedLibraries.Add(key, new WatchedLibrary(lib));
         }
     }
 

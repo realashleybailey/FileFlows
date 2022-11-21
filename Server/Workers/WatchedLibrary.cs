@@ -187,7 +187,8 @@ public class WatchedLibrary:IDisposable
             if (Library.SkipFileAccessTests == false && Library.Folders == false &&
                 CanAccess((FileInfo)fsInfo, Library.FileSizeDetectionInterval).Result == false)
             {
-                Logger.Instance.DLog($"Cannot access file: " + fullpath);
+                Logger.Instance.WLog($"Failed access checks for file file: " + fullpath +"\n" +
+                                     "These checks can be disabled in library settings, but ensure the flow can read and write to the library.");
                 return;
             }
 
@@ -610,6 +611,7 @@ public class WatchedLibrary:IDisposable
     private async Task<bool> CanAccess(FileInfo file, int fileSizeDetectionInterval)
     {
         DateTime now = DateTime.Now;
+        bool canRead = false, canWrite = false, checkedAccess = false;
         try
         {
             if (file.LastWriteTime > DateTime.Now.AddSeconds(-10))
@@ -626,6 +628,8 @@ public class WatchedLibrary:IDisposable
                 }
             }
 
+            checkedAccess = true;
+
             using (var fs = File.Open(file.FullName, FileMode.Open))
             {
                 if(fs.CanRead == false)
@@ -633,17 +637,28 @@ public class WatchedLibrary:IDisposable
                     Logger.Instance.ILog("Cannot read file: " + file.FullName);
                     return false;
                 }
+                canRead = true;
                 if (fs.CanWrite == false)
                 {
                     Logger.Instance.ILog("Cannot write file: " + file.FullName);
                     return false;
                 }
+
+                canWrite = true;
             }
 
             return true;
         }
         catch (Exception)
         {
+            if (checkedAccess)
+            {
+                if (canRead == false)
+                    Logger.Instance.ILog("Cannot read file: " + file.FullName);
+                if (canWrite == false)
+                    Logger.Instance.ILog("Cannot write file: " + file.FullName);
+            }
+
             return false;
         }
         finally

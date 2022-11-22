@@ -22,7 +22,6 @@ public class LibraryWorker : Worker
     /// </summary>
     public LibraryWorker() : base(ScheduleType.Minute, 1)
     {
-        Trigger();
         Instance = this;
     }
 

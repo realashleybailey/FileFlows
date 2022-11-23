@@ -59,7 +59,7 @@ public partial class Flows : ListPage<Guid, FlowListModel>
             NavigationManager.NavigateTo("flows/" + Guid.Empty);
             return;
         }
-        var  newFlow = await AddEditor.Show();
+        var newFlow = await AddEditor.Show(this.SelectedType);
         if (newFlow == null)
             return; // was canceled
         

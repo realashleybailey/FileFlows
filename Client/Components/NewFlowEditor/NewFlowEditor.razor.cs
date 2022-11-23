@@ -15,6 +15,8 @@ public partial class NewFlowEditor : Editor
     [Inject] NavigationManager NavigationManager { get; set; }
     [CascadingParameter] public Blocker Blocker { get; set; }
     TaskCompletionSource<Flow> ShowTask;
+
+    private FlowType? _flowType = null;
     
     /// <summary>
     /// Gets or sets the available templates
@@ -188,19 +190,21 @@ public partial class NewFlowEditor : Editor
     /// <summary>
     /// Shows the new flow editor
     /// </summary>
-    public Task<Flow> Show()
+    public Task<Flow> Show(FlowType type)
     {
         ShowTask = new TaskCompletionSource<Flow>();
         _ = Task.Run(async () =>
         {
-            if (this.Templates == null)
+            if (this.Templates == null || _flowType != type)
             {
+                _flowType = type;
+                TemplateOptions = new();
                 this.Blocker.Show("Pages.Flows.Messages.LoadingTemplates");
                 this.StateHasChanged();
                 try
                 {
                     var flowResult =
-                        await HttpHelper.Get<Dictionary<string, List<FlowTemplateModel>>>("/api/flow/templates");
+                        await HttpHelper.Get<Dictionary<string, List<FlowTemplateModel>>>("/api/flow/templates?type=" + type);
                     if (flowResult.Success)
                         Templates = flowResult.Data ?? new();
                     else
@@ -236,7 +240,9 @@ public partial class NewFlowEditor : Editor
             {
                 // no templates, give them a blank
                 NavigationManager.NavigateTo("flows/" + Guid.Empty);
-                ShowTask.TrySetResult(default(Flow));
+                var flow = default(Flow);
+                flow.Type = type;
+                ShowTask.TrySetResult(flow);
                 return;
             }
             this.Model = null;
@@ -451,6 +457,7 @@ public partial class NewFlowEditor : Editor
         }
         else
         {
+            flow.Type = _flowType.Value;
             ShowTask.TrySetResult(flow);
         }
         return true;

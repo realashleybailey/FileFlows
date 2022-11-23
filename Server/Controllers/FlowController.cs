@@ -768,9 +768,10 @@ public class FlowController : ControllerStore<Flow>
     /// <summary>
     /// Get flow templates
     /// </summary>
+    /// <param name="type">the flow type</param>
     /// <returns>A list of flow templates</returns>
     [HttpGet("templates")]
-    public async Task<IDictionary<string, List<FlowTemplateModel>>> GetTemplates()
+    public async Task<IDictionary<string, List<FlowTemplateModel>>> GetTemplates([FromQuery] FlowType type = FlowType.Standard)
     {
         var elements = await GetElements((FlowType)(-1)); // special case to load all template typs
         var parts = elements.ToDictionary(x => x.Uid, x => x);
@@ -781,6 +782,7 @@ public class FlowController : ControllerStore<Flow>
         templates.Add("Basic", new List<FlowTemplateModel>());
 
         var templateList = GetFlowTemplates(parts)
+            .Where(x => x.Template.Type == type)
             .OrderBy(x => x.Template.Group.ToLowerInvariant())
             .ThenBy(x => x.Template.Name == x.Template.Group + " File" ? 0 : 1)
             .ThenBy(x => x.Template.Name.ToLowerInvariant());

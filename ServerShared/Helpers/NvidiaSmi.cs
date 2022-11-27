@@ -18,67 +18,74 @@ public class NvidiaSmi
     /// <returns>A list of GPUs in the system</returns>
     public NvidiaGpu[] GetData()
     {
-        string output = GetOutput();
-        if (string.IsNullOrEmpty(output))
-            return new NvidiaGpu[] { };
-
-        MethodInfo method = typeof(XmlSerializer).GetMethod("set_Mode", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        method.Invoke(null, new object[] { 1 });
-
-        XmlReader reader = new XmlTextReader(new StringReader(output));
-        XmlSerializer serializer = new XmlSerializer(typeof(nvidia_smi_log));
-        if (serializer.CanDeserialize(reader))
+        try
         {
-            var info = (nvidia_smi_log)serializer.Deserialize(reader);
-            List<NvidiaGpu> gpus = new List<NvidiaGpu>();
-            foreach (var agpu in info.gpu)
+            string output = GetOutput();
+            if (string.IsNullOrEmpty(output))
+                return new NvidiaGpu[] { };
+
+            MethodInfo method = typeof(XmlSerializer).GetMethod("set_Mode",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new object[] { 1 });
+
+            XmlReader reader = new XmlTextReader(new StringReader(output));
+            XmlSerializer serializer = new XmlSerializer(typeof(nvidia_smi_log));
+            if (serializer.CanDeserialize(reader))
             {
-                var gpu = new NvidiaGpu()
+                var info = (nvidia_smi_log)serializer.Deserialize(reader);
+                List<NvidiaGpu> gpus = new List<NvidiaGpu>();
+                foreach (var agpu in info.gpu)
                 {
-                    Architecture = agpu.product_architecture,
-                    Brand = agpu.product_brand,
-                    Name = agpu.product_name,
-                    FanSpeedPercent = ParsePercent(agpu.fan_speed)
-                };
-                if (agpu.temperature?.Any() == true &&
-                    int.TryParse(Regex.Match(agpu.temperature[0].gpu_temp, @"[\d]+").Value, out int temp))
-                    gpu.GpuTemperature = temp;
-                if (agpu.fb_memory_usage?.Any() == true)
-                {
-                    string memTotal = agpu.fb_memory_usage[0].total;
-                    if (memTotal.EndsWith("MiB"))
-                        gpu.MemoryTotalMib = int.Parse(Regex.Match(memTotal, @"[\d]+").Value);
-                    string memUsed = agpu.fb_memory_usage[0].used;
-                    if (memUsed.EndsWith("MiB"))
-                        gpu.MemoryUsedMib = int.Parse(Regex.Match(memUsed, @"[\d]+").Value);
-                }
-
-                if (agpu.utilization?.Any() == true)
-                {
-                    gpu.UtilizationDecoderPercent = ParsePercent(agpu.utilization[0].decoder_util);
-                    gpu.UtilizationEncoderPercent = ParsePercent(agpu.utilization[0].encoder_util);
-                    gpu.UtilizationMemoryPercent = ParsePercent(agpu.utilization[0].memory_util);
-                }
-
-                if (agpu?.processes?.Any() == true)
-                {
-                    gpu.Processes = new();
-                    foreach (var p in agpu.processes)
+                    var gpu = new NvidiaGpu()
                     {
-                        gpu.Processes.Add(new ()
-                        {
-                            Memory = ParseMib(p.used_memory),
-                            ProcessName = p.process_name
-                        });
+                        Architecture = agpu.product_architecture,
+                        Brand = agpu.product_brand,
+                        Name = agpu.product_name,
+                        FanSpeedPercent = ParsePercent(agpu.fan_speed)
+                    };
+                    if (agpu.temperature?.Any() == true &&
+                        int.TryParse(Regex.Match(agpu.temperature[0].gpu_temp, @"[\d]+").Value, out int temp))
+                        gpu.GpuTemperature = temp;
+                    if (agpu.fb_memory_usage?.Any() == true)
+                    {
+                        string memTotal = agpu.fb_memory_usage[0].total;
+                        if (memTotal.EndsWith("MiB"))
+                            gpu.MemoryTotalMib = int.Parse(Regex.Match(memTotal, @"[\d]+").Value);
+                        string memUsed = agpu.fb_memory_usage[0].used;
+                        if (memUsed.EndsWith("MiB"))
+                            gpu.MemoryUsedMib = int.Parse(Regex.Match(memUsed, @"[\d]+").Value);
                     }
+
+                    if (agpu.utilization?.Any() == true)
+                    {
+                        gpu.UtilizationDecoderPercent = ParsePercent(agpu.utilization[0].decoder_util);
+                        gpu.UtilizationEncoderPercent = ParsePercent(agpu.utilization[0].encoder_util);
+                        gpu.UtilizationMemoryPercent = ParsePercent(agpu.utilization[0].memory_util);
+                    }
+
+                    if (agpu?.processes?.Any() == true)
+                    {
+                        gpu.Processes = new();
+                        foreach (var p in agpu.processes)
+                        {
+                            gpu.Processes.Add(new()
+                            {
+                                Memory = ParseMib(p.used_memory),
+                                ProcessName = p.process_name
+                            });
+                        }
+                    }
+
+                    gpus.Add(gpu);
                 }
 
-                gpus.Add(gpu);
+                return gpus.ToArray();
             }
-
-            return gpus.ToArray();
         }
-
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Failed calling nvidia-smi: " + ex.Message + Environment.NewLine + ex.StackTrace);
+        }
         return new NvidiaGpu[] { };
     }
 

@@ -3,6 +3,7 @@ using FileFlows.Server.Controllers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using System.ComponentModel;
+using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -283,26 +284,46 @@ public class WatchedLibrary:IDisposable
     {
         var service = new Server.Services.LibraryFileService();
         var knownFile = service.GetFileIfKnown(fullpath).Result;
+        string? fingerprint = null;
         if (knownFile != null)
         {
-            if(Library.ReprocessRecreatedFiles == false || 
-               Math.Abs(fsInfo.CreationTime.Subtract(knownFile.CreationTime).TotalSeconds) < 5)
+            // FF-393 - check to see if the file has been modified
+            var creationDiff = Math.Abs(fsInfo.CreationTime.Subtract(knownFile.CreationTime).TotalSeconds);
+            var writeDiff = Math.Abs(fsInfo.LastWriteTime.Subtract(knownFile.LastWriteTime).TotalSeconds);
+            bool needsReprocessing = false;
+            if (Library.UseFingerprinting && (creationDiff > 5 || writeDiff > 5))
             {
-                LogQueueMessage($"{Library.Name} skipping known file '{fullpath}'");
-                // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
-                return (true, null, null);
+                // file has been modified, recalculate the fingerprint to see if it needs to be reprocessed
+                fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
+                if (fingerprint?.EmptyAsNull() != knownFile.Fingerprint?.EmptyAsNull())
+                {
+                    Logger.Instance.ILog($"File '{fullpath}' has been modified since last was processed by FileFlows, marking for reprocessing");
+                    needsReprocessing = true;
+                }
             }
-            Logger.Instance.DLog($"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file '{fsInfo.CreationTime}' vs '{knownFile.CreationTime}'");
+
+            if (needsReprocessing == false)
+            {
+                if (Library.ReprocessRecreatedFiles == false || creationDiff < 5)
+                {
+                    LogQueueMessage($"{Library.Name} skipping known file '{fullpath}'");
+                    // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
+                    return (true, null, null);
+                }
+
+                Logger.Instance.DLog(
+                    $"{Library.Name} file '{fullpath}' creation time has changed, reprocessing file '{fsInfo.CreationTime}' vs '{knownFile.CreationTime}'");
+            }
+
             knownFile.CreationTime = fsInfo.CreationTime;
             knownFile.LastWriteTime = fsInfo.LastWriteTime;
             knownFile.Status = FileStatus.Unprocessed;
-            knownFile.Fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
+            knownFile.Fingerprint = fingerprint?.EmptyAsNull() ?? ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
             new LibraryFileController().Update(knownFile).Wait();
             // we dont return the duplicate here, or the hash since this could trigger a insertion, its already in the db, so we want to skip it
             return (true, null, null);
         }
 
-        string? fingerprint = null;
         if (Library.UseFingerprinting && Library.Folders == false)
         {
             fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
@@ -571,8 +592,12 @@ public class WatchedLibrary:IDisposable
                     if (knownFiles.ContainsKey(file.FullName.ToLowerInvariant()))
                     {
                         var knownFile = knownFiles[file.FullName.ToLower()];
-                        if (Library.ReprocessRecreatedFiles == false ||
-                            file.CreationTime <= knownFile)
+                        
+                        var creationDiff = Math.Abs(file.CreationTime.Subtract(knownFile.CreationTime).TotalSeconds);
+                        var writeDiff = Math.Abs(file.LastWriteTime.Subtract(knownFile.LastWriteTime).TotalSeconds);
+                        //if (Library.ReprocessRecreatedFiles == false ||
+                        //    Math.Abs((file.CreationTime - knownFile).TotalSeconds) < 2)
+                        if(creationDiff < 5 && writeDiff < 5)
                         {
                             continue; // known file that hasn't changed, skip it
                         }

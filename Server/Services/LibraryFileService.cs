@@ -537,14 +537,14 @@ public partial class LibraryFileService : ILibraryFileService
     /// </summary>
     /// <param name="includeOutput">if output names should be included</param>
     /// <returns>a list of all filenames</returns>
-    public async Task<Dictionary<string, DateTime>> GetKnownLibraryFilesWithCreationTimes(bool includeOutput = false)
+    public async Task<Dictionary<string, (DateTime CreationTime, DateTime LastWriteTime)>> GetKnownLibraryFilesWithCreationTimes(bool includeOutput = false)
     {
-        var list = await Database_Fetch<(string, DateTime)>("select Name, CreationTime from LibraryFile");
+        var list = await Database_Fetch<(string, DateTime, DateTime)>("select Name, CreationTime, LastWriteTime from LibraryFile");
         if (includeOutput == false)
-            return list.DistinctBy(x => x.Item1.ToLowerInvariant()).ToDictionary(x => x.Item1.ToLowerInvariant(), x => x.Item2);
-        var outputs = await Database_Fetch<(string, DateTime)>("select OutputPath, CreationTime from LibraryFile");
+            return list.DistinctBy(x => x.Item1.ToLowerInvariant()).ToDictionary(x => x.Item1.ToLowerInvariant(), x => (x.Item2, x.Item3));
+        var outputs = await Database_Fetch<(string, DateTime, DateTime)>("select OutputPath, CreationTime, LastWriteTime from LibraryFile");
         return list.Union(outputs).Where(x => string.IsNullOrEmpty(x.Item1) == false).DistinctBy(x => x.Item1.ToLowerInvariant())
-            .ToDictionary(x => x.Item1.ToLowerInvariant(), x => x.Item2);
+            .ToDictionary(x => x.Item1.ToLowerInvariant(), x => (x.Item2, x.Item3));
     }
 
     /// <summary>

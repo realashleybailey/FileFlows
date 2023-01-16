@@ -1,14 +1,10 @@
 ﻿using FileFlows.Plugin;
 using FileFlows.Server.Controllers;
-using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
 using System.ComponentModel;
-using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
-using FileFlows.ServerShared.Services;
-using MySqlConnector;
 
 namespace FileFlows.Server.Workers;
 
@@ -193,17 +189,12 @@ public class WatchedLibrary:IDisposable
                 return;
             }
 
-            int skip = Library.Path.Length;
-            if (Library.Path.EndsWith("/") == false && Library.Path.EndsWith("\\") == false)
-                ++skip;
 
             long size = Library.Folders ? 0 : ((FileInfo)fsInfo).Length;
-
-            string relative = fullpath.Substring(skip);
             var lf = new LibraryFile
             {
                 Name = fullpath,
-                RelativePath = relative,
+                RelativePath = GetRelativePath(fullpath),
                 Status = duplicate != null ? FileStatus.Duplicate : FileStatus.Unprocessed,
                 IsDirectory = fsInfo is DirectoryInfo,
                 Fingerprint = fingerprint ?? string.Empty,
@@ -248,6 +239,15 @@ public class WatchedLibrary:IDisposable
         {
             Logger.Instance.ELog("Error in queue: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
+    }
+
+    private string GetRelativePath(string fullpath)
+    {
+        int skip = Library.Path.Length;
+        if (Library.Path.EndsWith("/") == false && Library.Path.EndsWith("\\") == false)
+            ++skip;
+
+        return fullpath.Substring(skip);
     }
 
     private bool MatchesDetection(string fullpath)
@@ -332,6 +332,24 @@ public class WatchedLibrary:IDisposable
                 knownFile = service.GetFileByFingerprint(fingerprint).Result;
                 if (knownFile != null)
                 {
+                    if (knownFile.Name != fullpath && Library.UpdateMovedFiles && knownFile.LibraryUid == Library.Uid)
+                    {
+                        // library is set to update moved files, so check if the original file still exists
+                        if (File.Exists(knownFile.Name) == false)
+                        {
+                            // original no longer exists, update the original to be this file
+                            knownFile.CreationTime = fsInfo.CreationTime;
+                            knownFile.LastWriteTime = fsInfo.LastWriteTime;
+                            if (knownFile.OutputPath == knownFile.Name)
+                                knownFile.OutputPath = fullpath;
+                            knownFile.Name = fullpath;
+                            knownFile.RelativePath = GetRelativePath(fullpath);
+                            new FileFlows.Server.Services.LibraryFileService().UpdateMovedFile(knownFile).Wait();
+                            // new LibraryFileController().Update(knownFile).Wait();
+                            // file has been updated, we return this is known and tell the scanner to just continue
+                            return (true, null, null);
+                        }
+                    }
                     return (false, fingerprint, new ObjectReference()
                     {
                         Name = knownFile.Name,

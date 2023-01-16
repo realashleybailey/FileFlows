@@ -756,4 +756,15 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
         Logger.Instance.ILog("Aborting file: " + uid);
         await Database_Execute($"update LibraryFile set Status = {((int)FileStatus.ProcessingFailed)} where Uid = '{uid}'");
     }
+
+    /// <summary>
+    /// Updates a moved file in the database
+    /// </summary>
+    /// <param name="file">the file to update</param>
+    public async Task UpdateMovedFile(LibraryFile file)
+        => Database_Execute(
+            $"update LibraryFile set Name = @0, RelativePath = @1, OutputPath = @2, CreationTime = @3, LastWriteTime = @4 where Uid = @5",
+            file.Name, file.RelativePath, file.OutputPath, 
+            file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"), file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"), 
+            file.Uid);
 }

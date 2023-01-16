@@ -30,7 +30,8 @@ public partial class Libraries : ListPage<Guid, Library>
         tabs.Add("Advanced", TabAdvanced(library));
         var result = await Editor.Open(new()
         {
-            TypeName = "Pages.Library", Title = "Pages.Library.Title", Model = library, SaveCallback = Save, Tabs = tabs
+            TypeName = "Pages.Library", Title = "Pages.Library.Title", Model = library, SaveCallback = Save, Tabs = tabs,
+            HelpUrl = "https://docs.fileflows.com/libraries"
         });
         if (efTemplate != null)
         {
@@ -238,19 +239,29 @@ public partial class Libraries : ListPage<Guid, Library>
             }
             
         });
-        fields.Add(new ElementField
-        {
-            InputType = FormInputType.Switch,
-            Name = nameof(library.ReprocessRecreatedFiles)
-        });
-        fields.Add(new ElementField
+        var efFingerprinting = new ElementField
         {
             InputType = FormInputType.Switch,
             Name = nameof(library.UseFingerprinting),
             Conditions = new List<Condition>
             {
-                new (efFolders, library.Folders, value: false)
+                new(efFolders, library.Folders, value: false)
             }
+        };
+        fields.Add(efFingerprinting);
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.UpdateMovedFiles),
+            DisabledConditions = new List<Condition>
+            {
+                new (efFingerprinting, library.UseFingerprinting, value: true)
+            }
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.ReprocessRecreatedFiles)
         });
         fields.Add(new ElementField
         {

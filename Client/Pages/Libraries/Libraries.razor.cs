@@ -11,7 +11,15 @@ public partial class Libraries : ListPage<Guid, Library>
 
     private async Task Add()
     {
-        await Edit(new Library() { Enabled = true, ScanInterval = 60, FileSizeDetectionInterval = 5, UseFingerprinting = true, Schedule = new String('1', 672) });
+        await Edit(new ()
+        {
+            Enabled = true, 
+            ScanInterval = 60, 
+            FileSizeDetectionInterval = 5,
+            UseFingerprinting = true,
+            UpdateMovedFiles = true,
+            Schedule = new String('1', 672)
+        });
     }
 #if (DEMO)
     public override async Task Load(Guid? selectedUid = null)

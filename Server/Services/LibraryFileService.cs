@@ -154,6 +154,8 @@ public partial class LibraryFileService : ILibraryFileService
                     sql += " OriginalSize ";
                 else if (library.ProcessingOrder == ProcessingOrder.NewestFirst)
                     sql += " LibraryFile.DateCreated desc ";
+                else if (library.ProcessingOrder == ProcessingOrder.OldestFirst)
+                    sql += " LibraryFile.DateCreated asc ";
                 else
                     orderGood = false;
 

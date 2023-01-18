@@ -156,6 +156,7 @@
       "AsFound": "As Found (Default)",
       "LargestFirst":"Largest First",
       "NewestFirst":"Newest First",
+      "OldestFirst":"Oldest First",
       "Random":"Random",
       "SmallestFirst":"Smallest First"
     },

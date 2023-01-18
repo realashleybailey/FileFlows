@@ -184,4 +184,8 @@ public enum ProcessingOrder
     /// Newest files first
     /// </summary>
     NewestFirst = 4,
+    /// <summary>
+    /// Oldest files first
+    /// </summary>
+    OldestFirst = 5
 }

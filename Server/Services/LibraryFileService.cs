@@ -127,6 +127,9 @@ public partial class LibraryFileService : ILibraryFileService
             var execAndWhere = executing?.Any() != true
                 ? string.Empty
                 : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => "'" + x + "'")) + ") ");
+
+            if (node.MaxFileSizeMb > 0)
+                execAndWhere += $" and OriginalSize <= {node.MaxFileSizeMb * (1_000_000)} ";
             
             string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
                          $" and LibraryUid in ({libraryUids}) " + execAndWhere +

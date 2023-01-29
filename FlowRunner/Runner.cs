@@ -238,7 +238,7 @@ public class Runner
         Info.CurrentPart = step;
         try
         {
-            SendUpdate(Info);
+            SendUpdate(Info, waitMilliseconds: 1000);
         }
         catch (Exception) 
         { 
@@ -269,9 +269,9 @@ public class Runner
     private DateTime LastUpdate;
     private SemaphoreSlim UpdateSemaphore = new SemaphoreSlim(1);
     
-    private void SendUpdate(FlowExecutorInfo info)
+    private void SendUpdate(FlowExecutorInfo info, int waitMilliseconds = 50)
     {
-        if (UpdateSemaphore.Wait(50) == false)
+        if (UpdateSemaphore.Wait(waitMilliseconds) == false)
             return;
         try
         {
@@ -302,7 +302,7 @@ public class Runner
             try
             {
                 CalculateFinalSize();
-                SendUpdate(Info);
+                SendUpdate(Info, waitMilliseconds: 1000);
                 Logger.Instance?.DLog("Set final status to: " + status);
                 return;
             }

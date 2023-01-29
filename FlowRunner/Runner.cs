@@ -235,8 +235,7 @@ public class Runner
         Info.CurrentPart = step;
         try
         {
-            var service = FlowRunnerService.Load();
-            service.Update(Info);
+            SendUpdate(Info);
         }
         catch (Exception) 
         { 
@@ -249,17 +248,37 @@ public class Runner
         float diff = Math.Abs(Info.CurrentPartPercent - percentage);
         if (diff < 0.1)
             return; // so small no need to tell server about update;
+        if (LastUpdate > DateTime.Now.AddSeconds(-2))
+            return; // limit updates to one every 2 seconds
 
         Info.CurrentPartPercent = percentage;
 
-        try 
-        { 
-            var service = FlowRunnerService.Load();
-            service.Update(Info);
+        try
+        {
+            SendUpdate(Info);
         }
         catch (Exception)
         {
             // silently fail, not a big deal, just incremental progress update
+        }
+    }
+
+    private DateTime LastUpdate;
+    private SemaphoreSlim UpdateSemaphore = new SemaphoreSlim(1);
+    
+    private void SendUpdate(FlowExecutorInfo info)
+    {
+        if (UpdateSemaphore.Wait(50) == false)
+            return;
+        try
+        {
+            LastUpdate = DateTime.Now;
+            var service = FlowRunnerService.Load();
+            service.Update(info);
+        }
+        catch (Exception)
+        {
+            UpdateSemaphore.Release();
         }
     }
 
@@ -279,9 +298,8 @@ public class Runner
         {
             try
             {
-                var service = FlowRunnerService.Load();
                 CalculateFinalSize();
-                service.Update(Info);
+                SendUpdate(Info);
                 Logger.Instance?.DLog("Set final status to: " + status);
                 return;
             }

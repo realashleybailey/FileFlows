@@ -166,7 +166,10 @@ public class Runner
     public async Task Finish()
     {
         if (nodeParameters?.Logger is FlowLogger fl)
+        {
             Info.Log = fl.ToString();
+            await fl.Flush();
+        }
 
         if(nodeParameters?.OriginalMetadata != null)
             Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;

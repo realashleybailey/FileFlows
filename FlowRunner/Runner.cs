@@ -240,9 +240,10 @@ public class Runner
         {
             SendUpdate(Info, waitMilliseconds: 1000);
         }
-        catch (Exception) 
+        catch (Exception ex) 
         { 
             // silently fail, not a big deal, just incremental progress update
+            Logger.Instance.WLog("Failed to record step change: " + step + " : " + partName);
         }
     }
 
@@ -272,7 +273,11 @@ public class Runner
     private void SendUpdate(FlowExecutorInfo info, int waitMilliseconds = 50)
     {
         if (UpdateSemaphore.Wait(waitMilliseconds) == false)
+        {
+            Logger.Instance.DLog("Failed to wait for SendUpdate semaphore");
             return;
+        }
+
         try
         {
             LastUpdate = DateTime.Now;

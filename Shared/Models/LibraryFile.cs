@@ -203,6 +203,11 @@ public class LibraryFile : FileFlowObject
     /// Gets or sets if this library file is a directory
     /// </summary>
     public bool IsDirectory { get; set; }
+    
+    /// <summary>
+    /// Gets or sets any flags that are being applied to this file
+    /// </summary>
+    public LibraryFileFlags Flags { get; set; }
 
     /// <summary>
     /// Gets the total processing time of the library file
@@ -332,4 +337,20 @@ public class ExecutedNode
     /// Gets or sets the output from this node
     /// </summary>
     public int Output { get; set; }
+}
+
+/// <summary>
+/// Flags for library files
+/// </summary>
+[Flags]
+public enum LibraryFileFlags
+{
+    /// <summary>
+    /// No flags
+    /// </summary>
+    None = 0,
+    /// <summary>
+    /// This file should be forcible processed, disregarding any scheduling etc restrictions
+    /// </summary>
+    ForceProcessing = 1
 }

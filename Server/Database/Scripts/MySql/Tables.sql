@@ -56,6 +56,7 @@ CREATE TABLE LibraryFile
     ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
     IsDirectory         boolean            not null,
+    Flags               int                not null                     DEFAULT(0),
     
     -- size
     OriginalSize        bigint             NOT NULL,

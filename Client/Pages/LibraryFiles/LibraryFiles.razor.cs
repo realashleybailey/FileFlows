@@ -197,6 +197,26 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         await Refresh();
     }
 
+
+    public async Task ForceProcessing()
+    {
+        var selected = Table.GetSelected();
+        var uids = selected.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
+        if (uids.Length == 0)
+            return; // nothing to reprocess
+
+        Blocker.Show();
+        try
+        {
+            await HttpHelper.Post(ApiUrl + "/force-processing", new ReferenceModel<Guid> { Uids = uids });
+        }
+        finally
+        {
+            Blocker.Hide();
+        }
+        await Refresh();
+    }
+    
     public async Task Reprocess()
     {
         var selected = Table.GetSelected();

@@ -37,6 +37,10 @@
         {
             <FlowTableButton Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
         }
+        @if (SelectedStatus == FileStatus.OutOfSchedule)
+        {
+            <FlowTableButton Clicked=ForceProcessing SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
+        }
         @if (SelectedStatus == FileStatus.Processing)
         {
             <FlowTableButton Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />

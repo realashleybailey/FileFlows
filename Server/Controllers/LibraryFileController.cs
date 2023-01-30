@@ -500,7 +500,18 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     /// <returns>an awaited task</returns>
     [HttpPost("unhold")]
     public Task Unhold([FromBody] ReferenceModel<Guid> model)
-        => new LibraryFileService().Unhold(model.Uids);
+        => new LibraryFileService().Unhold(model?.Uids ?? new Guid[]{});
+
+
+    /// <summary>
+    /// Force processing of files
+    /// Used to force files that are currently out of schedule to be processed
+    /// </summary>
+    /// <param name="model">the items to process</param>
+    /// <returns>an awaited task</returns>
+    [HttpPost("force-processing")]
+    public Task ForceProcessing([FromBody] ReferenceModel<Guid> model)
+        => new LibraryFileService().ForceProcessing(model?.Uids ?? new Guid[]{});
     
 
     /// <summary>
@@ -604,6 +615,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     /// <returns>the library file instance</returns>
     internal Task<LibraryFile> GetCached(Guid uid)
         => new LibraryFileService().Get(uid);
+    
     //
     // {
     //

@@ -91,6 +91,9 @@ namespace FileFlows.Plugin.Helpers
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return true; // its macos, lets just pretend we did this
+                
             bool log = filePath.Contains("Runner-") == false;
 
             if (file == false)
@@ -157,6 +160,9 @@ namespace FileFlows.Plugin.Helpers
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return true; // its windows, lets just pretend we did this
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return true; // its macos, lets just pretend we did this
 
             bool log = filePath.Contains("Runner-") == false;
 

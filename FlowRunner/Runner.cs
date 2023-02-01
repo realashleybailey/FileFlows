@@ -286,6 +286,9 @@ public class Runner
         }
         catch (Exception)
         {
+        }
+        finally
+        {
             UpdateSemaphore.Release();
         }
     }

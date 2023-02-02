@@ -103,26 +103,35 @@ public abstract class Worker
 
     public void Trigger()
     {
-        if (Executing)
-            return; // dont let run twice
-        Logger.Instance.ILog("Triggering worker: " + this.GetType().Name);
-
-        _ = Task.Run(() =>
+        try
         {
-            Executing = true;
-            try
+            if (Executing)
+                return; // dont let run twice
+            Logger.Instance.ILog("Triggering worker: " + this.GetType().Name);
+
+            _ = Task.Run(() =>
             {
-                Execute();
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance?.ELog($"Error in worker '{this.GetType().Name}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-            finally
-            {
-                Executing = false;
-            }
-        });
+                Executing = true;
+                try
+                {
+                    Execute();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance?.ELog(
+                        $"Error in worker '{this.GetType().Name}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                }
+                finally
+                {
+                    Executing = false;
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            // FF-410 - catch any errors to avoid this call killing the application
+            Logger.Instance.WLog($"Error triggering worker '{this.GetType().Name}': " + ex.Message);
+        }
     }
 
     protected virtual void Execute()

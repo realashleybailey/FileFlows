@@ -1,10 +1,8 @@
 ﻿using FileFlows.Server.Helpers;
-
-namespace FileFlows.Server.Workers;
-
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
-using FileFlows.Shared.Helpers;
+
+namespace FileFlows.Server.Workers;
 
 public class PluginUpdaterWorker : Worker
 {

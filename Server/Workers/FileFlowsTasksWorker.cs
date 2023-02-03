@@ -16,7 +16,10 @@ namespace FileFlows.Server.Workers;
 /// </summary>
 public class FileFlowsTasksWorker: Worker
 {
-    private static FileFlowsTasksWorker Instance;
+    /// <summary>
+    /// Gets the instance of the tasks worker
+    /// </summary>
+    internal static FileFlowsTasksWorker Instance { get;private set; }
     private readonly List<FileFlowsTask> Tasks = new ();
     private readonly Dictionary<string, object> Variables = new ();
     /// <summary>
@@ -96,13 +99,32 @@ public class FileFlowsTasksWorker: Worker
         }
     }
 
-    private async Task RunTask(FileFlowsTask task, Dictionary<string, object> additionalVariables = null)
+    /// <summary>
+    /// Runs a task by its UID
+    /// </summary>
+    /// <param name="uid">The UID of the task to run</param>
+    /// <returns>the result of the executed task</returns>
+    internal async Task<ScriptExecutor.RunScriptResult> RunByUid(Guid uid)
+    {
+        var task = Tasks.FirstOrDefault(x => x.Uid == uid);
+        if (task == null)
+            return new() { Success = false, Log = "Task not found" };
+        return await RunTask(task);
+    } 
+
+    /// <summary>
+    /// Runs a task
+    /// </summary>
+    /// <param name="task">the task to run</param>
+    /// <param name="additionalVariables">any additional variables</param>
+    private async Task<ScriptExecutor.RunScriptResult> RunTask(FileFlowsTask task, Dictionary<string, object> additionalVariables = null)
     {
         string code = await new ScriptController().GetCode(task.Script, type: ScriptType.System);
         if (string.IsNullOrWhiteSpace(code))
         {
-            Logger.Instance.WLog($"No code found for Task '{task.Name}' using script: {task.Script}");
-            return;
+            var msg = $"No code found for Task '{task.Name}' using script: {task.Script}";
+            Logger.Instance.WLog(msg);
+            return new() { Success = false, Log = msg };
         }
         Logger.Instance.ILog("Executing task: " + task.Name);
         DateTime dtStart = DateTime.Now;
@@ -124,6 +146,8 @@ public class FileFlowsTasksWorker: Worker
             Logger.Instance.ILog($"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)) + "\n" + result.Log);
         else
             Logger.Instance.ELog($"Error executing task '{task.Name}: " + result.ReturnValue + "\n" + result.Log);
+        new TaskController().UpdateLastRun(task.Uid);
+        return result;
     }
     
     private void TriggerTaskType(TaskType type, Dictionary<string, object> variables)

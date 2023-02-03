@@ -16,9 +16,11 @@
         <ToolBar>            
             <FlowTableButton Clicked=Add Icon="fas fa-plus" Label="Labels.Add" />
             <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-edit" Label="Labels.Edit" />
-            <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />       
+            <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Delete" />
+            <FlowTableButtonSeparator/>
+            <FlowTableButton Clicked=Run SelectedOne="true" Icon="fas fa-running" Label="Labels.Run"/>
             <FlowTableButtonSeparator />             
-            <FlowTableHelpButton  HelpUrl="Tasks" />
+            <FlowTableHelpButton HelpUrl="Tasks" />
         </ToolBar>
 
         <Columns>
@@ -40,7 +42,21 @@
             </FlowTableColumn>
             <FlowTableColumn TItem="FileFlowsTask" Width="14rem" MobileWidth="0" >
                 <Header>
-                    Trigger
+                    @lblLastRun
+                </Header>
+                <Cell Context="item">
+                    @if (item.LastRun < new DateTime(2000, 1, 1))
+                    {
+                        <span>@lblNever</span>
+                    }
+                    else{
+                        <span>@item.LastRun.Humanize()</span>
+                    }
+                </Cell>
+            </FlowTableColumn>
+            <FlowTableColumn TItem="FileFlowsTask" Width="14rem" MobileWidth="0" >
+                <Header>
+                    @lblTrigger
                 </Header>
                 <Cell Context="item">
                     @if (item.Type == TaskType.Schedule)

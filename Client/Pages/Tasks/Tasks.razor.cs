@@ -10,6 +10,8 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
 {
     public override string ApiUrl => "/api/task";
 
+    private string lblLastRun, lblNever, lblTrigger;
+
     private enum TimeSchedule
     {
         Hourly,
@@ -25,6 +27,14 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
     private static readonly string SCHEDULE_6_HOURLY = string.Concat(Enumerable.Repeat("1" + new string('0', 23), 4 * 7));
     private static readonly string SCHEDULE_12_HOURLY = string.Concat(Enumerable.Repeat("1" + new string('0', 47), 2 * 7));
     private static readonly string SCHEDULE_DAILY = string.Concat(Enumerable.Repeat("1" + new string('0', 95), 7));
+
+    protected override void OnInitialized()
+    {
+        lblNever = Translater.Instant("Labels.Never");
+        lblLastRun = Translater.Instant("Labels.LastRun");
+        lblTrigger = Translater.Instant("Labels.Trigger");
+        base.OnInitialized();
+    }
 
     private string GetSchedule(FileFlowsTask task)
     {
@@ -245,5 +255,54 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             Blocker.Hide();
             this.StateHasChanged();
         }
+    }
+    
+    
+
+    async Task Run()
+    {
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item == null)
+            return;
+        try
+        {
+            var result = await HttpHelper.Post<RunScriptResult>($"/api/task/run/{item.Uid}");
+            if (result.Success && result.Data.Success)
+            {
+                Toast.ShowSuccess("Script executed");
+            }
+            else
+            {
+                Toast.ShowError(result?.Data?.Log?.EmptyAsNull() ?? result.Body?.EmptyAsNull() ?? "Failed to run task");
+            }
+
+            await Refresh();
+        }
+        finally
+        {
+            this.Blocker.Hide();
+        }
+        
+    }
+
+
+    /// <summary>
+    /// Results of a run script
+    /// </summary>
+    public class RunScriptResult
+    {
+        /// <summary>
+        /// Gets the execution log
+        /// </summary>
+        public string Log { get; init; }
+        /// <summary>
+        /// Gets the return value
+        /// </summary>
+        public object ReturnValue { get; init; }
+
+        /// <summary>
+        /// Gets if the script ran successfully
+        /// </summary>
+        public bool Success { get; init; }
     }
 }

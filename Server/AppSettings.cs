@@ -103,7 +103,7 @@ internal class AppSettings
             return settings;
         }
 
-        AppSettings result = null;
+        AppSettings? result = null;
         try
         {
             string json = File.ReadAllText(file);

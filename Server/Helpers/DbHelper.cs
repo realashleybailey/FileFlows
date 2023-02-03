@@ -257,6 +257,17 @@ public class DbHelper
     /// <param name="uid">the UID of the node</param>
     public static Task UpdateNodeLastSeen(Guid uid) => Manager.UpdateNodeLastSeen(uid);
     
+
+    /// <summary>
+    /// Updates a value in the json data of a DbObject
+    /// </summary>
+    /// <param name="uid">the UID of the object</param>
+    /// <param name="property">The name of the property</param>
+    /// <param name="value">the value to update</param>
+    /// <returns>>the awaited task</returns>
+    public static Task UpdateJsonProperty(Guid uid, string property, object value)
+        => Manager.UpdateJsonProperty(uid, property, value);
+    
     /// <summary>
     /// Restores defaults from the database if they have been removed
     /// </summary>

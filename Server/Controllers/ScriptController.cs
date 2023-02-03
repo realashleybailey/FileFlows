@@ -547,9 +547,6 @@ public class ScriptController : Controller
             return false;
         }
     }
-    
-    
-    
 
 
     /// <summary>

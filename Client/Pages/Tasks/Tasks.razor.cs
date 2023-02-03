@@ -266,7 +266,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             return;
         try
         {
-            var result = await HttpHelper.Post<RunScriptResult>($"/api/task/run/{item.Uid}");
+            var result = await HttpHelper.Post<FileFlowsTaskRun>($"/api/task/run/{item.Uid}");
             if (result.Success && result.Data.Success)
             {
                 Toast.ShowSuccess("Script executed");
@@ -282,27 +282,111 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         {
             this.Blocker.Hide();
         }
-        
     }
 
 
-    /// <summary>
-    /// Results of a run script
-    /// </summary>
-    public class RunScriptResult
+    public async Task RunHistory()
     {
-        /// <summary>
-        /// Gets the execution log
-        /// </summary>
-        public string Log { get; init; }
-        /// <summary>
-        /// Gets the return value
-        /// </summary>
-        public object ReturnValue { get; init; }
+        var item = Table.GetSelected()?.FirstOrDefault();
+        if (item == null)
+            return;
 
-        /// <summary>
-        /// Gets if the script ran successfully
-        /// </summary>
-        public bool Success { get; init; }
+        var blockerHidden = false;
+        Blocker.Show();
+        try
+        {
+            var taskResponse = await HttpHelper.Get<FileFlowsTask>("/api/task/" + item.Uid);
+            if (taskResponse.Success == false)
+            {
+                Toast.ShowError(taskResponse.Body);
+                return;
+            }
+
+            if (taskResponse.Data?.RunHistory?.Any() != true)
+            {
+                Toast.ShowInfo("Pages.Tasks.Messages.NoHistory");
+                return;
+            }
+
+            var task = taskResponse.Data;
+            Blocker.Hide();
+            blockerHidden = true;
+            _ = TaskHistory(task);
+            
+            //var latest = task.RunHistory.Last();
+            //_ = TaskRun(latest);
+        }
+        finally
+        {
+            if (blockerHidden == false)
+                Blocker.Hide();
+        }
+    }
+
+    async Task TaskHistory(FileFlowsTask task)
+    {
+        List<ElementField> fields = new List<ElementField>();
+        fields.Add(new ()
+        {
+            InputType = FormInputType.Table,
+            Name = nameof(task.RunHistory),
+            Parameters = new ()
+            {
+                { nameof(InputTable.TableType), typeof(FileFlowsTaskRun) },
+                { nameof(InputTable.Columns) , new List<InputTableColumn>
+                {
+                    new () { Name = nameof(FileFlowsTaskRun.RunAt), Property = nameof(FileFlowsTaskRun.RunAt) },
+                    new () { Name = nameof(FileFlowsTaskRun.Success), Property = nameof(FileFlowsTaskRun.Success) },
+                    new () { Name = nameof(FileFlowsTaskRun.ReturnValue), Property = nameof(FileFlowsTaskRun.ReturnValue) }
+                }}
+            }
+        });
+        
+        await Editor.Open(new()
+        {
+            TypeName = "Pages.FileFlowsTaskHistory", Title = "Pages.FileFlowsTaskHistory.Title",
+            ReadOnly = true,
+            Fields = fields,
+            Model = new {
+                RunHistory = task.RunHistory.ToList()
+            }
+        });
+        
+    }
+
+    async Task TaskRun(FileFlowsTaskRun fileFlowsTaskRun)
+    {
+        List<ElementField> fields = new List<ElementField>();
+
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.TextLabel,
+            Name = nameof(fileFlowsTaskRun.RunAt)
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.TextLabel,
+            Name = nameof(fileFlowsTaskRun.Success)
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.TextLabel,
+            Name = nameof(fileFlowsTaskRun.ReturnValue)
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.LogView,
+            Name = nameof(fileFlowsTaskRun.Log)
+        });
+
+        Logger.Instance.ILog("Log", fileFlowsTaskRun.Log);
+
+        await Editor.Open(new()
+        {
+            TypeName = "Pages.FileFlowsTaskRun", Title = "Pages.FileFlowsTaskRun.Title",
+            Model = fileFlowsTaskRun,
+            ReadOnly = true,
+            Fields = fields
+        });
     }
 }

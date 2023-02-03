@@ -5,6 +5,7 @@ using FileFlows.Plugin;
 using FileFlows.Plugin.Models;
 using FileFlows.ScriptExecution;
 using FileFlows.Shared.Helpers;
+using FileFlows.Shared.Models;
 
 namespace FileFlows.ServerShared;
 
@@ -98,7 +99,7 @@ public class ScriptExecutor:IScriptExecutor
     /// <param name="variables">any variables to be passed to the executor</param>
     /// <param name="sharedDirectory">[Optional] the shared script directory to look in</param>
     /// <returns>the result of the execution</returns>
-    public static RunScriptResult Execute(string code, Dictionary<string, object> variables, string sharedDirectory = null)
+    public static FileFlowsTaskRun Execute(string code, Dictionary<string, object> variables, string sharedDirectory = null)
     {
         Executor executor = new Executor();
         executor.Code = code;
@@ -114,7 +115,7 @@ public class ScriptExecutor:IScriptExecutor
         try
         {
             object returnValue = executor.Execute();
-            return new RunScriptResult()
+            return new FileFlowsTaskRun()
             {
                 Log = FixLog(sbLog),
                 Success = true,
@@ -123,7 +124,7 @@ public class ScriptExecutor:IScriptExecutor
         }
         catch (Exception ex)
         {
-            return new RunScriptResult()
+            return new FileFlowsTaskRun()
             {
                 Log = FixLog(sbLog),
                 Success = false,
@@ -197,25 +198,5 @@ public class ScriptExecutor:IScriptExecutor
                 StandardOutput = result.StandardOutput,
             };
         }
-    }
-
-    /// <summary>
-    /// Results of a run script
-    /// </summary>
-    public class RunScriptResult
-    {
-        /// <summary>
-        /// Gets the execution log
-        /// </summary>
-        public string Log { get; init; }
-        /// <summary>
-        /// Gets the return value
-        /// </summary>
-        public object ReturnValue { get; init; }
-
-        /// <summary>
-        /// Gets if the script ran successfully
-        /// </summary>
-        public bool Success { get; init; }
     }
 }

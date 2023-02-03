@@ -54,6 +54,7 @@
     "Filter": "Filter",
     "FilterPlaceholder": "Filter (/)",
     "Run": "Run",
+    "RunHistory": "Run History",
     "LastRun": "Last Run",
     "Never": "Never",
     "Trigger": "Trigger",
@@ -620,11 +621,27 @@
     "Tasks": {
       "Title": "Tasks",
       "Messages": {
-        "NoScripts":"No scripts found to create a task for."
+        "NoScripts":"No scripts found to create a task for.",
+        "NoHistory": "This task has no run history available."
       }
     },
     "FileFlowsTask":{
       "Title":"Task"
+    },
+    "FileFlowsTaskHistory": {
+      "Title": "Task History",
+      "Fields": {
+        "RunHistory": "History"
+      }
+    },
+    "FileFlowsTaskRun": {
+      "Title": "Task Run",
+      "Fields": {
+        "RunAt": "Run At",
+        "Success": "Success",
+        "ReturnValue": "Return Value",
+        "Log": "Log"
+      }
     },
     "Task":{ 
       "Title":"Task",

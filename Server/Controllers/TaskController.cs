@@ -72,20 +72,6 @@ public class TaskController  : ControllerStore<FileFlowsTask>
     /// </summary>
     /// <param name="uid">the UID of the script</param>
     [HttpPost("run/{uid}")]
-    public Task<ScriptExecutor.RunScriptResult> Run([FromRoute] Guid uid)
+    public Task<FileFlowsTaskRun> Run([FromRoute] Guid uid)
         => Workers.FileFlowsTasksWorker.Instance.RunByUid(uid);
-    
-    
-    /// <summary>
-    /// Updates the last run of a task to now
-    /// </summary>
-    /// <param name="uid">the unique identifier for the task to update</param>
-    internal async Task UpdateLastRun(Guid uid)
-    {
-        var task = GetByUid(uid).Result;
-        if(task == null)
-            return;
-        task.LastRun = DateTime.Now;
-        await DbHelper.UpdateJsonProperty(uid, nameof(FileFlowsTask.LastRun), task.LastRun);
-    }
 }

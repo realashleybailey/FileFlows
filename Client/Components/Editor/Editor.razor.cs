@@ -485,17 +485,28 @@ public partial class Editor : InputRegister, IDisposable
     internal object GetValue(string field, Type type)
     {
         if (Model == null)
+        {
+            Logger.Instance.ILog("GetValue: Model was null");
             return GetDefault(type);
-        
+        }
+
         var dict = (IDictionary<string, object>)Model;
         if (dict.ContainsKey(field) == false)
+        {
+            Logger.Instance.ILog("GetValue: Model does not contain key: " + field);
             return GetDefault(type);
+        }
+
         object value = dict[field];
         if (value == null)
+        {
+            Logger.Instance.ILog("GetValue: value was null");
             return GetDefault(type);
+        }
 
         if (value is JsonElement je)
         {
+            Logger.Instance.ILog("GetValue: value is json element");
             if (type == typeof(string))
                 return je.GetString();
             if (type== typeof(int))
@@ -508,15 +519,18 @@ public partial class Editor : InputRegister, IDisposable
 
         if (value.GetType().IsAssignableTo(type))
         {
+            Logger.Instance.ILog("GetValue: value is assignable to type");
             return value;
         }
 
         try
         {
+            Logger.Instance.ILog($"GetValue: trying to convert to type '{value.GetType()}' to '{type}'");
             return Converter.ConvertObject(type, value);
         }
-        catch(Exception)
+        catch(Exception ex)
         {
+            Logger.Instance.ILog("GetValue: failed converting ot type, returning default: " + ex.Message);
             return GetDefault(type);
         }
     }

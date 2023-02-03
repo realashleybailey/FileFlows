@@ -5,6 +5,7 @@
 @using FileFlows.Client.Helpers
 @using FileFlows.Shared.Widgets
 @using Microsoft.Extensions.Logging
+@using System.Collections
 
 @{
     string label = string.IsNullOrEmpty(field.Label) == false ? field.Label : IsScript ? FlowHelper.FormatLabel(field.Name) : TypeName + ".Fields." + field.Name;
@@ -221,13 +222,22 @@
                 <p>ADDING A TABLE</p>
                 var columns = GetParameter<List<InputTableColumn>>(field, nameof(InputTable.Columns), new List<InputTableColumn>());
                 var type = GetParameter<Type>(field, nameof(InputTable.TableType));
-                var oValue = GetValue(field.Name, type);
+                Type genericListType = typeof(List<>).MakeGenericType(type);
+                var oValue = GetValue(field.Name, genericListType);
                 if(oValue == null)
                 {
-                    Type genericListType = typeof(List<>).MakeGenericType(type);
+                    <p>ovalue was null, createing empty list</p>
                     oValue = Activator.CreateInstance(genericListType);
                 }
+                else
+                {
+                    <p>ovalue was not null: @(((IList)oValue).Count)</p>
+
+                }
                 <InputTable Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel TableType=@type Columns=@columns />
+                <p>field.Name: @field.Name</p>
+                <p>columns: @columns.Count</p>
+                <p>type: @type</p>
             }
             break;
         case FormInputType.Label:

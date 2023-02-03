@@ -24,4 +24,36 @@ public class FileFlowsTask : FileFlowObject
     /// Gets or sets when the task was last run
     /// </summary>
     public DateTime LastRun { get; set; }
+
+    /// <summary>
+    /// Gets or sets the recent run history
+    /// </summary>
+    public Queue<FileFlowsTaskRun> RunHistory { get; set; } = new Queue<FileFlowsTaskRun>(10);
+}
+
+
+
+/// <summary>
+/// Results of a run script
+/// </summary>
+public class FileFlowsTaskRun
+{
+    /// <summary>
+    /// Gets or sets when the run was executed
+    /// </summary>
+    public DateTime RunAt { get; set; } = DateTime.Now;
+    
+    /// <summary>
+    /// Gets the execution log
+    /// </summary>
+    public string Log { get; init; }
+    /// <summary>
+    /// Gets the return value
+    /// </summary>
+    public object ReturnValue { get; init; }
+
+    /// <summary>
+    /// Gets if the script ran successfully
+    /// </summary>
+    public bool Success { get; init; }
 }

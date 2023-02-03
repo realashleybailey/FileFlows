@@ -15,16 +15,23 @@ public partial class InputTable:Input<object>
 
     protected override void OnInitialized()
     {
+        Logger.Instance.ILog("Table initialized!");
         Properties = TableType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .ToDictionary(x => x.Name, x => x);
         
         
         
         Data = Value as IList;
+        Logger.Instance.ILog("data?!");
         if (Data == null)
         {
+            Logger.Instance.ILog("Data was null");
             Type genericListType = typeof(List<>).MakeGenericType(TableType);
             Data = (IList)Activator.CreateInstance(genericListType);
+        }
+        if(Data != null)
+        {
+            Logger.Instance.ILog("Data not null: " + Data.Count);
         }
     }
 

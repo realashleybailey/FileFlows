@@ -104,7 +104,7 @@ public class FileFlowsTasksWorker: Worker
     /// </summary>
     /// <param name="uid">The UID of the task to run</param>
     /// <returns>the result of the executed task</returns>
-    internal async Task<ScriptExecutor.RunScriptResult> RunByUid(Guid uid)
+    internal async Task<FileFlowsTaskRun> RunByUid(Guid uid)
     {
         var task = Tasks.FirstOrDefault(x => x.Uid == uid);
         if (task == null)
@@ -117,7 +117,7 @@ public class FileFlowsTasksWorker: Worker
     /// </summary>
     /// <param name="task">the task to run</param>
     /// <param name="additionalVariables">any additional variables</param>
-    private async Task<ScriptExecutor.RunScriptResult> RunTask(FileFlowsTask task, Dictionary<string, object> additionalVariables = null)
+    private async Task<FileFlowsTaskRun> RunTask(FileFlowsTask task, Dictionary<string, object> additionalVariables = null)
     {
         string code = await new ScriptController().GetCode(task.Script, type: ScriptType.System);
         if (string.IsNullOrWhiteSpace(code))
@@ -146,7 +146,10 @@ public class FileFlowsTasksWorker: Worker
             Logger.Instance.ILog($"Task '{task.Name}' completed in: " + (DateTime.Now.Subtract(dtStart)) + "\n" + result.Log);
         else
             Logger.Instance.ELog($"Error executing task '{task.Name}: " + result.ReturnValue + "\n" + result.Log);
-        new TaskController().UpdateLastRun(task.Uid);
+        task.LastRun = DateTime.Now;
+        task.RunHistory ??= new Queue<FileFlowsTaskRun>(10);
+        task.RunHistory.Enqueue(result);
+        await new TaskController().Update(task);
         return result;
     }
     

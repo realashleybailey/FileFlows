@@ -2,41 +2,40 @@
 
 @inherits Input<object>
 
-    TABLE!!
-    <table class="table">
-        <thead>
-            <tr>
+<table class="table @(AllowSelection ? "selectable" : "")">
+    <thead>
+        <tr>
+            @foreach (var c in Columns)
+            {
+                string name = c.Name?.EmptyAsNull() ?? c.Property ?? string.Empty;
+                if (string.IsNullOrEmpty(c.Width) == false)
+                {
+                    <th style="width:@c.Width">@name</th>
+                }
+                else
+                {
+                    <th>@name</th>
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Data)
+        {
+            <tr @ondblclick="() => Select(item)" @ontouchenter="() => Select(item)">
                 @foreach (var c in Columns)
                 {
-                    string name = c.Name?.EmptyAsNull() ?? c.Property ?? string.Empty;
+                    string value = GetValueString(c, item);
                     if (string.IsNullOrEmpty(c.Width) == false)
                     {
-                        <th style="width:@c.Width">@name</th>
+                        <td style="width:@c.Width">@value</td>
                     }
                     else
                     {
-                        <th>@name</th>
+                        <td>@value</td>
                     }
                 }
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Data)
-            {
-                <tr>
-                    @foreach (var c in Columns)
-                    {
-                        string value = GetValueString(c, item);
-                        if (string.IsNullOrEmpty(c.Width) == false)
-                        {
-                            <td style="width:@c.Width">@value</td>
-                        }
-                        else
-                        {
-                            <td>@value</td>
-                        }
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>

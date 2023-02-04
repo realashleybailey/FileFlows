@@ -219,25 +219,16 @@
             break;
         case FormInputType.Table:
             {
-                <p>ADDING A TABLE</p>
                 var columns = GetParameter<List<InputTableColumn>>(field, nameof(InputTable.Columns), new List<InputTableColumn>());
                 var type = GetParameter<Type>(field, nameof(InputTable.TableType));
                 Type genericListType = typeof(List<>).MakeGenericType(type);
                 var oValue = GetValue(field.Name, genericListType);
+                var selectAction = GetParameter<Action<object>>(field, nameof(InputTable.SelectAction));
                 if(oValue == null)
                 {
-                    <p>ovalue was null, createing empty list</p>
                     oValue = Activator.CreateInstance(genericListType);
                 }
-                else
-                {
-                    <p>ovalue was not null: @(((IList)oValue).Count)</p>
-
-                }
-                <InputTable Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel TableType=@type Columns=@columns />
-                <p>field.Name: @field.Name</p>
-                <p>columns: @columns.Count</p>
-                <p>type: @type</p>
+                <InputTable Field=@field Label="@label" Value="@oValue" HideLabel=@hideLabel TableType=@type Columns=@columns SelectAction=@selectAction />
             }
             break;
         case FormInputType.Label:

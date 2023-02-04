@@ -1,4 +1,3 @@
-using System.Data;
 using FileFlows.Client.Components;
 using FileFlows.Client.Components.Inputs;
 using FileFlows.Plugin;
@@ -11,6 +10,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
     public override string ApiUrl => "/api/task";
 
     private string lblLastRun, lblNever, lblTrigger;
+    private string lblRunAt, lblSuccess, lblReturnCode;
 
     private enum TimeSchedule
     {
@@ -33,6 +33,9 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         lblNever = Translater.Instant("Labels.Never");
         lblLastRun = Translater.Instant("Labels.LastRun");
         lblTrigger = Translater.Instant("Labels.Trigger");
+        lblRunAt = Translater.Instant("Labels.RunAt");
+        lblSuccess = Translater.Instant("Labels.Success");
+        lblReturnCode = Translater.Instant("Labels.ReturnCode");
         base.OnInitialized();
     }
 
@@ -81,7 +84,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
 
         fields.Add(new ElementField
         {
-            InputType = FileFlows.Plugin.FormInputType.Text,
+            InputType = FormInputType.Text,
             Name = nameof(item.Name),
             Validators = new List<FileFlows.Shared.Validators.Validator> {
                 new FileFlows.Shared.Validators.Required()
@@ -89,7 +92,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         });
         fields.Add(new ElementField
         {
-            InputType = FileFlows.Plugin.FormInputType.Select,
+            InputType = FormInputType.Select,
             Name = nameof(item.Script),
             Parameters = new ()
             {
@@ -98,7 +101,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         });
         var efTaskType = new ElementField
         {
-            InputType = FileFlows.Plugin.FormInputType.Select,
+            InputType = FormInputType.Select,
             Name = nameof(item.Type),
             Parameters = new()
             {
@@ -131,7 +134,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
 
         var efSchedule = new ElementField
         {
-            InputType = FileFlows.Plugin.FormInputType.Select,
+            InputType = FormInputType.Select,
             Name = "TimeSchedule",
             Parameters = new()
             {
@@ -171,7 +174,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         
         fields.Add(new ElementField
         {
-            InputType = FileFlows.Plugin.FormInputType.Schedule,
+            InputType = FormInputType.Schedule,
             Name = "CustomSchedule",
             Parameters = new ()
             {
@@ -183,7 +186,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
                 new (efSchedule, timeSchedule, value: TimeSchedule.Custom)
             }
         });
-        var result = await Editor.Open(new()
+        await Editor.Open(new()
         {
             TypeName = "Pages.Task", Title = "Pages.Task.Title", Fields = fields, Model = new
             {
@@ -207,8 +210,8 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
         this.StateHasChanged();
         var task = new FileFlowsTask();
         var dict = model as IDictionary<string, object>;
-        task.Name = dict["Name"].ToString();
-        task.Script = dict["Script"].ToString();
+        task.Name = dict["Name"].ToString() ?? string.Empty;
+        task.Script = dict["Script"].ToString() ?? string.Empty;
         task.Uid = (Guid)dict["Uid"];
         task.Type = (TaskType)dict["Type"];
         if (task.Type == TaskType.Schedule)
@@ -285,7 +288,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
     }
 
 
-    public async Task RunHistory()
+    async Task RunHistory()
     {
         var item = Table.GetSelected()?.FirstOrDefault();
         if (item == null)
@@ -312,9 +315,6 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             Blocker.Hide();
             blockerHidden = true;
             _ = TaskHistory(task);
-            
-            //var latest = task.RunHistory.Last();
-            //_ = TaskRun(latest);
         }
         finally
         {
@@ -335,10 +335,16 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
                 { nameof(InputTable.TableType), typeof(FileFlowsTaskRun) },
                 { nameof(InputTable.Columns) , new List<InputTableColumn>
                 {
-                    new () { Name = nameof(FileFlowsTaskRun.RunAt), Property = nameof(FileFlowsTaskRun.RunAt) },
-                    new () { Name = nameof(FileFlowsTaskRun.Success), Property = nameof(FileFlowsTaskRun.Success) },
-                    new () { Name = nameof(FileFlowsTaskRun.ReturnValue), Property = nameof(FileFlowsTaskRun.ReturnValue) }
-                }}
+                    new () { Name = lblRunAt, Property = nameof(FileFlowsTaskRun.RunAt) },
+                    new () { Name = lblSuccess, Property = nameof(FileFlowsTaskRun.Success) },
+                    new () { Name = lblReturnCode, Property = nameof(FileFlowsTaskRun.ReturnValue) }
+                }},
+                { nameof(InputTable.SelectAction), new Action<object>(item =>
+                {
+                    if (item is FileFlowsTaskRun run == false)
+                        return; // should never happen
+                    _ = TaskRun(run);
+                })}
             }
         });
         
@@ -378,8 +384,6 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             InputType = FormInputType.LogView,
             Name = nameof(fileFlowsTaskRun.Log)
         });
-
-        Logger.Instance.ILog("Log", fileFlowsTaskRun.Log);
 
         await Editor.Open(new()
         {

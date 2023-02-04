@@ -4,7 +4,7 @@ namespace FileFlows.Client;
 
 public class BackgroundTask
 {
-    private Task? _timerTask;
+    private Task _timerTask;
     private readonly PeriodicTimer _timer;
     private readonly CancellationTokenSource _cts = new();
     private Action _action;

@@ -46,7 +46,6 @@ public partial class NewFlowEditor : Editor
 
     private async Task InitTemplate(FlowTemplateModel template)
     {
-
         if (Fields?.Any() == true && template == this.CurrentTemplate)
             return;
         
@@ -176,14 +175,12 @@ public partial class NewFlowEditor : Editor
 
     private void EfTemplateOnValueChanged(object sender, object value)
     {
-        // if (InitializingTemplate)
-        //     return;
         if (value is FlowTemplateModel template)
         {
             if (template == CurrentTemplate)
                 return;
             
-            InitTemplate(template);
+            _ = InitTemplate(template);
         }
     }
 

@@ -25,13 +25,16 @@ public partial class InputTable:Input<object>
     /// </summary>
     [Parameter] public Action<object> SelectAction { get; set; }
 
-    private  Dictionary<string, PropertyInfo> Properties = new();
+    private Dictionary<string, PropertyInfo> Properties = new();
 
     /// <summary>
     /// The data rendered in the table
     /// </summary>
     private IList Data;
 
+    /// <summary>
+    /// If the table allow selection and has a select action
+    /// </summary>
     private bool AllowSelection;
 
     protected override void OnInitialized()

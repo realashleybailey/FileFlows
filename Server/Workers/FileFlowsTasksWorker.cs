@@ -148,7 +148,11 @@ public class FileFlowsTasksWorker: Worker
             Logger.Instance.ELog($"Error executing task '{task.Name}: " + result.ReturnValue + "\n" + result.Log);
         task.LastRun = DateTime.Now;
         task.RunHistory ??= new Queue<FileFlowsTaskRun>(10);
-        task.RunHistory.Enqueue(result);
+        lock (task.RunHistory)
+        {
+            task.RunHistory.Enqueue(result);
+            while (task.RunHistory.Count > 10 && task.RunHistory.TryDequeue(out _));
+        }
         await new TaskController().Update(task);
         return result;
     }

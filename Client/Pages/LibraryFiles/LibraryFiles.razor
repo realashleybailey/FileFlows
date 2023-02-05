@@ -33,39 +33,21 @@
            >
     <ToolBar>
         <FlowTableButton Clicked=Edit SelectedOne="true" Icon="fas fa-file" Label="Labels.View" />
-        @if (Skybox?.SelectedItem?.Value == FileStatus.Duplicate)
-        {
-            <FlowTableButton Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
-        }
-        @if (SelectedStatus == FileStatus.OutOfSchedule)
-        {
-            <FlowTableButton Clicked=ForceProcessing SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
-        }
-        @if (SelectedStatus == FileStatus.Processing)
-        {
-            <FlowTableButton Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
-        }
-        else
-        {
-            <FlowTableButton Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Remove" />
-        }
-
-        @if (SelectedStatus == FileStatus.Unprocessed)
-        {
-            <FlowTableButtonSeparator />    
-            <FlowTableButton Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
-            <FlowTableButton Clicked=Rescan Icon="fas fa-search-plus" Label="Labels.Rescan" />
-        }
-        else if (SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)
-        {
-            <FlowTableButtonSeparator />    
-            <FlowTableButton Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />
-        }
-        else if (SelectedStatus == FileStatus.OnHold)
-        {
-            <FlowTableButtonSeparator />    
-            <FlowTableButton Clicked=Unhold SelectedOneOrMore="true" Icon="fas fa-running" Label="Pages.LibraryFiles.Buttons.Unhold" />
-        }
+        <FlowTableButton Visible="@(Skybox?.SelectedItem?.Value == FileStatus.Duplicate)" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
+        <FlowTableButton Visible="@(SelectedStatus == FileStatus.OutOfSchedule)" Clicked=ForceProcessing SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Process" />
+        <FlowTableButton Visible="@(SelectedStatus == FileStatus.Processing)" Clicked=Cancel SelectedOneOrMore="true" Icon="fas fa-window-close" Label="Labels.Cancel" />
+        <FlowTableButton Visible="@(SelectedStatus != FileStatus.Processing)" Clicked=Delete SelectedOneOrMore="true" Icon="fas fa-trash" Label="Labels.Remove" />
+        
+        <FlowTableButtonSeparator Visible="@(SelectedStatus == FileStatus.Unprocessed)" />    
+        <FlowTableButton Visible="@(SelectedStatus == FileStatus.Unprocessed)" Clicked=MoveToTop SelectedOneOrMore="true" Icon="far fa-caret-square-up" Label="Pages.LibraryFiles.Buttons.MoveToTop" />
+        <FlowTableButton Visible="@(SelectedStatus == FileStatus.Unprocessed)" Clicked=Rescan Icon="fas fa-search-plus" Label="Labels.Rescan" />
+        
+        <FlowTableButtonSeparator Visible="@(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)" />    
+        <FlowTableButton Visible="@(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />
+    
+        <FlowTableButtonSeparator Visible="@(SelectedStatus == FileStatus.OnHold)" />    
+        <FlowTableButton Visible=@(SelectedStatus == FileStatus.OnHold) Clicked=Unhold SelectedOneOrMore="true" Icon="fas fa-running" Label="Pages.LibraryFiles.Buttons.Unhold" />
+        
         <FlowTableButtonSeparator />    
         <FlowTableHelpButton HelpUrl="library-files" />
     </ToolBar>

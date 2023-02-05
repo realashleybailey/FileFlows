@@ -192,6 +192,10 @@ window.ff = {
         };
         document.addEventListener("keydown", window.CodeCaptureListener);
     },
+    attachEventListeners: function(csharp) {
+        window.addEventListener('blur', () => {csharp.invokeMethodAsync("EventListener", "WindowBlur")});
+        document.addEventListener('click', () => {csharp.invokeMethodAsync("EventListener", "DocumentClick")});        
+    },
     resizableEditor: function(uid) {
         let panel = document.getElementById(uid);
         if(!panel)

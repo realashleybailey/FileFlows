@@ -1,9 +1,12 @@
 ﻿@namespace FileFlows.Client.Components.Common
 
-<button class="flowtable-button" @onclick="@OnClick" disabled="@(Enabled == false)">
-    @if (string.IsNullOrEmpty(Icon) == false)
-    {
-        <span class="icon @Icon"></span>
-    }
-    @Label
-</button>
+@if (Visible)
+{
+    <button class="flowtable-button" @onclick="@OnClick" disabled="@(Enabled == false)">
+        @if (string.IsNullOrEmpty(Icon) == false)
+        {
+            <span class="icon @Icon"></span>
+        }
+        @Label
+    </button>
+}

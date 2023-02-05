@@ -44,6 +44,11 @@ public partial class FlowTableButton : ComponentBase, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets if the button is visible
+    /// </summary>
+    [Parameter] public bool Visible { get; set; } = true;
+
     [Parameter]
     public EventCallback Clicked { get; set; }
 

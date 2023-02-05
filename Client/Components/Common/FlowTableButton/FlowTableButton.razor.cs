@@ -6,35 +6,48 @@ using System.Threading.Tasks;
 
 namespace FileFlows.Client.Components.Common;
 
-
+/// <summary>
+/// A flow table button that can appear in a toolbar and/or a context menu
+/// </summary>
 public partial class FlowTableButton : ComponentBase, IDisposable
 {
+    /// <summary>
+    /// Gets or sets the flow table that this button is contained within 
+    /// </summary>
     [CascadingParameter] FlowTableBase Table { get; set; }
 
     protected string _Label = string.Empty;
-    [Parameter]
-    public string Label
+    
+    /// <summary>
+    /// Gets or sets the label for this button
+    /// </summary>
+    [Parameter] public string Label
     {
         get => _Label;
-        set
-        {
-            this._Label = Translater.TranslateIfNeeded(value ?? string.Empty);
-        }
+        set => _Label = Translater.TranslateIfNeeded(value ?? string.Empty);
     }
 
     protected string _Icon;
 
-    [Parameter]
-    public string Icon
+    /// <summary>
+    /// Gets or sets the icon for this button
+    /// </summary>
+    [Parameter] public string Icon
     {
         get => _Icon;
-        set { _Icon = value ?? string.Empty; }
+        set => _Icon = value ?? string.Empty;
     }
 
-    [Parameter]
-    public bool Disabled { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if this button is disabled
+    /// </summary>
+    [Parameter] public bool Disabled { get; set; }
 
     private bool _Enabled = true;
+    /// <summary>
+    /// Gets if this button is enabled
+    /// </summary>
     public bool Enabled
     {
         get
@@ -48,19 +61,35 @@ public partial class FlowTableButton : ComponentBase, IDisposable
     /// Gets or sets if the button is visible
     /// </summary>
     [Parameter] public bool Visible { get; set; } = true;
+    
+    /// <summary>
+    /// Gets or sets the area where this button will be shown
+    /// </summary>
+    [Parameter] public ButtonArea Area { get; set; }
 
-    [Parameter]
-    public EventCallback Clicked { get; set; }
+    /// <summary>
+    /// Gets or sets the event that is called when the button is clicked
+    /// </summary>
+    [Parameter] public EventCallback Clicked { get; set; }
 
-    [Parameter]
-    public bool SelectedOne { get; set; }
-    [Parameter]
-    public bool SelectedOneOrMore { get; set; }
+    /// <summary>
+    /// Gets or sets if this button is enabled only when one item is selected in the datalist
+    /// </summary>
+    /// 
+    [Parameter] public bool SelectedOne { get; set; }
+    /// <summary>
+    /// Gets or sets if this button is enabled only when one or more items are selected in the datalist
+    /// </summary>
+    [Parameter] public bool SelectedOneOrMore { get; set; }
 
+    /// <summary>
+    /// Clicks the button and fires then Clicked event
+    /// </summary>
     public virtual async Task OnClick()
     {
         await this.Clicked.InvokeAsync();
     }
+    
     protected override void OnInitialized()
     {
         if (this.Table != null)
@@ -87,10 +116,33 @@ public partial class FlowTableButton : ComponentBase, IDisposable
             this.StateHasChanged();
     }
 
+    /// <summary>
+    /// Disposes of the button
+    /// </summary>
     public void Dispose()
     {
         if (this.Table != null)
             this.Table.SelectionChanged -= Table_SelectionChanged;
     }
 
+}
+
+
+/// <summary>
+/// An area where a button is shown
+/// </summary>
+public enum ButtonArea
+{
+    /// <summary>
+    /// Default, shown anywhere
+    /// </summary>
+    Anywhere = 0,
+    /// <summary>
+    /// Only shown in toolbar
+    /// </summary>
+    Toolbar = 1,
+    /// <summary>
+    /// Only shown in context menu
+    /// </summary>
+    ContextMenu = 2
 }

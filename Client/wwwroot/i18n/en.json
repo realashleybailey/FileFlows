@@ -67,6 +67,8 @@
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
     "DeleteLibraryFiles": "Are you sure you want to remove the selected {count, plural, one {file} other {files}}?\n\nNote this will not delete the {count, plural, one {file} other {files}} from disk, {count, plural, one {it} other {they}} will just be removed from the FileFlows database.",
+    "DeleteLibraryFilesPhysicallySwitch": "Delete files from disk",
+    "DeleteLibraryFilesPhysicallyMessage": "Are you sure you want to delete the selected {count, plural, one {file} other {files}}?\n\nNote this will permanently delete the {count, plural, one {file} other {files}} from disk and cannot be undone.",
     "CancelItems": "Are you sure you want to cancel the selected {count, plural, one {item} other {items}}?",
     "CancelMessage": "Are you sure you want to cancel and lose any unsaved changes?",
     "Confirm": "Confirm",
@@ -185,7 +187,8 @@
     "NameRequired": "Name is required",
     "DuplicatesFound": "Duplicates found",
     "NoFlowSpecified": "No flow specified, you must select a flow to create a library",
-    "CannotDeleteInternalNode": "You cannot delete the internal processing node."
+    "CannotDeleteInternalNode": "You cannot delete the internal processing node.",
+    "NotAllFilesCouldBeDeleted": "Not all the files could be deleted.\nSee the log for more information."
   },
   "Times": {
     "Never": "Never",

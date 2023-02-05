@@ -19,6 +19,7 @@ public partial class Confirm : ComponentBase, IDisposable
     TaskCompletionSource<(bool, bool)> ShowSwitchTask;
     private bool ShowSwitch;
     private bool SwitchState;
+    private bool RequireSwitch;
 
     private string btnYesUid; 
 
@@ -65,13 +66,14 @@ public partial class Confirm : ComponentBase, IDisposable
     /// <param name="message">the message of the confirm message</param>
     /// <param name="switchMessage">message to show with an extra switch</param>
     /// <param name="switchState">the switch state</param>
+    /// <param name="requireSwitch">if the switch is required to be checked for the YES button to become enabled</param>
     /// <returns>the task to await for the confirm result</returns>
-    public static Task<(bool Confirmed, bool SwitchState)> Show(string title, string message, string switchMessage, bool switchState = false)
+    public static Task<(bool Confirmed, bool SwitchState)> Show(string title, string message, string switchMessage, bool switchState = false, bool requireSwitch = false)
     {
         if (Instance == null)
             return Task.FromResult((false, false));
 
-        return Instance.ShowInstance(title, message, switchMessage, switchState);
+        return Instance.ShowInstance(title, message, switchMessage, switchState, requireSwitch);
     }
 
     private Task<bool> ShowInstance(string title, string message)
@@ -93,7 +95,7 @@ public partial class Confirm : ComponentBase, IDisposable
         Instance.ShowTask = new TaskCompletionSource<bool>();
         return Instance.ShowTask.Task;
     }
-    private Task<(bool, bool)> ShowInstance(string title, string message, string switchMessage, bool switchState)
+    private Task<(bool, bool)> ShowInstance(string title, string message, string switchMessage, bool switchState, bool requireSwitch)
     {
         this.btnYesUid = Guid.NewGuid().ToString();
         this.focused = false;
@@ -101,6 +103,7 @@ public partial class Confirm : ComponentBase, IDisposable
         this.Message = Translater.TranslateIfNeeded(message ?? "");
         this.SwitchMessage = Translater.TranslateIfNeeded(switchMessage ?? "");
         this.ShowSwitch = true;
+        this.RequireSwitch = requireSwitch;
         this.SwitchState = switchState;
         this.Visible = true;
         this.StateHasChanged();

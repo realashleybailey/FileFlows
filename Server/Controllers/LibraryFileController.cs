@@ -1,13 +1,11 @@
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Mvc;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
-using FileFlows.Plugin;
 using FileFlows.Server.Helpers.ModelHelpers;
 using FileFlows.Server.Services;
-using FileFlows.Shared.Formatters;
 using FileFlows.ServerShared.Models;
 using FileFlows.Shared.Helpers;
-using NPoco;
 
 namespace FileFlows.Server.Controllers;
 
@@ -17,7 +15,6 @@ namespace FileFlows.Server.Controllers;
 [Route("/api/library-file")]
 public class LibraryFileController : Controller //ControllerStore<LibraryFile>
 {
-
     private static CacheStore CacheStore = new();
 
     /// <summary>
@@ -62,41 +59,6 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
             Status = taskStatus.Result,
             LibraryFiles = LibaryFileListModelHelper.ConvertToListModel(taskFiles.Result, status, taskLibraries.Result)
         };
-            
-        // if (DbHelper.UseMemoryCache == false)
-        // {
-        //     var taskOverview = DbHelper.GetLibraryFileOverview();
-        //     var taskFiles = DbHelper.GetLibraryFiles(status, start: pageSize * page, max: pageSize);
-        //     var taskLibraries = DbHelper.Select<Library>();
-        //     Task.WaitAll(taskOverview, taskFiles, taskLibraries);
-        //
-        //     return new()
-        //     {
-        //         Status = taskOverview.Result,
-        //         LibraryFiles = ConvertToListModel(taskFiles.Result, status, taskLibraries.Result)
-        //     };
-        // }
-        
-        
-        //var allData  = await GetAllComplete(status);
-        
-        // var result = new LibraryFileDatalistModel();
-        // result.Status = GetStatusData(allData.all, allData.libraries);
-        // var libraries = await new LibraryController().GetAll();
-        // result.LibraryFiles = ConvertToListModel(allData.results, status, libraries);
-        //
-        //
-        // if (pageSize > 0)
-        // {
-        //     int startIndex = page * pageSize;
-        //     var libaryFileListModels = result.LibraryFiles.ToList();
-        //     if (libaryFileListModels.Count() < startIndex)
-        //         result.LibraryFiles = new LibaryFileListModel[] { };
-        //     else
-        //         result.LibraryFiles = libaryFileListModels.Skip(startIndex).Take(pageSize);
-        // }
-        //
-        // return result;
     }
 
     /// <summary>
@@ -115,123 +77,6 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         return await new LibraryFileService().GetAll(status, skip, top);
     }
     
-    
-    // private async Task<(IEnumerable<LibraryFile> results, IEnumerable<LibraryFile> all, Dictionary<Guid, Library> libraries)> 
-    //     GetAllComplete([FromQuery] FileStatus? status, [FromQuery] int skip = 0, [FromQuery] int top = 0)
-    // {
-    //     IEnumerable<LibraryFile> all = new LibraryFile[] { };
-    //     IEnumerable<LibraryFile> libraryFiles = new LibraryFile[] { };
-    //     Dictionary<Guid, Library> libraries = new Dictionary<Guid, Library>();
-    //     
-    //     await Task.WhenAll(new Task[]
-    //     {
-    //         Task.Run(async () => all = await base.GetDataList()),
-    //         Task.Run(async () => libraries = await new LibraryController().GetData())
-    //     });
-    //
-    //     libraryFiles = all;
-    //     
-    //     if (status != null && status != FileStatus.MissingLibrary)
-    //     {
-    //         FileStatus searchStatus =
-    //             (status.Value == FileStatus.OutOfSchedule || status.Value == FileStatus.Disabled || status.Value == FileStatus.OnHold)
-    //                 ? FileStatus.Unprocessed
-    //                 : status.Value;
-    //         libraryFiles = libraryFiles.Where(x => x.Status == searchStatus);
-    //     }
-    //     else if (status == FileStatus.MissingLibrary)
-    //     {
-    //         libraryFiles = libraryFiles.Where(x => libraries.ContainsKey(x.Library.Uid) == false);
-    //     }
-    //
-    //
-    //     if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.OnHold)
-    //     {
-    //         var filteredResults = libraryFiles
-    //             .Where(x =>
-    //             {
-    //                 // unprocessed just show the enabled libraries
-    //                 if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
-    //                     return false;
-    //                 var lib = libraries[x.Library.Uid];
-    //                 if (lib.Enabled == false)
-    //                     return false;
-    //                 if (TimeHelper.InSchedule(lib.Schedule) == false)
-    //                     return status == FileStatus.OutOfSchedule;
-    //                 if (lib.HoldMinutes != 0 && x.DateCreated > DateTime.Now.AddMinutes(-lib.HoldMinutes))                    
-    //                     return status == FileStatus.OnHold;
-    //                 return status == FileStatus.Unprocessed;
-    //             })
-    //             .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
-    //             .ThenByDescending(x =>
-    //             {
-    //                 // check the processing priority of the library
-    //                 if (x.Library != null && libraries.ContainsKey(x.Library.Uid))
-    //                 {
-    //                     return (int)libraries[x.Library.Uid].Priority;
-    //                 }
-    //
-    //                 return (int)ProcessingPriority.Normal;
-    //             })
-    //             .ThenBy(x => x.DateCreated);
-    //         return (filteredResults, all, libraries);
-    //     }
-    //
-    //     if (status == FileStatus.Disabled)
-    //     {
-    //         var filteredResults = libraryFiles
-    //             .Where(x =>
-    //             {
-    //                 // unprocessed just show the enabled libraries
-    //                 if (x.Library == null || libraries.ContainsKey(x.Library.Uid) == false)
-    //                     return false;
-    //                 var lib = libraries[x.Library.Uid];
-    //                 return lib.Enabled == false;
-    //             });
-    //         return (filteredResults, all, libraries);
-    //     }
-    //
-    //     if (status == FileStatus.Processing)
-    //         return (libraryFiles, all, libraries);;
-    //
-    //     IEnumerable<LibraryFile> results = libraryFiles.OrderByDescending(x => x.ProcessingEnded);
-    //
-    //     if (skip > 0)
-    //         results = results.Skip(skip);
-    //     if (top > 0)
-    //         results = results.Take(top);
-    //
-    //
-    //     return (results, all, libraries);
-    // }
-
-    // private async Task<IEnumerable<LibraryFile>> OrderLibraryFiles(IEnumerable<LibraryFile> libraryFiles, FileStatus status)
-    // {
-    //     Dictionary<Guid, Library> libraries = await new LibraryController().GetData();
-    //     
-    //     if (status is FileStatus.Unprocessed or FileStatus.OutOfSchedule)
-    //     {
-    //         return libraryFiles
-    //             .OrderBy(x => x.Order > 0 ? x.Order : int.MaxValue)
-    //             .ThenByDescending(x =>
-    //             {
-    //                 // check the processing priority of the library
-    //                 if (x.Library != null && libraries.ContainsKey(x.Library.Uid))
-    //                 {
-    //                     return (int)libraries[x.Library.Uid].Priority;
-    //                 }
-    //
-    //                 return (int)ProcessingPriority.Normal;
-    //             })
-    //             .ThenBy(x => x.DateCreated);
-    //     }
-    //
-    //     if (status == FileStatus.Processed)
-    //         return libraryFiles.OrderByDescending(x => x.ProcessingEnded);
-    //
-    //     return libraryFiles;
-    // }
-
     /// <summary>
     /// Get next 10 upcoming files to process
     /// </summary>
@@ -239,15 +84,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     [HttpGet("upcoming")]
     public Task<IEnumerable<LibraryFile>> Upcoming()
         => new LibraryFileService().GetAll(FileStatus.Unprocessed, rows: 10);
-        // if (DbHelper.UseMemoryCache)
-        // {
-        //     var libFiles = await GetAll(FileStatus.Unprocessed);
-        //     return libFiles.Take(10);
-        // }
-        //
-        // return await DbHelper.GetLibraryFiles(FileStatus.Unprocessed, max: 10);
     
-
     /// <summary>
     /// Gets the last 10 successfully processed files
     /// </summary>
@@ -256,18 +93,6 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     public Task<IEnumerable<LibraryFile>> RecentlyFinished() 
         => new LibraryFileService().GetAll(FileStatus.Processed, rows: 10);
         
-        // if (DbHelper.UseMemoryCache)
-        // {
-        //     var libraryFiles = await GetDataList();
-        //     return libraryFiles
-        //         .Where(x => x.Status == FileStatus.Processed)
-        //         .OrderByDescending(x => x.ProcessingEnded)
-        //         .Take(10);
-        // }
-        //
-        // return await DbHelper.GetLibraryFiles(FileStatus.Processed, max: 10);
-    
-
     /// <summary>
     /// Gets the library status overview
     /// </summary>
@@ -275,31 +100,6 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     [HttpGet("status")]
     public Task<IEnumerable<LibraryStatus>> GetStatus()
         => new LibraryFileService().GetStatus();
-    
-    // private IEnumerable<LibraryStatus> GetStatusData(IEnumerable<LibraryFile> libraryFiles, IDictionary<Guid, Library> libraries)
-    // {
-    //     var statuses = libraryFiles.Select(x =>
-    //     {
-    //         if (x.Status != FileStatus.Unprocessed)
-    //             return x.Status;
-    //         // unprocessed just show the enabled libraries
-    //         if (libraries.ContainsKey(x.Library.Uid) == false)
-    //             return FileStatus.MissingLibrary;
-    //
-    //         var lib = libraries[x.Library.Uid];
-    //         if (lib.Enabled == false)
-    //             return FileStatus.Disabled;
-    //         if (TimeHelper.InSchedule(lib.Schedule) == false)
-    //             return FileStatus.OutOfSchedule;
-    //         if (lib.HoldMinutes != 0 && x.DateCreated > DateTime.Now.AddMinutes(-lib.HoldMinutes))
-    //             return FileStatus.OnHold;
-    //         return FileStatus.Unprocessed;
-    //     });
-    //
-    //     return statuses.GroupBy(x => x)
-    //         .Select(x => new LibraryStatus { Status = x.Key, Count = x.Count() });
-    //
-    // }
 
 
     /// <summary>
@@ -485,6 +285,50 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         => new LibraryFileService().Delete(model?.Uids);
 
     /// <summary>
+    /// Delete library files from disk
+    /// </summary>
+    /// <param name="model">A reference model containing UIDs to delete</param>
+    /// <returns>an awaited task</returns>
+    [HttpDelete("delete-files")]
+    public async Task<string> DeleteFiles([FromBody] ReferenceModel<Guid> model)
+    {
+        List<Guid> deleted = new();
+        bool failed = false;
+        foreach (var uid in model.Uids)
+        {
+            var lf = await Get(uid);
+            if (System.IO.File.Exists(lf.Name) == false)
+                continue;
+            if (DeleteFile(lf.Name) == false)
+            {
+                failed = true;
+                continue;
+            }
+
+            deleted.Add(lf.Uid);
+        }
+
+        if (deleted.Any())
+            await new LibraryFileService().Delete(deleted.ToArray());
+
+        return failed ? Translater.Instant("ErrorMessages.NotAllFilesCouldBeDeleted") : string.Empty;
+
+        bool DeleteFile(string file)
+        {
+            try
+            {
+                System.IO.File.Delete(file);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.WLog("Failed to delete file: " + ex.Message);
+                return false;
+            }
+        }
+    }
+    
+    /// <summary>
     /// Reprocess library files
     /// </summary>
     /// <param name="model">A reference model containing UIDs to reprocess</param>
@@ -615,21 +459,4 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     /// <returns>the library file instance</returns>
     internal Task<LibraryFile> GetCached(Guid uid)
         => new LibraryFileService().Get(uid);
-    
-    //
-    // {
-    //
-    //     throw new NotImplementedException();
-    //     // if(DbHelper.UseMemoryCache)
-    //     //     return await GetByUid(uid);
-    //     //
-    //     // // using mysql, a little more complicated
-    //     // var cached = CacheStore.Get<LibraryFile>(uid);
-    //     // if (cached == null)
-    //     // {
-    //     //     cached = await GetByUid(uid);
-    //     //     CacheStore.Store(uid, cached);
-    //     // }
-    //     // return cached;
-    // }
 }

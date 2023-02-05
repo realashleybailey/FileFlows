@@ -25,7 +25,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     private string lblMoveToTop = "";
 
     private int Count;
-    private string lblSearch;
+    private string lblSearch, lblDeleteSwitch;
 
     private string TableIdentifier => "LibraryFiles_" + this.SelectedStatus; 
 
@@ -79,6 +79,7 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
         lblFileFlowsServer = Translater.Instant("Pages.Nodes.Labels.FileFlowsServer");
         Title = lblLibraryFiles + ": " + Translater.Instant("Enums.FileStatus." + FileStatus.Unprocessed);
         this.lblSearch = Translater.Instant("Labels.Search");
+        this.lblDeleteSwitch = Translater.Instant("Labels.DeleteLibraryFilesPhysicallySwitch");
         base.OnInitialized(true);
     }
 
@@ -355,4 +356,40 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
     
     Task Search() => NavigationService.NavigateTo("/library-files/search");
 
+
+    async Task DeleteFile()
+    {
+        var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
+        if (uids.Length == 0)
+            return; // nothing to delete
+        var msg = Translater.Instant("Labels.DeleteLibraryFilesPhysicallyMessage", new { count = uids.Length });
+        if ((await Confirm.Show("Labels.Delete", msg, switchMessage: lblDeleteSwitch, switchState: false, requireSwitch:true)).Confirmed == false)
+            return; // rejected the confirm
+        
+        
+        Blocker.Show();
+        this.StateHasChanged();
+
+        try
+        {
+            var deleteResult = await HttpHelper.Delete("/api/library-file/delete-files", new ReferenceModel<Guid> { Uids = uids });
+            if (deleteResult.Success == false)
+            {
+                if(Translater.NeedsTranslating(deleteResult.Body))
+                    Toast.ShowError( Translater.Instant(deleteResult.Body));
+                else
+                    Toast.ShowError( Translater.Instant("ErrorMessages.DeleteFailed"));
+                return;
+            }
+            
+            this.Data = this.Data.Where(x => uids.Contains(x.Uid) == false).ToList();
+
+            await PostDelete();
+        }
+        finally
+        {
+            Blocker.Hide();
+            this.StateHasChanged();
+        }
+    }
 }

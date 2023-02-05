@@ -563,7 +563,7 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
 
             if (x is FlowTableButton btn)
             {
-                if (btn.Enabled != true || btn.Visible != true)
+                if (btn.Enabled != true || btn.Visible != true || btn.Area == ButtonArea.Toolbar)
                     return null;
                 return new()
                 {

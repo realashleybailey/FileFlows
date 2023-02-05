@@ -1,6 +1,6 @@
 ﻿@namespace FileFlows.Client.Components.Common
 
-@if (Visible)
+@if (Visible && Area != ButtonArea.ContextMenu)
 {
     <button class="flowtable-button" @onclick="@OnClick" disabled="@(Enabled == false)">
         @if (string.IsNullOrEmpty(Icon) == false)

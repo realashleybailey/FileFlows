@@ -354,7 +354,7 @@ public partial class Tasks: ListPage<Guid, FileFlowsTask>
             ReadOnly = true,
             Fields = fields,
             Model = new {
-                RunHistory = task.RunHistory.ToList()
+                RunHistory = task.RunHistory.OrderByDescending(x => x.RunAt).ToList()
             }
         });
         

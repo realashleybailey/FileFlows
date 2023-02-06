@@ -113,6 +113,7 @@ public class NodeManager
         WorkerManager.StartWorkers(
             flowWorker, 
             updater, 
+            new RestApiWorker(),
             new LogFileCleaner(),
             new TempFileCleaner(AppSettings.Instance.HostName), 
             new SystemStatisticsWorker(),

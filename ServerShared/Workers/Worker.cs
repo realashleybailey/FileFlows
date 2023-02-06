@@ -10,10 +10,26 @@ public abstract class Worker
     /// </summary>
     public enum ScheduleType
     {
+        /// <summary>
+        /// Runs every [Interval] seconds
+        /// </summary>
         Second,
+        /// <summary>
+        /// Runs every [Interval] minutes
+        /// </summary>
         Minute,
+        /// <summary>
+        /// Runs every [Interval] hour
+        /// </summary>
         Hourly,
-        Daily
+        /// <summary>
+        /// Runs daily
+        /// </summary>
+        Daily,
+        /// <summary>
+        /// Special case, worker only runs once on startup
+        /// </summary>
+        Startup
     }
 
     /// <summary>
@@ -94,10 +110,13 @@ public abstract class Worker
         {
         }
         finally
-        {               
-            timer.Interval = ScheduleNext() * 1_000;
-            timer.AutoReset = false;
-            timer.Start();
+        {
+            if (Schedule != ScheduleType.Startup)
+            {
+                timer.Interval = ScheduleNext() * 1_000;
+                timer.AutoReset = false;
+                timer.Start();
+            }
         }
     }
 
@@ -145,6 +164,7 @@ public abstract class Worker
             case ScheduleType.Daily: return ScheduleDaily();
             case ScheduleType.Hourly: return ScheduleHourly();
             case ScheduleType.Minute: return ScheduleMinute();
+            case ScheduleType.Startup: return 2; // 2 seconds
         }
 
         // seconds

@@ -85,6 +85,11 @@ public class FlowWorker : Worker
     public static bool HasActiveRunners => Instance?.ExecutingRunners?.Any() == true;
 
     /// <summary>
+    /// Gets the number of active runners
+    /// </summary>
+    public static int ActiveRunners => Instance?.ExecutingRunners?.Count ?? 0;
+
+    /// <summary>
     /// Executes the flow worker and start a flow runner if required
     /// </summary>
     protected override void Execute()

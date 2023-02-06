@@ -28,6 +28,12 @@ class CommandLineOptions
     /// </summary>
     [CommandLineArg("If a GUI should be hidden", "true", "no-gui")]
     public bool NoGui { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the por the REST API will be exposed on
+    /// </summary>
+    [CommandLineArg("The port the REST API will be exposed on", "5000", "api-port")]
+    public int ApiPort { get; set; }
 
     /// <summary>
     /// Gets or sets if running inside a docker container

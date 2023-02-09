@@ -26,21 +26,12 @@
             </ToolBar>
 
             <Columns>
-
                 <FlowTableColumn TItem="PluginInfoModel">
                     <Header>
                         @Globals.lblName
                     </Header>
                     <Cell Context="item">
                         <span>@item.Name</span>
-                    </Cell>
-                </FlowTableColumn>
-                <FlowTableColumn TItem="PluginInfoModel" Width="10rem" MobileWidth="0">
-                    <Header>
-                        Elements
-                    </Header>
-                    <Cell Context="item">
-                        <span>@(item.Elements?.Count ?? 0)</span>
                     </Cell>
                 </FlowTableColumn>
                 <FlowTableColumn TItem="PluginInfoModel" Width="6rem" MobileWidth="0">
@@ -79,6 +70,14 @@
                         {
                             <i class="fas fa-check"></i>
                         }
+                    </Cell>
+                </FlowTableColumn>
+                <FlowTableColumn TItem="PluginInfoModel" Width="6rem">
+                    <Header>
+                        @Globals.lblEnabled
+                    </Header>
+                    <Cell Context="item">
+                        <FlowSwitch Value="@item.Enabled" ValueChanged="@(args => { item.Enabled= args; _ = Enable(args, item); })"  />
                     </Cell>
                 </FlowTableColumn>
             </Columns>

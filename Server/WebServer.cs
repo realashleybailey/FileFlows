@@ -15,10 +15,18 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace FileFlows.Server;
+
+/// <summary>
+/// Web Server for the FileFlows Server
+/// </summary>
 public class WebServer
 {
     private static WebApplication app;
     public static int Port { get; private set; }
+    
+    /// <summary>
+    /// Stops the server
+    /// </summary>
     public static async Task Stop()
     {
         if (app == null)
@@ -26,6 +34,10 @@ public class WebServer
         await app.StopAsync();
     }
 
+    /// <summary>
+    /// Starts the server
+    /// </summary>
+    /// <param name="args">command line arguments</param>
     public static void Start(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);

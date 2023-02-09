@@ -1,16 +1,13 @@
 using FileFlows.Plugin;
-using FileFlows.ServerShared.Models;
-
-namespace FileFlows.Server.Controllers;
-
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
-using FileFlows.Shared;
 using FileFlows.Shared.Models;
 using FileFlows.Server.Workers;
 using FileFlows.Server.Helpers;
 using FileFlows.Server.Database.Managers;
 
+
+namespace FileFlows.Server.Controllers;
 /// <summary>
 /// Settings Controller
 /// </summary>
@@ -303,10 +300,15 @@ public class SettingsController : Controller
         cfg.Libraries = (await new LibraryController().GetAll()).ToList();
         cfg.PluginSettings = await new PluginController().GetAllPluginSettings();
         cfg.MaxNodes = LicenseHelper.IsLicensed() ? 250 : 30;
+        var pluginInfos = (await new PluginController().GetAll())
+            .Where(x => x.Enabled)
+            .Select(x => x.PackageName + ".ffplugin")
+            .ToArray();
         var plugins = new Dictionary<string, byte[]>();
         foreach (var file in new DirectoryInfo(DirectoryHelper.PluginsDirectory).GetFiles("*.ffplugin"))
         {
-            plugins.Add(file.Name, System.IO.File.ReadAllBytes(file.FullName));
+            if(pluginInfos.Contains(file.Name)) // only include enabled plugins
+                plugins.Add(file.Name, System.IO.File.ReadAllBytes(file.FullName));
         }
 
         cfg.Plugins = plugins;

@@ -4,13 +4,22 @@ using FileFlows.ServerShared.Workers;
 
 namespace FileFlows.Server.Workers;
 
+/// <summary>
+/// Worker to update plugins
+/// </summary>
 public class PluginUpdaterWorker : Worker
 {
+    /// <summary>
+    /// Constructs a new plugin update worker
+    /// </summary>
     public PluginUpdaterWorker() : base(ScheduleType.Daily, 5)
     {
         Trigger();
     }
 
+    /// <summary>
+    /// Executes the worker
+    /// </summary>
     protected override void Execute()
     {
         var settings = new SettingsController().Get().Result;

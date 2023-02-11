@@ -1,7 +1,6 @@
 @namespace FileFlows.Client.Pages
 @using FileFlows.Shared.Models
 @using Microsoft.AspNetCore.Components
-@using FileFlows.Client.Helpers
 @using Humanizer
 @inherits ListPage<Guid, LibaryFileListModel>
 
@@ -152,7 +151,7 @@
                 <span>@(item.Status == null ? string.Empty : Translater.Instant("Enums.FileStatus." + item.Status))</span>
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus != FileStatus.Processed || App.Instance.IsMobile)">
+        <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus == FileStatus.Processed || App.Instance.IsMobile)">
             <Header>
                 Size
             </Header>

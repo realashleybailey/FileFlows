@@ -399,9 +399,12 @@
       "Labels": {
         "FileFlowsServer": "Internal Processing Node",
         "Address": "Address",
+        "Internal": "Internal",
         "Runners": "Runners",
         "Version": "Version",
-        "DownloadNode":"Download Node"
+        "DownloadNode":"Download Node",
+        "UpgradeRequired": "Upgrade Required",
+        "UpgradeRequiredHint": "The Server and Nodes must be on the same version"
       },
       "Fields": {
         "FlowRunners": "Flow Runners",

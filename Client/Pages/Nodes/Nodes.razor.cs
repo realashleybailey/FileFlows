@@ -12,7 +12,7 @@ public partial class Nodes : ListPage<Guid, ProcessingNode>
 
     private ProcessingNode EditingItem = null;
 
-    private string lblAddress, lblRunners, lblVersion, lblDownloadNode;
+    private string lblInternal, lblAddress, lblRunners, lblVersion, lblDownloadNode, lblUpgradeRequired, lblUpgradeRequiredHint;
      
 #if(DEBUG)
     string DownlaodUrl = "http://localhost:6868/download";
@@ -22,11 +22,13 @@ public partial class Nodes : ListPage<Guid, ProcessingNode>
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        lblInternal= Translater.Instant("Pages.Nodes.Labels.Internal");
         lblAddress = Translater.Instant("Pages.Nodes.Labels.Address");
         lblRunners = Translater.Instant("Pages.Nodes.Labels.Runners");
         lblVersion = Translater.Instant("Pages.Nodes.Labels.Version");
         lblDownloadNode = Translater.Instant("Pages.Nodes.Labels.DownloadNode");
-       
+        lblUpgradeRequired = Translater.Instant("Pages.Nodes.Labels.UpgradeRequired");
+        lblUpgradeRequiredHint = Translater.Instant("Pages.Nodes.Labels.UpgradeRequiredHint");
     }
 
 

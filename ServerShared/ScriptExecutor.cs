@@ -32,6 +32,12 @@ public class ScriptExecutor:IScriptExecutor
     public string FileFlowsUrl { get; set; }
     
     /// <summary>
+    /// Gets or sets the plugin method invoker
+    /// This allows plugins to expose static functions that can be called from functions/scripts
+    /// </summary>
+    public Func<string, string, object[], object> PluginMethodInvoker { get; set; }
+    
+    /// <summary>
     /// Executes javascript
     /// </summary>
     /// <param name="execArgs">the execution arguments</param>
@@ -76,6 +82,12 @@ public class ScriptExecutor:IScriptExecutor
             executor.AdditionalArguments["Flow"] = args;
         else
             executor.AdditionalArguments.Add("Flow", args);
+
+        if (executor.AdditionalArguments.ContainsKey("PluginMethod"))
+            executor.AdditionalArguments["PluginMethod"] = PluginMethodInvoker;
+        else
+            executor.AdditionalArguments.Add("PluginMethod", PluginMethodInvoker);
+        
         executor.SharedDirectory = SharedDirectory;
         try
         {

@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
 using FileFlows.Plugin;
@@ -284,6 +285,9 @@ public class ScriptController : Controller
         };
         executor.Variables = args.Variables ?? new Dictionary<string, object>();
         executor.AdditionalArguments.Add("Flow", new NodeParameters(null, Logger.Instance, false, null));
+        executor.AdditionalArguments.Add("PluginMethod", new Func<string, string, object[], object>((plugin, method, args) =>
+            new ExpandoObject()
+        ));
         if (executor.Execute() as bool? == false)
         {
             if(error.Contains("MISSING VARIABLE:") == false) // missing variables we don't care about

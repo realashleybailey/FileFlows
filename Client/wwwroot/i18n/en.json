@@ -90,6 +90,7 @@
     "Test":"Test",
     "LogPartialNotAvailable":"Unable to find partial log for node.",
     "ViewLog":"View Log",
+    "SetStatusProcessed": "Mark as Processed",
     "ObsoleteConfirm": {
       "Title": "Obsolete Node",
       "Message": "It is recommended you switch to a different node.",
@@ -188,7 +189,8 @@
     "DuplicatesFound": "Duplicates found",
     "NoFlowSpecified": "No flow specified, you must select a flow to create a library",
     "CannotDeleteInternalNode": "You cannot delete the internal processing node.",
-    "NotAllFilesCouldBeDeleted": "Not all the files could be deleted.\nSee the log for more information."
+    "NotAllFilesCouldBeDeleted": "Not all the files could be deleted.\nSee the log for more information.",
+    "SetFileStatus": "Failed to set file status"
   },
   "Times": {
     "Never": "Never",

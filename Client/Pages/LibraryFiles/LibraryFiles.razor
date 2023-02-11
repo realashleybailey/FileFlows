@@ -46,6 +46,8 @@
         <FlowTableButtonSeparator Visible="@(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)" />    
         <FlowTableButton Visible="@(SelectedStatus == FileStatus.Processed || SelectedStatus == FileStatus.ProcessingFailed || SelectedStatus == FileStatus.MappingIssue)" Clicked=Reprocess SelectedOneOrMore="true" Icon="fas fa-redo" Label="Pages.LibraryFiles.Buttons.Reprocess" />
     
+        <FlowTableButton Visible="@(SelectedStatus != FileStatus.Processing && SelectedStatus != FileStatus.Processed)" Area="ButtonArea.ContextMenu" Clicked="(() => SetStatus(FileStatus.Processed))" SelectedOneOrMore="true" Icon="far fa-check-circle" Label="Labels.SetStatusProcessed" />
+    
         <FlowTableButtonSeparator Visible="@(SelectedStatus == FileStatus.OnHold)" />    
         <FlowTableButton Visible=@(SelectedStatus == FileStatus.OnHold) Clicked=Unhold SelectedOneOrMore="true" Icon="fas fa-running" Label="Pages.LibraryFiles.Buttons.Unhold" />
         

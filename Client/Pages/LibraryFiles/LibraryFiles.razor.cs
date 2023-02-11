@@ -392,4 +392,33 @@ public partial class LibraryFiles : ListPage<Guid, LibaryFileListModel>
             this.StateHasChanged();
         }
     }
+
+    async Task SetStatus(FileStatus status)
+    {
+        var uids = Table.GetSelected()?.Select(x => x.Uid)?.ToArray() ?? new Guid[] { };
+        if (uids.Length == 0)
+            return; // nothing to mark
+        
+        Blocker.Show();
+        this.StateHasChanged();
+
+        try
+        {
+            var apiResult = await HttpHelper.Post($"/api/library-file/set-status/{status}", new ReferenceModel<Guid> { Uids = uids });
+            if (apiResult.Success == false)
+            {
+                if(Translater.NeedsTranslating(apiResult.Body))
+                    Toast.ShowError( Translater.Instant(apiResult.Body));
+                else
+                    Toast.ShowError( Translater.Instant("ErrorMessages.SetFileStatus"));
+                return;
+            }
+            await Refresh();
+        }
+        finally
+        {
+            Blocker.Hide();
+            this.StateHasChanged();
+        }
+    }
 }

@@ -554,6 +554,20 @@ public partial class LibraryFileService : ILibraryFileService
     }
     
     /// <summary>
+    /// Force processing of files
+    /// Used to force files that are currently out of schedule to be processed
+    /// </summary>
+    /// <param name="uids">the UIDs to force processed</param>
+    /// <returns>an awaited task</returns>
+    public async Task SetStatus(FileStatus status, Guid[] uids)
+    {
+        if (uids?.Any() != true)
+            return;
+        string inStr = string.Join(",", uids.Select(x => $"'{x}'"));
+        await Database_Execute($"update LibraryFile set Status = {((int)status)} where Uid in ({inStr})");
+    }
+    
+    /// <summary>
     /// Resets any currently processing library files 
     /// This will happen if a server or node is reset
     /// </summary>
@@ -750,8 +764,6 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
 
         return await Database_Fetch<LibraryFileProcessingTime>(sql);
     }
-
-    
 
     /// <summary>
     /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values

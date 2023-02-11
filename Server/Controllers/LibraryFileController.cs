@@ -356,7 +356,19 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
     [HttpPost("force-processing")]
     public Task ForceProcessing([FromBody] ReferenceModel<Guid> model)
         => new LibraryFileService().ForceProcessing(model?.Uids ?? new Guid[]{});
-    
+
+
+    /// <summary>
+    /// Sets the status of files
+    /// </summary>
+    /// <param name="status">the status to set to</param>
+    /// <param name="model">the items to set the status on</param>
+    /// <returns>an awaited task</returns>
+    [HttpPost("set-status/{status}")]
+    public Task SetStatus([FromRoute] FileStatus status, [FromBody] ReferenceModel<Guid> model)
+        => new LibraryFileService().SetStatus(status, model?.Uids ?? new Guid[]{});
+
+
 
     /// <summary>
     /// Gets the shrinkage data for a bar chart

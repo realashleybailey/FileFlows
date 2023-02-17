@@ -10,6 +10,11 @@ namespace FileFlows.Client
     public partial class App : ComponentBase
     {
         public static App Instance { get; private set; }
+        
+        public delegate void DocumentClickDelegate();
+        public event DocumentClickDelegate OnDocumentClick;
+        public delegate void WindowBlurDelegate();
+        public event WindowBlurDelegate OnWindowBlur;
 
         [Inject] public HttpClient Client { get; set; }
         [Inject] public IJSRuntime jsRuntime { get; set; }
@@ -93,7 +98,8 @@ namespace FileFlows.Client
             DisplayWidth = dimensions.width;
             DisplayHeight = dimensions.height;
             var dotNetObjRef = DotNetObjectReference.Create(this);
-            jsRuntime.InvokeVoidAsync("ff.onEscapeListener", new object[] { dotNetObjRef });
+            _ = jsRuntime.InvokeVoidAsync("ff.onEscapeListener", new object[] { dotNetObjRef });
+            _ = jsRuntime.InvokeVoidAsync("ff.attachEventListeners", new object[] { dotNetObjRef });
 
 #if (DEMO)
             Settings = new FileFlows.Shared.Models.Settings
@@ -110,6 +116,19 @@ namespace FileFlows.Client
         }
 
         record Dimensions(int width, int height);
+
+        /// <summary>
+        /// Method called by javascript for events we listen for
+        /// </summary>
+        /// <param name="eventName">the name of the event</param>
+        [JSInvokable]
+        public void EventListener(string eventName)
+        {
+            if(eventName == "WindowBlur")
+                OnWindowBlur?.Invoke();
+            else if(eventName == "DocumentClick")
+                OnDocumentClick?.Invoke(); ;
+        }
 
         /// <summary>
         /// Escape was pushed

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace FileFlows.Client.Components.Common;
 public abstract class FlowTableBase: ComponentBase
 {
     protected List<FlowTableButton> Buttons = new();
+    protected List<object> ToolbarItems = new();
     public delegate void SelectionChangedEvent(List<object> items);
     public event SelectionChangedEvent SelectionChanged;
     
@@ -28,12 +30,16 @@ public abstract class FlowTableBase: ComponentBase
     {
         if (Buttons.Contains(button) == false)
             Buttons.Add(button);
+        if (ToolbarItems.Contains(button) == false)
+            ToolbarItems.Add(button);
     }
 
-    internal void AddButtonSeperator()
+    internal void AddButtonSeperator(FlowTableButtonSeparator separator)
     {
         Logger.Instance.ILog("Adding button separator");
         Buttons.Add(null);
+        if (ToolbarItems.Contains(separator) == false)
+            ToolbarItems.Add(separator);
     }
     protected void NotifySelectionChanged(List<object> selectedItems)
     {
@@ -45,13 +51,14 @@ public abstract class FlowTableBase: ComponentBase
 
 public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropertyChanged
 {
+    
+    private FlowContextMenu TableContextMenu { get; set; }
+    
     private readonly string Uid = Guid.NewGuid().ToString();
     private readonly string ContextMenuUid = "ctxMenu-" + Guid.NewGuid();
     private Dictionary<TItem, string> DataDictionary;
     private List<TItem> _Data;
     private string lblResetLayout;
-
-    private ContextMenu ContextMenu;
 
     [Inject] private IBlazorContextMenuService ContextMenuService { get; set; }
 
@@ -537,6 +544,54 @@ public partial class FlowTable<TItem>: FlowTableBase,IDisposable, INotifyPropert
     private async Task ContextButton(FlowTableButton btn)
     {
         _ = btn.OnClick();
+    }
+
+    private void ContextMenuPreShow()
+    {
+        Logger.Instance.ILog("In flowtable context menu preshow!");
+        var items = this.ToolbarItems?.Select(x =>
+        {
+            if (x is FlowTableButtonSeparator separtor)
+            {
+                if (separtor.Visible == false)
+                    return null;
+                return new FlowContextMenuItem()
+                {
+                    Separator = true
+                };
+            }
+
+            if (x is FlowTableButton btn)
+            {
+                if (btn.Enabled != true || btn.Visible != true || btn.Area == ButtonArea.Toolbar)
+                    return null;
+                return new()
+                {
+                    Label = btn.Label,
+                    Icon = btn.Icon,
+                    IsHelpButton = btn is FlowTableHelpButton,
+                    OnClick = () => { _ = btn.OnClick(); }
+                };
+            }
+
+            return null;
+        }).Where(x => x != null).ToList();
+
+        if (items?.Any() == true)
+        {
+            FlowContextMenuItem reset = new()
+            {
+                Icon = "icon fas fa-table",
+                Label = lblResetLayout,
+                OnClick = () => ResetLayout()
+            };
+            if (items.Last().IsHelpButton)
+                items.Insert(items.Count - 1, reset);
+            else
+                items.Add(reset);
+        }
+
+        TableContextMenu.SetItems(items);
     }
 }
 public enum SelectionMode

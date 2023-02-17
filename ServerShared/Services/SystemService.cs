@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using FileFlows.ServerShared.Models;
 
@@ -74,7 +75,7 @@ public class SystemService : Service, ISystemService
     {
         try
         {
-            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/system/version");
+            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/system/version?version={Globals.Version}&system={GetSystem()}");
             if (result.Success == false)
                 throw new Exception("Failed to get version: " + result.Body);
             return Version.Parse(result.Data);
@@ -94,7 +95,7 @@ public class SystemService : Service, ISystemService
     {
         try
         {
-            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/system/node-update-version");
+            var result = await HttpHelper.Get<string>($"{ServiceBaseUrl}/api/system/node-update-version?version={Globals.Version}&system={GetSystem()}");
             if (result.Success == false)
                 throw new Exception("Failed to get node update version: " + result.Body);
             if (string.IsNullOrWhiteSpace(result.Data))
@@ -108,6 +109,13 @@ public class SystemService : Service, ISystemService
         }
     }
 
+    string GetSystem() =>
+        Globals.IsDocker ? "docker" :
+        Globals.IsWindows ? "windows" :
+        Globals.IsLinux ? "linux" :
+        Globals.IsMac ? "macos" :
+        "unknown";
+
     /// <summary>
     /// Gets the node updater binary
     /// </summary>
@@ -116,7 +124,7 @@ public class SystemService : Service, ISystemService
     {
         try
         {
-            var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/system/node-updater");
+            var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/system/node-updater?version={Globals.Version}&system={GetSystem()}");
             if (result.Success == false)
                 throw new Exception("Failed to get update: " + result.Body);
             return result.Data;
@@ -138,7 +146,7 @@ public class SystemService : Service, ISystemService
         try
         {
             bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/system/node-updater-available?version={version}&windows={windows}");
+            var result = await HttpHelper.Get<byte[]>($"{ServiceBaseUrl}/api/system/node-updater-available?version={version}&system={GetSystem()}&windows={windows}");
             if (result.Success == false)
                 throw new Exception("Failed to get update: " + result.Body);
             return result.Data;

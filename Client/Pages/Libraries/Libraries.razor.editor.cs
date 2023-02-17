@@ -30,7 +30,8 @@ public partial class Libraries : ListPage<Guid, Library>
         tabs.Add("Advanced", TabAdvanced(library));
         var result = await Editor.Open(new()
         {
-            TypeName = "Pages.Library", Title = "Pages.Library.Title", Model = library, SaveCallback = Save, Tabs = tabs
+            TypeName = "Pages.Library", Title = "Pages.Library.Title", Model = library, SaveCallback = Save, Tabs = tabs,
+            HelpUrl = "https://docs.fileflows.com/libraries"
         });
         if (efTemplate != null)
         {
@@ -161,10 +162,11 @@ public partial class Libraries : ListPage<Guid, Library>
                     { "AllowClear", false },
                     { "Options", new List<ListOption> {
                         new () { Value = ProcessingOrder.AsFound, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.AsFound)}" },
+                        new () { Value = ProcessingOrder.SmallestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.SmallestFirst)}" },
                         new () { Value = ProcessingOrder.LargestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.LargestFirst)}" },
                         new () { Value = ProcessingOrder.NewestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.NewestFirst)}" },
+                        new () { Value = ProcessingOrder.OldestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.OldestFirst)}" },
                         new () { Value = ProcessingOrder.Random, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.Random)}" },
-                        new () { Value = ProcessingOrder.SmallestFirst, Label = $"Enums.{nameof(ProcessingOrder)}.{nameof(ProcessingOrder.SmallestFirst)}" },
                     } }
                 }
             });
@@ -238,19 +240,29 @@ public partial class Libraries : ListPage<Guid, Library>
             }
             
         });
-        fields.Add(new ElementField
-        {
-            InputType = FormInputType.Switch,
-            Name = nameof(library.ReprocessRecreatedFiles)
-        });
-        fields.Add(new ElementField
+        var efFingerprinting = new ElementField
         {
             InputType = FormInputType.Switch,
             Name = nameof(library.UseFingerprinting),
             Conditions = new List<Condition>
             {
-                new (efFolders, library.Folders, value: false)
+                new(efFolders, library.Folders, value: false)
             }
+        };
+        fields.Add(efFingerprinting);
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.UpdateMovedFiles),
+            DisabledConditions = new List<Condition>
+            {
+                new (efFingerprinting, library.UseFingerprinting, value: true)
+            }
+        });
+        fields.Add(new ElementField
+        {
+            InputType = FormInputType.Switch,
+            Name = nameof(library.ReprocessRecreatedFiles)
         });
         fields.Add(new ElementField
         {

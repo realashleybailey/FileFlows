@@ -10,10 +10,26 @@ public abstract class Worker
     /// </summary>
     public enum ScheduleType
     {
+        /// <summary>
+        /// Runs every [Interval] seconds
+        /// </summary>
         Second,
+        /// <summary>
+        /// Runs every [Interval] minutes
+        /// </summary>
         Minute,
+        /// <summary>
+        /// Runs every [Interval] hour
+        /// </summary>
         Hourly,
-        Daily
+        /// <summary>
+        /// Runs daily
+        /// </summary>
+        Daily,
+        /// <summary>
+        /// Special case, worker only runs once on startup
+        /// </summary>
+        Startup
     }
 
     /// <summary>
@@ -94,35 +110,47 @@ public abstract class Worker
         {
         }
         finally
-        {               
-            timer.Interval = ScheduleNext() * 1_000;
-            timer.AutoReset = false;
-            timer.Start();
+        {
+            if (Schedule != ScheduleType.Startup)
+            {
+                timer.Interval = ScheduleNext() * 1_000;
+                timer.AutoReset = false;
+                timer.Start();
+            }
         }
     }
 
     public void Trigger()
     {
-        if (Executing)
-            return; // dont let run twice
-        Logger.Instance.ILog("Triggering worker: " + this.GetType().Name);
-
-        _ = Task.Run(() =>
+        try
         {
-            Executing = true;
-            try
+            if (Executing)
+                return; // dont let run twice
+            Logger.Instance.ILog("Triggering worker: " + this.GetType().Name);
+
+            _ = Task.Run(() =>
             {
-                Execute();
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance?.ELog($"Error in worker '{this.GetType().Name}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
-            }
-            finally
-            {
-                Executing = false;
-            }
-        });
+                Executing = true;
+                try
+                {
+                    Execute();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance?.ELog(
+                        $"Error in worker '{this.GetType().Name}': {ex.Message}{Environment.NewLine}{ex.StackTrace}");
+                }
+                finally
+                {
+                    Executing = false;
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            // FF-410 - catch any errors to avoid this call killing the application
+            Logger.Instance.WLog($"Error triggering worker '{this.GetType().Name}': " + ex.Message);
+        }
     }
 
     protected virtual void Execute()
@@ -136,6 +164,7 @@ public abstract class Worker
             case ScheduleType.Daily: return ScheduleDaily();
             case ScheduleType.Hourly: return ScheduleHourly();
             case ScheduleType.Minute: return ScheduleMinute();
+            case ScheduleType.Startup: return 2; // 2 seconds
         }
 
         // seconds

@@ -47,6 +47,8 @@ public class Program
         }
         Globals.IsDocker = options.Docker;
         Globals.IsSystemd = options.IsSystemd;
+        if (options.ApiPort > 0 && options.ApiPort < 65535)
+            Workers.RestApiWorker.Port = options.ApiPort;
         
         Console.WriteLine("BaseDirectory: " + DirectoryHelper.BaseDirectory);
         

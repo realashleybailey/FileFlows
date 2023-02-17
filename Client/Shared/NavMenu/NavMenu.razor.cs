@@ -145,7 +145,7 @@ public partial class NavMenu : IDisposable
         this.StateHasChanged();
     }
 
-    private string? GetStepLabel(NavMenuItem nmi)
+    private string GetStepLabel(NavMenuItem nmi)
     {
         if (nmi == Active)
             return null;

@@ -6,25 +6,26 @@ namespace FileFlows.Client.Components.Inputs;
 /// <summary>
 /// Input for a file size
 /// </summary>
-public partial class InputFileSize : Input<int>
+public partial class InputFileSize : Input<long>
 {
     public override bool Focus() => FocusUid();
 
     private bool UpdatingValue = false;
 
-    private int Unit { get; set; }
+    private long Unit { get; set; }
 
-    private int Number { get; set; }
+    private long Number { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        this.Unit = 1440;
+        this.Unit = 1000;
+        Logger.Instance.ILog("Start value: ", this.Value);
 
         if (Value > 0)
         {
-            foreach (int p in new [] { 1000000000, 1000000, 1000, 1})
+            foreach (long p in new [] { 1000000000, 1000000, 1000, 1})
             {
                 if (Value % p == 0)
                 {
@@ -42,7 +43,6 @@ public partial class InputFileSize : Input<int>
             Value = Number * Unit;
         }
     }
-    
 
     private async Task ChangeValue(ChangeEventArgs e)
     {

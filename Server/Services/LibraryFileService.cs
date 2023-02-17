@@ -4,7 +4,6 @@ using FileFlows.ServerShared.Models;
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Services;
 using FileFlows.ServerShared.Workers;
-using FileFlows.Shared.Json;
 using FileFlows.Shared.Models;
 
 namespace FileFlows.Server.Services;
@@ -115,10 +114,21 @@ public partial class LibraryFileService : ILibraryFileService
                 return nodeLibraries.Contains(x.Uid);
             return nodeLibraries.Contains(x.Uid) == false;
         }).ToArray();
-        if (canProcess.Any() != true)
+        
+        var canForceProcess = libraries.Where(x =>
+        {
+            if (node.AllLibraries == ProcessingLibraries.All)
+                return true;
+            if (node.AllLibraries == ProcessingLibraries.Only)
+                return nodeLibraries.Contains(x.Uid);
+            return nodeLibraries.Contains(x.Uid) == false;
+        }).ToArray();
+        
+        if (canProcess.Any() != true && canForceProcess.Any() != true)
             return null;
 
         string libraryUids = string.Join(",", canProcess.Select(x => "'" + x.Uid + "'"));
+        string forceLibraryUids  = string.Join(",", canForceProcess.Select(x => "'" + x.Uid + "'"));
         
         await GetNextSemaphore.WaitAsync();
         try
@@ -127,11 +137,19 @@ public partial class LibraryFileService : ILibraryFileService
             var execAndWhere = executing?.Any() != true
                 ? string.Empty
                 : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => "'" + x + "'")) + ") ");
-            
-            string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
-                         $" and LibraryUid in ({libraryUids}) " + execAndWhere +
-                         " order by " + UNPROCESSED_ORDER_BY;
 
+            if (node.MaxFileSizeMb > 0)
+                execAndWhere += $" and OriginalSize <= {node.MaxFileSizeMb * (1_000_000)} ";
+
+            string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " +
+                         SqlHelper.Now() + " and (";
+
+            if (canProcess.Any())
+                sql += $" LibraryUId in ({libraryUids}) or ";
+
+            sql += $" ( LibraryUid in ({forceLibraryUids}) and (Flags & 1) = 1 )";
+
+            sql += ") " + execAndWhere + " order by " + UNPROCESSED_ORDER_BY;
 
             var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
             if (libFile == null)
@@ -154,6 +172,8 @@ public partial class LibraryFileService : ILibraryFileService
                     sql += " OriginalSize ";
                 else if (library.ProcessingOrder == ProcessingOrder.NewestFirst)
                     sql += " LibraryFile.DateCreated desc ";
+                else if (library.ProcessingOrder == ProcessingOrder.OldestFirst)
+                    sql += " LibraryFile.DateCreated asc ";
                 else
                     orderGood = false;
 
@@ -250,6 +270,8 @@ public partial class LibraryFileService : ILibraryFileService
         file.ExecutedNodes ??= new ();
         file.OriginalMetadata ??= new ();
         file.FinalMetadata ??= new ();
+        if (file.Status == FileStatus.Processed || file.Status == FileStatus.ProcessingFailed)
+            file.Flags = LibraryFileFlags.None;
         await Database_Update(file);
         return file;
     }
@@ -273,6 +295,7 @@ public partial class LibraryFileService : ILibraryFileService
                      $" ProcessingStarted = @0, " +
                      $" ProcessingEnded = @1, " + 
                      $" ExecutedNodes = @2 " +
+                     (file.Status != FileStatus.Processing ? ", Flags = 0 " : string.Empty) + // clear flags on processed files
                      $" where Uid = '{file.Uid}'";
         
         string executedJson = file.ExecutedNodes?.Any() != true
@@ -383,9 +406,22 @@ public partial class LibraryFileService : ILibraryFileService
             }
             
             // add out of schedule condition
-            if(string.IsNullOrEmpty(outOfSchedule) == false)
-                sql += $" and LibraryUid {(status == FileStatus.OutOfSchedule ? "" : "not")} in ({outOfSchedule})";
-            
+            if (string.IsNullOrEmpty(outOfSchedule) == false)
+            {
+                if (status == FileStatus.OutOfSchedule)
+                {
+                    sql +=
+                        $" and LibraryUid in ({outOfSchedule}) " +
+                        $" and ((Flags & {(int)LibraryFileFlags.ForceProcessing}) <> {(int)LibraryFileFlags.ForceProcessing}) ";
+                }
+                else
+                {
+                    sql +=
+                        $" and ( LibraryUid not in ({outOfSchedule}) " +
+                        $" or ((Flags & {(int)LibraryFileFlags.ForceProcessing}) = {(int)LibraryFileFlags.ForceProcessing}) )";
+                }
+            }
+
             if (status == FileStatus.OutOfSchedule)
             {
                 if (string.IsNullOrEmpty(outOfSchedule))
@@ -504,6 +540,34 @@ public partial class LibraryFileService : ILibraryFileService
     }
     
     /// <summary>
+    /// Force processing of files
+    /// Used to force files that are currently out of schedule to be processed
+    /// </summary>
+    /// <param name="uids">the UIDs to force processed</param>
+    /// <returns>an awaited task</returns>
+    public async Task ForceProcessing(Guid[] uids)
+    {
+        if (uids?.Any() != true)
+            return;
+        string inStr = string.Join(",", uids.Select(x => $"'{x}'"));
+        await Database_Execute($"update LibraryFile set Flags = Flags | {((int)LibraryFileFlags.ForceProcessing)} where Uid in ({inStr})");
+    }
+    
+    /// <summary>
+    /// Force processing of files
+    /// Used to force files that are currently out of schedule to be processed
+    /// </summary>
+    /// <param name="uids">the UIDs to force processed</param>
+    /// <returns>an awaited task</returns>
+    public async Task SetStatus(FileStatus status, Guid[] uids)
+    {
+        if (uids?.Any() != true)
+            return;
+        string inStr = string.Join(",", uids.Select(x => $"'{x}'"));
+        await Database_Execute($"update LibraryFile set Status = {((int)status)} where Uid in ({inStr})");
+    }
+    
+    /// <summary>
     /// Resets any currently processing library files 
     /// This will happen if a server or node is reset
     /// </summary>
@@ -537,14 +601,14 @@ public partial class LibraryFileService : ILibraryFileService
     /// </summary>
     /// <param name="includeOutput">if output names should be included</param>
     /// <returns>a list of all filenames</returns>
-    public async Task<Dictionary<string, DateTime>> GetKnownLibraryFilesWithCreationTimes(bool includeOutput = false)
+    public async Task<Dictionary<string, (DateTime CreationTime, DateTime LastWriteTime)>> GetKnownLibraryFilesWithCreationTimes(bool includeOutput = false)
     {
-        var list = await Database_Fetch<(string, DateTime)>("select Name, CreationTime from LibraryFile");
+        var list = await Database_Fetch<(string, DateTime, DateTime)>("select Name, CreationTime, LastWriteTime from LibraryFile");
         if (includeOutput == false)
-            return list.DistinctBy(x => x.Item1.ToLowerInvariant()).ToDictionary(x => x.Item1.ToLowerInvariant(), x => x.Item2);
-        var outputs = await Database_Fetch<(string, DateTime)>("select OutputPath, CreationTime from LibraryFile");
+            return list.DistinctBy(x => x.Item1.ToLowerInvariant()).ToDictionary(x => x.Item1.ToLowerInvariant(), x => (x.Item2, x.Item3));
+        var outputs = await Database_Fetch<(string, DateTime, DateTime)>("select OutputPath, CreationTime, LastWriteTime from LibraryFile");
         return list.Union(outputs).Where(x => string.IsNullOrEmpty(x.Item1) == false).DistinctBy(x => x.Item1.ToLowerInvariant())
-            .ToDictionary(x => x.Item1.ToLowerInvariant(), x => x.Item2);
+            .ToDictionary(x => x.Item1.ToLowerInvariant(), x => (x.Item2, x.Item3));
     }
 
     /// <summary>
@@ -565,9 +629,16 @@ public partial class LibraryFileService : ILibraryFileService
         case 
             when LibraryFile.Status > 0 then LibraryFile.Status " + "\n";
         if (string.IsNullOrEmpty(disabled) == false)
+        {
             sql += $" when LibraryFile.Status = 0 and LibraryUid IN ({disabled}) then -2 " + "\n";
+        }
+
         if (string.IsNullOrEmpty(outOfSchedule) == false)
-            sql += $" when LibraryFile.Status = 0 and LibraryUid IN ({outOfSchedule}) then -1 " + "\n";
+        {
+            string flags = $"(Flags & {(int)LibraryFileFlags.ForceProcessing}) <> {(int)LibraryFileFlags.ForceProcessing}";
+            sql += $" when LibraryFile.Status = 0 and LibraryUid IN ({outOfSchedule}) and ({flags}) then -1 " + "\n";
+        }
+
         sql += $@"when HoldUntil > {SqlHelper.Now()} then -3
         else LibraryFile.Status
         end as FileStatus,
@@ -587,9 +658,7 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="uid">The UID of the file</param>
     /// <returns>the current status of the rfile</returns>
     public async Task<FileStatus> GetFileStatus(Guid uid)
-    {
-        return (FileStatus)await Database_ExecuteScalar<int>($"select Status from LibraryFile where Uid = '{uid}'");
-    }
+        => (FileStatus)await Database_ExecuteScalar<int>($"select Status from LibraryFile where Uid = '{uid}'");
 
     /// <summary>
     /// Moves the passed in UIDs to the top of the processing order
@@ -696,8 +765,6 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
         return await Database_Fetch<LibraryFileProcessingTime>(sql);
     }
 
-    
-
     /// <summary>
     /// Gets data for a days/hours heatmap.  Where the list is the days, and the dictionary is the hours with the count as the values
     /// </summary>
@@ -756,4 +823,15 @@ where Status = 1 and ProcessingEnded > ProcessingStarted;";
         Logger.Instance.ILog("Aborting file: " + uid);
         await Database_Execute($"update LibraryFile set Status = {((int)FileStatus.ProcessingFailed)} where Uid = '{uid}'");
     }
+
+    /// <summary>
+    /// Updates a moved file in the database
+    /// </summary>
+    /// <param name="file">the file to update</param>
+    public async Task UpdateMovedFile(LibraryFile file)
+        => Database_Execute(
+            $"update LibraryFile set Name = @0, RelativePath = @1, OutputPath = @2, CreationTime = @3, LastWriteTime = @4 where Uid = @5",
+            file.Name, file.RelativePath, file.OutputPath, 
+            file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"), file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"), 
+            file.Uid);
 }

@@ -1,12 +1,10 @@
 ﻿using FileFlows.Server.Helpers;
 using FileFlows.Shared.Formatters;
-
-namespace FileFlows.Server.Workers;
-
 using FileFlows.Server.Controllers;
 using FileFlows.ServerShared.Workers;
-using FileFlows.Shared;
 using FileFlows.Shared.Helpers;
+
+namespace FileFlows.Server.Workers;
 
 /// <summary>
 /// A worker that automatically updates FileFlows
@@ -54,6 +52,9 @@ public class ServerUpdater : UpdaterWorker
         base.Initialize(schedule, interval);
     }
 
+    /// <summary>
+    /// Quits the FileFlows server application
+    /// </summary>
     protected override void QuitApplication()
     {
         Logger.Instance.ILog($"{nameof(ServerUpdater)} - Exiting Application to run update");
@@ -62,29 +63,48 @@ public class ServerUpdater : UpdaterWorker
         Environment.Exit(Globals.IsSystemd ? 0 : 99);  
     }
     
+    /// <summary>
+    /// Gets if auto updates are enabled
+    /// </summary>
+    /// <returns>if auto updates are enabled</returns>
     protected override bool GetAutoUpdatesEnabled()
     {
         var settings = new SettingsController().Get().Result;
         return settings?.AutoUpdate == true;
     }
 
+    /// <summary>
+    /// Checks if an update can run now, ie if no flow runners are processing
+    /// </summary>
+    /// <returns>if an update can run now</returns>
     protected override bool CanUpdate()
     {
         var workers = new WorkerController(null).GetAll().Result;
         return workers?.Any() != true;
     }
 
+    /// <summary>
+    /// Prepares the application for shutdown, ie stops all workers
+    /// </summary>
     protected override void PrepareApplicationShutdown()
     {
         WorkerManager.StopWorkers();
     }
 
+    /// <summary>
+    /// Runs any pre update scripts
+    /// </summary>
+    /// <param name="updateScript">a script to run</param>
     protected override void PreRunUpdateScript(string updateScript)
     {
         if(DownloadedVersion != null)
             SystemEvents.TriggerServerUpdating(DownloadedVersion.ToString());
     }
 
+    /// <summary>
+    /// Gets if an update is available
+    /// </summary>
+    /// <returns>true if an update is available</returns>
     protected override bool GetUpdateAvailable()
     {
         var result = GetLatestOnlineVersion();
@@ -99,6 +119,10 @@ public class ServerUpdater : UpdaterWorker
         return result.updateAvailable;
     }
 
+    /// <summary>
+    /// Downloads the binary update
+    /// </summary>
+    /// <returns>the location of the saved binary file</returns>
     protected override string DownloadUpdateBinary()
     {
         var result = GetLatestOnlineVersion();
@@ -146,7 +170,15 @@ public class ServerUpdater : UpdaterWorker
     {
         try
         {
-            string url = UpdateUrl + "/latest-version";
+            string url = UpdateUrl + $"/latest-version?version={Globals.Version}&platform=";
+            if (Globals.IsDocker)
+                url += "docker";
+            else if (OperatingSystem.IsWindows())
+                url += "windows";
+            else if (OperatingSystem.IsLinux())
+                url += "linux";
+            else if (OperatingSystem.IsMacOS())
+                url += "macos";
             var result = HttpHelper.Get<string>(url, noLog: true).Result;
             if (result.Success == false)
             {

@@ -19,8 +19,10 @@ public class TelemetryReporter: Worker
     {
         if (Environment.GetEnvironmentVariable("DevBox") == "1")
             return;
+        try
+        {
 #if (DEBUG)
-        return;
+            return;
 #else
         var settings = new SettingsController().Get().Result;
         if (settings?.DisableTelemetry == true)
@@ -99,6 +101,11 @@ public class TelemetryReporter: Worker
         task.Wait();
 
 #endif
+        }
+        catch (Exception)
+        {
+            // FF-410: silent fail, may not have an internet connection
+        }
     }
 
 

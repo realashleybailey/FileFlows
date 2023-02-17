@@ -65,4 +65,13 @@ public class TaskController  : ControllerStore<FileFlowsTask>
         await DeleteAll(model);
         Workers.FileFlowsTasksWorker.ReloadTasks();
     }
+
+
+    /// <summary>
+    /// Runs a script now
+    /// </summary>
+    /// <param name="uid">the UID of the script</param>
+    [HttpPost("run/{uid}")]
+    public Task<FileFlowsTaskRun> Run([FromRoute] Guid uid)
+        => Workers.FileFlowsTasksWorker.Instance.RunByUid(uid);
 }

@@ -467,7 +467,6 @@ public class PluginController : ControllerStore<PluginInfo>
             }
         }
 
-
         var obj = await DbHelper.SingleByName<Models.PluginSettingsModel>("PluginSettings_" + packageName);
         obj ??= new Models.PluginSettingsModel();
         obj.Name = "PluginSettings_" + packageName;
@@ -477,6 +476,27 @@ public class PluginController : ControllerStore<PluginInfo>
         IncrementConfigurationRevision();
     }
 
+    
+    /// <summary>
+    /// Set state of a processing node
+    /// </summary>
+    /// <param name="uid">The UID of the processing node</param>
+    /// <param name="enable">Whether or not this node is enabled and will process files</param>
+    /// <returns>an awaited task</returns>
+    [HttpPut("state/{uid}")]
+    public async Task<PluginInfo> SetState([FromRoute] Guid uid, [FromQuery] bool? enable)
+    {
+        var node = await GetByUid(uid, useCache:true);
+        if (node == null)
+            throw new Exception("Node not found.");
+        if (enable != null)
+        {
+            node.Enabled = enable.Value;
+            await DbHelper.Update(node);
+        }
+        return await GetByUid(uid, useCache:true);;
+    }
+    
     /// <summary>
     /// Download model
     /// </summary>

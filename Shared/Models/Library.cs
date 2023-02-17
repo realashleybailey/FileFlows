@@ -169,4 +169,11 @@ public class Library : FileFlowObject
     /// Gets or sets the number of minutes to hold processing for this file
     /// </summary>
     public int HoldMinutes { get; set; }
+    
+    /// <summary>
+    /// Gets or sets if a moved/renamed files should have their database entries updated automatically
+    /// during a scan, if set a 'Duplicate' will not be created and the original file will be updated.
+    /// Note: this only happens if the original file no longer exists.  This is also is limited to files in the same library
+    /// </summary>
+    public bool UpdateMovedFiles { get; set; }
 }

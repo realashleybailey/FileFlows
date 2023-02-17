@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace FileFlows.FlowRunner;
 
 using System;
@@ -75,6 +77,8 @@ public class FlowLogger : ILogger
         this.Communicator = communicator;
     }
 
+    private StringBuilder Messages = new StringBuilder();
+
     /// <summary>
     /// Logs a message
     /// </summary>
@@ -97,15 +101,44 @@ public class FlowLogger : ILogger
             string.Join(", ", args.Select(x =>
             x == null ? "null" :
             x.GetType().IsPrimitive || x is string ? x.ToString() :
-            System.Text.Json.JsonSerializer.Serialize(x)));
+            JsonSerializer.Serialize(x)));
         log.Add(message);
         if(type != LogType.Debug)
             Console.WriteLine(message);
+
+        int count = 0;
+        lock (Messages)
+        {
+            Messages.Append(message);
+            count = Messages.Length;
+        }
+
+        if (count > 10)
+            Flush();
+    }
+
+    private SemaphoreSlim semaphore = new(1);
+    /// <summary>
+    /// Flushes any log message to the server
+    /// </summary>
+    public async Task Flush()
+    {
+        await semaphore.WaitAsync();
+        string messages;
+        lock (Messages)
+        {
+            messages = Messages.ToString();
+            Messages.Clear();
+        }
+
         try
         {
-            Communicator.LogMessage(Program.Uid, message).Wait();
+            await Communicator.LogMessage(Program.Uid, messages);
         }
-        catch (Exception) { }
+        finally
+        {
+            semaphore.Release();
+        }
     }
 
     /// <summary>

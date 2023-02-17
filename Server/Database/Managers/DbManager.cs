@@ -1009,7 +1009,39 @@ public abstract class DbManager
     /// <param name="uid">the UID of the node</param>
     /// <exception cref="NotImplementedException">not implemented yet</exception>
     public virtual Task UpdateNodeLastSeen(Guid uid)
+        => throw new NotImplementedException();
+
+
+    /// <summary>
+    /// Updates a value in the json data of a DbObject
+    /// </summary>
+    /// <param name="uid">the UID of the object</param>
+    /// <param name="property">The name of the property</param>
+    /// <param name="value">the value to update</param>
+    /// <returns>>the awaited task</returns>
+    public virtual async Task UpdateJsonProperty(Guid uid, string property, object value)
     {
-        throw new NotImplementedException();
+        using var db = await GetDb();
+        string strValue = "";
+        if (value is bool b)
+            strValue = b ? "1": "0";
+        else if (value is DateTime dt)
+            strValue = "'" + dt.ToString("yyyy-MM-ddTHH:mm:ss.ffffffzzzz") + "'";
+        else if (value is int i)
+            strValue = i.ToString();
+        else if (value is long l)
+            strValue = l.ToString();
+        else if (value is byte b2)
+            strValue = b2.ToString();
+        else if (value is short s)
+            strValue = s.ToString();
+        else if (value is double dbl)
+            strValue = dbl.ToString();
+        else
+            strValue = "'" + value.ToString().Replace("'", "''") + "'";
+        string sql =
+            $"update DbObject set Data = json_set(Data, '$.{property}', {strValue}) where Uid = '{uid}'";
+        await db.Db.ExecuteAsync(sql);
     }
+
 }

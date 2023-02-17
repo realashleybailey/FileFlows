@@ -1,0 +1,37 @@
+@namespace FileFlows.Client.Components.Common
+
+<div class="@CssClass" @oncontextmenu="@ShowContextMenu" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+    @ChildContent
+    @if (Visible)
+    {
+        <ul class="flow-contextmenu" style="left:@(xPos)px;top: @(yPos)px">
+        @{
+            bool previousSeparator = false;
+            @foreach (var item in Items)
+            {
+                if (item.Separator)
+                {
+                    // prevent two or more separators in a row
+                    if (previousSeparator == false)
+                    {
+                        <li class="separator"></li>
+                    }
+                    previousSeparator = true;
+                }
+                else
+                {
+                    previousSeparator = false;
+                    <li @onclick="() => Clicked(item)">
+                        @if (string.IsNullOrEmpty(item.Icon) == false)
+                        {
+                            <i class="icon @item.Icon"></i>
+                        }
+                        <span class="label">@item.Label</span>
+                    </li>
+                }
+            }
+        }
+        </ul>
+    }
+
+</div>

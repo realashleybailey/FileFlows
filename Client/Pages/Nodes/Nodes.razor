@@ -55,7 +55,7 @@
                             <span>@item.Address</span>
                         }else
                         {
-                            <span>Internal</span>
+                            <span>@lblInternal</span>
                         }
                     </Cell>
                 </FlowTableColumn>
@@ -71,9 +71,9 @@
                     <Header>
                     </Header>
                     <Cell Context="item">
-                        @if (Globals.Version != item.Version)
+                        @if (item.Address != FileFlowsServer && Globals.Version != item.Version)
                         {
-                            <span style="font-style: italic;color: var(--warning);" title="The Server and Nodes must be on the same version">Upgrade Required</span>
+                            <span style="font-style: italic;color: var(--warning);" title="@lblUpgradeRequiredHint">@lblUpgradeRequired</span>
                         }
                     </Cell>
                 </FlowTableColumn>

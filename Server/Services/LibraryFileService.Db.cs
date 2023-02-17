@@ -46,6 +46,7 @@ public partial class LibraryFileService
         DateTime dt = DateTime.Now;
         using (var db = await GetDbWithMappings())
         {
+            DateTime dt2 = DateTime.Now;
             try
             {
                 result = await db.Db.FirstOrDefaultAsync<T>(sql, args);
@@ -55,6 +56,7 @@ public partial class LibraryFileService
                 Logger.Instance.ELog("Failed getting SQL: " + sql + ", error: " + ex.Message);
                 return default;
             }
+            Database_Log(dt2, "get (actual): " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         }
         Database_Log(dt, "get: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
@@ -67,8 +69,10 @@ public partial class LibraryFileService
         try
         {
             using (var db = await GetDbWithMappings())
-            {
+            {        
+                DateTime dt2 = DateTime.Now;
                 results = await db.Db.FetchAsync<T>(sql, args);
+                Database_Log(dt2, "fetch (actual): " + Regex.Replace(sql, @"\s\s+", " ").Trim());
             }
         }
         finally
@@ -85,7 +89,9 @@ public partial class LibraryFileService
         int effected;
         using (var db = await GetDbWithMappings())
         {
+            DateTime dt2 = DateTime.Now;
             effected = await db.Db.ExecuteAsync(sql, args);
+            Logger.Instance.DLog($"Took '{(DateTime.Now - dt2)}' to execute (actual)[{effected}]: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         }
         Logger.Instance.DLog($"Took '{(DateTime.Now - dt)}' to execute [{effected}]: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
     }
@@ -95,7 +101,9 @@ public partial class LibraryFileService
         DateTime dt = DateTime.Now;
         using (var db = await GetDbWithMappings())
         {
+            DateTime dt2 = DateTime.Now;
             result = await db.Db.ExecuteScalarAsync<T>(sql, args);
+            Database_Log(dt2, "execute (actual): " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         }
         Database_Log(dt, "execute: " + Regex.Replace(sql, @"\s\s+", " ").Trim());
         return result;
@@ -112,7 +120,9 @@ public partial class LibraryFileService
         
         using (var db = await GetDbWithMappings())
         {
+            DateTime dt2 = DateTime.Now;
             await db.Db.UpdateAsync("LibraryFile", "Uid", o, o.Uid, LibraryFileUpdateColums);
+            Database_Log(dt2,"update object (actual)");
         }
         Database_Log(dt,"update object");
     }
@@ -123,8 +133,10 @@ public partial class LibraryFileService
         try
         {
             using (var db = await GetDbWithMappings())
-            {
+            {        
+                DateTime dt2 = DateTime.Now;
                 await db.Db.InsertAsync(o);
+                Database_Log(dt2, "insert object (actuaL)");
             }
             
             Database_Log(dt,"insert object");
@@ -142,7 +154,9 @@ public partial class LibraryFileService
         DateTime dt = DateTime.Now;
         using (var db = await GetDbWithMappings())
         {
+            DateTime dt2 = DateTime.Now;
             await db.Db.InsertBulkAsync(o.Where(x => x != null));
+            Database_Log(dt2,"insert objects (actual)");
         }
         Database_Log(dt,"insert objects");
     }

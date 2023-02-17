@@ -53,12 +53,22 @@
     "Searching": "Searching",
     "Filter": "Filter",
     "FilterPlaceholder": "Filter (/)",
+    "Run": "Run",
+    "RunHistory": "Run History",
+    "LastRun": "Last Run",
+    "Never": "Never",
+    "Trigger": "Trigger",
+    "RunAt": "Run At",
+    "Success": "Success",
+    "ReturnCode": "Return Code",
     "Log": "Log",
     "View": "View",
     "Delete": "Delete",
     "Deleting": "Deleting",
     "DeleteItems": "Are you sure you want to delete the selected {count, plural, one {item} other {items}}?",
     "DeleteLibraryFiles": "Are you sure you want to remove the selected {count, plural, one {file} other {files}}?\n\nNote this will not delete the {count, plural, one {file} other {files}} from disk, {count, plural, one {it} other {they}} will just be removed from the FileFlows database.",
+    "DeleteLibraryFilesPhysicallySwitch": "Delete files from disk",
+    "DeleteLibraryFilesPhysicallyMessage": "Are you sure you want to delete the selected {count, plural, one {file} other {files}}?\n\nNote this will permanently delete the {count, plural, one {file} other {files}} from disk and cannot be undone.",
     "CancelItems": "Are you sure you want to cancel the selected {count, plural, one {item} other {items}}?",
     "CancelMessage": "Are you sure you want to cancel and lose any unsaved changes?",
     "Confirm": "Confirm",
@@ -80,6 +90,7 @@
     "Test":"Test",
     "LogPartialNotAvailable":"Unable to find partial log for node.",
     "ViewLog":"View Log",
+    "SetStatusProcessed": "Mark as Processed",
     "ObsoleteConfirm": {
       "Title": "Obsolete Node",
       "Message": "It is recommended you switch to a different node.",
@@ -156,6 +167,7 @@
       "AsFound": "As Found (Default)",
       "LargestFirst":"Largest First",
       "NewestFirst":"Newest First",
+      "OldestFirst":"Oldest First",
       "Random":"Random",
       "SmallestFirst":"Smallest First"
     },
@@ -176,7 +188,9 @@
     "NameRequired": "Name is required",
     "DuplicatesFound": "Duplicates found",
     "NoFlowSpecified": "No flow specified, you must select a flow to create a library",
-    "CannotDeleteInternalNode": "You cannot delete the internal processing node."
+    "CannotDeleteInternalNode": "You cannot delete the internal processing node.",
+    "NotAllFilesCouldBeDeleted": "Not all the files could be deleted.\nSee the log for more information.",
+    "SetFileStatus": "Failed to set file status"
   },
   "Times": {
     "Never": "Never",
@@ -311,6 +325,8 @@
         "ScheduleDescription": "This allows you to configure when this library will be active.\n\nThe library scanner will not run against this library nor will any files be processed outside of the schedule.\n",
         "Scan": "Scan",
         "Scan-Help": "When Scan is enabled the library will be routinely scanned for new content.\nWhen disabled the library will listen for file system events to detect new files.\nIt is best to leave this off unless you are having issues with files not being detected.",
+        "UpdateMovedFiles": "Update Moved Files",
+        "UpdateMovedFiles-Help": "When enabled if a file has been detected that it has been moved within the same library, meaning the original file no longer exists and a new file is found with the same signature, then the original file will be updated to point to this new file.\nOtherwise when disabled, a duplicate will be added instead.",
         "ReprocessRecreatedFiles":"Reprocess Recreated Files",
         "ReprocessRecreatedFiles-Help":"When enabled if a file is re-detected with a different creation time than that is recorded, the file will be automatically set to reprocess.\nThis is helpful on a library of downloaded files, where you may download the same file multiple times and wish to process it each time.",
         "ProcessingOrder":"Processing Order",
@@ -383,9 +399,12 @@
       "Labels": {
         "FileFlowsServer": "Internal Processing Node",
         "Address": "Address",
+        "Internal": "Internal",
         "Runners": "Runners",
         "Version": "Version",
-        "DownloadNode":"Download Node"
+        "DownloadNode":"Download Node",
+        "UpgradeRequired": "Upgrade Required",
+        "UpgradeRequiredHint": "The Server and Nodes must be on the same version"
       },
       "Fields": {
         "FlowRunners": "Flow Runners",
@@ -613,11 +632,27 @@
     "Tasks": {
       "Title": "Tasks",
       "Messages": {
-        "NoScripts":"No scripts found to create a task for."
+        "NoScripts":"No scripts found to create a task for.",
+        "NoHistory": "This task has no run history available."
       }
     },
     "FileFlowsTask":{
       "Title":"Task"
+    },
+    "FileFlowsTaskHistory": {
+      "Title": "Task History",
+      "Fields": {
+        "RunHistory": "History"
+      }
+    },
+    "FileFlowsTaskRun": {
+      "Title": "Task Run",
+      "Fields": {
+        "RunAt": "Run At",
+        "Success": "Success",
+        "ReturnValue": "Return Value",
+        "Log": "Log"
+      }
     },
     "Task":{ 
       "Title":"Task",

@@ -166,7 +166,10 @@ public class Runner
     public async Task Finish()
     {
         if (nodeParameters?.Logger is FlowLogger fl)
+        {
             Info.Log = fl.ToString();
+            await fl.Flush();
+        }
 
         if(nodeParameters?.OriginalMetadata != null)
             Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;
@@ -235,12 +238,12 @@ public class Runner
         Info.CurrentPart = step;
         try
         {
-            var service = FlowRunnerService.Load();
-            service.Update(Info);
+            SendUpdate(Info, waitMilliseconds: 1000);
         }
-        catch (Exception) 
+        catch (Exception ex) 
         { 
             // silently fail, not a big deal, just incremental progress update
+            Logger.Instance.WLog("Failed to record step change: " + step + " : " + partName);
         }
     }
 
@@ -249,17 +252,44 @@ public class Runner
         float diff = Math.Abs(Info.CurrentPartPercent - percentage);
         if (diff < 0.1)
             return; // so small no need to tell server about update;
+        if (LastUpdate > DateTime.Now.AddSeconds(-2))
+            return; // limit updates to one every 2 seconds
 
         Info.CurrentPartPercent = percentage;
 
-        try 
-        { 
-            var service = FlowRunnerService.Load();
-            service.Update(Info);
+        try
+        {
+            SendUpdate(Info);
         }
         catch (Exception)
         {
             // silently fail, not a big deal, just incremental progress update
+        }
+    }
+
+    private DateTime LastUpdate;
+    private SemaphoreSlim UpdateSemaphore = new SemaphoreSlim(1);
+    
+    private void SendUpdate(FlowExecutorInfo info, int waitMilliseconds = 50)
+    {
+        if (UpdateSemaphore.Wait(waitMilliseconds) == false)
+        {
+            Logger.Instance.DLog("Failed to wait for SendUpdate semaphore");
+            return;
+        }
+
+        try
+        {
+            LastUpdate = DateTime.Now;
+            var service = FlowRunnerService.Load();
+            service.Update(info);
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            UpdateSemaphore.Release();
         }
     }
 
@@ -279,9 +309,8 @@ public class Runner
         {
             try
             {
-                var service = FlowRunnerService.Load();
                 CalculateFinalSize();
-                service.Update(Info);
+                SendUpdate(Info, waitMilliseconds: 1000);
                 Logger.Instance?.DLog("Set final status to: " + status);
                 return;
             }
@@ -307,7 +336,8 @@ public class Runner
         nodeParameters.ScriptExecutor = new ScriptExecutor()
         {
             SharedDirectory = Path.Combine(Info.ConfigDirectory, "Scripts", "Shared"),
-            FileFlowsUrl = Service.ServiceBaseUrl
+            FileFlowsUrl = Service.ServiceBaseUrl,
+            PluginMethodInvoker = PluginMethodInvoker
         };
         foreach (var variable in Info.Config.Variables)
         {
@@ -542,43 +572,12 @@ public class Runner
 
     private void DownloadScripts()
     {
-        //var service = ScriptService.Load();
-        //DateTime start = DateTime.Now;
         if (Directory.Exists(nodeParameters.TempPath) == false)
             Directory.CreateDirectory(nodeParameters.TempPath);
         
         DirectoryHelper.CopyDirectory(
             Path.Combine(Info.ConfigDirectory, "Scripts"),
             Path.Combine(nodeParameters.TempPath, "Scripts"));
-
-        // ScriptDir = Path.Combine(nodeParameters.TempPath, "Scripts");
-        // if (Directory.Exists(ScriptDir) == false)
-        //     Directory.CreateDirectory(ScriptDir);
-        
-        
-        // ScriptSharedDir = Path.Combine(ScriptDir, "Shared");
-        // if (Directory.Exists(ScriptSharedDir) == false)
-        //     Directory.CreateDirectory(ScriptSharedDir);
-        //
-        // ScriptFlowDir = Path.Combine(ScriptDir, "Flow");
-        // if (Directory.Exists(ScriptFlowDir) == false)
-        //     Directory.CreateDirectory(ScriptFlowDir);
-
-        // var allScripts = service.GetScripts().Result?.ToArray() ?? new Script[] { };
-        // var shared = allScripts.Where(x => x.Type == ScriptType.Shared);
-        // foreach (var script in shared)
-        // {
-        //     File.WriteAllText(Path.Combine(ScriptSharedDir, script.Name + ".js"), script.Code);
-        // }
-        //
-        // var flowScripts = allScripts.Where(x => x.Type == ScriptType.Flow);
-        // foreach (var script in flowScripts)
-        // {
-        //     File.WriteAllText(Path.Combine(ScriptFlowDir, script.Name + ".js"), script.Code);
-        // }
-        //
-        // TimeSpan timeTaken = DateTime.Now - start;
-        // nodeParameters.Logger?.ILog("Time taken to download scripts: " + timeTaken.ToString());
     }
     
     private void DownloadPlugins()
@@ -591,88 +590,7 @@ public class Runner
             string dest = Path.Combine(nodeParameters.TempPath, sub.Name);
             ServerShared.Helpers.DirectoryHelper.CopyDirectory(sub.FullName, dest);
         }
-        // var service = PluginService.Load();
-        // var plugins = service.GetAll().Result;
-        // DateTime start = DateTime.Now;
-        // List<Task<bool>> tasks = new List<Task<bool>>();
-        // foreach (var plugin in plugins)
-        // {
-        //     tasks.Add(DownloadPlugin(service, plugin));
-        // }
-        //
-        // Task.WaitAll(tasks.ToArray());
-        // TimeSpan timeTaken = DateTime.Now - start;
-        // nodeParameters.Logger?.ILog("Time taken to download plugins: " + timeTaken.ToString());
     }
-
-
-    // private async Task<bool> DownloadPlugin(IPluginService service, PluginInfo plugin)
-    // {
-    //     try
-    //     {
-    //         bool windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-    //         bool macOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-    //         bool is64bit = IntPtr.Size == 8;
-    //
-    //         DateTime dtDownload = DateTime.Now;
-    //         nodeParameters.Logger?.ILog($"Plugin: {plugin.PackageName} ({plugin.Version})");
-    //         if (Directory.Exists(nodeParameters.TempPath) == false)
-    //             Directory.CreateDirectory(nodeParameters.TempPath);
-    //         string file = Path.Combine(nodeParameters.TempPath, $"{plugin.PackageName}.ffplugin");
-    //         var data = await service.Download(plugin);
-    //         if (data == null || data.Length == 0)
-    //         {
-    //             nodeParameters.Logger?.ELog("Failed to download plugin: " + plugin.PackageName);
-    //             return false;
-    //         }
-    //
-    //         string destDir = Path.Combine(nodeParameters.TempPath, plugin.PackageName);
-    //
-    //         FileHelper.CreateDirectoryIfNotExists(nodeParameters.Logger, destDir);
-    //
-    //         FileHelper.SaveFile(nodeParameters.Logger, file, data);
-    //         
-    //         nodeParameters.Logger?.ILog($"Time taken to download plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtDownload)));
-    //
-    //         DateTime dtExtract = DateTime.Now;
-    //         FileHelper.ExtractFile(nodeParameters.Logger, file, destDir);
-    //         File.Delete(file);
-    //
-    //         // check if there are runtime specific files that need to be moved
-    //         foreach (string rdir in windows ? new[] { "win", "win-" + (is64bit ? "x64" : "x86") } : macOs ? new[] { "osx-x64" } : new string[] { "linux-x64", "linux" })
-    //         {
-    //             var runtimeDir = new DirectoryInfo(Path.Combine(destDir, "runtimes", rdir));
-    //             nodeParameters.Logger?.ILog("Searching for runtime directory: " + runtimeDir.FullName);
-    //             if (runtimeDir.Exists)
-    //             {
-    //                 foreach (var rfile in runtimeDir.GetFiles("*.*", SearchOption.AllDirectories))
-    //                 {
-    //                     try
-    //                     {
-    //                         if (Regex.IsMatch(rfile.Name, @"\.(dll|so)$") == false)
-    //                             continue;
-    //
-    //                         nodeParameters.Logger?.ILog("Trying to move file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
-    //                         rfile.MoveTo(Path.Combine(destDir, rfile.Name));
-    //                         nodeParameters.Logger?.ILog("Moved file: \"" + rfile.FullName + "\" to \"" + destDir + "\"");
-    //                     }
-    //                     catch (Exception ex)
-    //                     {
-    //                         nodeParameters.Logger?.ILog("Failed to move file: " + ex.Message);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         nodeParameters.Logger?.ILog($"Time taken to extract plugin '{plugin.PackageName}': " + (DateTime.Now.Subtract(dtExtract)));
-    //
-    //         return true;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         nodeParameters.Logger.ILog($"Failed downloading pugin '{plugin.Name}': " + ex.Message);
-    //         return false;
-    //     }
-    // }
 
     private Type? GetNodeType(string fullName)
     {
@@ -683,7 +601,7 @@ public class Runner
                 //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
                 var assembly = Assembly.LoadFrom(dll.FullName);
                 var types = assembly.GetTypes();
-                var pluginType = types.Where(x => x.IsAbstract == false && x.FullName == fullName).FirstOrDefault();
+                var pluginType = types.FirstOrDefault(x => x.IsAbstract == false && x.FullName == fullName);
                 if (pluginType != null)
                     return pluginType;
             }
@@ -758,5 +676,45 @@ public class Runner
         if (file.Exists == false)
             return string.Empty;
         return File.ReadAllText(file.FullName);
+    }
+
+    private object PluginMethodInvoker(string plugin, string method, object[] args)
+    {
+        var dll = new DirectoryInfo(WorkingDir).GetFiles(plugin + ".dll", SearchOption.AllDirectories).FirstOrDefault();
+        if (dll == null)
+        {
+            Logger.Instance.ELog("Failed to locate plugin: " + plugin);
+            return null;
+        }
+
+        try
+        {
+            //var assembly = Context.LoadFromAssemblyPath(dll.FullName);
+            var assembly = Assembly.LoadFrom(dll.FullName);
+            var type = assembly.GetTypes().FirstOrDefault(x => x.Name == "StaticMethods");
+            if (type == null)
+            {
+                Logger.Instance.ELog("No static methods found in plugin: " + plugin);
+                return null;
+            }
+
+            var methodInfo = type.GetMethod(method, BindingFlags.Public | BindingFlags.Static);
+            if (methodInfo == null)
+            {
+                Logger.Instance.ELog($"Method not found in plugin: {plugin}.{method}");
+                return null;
+            }
+
+            var result = methodInfo.Invoke(null, new[]
+            {
+                nodeParameters
+            }.Union(args ?? new object[] { }).ToArray());
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog($"Error executing plugin method [{plugin}.{method}]: " + ex.Message);
+            return null;
+        }
     }
 }

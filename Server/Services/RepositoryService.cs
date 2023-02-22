@@ -35,8 +35,16 @@ class RepositoryService
         }
         catch (Exception ex)
         {
-            Logger.Instance.ELog("Error getting repository: " + ex.Message);
-            throw;
+            Logger.Instance.WLog("Error getting repository: " + ex.Message);
+            return new FileFlowsRepository()
+            {
+                FlowScripts = new(),
+                FlowTemplates = new(),
+                FunctionScripts = new(),
+                LibraryTemplates = new(),
+                SharedScripts = new(),
+                SystemScripts = new()
+            };
         }
     }
 

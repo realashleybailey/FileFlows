@@ -38,6 +38,11 @@ public abstract class DbManager
     public virtual bool UseTop => false;
 
     /// <summary>
+    /// Gets the method for random in the SQL
+    /// </summary>
+    public virtual string RandomMethod => "RANDOM()";
+
+    /// <summary>
     /// Method used by the manager to extract a json variable, mysql/mariadb use JSON_EXTRACT
     /// </summary>
     protected virtual string JsonExtractMethod => "JSON_EXTRACT";

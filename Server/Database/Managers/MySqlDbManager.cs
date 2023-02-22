@@ -29,6 +29,11 @@ public class MySqlDbManager: DbManager
 ";
     
     /// <summary>
+    /// Gets the method for random in the SQL
+    /// </summary>
+    public override string RandomMethod => "RAND()";
+    
+    /// <summary>
     /// Creates an instance of a MySqlDbManager
     /// </summary>
     /// <param name="connectionString">a mysql connection string</param>

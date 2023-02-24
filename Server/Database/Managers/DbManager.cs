@@ -1049,4 +1049,11 @@ public abstract class DbManager
         await db.Db.ExecuteAsync(sql);
     }
 
+    /// <summary>
+    /// Gets if a column exists in the given table
+    /// </summary>
+    /// <param name="table">the table name</param>
+    /// <param name="column">the column to look for</param>
+    /// <returns>true if it exists, otherwise false</returns>
+    public abstract Task<bool> ColumnExists(string table, string column);
 }

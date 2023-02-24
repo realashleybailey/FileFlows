@@ -21,6 +21,8 @@ public class Upgrade_1_0_9
     private void AddLibraryFileFlags()
     {
         var manager = DbHelper.GetDbManager();
+        if (manager.ColumnExists("LibraryFile", "Flags").Result)
+            return;
 
         try
         {

@@ -22,6 +22,8 @@ public class Upgrade_1_0_10
     private void AddFinalFingerPrintField()
     {
         var manager = DbHelper.GetDbManager();
+        if (manager.ColumnExists("LibraryFile", "FinalFingerprint").Result)
+            return;
 
         string sql = "ALTER TABLE LibraryFile " +
                      " ADD FinalFingerprint               VARCHAR(255) ";

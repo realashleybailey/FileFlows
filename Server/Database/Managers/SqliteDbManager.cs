@@ -207,4 +207,17 @@ public class SqliteDbManager : DbManager
 
         return results;
     }
+    
+    /// <summary>
+    /// Gets if a column exists in the given table
+    /// </summary>
+    /// <param name="table">the table name</param>
+    /// <param name="column">the column to look for</param>
+    /// <returns>true if it exists, otherwise false</returns>
+    public override async Task<bool> ColumnExists(string table, string column)
+    {
+        using var db = await GetDb();
+        bool exists = db.Db.ExecuteScalar<int>("SELECT COUNT(*) AS CNTREC FROM pragma_table_info(@0) WHERE name=@1", table, column) > 0;
+        return exists;
+    }
 }

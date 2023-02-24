@@ -370,7 +370,9 @@ public class MySqlDbManager: DbManager
     public override async Task<bool> ColumnExists(string table, string column)
     {
         using var db = await GetDb();
-        bool exists = db.Db.Execute($"SHOW COLUMNS FROM {table} LIKE @0", column) > 0;
+        int result = db.Db.Execute($"SHOW COLUMNS FROM {table} LIKE @0", column);
+        Logger.Instance.ILog("Result of show columns: " + result);
+        bool exists = result > 0;
         return exists;
     }
 }

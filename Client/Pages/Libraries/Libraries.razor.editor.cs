@@ -45,7 +45,6 @@ public partial class Libraries : ListPage<Guid, Library>
     private async Task<List<ElementField>> TabGeneral(Library library, IEnumerable<ListOption> flowOptions)
     {
         List<ElementField> fields = new List<ElementField>();
-#if (!DEMO)
         if (library == null || library.Uid == Guid.Empty)
         {
             // adding
@@ -107,7 +106,7 @@ public partial class Libraries : ListPage<Guid, Library>
                 Blocker.Hide();
             }
         }
-#endif
+        
         fields.Add(new ElementField
         {
             InputType = FormInputType.Text,

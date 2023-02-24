@@ -168,6 +168,7 @@ public class LibraryFileController : Controller //ControllerStore<LibraryFile>
         existing.HoldUntil = file.HoldUntil;
         existing.Order = file.Order;
         existing.Fingerprint = file.Fingerprint;
+        existing.FinalFingerprint = file.FinalFingerprint;
         existing.OriginalSize = file.OriginalSize;
         existing.ExecutedNodes = file.ExecutedNodes ?? new List<ExecutedNode>();
         if (file.OriginalMetadata?.Any() == true)

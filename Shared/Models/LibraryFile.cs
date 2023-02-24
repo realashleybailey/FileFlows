@@ -135,6 +135,11 @@ public class LibraryFile : FileFlowObject
     /// Gets or sets the fingerprint of the file
     /// </summary>
     public string Fingerprint { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the final fingerprint of the file
+    /// </summary>
+    public string FinalFingerprint { get; set; }
 
     /// <summary>
     /// Gets or sets the node tha this processing/has processed the file

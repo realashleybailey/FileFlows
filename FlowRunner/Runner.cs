@@ -175,6 +175,9 @@ public class Runner
             Info.LibraryFile.OriginalMetadata = nodeParameters.OriginalMetadata;
         if (nodeParameters?.Metadata != null)
             Info.LibraryFile.FinalMetadata = nodeParameters.Metadata;
+        // calculates the final finger print
+        Info.LibraryFile.FinalFingerprint =
+            FileFlows.ServerShared.Helpers.FileHelper.CalculateFingerprint(Info.LibraryFile.OutputPath);
 
         await Complete();
         OnFlowCompleted?.Invoke(this, Info.LibraryFile.Status == FileStatus.Processed);

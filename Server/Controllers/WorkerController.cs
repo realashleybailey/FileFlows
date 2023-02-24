@@ -145,6 +145,7 @@ public class WorkerController : Controller
                     libfile.FinalSize = info.LibraryFile.FinalSize;
                 libfile.OutputPath = info.LibraryFile.OutputPath;
                 libfile.Fingerprint = info.LibraryFile.Fingerprint;
+                libfile.FinalFingerprint = info.LibraryFile.FinalFingerprint;
                 libfile.ExecutedNodes = info.LibraryFile.ExecutedNodes ?? new List<ExecutedNode>();
                 if (info.LibraryFile.OriginalMetadata != null)
                     libfile.OriginalMetadata = info.LibraryFile.OriginalMetadata;

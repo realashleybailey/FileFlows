@@ -55,6 +55,7 @@ CREATE TABLE LibraryFile
     Status              int                NOT NULL,
     ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL,
+    FinalFingerprint    VARCHAR(255)       COLLATE utf8_unicode_ci      NOT NULL        DEFAULT(''),
     IsDirectory         boolean            not null,
     Flags               int                not null                     DEFAULT(0),
     

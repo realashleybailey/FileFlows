@@ -45,6 +45,7 @@ CREATE TABLE LibraryFile
     Status              int                NOT NULL,
     ProcessingOrder     int                NOT NULL,
     Fingerprint         VARCHAR(255)       NOT NULL,
+    FinalFingerprint    VARCHAR(255)       NOT NULL         DEFAULT(''),
     IsDirectory         boolean            not null,
     Flags               int                not null         DEFAULT(0),
     

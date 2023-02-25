@@ -17,6 +17,8 @@ public class LogToHtml
     {
         StringBuilder colorized = new StringBuilder();
 
+        log = Regex.Replace(log, @"(?<=([^\s]))([\d]{4}\-[\d]{2}\-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}\.[\d]+)", "\n$1");
+
         foreach (var line in log.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
         {
             try

@@ -369,10 +369,16 @@ public class MySqlDbManager: DbManager
     /// <returns>true if it exists, otherwise false</returns>
     public override async Task<bool> ColumnExists(string table, string column)
     {
+        string dbName = GetDatabaseName(this.ConnectionString);
         using var db = await GetDb();
-        var result = db.Db.FirstOrDefault<dynamic>($"SHOW COLUMNS FROM {table} LIKE @0", column);
-        Logger.Instance.ILog("Result of show columns: " + (result != null));
-        bool exists = result != null;
+        var result = db.Db.ExecuteScalar<int>($@"SELECT count(*) 
+        FROM information_schema.COLUMNS 
+        WHERE 
+            TABLE_SCHEMA = @0 
+        AND TABLE_NAME = @1 
+        AND COLUMN_NAME = @2", dbName, table, column);
+        Logger.Instance.ILog($"Result of columns exists '{table}.{column}': " + (result > 0));
+        bool exists = result > 0;
         return exists;
     }
 }

@@ -38,6 +38,11 @@ public abstract class DbManager
     public virtual bool UseTop => false;
 
     /// <summary>
+    /// Gets the method for random in the SQL
+    /// </summary>
+    public virtual string RandomMethod => "RANDOM()";
+
+    /// <summary>
     /// Method used by the manager to extract a json variable, mysql/mariadb use JSON_EXTRACT
     /// </summary>
     protected virtual string JsonExtractMethod => "JSON_EXTRACT";
@@ -1044,4 +1049,11 @@ public abstract class DbManager
         await db.Db.ExecuteAsync(sql);
     }
 
+    /// <summary>
+    /// Gets if a column exists in the given table
+    /// </summary>
+    /// <param name="table">the table name</param>
+    /// <param name="column">the column to look for</param>
+    /// <returns>true if it exists, otherwise false</returns>
+    public abstract Task<bool> ColumnExists(string table, string column);
 }

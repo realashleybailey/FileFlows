@@ -29,6 +29,11 @@ public class MySqlDbManager: DbManager
 ";
     
     /// <summary>
+    /// Gets the method for random in the SQL
+    /// </summary>
+    public override string RandomMethod => "RAND()";
+    
+    /// <summary>
     /// Creates an instance of a MySqlDbManager
     /// </summary>
     /// <param name="connectionString">a mysql connection string</param>
@@ -353,5 +358,27 @@ public class MySqlDbManager: DbManager
                 $"update DbObject set Data = json_set(Data, '$.LastSeen', '{dt}') where Type = 'FileFlows.Shared.Models.ProcessingNode' and Uid = '{uid}'";
             await db.Db.ExecuteAsync(sql);
         }
+    }
+
+
+    /// <summary>
+    /// Gets if a column exists in the given table
+    /// </summary>
+    /// <param name="table">the table name</param>
+    /// <param name="column">the column to look for</param>
+    /// <returns>true if it exists, otherwise false</returns>
+    public override async Task<bool> ColumnExists(string table, string column)
+    {
+        string dbName = GetDatabaseName(this.ConnectionString);
+        using var db = await GetDb();
+        var result = db.Db.ExecuteScalar<int>($@"SELECT count(*) 
+        FROM information_schema.COLUMNS 
+        WHERE 
+            TABLE_SCHEMA = @0 
+        AND TABLE_NAME = @1 
+        AND COLUMN_NAME = @2", dbName, table, column);
+        Logger.Instance.ILog($"Result of columns exists '{table}.{column}': " + (result > 0));
+        bool exists = result > 0;
+        return exists;
     }
 }

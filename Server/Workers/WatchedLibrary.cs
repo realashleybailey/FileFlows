@@ -294,10 +294,21 @@ public class WatchedLibrary:IDisposable
             if (Library.UseFingerprinting && (creationDiff > 5 || writeDiff > 5))
             {
                 // file has been modified, recalculate the fingerprint to see if it needs to be reprocessed
-                fingerprint = ServerShared.Helpers.FileHelper.CalculateFingerprint(fullpath);
-                if (fingerprint?.EmptyAsNull() != knownFile.Fingerprint?.EmptyAsNull())
+                fingerprint = FileHelper.CalculateFingerprint(fullpath);
+                if (
+                    string.IsNullOrEmpty(knownFile.FinalFingerprint) == false // only check this after FF-425 and we have the final fingerprint  
+                    && fingerprint?.EmptyAsNull() != knownFile.Fingerprint?.EmptyAsNull() // fingerprint doesnt match original
+                    && fingerprint?.EmptyAsNull() != knownFile.FinalFingerprint // fingerprint doesnt match the final fingerprint we have saved for it
+                    )
                 {
-                    Logger.Instance.ILog($"File '{fullpath}' has been modified since last was processed by FileFlows, marking for reprocessing");
+                    // so if we have the final fingerprint, and the current fingerprint doesnt match the 
+                    // 1. original = in case the final action copies or moves a newly created file to another directory,
+                    //    then the original file should remain with original fingerprint
+                    // 2. final fingerprint = if the user chose to replace original, the original file now should have 
+                    //    the final fingerprint as its fingerprint
+                    // so this file doesnt match either fingerprints, therefore, we must reprocess it.
+                    Logger.Instance.ILog(
+                        $"File '{fullpath}' has been modified since last was processed by FileFlows, marking for reprocessing");
                     needsReprocessing = true;
                 }
             }

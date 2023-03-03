@@ -90,119 +90,6 @@ public partial class LibraryFileService : ILibraryFileService
     }
     
     /// <summary>
-    /// Gets the next library file queued for processing
-    /// </summary>
-    /// <param name="nodeName">The name of the node requesting a library file</param>
-    /// <param name="nodeUid">The UID of the node</param>
-    /// <param name="workerUid">The UID of the worker on the node</param>
-    /// <returns>If found, the next library file to process, otherwise null</returns>
-    private async Task<LibraryFile> GetNextLibraryFile(string nodeName, Guid nodeUid, Guid workerUid)
-    {
-        var node = await new NodeController().Get(nodeUid);
-        var nodeLibraries = node.Libraries?.Select(x => x.Uid)?.ToList() ?? new List<Guid>();
-        var libraries = (await new LibraryController().GetAll()).ToArray();
-        int quarter = TimeHelper.GetCurrentQuarter();
-        var canProcess = libraries.Where(x =>
-        {
-            if (x.Enabled == false)
-                return false;
-            if (x.Schedule?.Length == 672 && x.Schedule[quarter] == '0')
-                return false;
-            if (node.AllLibraries == ProcessingLibraries.All)
-                return true;
-            if (node.AllLibraries == ProcessingLibraries.Only)
-                return nodeLibraries.Contains(x.Uid);
-            return nodeLibraries.Contains(x.Uid) == false;
-        }).ToArray();
-        
-        var canForceProcess = libraries.Where(x =>
-        {
-            if (node.AllLibraries == ProcessingLibraries.All)
-                return true;
-            if (node.AllLibraries == ProcessingLibraries.Only)
-                return nodeLibraries.Contains(x.Uid);
-            return nodeLibraries.Contains(x.Uid) == false;
-        }).ToArray();
-        
-        if (canProcess.Any() != true && canForceProcess.Any() != true)
-            return null;
-
-        string libraryUids = string.Join(",", canProcess.Select(x => "'" + x.Uid + "'"));
-        string forceLibraryUids  = string.Join(",", canForceProcess.Select(x => "'" + x.Uid + "'"));
-        
-        await GetNextSemaphore.WaitAsync();
-        try
-        {
-            var executing = WorkerController.ExecutingLibraryFiles();
-            var execAndWhere = executing?.Any() != true
-                ? string.Empty
-                : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => "'" + x + "'")) + ") ");
-
-            if (node.MaxFileSizeMb > 0)
-                execAndWhere += $" and OriginalSize <= {node.MaxFileSizeMb * (1_000_000)} ";
-
-            string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " +
-                         SqlHelper.Now() + " and (";
-
-            if (canProcess.Any())
-                sql += $" LibraryUId in ({libraryUids}) or ";
-
-            sql += $" ( LibraryUid in ({forceLibraryUids}) and (Flags & 1) = 1 )";
-
-            sql += ") " + execAndWhere + " order by " + UNPROCESSED_ORDER_BY;
-
-            var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
-            if (libFile == null)
-                return null;
-
-            // check the library this file belongs, we may have to grab a different file from this library
-            var library = libraries.FirstOrDefault(x => x.Uid == libFile.LibraryUid);
-            if (libFile.Order < 1 && library != null && library.ProcessingOrder != ProcessingOrder.AsFound)
-            {
-                // need to change the order up
-                bool orderGood = true;
-                sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
-                      execAndWhere +
-                      $" and LibraryUid = '{library.Uid}' order by ";
-                if (library.ProcessingOrder == ProcessingOrder.Random)
-                    sql += " " + SqlHelper.Random() + " ";
-                else if (library.ProcessingOrder == ProcessingOrder.LargestFirst)
-                    sql += " OriginalSize desc ";
-                else if (library.ProcessingOrder == ProcessingOrder.SmallestFirst)
-                    sql += " OriginalSize ";
-                else if (library.ProcessingOrder == ProcessingOrder.NewestFirst)
-                    sql += " LibraryFile.DateCreated desc ";
-                else if (library.ProcessingOrder == ProcessingOrder.OldestFirst)
-                    sql += " LibraryFile.DateCreated asc ";
-                else
-                    orderGood = false;
-
-                if (orderGood)
-                {
-                    libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
-                    if (libFile == null)
-                        return null;
-                }
-            }
-
-            await Database_Execute("update LibraryFile set NodeUid = @0 , NodeName = @1 , WorkerUid = @2 " +
-                                   $" , Status = @3 , ProcessingStarted = @4, OriginalMetadata = '', FinalMetadata = '', ExecutedNodes = '' where Uid = @5",
-                nodeUid, nodeName, workerUid, (int)FileStatus.Processing, DateTime.Now, libFile.Uid);
-
-            return libFile;
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.ELog("Failed getting next file for processing: " + ex.Message);
-            throw;
-        }
-        finally
-        {
-            GetNextSemaphore.Release();
-        }
-    }
-
-    /// <summary>
     /// Saves the full library file log
     /// </summary>
     /// <param name="uid">The UID of the library file</param>
@@ -345,6 +232,135 @@ public partial class LibraryFileService : ILibraryFileService
     public async Task<IEnumerable<Guid>> GetUids()
         => await Database_Fetch<Guid>("select Uid from LibraryFile");
 
+    
+    /// <summary>
+    /// Gets the next library file queued for processing
+    /// </summary>
+    /// <param name="nodeName">The name of the node requesting a library file</param>
+    /// <param name="nodeUid">The UID of the node</param>
+    /// <param name="workerUid">The UID of the worker on the node</param>
+    /// <returns>If found, the next library file to process, otherwise null</returns>
+    private async Task<LibraryFile> GetNextLibraryFile(string nodeName, Guid nodeUid, Guid workerUid)
+    {
+        var node = await new NodeController().Get(nodeUid);
+        var nodeLibraries = node.Libraries?.Select(x => x.Uid)?.ToList() ?? new List<Guid>();
+        var libraries = (await new LibraryController().GetAll()).ToArray();
+        int quarter = TimeHelper.GetCurrentQuarter();
+        var canProcess = libraries.Where(x =>
+        {
+            if (x.Enabled == false)
+                return false;
+            if (x.Schedule?.Length == 672 && x.Schedule[quarter] == '0')
+                return false;
+            if (node.AllLibraries == ProcessingLibraries.All)
+                return true;
+            if (node.AllLibraries == ProcessingLibraries.Only)
+                return nodeLibraries.Contains(x.Uid);
+            return nodeLibraries.Contains(x.Uid) == false;
+        }).ToArray();
+        
+        var canForceProcess = libraries.Where(x =>
+        {
+            if (node.AllLibraries == ProcessingLibraries.All)
+                return true;
+            if (node.AllLibraries == ProcessingLibraries.Only)
+                return nodeLibraries.Contains(x.Uid);
+            return nodeLibraries.Contains(x.Uid) == false;
+        }).ToArray();
+        
+        if (canProcess.Any() != true && canForceProcess.Any() != true)
+            return null;
+
+        // string libraryUids = string.Join(",", canProcess.Select(x => "'" + x.Uid + "'"));
+        // string forceLibraryUids  = string.Join(",", canForceProcess.Select(x => "'" + x.Uid + "'"));
+        
+        await GetNextSemaphore.WaitAsync();
+        try
+        {
+            // var next = GetAll(FileStatus.Unprocessed,
+            //     0, 1,
+            //     allowedLibraries: canProcess.Select(x => x.Uid).ToList(),
+            //     maxSizeMBs: node.MaxFileSizeMb).Result;
+            //     
+            var executing = WorkerController.ExecutingLibraryFiles()?.ToList() ?? new List<Guid>();
+            
+            var libFile = GetAll(FileStatus.Unprocessed, 0, 1,
+                allowedLibraries: libraries.Select(x => x.Uid).ToList(),
+                exclusionUids: executing,
+                maxSizeMBs: node.MaxFileSizeMb).Result?.FirstOrDefault();
+            
+            // var execAndWhere = executing?.Any() != true
+            //     ? string.Empty
+            //     : (" and LibraryFile.Uid not in (" + string.Join(",", executing.Select(x => "'" + x + "'")) + ") ");
+            //
+            // if (node.MaxFileSizeMb > 0)
+            //     execAndWhere += $" and OriginalSize <= {node.MaxFileSizeMb * (1_000_000)} ";
+            //
+            // string sql = $"select * from LibraryFile {LIBRARY_JOIN} where Status = 0 and HoldUntil <= " +
+            //              SqlHelper.Now() + " and (";
+            //
+            // if (canProcess.Any())
+            //     sql += $" LibraryUId in ({libraryUids}) or ";
+            //
+            // sql += $" ( LibraryUid in ({forceLibraryUids}) and (Flags & 1) = 1 )";
+            //
+            // sql += ") " + execAndWhere + " order by " + UNPROCESSED_ORDER_BY;
+            //
+            // var libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
+            // if (libFile == null)
+            //     return null;
+            //
+            // // check the library this file belongs, we may have to grab a different file from this library
+            // var library = libraries.FirstOrDefault(x => x.Uid == libFile.LibraryUid);
+            // if (libFile.Order < 1 && library != null && library.ProcessingOrder != ProcessingOrder.AsFound)
+            // {
+            //     // need to change the order up
+            //     bool orderGood = true;
+            //     sql = $"select * from LibraryFile where Status = 0 and HoldUntil <= " + SqlHelper.Now() +
+            //           execAndWhere +
+            //           $" and LibraryUid = '{library.Uid}' order by ";
+            //     if (library.ProcessingOrder == ProcessingOrder.Random)
+            //         sql += " " + SqlHelper.Random() + " ";
+            //     else if (library.ProcessingOrder == ProcessingOrder.LargestFirst)
+            //         sql += " OriginalSize desc ";
+            //     else if (library.ProcessingOrder == ProcessingOrder.SmallestFirst)
+            //         sql += " OriginalSize ";
+            //     else if (library.ProcessingOrder == ProcessingOrder.NewestFirst)
+            //         sql += " LibraryFile.DateCreated desc ";
+            //     else if (library.ProcessingOrder == ProcessingOrder.OldestFirst)
+            //         sql += " LibraryFile.DateCreated asc ";
+            //     else
+            //         orderGood = false;
+            //
+            //     if (orderGood)
+            //     {
+            //         libFile = await Database_Get<LibraryFile>(SqlHelper.Limit(sql, 1));
+            //         if (libFile == null)
+            //             return null;
+            //     }
+            // }
+
+            if (libFile == null)
+                return null;
+
+            await Database_Execute("update LibraryFile set NodeUid = @0 , NodeName = @1 , WorkerUid = @2 " +
+                                   $" , Status = @3 , ProcessingStarted = @4, OriginalMetadata = '', FinalMetadata = '', ExecutedNodes = '' where Uid = @5",
+                nodeUid, nodeName, workerUid, (int)FileStatus.Processing, DateTime.Now, libFile.Uid);
+
+            return libFile;
+        }
+        catch (Exception ex)
+        {
+            Logger.Instance.ELog("Failed getting next file for processing: " + ex.Message);
+            throw;
+        }
+        finally
+        {
+            GetNextSemaphore.Release();
+        }
+    }
+
+    
     /// <summary>
     /// Gets all matching library files
     /// </summary>
@@ -352,8 +368,11 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="skip">the amount to skip</param>
     /// <param name="rows">the number to fetch</param>
     /// <param name="filter">[Optional] filter text</param>
+    /// <param name="allowedLibraries">[Optional] list of libraries to include</param>
+    /// <param name="maxSizeMBs">[Optional] maximum file size to include</param>
+    /// <param name="exclusionUids">[Optional] list of UIDs to exclude</param>
     /// <returns>a list of matching library files</returns>
-    public async Task<IEnumerable<LibraryFile>> GetAll(FileStatus?status, int skip = 0, int rows = 0, string filter = null)
+    public async Task<IEnumerable<LibraryFile>> GetAll(FileStatus? status, int skip = 0, int rows = 0, string filter = null, List<Guid> allowedLibraries = null, long? maxSizeMBs = null, List<Guid> exclusionUids = null)
     {
         try
         {
@@ -384,6 +403,9 @@ public partial class LibraryFileService : ILibraryFileService
             }
             
             var libraries = await new LibraryController().GetAll();
+            if (allowedLibraries?.Any() == true)
+                libraries = libraries.Where(x => allowedLibraries.Contains(x.Uid)).ToList();
+            
             var disabled = string.Join(", ",
                 libraries.Where(x => x.Enabled == false).Select(x => "'" + x.Uid + "'"));
             int quarter = TimeHelper.GetCurrentQuarter();
@@ -393,6 +415,13 @@ public partial class LibraryFileService : ILibraryFileService
             string sql = $"select * from LibraryFile where Status = {(int)FileStatus.Unprocessed}";
             if (hasFilter)
                 sql += " and " + filterWhere;
+
+            if (exclusionUids?.Any() == true)
+                sql +=
+                    $" and LibraryFile.Uid not in ({string.Join(",", exclusionUids.Select(x => "'" + x + "'").ToArray())}) ";
+            
+            if(maxSizeMBs is > 0)
+                sql += $" and OriginalSize <= {maxSizeMBs * 1_000_000} ";
             
             // add disabled condition
             if(string.IsNullOrEmpty(disabled) == false)
@@ -436,8 +465,9 @@ public partial class LibraryFileService : ILibraryFileService
                 return await Database_Fetch<LibraryFile>(SqlHelper.Skip(sql + " order by HoldUntil, DateModified", skip, rows));
 
             sql = sql.Replace("select * from LibraryFile", "select LibraryFile.* from LibraryFile  " + LIBRARY_JOIN);
-
-            sql = SqlHelper.Skip(sql + " order by " + UNPROCESSED_ORDER_BY, skip, rows);
+            
+            
+            sql = SqlHelper.Skip(sql + " order by " + GetUnprocessedOrderBy, skip, rows);
             return await Database_Fetch<LibraryFile>(sql);
         }
         catch (Exception ex)
@@ -594,7 +624,7 @@ public partial class LibraryFileService : ILibraryFileService
     /// <param name="fingerprint">the fingerprint of the library file</param>
     /// <returns>the library file if it is known</returns>
     public async Task<LibraryFile> GetFileByFingerprint(string fingerprint)
-        => await Database_Get<LibraryFile>(SqlHelper.Limit("select * from LibraryFile where fingerprint = @0", 1), fingerprint);
+        => await Database_Get<LibraryFile>(SqlHelper.Limit("select * from LibraryFile where fingerprint = @0 or finalfingerprint = @0", 1), fingerprint);
 
     /// <summary>
     /// Gets a list of all filenames and the file creation times

@@ -63,6 +63,8 @@ public class Upgrader
                 new Upgrade_1_0_5().Run2ndUpgrade(settings);
             if (currentVersion < new Version(1, 0, 9, 2190))  
                 new Upgrade_1_0_9().Run(settings);
+            if (currentVersion < new Version(1, 0, 10))  
+                new Upgrade_1_0_10().Run(settings);
         }
 
         // save the settings

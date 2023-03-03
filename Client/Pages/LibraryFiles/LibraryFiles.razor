@@ -151,12 +151,13 @@
                 <span>@(item.Status == null ? string.Empty : Translater.Instant("Enums.FileStatus." + item.Status))</span>
             </Cell>
         </FlowTableColumn>
-        <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@(SelectedStatus == FileStatus.Processed || App.Instance.IsMobile)">
+        <FlowTableColumn TItem="LibaryFileListModel" Width="min(6rem, 10vw)" Hidden="@App.Instance.IsMobile">
             <Header>
                 Size
             </Header>
             <Cell Context="item">
-                @{
+                @if (SelectedStatus == FileStatus.Processed)
+                {
                     long fs = item.FinalSize ?? 0;
                     long os = item.OriginalSize ?? 0;
                     int width = (int)((((double)fs) / os) * 100);
@@ -164,12 +165,16 @@
                     if (width > 100)
                         width = 100;
                     string toolTip = Helpers.FileSizeFormatter.FormatShrinkage(os, fs);
+                    if (fs > 0)
+                    {
+                        <div class="flow-bar @(bigger ? "grew" : "")" title="@toolTip">
+                            <div class="bar-value" style="width:calc(@(width)% - 2px)"></div>
+                        </div>
+                    }
                 }
-                @if (fs > 0)
+                else if(item.OriginalSize != null)
                 {
-                    <div class="flow-bar @(bigger ? "grew" : "")" title="@toolTip">
-                        <div class="bar-value" style="width:calc(@(width)% - 2px)"></div>
-                    </div>
+                    <span>@Helpers.FileSizeFormatter.FormatSize(item.OriginalSize.Value)</span>
                 }
             </Cell>
         </FlowTableColumn>

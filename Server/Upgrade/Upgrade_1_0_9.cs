@@ -21,10 +21,19 @@ public class Upgrade_1_0_9
     private void AddLibraryFileFlags()
     {
         var manager = DbHelper.GetDbManager();
+        if (manager.ColumnExists("LibraryFile", "Flags").Result)
+            return;
 
-        manager.Execute(@"
+        try
+        {
+            manager.Execute(@"
 ALTER TABLE LibraryFile
 ADD Flags               int                not null     DEFAULT(0)
 ".Trim(), null).Wait();
+        }
+        catch (Exception)
+        {
+            // FF-422 a user reported having this already, so silently ignore if this fails
+        }
     }
 }

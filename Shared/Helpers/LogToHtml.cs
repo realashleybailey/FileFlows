@@ -17,8 +17,13 @@ public class LogToHtml
     {
         StringBuilder colorized = new StringBuilder();
 
+        // fixes an issue with some lines not having newlines at the timestamps
+        log = Regex.Replace(log, @"(?<=([^\s]))([\d]{4}\-[\d]{2}\-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}\.[\d]+)", "\n$2");
+
         foreach (var line in log.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
         {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
             try
             {
                 colorized.Append("<div class=\"line\">");

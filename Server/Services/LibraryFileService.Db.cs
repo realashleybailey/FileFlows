@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using FileFlows.Server.Database.Managers;
 using FileFlows.Server.Helpers;
 using FileFlows.Shared.Models;
+using Jint.Runtime.Debugger;
 using NPoco;
 
 namespace FileFlows.Server.Services;
@@ -15,9 +16,17 @@ public partial class LibraryFileService
 
     private static SemaphoreSlim GetNextSemaphore = new (1);
 
-    private const string UNPROCESSED_ORDER_BY =
+    private string GetUnprocessedOrderBy =>
         " case when ProcessingOrder > 0 then ProcessingOrder " +
-        " else 1000000 end, JSON_EXTRACT(obj.Data, '$.Priority') desc, LibraryFile.DateModified desc";
+        " else 1000000 end, JSON_EXTRACT(obj.Data, '$.Priority') desc, " +
+        " case " +
+        $" when JSON_EXTRACT(obj.Data, '$.ProcessingOrder') = {(int)ProcessingOrder.Random} then " + DbHelper.GetDbManager().RandomMethod +
+        $" when JSON_EXTRACT(obj.Data, '$.ProcessingOrder') = {(int)ProcessingOrder.LargestFirst} then OriginalSize * -1 " +
+        $" when JSON_EXTRACT(obj.Data, '$.ProcessingOrder') = {(int)ProcessingOrder.SmallestFirst} then OriginalSize " +
+        $" when JSON_EXTRACT(obj.Data, '$.ProcessingOrder') = {(int)ProcessingOrder.NewestFirst} then LibraryFile.DateCreated " +
+        $" when JSON_EXTRACT(obj.Data, '$.ProcessingOrder') = {(int)ProcessingOrder.OldestFirst} then LibraryFile.DateCreated " +
+        " else LibraryFile.DateCreated " + 
+        " end ";
 
     private const string LIBRARY_JOIN =
         " left join DbObject obj on obj.Type = 'FileFlows.Shared.Models.Library' and LibraryFile.LibraryUid = obj.Uid ";

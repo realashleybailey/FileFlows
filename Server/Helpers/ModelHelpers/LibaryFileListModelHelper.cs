@@ -26,7 +26,8 @@ public class LibaryFileListModelHelper
                 Flow = x.Flow?.Name,
                 Library = x.Library?.Name,
                 RelativePath = x.RelativePath,
-                Name = x.Name
+                Name = x.Name,
+                OriginalSize = x.OriginalSize
             };
 
             if (status == FileStatus.Unprocessed || status == FileStatus.OutOfSchedule || status == FileStatus.Disabled)
@@ -61,7 +62,6 @@ public class LibaryFileListModelHelper
             if (status == FileStatus.Processed)
             {
                 item.FinalSize = x.FinalSize;
-                item.OriginalSize = x.OriginalSize;
                 item.OutputPath = x.OutputPath;
                 item.ProcessingTime = x.ProcessingTime;
                 item.Date = x.ProcessingEnded;

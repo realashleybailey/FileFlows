@@ -64,7 +64,7 @@ public class MainWindow : Window
     protected override void HandleWindowStateChanged(WindowState state)
     {
         base.HandleWindowStateChanged(state);
-        if(Globals.IsWindows && state == WindowState.Minimized)
+        if (Globals.IsWindows && state == WindowState.Minimized)
             this.Hide();
     }
 
@@ -111,7 +111,7 @@ public class MainWindow : Window
             {
                 await Task.Delay(1);
                 ConfirmedQuit = task.Result;
-                
+
                 if (ConfirmedQuit)
                 {
                     if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
@@ -125,7 +125,7 @@ public class MainWindow : Window
         {
             this._trayIcon.Menu = null;
             this._trayIcon.IsVisible = false;
-        
+
             base.OnClosing(e);
         }
     }
@@ -155,11 +155,15 @@ public class MainWindow : Window
         string url = AppSettings.Instance.ServerUrl;
         if (string.IsNullOrWhiteSpace(url))
             return;
-        
-        if (Globals.IsWindows)
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-        else
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            Process.Start("open", url);
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             Process.Start(new ProcessStartInfo("xdg-open", url));
+        else
+            return;
     }
 
 
@@ -172,7 +176,7 @@ public class MainWindow : Window
         this.Show();
         this.Close();
     }
-    
+
     /// <summary>
     /// Minimizes the application
     /// </summary>
@@ -180,7 +184,7 @@ public class MainWindow : Window
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             this.Hide();
-        else   
+        else
             this.WindowState = WindowState.Minimized;
     }
 
@@ -189,7 +193,7 @@ public class MainWindow : Window
     /// </summary>
     public async Task SaveRegister()
     {
-        if(Program.Manager != null && await Program.Manager.Register() == true)
+        if (Program.Manager != null && await Program.Manager.Register() == true)
         {
         }
     }
@@ -199,7 +203,7 @@ public class MainWindow : Window
     /// </summary>
     public void OpenLoggingDirectory()
     {
-        Process.Start(new ProcessStartInfo() 
+        Process.Start(new ProcessStartInfo()
         {
             FileName = DirectoryHelper.LoggingDirectory,
             UseShellExecute = true,
@@ -208,8 +212,8 @@ public class MainWindow : Window
     }
 }
 
-public class MainWindowViewModel:INotifyPropertyChanged
-{ 
+public class MainWindowViewModel : INotifyPropertyChanged
+{
     /// <summary>
     /// Gets or sets if a custom title should be rendered
     /// </summary>
@@ -270,7 +274,7 @@ public class MainWindowViewModel:INotifyPropertyChanged
             }
         }
     }
-    
+
     private bool _Enabled;
     /// <summary>
     /// Gets or sets if the Node is enabled
@@ -298,20 +302,20 @@ public class MainWindowViewModel:INotifyPropertyChanged
     /// </summary>
     public void Launch()
     {
-        if(string.IsNullOrWhiteSpace(ServerUrl) || ServerUrl == "http://")
+        if (string.IsNullOrWhiteSpace(ServerUrl) || ServerUrl == "http://")
             return;
-        
+
         if (Regex.IsMatch(ServerUrl, "^http(s)?://") == false)
             ServerUrl = "http://" + ServerUrl;
         if (ServerUrl.EndsWith("/") == false)
             ServerUrl += "/";
-        
+
         AppSettings.Instance.ServerUrl = ServerUrl;
 
         Window.Launch();
     }
 
-    
+
     /// <summary>
     /// Quits the application
     /// </summary>
@@ -332,19 +336,19 @@ public class MainWindowViewModel:INotifyPropertyChanged
     /// </summary>
     public void SaveRegister()
     {
-        if(string.IsNullOrWhiteSpace(ServerUrl) || string.IsNullOrWhiteSpace(TempPath) || ServerUrl == "http://")
+        if (string.IsNullOrWhiteSpace(ServerUrl) || string.IsNullOrWhiteSpace(TempPath) || ServerUrl == "http://")
             return;
-        
+
         if (Regex.IsMatch(ServerUrl, "^http(s)?://") == false)
             ServerUrl = "http://" + ServerUrl;
         if (ServerUrl.EndsWith("/") == false)
             ServerUrl += "/";
-        
+
         AppSettings.Instance.ServerUrl = ServerUrl;
         AppSettings.Instance.TempPath = TempPath;
         AppSettings.Instance.Runners = FlowRunners;
         AppSettings.Instance.Enabled = Enabled;
-        
+
         _ = Window.SaveRegister();
     }
 
@@ -356,7 +360,7 @@ public class MainWindowViewModel:INotifyPropertyChanged
     {
         this.Window = window;
         this.Version = "FileFlows Node Version: " + Globals.Version;
-        
+
         ServerUrl = AppSettings.Instance.ServerUrl;
         TempPath = AppSettings.Instance.TempPath;
         FlowRunners = AppSettings.Instance.Runners;

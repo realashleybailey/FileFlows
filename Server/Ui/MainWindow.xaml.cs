@@ -21,7 +21,7 @@ public class MainWindow : Window
     {
         _trayIcon = new TrayIcon();
         InitializeComponent();
-        
+
         var dc = new MainWindowViewModel(this)
         {
             CustomTitle = Globals.IsWindows
@@ -34,7 +34,7 @@ public class MainWindow : Window
         this.Height = dc.CustomTitle ? 260 : 230;
 
         DataContext = dc;
-        
+
         _trayIcon.IsVisible = true;
 
         _trayIcon.Icon = new WindowIcon(AvaloniaLocator.Current.GetService<IAssetLoader>()?.Open(new Uri($"avares://FileFlows.Server/Ui/icon.ico")));
@@ -76,7 +76,7 @@ public class MainWindow : Window
             {
                 await Task.Delay(1);
                 ConfirmedQuit = task.Result;
-                
+
                 if (ConfirmedQuit)
                 {
                     if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
@@ -90,7 +90,7 @@ public class MainWindow : Window
         {
             this._trayIcon.Menu = null;
             this._trayIcon.IsVisible = false;
-        
+
             base.OnClosing(e);
         }
     }
@@ -121,16 +121,18 @@ public class MainWindow : Window
         string url = $"http://{Environment.MachineName}:{WebServer.Port}/";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-        else
-        {
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            Process.Start("open", url);
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             Process.Start(new ProcessStartInfo("xdg-open", url));
-        }
+        else
+            return;
     }
 
     protected override void HandleWindowStateChanged(WindowState state)
     {
         base.HandleWindowStateChanged(state);
-        if(Globals.IsWindows && state == WindowState.Minimized)
+        if (Globals.IsWindows && state == WindowState.Minimized)
             this.Hide();
     }
 
@@ -148,13 +150,13 @@ public class MainWindow : Window
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             this.Hide();
-        else   
+        else
             this.WindowState = WindowState.Minimized;
     }
 }
 
 public class MainWindowViewModel
-{ 
+{
     /// <summary>
     /// Gets or sets if a custom title should be rendered
     /// </summary>
